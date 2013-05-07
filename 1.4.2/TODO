@@ -1,0 +1,18 @@
+/*
+BUGS:
+
+DEBUGS:
+
+FEATURES:
+	* Documentar la librería
+	- ¿Uso de GtkTreeModel en JBWArrayEditor?
+	- Optimizar uso de JBWArrayEditor
+	- Uso de autoconf
+	- Mostrar coordenadas en el paso del puntero por las gráficas
+	- Representación 3D
+	- Pestañas de guardado en gráficas con distintos formatos (bmp, jpg, ...)
+	- Leyenda en gráficas
+
+STYLE:
+
+*/
