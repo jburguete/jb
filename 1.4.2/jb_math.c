@@ -36,9 +36,9 @@
  * \fn int jbm_fcompare(JBDOUBLE a,JBDOUBLE b)
  * \brief Function to compare 2 float numbers.
  * \param a
- * \brief 1st float number.
+ * \brief 1st JBDOUBLE number.
  * \param b
- * \brief 2nd float number.
+ * \brief 2nd JBDOUBLE number.
  * \return 0 on the difference is lower than the 6th digit, else:
  * 	-1 on a < b, 1 on a > b
  */
@@ -48,12 +48,12 @@ int jbm_fcompare(JBDOUBLE a,JBDOUBLE b) {return _jbm_fcompare(a,b);}
 
 /**
  * \fn int jbm_max(int a,int b)
- * \brief Function to calculate the maximum of 2 ints.
+ * \brief Function to calculate the maximum of 2 int numbers.
  * \param a
  * \brief 1st int number.
  * \param b
  * \brief 2nd int number.
- * \return Maximum number
+ * \return Maximum number.
  */
 #if !INLINE_JBM_MAX
 int jbm_max(int a,int b) {return _jbm_max(a,b);}
@@ -61,12 +61,12 @@ int jbm_max(int a,int b) {return _jbm_max(a,b);}
 
 /**
  * \fn int jbm_min(int a,int b)
- * \brief Function to calculate the minimum of 2 ints.
+ * \brief Function to calculate the minimum of 2 int numbers.
  * \param a
  * \brief 1st int number.
  * \param b
  * \brief 2nd int number.
- * \return Minimum number
+ * \return Minimum number.
  */
 #if !INLINE_JBM_MIN
 int jbm_min(int a,int b) {return _jbm_min(a,b);}
@@ -74,12 +74,12 @@ int jbm_min(int a,int b) {return _jbm_min(a,b);}
 
 /**
  * \fn long int jbm_maxl(long int a,long int b)
- * \brief Function to calculate the maximum of 2 long ints.
+ * \brief Function to calculate the maximum of 2 long int numbers.
  * \param a
  * \brief 1st long int number.
  * \param b
  * \brief 2nd long int number.
- * \return Maximum number
+ * \return Maximum number.
  */
 #if !INLINE_JBM_MAXL
 long int jbm_maxl(long int a,long int b) {return _jbm_maxl(a,b);}
@@ -87,12 +87,12 @@ long int jbm_maxl(long int a,long int b) {return _jbm_maxl(a,b);}
 
 /**
  * \fn long int jbm_minl(long int a,long int b)
- * \brief Function to calculate the minimum of 2 long ints.
+ * \brief Function to calculate the minimum of 2 long int numbers.
  * \param a
  * \brief 1st long int number.
  * \param b
  * \brief 2nd long int number.
- * \return Minimum number
+ * \return Minimum number.
  */
 #if !INLINE_JBM_MINL
 long int jbm_minl(long int a,long int b) {return _jbm_minl(a,b);}
@@ -100,12 +100,12 @@ long int jbm_minl(long int a,long int b) {return _jbm_minl(a,b);}
 
 /**
  * \fn long long int jbm_maxll(long long int a,long long int b)
- * \brief Function to calculate the maximum of 2 long long ints.
+ * \brief Function to calculate the maximum of 2 long long int numbers.
  * \param a
  * \brief 1st long long int number.
  * \param b
  * \brief 2nd long long int number.
- * \return Maximum number
+ * \return Maximum number.
  */
 #if !INLINE_JBM_MAXLL
 long long int jbm_maxll(long long int a,long long int b)
@@ -114,31 +114,91 @@ long long int jbm_maxll(long long int a,long long int b)
 
 /**
  * \fn long long int jbm_minll(long long int a,long long int b)
- * \brief Function to calculate the minimum of 2 long long ints.
+ * \brief Function to calculate the minimum of 2 long long int numbers.
  * \param a
  * \brief 1st long long int number.
  * \param b
  * \brief 2nd long long int number.
- * \return Minimum number
+ * \return Minimum number.
  */
 #if !INLINE_JBM_MINLL
 long long int jbm_minll(long long int a,long long int b)
 {return _jbm_minll(a,b);}
 #endif
 
+/**
+ * \fn int jbm_modmin(int a,int b)
+ * \brief Function to calculate the number with the lower module in the [a, b]
+ *   interval (int arguments).
+ *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   0, & a\cdot b\le 0;\\
+ *   a, & a,b\ne 0,\;|a|<|b|;\\
+ *   b, & a,b\ne 0,\;|a|\ge|b|;
+ *   \end{array}\right.\f$.
+ * \param a
+ * \brief 1st int number.
+ * \param b
+ * \brief 2nd int number.
+ * \return Modmin number.
+ */
 #if !INLINE_JBM_MODMIN
 int jbm_modmin(int a,int b) {return _jbm_modmin(a,b);}
 #endif
 
+/**
+ * \fn int jbm_modminl(long int a,long int b)
+ * \brief Function to calculate the number with the lower module in the [a, b]
+ *   interval (long int arguments).
+ *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   0, & a\cdot b\le 0;\\
+ *   a, & a,b\ne 0,\;|a|<|b|;\\
+ *   b, & a,b\ne 0,\;|a|\ge|b|;
+ *   \end{array}\right.\f$.
+ * \param a
+ * \brief 1st long int number.
+ * \param b
+ * \brief 2nd long int number.
+ * \return Modmin number.
+ */
 #if !INLINE_JBM_MODMINL
 long int jbm_modminl(long int a,long int b) {return _jbm_modminl(a,b);}
 #endif
 
+/**
+ * \fn int jbm_modminll(long long int a,long long int b)
+ * \brief Function to calculate the number with the lower module in the [a, b]
+ *   interval (long long int arguments).
+ *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   0, & a\cdot b\le 0;\\
+ *   a, & a,b\ne 0,\;|a|<|b|;\\
+ *   b, & a,b\ne 0,\;|a|\ge|b|;
+ *   \end{array}\right.\f$.
+ * \param a
+ * \brief 1st long long int number.
+ * \param b
+ * \brief 2nd long long int number.
+ * \return Modmin number.
+ */
 #if !INLINE_JBM_MODMINLL
 long long int jbm_modminll(long long int a,long long int b)
 {return _jbm_modminll(a,b);}
 #endif
 
+/**
+ * \fn int jbm_modminll(JBDOUBLE a,JBDOUBLE b)
+ * \brief Function to calculate the number with the lower module in the [a, b]
+ *   interval (float arguments).
+ *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   0, & a\cdot b\le 0;\\
+ *   a, & a,b\ne 0,\;|a|<|b|;\\
+ *   b, & a,b\ne 0,\;|a|\ge|b|;
+ *   \end{array}\right.\f$.
+ * \param a
+ * \brief 1st JBDOUBLE number.
+ * \param b
+ * \brief 2nd JBDOUBLE number.
+ * \return Modmin number.
+ */
 #if !INLINE_JBM_FMODMIN
 JBDOUBLE jbm_fmodmin(JBDOUBLE a,JBDOUBLE b) {return _jbm_fmodmin(a,b);}
 #endif

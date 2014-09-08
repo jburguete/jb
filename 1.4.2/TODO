@@ -4,14 +4,13 @@ BUGS:
 DEBUGS:
 
 FEATURES:
-	* Documentar la librería
-	- ¿Uso de GtkTreeModel en JBWArrayEditor?
-	- Optimizar uso de JBWArrayEditor
-	- Uso de autoconf
-	- Mostrar coordenadas en el paso del puntero por las gráficas
-	- Representación 3D
+	* Documenting the library
+	- Using GtkTreeModel in JBWArrayEditor?
+	- Optimizing JBWArrayEditor
+	- Showing coordinates when moving the cursor over JBWGraphics
+	- 3D figures
+	- Legend in JBWGraphics
 	- Pestañas de guardado en gráficas con distintos formatos (bmp, jpg, ...)
-	- Leyenda en gráficas
 
 STYLE:
 

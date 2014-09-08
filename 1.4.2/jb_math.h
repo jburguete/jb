@@ -67,18 +67,33 @@
  * \def JBM_MODMIN
  * \brief Macro calculating the number with the lower module in the [a, b]
  *   interval (int arguments).
+ *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   0, & a\cdot b\le 0;\\
+ *   a, & a,b\ne 0,\;|a|<|b|;\\
+ *   b, & a,b\ne 0,\;|a|\ge|b|;
+ *   \end{array}\right.\f$.
  */
 #define JBM_MODMIN(a, b) (((a) * (b) <= 0)? 0: (abs(a) < abs(b))? (a): (b))
 /**
  * \def JBM_MODMINL
  * \brief Macro calculating the number with the lower module in the [a, b]
  *   interval (long int arguments).
+ *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   0, & a\cdot b\le 0;\\
+ *   a, & a,b\ne 0,\;|a|<|b|;\\
+ *   b, & a,b\ne 0,\;|a|\ge|b|;
+ *   \end{array}\right.\f$.
  */
 #define JBM_MODMINL(a, b) (((a) * (b) <= 0l)? 0l: (labs(a) < labs(b))? (a): (b))
 /**
  * \def JBM_MODMINLL
  * \brief Macro calculating the number with the lower module in the [a, b]
  *   interval (long long int arguments).
+ *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   0, & a\cdot b\le 0;\\
+ *   a, & a,b\ne 0,\;|a|<|b|;\\
+ *   b, & a,b\ne 0,\;|a|\ge|b|;
+ *   \end{array}\right.\f$.
  */
 #define JBM_MODMINLL(a, b) (((a) * (b) <= 0L)? 0L: \
 	(llabs(a) < llabs(b))? (a): (b))
@@ -86,6 +101,11 @@
  * \def JBM_FMODMIN
  * \brief Macro calculating the number with the lower module in the [a, b]
  *   interval (JBDOUBLE arguments).
+ *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   0, & a\cdot b\le 0;\\
+ *   a, & a,b\ne 0,\;|a|<|b|;\\
+ *   b, & a,b\ne 0,\;|a|\ge|b|;
+ *   \end{array}\right.\f$.
  */
 #if JB_PRECISION < 4
 	#define JBM_FMODMIN(a, b) (((a) * (b) <= 0.)? 0.: \
