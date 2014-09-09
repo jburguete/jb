@@ -38,7 +38,7 @@ PROJECT_NAME           = "JB"
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = "1.4.1"
+PROJECT_NUMBER         = "1.4.2"
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -789,8 +789,7 @@ RECURSIVE              = NO
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = fc2i.* \
-                         test*
+EXCLUDE                = fc2i.c fc2i.h test_math.c test_win.c
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -1911,7 +1910,7 @@ MACRO_EXPANSION        = NO
 # The default value is: NO.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_ONLY_PREDEF     = NO
+EXPAND_ONLY_PREDEF     = YES
 
 # If the SEARCH_INCLUDES tag is set to YES the includes files in the
 # INCLUDE_PATH will be searched if a #include is found.
@@ -1943,7 +1942,38 @@ INCLUDE_FILE_PATTERNS  =
 # recursively expanded use the := operator instead of the = operator.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-PREDEFINED             =
+PREDEFINED             = \
+	INLINE_JB_CHANGE=0 \
+	JB_FREE_NULL \
+	JB_FUNCTION_NULL \
+	JB_REALLOC \
+	JB_TRY_REALLOC \
+	JB_STRDUP \
+	INLINE_JB_FLENGTH=0 \
+	JB_SLIST_FREE \
+	INLINE_JB_BIN_READ=0 \
+	INLINE_JB_BIN_WRITE=0 \
+	INLINE_JB_MAKE_TIME=0 \
+	INLINE_JB_GET_TIME=0 \
+	INLINE_JB_GET_TIME_FILE=0 \
+	INLINE_JB_SET_TIME=0 \
+	INLINE_JBM_FCOMPARE=0 \
+	INLINE_JBM_FCOMPARE=0 \
+	INLINE_JBM_MAX=0 \
+	INLINE_JBM_MIN=0 \
+	INLINE_JBM_MAXL=0 \
+	INLINE_JBM_MINL=0 \
+	INLINE_JBM_MAXLL=0 \
+	INLINE_JBM_MINLL=0 \
+	INLINE_JBM_MODMIN=0 \
+	INLINE_JBM_MODMINL=0 \
+	INLINE_JBM_MODMINLL=0 \
+	INLINE_JBM_FMODMIN=0 \
+	INLINE_JBM_CHANGE=0 \
+	INLINE_JBM_CHANGEL=0 \
+	INLINE_JBM_CHANGELL=0 \
+	INLINE_JBM_FCHANGE=0 \
+	INLINE_JBM_FCHANGEL=0 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

@@ -203,22 +203,62 @@ long long int jbm_modminll(long long int a,long long int b)
 JBDOUBLE jbm_fmodmin(JBDOUBLE a,JBDOUBLE b) {return _jbm_fmodmin(a,b);}
 #endif
 
+/**
+ * \fn void jbm_change(int *a,int *b)
+ * \brief Function to interchange 2 int numbers.
+ * \param a
+ * \brief 1st int number pointer.
+ * \param b
+ * \brief 2nd int number pointer.
+ */
 #if !INLINE_JBM_CHANGE
 void jbm_change(int *a,int *b) {_jbm_change(a,b);}
 #endif
 
+/**
+ * \fn void jbm_changel(long int *a,long int *b)
+ * \brief Function to interchange 2 long int numbers.
+ * \param a
+ * \brief 1st long int number pointer.
+ * \param b
+ * \brief 2nd long int number pointer.
+ */
 #if !INLINE_JBM_CHANGEL
 void jbm_changel(long int *a,long int *b) {_jbm_changel(a,b);}
 #endif
 
+/**
+ * \fn void jbm_changell(long long int *a,long long int *b)
+ * \brief Function to interchange 2 long long int numbers.
+ * \param a
+ * \brief 1st long long int number pointer.
+ * \param b
+ * \brief 2nd long long int number pointer.
+ */
 #if !INLINE_JBM_CHANGELL
 void jbm_changell(long long int *a,long long int *b) {_jbm_changell(a,b);}
 #endif
 
+/**
+ * \fn void jbm_fchange(JBFLOAT *a,JBFLOAT *b)
+ * \brief Function to interchange 2 JBFLOAT numbers.
+ * \param a
+ * \brief 1st JBFLOAT number pointer.
+ * \param b
+ * \brief 2nd JBFLOAT number pointer.
+ */
 #if !INLINE_JBM_FCHANGE
 void jbm_fchange(JBFLOAT *a,JBFLOAT *b) {_jbm_fchange(a,b);}
 #endif
 
+/**
+ * \fn void jbm_fchangel(JBDOUBLE *a,JBDOUBLE *b)
+ * \brief Function to interchange 2 JBDOUBLE numbers.
+ * \param a
+ * \brief 1st JBDOUBLE number pointer.
+ * \param b
+ * \brief 2nd JBDOUBLE number pointer.
+ */
 #if !INLINE_JBM_FCHANGEL
 void jbm_fchangel(JBDOUBLE *a,JBDOUBLE *b) {_jbm_fchangel(a,b);}
 #endif
