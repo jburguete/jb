@@ -1974,6 +1974,14 @@ PREDEFINED             = \
 	INLINE_JBM_CHANGELL=0 \
 	INLINE_JBM_FCHANGE=0 \
 	INLINE_JBM_FCHANGEL=0 \
+	INLINE_JBM_SQR=0 \
+	INLINE_JBM_SQRL=0 \
+	INLINE_JBM_SQRLL=0 \
+	INLINE_JBM_FSQR=0 \
+	INLINE_JBM_DBL=0 \
+	INLINE_JBM_DBLL=0 \
+	INLINE_JBM_DBLLL=0 \
+	INLINE_JBM_FDBL=0 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

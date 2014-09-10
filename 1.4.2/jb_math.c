@@ -185,7 +185,7 @@ long long int jbm_modminll(long long int a,long long int b)
 #endif
 
 /**
- * \fn int jbm_modminll(JBDOUBLE a,JBDOUBLE b)
+ * \fn int jbm_fmodmin(JBDOUBLE a,JBDOUBLE b)
  * \brief Function to calculate the number with the lower module in the [a, b]
  *   interval (float arguments).
  *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
@@ -263,36 +263,92 @@ void jbm_fchange(JBFLOAT *a,JBFLOAT *b) {_jbm_fchange(a,b);}
 void jbm_fchangel(JBDOUBLE *a,JBDOUBLE *b) {_jbm_fchangel(a,b);}
 #endif
 
+/**
+ * \fn int jbm_sqr(int x)
+ * \brief Function to calculate the square of an int number.
+ * \param x
+ * \brief int number.
+ * \return square.
+ */
 #if !INLINE_JBM_SQR
 int jbm_sqr(int x) {return _jbm_sqr(x);}
 #endif
 
+/**
+ * \fn long int jbm_sqrl(long int x)
+ * \brief Function to calculate the square of a long int number.
+ * \param x
+ * \brief long int number.
+ * \return square.
+ */
 #if !INLINE_JBM_SQRL
 long int jbm_sqrl(long int x) {return _jbm_sqrl(x);}
 #endif
 
+/**
+ * \fn long long int jbm_sqrll(long long int x)
+ * \brief Function to calculate the square of a long long int number.
+ * \param x
+ * \brief long long int number.
+ * \return square.
+ */
 #if !INLINE_JBM_SQRLL
 long long int jbm_sqrll(long long int x) {return _jbm_sqrll(x);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_fsqr(JBDOUBLE x)
+ * \brief Function to calculate the square of a JBDOUBLE number.
+ * \param x
+ * \brief JBDOUBLE number.
+ * \return square.
+ */
 #if !INLINE_JBM_FSQR
 JBDOUBLE jbm_fsqr(JBDOUBLE x) {return _jbm_fsqr(x);}
 #endif
 
+/**
+ * \fn int jbm_dbl(int x)
+ * \brief Function to calculate the double of an int number.
+ * \param x
+ * \brief int number.
+ * \return double.
+ */
 #if !INLINE_JBM_DBL
 int jbm_dbl(int x) {return _jbm_dbl(x);}
 #endif
 
+/**
+ * \fn long int jbm_dbll(long int x)
+ * \brief Function to calculate the double of a long int number.
+ * \param x
+ * \brief long int number.
+ * \return double.
+ */
 #if !INLINE_JBM_DBLL
 long int jbm_dbll(long int x) {return _jbm_dbll(x);}
 #endif
 
+/**
+ * \fn long long int jbm_dblll(long long int x)
+ * \brief Function to calculate the double of a long long int number.
+ * \param x
+ * \brief long long int number.
+ * \return double.
+ */
 #if !INLINE_JBM_DBLLL
 long long int jbm_dblll(long long int x) {return _jbm_dblll(x);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_fdbl(JBDOUBLE x)
+ * \brief Function to calculate the double of a JBDOUBLE number.
+ * \param x
+ * \brief JBDOUBLE number.
+ * \return double.
+ */
 #if !INLINE_JBM_FDBL
-JBDOUBLE jbm_fdbl(register JBDOUBLE x) {return _jbm_fdbl(x);}
+JBDOUBLE jbm_fdbl(JBDOUBLE x) {return _jbm_fdbl(x);}
 #endif
 
 #if !INLINE_JBM_EXTRAPOLATE
