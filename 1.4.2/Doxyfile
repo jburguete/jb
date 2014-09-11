@@ -1991,6 +1991,7 @@ PREDEFINED             = \
 	INLINE_JBM_FARRAY_MAX=0 \
 	INLINE_JBM_FARRAY_MIN=0 \
 	INLINE_JBM_FARRAY_MAXMIN=0 \
+	INLINE_JBM_FARRAY_INTERPOLATE=0 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

@@ -156,7 +156,7 @@ void jb_slist_free(GSList **list)
  * \return 0 on error, >0 on success.
  */
 #if !INLINE_JB_BIN_READ
-int jb_bin_read(FILE *file,char *buffer) {return _jb_bin_read(file,buffer);}
+int jb_bin_read(FILE *file,char *buffer) {return _jb_bin_read(file, buffer);}
 #endif
 
 /**
@@ -169,7 +169,7 @@ int jb_bin_read(FILE *file,char *buffer) {return _jb_bin_read(file,buffer);}
  * \brief String.
  */
 #if !INLINE_JB_BIN_WRITE
-void jb_bin_write(FILE *file,char *buffer) {_jb_bin_write(file,buffer);}
+void jb_bin_write(FILE *file, char *buffer) {_jb_bin_write(file, buffer);}
 #endif
 
 /**
@@ -183,8 +183,8 @@ void jb_bin_write(FILE *file,char *buffer) {_jb_bin_write(file,buffer);}
  * \brief 1 on success, 0 on error.
  */
 #if !INLINE_JB_MAKE_TIME
-void jb_make_time(struct tm *sys_date,JBDOUBLE *sys_sec,int *error)
-{_jb_make_time(sys_date,sys_sec,error);}
+void jb_make_time(struct tm *sys_date, JBDOUBLE *sys_sec, int *error)
+{_jb_make_time(sys_date, sys_sec, error);}
 #endif
 
 /**
@@ -197,8 +197,8 @@ void jb_make_time(struct tm *sys_date,JBDOUBLE *sys_sec,int *error)
  * \return Date in JBDOUBLE format.
  */
 #if !INLINE_JB_GET_TIME
-JBDOUBLE jb_get_time(char *string,int *error)
-{return _jb_get_time(string,error);}
+JBDOUBLE jb_get_time(char *string, int *error)
+{return _jb_get_time(string, error);}
 #endif
 
 /**
@@ -212,8 +212,8 @@ JBDOUBLE jb_get_time(char *string,int *error)
  * \return Date in JBDOUBLE format.
  */
 #if !INLINE_JB_GET_TIME_FILE
-JBDOUBLE jb_get_time_file(FILE *file,int *error)
-{return _jb_get_time_file(file,error);}
+JBDOUBLE jb_get_time_file(FILE *file, int *error)
+{return _jb_get_time_file(file, error);}
 #endif
 
 /**

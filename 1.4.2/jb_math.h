@@ -575,24 +575,16 @@ static inline JBDOUBLE _jbm_integral
 		(JBDOUBLE (*f)(JBDOUBLE), JBDOUBLE x1, JBDOUBLE x2);
 #endif
 
-/* farray: array de tipo JBFLOAT de elementos 0 a n */
-
 static inline int _jbm_farray_search(JBDOUBLE x, JBFLOAT *fa, int n)
 {
-
-/*
-	Búsqueda del intervalo en el que se sitúa x en un farray ordenado de menor
-	a mayor
-*/
-
 	register int i, j;
 	#if DEBUG_JBM_FARRAY_SEARCH
 		fprintf(stderr, "JBM float array search\n");
 	#endif
-	for (i=0; n-i>1;)
+	for (i = 0; n - i > 1;)
 	{
-		j=(i+n)>>1;
-		if (x<=fa[j]) n=j; else i=j;
+		j = (i + n) >> 1;
+		if (x <= fa[j]) n = j; else i = j;
 	}
 	#if DEBUG_JBM_FARRAY_SEARCH
 		fprintf(stderr, "JBM float array search i=%d\n", i);
@@ -608,19 +600,13 @@ static inline int _jbm_farray_search(JBDOUBLE x, JBFLOAT *fa, int n)
 
 static inline int _jbm_farray_search_extended(JBDOUBLE x, JBFLOAT *fa, int n)
 {
-
-/*
-	Búsqueda del intervalo en el que se sitúa x en un farray ordenado de menor
-	a mayor: develve -1 si x<f0, n si x>=fn
-*/
-
 	register int i;
 	#if DEBUG_JBM_FARRAY_SEARCH_EXTENDED
 		fprintf(stderr, "JBM float array search_extended\n");
 	#endif
-	if (x<fa[0]) i=-1;
-	else if (x>=fa[n]) i=n;
-	else i=jbm_farray_search(x, fa, n);
+	if (x < fa[0]) i = -1;
+	else if (x >= fa[n]) i = n;
+	else i = jbm_farray_search(x, fa, n);
 	#if DEBUG_JBM_FARRAY_SEARCH_EXTENDED
 		fprintf(stderr, "JBM float array search_extended i=%d\n", i);
 	#endif
@@ -640,8 +626,8 @@ static inline JBDOUBLE _jbm_farray_max(JBFLOAT *fa, int n)
 	#if DEBUG_JBM_FARRAY_MAX
 		fprintf(stderr, "JBM float array max\n");
 	#endif
-	k=*fa;
-	for (i=0; ++i<=n;) k=fmaxl(k, *(++fa));
+	k = *fa;
+	for (i = 0; ++i <= n;) k = fmaxl(k, *(++fa));
 	#if DEBUG_JBM_FARRAY_MAX
 		fprintf(stderr, "JBM float array max="FWL"\n", k);
 	#endif
@@ -661,8 +647,8 @@ static inline JBDOUBLE _jbm_farray_min(JBFLOAT *fa, int n)
 	#if DEBUG_JBM_FARRAY_MIN
 		fprintf(stderr, "JBM float array min\n");
 	#endif
-	k=*fa;
-	for (i=0; ++i<=n;) k=fminl(k, *(++fa));
+	k = *fa;
+	for (i = 0; ++i <= n;) k = fminl(k, *(++fa));
 	#if DEBUG_JBM_FARRAY_MIN
 		fprintf(stderr, "JBM float array min="FWL"\n", k);
 	#endif
@@ -675,20 +661,21 @@ static inline JBDOUBLE _jbm_farray_min(JBFLOAT *fa, int n)
 	JBDOUBLE jbm_farray_min(JBFLOAT*, int);
 #endif
 
-static inline void _jbm_farray_maxmin(JBFLOAT *fa, int n, JBDOUBLE *max, JBDOUBLE *min)
+static inline void _jbm_farray_maxmin
+	(JBFLOAT *fa, int n, JBDOUBLE *max, JBDOUBLE *min)
 {
 	register int i;
 	register JBDOUBLE kmax, kmin;
 	#if DEBUG_JBM_FARRAY_MAXMIN
 		fprintf(stderr, "JBM float array maxmin\n");
 	#endif
-	kmax=kmin=*fa;
-	for (i=0; ++i<=n;)
+	kmax = kmin = *fa;
+	for (i = 0; ++i <= n;)
 	{
 		++fa;
 		if (kmax < *fa) kmax = *fa; else if (kmin > *fa) kmin = *fa;
 	}
-	*max=kmax, *min=kmin;
+	*max = kmax, *min = kmin;
 	#if DEBUG_JBM_FARRAY_MAXMIN
 		fprintf(stderr, "JBM float array max="FWL" min="FWL"\n", kmax, kmin);
 	#endif
@@ -700,15 +687,17 @@ static inline void _jbm_farray_maxmin(JBFLOAT *fa, int n, JBDOUBLE *max, JBDOUBL
 	void jbm_farray_maxmin(JBFLOAT*, int, JBDOUBLE*, JBDOUBLE*);
 #endif
 
-static inline JBDOUBLE _jbm_farray_interpolate(JBDOUBLE x, JBFLOAT *fa, JBFLOAT *fb, int n)
+static inline JBDOUBLE _jbm_farray_interpolate
+	(JBDOUBLE x, JBFLOAT *fa, JBFLOAT *fb, int n)
 {
 	register int i;
 	register JBDOUBLE k;
 	#if DEBUG_JBM_FARRAY_INTERPOLATE
 		fprintf(stderr, "JBM float array interpolate\n");
 	#endif
-	i=jbm_farray_search(x, fa, n);
-	if (i==n) k=fb[i]; else k=jbm_interpolate(x, fa[i], fa[i+1], fb[i], fb[i+1]);
+	i = jbm_farray_search(x, fa, n);
+	if (i == n) k = fb[i];
+	else k = jbm_interpolate(x, fa[i], fa[i + 1], fb[i], fb[i + 1]);
 	#if DEBUG_JBM_FARRAY_INTERPOLATE
 		fprintf(stderr, "JBM float array interpolate k="FWL"\n", k);
 	#endif

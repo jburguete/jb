@@ -271,7 +271,7 @@ static inline long int _jb_flength(FILE *file)
 	register long int p, q;
 	q = ftell(file);
 	fseek(file, 0l, SEEK_END);
-	p=ftell(file);
+	p = ftell(file);
 	fseek(file, q, SEEK_SET);
 	return p;
 }

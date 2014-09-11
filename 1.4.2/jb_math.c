@@ -413,7 +413,7 @@ JBDOUBLE jbm_integral(JBDOUBLE (*f)(JBDOUBLE),JBDOUBLE x1,JBDOUBLE x2)
 
 /**
  * \fn int jbm_farray_search(JBDOUBLE x,JBFLOAT *fa,int n)
- * \brief Function to search the interval where a number is in a increasing
+ * \brief Function to search the interval where a number is in a increasingly
  *   sorted array of JBFLOAT numbers.
  * \param x
  * \brief number.
@@ -430,7 +430,7 @@ int jbm_farray_search(JBDOUBLE x,JBFLOAT *fa,int n)
 
 /**
  * \fn int jbm_farray_search_extended(JBDOUBLE x,JBFLOAT *fa,int n)
- * \brief Function to search the interval where a number is in a increasing
+ * \brief Function to search the interval where a number is in a increasingly
  *   sorted array of JBFLOAT numbers.
  * \param x
  * \brief number.
@@ -489,6 +489,20 @@ void jbm_farray_maxmin(JBFLOAT *fa,int n,JBDOUBLE *max,JBDOUBLE *min)
 {_jbm_farray_maxmin(fa,n,max,min);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_farray_interpolate(JBDOUBLE x,JBFLOAT *fa,JBFLOAT *fb,int n)
+ * \brief Function to calculate the y-coordinate of a 2D point interpolated
+ *   between a tabular function defined by 2 arrays of JBFLOAT numbers.
+ * \param x
+ * \brief x-coordinate of the point.
+ * \param fa
+ * \brief increasingly sorted array of x-coordinates of the tabular function.
+ * \param fb
+ * \brief array of y-coordinates of the tabular function.
+ * \param n
+ * \brief the highest element number of the arrays.
+ * \return y-coordinate of the interpolated point.
+ */
 #if !INLINE_JBM_FARRAY_INTERPOLATE
 JBDOUBLE jbm_farray_interpolate(JBDOUBLE x,JBFLOAT *fa,JBFLOAT *fb,int n)
 {return _jbm_farray_interpolate(x,fa,fb,n);}
