@@ -560,6 +560,37 @@ JBDOUBLE jbm_farray_integral
 /**
  * \fn JBDOUBLE jbm_farray_mean_square_error(JBFLOAT *xa, JBFLOAT *fa, int na, \
  *   JBFLOAT *xr, JBFLOAT *fr, int nr)
+ * \brief Function to calculate the mean square error between 2 tabular
+ *   functions.
+ * \param xa
+ * \brief incresingly sorted array of JBFLOAT numbers defining the x-coordinates
+ *   of the 1st tabular function.
+ * \param fa
+ * \brief array of JBFLOAT numbers defining the y-coordinates of the 1st tabular
+ *   function.
+ * \param na
+ * \brief the highest element number of the arrays defining the 1st tabular
+ *   function.
+ * \param xr
+ * \brief incresingly sorted array of JBFLOAT numbers defining the x-coordinates
+ *   of the 2nd tabular function.
+ * \param fr
+ * \brief array of JBFLOAT numbers defining the y-coordinates of the 2nd tabular
+ *   function.
+ * \param nr
+ * \brief the highest element number of the arrays defining the 2nd tabular
+ *   function.
+ * \return mean square error.
+ */
+#if !INLINE_JBM_FARRAY_MEAN_SQUARE_ERROR
+JBDOUBLE jbm_farray_mean_square_error
+	(JBFLOAT *xa, JBFLOAT *fa, int na, JBFLOAT *xr, JBFLOAT *fr, int nr)
+{return _jbm_farray_mean_square_error(xa, fa, na, xr, fr, nr);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_farray_root_mean_square_error(JBFLOAT *xa, JBFLOAT *fa, \
+ *   int na, JBFLOAT *xr, JBFLOAT *fr, int nr)
  * \brief Function to calculate the root mean square error between 2 tabular
  *   functions.
  * \param xa
@@ -582,10 +613,10 @@ JBDOUBLE jbm_farray_integral
  *   function.
  * \return root mean square error.
  */
-#if !INLINE_JBM_FARRAY_MEAN_SQUARE_ERROR
-JBDOUBLE jbm_farray_mean_square_error
+#if !INLINE_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR
+JBDOUBLE jbm_farray_root_mean_square_error
 	(JBFLOAT *xa, JBFLOAT *fa, int na, JBFLOAT *xr, JBFLOAT *fr, int nr)
-{return _jbm_farray_mean_square_error(xa, fa, na, xr, fr, nr);}
+{return _jbm_farray_root_mean_square_error(xa, fa, na, xr, fr, nr);}
 #endif
 
 #if !INLINE_JBM_V2_LENGTH

@@ -1995,6 +1995,7 @@ PREDEFINED             = \
 	INLINE_JBM_FARRAY_ADD=0 \
 	INLINE_JBM_FARRAY_INTEGRAL=0 \
 	INLINE_JBM_FARRAY_MEAN_SQUARE_ERROR=0 \
+	INLINE_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR=0 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

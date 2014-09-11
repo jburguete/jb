@@ -870,7 +870,7 @@ static inline JBDOUBLE _jbm_farray_mean_square_error
 			fprintf(stderr, "JBMFMSE i=%d j=%d k="FWL"\n", i, j, k);
 		#endif
 	}
-	k = sqrt(k / (na + 1));
+	k /= na + 1;
 	#if DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBM float array mean square error="FWL"\n", k);
 	#endif
@@ -881,6 +881,27 @@ static inline JBDOUBLE _jbm_farray_mean_square_error
 	#define jbm_farray_mean_square_error _jbm_farray_mean_square_error
 #else
 	JBDOUBLE jbm_farray_mean_square_error
+		(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*, int);
+#endif
+
+static inline JBDOUBLE _jbm_farray_root_mean_square_error
+	(JBFLOAT *xa, JBFLOAT *fa, int na, JBFLOAT *xr, JBFLOAT *fr, int nr)
+{
+	JBDOUBLE k = 0.;
+	#if DEBUG_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM float array root_mean square error\n");
+	#endif
+	k = sqrt(jbm_farray_mean_square_error(xa, fa, na, xr, fr, nr));
+	#if DEBUG_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM float array root_mean square error="FWL"\n", k);
+	#endif
+	return k;
+}
+
+#if INLINE_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR
+	#define jbm_farray_root_mean_square_error _jbm_farray_root_mean_square_error
+#else
+	JBDOUBLE jbm_farray_root_mean_square_error
 		(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*, int);
 #endif
 
