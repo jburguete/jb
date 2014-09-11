@@ -33,7 +33,7 @@
 #include "jb_math.h"
 
 /**
- * \fn int jbm_fcompare(JBDOUBLE a,JBDOUBLE b)
+ * \fn int jbm_fcompare(JBDOUBLE a, JBDOUBLE b)
  * \brief Function to compare 2 float numbers.
  * \param a
  * \brief 1st JBDOUBLE number.
@@ -43,11 +43,11 @@
  * 	-1 on a < b, 1 on a > b
  */
 #if !INLINE_JBM_FCOMPARE
-int jbm_fcompare(JBDOUBLE a,JBDOUBLE b) {return _jbm_fcompare(a,b);}
+int jbm_fcompare(JBDOUBLE a, JBDOUBLE b) {return _jbm_fcompare(a, b);}
 #endif
 
 /**
- * \fn int jbm_max(int a,int b)
+ * \fn int jbm_max(int a, int b)
  * \brief Function to calculate the maximum of 2 int numbers.
  * \param a
  * \brief 1st int number.
@@ -56,11 +56,11 @@ int jbm_fcompare(JBDOUBLE a,JBDOUBLE b) {return _jbm_fcompare(a,b);}
  * \return Maximum number.
  */
 #if !INLINE_JBM_MAX
-int jbm_max(int a,int b) {return _jbm_max(a,b);}
+int jbm_max(int a, int b) {return _jbm_max(a, b);}
 #endif
 
 /**
- * \fn int jbm_min(int a,int b)
+ * \fn int jbm_min(int a, int b)
  * \brief Function to calculate the minimum of 2 int numbers.
  * \param a
  * \brief 1st int number.
@@ -69,11 +69,11 @@ int jbm_max(int a,int b) {return _jbm_max(a,b);}
  * \return Minimum number.
  */
 #if !INLINE_JBM_MIN
-int jbm_min(int a,int b) {return _jbm_min(a,b);}
+int jbm_min(int a, int b) {return _jbm_min(a, b);}
 #endif
 
 /**
- * \fn long int jbm_maxl(long int a,long int b)
+ * \fn long int jbm_maxl(long int a, long int b)
  * \brief Function to calculate the maximum of 2 long int numbers.
  * \param a
  * \brief 1st long int number.
@@ -82,11 +82,11 @@ int jbm_min(int a,int b) {return _jbm_min(a,b);}
  * \return Maximum number.
  */
 #if !INLINE_JBM_MAXL
-long int jbm_maxl(long int a,long int b) {return _jbm_maxl(a,b);}
+long int jbm_maxl(long int a, long int b) {return _jbm_maxl(a, b);}
 #endif
 
 /**
- * \fn long int jbm_minl(long int a,long int b)
+ * \fn long int jbm_minl(long int a, long int b)
  * \brief Function to calculate the minimum of 2 long int numbers.
  * \param a
  * \brief 1st long int number.
@@ -95,11 +95,11 @@ long int jbm_maxl(long int a,long int b) {return _jbm_maxl(a,b);}
  * \return Minimum number.
  */
 #if !INLINE_JBM_MINL
-long int jbm_minl(long int a,long int b) {return _jbm_minl(a,b);}
+long int jbm_minl(long int a, long int b) {return _jbm_minl(a, b);}
 #endif
 
 /**
- * \fn long long int jbm_maxll(long long int a,long long int b)
+ * \fn long long int jbm_maxll(long long int a, long long int b)
  * \brief Function to calculate the maximum of 2 long long int numbers.
  * \param a
  * \brief 1st long long int number.
@@ -108,12 +108,12 @@ long int jbm_minl(long int a,long int b) {return _jbm_minl(a,b);}
  * \return Maximum number.
  */
 #if !INLINE_JBM_MAXLL
-long long int jbm_maxll(long long int a,long long int b)
-{return _jbm_maxll(a,b);}
+long long int jbm_maxll(long long int a, long long int b)
+{return _jbm_maxll(a, b);}
 #endif
 
 /**
- * \fn long long int jbm_minll(long long int a,long long int b)
+ * \fn long long int jbm_minll(long long int a, long long int b)
  * \brief Function to calculate the minimum of 2 long long int numbers.
  * \param a
  * \brief 1st long long int number.
@@ -122,15 +122,15 @@ long long int jbm_maxll(long long int a,long long int b)
  * \return Minimum number.
  */
 #if !INLINE_JBM_MINLL
-long long int jbm_minll(long long int a,long long int b)
-{return _jbm_minll(a,b);}
+long long int jbm_minll(long long int a, long long int b)
+{return _jbm_minll(a, b);}
 #endif
 
 /**
- * \fn int jbm_modmin(int a,int b)
+ * \fn int jbm_modmin(int a, int b)
  * \brief Function to calculate the number with the lower module in the [a, b]
  *   interval (int arguments).
- *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
  *   0, & a\cdot b\le 0;\\
  *   a, & a,b\ne 0,\;|a|<|b|;\\
  *   b, & a,b\ne 0,\;|a|\ge|b|;
@@ -142,14 +142,14 @@ long long int jbm_minll(long long int a,long long int b)
  * \return Modmin number.
  */
 #if !INLINE_JBM_MODMIN
-int jbm_modmin(int a,int b) {return _jbm_modmin(a,b);}
+int jbm_modmin(int a, int b) {return _jbm_modmin(a, b);}
 #endif
 
 /**
- * \fn int jbm_modminl(long int a,long int b)
+ * \fn int jbm_modminl(long int a, long int b)
  * \brief Function to calculate the number with the lower module in the [a, b]
  *   interval (long int arguments).
- *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
  *   0, & a\cdot b\le 0;\\
  *   a, & a,b\ne 0,\;|a|<|b|;\\
  *   b, & a,b\ne 0,\;|a|\ge|b|;
@@ -161,14 +161,14 @@ int jbm_modmin(int a,int b) {return _jbm_modmin(a,b);}
  * \return Modmin number.
  */
 #if !INLINE_JBM_MODMINL
-long int jbm_modminl(long int a,long int b) {return _jbm_modminl(a,b);}
+long int jbm_modminl(long int a, long int b) {return _jbm_modminl(a, b);}
 #endif
 
 /**
- * \fn int jbm_modminll(long long int a,long long int b)
+ * \fn int jbm_modminll(long long int a, long long int b)
  * \brief Function to calculate the number with the lower module in the [a, b]
  *   interval (long long int arguments).
- *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
  *   0, & a\cdot b\le 0;\\
  *   a, & a,b\ne 0,\;|a|<|b|;\\
  *   b, & a,b\ne 0,\;|a|\ge|b|;
@@ -180,15 +180,15 @@ long int jbm_modminl(long int a,long int b) {return _jbm_modminl(a,b);}
  * \return Modmin number.
  */
 #if !INLINE_JBM_MODMINLL
-long long int jbm_modminll(long long int a,long long int b)
-{return _jbm_modminll(a,b);}
+long long int jbm_modminll(long long int a, long long int b)
+{return _jbm_modminll(a, b);}
 #endif
 
 /**
- * \fn int jbm_fmodmin(JBDOUBLE a,JBDOUBLE b)
+ * \fn int jbm_fmodmin(JBDOUBLE a, JBDOUBLE b)
  * \brief Function to calculate the number with the lower module in the [a, b]
  *   interval (float arguments).
- *   \f$\mathrm{modmin}(a,b)=\left\{\begin{array}{lc}
+ *   \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
  *   0, & a\cdot b\le 0;\\
  *   a, & a,b\ne 0,\;|a|<|b|;\\
  *   b, & a,b\ne 0,\;|a|\ge|b|;
@@ -200,11 +200,11 @@ long long int jbm_modminll(long long int a,long long int b)
  * \return Modmin number.
  */
 #if !INLINE_JBM_FMODMIN
-JBDOUBLE jbm_fmodmin(JBDOUBLE a,JBDOUBLE b) {return _jbm_fmodmin(a,b);}
+JBDOUBLE jbm_fmodmin(JBDOUBLE a, JBDOUBLE b) {return _jbm_fmodmin(a, b);}
 #endif
 
 /**
- * \fn void jbm_change(int *a,int *b)
+ * \fn void jbm_change(int *a, int *b)
  * \brief Function to interchange 2 int numbers.
  * \param a
  * \brief 1st int number pointer.
@@ -212,11 +212,11 @@ JBDOUBLE jbm_fmodmin(JBDOUBLE a,JBDOUBLE b) {return _jbm_fmodmin(a,b);}
  * \brief 2nd int number pointer.
  */
 #if !INLINE_JBM_CHANGE
-void jbm_change(int *a,int *b) {_jbm_change(a,b);}
+void jbm_change(int *a, int *b) {_jbm_change(a, b);}
 #endif
 
 /**
- * \fn void jbm_changel(long int *a,long int *b)
+ * \fn void jbm_changel(long int *a, long int *b)
  * \brief Function to interchange 2 long int numbers.
  * \param a
  * \brief 1st long int number pointer.
@@ -224,11 +224,11 @@ void jbm_change(int *a,int *b) {_jbm_change(a,b);}
  * \brief 2nd long int number pointer.
  */
 #if !INLINE_JBM_CHANGEL
-void jbm_changel(long int *a,long int *b) {_jbm_changel(a,b);}
+void jbm_changel(long int *a, long int *b) {_jbm_changel(a, b);}
 #endif
 
 /**
- * \fn void jbm_changell(long long int *a,long long int *b)
+ * \fn void jbm_changell(long long int *a, long long int *b)
  * \brief Function to interchange 2 long long int numbers.
  * \param a
  * \brief 1st long long int number pointer.
@@ -236,11 +236,11 @@ void jbm_changel(long int *a,long int *b) {_jbm_changel(a,b);}
  * \brief 2nd long long int number pointer.
  */
 #if !INLINE_JBM_CHANGELL
-void jbm_changell(long long int *a,long long int *b) {_jbm_changell(a,b);}
+void jbm_changell(long long int *a, long long int *b) {_jbm_changell(a, b);}
 #endif
 
 /**
- * \fn void jbm_fchange(JBFLOAT *a,JBFLOAT *b)
+ * \fn void jbm_fchange(JBFLOAT *a, JBFLOAT *b)
  * \brief Function to interchange 2 JBFLOAT numbers.
  * \param a
  * \brief 1st JBFLOAT number pointer.
@@ -248,11 +248,11 @@ void jbm_changell(long long int *a,long long int *b) {_jbm_changell(a,b);}
  * \brief 2nd JBFLOAT number pointer.
  */
 #if !INLINE_JBM_FCHANGE
-void jbm_fchange(JBFLOAT *a,JBFLOAT *b) {_jbm_fchange(a,b);}
+void jbm_fchange(JBFLOAT *a, JBFLOAT *b) {_jbm_fchange(a, b);}
 #endif
 
 /**
- * \fn void jbm_fchangel(JBDOUBLE *a,JBDOUBLE *b)
+ * \fn void jbm_fchangel(JBDOUBLE *a, JBDOUBLE *b)
  * \brief Function to interchange 2 JBDOUBLE numbers.
  * \param a
  * \brief 1st JBDOUBLE number pointer.
@@ -260,7 +260,7 @@ void jbm_fchange(JBFLOAT *a,JBFLOAT *b) {_jbm_fchange(a,b);}
  * \brief 2nd JBDOUBLE number pointer.
  */
 #if !INLINE_JBM_FCHANGEL
-void jbm_fchangel(JBDOUBLE *a,JBDOUBLE *b) {_jbm_fchangel(a,b);}
+void jbm_fchangel(JBDOUBLE *a, JBDOUBLE *b) {_jbm_fchangel(a, b);}
 #endif
 
 /**
@@ -352,8 +352,8 @@ JBDOUBLE jbm_fdbl(JBDOUBLE x) {return _jbm_fdbl(x);}
 #endif
 
 /**
- * \fn JBDOUBLE jbm_extrapolate(JBDOUBLE x,JBDOUBLE x1,JBDOUBLE x2, \
- *   JBDOUBLE y1,JBDOUBLE y2)
+ * \fn JBDOUBLE jbm_extrapolate(JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, \
+ *   JBDOUBLE y1, JBDOUBLE y2)
  * \brief Function to perform an extrapolation between 2 2D points.
  * \param x
  * \brief x-coordinate of the extrapolated point.
@@ -369,13 +369,13 @@ JBDOUBLE jbm_fdbl(JBDOUBLE x) {return _jbm_fdbl(x);}
  */
 #if !INLINE_JBM_EXTRAPOLATE
 JBDOUBLE jbm_extrapolate
-	(JBDOUBLE x,JBDOUBLE x1,JBDOUBLE x2,JBDOUBLE y1,JBDOUBLE y2)
-{return _jbm_extrapolate(x,x1,x2,y1,y2);}
+	(JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2)
+{return _jbm_extrapolate(x, x1, x2, y1, y2);}
 #endif
 
 /**
- * \fn JBDOUBLE jbm_interpolate(JBDOUBLE x,JBDOUBLE x1,JBDOUBLE x2, \
- *   JBDOUBLE y1,JBDOUBLE y2)
+ * \fn JBDOUBLE jbm_interpolate(JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, \
+ *   JBDOUBLE y1, JBDOUBLE y2)
  * \brief Function to perform an interpolation between 2 2D points.
  * \param x
  * \brief x-coordinate of the interpolated point.
@@ -391,12 +391,12 @@ JBDOUBLE jbm_extrapolate
  */
 #if !INLINE_JBM_INTERPOLATE
 JBDOUBLE jbm_interpolate
-	(JBDOUBLE x,JBDOUBLE x1,JBDOUBLE x2,JBDOUBLE y1,JBDOUBLE y2)
-{return _jbm_interpolate(x,x1,x2,y1,y2);}
+	(JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2)
+{return _jbm_interpolate(x, x1, x2, y1, y2);}
 #endif
 
 /**
- * \fn JBDOUBLE jbm_integral(JBDOUBLE (*f)(JBDOUBLE),JBDOUBLE x1,JBDOUBLE x2)
+ * \fn JBDOUBLE jbm_integral(JBDOUBLE (*f)(JBDOUBLE), JBDOUBLE x1, JBDOUBLE x2)
  * \brief Function to approximate an integral defined in an interval.
  * \param f
  * \brief pointer to the function to integrate.
@@ -407,12 +407,12 @@ JBDOUBLE jbm_interpolate
  * \return integral value.
  */
 #if !INLINE_JBM_INTEGRAL
-JBDOUBLE jbm_integral(JBDOUBLE (*f)(JBDOUBLE),JBDOUBLE x1,JBDOUBLE x2)
-{return _jbm_integral(f,x1,x2);}
+JBDOUBLE jbm_integral(JBDOUBLE (*f)(JBDOUBLE), JBDOUBLE x1, JBDOUBLE x2)
+{return _jbm_integral(f, x1, x2);}
 #endif
 
 /**
- * \fn int jbm_farray_search(JBDOUBLE x,JBFLOAT *fa,int n)
+ * \fn int jbm_farray_search(JBDOUBLE x, JBFLOAT *fa, int n)
  * \brief Function to search the interval where a number is in a increasingly
  *   sorted array of JBFLOAT numbers.
  * \param x
@@ -424,12 +424,12 @@ JBDOUBLE jbm_integral(JBDOUBLE (*f)(JBDOUBLE),JBDOUBLE x1,JBDOUBLE x2)
  * \return interval number.
  */
 #if !INLINE_JBM_FARRAY_SEARCH
-int jbm_farray_search(JBDOUBLE x,JBFLOAT *fa,int n)
-{return _jbm_farray_search(x,fa,n);}
+int jbm_farray_search(JBDOUBLE x, JBFLOAT *fa, int n)
+{return _jbm_farray_search(x, fa, n);}
 #endif
 
 /**
- * \fn int jbm_farray_search_extended(JBDOUBLE x,JBFLOAT *fa,int n)
+ * \fn int jbm_farray_search_extended(JBDOUBLE x, JBFLOAT *fa, int n)
  * \brief Function to search the interval where a number is in a increasingly
  *   sorted array of JBFLOAT numbers.
  * \param x
@@ -441,12 +441,12 @@ int jbm_farray_search(JBDOUBLE x,JBFLOAT *fa,int n)
  * \return interval number, -1 if x<fa[0] or n if x>fa[n].
  */
 #if !INLINE_JBM_FARRAY_SEARCH_EXTENDED
-int jbm_farray_search_extended(JBDOUBLE x,JBFLOAT *fa,int n)
-{return _jbm_farray_search_extended(x,fa,n);}
+int jbm_farray_search_extended(JBDOUBLE x, JBFLOAT *fa, int n)
+{return _jbm_farray_search_extended(x, fa, n);}
 #endif
 
 /**
- * \fn JBDOUBLE jbm_farray_max(JBFLOAT *fa,int n)
+ * \fn JBDOUBLE jbm_farray_max(JBFLOAT *fa, int n)
  * \brief Function to find the highest element of an array of JBFLOAT numbers.
  * \param fa
  * \brief array of JBFLOAT numbers.
@@ -455,11 +455,11 @@ int jbm_farray_search_extended(JBDOUBLE x,JBFLOAT *fa,int n)
  * \return the highest value.
  */
 #if !INLINE_JBM_FARRAY_MAX
-JBDOUBLE jbm_farray_max(JBFLOAT *fa,int n) {return _jbm_farray_max(fa,n);}
+JBDOUBLE jbm_farray_max(JBFLOAT *fa, int n) {return _jbm_farray_max(fa, n);}
 #endif
 
 /**
- * \fn JBDOUBLE jbm_farray_min(JBFLOAT *fa,int n)
+ * \fn JBDOUBLE jbm_farray_min(JBFLOAT *fa, int n)
  * \brief Function to find the lowest element of an array of JBFLOAT numbers.
  * \param fa
  * \brief array of JBFLOAT numbers.
@@ -468,11 +468,11 @@ JBDOUBLE jbm_farray_max(JBFLOAT *fa,int n) {return _jbm_farray_max(fa,n);}
  * \return the lowest value.
  */
 #if !INLINE_JBM_FARRAY_MIN
-JBDOUBLE jbm_farray_min(JBFLOAT *fa,int n) {return _jbm_farray_min(fa,n);}
+JBDOUBLE jbm_farray_min(JBFLOAT *fa, int n) {return _jbm_farray_min(fa, n);}
 #endif
 
 /**
- * \fn void jbm_farray_maxmin(JBFLOAT *fa,int n,JBDOUBLE *max,JBDOUBLE *min)
+ * \fn void jbm_farray_maxmin(JBFLOAT *fa, int n, JBDOUBLE *max, JBDOUBLE *min)
  * \brief Function to find the highest and the lowest elements of an array of
  *   JBFLOAT numbers.
  * \param fa
@@ -485,12 +485,13 @@ JBDOUBLE jbm_farray_min(JBFLOAT *fa,int n) {return _jbm_farray_min(fa,n);}
  * \brief the lowest value.
  */
 #if !INLINE_JBM_FARRAY_MAXMIN
-void jbm_farray_maxmin(JBFLOAT *fa,int n,JBDOUBLE *max,JBDOUBLE *min)
-{_jbm_farray_maxmin(fa,n,max,min);}
+void jbm_farray_maxmin(JBFLOAT *fa, int n, JBDOUBLE *max, JBDOUBLE *min)
+{_jbm_farray_maxmin(fa, n, max, min);}
 #endif
 
 /**
- * \fn JBDOUBLE jbm_farray_interpolate(JBDOUBLE x,JBFLOAT *fa,JBFLOAT *fb,int n)
+ * \fn JBDOUBLE jbm_farray_interpolate(JBDOUBLE x, JBFLOAT *fa, JBFLOAT *fb, \
+ *   int n)
  * \brief Function to calculate the y-coordinate of a 2D point interpolated
  *   between a tabular function defined by 2 arrays of JBFLOAT numbers.
  * \param x
@@ -504,81 +505,81 @@ void jbm_farray_maxmin(JBFLOAT *fa,int n,JBDOUBLE *max,JBDOUBLE *min)
  * \return y-coordinate of the interpolated point.
  */
 #if !INLINE_JBM_FARRAY_INTERPOLATE
-JBDOUBLE jbm_farray_interpolate(JBDOUBLE x,JBFLOAT *fa,JBFLOAT *fb,int n)
-{return _jbm_farray_interpolate(x,fa,fb,n);}
+JBDOUBLE jbm_farray_interpolate(JBDOUBLE x, JBFLOAT *fa, JBFLOAT *fb, int n)
+{return _jbm_farray_interpolate(x, fa, fb, n);}
 #endif
 
 #if !INLINE_JBM_FARRAY_ADD
-JBFLOAT* jbm_farray_add(JBFLOAT *fa,int na,JBFLOAT *fb,int nb,JBFLOAT **fc,int *nc)
-{return _jbm_farray_add(fa,na,fb,nb,fc,nc);}
+JBFLOAT* jbm_farray_add(JBFLOAT *fa, int na, JBFLOAT *fb, int nb, JBFLOAT **fc, int *nc)
+{return _jbm_farray_add(fa, na, fb, nb, fc, nc);}
 #endif
 
 #if !INLINE_JBM_FARRAY_INTEGRAL
-JBDOUBLE jbm_farray_integral(JBFLOAT *x,JBFLOAT *y,int n,JBDOUBLE x1,JBDOUBLE x2)
-{return _jbm_farray_integral(x,y,n,x1,x2);}
+JBDOUBLE jbm_farray_integral(JBFLOAT *x, JBFLOAT *y, int n, JBDOUBLE x1, JBDOUBLE x2)
+{return _jbm_farray_integral(x, y, n, x1, x2);}
 #endif
 
 #if !INLINE_JBM_FARRAY_MEAN_SQUARE_ERROR
 JBDOUBLE jbm_farray_mean_square_error
-	(JBFLOAT *xa,JBFLOAT *fa,int na,JBFLOAT *xr,JBFLOAT *fr,int nr)
-{return _jbm_farray_mean_square_error(xa,fa,na,xr,fr,nr);}
+	(JBFLOAT *xa, JBFLOAT *fa, int na, JBFLOAT *xr, JBFLOAT *fr, int nr)
+{return _jbm_farray_mean_square_error(xa, fa, na, xr, fr, nr);}
 #endif
 
 #if !INLINE_JBM_V2_LENGTH
-JBDOUBLE jbm_v2_length(JBDOUBLE x1,JBDOUBLE y1,JBDOUBLE x2,JBDOUBLE y2)
-{return _jbm_v2_length(x1,y1,x2,y2);}
+JBDOUBLE jbm_v2_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2, JBDOUBLE y2)
+{return _jbm_v2_length(x1, y1, x2, y2);}
 #endif
 
 #if !INLINE_JBM_SOLVE_CUADRATIC_REDUCED
 JBDOUBLE jbm_solve_cuadratic_reduced
-	(JBDOUBLE a,JBDOUBLE b,JBDOUBLE x1,JBDOUBLE x2)
-{return _jbm_solve_cuadratic_reduced(a,b,x1,x2);}
+	(JBDOUBLE a, JBDOUBLE b, JBDOUBLE x1, JBDOUBLE x2)
+{return _jbm_solve_cuadratic_reduced(a, b, x1, x2);}
 #endif
 
 #if !INLINE_JBM_SOLVE_CUADRATIC
 JBDOUBLE jbm_solve_cuadratic
-	(JBDOUBLE a,JBDOUBLE b,JBDOUBLE c,JBDOUBLE x1,JBDOUBLE x2)
-{return _jbm_solve_cuadratic(a,b,c,x1,x2);}
+	(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
+{return _jbm_solve_cuadratic(a, b, c, x1, x2);}
 #endif
 
 #if !INLINE_JBM_SOLVE_CUBIC_REDUCED
 JBDOUBLE jbm_solve_cubic_reduced
-	(JBDOUBLE a,JBDOUBLE b,JBDOUBLE c,JBDOUBLE x1,JBDOUBLE x2)
-{return _jbm_solve_cubic_reduced(a,b,c,x1,x2);}
+	(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
+{return _jbm_solve_cubic_reduced(a, b, c, x1, x2);}
 #endif
 
 #if !INLINE_JBM_SOLVE_CUBIC
-JBDOUBLE jbm_solve_cubic(JBDOUBLE a,JBDOUBLE b,JBDOUBLE c,
-	JBDOUBLE d,JBDOUBLE x1,JBDOUBLE x2)
-{return _jbm_solve_cubic(a,b,c,d,x1,x2);}
+JBDOUBLE jbm_solve_cubic(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c,
+	JBDOUBLE d, JBDOUBLE x1, JBDOUBLE x2)
+{return _jbm_solve_cubic(a, b, c, d, x1, x2);}
 #endif
 
 #if !INLINE_JBM_INDEX_SORT_INSERTION
-void jbm_index_sort_insertion(JBFLOAT *x,int *ni,int n)
-{_jbm_index_sort_insertion(x,ni,n);}
+void jbm_index_sort_insertion(JBFLOAT *x, int *ni, int n)
+{_jbm_index_sort_insertion(x, ni, n);}
 #endif
 
 #if !INLINE_JBM_INDEX_SORT_INTERCHANGE
-void jbm_index_sort_interchange(JBFLOAT *x,int *ni,int n)
-{_jbm_index_sort_interchange(x,ni,n);}
+void jbm_index_sort_interchange(JBFLOAT *x, int *ni, int n)
+{_jbm_index_sort_interchange(x, ni, n);}
 #endif
 
 #if !INLINE_JBM_INDEX_SORT_MERGE
-void jbm_index_sort_merge(JBFLOAT *x,int *ni,int n)
-{_jbm_index_sort_merge(x,ni,n);}
+void jbm_index_sort_merge(JBFLOAT *x, int *ni, int n)
+{_jbm_index_sort_merge(x, ni, n);}
 #endif
 
 #if JBM_INDEX_SORT_FLASH
-void jbm_index_sort_flash(JBFLOAT *x,int *ni,int n)
+void jbm_index_sort_flash(JBFLOAT *x, int *ni, int n)
 {
-	register int i,j,m=n/32+1;
-	int *nj,*nk,*l1,*l2;
-	register JBDOUBLE xi,xmin,xmax;
+	register int i, j, m=n/32+1;
+	int *nj, *nk, *l1, *l2;
+	register JBDOUBLE xi, xmin, xmax;
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		fprintf(stderr,"JBM index flash sort\n");
+		fprintf(stderr, "JBM index flash sort\n");
 		for (i=0; i<=n; ++i)
-			fprintf(stderr,"JBM isf i=%d x="FWF" ni=%d\n",i,x[ni[i]],ni[i]);
-		fprintf(stderr,"JBM isf m=%d\n",m);
+			fprintf(stderr, "JBM isf i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
+		fprintf(stderr, "JBM isf m=%d\n", m);
 	#endif
 	nj=(int*)g_malloc((n+m+2)*2*sizeof(int));
 	nk=nj+n+1;
@@ -592,9 +593,9 @@ void jbm_index_sort_flash(JBFLOAT *x,int *ni,int n)
 		if (xi>xmax) xmax=xi, j=i; else if (xi<xmin) xmin=xi;
 	}
 	if (xmax==xmin) goto sorted;
-	jbm_change(ni,ni+j);
+	jbm_change(ni, ni+j);
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		fprintf(stderr,"JBM isf xmin="FWL" xmax="FWL"\n",xmin,xmax);
+		fprintf(stderr, "JBM isf xmin="FWL" xmax="FWL"\n", xmin, xmax);
 	#endif
 	i=m;
 	l1[i]=1;
@@ -607,40 +608,40 @@ void jbm_index_sort_flash(JBFLOAT *x,int *ni,int n)
 	}
 	nj[0]=m;
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		for (i=0; i<=n; ++i) fprintf(stderr,"JBM isf i=%d nj=%d\n",i,nj[i]);
+		for (i=0; i<=n; ++i) fprintf(stderr, "JBM isf i=%d nj=%d\n", i, nj[i]);
 		for (i=0; i<=n; ++i)
-			fprintf(stderr,"JBM isf i=%d x="FWF" ni=%d\n",i,x[ni[i]],ni[i]);
+			fprintf(stderr, "JBM isf i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 	#endif
 	for (i=m, l2[i]=l1[i]; --i>=0;) l2[i]=l2[i+1]+l1[i];
 	#if DEBUG_JBM_INDEX_SORT_FLASH
 		for (i=0; i<=m; ++i)
-			fprintf(stderr,"JBM isf i=%d l1=%d l2=%d\n",i,l1[i],l2[i]);
+			fprintf(stderr, "JBM isf i=%d l1=%d l2=%d\n", i, l1[i], l2[i]);
 	#endif
 	for (i=n+1; --i>0;) nk[--l2[nj[i]]]=ni[i];
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		for (i=0; i<=n; ++i) fprintf(stderr,"JBM isf i=%d nk=%d\n",i,nk[i]);
+		for (i=0; i<=n; ++i) fprintf(stderr, "JBM isf i=%d nk=%d\n", i, nk[i]);
 	#endif
 	for (i=n+1; --i>0;) ni[i]=nk[i];
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		for (i=0; i<=n; ++i) fprintf(stderr,"JBM isf i=%d ni=%d\n",i,ni[i]);
+		for (i=0; i<=n; ++i) fprintf(stderr, "JBM isf i=%d ni=%d\n", i, ni[i]);
 	#endif
 	--l2[m];
 	#if DEBUG_JBM_INDEX_SORT_FLASH
 		for (i=0; i<=m; ++i)
-			fprintf(stderr,"JBM isf i=%d l1=%d l2=%d\n",i,l1[i],l2[i]);
+			fprintf(stderr, "JBM isf i=%d l1=%d l2=%d\n", i, l1[i], l2[i]);
 	#endif
 	i=m;
 	do
 	{
 		#if DEBUG_JBM_INDEX_SORT_FLASH
-			fprintf(stderr,"JBM isf i=%d l1=%d l2=%d\n",i,l1[i],l2[i]);
+			fprintf(stderr, "JBM isf i=%d l1=%d l2=%d\n", i, l1[i], l2[i]);
 		#endif
 		j=l1[i]-1;
 		nk=ni+l2[i];
-		if (j<JBM_INDEX_SORT_FLASH_MIN) jbm_index_sort_insertion(x,nk,j);
-		else jbm_index_sort_flash(x,nk,j);
+		if (j<JBM_INDEX_SORT_FLASH_MIN) jbm_index_sort_insertion(x, nk, j);
+		else jbm_index_sort_flash(x, nk, j);
 		#if DEBUG_JBM_INDEX_SORT_FLASH
-			fprintf(stderr,"JBM isf i=%d l1=%d l2=%d\n",i,l1[i],l2[i]);
+			fprintf(stderr, "JBM isf i=%d l1=%d l2=%d\n", i, l1[i], l2[i]);
 		#endif
 	}
 	while (--i>=0);
@@ -648,186 +649,186 @@ sorted:
 	g_free(nj);
 	#if DEBUG_JBM_INDEX_SORT_FLASH
 		for (i=0; i<=n; ++i)
-			fprintf(stderr,"JBM isf i=%d x="FWF" ni=%d\n",i,x[ni[i]],ni[i]);
-		fprintf(stderr,"JBM index flash sort exit\n");
+			fprintf(stderr, "JBM isf i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
+		fprintf(stderr, "JBM index flash sort exit\n");
 	#endif
 	return;
 }
 #endif
 
 #if !INLINE_JBM_INDEX_SORT
-void jbm_index_sort(JBFLOAT *x,int *ni,int n) {_jbm_index_sort(x,ni,n);}
+void jbm_index_sort(JBFLOAT *x, int *ni, int n) {_jbm_index_sort(x, ni, n);}
 #endif
 
 #if !INLINE_JBM_INDEX_SORT_EXTENDED
-int jbm_index_sort_extended(JBFLOAT *x,JBFLOAT **xr,int **ni,int n)
-{return _jbm_index_sort_extended(x,xr,ni,n);}
+int jbm_index_sort_extended(JBFLOAT *x, JBFLOAT **xr, int **ni, int n)
+{return _jbm_index_sort_extended(x, xr, ni, n);}
 #endif
 
 #if !INLINE_JBM_SOLVE_MATRIX
-void jbm_solve_matrix(JBFLOAT *x,int n) {_jbm_solve_matrix(x,n);}
+void jbm_solve_matrix(JBFLOAT *x, int n) {_jbm_solve_matrix(x, n);}
 #endif
 
 #if !INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX
 void jbm_solve_tridiagonal_matrix
-	(JBFLOAT *C,JBFLOAT *D,JBFLOAT *E,JBFLOAT *iu,int n)
-{_jbm_solve_tridiagonal_matrix(C,D,E,iu,n);}
+	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *iu, int n)
+{_jbm_solve_tridiagonal_matrix(C, D, E, iu, n);}
 #endif
 
 #if !INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO
 void jbm_solve_tridiagonal_matrix_zero
-	(JBFLOAT *C,JBFLOAT *D,JBFLOAT *E,JBFLOAT *iu,int n)
-{_jbm_solve_tridiagonal_matrix_zero(C,D,E,iu,n);}
+	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *iu, int n)
+{_jbm_solve_tridiagonal_matrix_zero(C, D, E, iu, n);}
 #endif
 
 #if !INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX
 void jbm_solve_pentadiagonal_matrix
-	(JBFLOAT *B,JBFLOAT *C,JBFLOAT *D,JBFLOAT *E,JBFLOAT *F,JBFLOAT *iu,int n)
-{_jbm_solve_pentadiagonal_matrix(B,C,D,E,F,iu,n);}
+	(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *F, JBFLOAT *iu, int n)
+{_jbm_solve_pentadiagonal_matrix(B, C, D, E, F, iu, n);}
 #endif
 
 #if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY
-void jbm_solve_tridiagonal_varray(void *v,int size,int n)
-{_jbm_solve_tridiagonal_varray(v,size,n);}
+void jbm_solve_tridiagonal_varray(void *v, int size, int n)
+{_jbm_solve_tridiagonal_varray(v, size, n);}
 #endif
 
 #if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY_ZERO
-void jbm_solve_tridiagonal_varray_zero(void *v,int size,int n)
-{_jbm_solve_tridiagonal_varray_zero(v,size,n);}
+void jbm_solve_tridiagonal_varray_zero(void *v, int size, int n)
+{_jbm_solve_tridiagonal_varray_zero(v, size, n);}
 #endif
 
 #if !INLINE_JBM_REGRESSION
-void jbm_regression(JBFLOAT *x,JBFLOAT *y,int n,JBFLOAT **A,int m)
-{_jbm_regression(x,y,n,A,m);}
+void jbm_regression(JBFLOAT *x, JBFLOAT *y, int n, JBFLOAT **A, int m)
+{_jbm_regression(x, y, n, A, m);}
 #endif
 
 #if !INLINE_JBM_SPLINE_CUBIC
 void jbm_spline_cubic
-	(JBFLOAT *x,JBFLOAT *y,int n,JBFLOAT **b,JBFLOAT **c,JBFLOAT **d)
-{_jbm_spline_cubic(x,y,n,b,c,d);}
+	(JBFLOAT *x, JBFLOAT *y, int n, JBFLOAT **b, JBFLOAT **c, JBFLOAT **d)
+{_jbm_spline_cubic(x, y, n, b, c, d);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_SUPERBEE
-JBDOUBLE jbm_flux_limiter_superbee(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_superbee(d1,d2);}
+JBDOUBLE jbm_flux_limiter_superbee(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_superbee(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_VANLEER
-JBDOUBLE jbm_flux_limiter_VanLeer(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_VanLeer(d1,d2);}
+JBDOUBLE jbm_flux_limiter_VanLeer(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_VanLeer(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_VANALBADA
-JBDOUBLE jbm_flux_limiter_VanAlbada(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_VanAlbada(d1,d2);}
+JBDOUBLE jbm_flux_limiter_VanAlbada(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_VanAlbada(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_MINMOD
-JBDOUBLE jbm_flux_limiter_minmod(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_minmod(d1,d2);}
+JBDOUBLE jbm_flux_limiter_minmod(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_minmod(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_SUPERMIN
-JBDOUBLE jbm_flux_limiter_supermin(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_supermin(d1,d2);}
+JBDOUBLE jbm_flux_limiter_supermin(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_supermin(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_MINSUPER
-JBDOUBLE jbm_flux_limiter_minsuper(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_minsuper(d1,d2);}
+JBDOUBLE jbm_flux_limiter_minsuper(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_minsuper(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_NULL
-JBDOUBLE jbm_flux_limiter_null(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_null(d1,d2);}
+JBDOUBLE jbm_flux_limiter_null(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_null(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_CENTERED
-JBDOUBLE jbm_flux_limiter_centered(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_centered(d1,d2);}
+JBDOUBLE jbm_flux_limiter_centered(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_centered(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_TOTAL
-JBDOUBLE jbm_flux_limiter_total(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_total(d1,d2);}
+JBDOUBLE jbm_flux_limiter_total(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_total(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_BURGUETE
-JBDOUBLE jbm_flux_limiter_Burguete(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_Burguete(d1,d2);}
+JBDOUBLE jbm_flux_limiter_Burguete(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_Burguete(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_MEAN
-JBDOUBLE jbm_flux_limiter_mean(JBDOUBLE d1,JBDOUBLE d2)
-{return _jbm_flux_limiter_mean(d1,d2);}
+JBDOUBLE jbm_flux_limiter_mean(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_mean(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_SELECT
-JBDOUBLE(*jbm_flux_limiter_select(int type))(JBDOUBLE,JBDOUBLE)
+JBDOUBLE(*jbm_flux_limiter_select(int type))(JBDOUBLE, JBDOUBLE)
 {return _jbm_flux_limiter_select(type);}
 #endif
 
 #if !INLINE_JBM_TRANSVERSAL_SECTION_REGIONS_SORT
 void jbm_transversal_section_regions_sort
-	(int i,int *nj,int *nk,JBFLOAT *l,JBFLOAT *z,JBFLOAT *x,JBFLOAT *zz,int *nx)
-{_jbm_transversal_section_regions_sort(i,nj,nk,l,z,x,zz,nx);}
+	(int i, int *nj, int *nk, JBFLOAT *l, JBFLOAT *z, JBFLOAT *x, JBFLOAT *zz, int *nx)
+{_jbm_transversal_section_regions_sort(i, nj, nk, l, z, x, zz, nx);}
 #endif
 
 #if !INLINE_JBM_TRANSVERSAL_SECTION_REGIONS
-int jbm_transversal_section_regions(JBFLOAT *l,JBFLOAT *z,int n,
-	JBFLOAT **zz,int **ni,int **nj,int **nij,int *nmin)
-{return _jbm_transversal_section_regions(l,z,n,zz,ni,nj,nij,nmin);}
+int jbm_transversal_section_regions(JBFLOAT *l, JBFLOAT *z, int n,
+	JBFLOAT **zz, int **ni, int **nj, int **nij, int *nmin)
+{return _jbm_transversal_section_regions(l, z, n, zz, ni, nj, nij, nmin);}
 #endif
 
 #if !INLINE_JBM_REGRESSION_LINEAR
-void jbm_regression_linear(JBFLOAT *x,JBFLOAT *y,int n,JBDOUBLE *a,JBDOUBLE *b)
-{_jbm_regression_linear(x,y,n,a,b);}
+void jbm_regression_linear(JBFLOAT *x, JBFLOAT *y, int n, JBDOUBLE *a, JBDOUBLE *b)
+{_jbm_regression_linear(x, y, n, a, b);}
 #endif
 
 #if !INLINE_JBM_REGRESSION_EXPONENTIAL
-void jbm_regression_exponential(JBFLOAT *x,JBFLOAT *y,int n,JBDOUBLE *a,JBDOUBLE *b)
-{_jbm_regression_exponential(x,y,n,a,b);}
+void jbm_regression_exponential(JBFLOAT *x, JBFLOAT *y, int n, JBDOUBLE *a, JBDOUBLE *b)
+{_jbm_regression_exponential(x, y, n, a, b);}
 #endif
 
 #if !INLINE_JBM_REGRESSION_MULTILINEAR
-void jbm_regression_multilinear(JBFLOAT **x,int n,JBFLOAT *a,int m)
-{_jbm_regression_multilinear(x,n,a,m);}
+void jbm_regression_multilinear(JBFLOAT **x, int n, JBFLOAT *a, int m)
+{_jbm_regression_multilinear(x, n, a, m);}
 #endif
 
 #if !INLINE_JBM_VARRAY_SEARCH
-int jbm_varray_search(JBDOUBLE x,void *v,int size,int n)
-{return _jbm_varray_search(x,v,size,n);}
+int jbm_varray_search(JBDOUBLE x, void *v, int size, int n)
+{return _jbm_varray_search(x, v, size, n);}
 #endif
 
 #if !INLINE_JBM_VARRAY_SEARCH_EXTENDED
-int jbm_varray_search_extended(JBDOUBLE x,void *v,int size,int n)
-{return _jbm_varray_search_extended(x,v,size,n);}
+int jbm_varray_search_extended(JBDOUBLE x, void *v, int size, int n)
+{return _jbm_varray_search_extended(x, v, size, n);}
 #endif
 
 #if !INLINE_JBM_VARRAY_MAX
-JBDOUBLE jbm_varray_max(void *va,int size,int n)
-{return _jbm_varray_max(va,size,n);}
+JBDOUBLE jbm_varray_max(void *va, int size, int n)
+{return _jbm_varray_max(va, size, n);}
 #endif
 
 #if !INLINE_JBM_VARRAY_MIN
-JBDOUBLE jbm_varray_min(void *va,int size,int n)
-{return _jbm_varray_min(va,size,n);}
+JBDOUBLE jbm_varray_min(void *va, int size, int n)
+{return _jbm_varray_min(va, size, n);}
 #endif
 
 #if !INLINE_JBM_VARRAY_MAXMIN
-void jbm_varray_maxmin(void *va,int size,int n,JBDOUBLE *max,JBDOUBLE *min)
-{_jbm_varray_maxmin(va,size,n,max,min);}
+void jbm_varray_maxmin(void *va, int size, int n, JBDOUBLE *max, JBDOUBLE *min)
+{_jbm_varray_maxmin(va, size, n, max, min);}
 #endif
 
 #if !INLINE_JBM_VARRAY_MEAN_SQUARE_ERROR
 JBDOUBLE jbm_varray_mean_square_error
-	(void *xa,void *fa,int sizea,int na,void *xr,void *fr,int sizer,int nr)
-{return _jbm_varray_mean_square_error(xa,fa,sizea,na,xr,fr,sizer,nr);}
+	(void *xa, void *fa, int sizea, int na, void *xr, void *fr, int sizer, int nr)
+{return _jbm_varray_mean_square_error(xa, fa, sizea, na, xr, fr, sizer, nr);}
 #endif
 
 #if !INLINE_JBM_FILE_MEAN_SQUARE_ERROR
 JBDOUBLE jbm_file_mean_square_error
-	(char *namea,int ixa,int ifa,int na,char *namer,int ixr,int ifr,int nr)
-{return _jbm_file_mean_square_error(namea,ixa,ifa,na,namer,ixr,ifr,nr);}
+	(char *namea, int ixa, int ifa, int na, char *namer, int ixr, int ifr, int nr)
+{return _jbm_file_mean_square_error(namea, ixa, ifa, na, namer, ixr, ifr, nr);}
 #endif
 
