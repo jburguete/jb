@@ -411,24 +411,79 @@ JBDOUBLE jbm_integral(JBDOUBLE (*f)(JBDOUBLE),JBDOUBLE x1,JBDOUBLE x2)
 {return _jbm_integral(f,x1,x2);}
 #endif
 
+/**
+ * \fn int jbm_farray_search(JBDOUBLE x,JBFLOAT *fa,int n)
+ * \brief Function to search the interval where a number is in a increasing
+ *   sorted array of JBFLOAT numbers.
+ * \param x
+ * \brief number.
+ * \param fa
+ * \brief array of JBFLOAT numbers.
+ * \param n
+ * \brief number of the highest array element.
+ * \return interval number.
+ */
 #if !INLINE_JBM_FARRAY_SEARCH
 int jbm_farray_search(JBDOUBLE x,JBFLOAT *fa,int n)
 {return _jbm_farray_search(x,fa,n);}
 #endif
 
+/**
+ * \fn int jbm_farray_search_extended(JBDOUBLE x,JBFLOAT *fa,int n)
+ * \brief Function to search the interval where a number is in a increasing
+ *   sorted array of JBFLOAT numbers.
+ * \param x
+ * \brief number.
+ * \param fa
+ * \brief array of JBFLOAT numbers.
+ * \param n
+ * \brief number of the highest array element.
+ * \return interval number, -1 if x<fa[0] or n if x>fa[n].
+ */
 #if !INLINE_JBM_FARRAY_SEARCH_EXTENDED
 int jbm_farray_search_extended(JBDOUBLE x,JBFLOAT *fa,int n)
 {return _jbm_farray_search_extended(x,fa,n);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_farray_max(JBFLOAT *fa,int n)
+ * \brief Function to find the highest element of an array of JBFLOAT numbers.
+ * \param fa
+ * \brief array of JBFLOAT numbers.
+ * \param n
+ * \brief number of the ending array element.
+ * \return the highest value.
+ */
 #if !INLINE_JBM_FARRAY_MAX
 JBDOUBLE jbm_farray_max(JBFLOAT *fa,int n) {return _jbm_farray_max(fa,n);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_farray_min(JBFLOAT *fa,int n)
+ * \brief Function to find the lowest element of an array of JBFLOAT numbers.
+ * \param fa
+ * \brief array of JBFLOAT numbers.
+ * \param n
+ * \brief number of the ending array element.
+ * \return the lowest value.
+ */
 #if !INLINE_JBM_FARRAY_MIN
 JBDOUBLE jbm_farray_min(JBFLOAT *fa,int n) {return _jbm_farray_min(fa,n);}
 #endif
 
+/**
+ * \fn void jbm_farray_maxmin(JBFLOAT *fa,int n,JBDOUBLE *max,JBDOUBLE *min)
+ * \brief Function to find the highest and the lowest elements of an array of
+ *   JBFLOAT numbers.
+ * \param fa
+ * \brief array of JBFLOAT numbers.
+ * \param n
+ * \brief number of the ending array element.
+ * \param max
+ * \brief the highest value.
+ * \param min
+ * \brief the lowest value.
+ */
 #if !INLINE_JBM_FARRAY_MAXMIN
 void jbm_farray_maxmin(JBFLOAT *fa,int n,JBDOUBLE *max,JBDOUBLE *min)
 {_jbm_farray_maxmin(fa,n,max,min);}
