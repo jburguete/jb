@@ -24,6 +24,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * \file jb_win.c
+ * \brief Source file with useful display functions.
+ * \author Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2014, Javier Burguete Tolosa.
+ */
 #include "jb_win.h"
 
 #if JBW==JBW_GTK

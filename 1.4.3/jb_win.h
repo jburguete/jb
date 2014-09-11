@@ -24,6 +24,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * \file jb_win.h
+ * \brief Header file with useful display functions.
+ * \author Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2014, Javier Burguete Tolosa.
+ */
 #ifndef JB_WIN__H
 #define JB_WIN__H 1
 
