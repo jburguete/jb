@@ -718,16 +718,16 @@ static inline JBFLOAT* _jbm_farray_add
 	#if DEBUG_JBM_FARRAY_ADD
 		fprintf(stderr, "JBM float array add: start\n");
 	#endif
-	*fc = x = (JBFLOAT*)g_try_malloc((na+nb+2)*sizeof(JBFLOAT));
+	*fc = x = (JBFLOAT*)g_try_malloc((na + nb + 2) * sizeof(JBFLOAT));
 	if (!x) return 0;
-	for (i=j=k=0; i<=na || j<=nb;)
+	for (i = j = k = 0; i <= na || j <= nb;)
 	{
-		if (*fa>*fb)
+		if (*fa > *fb)
 		{
 			++j;
 			*x = *(fb++);
 		}
-		else if (*fa<*fb)
+		else if (*fa < *fb)
 		{
 			++i;
 			*x = *(fa++);
@@ -742,7 +742,7 @@ static inline JBFLOAT* _jbm_farray_add
 		++k;
 		++x;
 	}
-	*fc = (JBFLOAT*)jb_try_realloc(*fc, k*sizeof(JBFLOAT));
+	*fc = (JBFLOAT*)jb_try_realloc(*fc, k * sizeof(JBFLOAT));
 	*nc = --k;
 	#if DEBUG_JBM_FARRAY_ADD
 		fprintf(stderr, "JBM float array add: end\n");
@@ -763,78 +763,74 @@ static inline JBDOUBLE _jbm_farray_integral
 	register JBFLOAT *yy, *xx;
 	register JBDOUBLE I, y1;
 
-	/*
-		Integral de una función tabular expresada en 2 float arrays de 0 a n
-		puntos por la regla trapezoidal
-	*/
-
 	#if DEBUG_JBM_FARRAY_INTEGRAL
 		fprintf(stderr, "JBM float array integral: start\n");
 	#endif
-	if (n==0)
+	if (n == 0)
 	{
-		I=y[0]*(x2-x1);
+		I = y[0] * (x2 - x1);
 		goto exit1;
 	}
-	i=jbm_farray_search_extended(x1, x, n);
-	if (i<0)
+	i = jbm_farray_search_extended(x1, x, n);
+	if (i < 0)
 	{
-		i=0;
-		I=y[0]*(x2-x1);
-		x1=x[0];
-		y1=y[0];
-		xx=x;
-		yy=y;
+		i = 0;
+		I = y[0] * (x2 - x1);
+		x1 = x[0];
+		y1 = y[0];
+		xx = x;
+		yy = y;
 		#if DEBUG_JBM_FARRAY_INTEGRAL
 			fprintf(stderr, "JBMFI a I="FWL"\n", I);
 		#endif
 	}
-	else if (i==n)
+	else if (i == n)
 	{
-		I=y[i]*(x2-x1);
+		I = y[i] * (x2 - x1);
 		goto exit1;
 	}
 	else
 	{
-		I=0.;
-		xx=x+i;
-		yy=y+i;
-		y1=jbm_extrapolate(x1, xx[0], xx[1], yy[0], yy[1]);
+		I = 0.;
+		xx = x + i;
+		yy = y + i;
+		y1 = jbm_extrapolate(x1, xx[0], xx[1], yy[0], yy[1]);
 		#if DEBUG_JBM_FARRAY_INTEGRAL
 			fprintf(stderr, "JBMFI b I="FWL"\n", I);
 		#endif
 	}
-	if (x2<xx[1])
+	if (x2 < xx[1])
 	{
-		I+=0.5*(y1+jbm_extrapolate(x2, xx[0], xx[1], yy[0], yy[1]))*(x2-x1);
+		I += 0.5 * (y1 + jbm_extrapolate(x2, xx[0], xx[1], yy[0], yy[1]))
+			* (x2 - x1);
 		#if DEBUG_JBM_FARRAY_INTEGRAL
 			fprintf(stderr, "JBMFI c I="FWL"\n", I);
 		#endif
 		goto exit1;
 	}
-	I+=0.5*(y1+yy[1])*(xx[1]-x1);
+	I += 0.5 * (y1 + yy[1]) * (xx[1] - x1);
 	#if DEBUG_JBM_FARRAY_INTEGRAL
 		fprintf(stderr, "JBMFI d I="FWL"\n", I);
 	#endif
-	if (++i==n)
+	if (++i == n)
 	{
-		I+=yy[1]*(x2-xx[1]);
+		I += yy[1] * (x2 - xx[1]);
 		#if DEBUG_JBM_FARRAY_INTEGRAL
 			fprintf(stderr, "JBMFI e I="FWL"\n", I);
 		#endif
 		goto exit1;
 	}
-	while (++i<n && x2>xx[2])
+	while (++i < n && x2 > xx[2])
 	{
 		++xx, ++yy;
-		I+=0.5*(yy[0]+yy[1])*(xx[1]-xx[0]);
+		I += 0.5 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
 		#if DEBUG_JBM_FARRAY_INTEGRAL
 			fprintf(stderr, "JBMFI i=%d I="FWL"\n", i, I);
 		#endif
 	}
-	if (i==n) I+=yy[2]*(x2-xx[1]);
-	else if (x2<xx[2])
-		I+=0.5*(yy[1]+jbm_extrapolate(x2, xx[1], xx[2], yy[1], yy[2]))*(x2-xx[1]);
+	if (i == n) I += yy[2] * (x2 - xx[1]);
+	else if (x2 < xx[2]) I += 0.5 * (yy[1]
+		+ jbm_extrapolate(x2, xx[1], xx[2], yy[1], yy[2])) * (x2 - xx[1]);
 exit1:
 	#if DEBUG_JBM_FARRAY_INTEGRAL
 		fprintf(stderr, "JBMFI I="FWL"\n", I);
@@ -853,28 +849,28 @@ static inline JBDOUBLE _jbm_farray_mean_square_error
 	(JBFLOAT *xa, JBFLOAT *fa, int na, JBFLOAT *xr, JBFLOAT *fr, int nr)
 {
 	register int i, j;
-	JBDOUBLE k=0.;
+	JBDOUBLE k = 0.;
 	#if DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBM float array mean square error\n");
 	#endif
-	for (i=0; i<=na && xa[i]<xr[0]; ++i) k+=jbm_fsqr(fa[i]-fr[0]);
+	for (i = 0; i <= na && xa[i] < xr[0]; ++i) k += jbm_fsqr(fa[i] - fr[0]);
 	#if DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBMFMSE i=%d k="FWL"\n", i, k);
 	#endif
-	for (j=0; i<=na; ++i)
+	for (j = 0; i <= na; ++i)
 	{
-		while (j<nr && xa[i]>xr[j+1]) ++j;
+		while (j < nr && xa[i] > xr[j+1]) ++j;
 		#if DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR
 			fprintf(stderr, "JBMFMSE j=%d\n", j);
 		#endif
-		if (j==nr) for (; i<=na; ++i) k+=jbm_fsqr(fa[i]-fr[nr]);
-		else k+=jbm_fsqr
-			(fa[i]-jbm_extrapolate(xa[i], xr[j], xr[j+1], fr[j], fr[j+1]));
+		if (j == nr) for (; i<=na; ++i) k += jbm_fsqr(fa[i] - fr[nr]);
+		else k += jbm_fsqr
+			(fa[i] - jbm_extrapolate(xa[i], xr[j], xr[j+1], fr[j], fr[j+1]));
 		#if DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR
 			fprintf(stderr, "JBMFMSE i=%d j=%d k="FWL"\n", i, j, k);
 		#endif
 	}
-	k=sqrt(k/(na+1));
+	k = sqrt(k / (na + 1));
 	#if DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBM float array mean square error="FWL"\n", k);
 	#endif
@@ -884,7 +880,8 @@ static inline JBDOUBLE _jbm_farray_mean_square_error
 #if INLINE_JBM_FARRAY_MEAN_SQUARE_ERROR
 	#define jbm_farray_mean_square_error _jbm_farray_mean_square_error
 #else
-	JBDOUBLE jbm_farray_mean_square_error(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*, int);
+	JBDOUBLE jbm_farray_mean_square_error
+		(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*, int);
 #endif
 
 static inline JBDOUBLE _jbm_v2_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2, JBDOUBLE y2)

@@ -509,16 +509,79 @@ JBDOUBLE jbm_farray_interpolate(JBDOUBLE x, JBFLOAT *fa, JBFLOAT *fb, int n)
 {return _jbm_farray_interpolate(x, fa, fb, n);}
 #endif
 
+/**
+ * \fn JBFLOAT* jbm_farray_add(JBFLOAT *fa, int na, JBFLOAT *fb, int nb, \
+ *   JBFLOAT **fc, int *nc)
+ * \brief Function to add 2 increasingly sorted arrays of JBFLOAT numbers.
+ * \param fa
+ * \brief 1st increasingly sorted array of JBFLOAT numbers.
+ * \param na
+ * \brief the highest element number of the 1st array.
+ * \param fb
+ * \brief 2nd increasingly sorted array of JBFLOAT numbers.
+ * \param nb
+ * \brief the highest element number of the 2nd array.
+ * \param fc
+ * \brief pointer to the resulting increasingly sorted array of JBFLOAT numbers.
+ * \param nc
+ * \brief pointer to the highest element number of the resulting array.
+ * \return resulting array.
+ */
 #if !INLINE_JBM_FARRAY_ADD
-JBFLOAT* jbm_farray_add(JBFLOAT *fa, int na, JBFLOAT *fb, int nb, JBFLOAT **fc, int *nc)
+JBFLOAT* jbm_farray_add
+	(JBFLOAT *fa, int na, JBFLOAT *fb, int nb, JBFLOAT **fc, int *nc)
 {return _jbm_farray_add(fa, na, fb, nb, fc, nc);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_farray_integral(JBFLOAT *x, JBFLOAT *y, int n, \
+ *   JBDOUBLE x1, JBDOUBLE x2)
+ * \brief Function to integrate a tabular function in an interval.
+ * \param x
+ * \brief incresingly sorted array of JBFLOAT numbers defining the x-coordinates
+ *   of the tabular function.
+ * \param y
+ * \brief array of JBFLOAT numbers defining the y-coordinates of the tabular
+ *   function.
+ * \param n
+ * \brief the highest element number of the arrays.
+ * \param x1
+ * \brief left limit of the integration interval.
+ * \param x2
+ * \brief right limit of the integration interval.
+ * \return integral value.
+ */
 #if !INLINE_JBM_FARRAY_INTEGRAL
-JBDOUBLE jbm_farray_integral(JBFLOAT *x, JBFLOAT *y, int n, JBDOUBLE x1, JBDOUBLE x2)
+JBDOUBLE jbm_farray_integral
+	(JBFLOAT *x, JBFLOAT *y, int n, JBDOUBLE x1, JBDOUBLE x2)
 {return _jbm_farray_integral(x, y, n, x1, x2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_farray_mean_square_error(JBFLOAT *xa, JBFLOAT *fa, int na, \
+ *   JBFLOAT *xr, JBFLOAT *fr, int nr)
+ * \brief Function to calculate the root mean square error between 2 tabular
+ *   functions.
+ * \param xa
+ * \brief incresingly sorted array of JBFLOAT numbers defining the x-coordinates
+ *   of the 1st tabular function.
+ * \param fa
+ * \brief array of JBFLOAT numbers defining the y-coordinates of the 1st tabular
+ *   function.
+ * \param na
+ * \brief the highest element number of the arrays defining the 1st tabular
+ *   function.
+ * \param xr
+ * \brief incresingly sorted array of JBFLOAT numbers defining the x-coordinates
+ *   of the 2nd tabular function.
+ * \param fr
+ * \brief array of JBFLOAT numbers defining the y-coordinates of the 2nd tabular
+ *   function.
+ * \param nr
+ * \brief the highest element number of the arrays defining the 2nd tabular
+ *   function.
+ * \return root mean square error.
+ */
 #if !INLINE_JBM_FARRAY_MEAN_SQUARE_ERROR
 JBDOUBLE jbm_farray_mean_square_error
 	(JBFLOAT *xa, JBFLOAT *fa, int na, JBFLOAT *xr, JBFLOAT *fr, int nr)
