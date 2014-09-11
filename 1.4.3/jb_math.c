@@ -619,9 +619,47 @@ JBDOUBLE jbm_farray_root_mean_square_error
 {return _jbm_farray_root_mean_square_error(xa, fa, na, xr, fr, nr);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_v2_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2, \
+ *   JBDOUBLE y2)
+ * \brief Function to calculate the length of a 2D segement.
+ * \param x1
+ * \brief x-coordinate of the 1st point defining the segemnt.
+ * \param y1
+ * \brief y-coordinate of the 1st point defining the segemnt.
+ * \param x2
+ * \brief x-coordinate of the 2nd point defining the segemnt.
+ * \param y2
+ * \brief y-coordinate of the 2nd point defining the segemnt.
+ * \return segement length.
+ */
 #if !INLINE_JBM_V2_LENGTH
 JBDOUBLE jbm_v2_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2, JBDOUBLE y2)
 {return _jbm_v2_length(x1, y1, x2, y2);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_v3_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE z1, \
+ *   JBDOUBLE x2, JBDOUBLE y2, JBDOUBLE z2)
+ * \brief Function to calculate the length of a 3D segement.
+ * \param x1
+ * \brief x-coordinate of the 1st point defining the segemnt.
+ * \param y1
+ * \brief y-coordinate of the 1st point defining the segemnt.
+ * \param z1
+ * \brief z-coordinate of the 1st point defining the segemnt.
+ * \param x2
+ * \brief x-coordinate of the 2nd point defining the segemnt.
+ * \param y2
+ * \brief y-coordinate of the 2nd point defining the segemnt.
+ * \param z2
+ * \brief z-coordinate of the 2nd point defining the segemnt.
+ * \return segement length.
+ */
+#if !INLINE_JBM_V3_LENGTH
+JBDOUBLE jbm_v3_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE z1,
+	JBDOUBLE x2, JBDOUBLE y2, JBDOUBLE z2)
+{return _jbm_v3_length(x1, y1, z1, x2, y2, z2);}
 #endif
 
 #if !INLINE_JBM_SOLVE_CUADRATIC_REDUCED

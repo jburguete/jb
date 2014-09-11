@@ -905,15 +905,29 @@ static inline JBDOUBLE _jbm_farray_root_mean_square_error
 		(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*, int);
 #endif
 
-static inline JBDOUBLE _jbm_v2_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2, JBDOUBLE y2)
+static inline JBDOUBLE _jbm_v2_length
+	(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2, JBDOUBLE y2)
 {
-	return sqrtl(jbm_fsqr(x2-x1)+jbm_fsqr(y2-y1));
+	return sqrtl(jbm_fsqr(x2 - x1) + jbm_fsqr(y2 - y1));
 }
 
 #if INLINE_JBM_V2_LENGTH
 	#define jbm_v2_length _jbm_v2_length
 #else
 	JBDOUBLE jbm_v2_length(JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
+#endif
+
+static inline JBDOUBLE _jbm_v3_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE z1,
+	JBDOUBLE x2, JBDOUBLE y2, JBDOUBLE z2)
+{
+	return sqrtl(jbm_fsqr(x2 - x1) + jbm_fsqr(y2 - y1) + jbm_fsqr(z2 - z1));
+}
+
+#if INLINE_JBM_V3_LENGTH
+	#define jbm_v3_length _jbm_v3_length
+#else
+	JBDOUBLE jbm_v3_length
+		(JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_solve_cuadratic_reduced
