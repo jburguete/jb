@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2011, Javier Burguete Tolosa.
+ * Copyright 2005-2014, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_config.h
  * \brief Header file to configure the jb library.
  * \author Javier Burguete Tolosa,
- * \copyright Copyright 2005-2011, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2014, Javier Burguete Tolosa.
  */
 #ifndef JB_CONFIG__H
 #define JB_CONFIG__H 1

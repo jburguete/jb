@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2011, Javier Burguete Tolosa.
+ * Copyright 2005-2014, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_math.c
  * \brief Source file with useful mathematical functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2011, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2014, Javier Burguete Tolosa.
  */
 #include "jb_math.h"
 
@@ -351,18 +351,61 @@ long long int jbm_dblll(long long int x) {return _jbm_dblll(x);}
 JBDOUBLE jbm_fdbl(JBDOUBLE x) {return _jbm_fdbl(x);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_extrapolate(JBDOUBLE x,JBDOUBLE x1,JBDOUBLE x2, \
+ *   JBDOUBLE y1,JBDOUBLE y2)
+ * \brief Function to perform an extrapolation between 2 2D points.
+ * \param x
+ * \brief x-coordinate of the extrapolated point.
+ * \param x1
+ * \brief x-coordinate of the 1st point.
+ * \param x2
+ * \brief x-coordinate of the 2nd point.
+ * \param y1
+ * \brief y-coordinate of the 1st point.
+ * \param y2
+ * \brief y-coordinate of the 2nd point.
+ * \return y-coordinate of the extrapolated point.
+ */
 #if !INLINE_JBM_EXTRAPOLATE
 JBDOUBLE jbm_extrapolate
 	(JBDOUBLE x,JBDOUBLE x1,JBDOUBLE x2,JBDOUBLE y1,JBDOUBLE y2)
 {return _jbm_extrapolate(x,x1,x2,y1,y2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_interpolate(JBDOUBLE x,JBDOUBLE x1,JBDOUBLE x2, \
+ *   JBDOUBLE y1,JBDOUBLE y2)
+ * \brief Function to perform an interpolation between 2 2D points.
+ * \param x
+ * \brief x-coordinate of the interpolated point.
+ * \param x1
+ * \brief x-coordinate of the 1st point.
+ * \param x2
+ * \brief x-coordinate of the 2nd point.
+ * \param y1
+ * \brief y-coordinate of the 1st point.
+ * \param y2
+ * \brief y-coordinate of the 2nd point.
+ * \return y-coordinate of the interpolated point.
+ */
 #if !INLINE_JBM_INTERPOLATE
 JBDOUBLE jbm_interpolate
 	(JBDOUBLE x,JBDOUBLE x1,JBDOUBLE x2,JBDOUBLE y1,JBDOUBLE y2)
 {return _jbm_interpolate(x,x1,x2,y1,y2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_integral(JBDOUBLE (*f)(JBDOUBLE),JBDOUBLE x1,JBDOUBLE x2)
+ * \brief Function to approximate an integral defined in an interval.
+ * \param f
+ * \brief pointer to the function to integrate.
+ * \param x1
+ * \brief left limit of the interval.
+ * \param x2
+ * \brief right limit of the interval.
+ * \return integral value.
+ */
 #if !INLINE_JBM_INTEGRAL
 JBDOUBLE jbm_integral(JBDOUBLE (*f)(JBDOUBLE),JBDOUBLE x1,JBDOUBLE x2)
 {return _jbm_integral(f,x1,x2);}

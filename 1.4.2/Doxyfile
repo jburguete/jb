@@ -1982,6 +1982,9 @@ PREDEFINED             = \
 	INLINE_JBM_DBLL=0 \
 	INLINE_JBM_DBLLL=0 \
 	INLINE_JBM_FDBL=0 \
+	INLINE_JBM_EXTRAPOLATE=0 \
+	INLINE_JBM_INTERPOLATE=0 \
+	INLINE_JBM_INTEGRAL=0 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
