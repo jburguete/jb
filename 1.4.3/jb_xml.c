@@ -24,6 +24,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * \file jb_xml.c
+ * \brief Source file with useful XML functions.
+ * \author Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2014, Javier Burguete Tolosa.
+ */
 #define _GNU_SOURCE
 #include <string.h>
 #include "jb_xml.h"

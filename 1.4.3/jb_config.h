@@ -1391,6 +1391,12 @@
  */
 #define DEBUG_JBM_FARRAY_MAXMIN						0
 /**
+ * \def DEBUG_JBM_FARRAY_INTERPOLATE
+ * \brief Macro deciding if the function jbm_farray_interpolate() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_FARRAY_INTERPOLATE				1
+/**
  * \def DEBUG_JBM_FARRAY_ADD
  * \brief Macro deciding if the function jbm_farray_add() has to be
  *   debugged.
@@ -1408,6 +1414,22 @@
  *   to be debugged.
  */
 #define DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR			0
+/**
+ * \def DEBUG_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_farray_root_mean_square_error() has
+ *   to be debugged.
+ */
+#define DEBUG_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR		0
+/**
+ * \def DEBUG_JBM_V2_LENGTH
+ * \brief Macro deciding if the function jbm_v2_length() has to be debugged.
+ */
+#define DEBUG_JBM_V2_LENGTH							1
+/**
+ * \def DEBUG_JBM_V3_LENGTH
+ * \brief Macro deciding if the function jbm_v3_length() has to be debugged.
+ */
+#define DEBUG_JBM_V3_LENGTH							1
 /**
  * \def DEBUG_JBM_SOLVE_CUADRATIC_REDUCED
  * \brief Macro deciding if the function jbm_solve_cuadratic_reduced() has

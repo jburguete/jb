@@ -24,6 +24,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * \file jb_xml.h
+ * \brief Header file with useful XML functions.
+ * \author Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2014, Javier Burguete Tolosa.
+ */
 #ifndef JB_XML__H
 #define JB_XML__H 1
 

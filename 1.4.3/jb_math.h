@@ -591,7 +591,6 @@ static inline int _jbm_farray_search(JBDOUBLE x, JBFLOAT *fa, int n)
 	#endif
 	return i;
 }
-
 #if INLINE_JBM_FARRAY_SEARCH
 	#define jbm_farray_search _jbm_farray_search
 #else
@@ -612,7 +611,6 @@ static inline int _jbm_farray_search_extended(JBDOUBLE x, JBFLOAT *fa, int n)
 	#endif
 	return i;
 }
-
 #if INLINE_JBM_FARRAY_SEARCH_EXTENDED
 	#define jbm_farray_search_extended _jbm_farray_search_extended
 #else
@@ -633,7 +631,6 @@ static inline JBDOUBLE _jbm_farray_max(JBFLOAT *fa, int n)
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_FARRAY_MAX
 	#define jbm_farray_max _jbm_farray_max
 #else
@@ -654,7 +651,6 @@ static inline JBDOUBLE _jbm_farray_min(JBFLOAT *fa, int n)
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_FARRAY_MIN
 	#define jbm_farray_min _jbm_farray_min
 #else
@@ -680,7 +676,6 @@ static inline void _jbm_farray_maxmin
 		fprintf(stderr, "JBM float array max="FWL" min="FWL"\n", kmax, kmin);
 	#endif
 }
-
 #if INLINE_JBM_FARRAY_MAXMIN
 	#define jbm_farray_maxmin _jbm_farray_maxmin
 #else
@@ -703,7 +698,6 @@ static inline JBDOUBLE _jbm_farray_interpolate
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_FARRAY_INTERPOLATE
 	#define jbm_farray_interpolate _jbm_farray_interpolate
 #else
@@ -749,7 +743,6 @@ static inline JBFLOAT* _jbm_farray_add
 	#endif
 	return *fc;
 }
-
 #if INLINE_JBM_FARRAY_ADD
 	#define jbm_farray_add _jbm_farray_add
 #else
@@ -838,7 +831,6 @@ exit1:
 	#endif
 	return I;
 }
-
 #if INLINE_JBM_FARRAY_INTEGRAL
 	#define jbm_farray_integral _jbm_farray_integral
 #else
@@ -876,7 +868,6 @@ static inline JBDOUBLE _jbm_farray_mean_square_error
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_FARRAY_MEAN_SQUARE_ERROR
 	#define jbm_farray_mean_square_error _jbm_farray_mean_square_error
 #else
@@ -897,7 +888,6 @@ static inline JBDOUBLE _jbm_farray_root_mean_square_error
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR
 	#define jbm_farray_root_mean_square_error _jbm_farray_root_mean_square_error
 #else
@@ -910,7 +900,6 @@ static inline JBDOUBLE _jbm_v2_length
 {
 	return sqrtl(jbm_fsqr(x2 - x1) + jbm_fsqr(y2 - y1));
 }
-
 #if INLINE_JBM_V2_LENGTH
 	#define jbm_v2_length _jbm_v2_length
 #else
@@ -922,7 +911,6 @@ static inline JBDOUBLE _jbm_v3_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE z1,
 {
 	return sqrtl(jbm_fsqr(x2 - x1) + jbm_fsqr(y2 - y1) + jbm_fsqr(z2 - z1));
 }
-
 #if INLINE_JBM_V3_LENGTH
 	#define jbm_v3_length _jbm_v3_length
 #else
