@@ -927,20 +927,20 @@ static inline JBDOUBLE _jbm_solve_cuadratic_reduced
 			"JBM Solve cuadratic reduced\na="FWL" b="FWL" x1="FWL" x2="FWL"\n",
 			a, b, x1, x2);
 	#endif
-	a/=2.;
-	b=sqrtl(a*a-b);
-	k=b-a;
-	if (k<x1 || k>x2) k=-b-a;
+	a /= 2.L;
+	b = sqrtl(a * a - b);
+	k = b - a;
+	if (k < x1 || k > x2) k = -b - a;
 	#if DEBUG_JBM_SOLVE_CUADRATIC_REDUCED
 		fprintf(stderr, "JBM Solve cuadratic reduced solution="FWL"\n", k);
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_SOLVE_CUADRATIC_REDUCED
 	#define jbm_solve_cuadratic_reduced _jbm_solve_cuadratic_reduced
 #else
-	JBDOUBLE jbm_solve_cuadratic_reduced(JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
+	JBDOUBLE jbm_solve_cuadratic_reduced
+		(JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_solve_cuadratic
@@ -952,13 +952,13 @@ static inline JBDOUBLE _jbm_solve_cuadratic
 			"JBM solve cuadratic\na="FWL" b="FWL" c="FWL"\nx1="FWL" x2="FWL"\n",
 			a, b, c, x1, x2);
 	#endif
-	if (a==0.) k=-c/b; else k=jbm_solve_cuadratic_reduced(b/a, c/a, x1, x2);
+	if (a == 0.L) k = -c / b;
+	else k = jbm_solve_cuadratic_reduced(b / a, c / a, x1, x2);
 	#if DEBUG_JBM_SOLVE_CUADRATIC
 		fprintf(stderr, "JBM solve cuadratic solution="FWL"\n", k);
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_SOLVE_CUADRATIC
 	#define jbm_solve_cuadratic _jbm_solve_cuadratic
 #else
@@ -974,38 +974,37 @@ static inline JBDOUBLE _jbm_solve_cubic_reduced
 		"JBM solve cubic reduced\na="FWL" b="FWL" c="FWL"\nx1="FWL" x2="FWL"\n",
 			a, b, c, x1, x2);
 	#endif
-	a/=3.;
-	k0=a*a;
-	k1=b/3.-k0;
-	k0=(b*a-c)/2.-a*k0;
-	k2=k1*k1*k1+k0*k0;
-	if (k2<0.)
+	a /= 3.L;
+	k0 = a * a;
+	k1 = b / 3.L - k0;
+	k0 = (b * a - c) / 2.L -a * k0;
+	k2 = k1 * k1 * k1 + k0 * k0;
+	if (k2 < 0.L)
 	{
-		k1=sqrtl(-k1);
-		k0=acos(k0/(k1*k1*k1))/3.;
-		k1*=2.;
-		k2=k1*cos(k0)-a;
-		if (k2<x1 || k2>x2)
+		k1 = sqrtl(-k1);
+		k0 = acosl(k0 / (k1 * k1 * k1)) / 3.L;
+		k1 *= 2.L;
+		k2 = k1 * cosl(k0) - a;
+		if (k2 < x1 || k2 > x2)
 		{
-			k2=k1*cos(k0+2.*M_PI/3.)-a;
-			if (k2<x1 || k2>x2) k2=k1*cos(k0-2.*M_PI/3.)-a;
+			k2 = k1 * cosl(k0 + 2.L * M_PIl / 3.L) - a;
+			if (k2 < x1 || k2 > x2) k2 = k1 * cosl(k0 - 2.L * M_PIl / 3.L) - a;
 		}
 	}
 	else
 	{
-		k1=sqrtl(k2);
-		k2=k0+k1;
-		if (k2<0.) k2=-pow(-k2, 1./3.); else k2=pow(k2, 1./3.);
-		k0-=k1;
-		if (k0<0.) k2-=pow(-k0, 1./3.); else k2+=pow(k0, 1./3.);
-		k2-=a;
+		k1 = sqrtl(k2);
+		k2 = k0 + k1;
+		if (k2 < 0.L) k2 = -powl(-k2, 1.L/3.L); else k2 = powl(k2, 1.L/3.L);
+		k0 -= k1;
+		if (k0 < 0.L) k2 -= powl(-k0, 1.L/3.L); else k2 += powl(k0, 1.L/3.L);
+		k2 -= a;
 	}
 	#if DEBUG_JBM_SOLVE_CUBIC_REDUCED
 		fprintf(stderr, "JBM solve cubic reduced solution="FWL"\n", k2);
 	#endif
 	return k2;
 }
-
 #if INLINE_JBM_SOLVE_CUBIC_REDUCED
 	#define jbm_solve_cubic_reduced _jbm_solve_cubic_reduced
 #else
@@ -1021,49 +1020,42 @@ static inline JBDOUBLE _jbm_solve_cubic(JBDOUBLE a, JBDOUBLE b,
 		"JBM solve cubic\na="FWL" b="FWL" c="FWL" d="FWL"\nx1="FWL" x2="FWL"\n",
 			a, b, c, d, x1, x2);
 	#endif
-	if (a==0.) k=jbm_solve_cuadratic(b, c, d, x1, x2);
-	else k=jbm_solve_cubic_reduced(b/a, c/a, d/a, x1, x2);
+	if (a == 0.) k = jbm_solve_cuadratic(b, c, d, x1, x2);
+	else k = jbm_solve_cubic_reduced(b / a, c / a, d / a, x1, x2);
 	#if DEBUG_JBM_SOLVE_CUBIC
 		fprintf(stderr, "JBM solve cubic solution="FWL"\n", k);
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_SOLVE_CUBIC
 	#define jbm_solve_cubic _jbm_solve_cubic
 #else
-	JBDOUBLE jbm_solve_cubic(JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
+	JBDOUBLE jbm_solve_cubic
+		(JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline void _jbm_index_sort_insertion(JBFLOAT *x, int *ni, int n)
 {
-
-/*
-	Ordena los índices ni de mayor a menor en un farray por el método de
-	inserción
-*/
-
 	register int i, j, ii;
 	register JBDOUBLE xi;
 	#if DEBUG_JBM_INDEX_SORT_INSERTION
 		fprintf(stderr, "JBM index sort insertion\n");
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM isi i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 	#endif
-	for (i=0; ++i<=n;)
+	for (i = 0; ++i <= n;)
 	{
-		ii=ni[i];
-		xi=x[ii];
-		for (j=i; --j>=0 && x[ni[j]]<xi;) ni[j+1]=ni[j];
-		ni[j+1]=ii;
+		ii = ni[i];
+		xi = x[ii];
+		for (j = i; --j >= 0 && x[ni[j]] < xi;) ni[j + 1] = ni[j];
+		ni[j + 1] = ii;
 	}
 	#if DEBUG_JBM_INDEX_SORT_INSERTION
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM isi i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 		fprintf(stderr, "JBM index sort insertion exit\n");
 	#endif
 }
-
 #if INLINE_JBM_INDEX_SORT_INSERTION
 	#define jbm_index_sort_insertion _jbm_index_sort_insertion
 #else
@@ -1072,39 +1064,32 @@ static inline void _jbm_index_sort_insertion(JBFLOAT *x, int *ni, int n)
 
 static inline void _jbm_index_sort_interchange(JBFLOAT *x, int *ni, int n)
 {
-
-/*
-	Ordena los índices ni de mayor a menor en un farray por el método de la
-	burbuja
-*/
-
 	register int i, j;
 	register JBDOUBLE xi, xj;
 	#if DEBUG_JBM_INDEX_SORT_INTERCHANGE
 		fprintf(stderr, "JBM index sort interchange\n");
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM isi i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 	#endif
-	for (i=n+1; --i>0;)
+	for (i = n + 1; --i > 0;)
 	{
-		xi=x[ni[i]];
-		for (j=i; --j>=0;)
+		xi = x[ni[i]];
+		for (j = i; --j >= 0;)
 		{
-			xj=x[ni[j]];
-			if (xj<xi)
+			xj = x[ni[j]];
+			if (xj < xi)
 			{
-				xi=xj;
-				jbm_change(ni+i, ni+j);
+				xi = xj;
+				jbm_change(ni + i, ni + j);
 			}
 		}
 	}
 	#if DEBUG_JBM_INDEX_SORT_INTERCHANGE
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM isi i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 		fprintf(stderr, "JBM index sort interchange exit\n");
 	#endif
 }
-
 #if INLINE_JBM_INDEX_SORT_INTERCHANGE
 	#define jbm_index_sort_interchange _jbm_index_sort_interchange
 #else
@@ -1113,64 +1098,57 @@ static inline void _jbm_index_sort_interchange(JBFLOAT *x, int *ni, int n)
 
 static inline void _jbm_index_sort_merge(JBFLOAT *x, int *ni, int n)
 {
-
-/*
-	Ordena los índices ni de mayor a menor en un farray por el método de
-	composición
-*/
-
 	int i, j, i1, i2, k, l;
-	int *ni1, *ni2, *nj, *nk, *nt, nn[n+1];
+	int *ni1, *ni2, *nj, *nk, *nt, nn[n + 1];
 	#if DEBUG_JBM_INDEX_SORT_MERGE
 		fprintf(stderr, "JBM index sort merge\n");
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM ism i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 	#endif
 	j=JBM_INDEX_SORT_MERGE_MIN;
-	for (i=0; i<=n-j; i+=j) jbm_index_sort_insertion(x, ni+i, j-1);
-	if (i<n) jbm_index_sort_insertion(x, ni+i, n-i);
+	for (i = 0; i <= n - j; i += j) jbm_index_sort_insertion(x, ni + i, j - 1);
+	if (i < n) jbm_index_sort_insertion(x, ni + i, n - i);
 	#if DEBUG_JBM_INDEX_SORT_MERGE
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM ism i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 	#endif
 	++n;
-	for (nk=ni, nj=nn; j<=n; j*=2)
+	for (nk = ni, nj = nn; j <= n; j *= 2)
 	{
-		for (ni1=nk, l=0, k=n/j; (k-=2)>=0; ni1=ni2+j)
+		for (ni1 = nk, l = 0, k = n / j; (k -= 2) >= 0; ni1 = ni2 + j)
 		{
-			ni2=ni1+j;
-			for (i1=i2=0; i1<j && i2<j;)
+			ni2 = ni1 + j;
+			for (i1 = i2 = 0; i1 < j && i2 < j;)
 			{
-				if (x[ni1[i1]]>x[ni2[i2]]) nj[l++]=ni1[i1++];
-				else nj[l++]=ni2[i2++];
+				if (x[ni1[i1]] > x[ni2[i2]]) nj[l++] = ni1[i1++];
+				else nj[l++] = ni2[i2++];
 			}
-			while (i2<j) nj[l++]=ni2[i2++];
-			while (i1<j) nj[l++]=ni1[i1++];
+			while (i2 < j) nj[l++] = ni2[i2++];
+			while (i1 < j) nj[l++] = ni1[i1++];
 		}
-		if (k==-1)
+		if (k == -1)
 		{
-			ni2=ni1+j;
-			for (k=n-l-j, i1=i2=0; i1<j && i2<k;)
+			ni2 = ni1 + j;
+			for (k = n - l - j, i1 = i2 = 0; i1 < j && i2 < k;)
 			{
-				if (x[ni1[i1]]>x[ni2[i2]]) nj[l++]=ni1[i1++];
-				else nj[l++]=ni2[i2++];
+				if (x[ni1[i1]] > x[ni2[i2]]) nj[l++] = ni1[i1++];
+				else nj[l++] = ni2[i2++];
 			}
-			while (i2<k) nj[l++]=ni2[i2++];
-			while (i1<j) nj[l++]=ni1[i1++];
+			while (i2 < k) nj[l++] = ni2[i2++];
+			while (i1 < j) nj[l++] = ni1[i1++];
 		}
-		for (; l<n; ++l) nj[l]=nk[l];
-		nt=nk;
-		nk=nj;
-		nj=nt;
+		for (; l < n; ++l) nj[l] = nk[l];
+		nt = nk;
+		nk = nj;
+		nj = nt;
 	}
-	if (ni!=nj) memcpy(ni, nj, n*sizeof(int));
+	if (ni != nj) memcpy(ni, nj, n * sizeof(int));
 	#if DEBUG_JBM_INDEX_SORT_MERGE
 		for (i=0; i<=n; ++i)
 			fprintf(stderr, "JBM ism i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 		fprintf(stderr, "JBM index sort merge exit\n");
 	#endif
 }
-
 #if INLINE_JBM_INDEX_SORT_MERGE
 	#define jbm_index_sort_merge _jbm_index_sort_merge
 #else
@@ -1178,36 +1156,26 @@ static inline void _jbm_index_sort_merge(JBFLOAT *x, int *ni, int n)
 #endif
 
 #if JBM_INDEX_SORT_FLASH
-/*
-	Ordena los índices ni de mayor a menor en un farray por el método de
-	clasificación
-*/
 	void jbm_index_sort_flash(JBFLOAT *x, int *ni, int n);
 #endif
 
 static inline void _jbm_index_sort(JBFLOAT *x, int *ni, int n)
 {
-
-/*
-	Crea los índices ni ordenados según el farray x de mayor a menor
-	por el método óptimo
-*/
-
 	register int i;
 	#if DEBUG_JBM_INDEX_SORT
 		fprintf(stderr, "JBM index sort\n");
-		for (i=0; i<=n; ++i) fprintf(stderr, "JBM is i=%d x="FWF"\n", i, x[i]);
+		for (i = 0; i <= n; ++i)
+			fprintf(stderr, "JBM is i=%d x="FWF"\n", i, x[i]);
 	#endif
-	for (i=n+1; --i>=0;) ni[i]=i;
+	for (i = n + 1; --i >= 0;) ni[i] = i;
 	if (n < JBM_INDEX_SORT_FLASH_MIN) jbm_index_sort_insertion(x, ni, n);
 	else jbm_index_sort_flash(x, ni, n);
 	#if DEBUG_JBM_INDEX_SORT
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM is i=%d x="FWF" ni=%d\n", i, x[i], ni[i]);
 		fprintf(stderr, "JBM index sort\n");
 	#endif
 }
-
 #if INLINE_JBM_INDEX_SORT
 	#define jbm_index_sort _jbm_index_sort
 #else

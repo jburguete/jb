@@ -459,16 +459,27 @@
 #define INLINE_JBM_SOLVE_CUBIC_REDUCED				1
 /**
  * \def INLINE_JBM_SOLVE_CUBIC
- * \brief Macro deciding if the function jbm_solve_cubic() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbm_solve_cubic() has to be inlined.
  */
 #define INLINE_JBM_SOLVE_CUBIC						1
+/**
+ * \def INLINE_JBM_INDEX_SORT_INSERTION
+ * \brief Macro deciding if the function jbm_index_sort_insertion() has to be
+ * inlined.
+ */
+#define INLINE_JBM_INDEX_SORT_INSERTION				1
 /**
  * \def INLINE_JBM_INDEX_SORT_INTERCHANGE
  * \brief Macro deciding if the function jbm_index_sort_interchange() has to
  *   be inlined.
  */
 #define INLINE_JBM_INDEX_SORT_INTERCHANGE			1
+/**
+ * \def INLINE_JBM_INDEX_SORT_MERGE
+ * \brief Macro deciding if the function jbm_index_sort_merge() has to be
+ * inlined.
+ */
+#define INLINE_JBM_INDEX_SORT_MERGE					1
 /**
  * \def INLINE_JBM_INDEX_SORT
  * \brief Macro deciding if the function jbm_index_sort() has to be inlined.
@@ -1455,11 +1466,23 @@
  */
 #define DEBUG_JBM_SOLVE_CUBIC						1
 /**
+ * \def DEBUG_JBM_INDEX_SORT_INSERTION
+ * \brief Macro deciding if the function jbm_index_sort_insertion() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_INDEX_SORT_INSERTION				0
+/**
  * \def DEBUG_JBM_INDEX_SORT_INTERCHANGE
- * \brief Macro deciding if the function jbm_index_sort_interchange() has to
- *   be debugged.
+ * \brief Macro deciding if the function jbm_index_sort_interchange() has to be
+ *   debugged.
  */
 #define DEBUG_JBM_INDEX_SORT_INTERCHANGE			0
+/**
+ * \def DEBUG_JBM_INDEX_SORT_MERGE
+ * \brief Macro deciding if the function jbm_index_sort_merge() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_INDEX_SORT_MERGE					0
 /**
  * \def DEBUG_JBM_INDEX_SORT_FLASH
  * \brief Macro deciding if the function jbm_index_sort_flash() has to be

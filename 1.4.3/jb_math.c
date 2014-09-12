@@ -662,125 +662,240 @@ JBDOUBLE jbm_v3_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE z1,
 {return _jbm_v3_length(x1, y1, z1, x2, y2, z2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_solve_cuadratic_reduced(JBDOUBLE a, JBDOUBLE b, \
+ *   JBDOUBLE x1, JBDOUBLE x2)
+ * \brief Function to calculate the solution of a reduced cuadratic equation in
+ *   an interval.
+ * \param a
+ * \brief 1st order coefficient of the equation.
+ * \param b
+ * \brief 0th order coefficient of the equation.
+ * \param x1
+ * \brief left limit of the solution interval.
+ * \param x2
+ * \brief right limit of the solution interval.
+ * \return solution value.
+ */
 #if !INLINE_JBM_SOLVE_CUADRATIC_REDUCED
 JBDOUBLE jbm_solve_cuadratic_reduced
 	(JBDOUBLE a, JBDOUBLE b, JBDOUBLE x1, JBDOUBLE x2)
 {return _jbm_solve_cuadratic_reduced(a, b, x1, x2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_solve_cuadratic(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, \
+ *   JBDOUBLE x1, JBDOUBLE x2)
+ * \brief Function to calculate the solution of a cuadratic equation in an
+ *   interval.
+ * \param a
+ * \brief 2nd order coefficient of the equation.
+ * \param b
+ * \brief 1st order coefficient of the equation.
+ * \param c
+ * \brief 0th order coefficient of the equation.
+ * \param x1
+ * \brief left limit of the solution interval.
+ * \param x2
+ * \brief right limit of the solution interval.
+ * \return solution value.
+ */
 #if !INLINE_JBM_SOLVE_CUADRATIC
 JBDOUBLE jbm_solve_cuadratic
 	(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
 {return _jbm_solve_cuadratic(a, b, c, x1, x2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_solve_cubic_reduced(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, \
+ *   JBDOUBLE x1, JBDOUBLE x2)
+ * \brief Function to calculate the solution of a reduced cubic equation in an
+ *   interval.
+ * \param a
+ * \brief 2nd order coefficient of the equation.
+ * \param b
+ * \brief 1st order coefficient of the equation.
+ * \param c
+ * \brief 0th order coefficient of the equation.
+ * \param x1
+ * \brief left limit of the solution interval.
+ * \param x2
+ * \brief right limit of the solution interval.
+ * \return solution value.
+ */
 #if !INLINE_JBM_SOLVE_CUBIC_REDUCED
 JBDOUBLE jbm_solve_cubic_reduced
 	(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
 {return _jbm_solve_cubic_reduced(a, b, c, x1, x2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_solve_cubic(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, \
+ *   JBDOUBLE d, JBDOUBLE x1, JBDOUBLE x2)
+ * \brief Function to calculate the solution of a reduced cubic equation in an
+ *   interval.
+ * \param a
+ * \brief 3rd order coefficient of the equation.
+ * \param b
+ * \brief 2nd order coefficient of the equation.
+ * \param c
+ * \brief 1st order coefficient of the equation.
+ * \param d
+ * \brief 0th order coefficient of the equation.
+ * \param x1
+ * \brief left limit of the solution interval.
+ * \param x2
+ * \brief right limit of the solution interval.
+ * \return solution value.
+ */
 #if !INLINE_JBM_SOLVE_CUBIC
 JBDOUBLE jbm_solve_cubic(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c,
 	JBDOUBLE d, JBDOUBLE x1, JBDOUBLE x2)
 {return _jbm_solve_cubic(a, b, c, d, x1, x2);}
 #endif
 
+/**
+ * \fn void jbm_index_sort_insertion(JBFLOAT *x, int *ni, int n)
+ * \brief Function to sort from the highest to the lowest the indexes of an
+ *   array of JBFLOAT numbers by the insertion method.
+ * \param x
+ * \brief array of JBFLOAT numbers.
+ * \param ni
+ * \brief array of indexes.
+ * \param n
+ * \brief the highest element number of the arrays.
+ */
 #if !INLINE_JBM_INDEX_SORT_INSERTION
 void jbm_index_sort_insertion(JBFLOAT *x, int *ni, int n)
 {_jbm_index_sort_insertion(x, ni, n);}
 #endif
 
+/**
+ * \fn void jbm_index_sort_interchange(JBFLOAT *x, int *ni, int n)
+ * \brief Function to sort from the highest to the lowest the indexes of an
+ *   array of JBFLOAT numbers by the interchange method.
+ * \param x
+ * \brief array of JBFLOAT numbers.
+ * \param ni
+ * \brief array of indexes.
+ * \param n
+ * \brief the highest element number of the arrays.
+ */
 #if !INLINE_JBM_INDEX_SORT_INTERCHANGE
 void jbm_index_sort_interchange(JBFLOAT *x, int *ni, int n)
 {_jbm_index_sort_interchange(x, ni, n);}
 #endif
 
+/**
+ * \fn void jbm_index_sort_merge(JBFLOAT *x, int *ni, int n)
+ * \brief Function to sort from the highest to the lowest the indexes of an
+ *   array of JBFLOAT numbers by the merge method.
+ * \param x
+ * \brief array of JBFLOAT numbers.
+ * \param ni
+ * \brief array of indexes.
+ * \param n
+ * \brief the highest element number of the arrays.
+ */
 #if !INLINE_JBM_INDEX_SORT_MERGE
 void jbm_index_sort_merge(JBFLOAT *x, int *ni, int n)
 {_jbm_index_sort_merge(x, ni, n);}
 #endif
 
 #if JBM_INDEX_SORT_FLASH
+/**
+ * \fn void jbm_index_sort_flash(JBFLOAT *x, int *ni, int n)
+ * \brief Function to sort from the highest to the lowest the indexes of an
+ *   array of JBFLOAT numbers by the flash method.
+ * \param x
+ * \brief array of JBFLOAT numbers.
+ * \param ni
+ * \brief array of indexes.
+ * \param n
+ * \brief the highest element number of the arrays.
+ */
 void jbm_index_sort_flash(JBFLOAT *x, int *ni, int n)
 {
-	register int i, j, m=n/32+1;
+	register int i, j, m = n / 32 + 1;
 	int *nj, *nk, *l1, *l2;
 	register JBDOUBLE xi, xmin, xmax;
 	#if DEBUG_JBM_INDEX_SORT_FLASH
 		fprintf(stderr, "JBM index flash sort\n");
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM isf i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 		fprintf(stderr, "JBM isf m=%d\n", m);
 	#endif
-	nj=(int*)g_malloc((n+m+2)*2*sizeof(int));
-	nk=nj+n+1;
-	l1=nk+n+1;
-	l2=l1+m+1;
-	j=i=n;
-	xmax=xmin=x[ni[i]];
-	while (--i>=0)
+	nj = (int*)g_malloc((n + m + 2) * 2 * sizeof(int));
+	nk =nj + n + 1;
+	l1 =nk + n + 1;
+	l2 =l1 + m + 1;
+	j = i = n;
+	xmax = xmin = x[ni[i]];
+	while (--i >= 0)
 	{
-		xi=x[ni[i]];
-		if (xi>xmax) xmax=xi, j=i; else if (xi<xmin) xmin=xi;
+		xi = x[ni[i]];
+		if (xi > xmax) xmax = xi, j = i; else if (xi < xmin) xmin = xi;
 	}
-	if (xmax==xmin) goto sorted;
-	jbm_change(ni, ni+j);
+	if (xmax == xmin) goto sorted;
+	jbm_change(ni, ni + j);
 	#if DEBUG_JBM_INDEX_SORT_FLASH
 		fprintf(stderr, "JBM isf xmin="FWL" xmax="FWL"\n", xmin, xmax);
 	#endif
-	i=m;
-	l1[i]=1;
-	while (--i>=0) l1[i]=0;
-	for (i=n+1; --i>0;)
+	i = m;
+	l1[i] = 1;
+	while (--i >= 0) l1[i] = 0;
+	for (i = n + 1; --i > 0;)
 	{
-		j=floor(m*(x[ni[i]]-xmin)/(xmax-xmin));
-		nj[i]=j;
+		j = floor(m * (x[ni[i]] - xmin) / (xmax - xmin));
+		nj[i] = j;
 		++l1[j];
 	}
-	nj[0]=m;
+	nj[0] = m;
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		for (i=0; i<=n; ++i) fprintf(stderr, "JBM isf i=%d nj=%d\n", i, nj[i]);
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
+			fprintf(stderr, "JBM isf i=%d nj=%d\n", i, nj[i]);
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM isf i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 	#endif
-	for (i=m, l2[i]=l1[i]; --i>=0;) l2[i]=l2[i+1]+l1[i];
+	for (i = m, l2[i] = l1[i]; --i >= 0;) l2[i] = l2[i + 1] + l1[i];
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		for (i=0; i<=m; ++i)
+		for (i = 0; i <= m; ++i)
 			fprintf(stderr, "JBM isf i=%d l1=%d l2=%d\n", i, l1[i], l2[i]);
 	#endif
-	for (i=n+1; --i>0;) nk[--l2[nj[i]]]=ni[i];
+	for (i = n + 1; --i > 0;) nk[--l2[nj[i]]] = ni[i];
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		for (i=0; i<=n; ++i) fprintf(stderr, "JBM isf i=%d nk=%d\n", i, nk[i]);
+		for (i = 0; i <= n; ++i)
+			fprintf(stderr, "JBM isf i=%d nk=%d\n", i, nk[i]);
 	#endif
-	for (i=n+1; --i>0;) ni[i]=nk[i];
+	for (i = n + 1; --i > 0;) ni[i] = nk[i];
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		for (i=0; i<=n; ++i) fprintf(stderr, "JBM isf i=%d ni=%d\n", i, ni[i]);
+		for (i = 0; i <= n; ++i)
+			fprintf(stderr, "JBM isf i=%d ni=%d\n", i, ni[i]);
 	#endif
 	--l2[m];
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		for (i=0; i<=m; ++i)
+		for (i = 0; i <= m; ++i)
 			fprintf(stderr, "JBM isf i=%d l1=%d l2=%d\n", i, l1[i], l2[i]);
 	#endif
-	i=m;
+	i = m;
 	do
 	{
 		#if DEBUG_JBM_INDEX_SORT_FLASH
 			fprintf(stderr, "JBM isf i=%d l1=%d l2=%d\n", i, l1[i], l2[i]);
 		#endif
-		j=l1[i]-1;
-		nk=ni+l2[i];
-		if (j<JBM_INDEX_SORT_FLASH_MIN) jbm_index_sort_insertion(x, nk, j);
+		j = l1[i] - 1;
+		nk = ni + l2[i];
+		if (j < JBM_INDEX_SORT_FLASH_MIN) jbm_index_sort_insertion(x, nk, j);
 		else jbm_index_sort_flash(x, nk, j);
 		#if DEBUG_JBM_INDEX_SORT_FLASH
 			fprintf(stderr, "JBM isf i=%d l1=%d l2=%d\n", i, l1[i], l2[i]);
 		#endif
 	}
-	while (--i>=0);
+	while (--i >= 0);
 sorted:
 	g_free(nj);
 	#if DEBUG_JBM_INDEX_SORT_FLASH
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM isf i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 		fprintf(stderr, "JBM index flash sort exit\n");
 	#endif
@@ -788,6 +903,17 @@ sorted:
 }
 #endif
 
+/**
+ * \fn void jbm_index_sort(JBFLOAT *x, int *ni, int n)
+ * \brief Function to sort from the highest to the lowest the indexes of an
+ *   array of JBFLOAT numbers by the optime method.
+ * \param x
+ * \brief array of JBFLOAT numbers.
+ * \param ni
+ * \brief array of indexes.
+ * \param n
+ * \brief the highest element number of the arrays.
+ */
 #if !INLINE_JBM_INDEX_SORT
 void jbm_index_sort(JBFLOAT *x, int *ni, int n) {_jbm_index_sort(x, ni, n);}
 #endif
