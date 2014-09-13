@@ -39,8 +39,8 @@
  * \brief 1st JBDOUBLE number.
  * \param b
  * \brief 2nd JBDOUBLE number.
- * \return 0 on the difference is lower than the 6th digit, else:
- * 	-1 on a < b, 1 on a > b
+ * \return a!=b on Unix systems, on Microsoft Windows systems 0 if the
+ *   difference is lower than the 6th digit else -1 if a < b and 1 if a > b
  */
 #if !INLINE_JBM_FCOMPARE
 int jbm_fcompare(JBDOUBLE a, JBDOUBLE b) {return _jbm_fcompare(a, b);}
@@ -1083,16 +1083,6 @@ void jbm_solve_pentadiagonal_matrix_zero(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D,
 {_jbm_solve_pentadiagonal_matrix_zero(B, C, D, E, F, H, n);}
 #endif
 
-#if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY
-void jbm_solve_tridiagonal_varray(void *v, int size, int n)
-{_jbm_solve_tridiagonal_varray(v, size, n);}
-#endif
-
-#if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY_ZERO
-void jbm_solve_tridiagonal_varray_zero(void *v, int size, int n)
-{_jbm_solve_tridiagonal_varray_zero(v, size, n);}
-#endif
-
 #if !INLINE_JBM_REGRESSION
 void jbm_regression(JBFLOAT *x, JBFLOAT *y, int n, JBFLOAT **A, int m)
 {_jbm_regression(x, y, n, A, m);}
@@ -1228,3 +1218,12 @@ JBDOUBLE jbm_file_mean_square_error
 {return _jbm_file_mean_square_error(namea, ixa, ifa, na, namer, ixr, ifr, nr);}
 #endif
 
+#if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY
+void jbm_solve_tridiagonal_varray(void *v, int size, int n)
+{_jbm_solve_tridiagonal_varray(v, size, n);}
+#endif
+
+#if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY_ZERO
+void jbm_solve_tridiagonal_varray_zero(void *v, int size, int n)
+{_jbm_solve_tridiagonal_varray_zero(v, size, n);}
+#endif

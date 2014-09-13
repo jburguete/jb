@@ -1234,7 +1234,7 @@
  * \def DEBUG_JBM_FCOMPARE
  * \brief Macro deciding if the function jbm_fcompare() has to be debugged.
  */
-#define DEBUG_JBM_FCOMPARE							1
+#define DEBUG_JBM_FCOMPARE							0
 /**
  * \def DEBUG_JBM_MAX
  * \brief Macro deciding if the function jbm_max() has to be debugged.
