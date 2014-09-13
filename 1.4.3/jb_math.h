@@ -1182,23 +1182,17 @@ static inline void _jbm_index_sort(JBFLOAT *x, int *ni, int n)
 	void jbm_index_sort(JBFLOAT*, int*, int);
 #endif
 
-static inline int _jbm_index_sort_extended(JBFLOAT *x, JBFLOAT **xr, int **ni, int n)
+static inline int _jbm_index_sort_extended
+ (JBFLOAT *x, JBFLOAT **xr, int **ni, int n)
 {
-
-/*
-	Crea un farray xr ordenado de menor a mayor con los elementos de x
-	Devuelve el número n de este farray
-	Crea un array ni con los índices que corresponden a cada elemento de x
-*/
-	
-	register int i, j=0;
+	register int i, j = 0;
 	register JBDOUBLE k1, k2;
-	int nk[n+1], nj[n+1];
+	int nk[n + 1], nj[n + 1];
 	#if DEBUG_JBM_INDEX_SORT_EXTENDED
 		fprintf(stderr, "JBM index sort extended: start\n");
 	#endif
-	*ni = (int*)g_try_malloc((n+1)*sizeof(int));
-	*xr = (JBFLOAT*)g_try_malloc((n+1)*sizeof(JBFLOAT));
+	*ni = (int*)g_try_malloc((n + 1) * sizeof(int));
+	*xr = (JBFLOAT*)g_try_malloc((n + 1) * sizeof(JBFLOAT));
 	if (! *xr)
 	{
 		jb_free_null((void**)ni);
@@ -1206,24 +1200,26 @@ static inline int _jbm_index_sort_extended(JBFLOAT *x, JBFLOAT **xr, int **ni, i
 		goto index_exit;
 	}
 	jbm_index_sort(x, nk, n);
-	i=n;
-	k2=x[nk[i]];
-	nj[i]=0;
-	(*xr)[0]=k2;
-	for (; --i>=0; k2=k1)
+	i = n;
+	k2 = x[nk[i]];
+	nj[i] = 0;
+	(*xr)[0] = k2;
+	for (; --i >= 0; k2 = k1)
 	{
-		k1=x[nk[i]];
-		if (k1!=k2) (*xr)[++j]=k1;
-		nj[i]=j;
+		k1 = x[nk[i]];
+		if (k1 != k2) (*xr)[++j] = k1;
+		nj[i] = j;
 	}
 	#if DEBUG_JBM_INDEX_SORT_EXTENDED
-		for (i=0; i<=n; ++i) fprintf(stderr, "JBM ise i=%d nj=%d\n", i, nj[i]);
-		for (i=0; i<=j; ++i)
+		for (i = 0; i <= n; ++i)
+			fprintf(stderr, "JBM ise i=%d nj=%d\n", i, nj[i]);
+		for (i = 0; i <= j; ++i)
 			fprintf(stderr, "JBM ise i=%d xr="FWF"\n", i, (*xr)[i]);
 	#endif
-	for (i=n+1; --i>=0;) (*ni)[nk[i]] = nj[i];
+	for (i = n + 1; --i >= 0;) (*ni)[nk[i]] = nj[i];
 	#if DEBUG_JBM_INDEX_SORT_EXTENDED
-		for (i=0; i<=n; ++i) fprintf(stderr, "JBM ise i=%d ni=%d\n", i, (*ni)[i]);
+		for (i = 0; i <= n; ++i)
+			fprintf(stderr, "JBM ise i=%d ni=%d\n", i, (*ni)[i]);
 	#endif
 index_exit:
 	#if DEBUG_JBM_INDEX_SORT_EXTENDED
@@ -1231,7 +1227,6 @@ index_exit:
 	#endif
 	return j;
 }
-
 #if INLINE_JBM_INDEX_SORT_EXTENDED
 	#define jbm_index_sort_extended _jbm_index_sort_extended
 #else
@@ -1240,54 +1235,47 @@ index_exit:
 
 static inline void _jbm_solve_matrix(JBFLOAT *x, int n)
 {
-
-/*
-	Resuelve un sistema de n ecuaciones dejando los resultados en la columna n+1
-	Modifica la matriz x
-*/
-
 	register int i, j, k;
 	JBDOUBLE k1, k2;
 	JBFLOAT *f, *g;
 	++n;
-	for (i=n, f=x; --i>0;)
+	for (i = n, f = x; --i > 0;)
 	{
 		jbm_farray_maxmin(f, n, &k1, &k2);
-		k1=fmaxl(fabsl(k1), fabsl(k2));
-		for (j=n; --j>=0; ++f) *f /= k1;
+		k1 = fmaxl(fabsl(k1), fabsl(k2));
+		for (j = n; --j >= 0; ++f) *f /= k1;
 	}
-	for (i=n-1, f=x; --i>0; f+=n+1)
+	for (i = n - 1, f = x; --i > 0; f += n + 1)
 	{
-		k1=fabsl(*f);
-		for (k=j=i, g=f; --j>=0;)
+		k1 = fabsl(*f);
+		for (k = j = i, g = f; --j >=0 ;)
 		{
-			g+=n;
-			k2=fabsl(*g);
-			if (k2>k1)
+			g += n;
+			k2 = fabsl(*g);
+			if (k2 > k1)
 			{
-				k1=k2;
-				k=j;
+				k1 = k2;
+				k = j;
 			}
 		}
-		if (k!=i)
+		if (k != i)
 		{
-			g=f+(i-k)*n;
-			for (j=i+2; --j>=0;) jbm_fchange(g+j, f+j);
+			g = f + (i - k) * n;
+			for (j = i + 2; --j >= 0;) jbm_fchange(g + j, f + j);
 		}
-		for (j=i, g=f+n; --j>=0; g+=n)
+		for (j = i, g = f + n; --j >= 0; g += n)
 		{
 			k1 = *g / *f;
-			for (k=i+2; --k>0;) g[k]-=k1*f[k];
+			for (k = i + 2; --k > 0;) g[k] -= k1 * f[k];
 		}
 	}
-	f=x+n*(n-1)-1;
-	for (i=0; ++i<n; f-=n)
+	f = x + n * (n - 1) - 1;
+	for (i = 0; ++i < n; f -= n)
 	{
 		k1 = *f /= *(f-i);
-		for (j=n, g=f-n; --j>i; g-=n) *g -= *(g-i) * k1;
+		for (j = n, g = f - n; --j > i; g -= n) *g -= *(g - i) * k1;
 	}
 }
-
 #if INLINE_JBM_SOLVE_MATRIX
 	#define jbm_solve_matrix _jbm_solve_matrix
 #else
@@ -1297,21 +1285,9 @@ static inline void _jbm_solve_matrix(JBFLOAT *x, int n)
 static inline void _jbm_solve_tridiagonal_matrix
 	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *H, int n)
 {
-
-/*
-	Resuelve una matriz tridiagonal de forma:
-		D0 E0                   H0
-		C0 D1 E1                H1
-
-		         Cn-2 Dn-1 En-1 Hn-1
-		              Cn-1 Dn   Hn
-	La solución se almacena en H
-	Modifica las matrices C, D, E, H
-*/
-
 	register int i;
 	register JBDOUBLE k;
-	for (i=0; ++i<=n;)
+	for (i = 0; ++i <= n;)
 	{
 		k = *(C++) / *(D++);
 		*D -= k * *(E++);
@@ -1319,37 +1295,25 @@ static inline void _jbm_solve_tridiagonal_matrix
 		*H -= k;
 	}
 	*H /= *D;
-	while (--i>0)
+	while (--i > 0)
 	{
 		--H;
-		*H = (*H - *(--E) * *(H+1)) / *(--D);
+		*H = (*H - *(--E) * *(H + 1)) / *(--D);
 	}
 }
-
 #if INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX
 	#define jbm_solve_tridiagonal_matrix _jbm_solve_tridiagonal_matrix
 #else
-	void jbm_solve_tridiagonal_matrix(JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
+	void jbm_solve_tridiagonal_matrix
+		(JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
 #endif
 
 static inline void _jbm_solve_tridiagonal_matrix_zero
 	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *H, int n)
 {
-
-/*
-	Resuelve una matriz tridiagonal de forma:
-		D0 E0                   H0
-		C0 D1 E1                H1
-
-		         Cn-2 Dn-1 En-1 Hn-1
-		              Cn-1 Dn   Hn
-	evitando divisiones por cero. La solución se almacena en H
-	Modifica las matrices C, D, E, H
-*/
-
 	register int i;
 	register JBDOUBLE k;
-	for (i=0; ++i<=n;)
+	for (i = 0; ++i <= n;)
 	{
 		if (*D != 0.)
 		{
@@ -1361,63 +1325,47 @@ static inline void _jbm_solve_tridiagonal_matrix_zero
 		else ++C, ++D, ++E, ++H;
 	}
 	if (*D != 0.) *H /= *D; else *H = 0.;
-	while (--i>0)
+	while (--i > 0)
 	{
 		--H, --D, --E;
-		if (*D != 0.) *H = (*H - *E * *(H+1)) / *D; else *H = 0.;
+		if (*D != 0.) *H = (*H - *E * *(H + 1)) / *D; else *H = 0.;
 	}
 }
-
 #if INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO
 	#define jbm_solve_tridiagonal_matrix_zero _jbm_solve_tridiagonal_matrix_zero
 #else
-	void jbm_solve_tridiagonal_matrix_zero(JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
+	void jbm_solve_tridiagonal_matrix_zero
+		(JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
 #endif
 
-static inline void _jbm_solve_pentadiagonal_matrix
-	(JBFLOAT *B,JBFLOAT *C,JBFLOAT *D,JBFLOAT *E,JBFLOAT *F,JBFLOAT *H,int n)
+static inline void _jbm_solve_pentadiagonal_matrix(JBFLOAT *B, JBFLOAT *C,
+	JBFLOAT *D, JBFLOAT *E, JBFLOAT *F, JBFLOAT *H, int n)
 {
-
-/*
-	Resuelve una matriz pentadiagonal de forma:
-		D0 E0 F0                                    H0
-		C0 D1 E1 F1                                 H1
-		B0 C1 D2 E2 F2
-
-		                 Bn-4 Cn-3 Dn-2 En-2 Fn-2   Hn-2
-		                      Bn-3 Cn-2 Dn-1 En-1   Hn-1
-						           Bn-2 Cn-1 Dn     Hn
-
-	La solución se almacena en H
-	Modifica las matrices B, C, D, E, F, H
-*/
-
 	register int i;
 	register JBDOUBLE k;
-	for (i=n-1; --i>0; ++B, ++C, ++D, ++E, ++F, ++H)
+	for (i = n - 1; --i > 0; ++B, ++C, ++D, ++E, ++F, ++H)
 	{
 		k = *C / *D;
-		*(D+1) -= k * *E;
-		*(E+1) -= k * *F;
-		*(H+1) -= k * *H;
+		*(D + 1) -= k * *E;
+		*(E + 1) -= k * *F;
+		*(H + 1) -= k * *H;
 		k = *B / *D;
-		*(C+1) -= k * *E;
-		*(D+2) -= k * *F;
-		*(H+2) -= k * *H;
+		*(C + 1) -= k * *E;
+		*(D + 2) -= k * *F;
+		*(H + 2) -= k * *H;
 	}
 	k = *C / *D;
 	*(++D) -= k * *E;
 	*(H+1) -= k * *H;
 	*(++H) /= *D;
 	--H;
-	*H = (*H - *(E--) * *(H+1)) / *(--D);
-	for (i=n-1; --i>0;)
+	*H = (*H - *(E--) * *(H + 1)) / *(--D);
+	for (i = n - 1; --i > 0;)
 	{
 		--H;
-		*H = (*H - *(E--) * *(H+1) - *(--F) * *(H+2)) / *(--D);
+		*H = (*H - *(E--) * *(H + 1) - *(--F) * *(H + 2)) / *(--D);
 	}
 }
-
 #if INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX
 	#define jbm_solve_pentadiagonal_matrix _jbm_solve_pentadiagonal_matrix
 #else

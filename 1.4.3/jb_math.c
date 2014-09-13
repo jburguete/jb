@@ -918,25 +918,102 @@ sorted:
 void jbm_index_sort(JBFLOAT *x, int *ni, int n) {_jbm_index_sort(x, ni, n);}
 #endif
 
+/**
+ * \fn int jbm_index_sort_extended(JBFLOAT *x, JBFLOAT **xr, int **ni, int n)
+ * \brief Function to create a sorted index from the highest to the lowest of an
+ *   array of JBFLOAT numbers by the optime method.
+ * \param x
+ * \brief array of JBFLOAT numbers to sort.
+ * \param xr
+ * \brief pointer to the array of sorted JBFLOAT numbers elliminating duplicated
+ *   numbers.
+ * \param ni
+ * \brief point to the array of sorted indexes.
+ * \param n
+ * \brief the highest element number of the array to sort.
+ * \return the highest element number of the sorted array.
+ */
 #if !INLINE_JBM_INDEX_SORT_EXTENDED
 int jbm_index_sort_extended(JBFLOAT *x, JBFLOAT **xr, int **ni, int n)
 {return _jbm_index_sort_extended(x, xr, ni, n);}
 #endif
 
+/**
+ * \fn void jbm_solve_matrix(JBFLOAT *x, int n)
+ * \brief Function to solve a linear equations system stored in a matrix with
+ *   format: \f$\left(\begin{array}{cccc|c}
+ *   x_{0,0} & x_{0,1} & \cdots & x_{0,n-1} & x_{0,n}\\
+ *   x_{1,0} & x_{1,1} & \cdots & x_{1,n-1} & x_{1,n}\\
+ *   & & \cdots \\
+ *   x_{n-1,0} & x_{n-1,1} & \cdots & x_{n-1,n-1} & x_{n-1,n}
+ *   \end{array}\right)\f$.
+ *   Results are stored in the n+1-th column:
+ *   \f$\left(x_{0,n},\;x_{1,n},\;\cdots,\;x_{n-1,n}\right)\f$.
+ *   It modifies the x matrix.
+ * \param x
+ * \brief matrix storing the linear equations system.
+ * \param n
+ * \brief number of matrix rows.
+ */
 #if !INLINE_JBM_SOLVE_MATRIX
 void jbm_solve_matrix(JBFLOAT *x, int n) {_jbm_solve_matrix(x, n);}
 #endif
 
+/**
+ * \fn void jbm_solve_tridiagonal_matrix(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, \
+ *   JBFLOAT *H, int n)
+ * \brief Function to solve a linear equations system stored in a tridiagonal
+ *   matrix with format: \f$\left(\begin{array}{cccc|c}
+ *   D_0 & E_0    &         &         & H_0\\
+ *   C_0 & D_1    & E_1     &         & H_1\\
+ *       & \ddots & \ddots  & \ddots  & \vdots\\
+ *       &        & C_{n-2} & D_{n-1} & H_{n-1}
+ *   \end{array}\right)\f$.
+ *   Results are stored in the iu array. It modifies C, D and iu matrices.
+ * \param C
+ * \brief left diagonal array.
+ * \param D
+ * \brief central diagonal array.
+ * \param E
+ * \brief right diagonal array.
+ * \param H
+ * \brief final column array.
+ * \param n
+ * \brief number of matrix rows.
+ */
 #if !INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX
 void jbm_solve_tridiagonal_matrix
-	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *iu, int n)
-{_jbm_solve_tridiagonal_matrix(C, D, E, iu, n);}
+	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *H, int n)
+{_jbm_solve_tridiagonal_matrix(C, D, E, H, n);}
 #endif
 
+/**
+ * \fn void jbm_solve_tridiagonal_matrix_zero(JBFLOAT *C, JBFLOAT *D, \
+ *   JBFLOAT *E, JBFLOAT *H, int n)
+ * \brief Function to solve a linear equations system stored in a tridiagonal
+ *   matrix with format: \f$\left(\begin{array}{cccc|c}
+ *   D_0 & E_0    &         &         & H_0\\
+ *   C_0 & D_1    & E_1     &         & H_1\\
+ *       & \ddots & \ddots  & \ddots  & \vdots\\
+ *       &        & C_{n-2} & D_{n-1} & H_{n-1}
+ *   \end{array}\right)\f$
+ *   avoiding zero divisions. Results are stored in the iu array. It modifies C,
+ *   D and iu matrices.
+ * \param C
+ * \brief left diagonal array.
+ * \param D
+ * \brief central diagonal array.
+ * \param E
+ * \brief right diagonal array.
+ * \param H
+ * \brief final column array.
+ * \param n
+ * \brief number of matrix rows.
+ */
 #if !INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO
 void jbm_solve_tridiagonal_matrix_zero
-	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *iu, int n)
-{_jbm_solve_tridiagonal_matrix_zero(C, D, E, iu, n);}
+	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *H, int n)
+{_jbm_solve_tridiagonal_matrix_zero(C, D, E, H, n);}
 #endif
 
 #if !INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX

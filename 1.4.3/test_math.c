@@ -1,6 +1,29 @@
 #include "jb_math.h"
 
-#define SPLINE_CUBIC 1
+#define SOLVE_MATRIX 1
+//#define SPLINE_CUBIC 1
+
+#ifdef SOLVE_MATRIX
+
+#include "jb_math.h"
+
+JBFLOAT x[]=
+{
+	1., 3., 2., 16.,
+	2., 4., 8., 18.,
+	3., -1, 4., 0.
+};
+JBFLOAT y[]={3., 5., -1.};
+
+main()
+{
+	jbm_solve_matrix(x, 3);
+	printf("x0="FWF2"x0="FWF"\n", x[3], y[0]);
+	printf("x1="FWF2"x1="FWF"\n", x[7], y[1]);
+	printf("x2="FWF2"x2="FWF"\n", x[11], y[2]);
+}
+
+#endif
 
 #ifdef SPLINE_CUBIC
 
@@ -17,7 +40,7 @@ JBFLOAT D[]={-2.,-1.,3.,1.};
 JBFLOAT E[]={-3.,1.,2.};
 JBFLOAT H[]={-20.,13.,14.,52.,48.};
 
-void main()
+main()
 {
 	int i;
 	FILE *file;
