@@ -1355,21 +1355,64 @@ static inline void _jbm_solve_pentadiagonal_matrix(JBFLOAT *B, JBFLOAT *C,
 		*(H + 2) -= k * *H;
 	}
 	k = *C / *D;
-	*(++D) -= k * *E;
-	*(H+1) -= k * *H;
-	*(++H) /= *D;
-	--H;
-	*H = (*H - *(E--) * *(H + 1)) / *(--D);
+	*(D + 1) -= k * *E;
+	*(H + 1) -= k * *H;
+	*(H + 1) /= *(D + 1);
+	*H = (*H - *(E--) * *(H + 1)) / *(D--);
 	for (i = n - 1; --i > 0;)
 	{
 		--H;
-		*H = (*H - *(E--) * *(H + 1) - *(--F) * *(H + 2)) / *(--D);
+		*H = (*H - *(E--) * *(H + 1) - *(--F) * *(H + 2)) / *(D--);
 	}
 }
 #if INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX
 	#define jbm_solve_pentadiagonal_matrix _jbm_solve_pentadiagonal_matrix
 #else
 	void jbm_solve_pentadiagonal_matrix
+		(JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
+#endif
+
+static inline void _jbm_solve_pentadiagonal_matrix_zero(JBFLOAT *B, JBFLOAT *C,
+	JBFLOAT *D, JBFLOAT *E, JBFLOAT *F, JBFLOAT *H, int n)
+{
+	register int i;
+	register JBDOUBLE k;
+	for (i = n - 1; --i > 0; ++B, ++C, ++D, ++E, ++F, ++H)
+	{
+		if (*D != 0.)
+		{
+			k = *C / *D;
+			*(D + 1) -= k * *E;
+			*(E + 1) -= k * *F;
+			*(H + 1) -= k * *H;
+			k = *B / *D;
+			*(C + 1) -= k * *E;
+			*(D + 2) -= k * *F;
+			*(H + 2) -= k * *H;
+		}
+	}
+	if (*D != 0.)
+	{
+		k = *C / *D;
+		*(D + 1) -= k * *E;
+		*(H + 1) -= k * *H;
+		*(H + 1) /= *(D + 1);
+		*H = (*H - *(E--) * *(H + 1)) / *(D--);
+	}
+	else --E, --D;
+	for (i = n - 1; --i > 0;)
+	{
+		--H;
+		if (*D != 0.)
+			*H = (*H - *(E--) * *(H + 1) - *(--F) * *(H + 2)) / *(D--);
+		else --E, --F, --D;
+	}
+}
+#if INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO
+	#define jbm_solve_pentadiagonal_matrix_zero \
+		_jbm_solve_pentadiagonal_matrix_zero
+#else
+	void jbm_solve_pentadiagonal_matrix_zero
 		(JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
 #endif
 

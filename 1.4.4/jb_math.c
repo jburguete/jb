@@ -969,7 +969,7 @@ void jbm_solve_matrix(JBFLOAT *x, int n) {_jbm_solve_matrix(x, n);}
  *       & \ddots & \ddots  & \ddots  & \vdots\\
  *       &        & C_{n-2} & D_{n-1} & H_{n-1}
  *   \end{array}\right)\f$.
- *   Results are stored in the iu array. It modifies C, D and iu matrices.
+ *   Results are stored in the H array. It modifies D and H arrays.
  * \param C
  * \brief left diagonal array.
  * \param D
@@ -997,8 +997,8 @@ void jbm_solve_tridiagonal_matrix
  *       & \ddots & \ddots  & \ddots  & \vdots\\
  *       &        & C_{n-2} & D_{n-1} & H_{n-1}
  *   \end{array}\right)\f$
- *   avoiding zero divisions. Results are stored in the iu array. It modifies C,
- *   D and iu matrices.
+ *   avoiding zero divisions. Results are stored in the H array. It modifies D
+ *   and H arrays.
  * \param C
  * \brief left diagonal array.
  * \param D
@@ -1016,10 +1016,71 @@ void jbm_solve_tridiagonal_matrix_zero
 {_jbm_solve_tridiagonal_matrix_zero(C, D, E, H, n);}
 #endif
 
+/**
+ * \fn void jbm_solve_pentadiagonal_matrix(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, \
+ *   JBFLOAT *H, int n)
+ * \brief Function to solve a linear equations system stored in a pentadiagonal
+ *   matrix with format: \f$\left(\begin{array}{cccccc|c}
+ *   D_0 & E_0    & F_0     &         &         &         & H_0\\
+ *   C_0 & D_1    & E_1     & F_1     &         &         & H_1\\
+ *   B_0 & C_1    & D_2     & E_2     & F_2     &         & H_2\\
+ *       & \ddots & \ddots  & \ddots  & \ddots  & \ddots  & \vdots\\
+ *       &        &         & B_{n-3} & C_{n-2} & D_{n-1} & H_{n-1}
+ *   \end{array}\right)\f$.
+ *   Results are stored in the H array. It modifies C, D, E and H arrays.
+ * \param B
+ * \brief double-left diagonal array.
+ * \param C
+ * \brief left diagonal array.
+ * \param D
+ * \brief central diagonal array.
+ * \param E
+ * \brief right diagonal array.
+ * \param F
+ * \brief double-right diagonal array.
+ * \param H
+ * \brief final column array.
+ * \param n
+ * \brief number of matrix rows.
+ */
 #if !INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX
-void jbm_solve_pentadiagonal_matrix
-	(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *F, JBFLOAT *iu, int n)
-{_jbm_solve_pentadiagonal_matrix(B, C, D, E, F, iu, n);}
+void jbm_solve_pentadiagonal_matrix(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D,
+	JBFLOAT *E, JBFLOAT *F, JBFLOAT *H, int n)
+{_jbm_solve_pentadiagonal_matrix(B, C, D, E, F, H, n);}
+#endif
+
+/**
+ * \fn void jbm_solve_pentadiagonal_matrix_zero(JBFLOAT *C, JBFLOAT *D, \
+ *   JBFLOAT *E, JBFLOAT *H, int n)
+ * \brief Function to solve a linear equations system stored in a pentadiagonal
+ *   matrix with format: \f$\left(\begin{array}{cccccc|c}
+ *   D_0 & E_0    & F_0     &         &         &         & H_0\\
+ *   C_0 & D_1    & E_1     & F_1     &         &         & H_1\\
+ *   B_0 & C_1    & D_2     & E_2     & F_2     &         & H_2\\
+ *       & \ddots & \ddots  & \ddots  & \ddots  & \ddots  & \vdots\\
+ *       &        &         & B_{n-3} & C_{n-2} & D_{n-1} & H_{n-1}
+ *   \end{array}\right)\f$
+ *   avoiding zero divisions. Results are stored in the H array. It modifies C,
+ *   D, E and H arrays.
+ * \param B
+ * \brief double-left diagonal array.
+ * \param C
+ * \brief left diagonal array.
+ * \param D
+ * \brief central diagonal array.
+ * \param E
+ * \brief right diagonal array.
+ * \param F
+ * \brief double-right diagonal array.
+ * \param H
+ * \brief final column array.
+ * \param n
+ * \brief number of matrix rows.
+ */
+#if !INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO
+void jbm_solve_pentadiagonal_matrix_zero(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D,
+	JBFLOAT *E, JBFLOAT *F, JBFLOAT *H, int n)
+{_jbm_solve_pentadiagonal_matrix_zero(B, C, D, E, F, H, n);}
 #endif
 
 #if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY

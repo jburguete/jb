@@ -504,17 +504,23 @@
  */
 #define INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX			1
 /**
+ * \def INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO
+ * \brief Macro deciding if the function jbm_solve_pentadiagonal_matrix()
+ *   has to be inlined.
+ */
+#define INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO	1
+/**
  * \def INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX
  * \brief Macro deciding if the function jbm_solve_tridiagonal_matrix_zero()
  *   has to be inlined.
  */
 #define INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX		1
 /**
- * \def INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO
- * \brief Macro deciding if the function jbm_solve_pentadiagonal_matrix()
+ * \def INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO
+ * \brief Macro deciding if the function jbm_solve_tridiagonal_matrix_zero()
  *   has to be inlined.
  */
-#define INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO	1
+#define INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO	1
 /**
  * \def INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY
  * \brief Macro deciding if the function jbm_solve_tridiagonal_varray() has
@@ -1519,6 +1525,18 @@
  *   has to be debugged.
  */
 #define DEBUG_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO		1
+/**
+ * \def DEBUG_JBM_SOLVE_PENTADIAGONAL_MATRIX
+ * \brief Macro deciding if the function jbm_solve_pentadiagonal_matrix() has
+ *   to be debugged.
+ */
+#define DEBUG_JBM_SOLVE_PENTADIAGONAL_MATRIX		1
+/**
+ * \def DEBUG_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO
+ * \brief Macro deciding if the function jbm_solve_pentadiagonal_matrix_zero()
+ *   has to be debugged.
+ */
+#define DEBUG_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO	1
 /**
  * \def DEBUG_JBM_FLUX_LIMITER_SUPERBEE
  * \brief Macro deciding if the function jbm_flux_limiter_superbee() has to
