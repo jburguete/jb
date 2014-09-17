@@ -2013,6 +2013,7 @@ PREDEFINED             = \
 	INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO=0 \
 	INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX=0 \
 	INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO=0 \
+	INLINE_JBM_REGRESSION=0 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

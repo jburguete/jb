@@ -1417,50 +1417,146 @@ static inline void _jbm_solve_pentadiagonal_matrix_zero(JBFLOAT *B, JBFLOAT *C,
 #endif
 
 static inline void _jbm_regression
-	(JBFLOAT *x,JBFLOAT *y,int n,JBFLOAT **A,int m)
+	(JBFLOAT *x, JBFLOAT *y, int n, JBFLOAT **A, int m)
 {
 	JBFLOAT *B;
-	JBDOUBLE xx[m+m+1], yx[m+1];
-	register int i,j;
+	JBDOUBLE xx[m + m + 1], yx[m + 1];
+	register int i, j;
 	register JBFLOAT *k;
 	register JBDOUBLE zx, zy;
-	*A = (JBFLOAT*)g_malloc((m+1) * sizeof(JBFLOAT));
-	B=(JBFLOAT*)g_malloc((m+1)*(m+2)*sizeof(JBFLOAT));
-	for (j=m; j>=0; --j) xx[j]=yx[j]=0.;
-	for (j=m+m; --j>m;) xx[j]=0.;
-	for (i=n; --i>=0;)
+	*A = (JBFLOAT*)g_malloc((m + 1) * sizeof(JBFLOAT));
+	B = (JBFLOAT*)g_malloc((m + 1) * (m + 2) * sizeof(JBFLOAT));
+	for (j = m; j >= 0; --j) xx[j] = yx[j] = 0.;
+	for (j = m + m; --j > m;) xx[j] = 0.;
+	for (i = n; --i >= 0;)
 	{
-		for (j=0, zx=1., zy=y[i]; j<=m; ++j)
+		for (j = 0, zx = 1., zy = y[i]; j <= m; ++j)
 		{
-			yx[j]+=zy;
-			xx[j]+=zx;
-			zx*=x[i];
-			zy*=x[i];
+			yx[j] += zy;
+			xx[j] += zx;
+			zx *= x[i];
+			zy *= x[i];
 		}
-		for (; j<=m+m; ++j)
+		for (; j <= m + m; ++j)
 		{
-			xx[j]+=zx;
-			zx*=x[i];
+			xx[j] += zx;
+			zx *= x[i];
 		}
 	}
-	for (i=0, k=B; i<=m; ++i, ++k)
+	for (i = 0, k = B; i <= m; ++i, ++k)
 	{
-		for (j=0; j<=m; ++j, ++k) *k = xx[j+i];
+		for (j = 0; j <= m; ++j, ++k) *k = xx[j + i];
 		*k = yx[i];
 	}
-	jbm_solve_matrix(B,m+1);
-	for (i=0, k=B; i<=m; ++i, k+=m+1)
+	jbm_solve_matrix(B, m + 1);
+	for (i = 0, k = B; i <= m; ++i, k += m + 1)
 	{
 		(*A)[i] = *k;
-		printf("i=%d A="FWF"\n",i,*k);
+		printf("i=%d A="FWF"\n", i, *k);
 	}
 	g_free(B);
 }
-
 #if INLINE_JBM_REGRESSION
 	#define jbm_regression _jbm_regression
 #else
-	void jbm_regression(JBFLOAT*,JBFLOAT*,int,JBFLOAT**,int);
+	void jbm_regression(JBFLOAT*, JBFLOAT*, int, JBFLOAT**, int);
+#endif
+
+static inline void _jbm_regression_linear(JBFLOAT *x, JBFLOAT *y, int n,
+	JBDOUBLE *a, JBDOUBLE *b)
+{
+	register int i;
+	register JBDOUBLE syx, sy, sxx, sx;
+	syx = sy = sxx = sx = 0.;
+	++n;
+	for (i = n; --i >= 0; ++x, ++y)
+	{
+		sy += *y;
+		syx += *x * *y;
+		sxx += *x * *x;
+		sy += *x;
+	}
+	*b = (n * syx - sy * sx) / (n * sxx - sx * sx);
+	*a = (sy - *b * sx) / n;
+}
+#if INLINE_JBM_REGRESSION_LINEAR
+	#define jbm_regression_linear _jbm_regression_linear
+#else
+	void jbm_regression_linear(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*);
+#endif
+
+static inline void _jbm_regression_exponential
+	(JBFLOAT *x, JBFLOAT *y, int n, JBDOUBLE *a, JBDOUBLE *b)
+{
+	register int i;
+	for (i = n + 1; --i >= 0;) x[i] = log(x[i]), y[i] = log(y[i]);
+	jbm_regression_linear(x, y, n, a, b);
+	*a = exp(*a);
+}
+#if INLINE_JBM_REGRESSION_EXPONENTIAL
+	#define jbm_regression_exponential _jbm_regression_exponential
+#else
+	void jbm_regression_exponential
+		(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*);
+#endif
+
+static inline void _jbm_regression_multilinear
+	(JBFLOAT **x, int n, JBFLOAT *a, int m)
+{
+	register int i, j, k;
+	JBFLOAT *c, *d, *xj, *xk;
+	++m;
+	c = (JBFLOAT*)g_malloc(m * (m + 1) * sizeof(JBFLOAT));
+	for (j = m; --j > 0;)
+	{
+		for (k = m; --k >= j;)
+		{
+			d = c + (m + 1) * j + k;
+			xj = x[j];
+			xk = x[k];
+			for (*d = 0., i = n + 1; --i >= 0;) *d += *(xj++) * *(xk++);
+		}
+		d = c + (m + 1) * j + m;
+		xj = x[j];
+		xk = x[0];
+		for (*d = 0., i = n + 1; --i >= 0;) *d += *(xj++) * *(xk++);
+	}
+	for (k = m; --k > 0;)
+	{
+		d = c + k;
+		xk = x[k];
+		for (*d = 0., i = n + 1; --i >= 0;) *d += *(xk++);
+	}
+	d = c + m;
+	xk = x[0];
+	for (*d = 0., i = n + 1; --i >= 0;) *d += *(xk++);
+	c[0] = n + 1;
+	for (j = m; --j > 0;)
+		for (k = j; --k >= 0;) c[(m + 1) * j + k] = c[(m + 1) * k + j];
+	jbm_solve_matrix(c, m);
+	for (i = 0, d = c + m; ++i <= m; ++a, d += m + 1) *a = *d;
+	g_free(c);
+}
+#if INLINE_JBM_REGRESSION_MULTILINEAR
+	#define jbm_regression_multilinear _jbm_regression_multilinear
+#else
+	void jbm_regression_multilinear(JBFLOAT**, int, JBFLOAT*, int);
+#endif
+
+static inline void
+	_jbm_regression_multiexponential(JBFLOAT **x, int n, JBFLOAT *a, int m)
+{
+	register int i, j;
+	JBFLOAT *c;
+	for (j = m + 1; --j >= 0;)
+		for (i = n + 1, c = x[j]; --i >= 0; ++c) *c = log(*c);
+	jbm_regression_multilinear(x, n, a, m);
+	a[0] = exp(a[0]);
+}
+#if INLINE_JBM_REGRESSION_MULTIEXPONENTIAL
+	#define jbm_regression_multiexponential _jbm_regression_multiexponential
+#else
+	void jbm_regression_multiexponential(JBFLOAT **x, int n, JBFLOAT *a, int m);
 #endif
 
 static inline void _jbm_spline_cubic
@@ -1834,110 +1930,6 @@ exit1:
 #else
 	int jbm_transversal_section_regions
 		(JBFLOAT*, JBFLOAT*, int, JBFLOAT**, int**, int**, int**, int*);
-#endif
-
-/* Regresión lineal: obtiene los coeficientes a y b de la regresión y=a+bx */
-
-static inline void
-	_jbm_regression_linear(JBFLOAT *x, JBFLOAT *y, int n, JBDOUBLE *a, JBDOUBLE *b)
-{
-	register int i;
-	register JBDOUBLE syx, sy, sxx, sx;
-	syx=sy=sxx=sx=0.;
-	++n;
-	for (i=n; --i>=0; ++x, ++y)
-	{
-		sy += *y;
-		syx += *x * *y;
-		sxx += *x * *x;
-		sy += *x;
-	}
-	*b = (n * syx - sy * sx) / (n * sxx - sx * sx);
-	*a = (sy - *b * sx) / n;
-}
-
-#if INLINE_JBM_REGRESSION_LINEAR
-	#define jbm_regression_linear _jbm_regression_linear
-#else
-	void jbm_regression_linear(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*);
-#endif
-
-/*
-	Regresión exponencial: obtiene los coeficientes a y b de la regresión y=ax^b
-	Modifica las matrices x, y
-*/
-
-static inline void
-	_jbm_regression_exponential(JBFLOAT *x, JBFLOAT *y, int n, JBDOUBLE *a, JBDOUBLE *b)
-{
-	register int i;
-	for (i=n+1; --i>=0;) x[i]=log(x[i]), y[i]=log(y[i]);
-	jbm_regression_linear(x, y, n, a, b);
-	*a = exp(*a);
-}
-
-#if INLINE_JBM_REGRESSION_EXPONENTIAL
-	#define jbm_regression_exponential _jbm_regression_exponential
-#else
-	void jbm_regression_exponential(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*);
-#endif
-
-static inline void _jbm_regression_multilinear(JBFLOAT **x, int n, JBFLOAT *a, int m)
-{
-	register int i, j, k;
-	JBFLOAT *c, *d, *xj, *xk;
-	++m;
-	c=(JBFLOAT*)g_malloc(m*(m+1)*sizeof(JBFLOAT));
-	for (j=m; --j>0;)
-	{
-		for (k=m; --k>=j;)
-		{
-			d=c+(m+1)*j+k;
-			xj=x[j];
-			xk=x[k];
-			for (*d = 0., i=n+1; --i>=0;) *d += *(xj++) * *(xk++);
-		}
-		d=c+(m+1)*j+m;
-		xj=x[j];
-		xk=x[0];
-		for (*d = 0., i=n+1; --i>=0;) *d += *(xj++) * *(xk++);
-	}
-	for (k=m; --k>0;)
-	{
-		d=c+k;
-		xk=x[k];
-		for (*d = 0., i=n+1; --i>=0;) *d += *(xk++);
-	}
-	d=c+m;
-	xk=x[0];
-	for (*d = 0., i=n+1; --i>=0;) *d += *(xk++);
-	c[0]=n+1;
-	for (j=m; --j>0;) for (k=j; --k>=0;) c[(m+1)*j+k]=c[(m+1)*k+j];
-	jbm_solve_matrix(c, m);
-	for (i=0, d=c+m; ++i<=m; ++a, d+=m+1) *a = *d;
-	g_free(c);
-}
-
-#if INLINE_JBM_REGRESSION_MULTILINEAR
-	#define jbm_regression_multilinear _jbm_regression_multilinear
-#else
-	void jbm_regression_multilinear(JBFLOAT **x, int n, JBFLOAT *a, int m);
-#endif
-
-static inline void
-	_jbm_regression_multiexponential(JBFLOAT **x, int n, JBFLOAT *a, int m)
-{
-	register int i, j;
-	JBFLOAT *c;
-	for (j=m+1; --j>=0;) for (i=n+1, c=x[j]; --i>=0; ++c) *c = log(*c);
-	jbm_regression_multilinear(x, n, a, m);
-	a[0]=exp(a[0]);
-}
-
-#if INLINE_JBM_REGRESSION_MULTIEXPONENTIAL
-	#define jbm_regression_multiexponential _jbm_regression_multiexponential
-#else
-	void jbm_regression_multiexponential(JBFLOAT **x, int n, JBFLOAT *a, int m);
 #endif
 
 /* varray: array de tipo struct de tamaño size de elementos 0 a n */

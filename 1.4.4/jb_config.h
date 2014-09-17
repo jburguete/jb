@@ -533,6 +533,30 @@
  */
 #define INLINE_JBM_REGRESSION						1
 /**
+ * \def INLINE_JBM_REGRESSION_LINEAR
+ * \brief Macro deciding if the function jbm_regression_linear() has to be
+ *   inlined.
+ */
+#define INLINE_JBM_REGRESSION_LINEAR				1
+/**
+ * \def INLINE_JBM_REGRESSION_EXPONENTIAL
+ * \brief Macro deciding if the function jbm_regression_exponential() has to
+ *   be inlined.
+ */
+#define INLINE_JBM_REGRESSION_EXPONENTIAL			1
+/**
+ * \def INLINE_JBM_REGRESSION_MULTILINEAR
+ * \brief Macro deciding if the function jbm_regression_multilinear() has to
+ *   be inlined.
+ */
+#define INLINE_JBM_REGRESSION_MULTILINEAR			1
+/**
+ * \def INLINE_JBM_REGRESSION_MULTIEXPONENTIAL
+ * \brief Macro deciding if the function jbm_regression_multiexponential()
+ *   has to be inlined.
+ */
+#define INLINE_JBM_REGRESSION_MULTIEXPONENTIAL		1
+/**
  * \def INLINE_JBM_SPLINE_CUBIC
  * \brief Macro deciding if the function jbm_spline_cubic() has to be inlined.
  */
@@ -621,30 +645,6 @@
  *   has to be inlined.
  */
 #define INLINE_JBM_TRANSVERSAL_SECTION_REGIONS		0
-/**
- * \def INLINE_JBM_REGRESSION_LINEAR
- * \brief Macro deciding if the function jbm_regression_linear() has to be
- *   inlined.
- */
-#define INLINE_JBM_REGRESSION_LINEAR				1
-/**
- * \def INLINE_JBM_REGRESSION_EXPONENTIAL
- * \brief Macro deciding if the function jbm_regression_exponential() has to
- *   be inlined.
- */
-#define INLINE_JBM_REGRESSION_EXPONENTIAL			1
-/**
- * \def INLINE_JBM_REGRESSION_MULTILINEAR
- * \brief Macro deciding if the function jbm_regression_multilinear() has to
- *   be inlined.
- */
-#define INLINE_JBM_REGRESSION_MULTILINEAR			1
-/**
- * \def INLINE_JBM_REGRESSION_MULTIEXPONENTIAL
- * \brief Macro deciding if the function jbm_regression_multiexponential()
- *   has to be inlined.
- */
-#define INLINE_JBM_REGRESSION_MULTIEXPONENTIAL		1
 /**
  * \def INLINE_JBM_VARRAY_SEARCH
  * \brief Macro deciding if the function jbm_varray_search() has to be
@@ -1538,6 +1538,40 @@
  */
 #define DEBUG_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO	1
 /**
+ * \def DEBUG_JBM_REGRESSION
+ * \brief Macro deciding if the function jbm_regression() has to be debugged.
+ */
+#define DEBUG_JBM_REGRESSION						1
+/**
+ * \def DEBUG_JBM_REGRESSION_LINEAR
+ * \brief Macro deciding if the function jbm_regression_linear() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_REGRESSION_LINEAR					0
+/**
+ * \def DEBUG_JBM_REGRESSION_EXPONENTIAL
+ * \brief Macro deciding if the function jbm_regression_exponential() has to
+ *   be debugged.
+ */
+#define DEBUG_JBM_REGRESSION_EXPONENTIAL			1
+/**
+ * \def DEBUG_JBM_REGRESSION_MULTILINEAR
+ * \brief Macro deciding if the function jbm_regression_multilinear() has to
+ *   be debugged.
+ */
+#define DEBUG_JBM_REGRESSION_MULTILINEAR			0
+/**
+ * \def DEBUG_JBM_REGRESSION_MULTIEXPONENTIAL
+ * \brief Macro deciding if the function jbm_regression_multiexponential()
+ *   has to be debugged.
+ */
+#define DEBUG_JBM_REGRESSION_MULTIEXPONENTIAL		0
+/**
+ * \def DEBUG_JBM_SPLINE_CUBIC
+ * \brief Macro deciding if the function jbm_spline_cubic() has to be debugged.
+ */
+#define DEBUG_JBM_SPLINE_CUBIC						1
+/**
  * \def DEBUG_JBM_FLUX_LIMITER_SUPERBEE
  * \brief Macro deciding if the function jbm_flux_limiter_superbee() has to
  *   be debugged.
@@ -1621,30 +1655,6 @@
  *   has to be debugged.
  */
 #define DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS		0
-/**
- * \def DEBUG_JBM_REGRESSION_LINEAR
- * \brief Macro deciding if the function jbm_regression_linear() has to be
- *   debugged.
- */
-#define DEBUG_JBM_REGRESSION_LINEAR					0
-/**
- * \def DEBUG_JBM_REGRESSION_EXPONENTIAL
- * \brief Macro deciding if the function jbm_regression_exponential() has to
- *   be debugged.
- */
-#define DEBUG_JBM_REGRESSION_EXPONENTIAL			1
-/**
- * \def DEBUG_JBM_REGRESSION_MULTILINEAR
- * \brief Macro deciding if the function jbm_regression_multilinear() has to
- *   be debugged.
- */
-#define DEBUG_JBM_REGRESSION_MULTILINEAR			0
-/**
- * \def DEBUG_JBM_REGRESSION_MULTIEXPONENTIAL
- * \brief Macro deciding if the function jbm_regression_multiexponential()
- *   has to be debugged.
- */
-#define DEBUG_JBM_REGRESSION_MULTIEXPONENTIAL		0
 /**
  * \def DEBUG_JBM_VARRAY_SEARCH
  * \brief Macro deciding if the function jbm_varray_search() has to be
