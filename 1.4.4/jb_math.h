@@ -1560,66 +1560,66 @@ static inline void
 #endif
 
 static inline void _jbm_spline_cubic
-	(JBFLOAT *x,JBFLOAT *y,int n,JBFLOAT **b,JBFLOAT **c,JBFLOAT **d)
+	(JBFLOAT *x, JBFLOAT *y, int n, JBFLOAT **b, JBFLOAT **c, JBFLOAT **d)
 {
-	register int i,j,m;
+	register int i, j, m;
 	register JBFLOAT dx;
-	JBFLOAT *B,*C,*D,*E,*F,*H;
-	m=3*(n-1);
-	B=(JBFLOAT*)g_malloc(6*(m-1)*sizeof(JBFLOAT));
-	C=B+m-2;
-	D=C+m-1;
-	E=D+m;
-	F=E+m-1;
-	H=F+m-2;
-	dx=x[1]-x[0];
-	B[0]=B[1]=D[3]=E[2]=E[3]=F[3]=H[1]=H[2]=H[3]=0.;
-	C[0]=C[1]=C[2]=1.;
-	F[1]=F[2]=-1.;
-	D[0]=dx;
-	D[1]=D[0]+dx;
-	D[2]=D[1]+dx;
-	E[0]=D[0]*dx;
-	E[1]=3*E[0];
-	F[0]=E[0]*dx;
-	H[0]=y[1]-y[0];
-	for (i=n-2; --i>0;)
+	JBFLOAT *B, *C, *D, *E, *F, *H;
+	m = 3 * (n - 1);
+	B = (JBFLOAT*)g_malloc(6 * (m - 1) * sizeof(JBFLOAT));
+	C = B + m - 2;
+	D = C + m - 1;
+	E = D + m;
+	F = E + m - 1;
+	H = F + m - 2;
+	dx = x[1] - x[0];
+	B[0] = B[1] = D[3] = E[2] = E[3] = F[3] = H[1] = H[2] = H[3] = 0.;
+	C[0] = C[1] = C[2] = 1.;
+	F[1] = F[2] =  - 1.;
+	D[0] = dx;
+	D[1] = D[0] + dx;
+	D[2] = D[1] + dx;
+	E[0] = D[0] * dx;
+	E[1] = 3 * E[0];
+	F[0] = E[0] * dx;
+	H[0] = y[1] - y[0];
+	for (i = n - 2; --i > 0;)
 	{
-		j=3*i+1;
-		dx=x[i+1]-x[i];
-		B[j-2]=D[j+2]=F[j]=F[j+1]=F[j+2]=H[j+1]=H[j+2]=0.;
-		B[j-1]=B[j]=1.;
-		E[j+1]=E[j+2]=-1.;
-		C[j-1]=dx;
-		C[j]=C[j-1]+dx;
-		C[j+1]=C[j]+dx;
-		D[j]=C[j-1]*dx;
-		D[j+1]=3*D[j];
-		E[j]=D[j]*dx;
-		H[j]=y[i+1]-y[i];
+		j = 3 * i + 1;
+		dx = x[i + 1] - x[i];
+		B[j - 2] = D[j + 2] = F[j] = F[j + 1] = F[j + 2] = H[j + 1] = H[j + 2]
+			= 0.;
+		B[j - 1] = B[j] = 1.;
+		E[j + 1] = E[j + 2] =  - 1.;
+		C[j - 1] = dx;
+		C[j] = C[j - 1] + dx;
+		C[j + 1] = C[j] + dx;
+		D[j] = C[j - 1] * dx;
+		D[j + 1] = 3 * D[j];
+		E[j] = D[j] * dx;
+		H[j] = y[i + 1] - y[i];
 	}
-	j=3*n-5;
-	dx=x[n-1]-x[n-2];
-	B[j-2]=B[j-1]=C[j]=H[j+1]=0.;
-	D[j+1]=1.;
-	C[j-1]=dx;
-	D[j]=dx*dx;
-	E[j]=D[j]*dx;
-	H[j]=y[n-1]-y[n-2];
-	jbm_solve_pentadiagonal_matrix(B,C,D,E,F,H,m-1);
-	*b = (JBFLOAT*)g_malloc(3 * (n-1) * sizeof(JBFLOAT));
+	j = 3 * n - 5;
+	dx = x[n - 1] - x[n - 2];
+	B[j - 2] = B[j - 1] = C[j] = H[j + 1] = 0.;
+	D[j + 1] = 1.;
+	C[j - 1] = dx;
+	D[j] = dx * dx;
+	E[j] = D[j] * dx;
+	H[j] = y[n - 1] - y[n - 2];
+	jbm_solve_pentadiagonal_matrix(B, C, D, E, F, H, m - 1);
+	*b = (JBFLOAT*)g_malloc(3 * (n - 1) * sizeof(JBFLOAT));
 	*c = *b + n - 1;
 	*d = *c + n - 1;
-	for (i=n-1; --i>=0;)
+	for (i = n - 1; --i >= 0;)
 	{
-		j=3*i;
-		(*b)[i]=H[j];
-		(*c)[i]=H[++j];
-		(*d)[i]=H[++j];
+		j = 3 * i;
+		(*b)[i] = H[j];
+		(*c)[i] = H[++j];
+		(*d)[i] = H[++j];
 	}
 	g_free(B);
 }
-
 #if INLINE_JBM_SPLINE_CUBIC
 	#define jbm_spline_cubic _jbm_spline_cubic
 #else

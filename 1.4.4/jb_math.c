@@ -1135,9 +1135,9 @@ void jbm_regression_linear
  *   adjusted by minimum squares:
  *   \f$y=a\,x^b\f$.
  * \param x
- * \brief array of point x-coordinates.
+ * \brief array of point x-coordinates. It is modified by the function.
  * \param y
- * \brief array of point y-coordinates.
+ * \brief array of point y-coordinates. It is modified by the function.
  * \param n
  * \brief points number.
  * \param a
@@ -1151,8 +1151,45 @@ void jbm_regression_exponential
 {_jbm_regression_exponential(x, y, n, a, b);}
 #endif
 
+/**
+ * \fn void jbm_regression_multilinear(JBFLOAT **x, int n, JBFLOAT *a, int m)
+ * \brief Function to calculate the coefficientes of a multilinear regression
+ *   adjusted by minimum squares:
+ *   \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$.
+ * \param x
+ * \brief array of point coordinates in format:
+ *   \f$\left(x_1,\cdots,x_n,y_1,\cdots,y_n,\cdots,f_1,\cdots,f_n\right)\f$.
+ * \param n
+ * \brief points number.
+ * \param a
+ * \brief array of regression coefficients.
+ * \param m
+ * \brief number of variables.
+ */
 #if !INLINE_JBM_REGRESSION_MULTILINEAR
 void jbm_regression_multilinear(JBFLOAT **x, int n, JBFLOAT *a, int m)
+{_jbm_regression_multilinear(x, n, a, m);}
+#endif
+
+/**
+ * \fn void jbm_regression_multiexponential(JBFLOAT **x, int n, JBFLOAT *a, \
+ *   int m)
+ * \brief Function to calculate the coefficientes of a multiexponential
+ *   regression adjusted by minimum squares:
+ *   \f$f=a_0\,x^{a_1}\,y^{a_2}\cdots\f$.
+ * \param x
+ * \brief array of point coordinates in format:
+ *   \f$\left(x_1,\cdots,x_n,y_1,\cdots,y_n,\cdots,f_1,\cdots,f_n\right)\f$.
+ *   It is modified by the function.
+ * \param n
+ * \brief points number.
+ * \param a
+ * \brief array of regression coefficients.
+ * \param m
+ * \brief number of variables.
+ */
+#if !INLINE_JBM_REGRESSION_MULTIEXPONENTIAL
+void jbm_regression_multiexponential(JBFLOAT **x, int n, JBFLOAT *a, int m)
 {_jbm_regression_multilinear(x, n, a, m);}
 #endif
 
