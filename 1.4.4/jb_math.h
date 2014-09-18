@@ -1629,11 +1629,10 @@ static inline void _jbm_spline_cubic
 static inline JBDOUBLE _jbm_flux_limiter_superbee(JBDOUBLE d1, JBDOUBLE d2)
 {
 	register JBDOUBLE r;
-	if (d1*d2<=0.) return 0.;
-	r=d1/d2;
-	return fmaxl(fminl(r+r, 1.), fminl(r, 2.));
+	if (d1 * d2 <= 0.L) return 0.L;
+	r = d1 / d2;
+	return fmaxl(fminl(r + r, 1.L), fminl(r, 2.L));
 }
-
 #if INLINE_JBM_FLUX_LIMITER_SUPERBEE
 	#define jbm_flux_limiter_superbee _jbm_flux_limiter_superbee
 #else
@@ -1643,12 +1642,11 @@ static inline JBDOUBLE _jbm_flux_limiter_superbee(JBDOUBLE d1, JBDOUBLE d2)
 static inline JBDOUBLE _jbm_flux_limiter_VanLeer(JBDOUBLE d1, JBDOUBLE d2)
 {
 	register JBDOUBLE r, k;
-	if (d1*d2<=0.) return 0.;
-	r=d1/d2;
-	k=fabsl(r);
-	return (r+k)/(1.+k);
+	if (d1 * d2 <= 0.L) return 0.L;
+	r = d1 / d2;
+	k = fabsl(r);
+	return (r + k) / (1.L + k);
 }
-
 #if INLINE_JBM_FLUX_LIMITER_VANLEER
 	#define jbm_flux_limiter_VanLeer _jbm_flux_limiter_VanLeer
 #else
@@ -1658,12 +1656,11 @@ static inline JBDOUBLE _jbm_flux_limiter_VanLeer(JBDOUBLE d1, JBDOUBLE d2)
 static inline JBDOUBLE _jbm_flux_limiter_VanAlbada(JBDOUBLE d1, JBDOUBLE d2)
 {
 	register JBDOUBLE r, k;
-	if (d1*d2<=0.) return 0.;
-	r=d1/d2;
-	k=r*r;
-	return (r+k)/(1.+k);
+	if (d1 * d2 <= 0.L) return 0.L;
+	r = d1 / d2;
+	k = r * r;
+	return (r + k) / (1.L + k);
 }
-
 #if INLINE_JBM_FLUX_LIMITER_VANALBADA
 	#define jbm_flux_limiter_VanAlbada _jbm_flux_limiter_VanAlbada
 #else
@@ -1672,10 +1669,9 @@ static inline JBDOUBLE _jbm_flux_limiter_VanAlbada(JBDOUBLE d1, JBDOUBLE d2)
 
 static inline JBDOUBLE _jbm_flux_limiter_minmod(JBDOUBLE d1, JBDOUBLE d2)
 {
-	if (d1*d2<=0.) return 0.;
-	return fminl(d1/d2, 1.);
+	if (d1 * d2 <= 0.L) return 0.L;
+	return fminl(d1 / d2, 1.L);
 }
-
 #if INLINE_JBM_FLUX_LIMITER_MINMOD
 	#define jbm_flux_limiter_minmod _jbm_flux_limiter_minmod
 #else
@@ -1684,10 +1680,9 @@ static inline JBDOUBLE _jbm_flux_limiter_minmod(JBDOUBLE d1, JBDOUBLE d2)
 
 static inline JBDOUBLE _jbm_flux_limiter_supermin(JBDOUBLE d1, JBDOUBLE d2)
 {
-	if (d1*d2<=0.) return 0.;
-	return fminl(jbm_fdbl(d1/d2), 1.);
+	if (d1 * d2 <= 0.L) return 0.L;
+	return fminl(jbm_fdbl(d1 / d2), 1.L);
 }
-
 #if INLINE_JBM_FLUX_LIMITER_SUPERMIN
 	#define jbm_flux_limiter_supermin _jbm_flux_limiter_supermin
 #else
@@ -1696,10 +1691,9 @@ static inline JBDOUBLE _jbm_flux_limiter_supermin(JBDOUBLE d1, JBDOUBLE d2)
 
 static inline JBDOUBLE _jbm_flux_limiter_minsuper(JBDOUBLE d1, JBDOUBLE d2)
 {
-	if (d1*d2<=0.) return 0.;
-	return fminl(d1/d2, 2.);
+	if (d1 * d2 <= 0.L) return 0.L;
+	return fminl(d1 / d2, 2.L);
 }
-
 #if INLINE_JBM_FLUX_LIMITER_MINSUPER
 	#define jbm_flux_limiter_minsuper _jbm_flux_limiter_minsuper
 #else
@@ -1708,60 +1702,57 @@ static inline JBDOUBLE _jbm_flux_limiter_minsuper(JBDOUBLE d1, JBDOUBLE d2)
 
 static inline JBDOUBLE _jbm_flux_limiter_null(JBDOUBLE d1, JBDOUBLE d2)
 {
-	return 1.;
+	return 1.L;
 }
-
 #if INLINE_JBM_FLUX_LIMITER_NULL
 	#define jbm_flux_limiter_null _jbm_flux_limiter_null
 #else
 	JBDOUBLE jbm_flux_limiter_null(JBDOUBLE, JBDOUBLE);
 #endif
 
-static inline JBDOUBLE _jbm_flux_limiter_centered(JBDOUBLE d1, JBDOUBLE d2)
+static inline JBDOUBLE _jbm_flux_limiter_centred(JBDOUBLE d1, JBDOUBLE d2)
 {
-	if (d2==0.) return 0.;
-	return d1/d2;
+	if (d2 == 0.L) return 0.L;
+	return d1 / d2;
 }
-
-#if INLINE_JBM_FLUX_LIMITER_CENTERED
-	#define jbm_flux_limiter_centered _jbm_flux_limiter_centered
+#if INLINE_JBM_FLUX_LIMITER_CENTRED
+	#define jbm_flux_limiter_centred _jbm_flux_limiter_centred
 #else
-	JBDOUBLE jbm_flux_limiter_centered(JBDOUBLE, JBDOUBLE);
+	JBDOUBLE jbm_flux_limiter_centred(JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_flux_limiter_total(JBDOUBLE d1, JBDOUBLE d2)
 {
-	return 0.;
+	return 0.L;
 }
-
 #if INLINE_JBM_FLUX_LIMITER_TOTAL
 	#define jbm_flux_limiter_total _jbm_flux_limiter_total
 #else
 	JBDOUBLE jbm_flux_limiter_total(JBDOUBLE, JBDOUBLE);
 #endif
 
-static inline JBDOUBLE _jbm_flux_limiter_Burguete(JBDOUBLE d1, JBDOUBLE d2)
+static inline JBDOUBLE _jbm_flux_limiter_monotonized_central
+	(JBDOUBLE d1, JBDOUBLE d2)
 {
 	register JBDOUBLE k;
-	if (d1*d2<=0.) return 0.;
-	k=d1/d2;
-	if (k>=3.) return 2.;
-	if (k<=1./3.) return k+k;
-	return 0.5*(k+1.);
+	if (d1 * d2 <= 0.L) return 0.L;
+	k = d1 / d2;
+	if (k >= 3.L) return 2.L;
+	if (k <= 1.L/3.L) return k + k;
+	return 0.5L * (k + 1.L);
 }
-
-#if INLINE_JBM_FLUX_LIMITER_BURGUETE
-	#define jbm_flux_limiter_Burguete _jbm_flux_limiter_Burguete
+#if INLINE_JBM_FLUX_LIMITER_MONOTONIZED_CENTRAL
+	#define jbm_flux_limiter_monotonized_central \
+		_jbm_flux_limiter_monotonized_central
 #else
-	JBDOUBLE jbm_flux_limiter_Burguete(JBDOUBLE, JBDOUBLE);
+	JBDOUBLE jbm_flux_limiter_monotonized_central(JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_flux_limiter_mean(JBDOUBLE d1, JBDOUBLE d2)
 {
-	if (d2==0.) return 0.;
-	return 0.5*(d1/d2+1.);
+	if (d2 == 0.L) return 0.L;
+	return 0.5 * (d1 / d2 + 1.L);
 }
-
 #if INLINE_JBM_FLUX_LIMITER_MEAN
 	#define jbm_flux_limiter_mean _jbm_flux_limiter_mean
 #else
@@ -1792,11 +1783,10 @@ static inline JBDOUBLE
 	case 8:
 		return jbm_flux_limiter_total;
 	case 9:
-		return jbm_flux_limiter_Burguete;
+		return jbm_flux_limiter_monotonized_central;
 	}
 	return jbm_flux_limiter_mean;
 }
-
 #if INLINE_JBM_FLUX_LIMITER_SELECT
 	#define jbm_flux_limiter_select _jbm_flux_limiter_select
 #else

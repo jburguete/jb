@@ -616,11 +616,11 @@
  */
 #define INLINE_JBM_FLUX_LIMITER_TOTAL				1
 /**
- * \def INLINE_JBM_FLUX_LIMITER_BURGUETE
- * \brief Macro deciding if the function jbm_flux_limiter_Burguete() has to
- *   be inlined.
+ * \def INLINE_JBM_FLUX_LIMITER_MONOTONIZED_CENTRAL
+ * \brief Macro deciding if the function jbm_flux_limiter_monotonized_central()
+ *   has to be inlined.
  */
-#define INLINE_JBM_FLUX_LIMITER_BURGUETE			1
+#define INLINE_JBM_FLUX_LIMITER_MONOTONIZED_CENTRAL	1
 /**
  * \def INLINE_JBM_FLUX_LIMITER_MEAN
  * \brief Macro deciding if the function jbm_flux_limiter_mean() has to be
@@ -1626,11 +1626,11 @@
  */
 #define DEBUG_JBM_FLUX_LIMITER_TOTAL				1
 /**
- * \def DEBUG_JBM_FLUX_LIMITER_BURGUETE
- * \brief Macro deciding if the function jbm_flux_limiter_Burguete() has to
- *   be debugged.
+ * \def DEBUG_JBM_FLUX_LIMITER_MONOTONIZED_CENTRAL
+ * \brief Macro deciding if the function jbm_flux_limiter_monotonized_central()
+ *   has to be debugged.
  */
-#define DEBUG_JBM_FLUX_LIMITER_BURGUETE				1
+#define DEBUG_JBM_FLUX_LIMITER_MONOTONIZED_CENTRAL	1
 /**
  * \def DEBUG_JBM_FLUX_LIMITER_MEAN
  * \brief Macro deciding if the function jbm_flux_limiter_mean() has to be

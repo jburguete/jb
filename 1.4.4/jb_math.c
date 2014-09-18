@@ -1193,60 +1193,186 @@ void jbm_regression_multiexponential(JBFLOAT **x, int n, JBFLOAT *a, int m)
 {_jbm_regression_multilinear(x, n, a, m);}
 #endif
 
+/**
+ * \fn void jbm_spline_cubic(JBFLOAT *x, JBFLOAT *y, int n, JBFLOAT **b, \
+ *   JBFLOAT **c, JBFLOAT **d)
+ * \brief Function to calculate a cubic spline on tabular data.
+ * \param x
+ * \brief array of point x-coordinates.
+ * \param y
+ * \brief array of point y-coordinates.
+ * \param n
+ * \brief number of points.
+ * \param b
+ * \brief pointer to the array of 1st order spline coefficients. It is generated
+ *   by g_malloc.
+ * \param c
+ * \brief pointer to the array of 2nd order spline coefficients.
+ * \param d
+ * \brief pointer to the array of 3rd order spline coefficients.
+ */
 #if !INLINE_JBM_SPLINE_CUBIC
 void jbm_spline_cubic
 	(JBFLOAT *x, JBFLOAT *y, int n, JBFLOAT **b, JBFLOAT **c, JBFLOAT **d)
 {_jbm_spline_cubic(x, y, n, b, c, d);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_flux_limiter_superbee(JBDOUBLE d1, JBDOUBLE d2)
+ * \brief Function to calculate the superbee flux limiter:
+ *   \f$\psi\left(d_1,\,d_2)=\max\left[0,\,
+ *   \min\left(1,\,\frac{2\,d_1}{d_2}\right),\,
+ *   \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$.
+ * \param d_1
+ * \brief 1st flux limiter function parameter.
+ * \param d_2
+ * \brief 2nd flux limiter function parameter.
+ * \return flux limiter function value.
+ */
 #if !INLINE_JBM_FLUX_LIMITER_SUPERBEE
 JBDOUBLE jbm_flux_limiter_superbee(JBDOUBLE d1, JBDOUBLE d2)
 {return _jbm_flux_limiter_superbee(d1, d2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_flux_limiter_VanLeer(JBDOUBLE d1, JBDOUBLE d2)
+ * \brief Function to calculate the van Leer flux limiter:
+ *   \f$\psi\left(d_1,\,d_2)=\frac{\frac{d_1}{d_2}+\left|\frac{d_1}{d_2}\right|}
+ *   {1+\left|\frac{d_1}{d_2}\right|}\f$.
+ * \param d_1
+ * \brief 1st flux limiter function parameter.
+ * \param d_2
+ * \brief 2nd flux limiter function parameter.
+ * \return flux limiter function value.
+ */
 #if !INLINE_JBM_FLUX_LIMITER_VANLEER
 JBDOUBLE jbm_flux_limiter_VanLeer(JBDOUBLE d1, JBDOUBLE d2)
 {return _jbm_flux_limiter_VanLeer(d1, d2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_flux_limiter_VanAlbada(JBDOUBLE d1, JBDOUBLE d2)
+ * \brief Function to calculate the van Albada flux limiter:
+ *   \f$\psi\left(d_1,\,d_2)=\frac{\frac{d_1}{d_2}+\frac{d_1^2}{d_2^2}}
+ *   {1+\frac{d_1^2}{d_2^2}}\f$.
+ * \param d_1
+ * \brief 1st flux limiter function parameter.
+ * \param d_2
+ * \brief 2nd flux limiter function parameter.
+ * \return flux limiter function value.
+ */
 #if !INLINE_JBM_FLUX_LIMITER_VANALBADA
 JBDOUBLE jbm_flux_limiter_VanAlbada(JBDOUBLE d1, JBDOUBLE d2)
 {return _jbm_flux_limiter_VanAlbada(d1, d2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_flux_limiter_minmod(JBDOUBLE d1, JBDOUBLE d2)
+ * \brief Function to calculate the minmod flux limiter:
+ *   \f$\psi\left(d_1,\,d_2)=\max\left[0,\,
+ *   \min\left(1,\,\frac{d_1}{d_2}\right)\right]\f$.
+ * \param d_1
+ * \brief 1st flux limiter function parameter.
+ * \param d_2
+ * \brief 2nd flux limiter function parameter.
+ * \return flux limiter function value.
+ */
 #if !INLINE_JBM_FLUX_LIMITER_MINMOD
 JBDOUBLE jbm_flux_limiter_minmod(JBDOUBLE d1, JBDOUBLE d2)
 {return _jbm_flux_limiter_minmod(d1, d2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_flux_limiter_supermin(JBDOUBLE d1, JBDOUBLE d2)
+ * \brief Function to calculate the supermin flux limiter:
+ *   \f$\psi\left(d_1,\,d_2)=\max\left[0,\,
+ *   \min\left(1,\,\frac{2\,d_1}{d_2}\right)\right]\f$.
+ * \param d_1
+ * \brief 1st flux limiter function parameter.
+ * \param d_2
+ * \brief 2nd flux limiter function parameter.
+ * \return flux limiter function value.
+ */
 #if !INLINE_JBM_FLUX_LIMITER_SUPERMIN
 JBDOUBLE jbm_flux_limiter_supermin(JBDOUBLE d1, JBDOUBLE d2)
 {return _jbm_flux_limiter_supermin(d1, d2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_flux_limiter_minsuper(JBDOUBLE d1, JBDOUBLE d2)
+ * \brief Function to calculate the minsuper flux limiter:
+ *   \f$\psi\left(d_1,\,d_2)=\max\left[0,\,
+ *   \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$.
+ * \param d_1
+ * \brief 1st flux limiter function parameter.
+ * \param d_2
+ * \brief 2nd flux limiter function parameter.
+ * \return flux limiter function value.
+ */
 #if !INLINE_JBM_FLUX_LIMITER_MINSUPER
 JBDOUBLE jbm_flux_limiter_minsuper(JBDOUBLE d1, JBDOUBLE d2)
 {return _jbm_flux_limiter_minsuper(d1, d2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_flux_limiter_null(JBDOUBLE d1, JBDOUBLE d2)
+ * \brief Function to calculate the null (2nd order upwind) flux limiter:
+ *   \f$\psi\left(d_1,\,d_2)=1\f$.
+ * \param d_1
+ * \brief 1st flux limiter function parameter.
+ * \param d_2
+ * \brief 2nd flux limiter function parameter.
+ * \return flux limiter function value.
+ */
 #if !INLINE_JBM_FLUX_LIMITER_NULL
 JBDOUBLE jbm_flux_limiter_null(JBDOUBLE d1, JBDOUBLE d2)
 {return _jbm_flux_limiter_null(d1, d2);}
 #endif
 
-#if !INLINE_JBM_FLUX_LIMITER_CENTERED
-JBDOUBLE jbm_flux_limiter_centered(JBDOUBLE d1, JBDOUBLE d2)
-{return _jbm_flux_limiter_centered(d1, d2);}
+/**
+ * \fn JBDOUBLE jbm_flux_limiter_centred(JBDOUBLE d1, JBDOUBLE d2)
+ * \brief Function to calculate the centred (2nd order centred) flux limiter:
+ *   \f$\psi\left(d_1,\,d_2)=\frac{d_1}{d_2}\f$.
+ * \param d_1
+ * \brief 1st flux limiter function parameter.
+ * \param d_2
+ * \brief 2nd flux limiter function parameter.
+ * \return flux limiter function value.
+ */
+#if !INLINE_JBM_FLUX_LIMITER_CENTRED
+JBDOUBLE jbm_flux_limiter_centred(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_centred(d1, d2);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_flux_limiter_total(JBDOUBLE d1, JBDOUBLE d2)
+ * \brief Function to calculate the total (1st order upwind) flux limiter:
+ *   \f$\psi\left(d_1,\,d_2)=0\f$.
+ * \param d_1
+ * \brief 1st flux limiter function parameter.
+ * \param d_2
+ * \brief 2nd flux limiter function parameter.
+ * \return flux limiter function value.
+ */
 #if !INLINE_JBM_FLUX_LIMITER_TOTAL
 JBDOUBLE jbm_flux_limiter_total(JBDOUBLE d1, JBDOUBLE d2)
 {return _jbm_flux_limiter_total(d1, d2);}
 #endif
 
-#if !INLINE_JBM_FLUX_LIMITER_BURGUETE
-JBDOUBLE jbm_flux_limiter_Burguete(JBDOUBLE d1, JBDOUBLE d2)
-{return _jbm_flux_limiter_Burguete(d1, d2);}
+/**
+ * \fn JBDOUBLE jbm_flux_limiter_monotonized_central(JBDOUBLE d1, JBDOUBLE d2)
+ * \brief Function to calculate the monotonized central flux limiter:
+ *   \f$\psi\left(d_1,\,d_2)=\max\left[0,\,
+ *   \min\left(2,\,\frac{1+\frac{d_1}{d_2}}{2}\right)\right]\f$.
+ * \param d_1
+ * \brief 1st flux limiter function parameter.
+ * \param d_2
+ * \brief 2nd flux limiter function parameter.
+ * \return flux limiter function value.
+ */
+#if !INLINE_JBM_FLUX_LIMITER_MONOTONIZED_CENTRAL
+JBDOUBLE jbm_flux_limiter_monotonized_central(JBDOUBLE d1, JBDOUBLE d2)
+{return _jbm_flux_limiter_monotonized_central(d1, d2);}
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_MEAN
@@ -1255,7 +1381,7 @@ JBDOUBLE jbm_flux_limiter_mean(JBDOUBLE d1, JBDOUBLE d2)
 #endif
 
 #if !INLINE_JBM_FLUX_LIMITER_SELECT
-JBDOUBLE(*jbm_flux_limiter_select(int type))(JBDOUBLE, JBDOUBLE)
+JBDOUBLE (*jbm_flux_limiter_select(int type))(JBDOUBLE, JBDOUBLE)
 {return _jbm_flux_limiter_select(type);}
 #endif
 
