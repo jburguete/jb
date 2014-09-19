@@ -604,11 +604,11 @@
  */
 #define INLINE_JBM_FLUX_LIMITER_NULL				1
 /**
- * \def INLINE_JBM_FLUX_LIMITER_CENTERED
- * \brief Macro deciding if the function jbm_flux_limiter_centered() has to
+ * \def INLINE_JBM_FLUX_LIMITER_CENTRED
+ * \brief Macro deciding if the function jbm_flux_limiter_centred() has to
  *   be inlined.
  */
-#define INLINE_JBM_FLUX_LIMITER_CENTERED			1
+#define INLINE_JBM_FLUX_LIMITER_CENTRED				1
 /**
  * \def INLINE_JBM_FLUX_LIMITER_TOTAL
  * \brief Macro deciding if the function jbm_flux_limiter_total() has to be
@@ -1614,11 +1614,11 @@
  */
 #define DEBUG_JBM_FLUX_LIMITER_NULL					1
 /**
- * \def DEBUG_JBM_FLUX_LIMITER_CENTERED
- * \brief Macro deciding if the function jbm_flux_limiter_centered() has to
- *   be debugged.
+ * \def DEBUG_JBM_FLUX_LIMITER_CENTRED
+ * \brief Macro deciding if the function jbm_flux_limiter_centred() has to be
+ *   debugged.
  */
-#define DEBUG_JBM_FLUX_LIMITER_CENTERED				1
+#define DEBUG_JBM_FLUX_LIMITER_CENTRED				1
 /**
  * \def DEBUG_JBM_FLUX_LIMITER_TOTAL
  * \brief Macro deciding if the function jbm_flux_limiter_total() has to be

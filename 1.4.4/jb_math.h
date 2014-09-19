@@ -1482,7 +1482,7 @@ static inline void _jbm_regression_linear(JBFLOAT *x, JBFLOAT *y, int n,
 #if INLINE_JBM_REGRESSION_LINEAR
 	#define jbm_regression_linear _jbm_regression_linear
 #else
-	void jbm_regression_linear(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*);
+	void jbm_regression_linear(JBFLOAT*, JBFLOAT*, int, JBDOUBLE*, JBDOUBLE*);
 #endif
 
 static inline void _jbm_regression_exponential
@@ -1497,7 +1497,7 @@ static inline void _jbm_regression_exponential
 	#define jbm_regression_exponential _jbm_regression_exponential
 #else
 	void jbm_regression_exponential
-		(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*);
+		(JBFLOAT*, JBFLOAT*, int, JBDOUBLE*, JBDOUBLE*);
 #endif
 
 static inline void _jbm_regression_multilinear
@@ -1779,7 +1779,7 @@ static inline JBDOUBLE
 	case 6:
 		return jbm_flux_limiter_null;
 	case 7:
-		return jbm_flux_limiter_centered;
+		return jbm_flux_limiter_centred;
 	case 8:
 		return jbm_flux_limiter_total;
 	case 9:
