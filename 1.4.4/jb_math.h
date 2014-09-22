@@ -1803,25 +1803,25 @@ static inline void _jbm_transversal_section_regions_sort
 	#if DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS_SORT
 		fprintf(stderr, "JBM transversal section regions sort: start\n");
 	#endif
-	t=0.5*(zz[i]+zz[i+1]);
-	for (j=nj; --j>=0;)
+	t = 0.5 * (zz[i] + zz[i + 1]);
+	for (j = nj; --j >= 0;)
 	{
-		na[j]=k=nk[j];
-		x[j]=jbm_extrapolate(t, z[k], z[k+1], l[k], l[k+1]);
+		na[j] = k = nk[j];
+		x[j] = jbm_extrapolate(t, z[k], z[k + 1], l[k], l[k + 1]);
 		#if DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS_SORT
 			fprintf(stderr, "JBM tsrs j=%d k=%d x="FWF"\n", j, k, x[j]);
 		#endif
 	}
-	jbm_index_sort(x, nx, nj-1);
+	jbm_index_sort(x, nx, nj - 1);
 	#if DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS_SORT
-		for (j=0; j<nj; ++j) fprintf(stderr, "JBM tsrs i=%d nx=%d\n", j, nx[j]);
+		for (j = 0; j < nj; ++j)
+			fprintf(stderr, "JBM tsrs i=%d nx=%d\n", j, nx[j]);
 	#endif
-	for (j=nj; --j>=0;) *(nk++)=na[nx[j]];
+	for (j = nj; --j >= 0;) *(nk++) = na[nx[j]];
 	#if DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS_SORT
 		fprintf(stderr, "JBM transversal section regions sort: end\n");
 	#endif
 }
-
 #if INLINE_JBM_TRANSVERSAL_SECTION_REGIONS_SORT
 	#define jbm_transversal_section_regions_sort \
 		_jbm_transversal_section_regions_sort
@@ -1830,8 +1830,8 @@ static inline void _jbm_transversal_section_regions_sort
 		(int, int*, int*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int*);
 #endif
 
-static inline int _jbm_transversal_section_regions(JBFLOAT *l, JBFLOAT *z, int n,
-	JBFLOAT **zz, int **ni, int **nj, int **nij, int *nmin)
+static inline int _jbm_transversal_section_regions(JBFLOAT *l, JBFLOAT *z,
+	int n, JBFLOAT **zz, int **ni, int **nj, int **nij, int *nmin)
 {
 
 /*
@@ -1852,7 +1852,7 @@ Salidas:
 Deben liberarse: zz, ni, nj
 */
 
-	register int i=0, j, k;
+	register int i = 0, j, k;
 	int nmax, *nk;
 	#if DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS
 		fprintf(stderr, "JBM transversal section regions: start\n");
@@ -1861,51 +1861,53 @@ Deben liberarse: zz, ni, nj
 	if (!i) goto exit1;
 	#if DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS
 		fprintf(stderr, "JBM tsr n=%d\n", i);
-		for (j=0; j<=n; ++j) fprintf(stderr, "JBM tsr i=%d ni=%d\n", j, (*ni)[j]);
-		for (j=0; j<=i; ++j)
+		for (j = 0; j <= n; ++j)
+			fprintf(stderr, "JBM tsr i=%d ni=%d\n", j, (*ni)[j]);
+		for (j = 0; j <= i; ++j)
 			fprintf(stderr, "JBM tsr i=%d z="FWF"\n", j, (*zz)[j]);
 	#endif
-	*nj=(int*)g_try_malloc(n*(i+1)*sizeof(int));
+	*nj = (int*)g_try_malloc(n * (i + 1) * sizeof(int));
 	if (!*nj)
 	{
 		g_free(*zz);
 		g_free(*ni);
-		i=0;
+		i = 0;
 		goto exit1;
 	}
-	*nij=*nj+n;
-	while (--i>=0) (*nj)[i]=0;
-	for (i=0; i<n; ++i)
+	*nij = *nj + n;
+	while (--i >= 0) (*nj)[i] = 0;
+	for (i = 0; i < n; ++i)
 	{
-		if ((*ni)[i+1] > (*ni)[i]) j=(*ni)[i+1], k=(*ni)[i];
-		else j=(*ni)[i], k=(*ni)[i+1];
-		while (--j>=k) (*nij)[n*j+(*nj)[j]++]=i;
+		if ((*ni)[i + 1] > (*ni)[i]) j = (*ni)[i + 1], k = (*ni)[i];
+		else j = (*ni)[i], k = (*ni)[i + 1];
+		while (--j >= k) (*nij)[n * j + (*nj)[j]++] = i;
 	}
 	#if DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS
-		for (i=0; i<nmax; ++i)
+		for (i = 0; i < nmax; ++i)
 		{
 			fprintf(stderr, "JBM tsr i=%d (*nj)=%d\n", i, (*nj)[i]);
-			for (j=0; j<(*nj)[i]; ++j)
-				fprintf(stderr, "JBM tsr i=%d j=%d nij=%d\n", i, j, (*nij)[n*i+j]);
+			for (j = 0; j < (*nj)[i]; ++j)
+				fprintf(stderr, "JBM tsr i=%d j=%d nij=%d\n",
+					i, j, (*nij)[n * i + j]);
 		}
 	#endif
-	*nmin=jbm_min((*ni)[0], (*ni)[n]);
+	*nmin = jbm_min((*ni)[0], (*ni)[n]);
 	#if DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS
 		fprintf(stderr, "JBM tsr n0=%d nn=%d nmax=%d nmin=%d\n",
 			(*ni)[0], (*ni)[n], nmax, *nmin);
 	#endif
-	for (i=0, nk=*nij; i<nmax; ++i, nk+=n)
+	for (i = 0, nk = *nij; i < nmax; ++i, nk += n)
 		jbm_transversal_section_regions_sort(i, (*nj)[i], nk, l, z, *zz);
-
 	#if DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS
-		for (i=0; i<=n; ++i)
+		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM tsr i=%d ni=%d\n", i, (*ni)[i]);
-		for (i=0; i<=nmax; ++i)
+		for (i = 0; i <= nmax; ++i)
 			fprintf(stderr, "JBM tsr i=%d z="FWF"\n", i, (*zz)[i]);
-		for (i=0; i<nmax; ++i)
+		for (i = 0; i < nmax; ++i)
 			fprintf(stderr, "JBM tsr i=%d nj=%d\n", i, (*nj)[i]);
-		for (i=0, nk=*nij; i<nmax; ++i, nk+=n) for (j=0; j<(*nj)[i]; ++j)
-			fprintf(stderr, "JBM tsr i=%d j=%d nij=%d\n", i, j, nk[j]);
+		for (i = 0, nk = *nij; i < nmax; ++i, nk += n)
+			for (j = 0; j < (*nj)[i]; ++j)
+				fprintf(stderr, "JBM tsr i=%d j=%d nij=%d\n", i, j, nk[j]);
 	#endif
 
 exit1:
@@ -1914,7 +1916,6 @@ exit1:
 	#endif
 	return i;
 }
-
 #if INLINE_JBM_TRANSVERSAL_SECTION_REGIONS
 	#define jbm_transversal_section_regions _jbm_transversal_section_regions
 #else

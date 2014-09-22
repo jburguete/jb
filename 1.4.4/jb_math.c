@@ -1406,8 +1406,8 @@ JBDOUBLE (*jbm_flux_limiter_select(int type))(JBDOUBLE, JBDOUBLE)
 #endif
 
 #if !INLINE_JBM_TRANSVERSAL_SECTION_REGIONS_SORT
-void jbm_transversal_section_regions_sort
-	(int i, int *nj, int *nk, JBFLOAT *l, JBFLOAT *z, JBFLOAT *x, JBFLOAT *zz, int *nx)
+void jbm_transversal_section_regions_sort(int i, int *nj, int *nk, JBFLOAT *l,
+	JBFLOAT *z, JBFLOAT *x, JBFLOAT *zz, int *nx)
 {_jbm_transversal_section_regions_sort(i, nj, nk, l, z, x, zz, nx);}
 #endif
 
