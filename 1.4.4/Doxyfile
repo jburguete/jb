@@ -2031,6 +2031,7 @@ PREDEFINED             = \
 	INLINE_JBM_FLUX_LIMITER_MONOTONIZED_CENTRAL=0 \
 	INLINE_JBM_FLUX_LIMITER_MEAN=0 \
 	INLINE_JBM_FLUX_LIMITER_SELECT=0 \
+	INLINE_JBM_TRANSVERSAL_SECTION_REGIONS=0 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

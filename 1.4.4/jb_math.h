@@ -1833,25 +1833,6 @@ static inline void _jbm_transversal_section_regions_sort
 static inline int _jbm_transversal_section_regions(JBFLOAT *l, JBFLOAT *z,
 	int n, JBFLOAT **zz, int **ni, int **nj, int **nij, int *nmin)
 {
-
-/*
-	Obtención de las regiones de un transversal
-	
-Entradas:
-	l, z: farrays de puntos que definen el transversal
-	n: Número de los farrays (de 0 a n)
-
-Salidas:
-	Devuelve el número de regiones (de 0 a n-1)
-	zz: farray ordenado de menor a mayor con las coordenadas z del transversal
-	ni: Índices (ordenados en z) de los puntos del transversal
-	nj: Número de elementos (de 0 a nj-1) de cada región j
-	nij: Segmentos ordenados de menor a mayor de cada región j
-	nmin: Punto de orilla mínima
-
-Deben liberarse: zz, ni, nj
-*/
-
 	register int i = 0, j, k;
 	int nmax, *nk;
 	#if DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS
