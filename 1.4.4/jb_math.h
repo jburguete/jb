@@ -1904,57 +1904,43 @@ exit1:
 		(JBFLOAT*, JBFLOAT*, int, JBFLOAT**, int**, int**, int**, int*);
 #endif
 
-/* varray: array de tipo struct de tamaño size de elementos 0 a n */
-
 static inline int _jbm_varray_search(JBDOUBLE x, void *v, int size, int n)
 {
-
-/*
-	Búsqueda del intervalo en el que se sitúa x en un varray ordenado de menor
-	a mayor
-*/
 	register int i, j;
 	#if DEBUG_JBM_VARRAY_SEARCH
 		fprintf(stderr, "JBM varray search\n");
 	#endif
-	for (i=0; n-i>1;)
+	for (i = 0; n - i > 1;)
 	{
-		j=(i+n)>>1;
-		if (x<=*(JBFLOAT*)(v+j*size)) n=j; else i=j;
+		j = (i + n) >> 1;
+		if (x <= *(JBFLOAT*)(v + j * size)) n = j; else i = j;
 	}
 	#if DEBUG_JBM_VARRAY_SEARCH
 		fprintf(stderr, "JBM varray search i=%d\n", i);
 	#endif
 	return i;
 }
-
 #if INLINE_JBM_VARRAY_SEARCH
 	#define jbm_varray_search _jbm_varray_search
 #else
 	int jbm_varray_search(JBDOUBLE, void*, int, int);
 #endif
 
-static inline int _jbm_varray_search_extended(JBDOUBLE x, void *v, int size, int n)
+static inline int _jbm_varray_search_extended
+	(JBDOUBLE x, void *v, int size, int n)
 {
-
-/*
-	Búsqueda del intervalo en el que se sitúa x en un varray ordenado de menor
-	a mayor: develve -1 si x<v0, n si x>=vn
-*/
-
 	register int i;
 	#if DEBUG_JBM_VARRAY_SEARCH_EXTENDED
 		fprintf(stderr, "JBM varray search_extended\n");
 	#endif
-	if (x<*(JBFLOAT*)v) i=-1;
-	else if (x>=*(JBFLOAT*)(v+n*size)) i=n;
-	else i=jbm_varray_search(x, v, size, n);
+	if (x < *(JBFLOAT*)v) i = -1;
+	else if (x >= *(JBFLOAT*)(v + n * size)) i = n;
+	else i = jbm_varray_search(x, v, size, n);
 	#if DEBUG_JBM_VARRAY_SEARCH_EXTENDED
 		fprintf(stderr, "JBM varray search_extended i=%d\n", i);
 	#endif
 	return i;
 }
-
 #if INLINE_JBM_VARRAY_SEARCH_EXTENDED
 	#define jbm_varray_search_extended _jbm_varray_search_extended
 #else
@@ -1969,13 +1955,12 @@ static inline JBDOUBLE _jbm_varray_max(void *v, int size, int n)
 		fprintf(stderr, "JBM varray max\n");
 	#endif
 	k = *(JBFLOAT*)v;
-	for (i=0; ++i<=n;) k = fmaxl(k, *(JBFLOAT*)(v += size));
+	for (i = 0; ++i <= n;) k = fmaxl(k, *(JBFLOAT*)(v += size));
 	#if DEBUG_JBM_VARRAY_MAX
 		fprintf(stderr, "JBM varray max="FWL"\n", k);
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_VARRAY_MAX
 	#define jbm_varray_max _jbm_varray_max
 #else
@@ -1990,13 +1975,12 @@ static inline JBDOUBLE _jbm_varray_min(void *v, int size, int n)
 		fprintf(stderr, "JBM varray min\n");
 	#endif
 	k = *(JBFLOAT*)v;
-	for (i=0; ++i<=n;) k = fminl(k, *(JBFLOAT*)(v += size));
+	for (i = 0; ++i <= n;) k = fminl(k, *(JBFLOAT*)(v += size));
 	#if DEBUG_JBM_VARRAY_MIN
 		fprintf(stderr, "JBM varray min="FWL"\n", k);
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_VARRAY_MIN
 	#define jbm_varray_min _jbm_varray_min
 #else
@@ -2012,18 +1996,17 @@ static inline void
 		fprintf(stderr, "JBM varray maxmin\n");
 	#endif
 	kmax = kmin = *(JBFLOAT*)v;
-	for (i=0; ++i<=n;)
+	for (i = 0; ++i <= n;)
 	{
-		v+=size;
+		v += size;
 		if (kmax < *(JBFLOAT*)v) kmax = *(JBFLOAT*)v;
 		else if (kmin > *(JBFLOAT*)v) kmin = *(JBFLOAT*)v;
 	}
-	*max=kmax, *min=kmin;
+	*max = kmax, *min = kmin;
 	#if DEBUG_JBM_VARRAY_MAXMIN
 		fprintf(stderr, "JBM varray max="FWL" min="FWL"\n", kmax, kmin);
 	#endif
 }
-
 #if INLINE_JBM_VARRAY_MAXMIN
 	#define jbm_varray_maxmin _jbm_varray_maxmin
 #else
