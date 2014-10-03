@@ -878,11 +878,11 @@ static inline JBDOUBLE _jbm_farray_mean_square_error
 static inline JBDOUBLE _jbm_farray_root_mean_square_error
 	(JBFLOAT *xa, JBFLOAT *fa, int na, JBFLOAT *xr, JBFLOAT *fr, int nr)
 {
-	JBDOUBLE k = 0.;
+	JBDOUBLE k;
 	#if DEBUG_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBM float array root_mean square error\n");
 	#endif
-	k = sqrt(jbm_farray_mean_square_error(xa, fa, na, xr, fr, nr));
+	k = sqrtl(jbm_farray_mean_square_error(xa, fa, na, xr, fr, nr));
 	#if DEBUG_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBM float array root_mean square error="FWL"\n", k);
 	#endif
@@ -2013,15 +2013,16 @@ static inline void
 	void jbm_varray_maxmin(void*, int, int, JBDOUBLE*, JBDOUBLE*);
 #endif
 
-static inline JBDOUBLE _jbm_varray_mean_square_error
-	(void *xa, void *fa, int sizea, int na, void *xr, void *fr, int sizer, int nr)
+static inline JBDOUBLE _jbm_varray_mean_square_error(void *xa, void *fa,
+	int sizea, int na, void *xr, void *fr, int sizer, int nr)
 {
 	register int i, j;
 	JBDOUBLE k=0., k2;
 	#if DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBM varray mean square error\n");
 	#endif
-	for (i=0; i<=na && *(JBFLOAT*)xa<*(JBFLOAT*)xr; ++i, xa+=sizea, fa+=sizea)
+	for (i = 0; i <= na && *(JBFLOAT*)xa < *(JBFLOAT*)xr;
+		++i, xa += sizea, fa += sizea)
 	{
 		k += jbm_fsqr(*(JBFLOAT*)fa - *(JBFLOAT*)fr);
 		#if DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR
@@ -2029,16 +2030,16 @@ static inline JBDOUBLE _jbm_varray_mean_square_error
 				i, *(JBFLOAT*)fa, *(JBFLOAT*)fr, k);
 		#endif
 	}
-	for (j=0; i<=na; ++i, xa+=sizea, fa+=sizea)
+	for (j = 0; i <= na; ++i, xa += sizea, fa += sizea)
 	{
-		while (j<nr && *(JBFLOAT*)xa>*(JBFLOAT*)(xr+sizer))
-			++j, xr+=sizer, fr+=sizer;
+		while (j < nr && *(JBFLOAT*)xa > *(JBFLOAT*)(xr + sizer))
+			++j, xr += sizer, fr += sizer;
 		#if DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR
 			fprintf(stderr, "JBMVMSE j=%d\n", j);
 		#endif
-		if (j==nr)
+		if (j == nr)
 		{
-			for (; i<=na; ++i, xa+=sizea, fa+=sizea)
+			for (; i <= na; ++i, xa += sizea, fa += sizea)
 			{
 				k += jbm_fsqr(*(JBFLOAT*)fa - *(JBFLOAT*)fr);
 				#if DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR
@@ -2050,19 +2051,20 @@ static inline JBDOUBLE _jbm_varray_mean_square_error
 		else
 		{
 			
-			k2 =jbm_extrapolate(*(JBFLOAT*)xa, *(JBFLOAT*)xr, *(JBFLOAT*)(xr+sizer),
-				*(JBFLOAT*)fr, *(JBFLOAT*)(fr+sizer));
+			k2 = jbm_extrapolate(*(JBFLOAT*)xa, *(JBFLOAT*)xr,
+				*(JBFLOAT*)(xr + sizer), *(JBFLOAT*)fr,
+				*(JBFLOAT*)(fr + sizer));
 			k += jbm_fsqr(*(JBFLOAT*)fa - k2);
 			#if DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR
 				fprintf(stderr, "JBMVMSE xa="FWF" xr="FWF" xr2="FWF"\n",
-					*(JBFLOAT*)xa, *(JBFLOAT*)xr, *(JBFLOAT*)(xr+sizer));
+					*(JBFLOAT*)xa, *(JBFLOAT*)xr, *(JBFLOAT*)(xr + sizer));
 				fprintf(stderr, "JBMVMSE k2="FWL" yr="FWF" yr2="FWF"\n",
-					k2, *(JBFLOAT*)fr, *(JBFLOAT*)(fr+sizer));
+					k2, *(JBFLOAT*)fr, *(JBFLOAT*)(fr + sizer));
 				fprintf(stderr, "JBMVMSE i=%d j=%d k="FWL"\n", i, j, k);
 			#endif
 		}
 	}
-	k=sqrt(k/(na+1));
+	k /= na + 1;
 	#if DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBM varray mean square error="FWL"\n", k);
 	#endif
@@ -2073,6 +2075,28 @@ static inline JBDOUBLE _jbm_varray_mean_square_error
 	#define jbm_varray_mean_square_error _jbm_varray_mean_square_error
 #else
 	JBDOUBLE jbm_varray_mean_square_error
+		(void*, void*, int, int, void*, void*, int, int);
+#endif
+
+static inline JBDOUBLE _jbm_varray_root_mean_square_error(void *xa, void *fa,
+	int sizea, int na, void *xr, void *fr, int sizer, int nr)
+{
+	JBDOUBLE k;
+	#if DEBUG_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM varray root mean square error\n");
+	#endif
+	k = sqrtl
+		(jbm_varray_mean_square_error(xa, fa, na, sizea, xr, fr, nr, sizer));
+	#if DEBUG_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM varray root mean square error="FWL"\n", k);
+	#endif
+	return k;
+}
+
+#if INLINE_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR
+	#define jbm_varray_root_mean_square_error _jbm_varray_root_mean_square_error
+#else
+	JBDOUBLE jbm_varray_root_mean_square_error
 		(void*, void*, int, int, void*, void*, int, int);
 #endif
 
@@ -2150,10 +2174,11 @@ end_filer:
 	}
 exit_mse:
 	#if DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
-		fprintf(stderr, "JBM file mean square error="FWL" i=%d\n", (JBDOUBLE)sqrt(k/i), i);
+		fprintf(stderr, "JBM file mean square error="FWL" i=%d\n",
+			(JBDOUBLE)sqrtl(k / i), i);
 	#endif
 	if (i==0) return 0.;
-	return sqrt(k/i);
+	return sqrtl(k / i);
 }
 
 #if INLINE_JBM_FILE_MEAN_SQUARE_ERROR

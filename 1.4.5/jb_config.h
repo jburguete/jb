@@ -399,7 +399,7 @@
  * \brief Macro deciding if the function jbm_farray_maxmin() has to be
  *   inlined.
  */
-#define INLINE_JBM_FARRAY_MAXMIN					0
+#define INLINE_JBM_FARRAY_MAXMIN					1
 /**
  * \def INLINE_JBM_FARRAY_INTERPOLATE
  * \brief Macro deciding if the function jbm_farray_interpolate() has to
@@ -644,7 +644,7 @@
  * \brief Macro deciding if the function jbm_transversal_section_regions()
  *   has to be inlined.
  */
-#define INLINE_JBM_TRANSVERSAL_SECTION_REGIONS		0
+#define INLINE_JBM_TRANSVERSAL_SECTION_REGIONS		1
 /**
  * \def INLINE_JBM_VARRAY_SEARCH
  * \brief Macro deciding if the function jbm_varray_search() has to be
@@ -661,18 +661,18 @@
  * \def INLINE_JBM_VARRAY_MAX
  * \brief Macro deciding if the function jbm_varray_max() has to be inlined.
  */
-#define INLINE_JBM_VARRAY_MAX						0
+#define INLINE_JBM_VARRAY_MAX						1
 /**
  * \def INLINE_JBM_VARRAY_MIN
  * \brief Macro deciding if the function jbm_varray_min() has to be inlined.
  */
-#define INLINE_JBM_VARRAY_MIN						0
+#define INLINE_JBM_VARRAY_MIN						1
 /**
  * \def INLINE_JBM_VARRAY_MAXMIN
  * \brief Macro deciding if the function jbm_varray_maxmin() has to be
  *   inlined.
  */
-#define INLINE_JBM_VARRAY_MAXMIN					0
+#define INLINE_JBM_VARRAY_MAXMIN					1
 /**
  * \def INLINE_JBM_VARRAY_MEAN_SQUARE_ERROR
  * \brief Macro deciding if the function jbm_varray_mean_square_error() has
@@ -680,11 +680,17 @@
  */
 #define INLINE_JBM_VARRAY_MEAN_SQUARE_ERROR			1
 /**
+ * \def INLINE_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_varray_root_mean_square_error() has
+ *   to be inlined.
+ */
+#define INLINE_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR	1
+/**
  * \def INLINE_JBM_FILE_MEAN_SQUARE_ERROR
  * \brief Macro deciding if the function jbm_file_mean_square_error() has to
  *   be inlined.
  */
-#define INLINE_JBM_FILE_MEAN_SQUARE_ERROR			0
+#define INLINE_JBM_FILE_MEAN_SQUARE_ERROR			1
 /**
  * \def INLINE_JBW_BUTTON_NEW_FROM_STOCK
  * \brief Macro deciding if the function jbw_button_new_from_stock() has to
@@ -944,7 +950,7 @@
  * \def INLINE_JBW_LOGO_NEW
  * \brief Macro deciding if the function jbw_logo_destroy has to be inlined.
  */
-#define INLINE_JBW_LOGO_NEW							1
+#define INLINE_JBW_LOGO_NEW								1
 /**
  * \def INLINE_JBW_GRAPHIC_STRING
  * \brief Macro deciding if the function jbw_graphic_string() has to be
@@ -1691,6 +1697,12 @@
  *   to be debugged.
  */
 #define DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR			0
+/**
+ * \def DEBUG_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_varray_root_mean_square_error() has
+ *   to be debugged.
+ */
+#define DEBUG_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR		0
 /**
  * \def DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
  * \brief Macro deciding if the function jbm_file_mean_square_error() has to

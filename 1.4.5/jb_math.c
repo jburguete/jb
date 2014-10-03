@@ -1540,10 +1540,65 @@ void jbm_varray_maxmin(void *va, int size, int n, JBDOUBLE *max, JBDOUBLE *min)
 {_jbm_varray_maxmin(va, size, n, max, min);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_varray_mean_square_error(void *xa, void *fa, int sizea, \
+ *   int na, void *xr, void *fr, int sizer, int nr)
+ * \brief Function to calculate the mean square error between 2 functions
+ *   tabulated in 2 arrays of structs.
+ * \param xa
+ * \brief x-coordinates tabulating the 1st function.
+ * \param fa
+ * \brief values of the 1st function.
+ * \param sizea
+ * \brief size of the structs of the 1st array.
+ * \param na
+ * \brief the highest point number tabulating the 1st function.
+ * \param xr
+ * \brief x-coordinates tabulating the 2nd function.
+ * \param fr
+ * \brief values of the 2nd function.
+ * \param sizer
+ * \brief size of the structs of the 2nd array.
+ * \param nr
+ * \brief the highest point number tabulating the 2nd function.
+ * \return mean square error value.
+ */
 #if !INLINE_JBM_VARRAY_MEAN_SQUARE_ERROR
-JBDOUBLE jbm_varray_mean_square_error
-	(void *xa, void *fa, int sizea, int na, void *xr, void *fr, int sizer, int nr)
+JBDOUBLE jbm_varray_mean_square_error(void *xa, void *fa, int sizea, int na,
+	void *xr, void *fr, int sizer, int nr)
 {return _jbm_varray_mean_square_error(xa, fa, sizea, na, xr, fr, sizer, nr);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_varray_root_mean_square_error(void *xa, void *fa, \
+ * int sizea, int na, void *xr, void *fr, int sizer, int nr)
+ * \brief Function to calculate the root mean square error between 2 functions
+ *   tabulated in 2 arrays of structs.
+ * \param xa
+ * \brief x-coordinates tabulating the 1st function.
+ * \param fa
+ * \brief values of the 1st function.
+ * \param sizea
+ * \brief size of the structs of the 1st array.
+ * \param na
+ * \brief the highest point number tabulating the 1st function.
+ * \param xr
+ * \brief x-coordinates tabulating the 2nd function.
+ * \param fr
+ * \brief values of the 2nd function.
+ * \param sizer
+ * \brief size of the structs of the 2nd array.
+ * \param nr
+ * \brief the highest point number tabulating the 2nd function.
+ * \return mean square error value.
+ */
+#if !INLINE_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR
+JBDOUBLE jbm_varray_root_mean_square_error(void *xa, void *fa, int sizea,
+	int na, void *xr, void *fr, int sizer, int nr)
+{
+	return _jbm_varray_root_mean_square_error
+		(xa, fa, sizea, na, xr, fr, sizer, nr);
+}
 #endif
 
 #if !INLINE_JBM_FILE_MEAN_SQUARE_ERROR
