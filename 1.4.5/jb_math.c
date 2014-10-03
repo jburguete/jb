@@ -1590,7 +1590,7 @@ JBDOUBLE jbm_varray_mean_square_error(void *xa, void *fa, int sizea, int na,
  * \brief size of the structs of the 2nd array.
  * \param nr
  * \brief the highest point number tabulating the 2nd function.
- * \return mean square error value.
+ * \return root mean square error value.
  */
 #if !INLINE_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR
 JBDOUBLE jbm_varray_root_mean_square_error(void *xa, void *fa, int sizea,
@@ -1601,10 +1601,65 @@ JBDOUBLE jbm_varray_root_mean_square_error(void *xa, void *fa, int sizea,
 }
 #endif
 
+/**
+ * \fn JBDOUBLE jbm_file_mean_square_error(char *namea, int ixa, int ifa, \
+ *   int na, char *namer, int ixr, int ifr, int nr)
+ * \brief Function to calculate the mean square error between 2 functions
+ *   tabulated in 2 columns data of a file.
+ * \param namea
+ * \brief name of file where the 1st function is tabulated.
+ * \param ixa
+ * \brief column number of x-coordinates tabulating the 1st function.
+ * \param ifa
+ * \brief column number of values tabulating the 1st function.
+ * \param na
+ * \brief columns number of file tabulating the 1st function.
+ * \param namer
+ * \brief name of file where the 2nd function is tabulated.
+ * \param ixr
+ * \brief column number of x-coordinates tabulating the 2nd function.
+ * \param ifr
+ * \brief column number of values tabulating the 2nd function.
+ * \param nr
+ * \brief columns number of file tabulating the 2nd function.
+ * \return mean square error value.
+ */
 #if !INLINE_JBM_FILE_MEAN_SQUARE_ERROR
-JBDOUBLE jbm_file_mean_square_error
-	(char *namea, int ixa, int ifa, int na, char *namer, int ixr, int ifr, int nr)
+JBDOUBLE jbm_file_mean_square_error(char *namea, int ixa, int ifa, int na,
+	char *namer, int ixr, int ifr, int nr)
 {return _jbm_file_mean_square_error(namea, ixa, ifa, na, namer, ixr, ifr, nr);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_file_root_mean_square_error(char *namea, int ixa, int ifa, \
+ *   int na, char *namer, int ixr, int ifr, int nr)
+ * \brief Function to calculate the root mean square error between 2 functions
+ *   tabulated in 2 columns data of a file.
+ * \param namea
+ * \brief name of file where the 1st function is tabulated.
+ * \param ixa
+ * \brief column number of x-coordinates tabulating the 1st function.
+ * \param ifa
+ * \brief column number of values tabulating the 1st function.
+ * \param na
+ * \brief columns number of file tabulating the 1st function.
+ * \param namer
+ * \brief name of file where the 2nd function is tabulated.
+ * \param ixr
+ * \brief column number of x-coordinates tabulating the 2nd function.
+ * \param ifr
+ * \brief column number of values tabulating the 2nd function.
+ * \param nr
+ * \brief columns number of file tabulating the 2nd function.
+ * \return root mean square error value.
+ */
+#if !INLINE_JBM_FILE_ROOT_MEAN_SQUARE_ERROR
+JBDOUBLE jbm_file_root_mean_square_error(char *namea, int ixa, int ifa, int na,
+	char *namer, int ixr, int ifr, int nr)
+{
+	return _jbm_file_root_mean_square_error
+		(namea, ixa, ifa, na, namer, ixr, ifr, nr);
+}
 #endif
 
 #if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY

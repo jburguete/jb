@@ -2039,6 +2039,8 @@ PREDEFINED             = \
 	INLINE_JBM_VARRAY_MAXMIN=0 \
 	INLINE_JBM_VARRAY_MEAN_SQUARE_ERROR=0 \
 	INLINE_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR=0 \
+	INLINE_JBM_FILE_MEAN_SQUARE_ERROR=0 \
+	INLINE_JBM_FILE_ROOT_MEAN_SQUARE_ERROR=0 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

@@ -675,8 +675,8 @@
 #define INLINE_JBM_VARRAY_MAXMIN					1
 /**
  * \def INLINE_JBM_VARRAY_MEAN_SQUARE_ERROR
- * \brief Macro deciding if the function jbm_varray_mean_square_error() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbm_varray_mean_square_error() has to
+ *   be inlined.
  */
 #define INLINE_JBM_VARRAY_MEAN_SQUARE_ERROR			1
 /**
@@ -687,10 +687,16 @@
 #define INLINE_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR	1
 /**
  * \def INLINE_JBM_FILE_MEAN_SQUARE_ERROR
- * \brief Macro deciding if the function jbm_file_mean_square_error() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_file_mean_square_error() has to be
+ *   inlined.
  */
 #define INLINE_JBM_FILE_MEAN_SQUARE_ERROR			1
+/**
+ * \def INLINE_JBM_FILE_ROOT_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_file_root_mean_square_error() has
+ *   to be inlined.
+ */
+#define INLINE_JBM_FILE_ROOT_MEAN_SQUARE_ERROR		1
 /**
  * \def INLINE_JBW_BUTTON_NEW_FROM_STOCK
  * \brief Macro deciding if the function jbw_button_new_from_stock() has to

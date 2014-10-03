@@ -2100,8 +2100,8 @@ static inline JBDOUBLE _jbm_varray_root_mean_square_error(void *xa, void *fa,
 		(void*, void*, int, int, void*, void*, int, int);
 #endif
 
-static inline JBDOUBLE _jbm_file_mean_square_error
-	(char *namea, int ixa, int ifa, int na, char *namer, int ixr, int ifr, int nr)
+static inline JBDOUBLE _jbm_file_mean_square_error(char *namea, int ixa,
+	int ifa, int na, char *namer, int ixr, int ifr, int nr)
 {
 	int i, j, endr;
 	JBDOUBLE k, xa, fa, xr1, fr1, xr2, fr2, aa[na], ar[nr];
@@ -2109,65 +2109,63 @@ static inline JBDOUBLE _jbm_file_mean_square_error
 	#if DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBM file mean square error\n");
 	#endif
-	endr=i=0;
-	k=0.;
-	filea=fopen(namea, "r");
+	endr = i = 0;
+	k = 0.;
+	filea = fopen(namea, "r");
 	if (!filea) goto exit_mse;
-	filer=fopen(namer, "r");
+	filer = fopen(namer, "r");
 	if (!filer) goto exit_mse;
-	for (j=0; j<nr; ++j)
-		if (fscanf(filer, FRL, ar+j)!=1) goto exit_mse;
-	xr1=ar[ixr-1];
-	fr1=ar[ifr-1];
+	for (j = 0; j < nr; ++j) if (fscanf(filer, FRL, ar + j) != 1) goto exit_mse;
+	xr1 = ar[ixr - 1];
+	fr1 = ar[ifr - 1];
 	#if DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBMFMSE xr1="FWL" fr1="FWL"\n", xr1, fr1);
 	#endif
-	for (j=0; j<nr; ++j)
-		if (fscanf(filer, FRL, ar+j)!=1) endr=1;
-	xr2=ar[ixr-1];
-	fr2=ar[ifr-1];
+	for (j = 0; j < nr; ++j) if (fscanf(filer, FRL, ar + j) != 1) endr = 1;
+	xr2 = ar[ixr - 1];
+	fr2 = ar[ifr - 1];
 	#if DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
 		fprintf(stderr, "JBMFMSE xr2="FWL" fr2="FWL"\n", xr2, fr2);
 	#endif
-	for (i=0; !endr; ++i)
+	for (i = 0; !endr; ++i)
 	{
-		for (j=0; j<na; ++j)
-			if (fscanf(filea, FRL, aa+j)!=1) goto exit_mse;
-		xa=aa[ixa-1];
-		fa=aa[ifa-1];
+		for (j = 0; j < na; ++j)
+			if (fscanf(filea, FRL, aa + j) != 1) goto exit_mse;
+		xa = aa[ixa - 1];
+		fa = aa[ifa - 1];
 		#if DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
 			fprintf(stderr, "JBMFMSE xa="FWL" fa="FWL"\n", xa, fa);
 		#endif
-		while (xa>xr2)
+		while (xa > xr2)
 		{
-			xr1=xr2;
-			fr1=fr2;
-			for (j=0; j<nr; ++j) if (fscanf(filer, FRL, ar+j)!=1)
+			xr1 = xr2;
+			fr1 = fr2;
+			for (j = 0; j < nr; ++j) if (fscanf(filer, FRL, ar + j) != 1)
 			{
-				endr=1;
+				endr = 1;
 				goto end_filer;
 			}
-			xr2=ar[ixr-1];
-			fr2=ar[ifr-1];
+			xr2 = ar[ixr - 1];
+			fr2 = ar[ifr - 1];
 			#if DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
 				fprintf(stderr, "JBMFMSE xr2="FWL" fr2="FWL"\n", xr2, fr2);
 			#endif
 		}
 end_filer:
-		if (!endr && xa>xr1)
-			k+=jbm_fsqr(fa-jbm_extrapolate(xa, xr1, xr2, fr1, fr2));
-		else k+=jbm_fsqr(fa-fr1);
+		if (!endr && xa > xr1)
+			k += jbm_fsqr(fa - jbm_extrapolate(xa, xr1, xr2, fr1, fr2));
+		else k += jbm_fsqr(fa - fr1);
 		#if DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
 			fprintf(stderr, "JBMFMSE k="FWL"\n", k);
 		#endif
 	}
 	for (; 1; ++i)
 	{
-		for (j=0; j<na; ++j)
-			if (fscanf(filea, FRL, aa+j)!=1) goto exit_mse;
-		xa=aa[ixa-1];
-		fa=aa[ifa-1];
-		k+=jbm_fsqr(fa-fr1);
+		for (j = 0; j < na; ++j)
+			if (fscanf(filea, FRL, aa + j) != 1) goto exit_mse;
+		xa = aa[ixa - 1];
+		fa = aa[ifa - 1];
+		k += jbm_fsqr(fa - fr1);
 		#if DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
 			fprintf(stderr, "JBMFMSE xa="FWL" fa="FWL"\n", xa, fa);
 		#endif
@@ -2177,14 +2175,37 @@ exit_mse:
 		fprintf(stderr, "JBM file mean square error="FWL" i=%d\n",
 			(JBDOUBLE)sqrtl(k / i), i);
 	#endif
-	if (i==0) return 0.;
-	return sqrtl(k / i);
+	if (i == 0) return 0.;
+	return k / i;
 }
 
 #if INLINE_JBM_FILE_MEAN_SQUARE_ERROR
 	#define jbm_file_mean_square_error _jbm_file_mean_square_error
 #else
-	JBDOUBLE jbm_file_mean_square_error(char*, int, int, int, char*, int, int, int);
+	JBDOUBLE jbm_file_mean_square_error
+		(char*, int, int, int, char*, int, int, int);
+#endif
+
+static inline JBDOUBLE _jbm_file_root_mean_square_error(char *namea, int ixa,
+	int ifa, int na, char *namer, int ixr, int ifr, int nr)
+{
+	JBDOUBLE k;
+	#if DEBUG_JBM_FILE_ROOT_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM file root mean square error\n");
+	#endif
+	k = sqrtl
+		(jbm_file_mean_square_error(namea, ixa, ifa, na, namer, ixr, ifr, nr));
+	#if DEBUG_JBM_FILE_ROOT_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM file root mean square error="FWL"\n", k);
+	#endif
+	return k;
+}
+
+#if INLINE_JBM_FILE_ROOT_MEAN_SQUARE_ERROR
+	#define jbm_file_root_mean_square_error _jbm_file_root_mean_square_error
+#else
+	JBDOUBLE jbm_file_root_mean_square_error
+		(char*, int, int, int, char*, int, int, int);
 #endif
 
 static inline void _jbm_solve_tridiagonal_varray(void *v, int size, int n)
