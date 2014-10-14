@@ -244,6 +244,8 @@ void jb_xml_node_set_int(xmlNode *node, const xmlChar *prop, long x)
  * \brief XML node property.
  * \param x
  * \brief integer number value in long int format.
+ * \param def
+ * \brief default value.
  */
 void jb_xml_node_set_int_with_default
 	(xmlNode *node, const xmlChar *prop, long x, long def)
@@ -253,6 +255,19 @@ void jb_xml_node_set_int_with_default
 #endif
 
 #if JB_XML_NODE_GET_TIME
+/**
+ * \fn JBDOUBLE jb_xml_node_get_time(xmlNode *node, const xmlChar *prop, \
+ *   int *error)
+ * \brief Function to get a time, in format "year month day hour minute
+ *   seconds", from a property of a XML node.
+ * \param node
+ * \brief XML node struct.
+ * \param prop
+ * \brief XML node property.
+ * \param error
+ * \brief error code (1 on success, 0 on error).
+ * \return date in floating point format.
+ */
 JBDOUBLE jb_xml_node_get_time(xmlNode *node, const xmlChar *prop, int *error)
 {
 	char *buffer;
@@ -267,16 +282,23 @@ JBDOUBLE jb_xml_node_get_time(xmlNode *node, const xmlChar *prop, int *error)
 }
 #endif
 
-#if JB_XML_NODE_SET_TIME
-void jb_xml_node_set_time(xmlNode *node, const xmlChar *prop, JBDOUBLE t)
-{
-	const xmlChar *buffer;
-	buffer = (const xmlChar*)jb_set_time(t);
-	xmlSetProp(node, prop, buffer);
-}
-#endif
-
 #if JB_XML_NODE_GET_TIME_WITH_DEFAULT
+/**
+ * \fn JBDOUBLE jb_xml_node_get_time_with_default(xmlNode *node, \
+ *   const xmlChar *prop, int *error, JBDOUBLE def)
+ * \brief Function to get a time, in format "year month day hour minute
+ *   seconds", from a property of a XML node or a default value if the node has
+ *   not the property.
+ * \param node
+ * \brief XML node struct.
+ * \param prop
+ * \brief XML node property.
+ * \param error
+ * \brief error code (1 on success, 0 on error).
+ * \param def
+ * \brief default value.
+ * \return date in floating point format.
+ */
 JBDOUBLE jb_xml_node_get_time_with_default
 	(xmlNode *node, const xmlChar *prop, int *error, JBDOUBLE def)
 {
@@ -289,7 +311,42 @@ JBDOUBLE jb_xml_node_get_time_with_default
 }
 #endif
 
+#if JB_XML_NODE_SET_TIME
+/**
+ * \fn void jb_xml_node_set_time(xmlNode *node, const xmlChar *prop, JBDOUBLE t)
+ * \brief Function to set a time, in format "year month day hour minute
+ *   seconds", on a property of a XML node.
+ * \param node
+ * \brief XML node struct.
+ * \param prop
+ * \brief XML node property.
+ * \param t
+ * \brief date in floating point format.
+ */
+void jb_xml_node_set_time(xmlNode *node, const xmlChar *prop, JBDOUBLE t)
+{
+	const xmlChar *buffer;
+	buffer = (const xmlChar*)jb_set_time(t);
+	xmlSetProp(node, prop, buffer);
+}
+#endif
+
 #if JB_XML_NODE_SET_TIME_WITH_DEFAULT
+/**
+ * \fn void jb_xml_node_set_time_with_default(xmlNode *node, \
+ *   const xmlChar *prop, JBDOUBLE t, JBDOUBLE def)
+ * \brief Function to set a time, in format "year month day hour minute
+ *   seconds", on a property of a XML node or a default value if the node has
+ *   not the property.
+ * \param node
+ * \brief XML node struct.
+ * \param prop
+ * \brief XML node property.
+ * \param t
+ * \brief date in floating point format.
+ * \param def
+ * \brief default value.
+ */
 void jb_xml_node_set_time_with_default
 	(xmlNode *node, const xmlChar *prop, JBDOUBLE t, JBDOUBLE def)
 {
