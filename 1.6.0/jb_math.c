@@ -1601,6 +1601,12 @@ JBDOUBLE jbm_varray_root_mean_square_error(void *xa, void *fa, int sizea,
 }
 #endif
 
+#if !INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL
+void jbm_varray_solve_tridiagonal
+	(void *v1, void *v2, void *v3, void *v4, int size, int n)
+{_jbm_varray_solve_tridiagonal(v1, v2, v3, v4, size, n);}
+#endif
+
 /**
  * \fn JBDOUBLE jbm_file_mean_square_error(char *namea, int ixa, int ifa, \
  *   int na, char *namer, int ixr, int ifr, int nr)
@@ -1660,11 +1666,6 @@ JBDOUBLE jbm_file_root_mean_square_error(char *namea, int ixa, int ifa, int na,
 	return _jbm_file_root_mean_square_error
 		(namea, ixa, ifa, na, namer, ixr, ifr, nr);
 }
-#endif
-
-#if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY
-void jbm_solve_tridiagonal_varray(void *v, int size, int n)
-{_jbm_solve_tridiagonal_varray(v, size, n);}
 #endif
 
 #if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY_ZERO

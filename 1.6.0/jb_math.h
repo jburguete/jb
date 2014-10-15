@@ -2070,7 +2070,6 @@ static inline JBDOUBLE _jbm_varray_mean_square_error(void *xa, void *fa,
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_VARRAY_MEAN_SQUARE_ERROR
 	#define jbm_varray_mean_square_error _jbm_varray_mean_square_error
 #else
@@ -2092,7 +2091,6 @@ static inline JBDOUBLE _jbm_varray_root_mean_square_error(void *xa, void *fa,
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR
 	#define jbm_varray_root_mean_square_error _jbm_varray_root_mean_square_error
 #else
@@ -2178,7 +2176,6 @@ exit_mse:
 	if (i == 0) return 0.;
 	return k / i;
 }
-
 #if INLINE_JBM_FILE_MEAN_SQUARE_ERROR
 	#define jbm_file_mean_square_error _jbm_file_mean_square_error
 #else
@@ -2200,7 +2197,6 @@ static inline JBDOUBLE _jbm_file_root_mean_square_error(char *namea, int ixa,
 	#endif
 	return k;
 }
-
 #if INLINE_JBM_FILE_ROOT_MEAN_SQUARE_ERROR
 	#define jbm_file_root_mean_square_error _jbm_file_root_mean_square_error
 #else
@@ -2208,42 +2204,52 @@ static inline JBDOUBLE _jbm_file_root_mean_square_error(char *namea, int ixa,
 		(char*, int, int, int, char*, int, int, int);
 #endif
 
-static inline void _jbm_solve_tridiagonal_varray(void *v, int size, int n)
+static inline void _jbm_varray_solve_tridiagonal
+	(void *v1, void *v2, void *v3, *v4, int size, int n)
 {
 
 /*
 	Resuelve una estructura tridiagonal de forma:
-		(v)0 (v+2)0                                 (v+3)0
-		(v)0 (v+1)1 v(+2)1                          (v+3)1
+		(v2)0 (v3)0                                (v4)0
+		(v1)0 (v2)1 (v3)1                          (v4)1
 
-		                   (v)n-2 (v+1)n-1 (v+2)n-1 (v+3)n-1
-		                            (v)n-1 (v+1)n   (v+3)n
-	La solución se almacena en v+3
-	Modifica los campos v+1, v+2, v+3
+		                   (v1)n-2 (v2)n-1 (v3)n-1 (v4)n-1
+		                           (v1)n-1 (v2)n   (v4)n
+	La solución se almacena en v4
+	Modifica los campos v2, v3, v4
 */
 
 	int i;
 	register JBDOUBLE k;
-	register JBFLOAT *C, *CC;
-	for (i=0; ++i<=n;)
+	register JBFLOAT *C, *D, *E, *H;
+	D = (JBFLOAT*)v2;
+	H = (JBFLOAT*)v4;
+	for (i = 0; ++i <= n; v1 += size, v3 += size)
 	{
-		C=(JBFLOAT*)v;
-		v+=size;
-		CC=(JBFLOAT*)v;
-		k = *C / *(C+1);
-		*(CC+1) -= k * *(C+2);
-		*(CC+3) -= k * *(C+3);
+		C = (JBFLOAT*)v1;
+		E = (JBFLOAT*)v3;
+		k = *C / *D;
+		v2 += size;
+		D = (JBFLOAT*)v2;
+		*D -= k * *E;
+		k *= *H;
+		v4 += size;
+		H = (JBFLOAT*)v4;
+		*H -= k;
 	}
-	*(CC+3) /= *(CC+1);
-	while (--i>0)
+	*F /= *D;
+	while (--i > 0)
 	{
-		C=(JBFLOAT*)v;
-		v-=size;
-		CC=(JBFLOAT*)v;
-		*(CC+3) = (*(CC+3) - *(CC+2) * *(C+3)) / *(CC+1);
+		v3 -= size;
+		E = (JBFLOAT*)v3;
+		k = *E * *F; 
+		v2 -= size;
+		D = (JBFLOAT*)v2;
+		v4 -= size;
+		H = (JBFLOAT*)v4;
+		*H = (*H - k) / *D;
 	}
 }
-
 #if INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY
 	#define jbm_solve_tridiagonal_varray _jbm_solve_tridiagonal_varray
 #else

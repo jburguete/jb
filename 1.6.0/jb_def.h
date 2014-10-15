@@ -78,20 +78,15 @@
  */
 #define JBW_GRAPHIC_CAIRO		1
 /**
- * \def JBW_GRAPHIC_GTKGLEXT
- * \brief Macro to using the GtkGLExt library in graphical widgets.
- */
-#define JBW_GRAPHIC_GTKGLEXT	2
-/**
  * \def JBW_GRAPHIC_GLUT
  * \brief Macro to using the FreeGLUT library in graphical widgets.
  */
-#define JBW_GRAPHIC_GLUT		3
+#define JBW_GRAPHIC_GLUT		2
 /**
  * \def JBW_GRAPHIC_CLUTTER
  * \brief Macro to using the Clutter library in graphical widgets.
  */
-#define JBW_GRAPHIC_CLUTTER		4
+#define JBW_GRAPHIC_CLUTTER		3
 
 #include "jb_config.h"
 
