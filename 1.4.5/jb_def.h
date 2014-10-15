@@ -237,7 +237,7 @@ static inline void _JBChange(void **a, void **b)
 #if INLINE_JB_CHANGE
 	#define JBChange _JBChange
 #else
-	void JBChange(void **a, void **b)
+	void JBChange(void **a, void **b);
 #endif
 
 /**

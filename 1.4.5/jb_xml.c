@@ -355,6 +355,16 @@ void jb_xml_node_set_time_with_default
 #endif
 
 #if JB_XML_NODE_GET_CONTENT_FILE
+/**
+ * \fn FILE* jb_xml_node_get_content_file(xmlNode *node, char **buffer)
+ * \brief Function to get in a file and in a buffer the content of a XML node.
+ * \param node
+ * \brief XML node struct.
+ * \param buffer
+ * \brief pointer to the buffer with the content, it has to be freed with
+ *   xmlFree.
+ * \return file struct with the content.
+ */
 FILE* jb_xml_node_get_content_file(xmlNode *node, char **buffer)
 {
 	int l;
@@ -380,6 +390,14 @@ exit1:
 #endif
 
 #if JB_XML_NODE_SET_CONTENT_FILE
+/**
+ * \fn void jb_xml_node_set_content_file(xmlNode *node, FILE *file)
+ * \brief Function to set in the content of a XML node a file.
+ * \param node
+ * \brief XML node struct.
+ * \param file
+ * \brief file struct with the content.
+ */
 void jb_xml_node_set_content_file(xmlNode *node, FILE *file)
 {
 	long int l;
@@ -387,7 +405,7 @@ void jb_xml_node_set_content_file(xmlNode *node, FILE *file)
 	l = ftell(file);
 	buffer = (char*)g_malloc(l + 1);
 	fseek(file, 0, SEEK_SET);
-	l=fread(buffer, 1, l, file);
+	l = fread(buffer, 1, l, file);
 	buffer[l] = 0;
 	xmlNodeSetContent(node, buffer);
 	g_free(buffer);

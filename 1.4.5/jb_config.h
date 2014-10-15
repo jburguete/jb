@@ -200,7 +200,7 @@
  * \brief Macro deciding if the function jb_xml_node_set_content_file() has to
  *   be compiled.
  */
-#define JB_XML_NODE_SET_CONTENT_FILE		0
+#define JB_XML_NODE_SET_CONTENT_FILE		1
 
 // These macros decide if the corresponding functions have to be inline 
 

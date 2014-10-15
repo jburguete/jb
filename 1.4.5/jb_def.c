@@ -49,7 +49,7 @@ void JBChange(void **a, void **b) {_JBChange(a,b);}
  * \brief Function to free a pointer with the g_free function and to set the
  *   pointer to NULL.
  * \param p
- * \brief A pointer
+ * \brief A pointer to free.
  */
 #if JB_FREE_NULL
 void jb_free_null(void **p) {g_free(*p); *p=0;}
