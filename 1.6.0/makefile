@@ -9,7 +9,7 @@ test_math: test_math.c jb_math.h jb_math.c makefile
 
 test_win: test_win.c jb_win.h jb_win.c makefile
 	gcc -g -Wall test_win.c jb_win.c jb_math.c jb_def.c -o test_win \
-		-lm -lglut `pkg-config --cflags --libs gtk+-2.0 gl glu` \
+		-lm -lglut -lpng `pkg-config --cflags --libs gtk+-2.0 gl glu` \
 		-DJBW=2 -DJBW_DRAW=2 -DJBW_GRAPHIC=2
 
 doc/latex/refman.pdf: $(src) Doxyfile makefile

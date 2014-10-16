@@ -15,12 +15,36 @@ JBFLOAT x[]=
 };
 JBFLOAT y[]={3., 5., -1.};
 
+typedef struct
+{
+	JBFLOAT A, B, C, D, E, F, G, H;
+} Check;
+
 main()
 {
-	jbm_solve_matrix(x, 3);
+	int i;
+	Check check[4];
+	jbm_matrix_solve(x, 3);
 	printf("x0="FWF2"x0="FWF"\n", x[3], y[0]);
 	printf("x1="FWF2"x1="FWF"\n", x[7], y[1]);
 	printf("x2="FWF2"x2="FWF"\n", x[11], y[2]);
+	check[0].D = 2.;
+	check[0].E = 1.;
+	check[1].C = 1.;
+	check[1].D = 2.;
+	check[1].E = 1.;
+	check[2].C = -1.;
+	check[2].D = 2.;
+	check[2].E = -1.;
+	check[3].C = -1.;
+	check[3].D = 1.;
+	check[0].H = 5.;
+	check[1].H = 9.;
+	check[2].H = -7.;
+	check[3].H = 6.;
+	jbm_varray_solve_tridiagonal(&check[1].C, &check[0].D, &check[0].E,
+		&check[0].H, sizeof(Check), 3);
+	for (i = 0; i < 4; ++i) printf("x%d="FWF"\n", i, check[i].H);
 }
 
 #endif
@@ -45,7 +69,7 @@ main()
 	int i;
 	FILE *file;
 	JBFLOAT *c, *d, *e;
-	jbm_solve_pentadiagonal_matrix(A,B,C,D,E,H,5);
+	jbm_matrix_solve_pentadiagonal(A,B,C,D,E,H,5);
 	for (i = 0; i < 5; ++i) printf("i=%d x="FWF"\n", i, H[i]);
 	jbm_spline_cubic(x, y, 6, &c, &d, &e);
 	file = fopen("out", "w");

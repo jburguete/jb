@@ -939,7 +939,7 @@ int jbm_index_sort_extended(JBFLOAT *x, JBFLOAT **xr, int **ni, int n)
 #endif
 
 /**
- * \fn void jbm_solve_matrix(JBFLOAT *x, int n)
+ * \fn void jbm_matrix_solve(JBFLOAT *x, int n)
  * \brief Function to solve a linear equations system stored in a matrix with
  *   format: \f$\left(\begin{array}{cccc|c}
  *   x_{0,0} & x_{0,1} & \cdots & x_{0,n-1} & x_{0,n}\\
@@ -955,12 +955,12 @@ int jbm_index_sort_extended(JBFLOAT *x, JBFLOAT **xr, int **ni, int n)
  * \param n
  * \brief number of matrix rows.
  */
-#if !INLINE_JBM_SOLVE_MATRIX
-void jbm_solve_matrix(JBFLOAT *x, int n) {_jbm_solve_matrix(x, n);}
+#if !INLINE_JBM_MATRIX_SOLVE
+void jbm_matrix_solve(JBFLOAT *x, int n) {_jbm_matrix_solve(x, n);}
 #endif
 
 /**
- * \fn void jbm_solve_tridiagonal_matrix(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, \
+ * \fn void jbm_matrix_solve_tridiagonal(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, \
  *   JBFLOAT *H, int n)
  * \brief Function to solve a linear equations system stored in a tridiagonal
  *   matrix with format: \f$\left(\begin{array}{cccc|c}
@@ -981,14 +981,14 @@ void jbm_solve_matrix(JBFLOAT *x, int n) {_jbm_solve_matrix(x, n);}
  * \param n
  * \brief number of matrix rows.
  */
-#if !INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX
-void jbm_solve_tridiagonal_matrix
+#if !INLINE_JBM_MATRIX_SOLVE_TRIDIAGONAL
+void jbm_matrix_solve_tridiagonal
 	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *H, int n)
-{_jbm_solve_tridiagonal_matrix(C, D, E, H, n);}
+{_jbm_matrix_solve_tridiagonal(C, D, E, H, n);}
 #endif
 
 /**
- * \fn void jbm_solve_tridiagonal_matrix_zero(JBFLOAT *C, JBFLOAT *D, \
+ * \fn void jbm_matrix_solve_tridiagonal_zero(JBFLOAT *C, JBFLOAT *D, \
  *   JBFLOAT *E, JBFLOAT *H, int n)
  * \brief Function to solve a linear equations system stored in a tridiagonal
  *   matrix with format: \f$\left(\begin{array}{cccc|c}
@@ -1010,14 +1010,14 @@ void jbm_solve_tridiagonal_matrix
  * \param n
  * \brief number of matrix rows.
  */
-#if !INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO
-void jbm_solve_tridiagonal_matrix_zero
+#if !INLINE_JBM_MATRIX_SOLVE_TRIDIAGONAL_ZERO
+void jbm_matrix_solve_tridiagonal_zero
 	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *H, int n)
-{_jbm_solve_tridiagonal_matrix_zero(C, D, E, H, n);}
+{_jbm_matrix_solve_tridiagonal_zero(C, D, E, H, n);}
 #endif
 
 /**
- * \fn void jbm_solve_pentadiagonal_matrix(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D, \
+ * \fn void jbm_matrix_solve_pentadiagonal(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D, \
  *   JBFLOAT *E, JBFLOAT *F, JBFLOAT *H, int n)
  * \brief Function to solve a linear equations system stored in a pentadiagonal
  *   matrix with format: \f$\left(\begin{array}{cccccc|c}
@@ -1043,14 +1043,14 @@ void jbm_solve_tridiagonal_matrix_zero
  * \param n
  * \brief number of matrix rows.
  */
-#if !INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX
-void jbm_solve_pentadiagonal_matrix(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D,
+#if !INLINE_JBM_MATRIX_SOLVE_PENTADIAGONAL
+void jbm_matrix_solve_pentadiagonal(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D,
 	JBFLOAT *E, JBFLOAT *F, JBFLOAT *H, int n)
-{_jbm_solve_pentadiagonal_matrix(B, C, D, E, F, H, n);}
+{_jbm_matrix_solve_pentadiagonal(B, C, D, E, F, H, n);}
 #endif
 
 /**
- * \fn void jbm_solve_pentadiagonal_matrix_zero(JBFLOAT *B, JBFLOAT *C, \
+ * \fn void jbm_matrix_solve_pentadiagonal_zero(JBFLOAT *B, JBFLOAT *C, \
  *   JBFLOAT *D, JBFLOAT *E, JBFLOAT *F, JBFLOAT *H, int n)
  * \brief Function to solve a linear equations system stored in a pentadiagonal
  *   matrix with format: \f$\left(\begin{array}{cccccc|c}
@@ -1077,10 +1077,10 @@ void jbm_solve_pentadiagonal_matrix(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D,
  * \param n
  * \brief number of matrix rows.
  */
-#if !INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO
-void jbm_solve_pentadiagonal_matrix_zero(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D,
+#if !INLINE_JBM_MATRIX_SOLVE_PENTADIAGONAL_ZERO
+void jbm_matrix_solve_pentadiagonal_zero(JBFLOAT *B, JBFLOAT *C, JBFLOAT *D,
 	JBFLOAT *E, JBFLOAT *F, JBFLOAT *H, int n)
-{_jbm_solve_pentadiagonal_matrix_zero(B, C, D, E, F, H, n);}
+{_jbm_matrix_solve_pentadiagonal_zero(B, C, D, E, F, H, n);}
 #endif
 
 /**
@@ -1601,10 +1601,73 @@ JBDOUBLE jbm_varray_root_mean_square_error(void *xa, void *fa, int sizea,
 }
 #endif
 
+/**
+ * \fn void jbm_varray_solve_tridiagonal(void *C, void *D, void *E, void *H,
+ *   int size, int n)
+ * \brief Function to solve a tridiagonal linear equations system stored in the
+ *   fields of a struct array with format: \f$\left(\begin{array}{cccc|c}
+ *   D_0 & E_0    &         &        & H_0\\
+ *   C_0 & D_1    & E_1     &        & H_1\\
+ *       & \ddots & \ddots  & \ddots & \vdots\\
+ *       &        & C_{n-1} & D_n    & H_n
+ *   \end{array}\right)\f$.
+ *   Results are stored in the H fields. It modifies D and H fields.
+ * \param C
+ * \brief field address of first element of the struct array containing the left
+ *   diagonal equation system values.
+ * \param D
+ * \brief field addres of first element of the struct array containing the
+ *   central diagonal equation system values.
+ * \param E
+ * \brief field address of first element of the struct array containing the
+ *   right diagonal equation system values.
+ * \param H
+ * \brief field address of first element of the struct array containing the
+ *   final equation system values.
+ * \param size
+ * \brief struct size.
+ * \param n
+ * \brief the latest struct array element.
+ */
 #if !INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL
 void jbm_varray_solve_tridiagonal
-	(void *v1, void *v2, void *v3, void *v4, int size, int n)
-{_jbm_varray_solve_tridiagonal(v1, v2, v3, v4, size, n);}
+	(void *C, void *D, void *E, void *H, int size, int n)
+{_jbm_varray_solve_tridiagonal(C, D, E, H, size, n);}
+#endif
+
+/**
+ * \fn void jbm_varray_solve_tridiagonal_zero(void *C, void *D, void *E, \
+ *   void *H, int size, int n)
+ * \brief Function to solve a tridiagonal linear equations system stored in the
+ *   fields of a struct array with format: \f$\left(\begin{array}{cccc|c}
+ *   D_0 & E_0    &         &        & H_0\\
+ *   C_0 & D_1    & E_1     &        & H_1\\
+ *       & \ddots & \ddots  & \ddots & \vdots\\
+ *       &        & C_{n-1} & D_n    & H_n
+ *   \end{array}\right)\f$.
+ *   avoiding zero divisions. Results are stored in the H fields. It modifies D
+ *   and H fields.
+ * \param C
+ * \brief field address of first element of the struct array containing the left
+ *   diagonal equation system values.
+ * \param D
+ * \brief field addres of first element of the struct array containing the
+ *   central diagonal equation system values.
+ * \param E
+ * \brief field address of first element of the struct array containing the
+ *   right diagonal equation system values.
+ * \param H
+ * \brief field address of first element of the struct array containing the
+ *   final equation system values.
+ * \param size
+ * \brief struct size.
+ * \param n
+ * \brief the latest struct array element.
+ */
+#if !INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL_ZERO
+void jbm_varray_solve_tridiagonal_zero
+	(void *C, void *D, void *E, void *H, int size, int n)
+{_jbm_varray_solve_tridiagonal_zero(C, D, E, H, size, n);}
 #endif
 
 /**
@@ -1666,9 +1729,4 @@ JBDOUBLE jbm_file_root_mean_square_error(char *namea, int ixa, int ifa, int na,
 	return _jbm_file_root_mean_square_error
 		(namea, ixa, ifa, na, namer, ixr, ifr, nr);
 }
-#endif
-
-#if !INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY_ZERO
-void jbm_solve_tridiagonal_varray_zero(void *v, int size, int n)
-{_jbm_solve_tridiagonal_varray_zero(v, size, n);}
 #endif

@@ -1233,7 +1233,7 @@ index_exit:
 	int jbm_index_sort_extended(JBFLOAT*, JBFLOAT**, int**, int);
 #endif
 
-static inline void _jbm_solve_matrix(JBFLOAT *x, int n)
+static inline void _jbm_matrix_solve(JBFLOAT *x, int n)
 {
 	register int i, j, k;
 	JBDOUBLE k1, k2;
@@ -1276,13 +1276,13 @@ static inline void _jbm_solve_matrix(JBFLOAT *x, int n)
 		for (j = n, g = f - n; --j > i; g -= n) *g -= *(g - i) * k1;
 	}
 }
-#if INLINE_JBM_SOLVE_MATRIX
-	#define jbm_solve_matrix _jbm_solve_matrix
+#if INLINE_JBM_MATRIX_SOLVE
+	#define jbm_matrix_solve _jbm_matrix_solve
 #else
-	void jbm_solve_matrix(JBFLOAT*, int);
+	void jbm_matrix_solve(JBFLOAT*, int);
 #endif
 
-static inline void _jbm_solve_tridiagonal_matrix
+static inline void _jbm_matrix_solve_tridiagonal
 	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *H, int n)
 {
 	register int i;
@@ -1301,14 +1301,14 @@ static inline void _jbm_solve_tridiagonal_matrix
 		*H = (*H - *(--E) * *(H + 1)) / *(--D);
 	}
 }
-#if INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX
-	#define jbm_solve_tridiagonal_matrix _jbm_solve_tridiagonal_matrix
+#if INLINE_JBM_MATRIX_SOLVE_TRIDIAGONAL
+	#define jbm_matrix_solve_tridiagonal _jbm_matrix_solve_tridiagonal
 #else
-	void jbm_solve_tridiagonal_matrix
+	void jbm_matrix_solve_tridiagonal
 		(JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
 #endif
 
-static inline void _jbm_solve_tridiagonal_matrix_zero
+static inline void _jbm_matrix_solve_tridiagonal_zero
 	(JBFLOAT *C, JBFLOAT *D, JBFLOAT *E, JBFLOAT *H, int n)
 {
 	register int i;
@@ -1331,14 +1331,14 @@ static inline void _jbm_solve_tridiagonal_matrix_zero
 		if (*D != 0.) *H = (*H - *E * *(H + 1)) / *D; else *H = 0.;
 	}
 }
-#if INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO
-	#define jbm_solve_tridiagonal_matrix_zero _jbm_solve_tridiagonal_matrix_zero
+#if INLINE_JBM_MATRIX_SOLVE_TRIDIAGONAL_ZERO
+	#define jbm_matrix_solve_tridiagonal_zero _jbm_matrix_solve_tridiagonal_zero
 #else
-	void jbm_solve_tridiagonal_matrix_zero
+	void jbm_matrix_solve_tridiagonal_zero
 		(JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
 #endif
 
-static inline void _jbm_solve_pentadiagonal_matrix(JBFLOAT *B, JBFLOAT *C,
+static inline void _jbm_matrix_solve_pentadiagonal(JBFLOAT *B, JBFLOAT *C,
 	JBFLOAT *D, JBFLOAT *E, JBFLOAT *F, JBFLOAT *H, int n)
 {
 	register int i;
@@ -1365,14 +1365,14 @@ static inline void _jbm_solve_pentadiagonal_matrix(JBFLOAT *B, JBFLOAT *C,
 		*H = (*H - *(E--) * *(H + 1) - *(--F) * *(H + 2)) / *(D--);
 	}
 }
-#if INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX
-	#define jbm_solve_pentadiagonal_matrix _jbm_solve_pentadiagonal_matrix
+#if INLINE_JBM_MATRIX_SOLVE_PENTADIAGONAL
+	#define jbm_matrix_solve_pentadiagonal _jbm_matrix_solve_pentadiagonal
 #else
-	void jbm_solve_pentadiagonal_matrix
+	void jbm_matrix_solve_pentadiagonal
 		(JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
 #endif
 
-static inline void _jbm_solve_pentadiagonal_matrix_zero(JBFLOAT *B, JBFLOAT *C,
+static inline void _jbm_matrix_solve_pentadiagonal_zero(JBFLOAT *B, JBFLOAT *C,
 	JBFLOAT *D, JBFLOAT *E, JBFLOAT *F, JBFLOAT *H, int n)
 {
 	register int i;
@@ -1408,11 +1408,11 @@ static inline void _jbm_solve_pentadiagonal_matrix_zero(JBFLOAT *B, JBFLOAT *C,
 		else --E, --F, --D;
 	}
 }
-#if INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO
-	#define jbm_solve_pentadiagonal_matrix_zero \
-		_jbm_solve_pentadiagonal_matrix_zero
+#if INLINE_JBM_MATRIX_SOLVE_PENTADIAGONAL_ZERO
+	#define jbm_matrix_solve_pentadiagonal_zero \
+		_jbm_matrix_solve_pentadiagonal_zero
 #else
-	void jbm_solve_pentadiagonal_matrix_zero
+	void jbm_matrix_solve_pentadiagonal_zero
 		(JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
 #endif
 
@@ -1448,7 +1448,7 @@ static inline void _jbm_regression
 		for (j = 0; j <= m; ++j, ++k) *k = xx[j + i];
 		*k = yx[i];
 	}
-	jbm_solve_matrix(B, m + 1);
+	jbm_matrix_solve(B, m + 1);
 	for (i = 0, k = B; i <= m; ++i, k += m + 1)
 	{
 		(*A)[i] = *k;
@@ -1533,7 +1533,7 @@ static inline void _jbm_regression_multilinear
 	c[0] = n + 1;
 	for (j = m; --j > 0;)
 		for (k = j; --k >= 0;) c[(m + 1) * j + k] = c[(m + 1) * k + j];
-	jbm_solve_matrix(c, m);
+	jbm_matrix_solve(c, m);
 	for (i = 0, d = c + m; ++i <= m; ++a, d += m + 1) *a = *d;
 	g_free(c);
 }
@@ -1607,7 +1607,7 @@ static inline void _jbm_spline_cubic
 	D[j] = dx * dx;
 	E[j] = D[j] * dx;
 	H[j] = y[n - 1] - y[n - 2];
-	jbm_solve_pentadiagonal_matrix(B, C, D, E, F, H, m - 1);
+	jbm_matrix_solve_pentadiagonal(B, C, D, E, F, H, m - 1);
 	*b = (JBFLOAT*)g_malloc(3 * (n - 1) * sizeof(JBFLOAT));
 	*c = *b + n - 1;
 	*d = *c + n - 1;
@@ -2098,6 +2098,91 @@ static inline JBDOUBLE _jbm_varray_root_mean_square_error(void *xa, void *fa,
 		(void*, void*, int, int, void*, void*, int, int);
 #endif
 
+static inline void _jbm_varray_solve_tridiagonal
+	(void *C, void *D, void *E, void *H, int size, int n)
+{
+	int i;
+	register JBDOUBLE k;
+	register JBFLOAT *CC, *DD, *EE, *HH;
+	DD = (JBFLOAT*)D;
+	HH = (JBFLOAT*)H;
+	for (i = 0; ++i <= n; C += size, E += size)
+	{
+		CC = (JBFLOAT*)C;
+		EE = (JBFLOAT*)E;
+		k = *CC / *DD;
+		D += size;
+		DD = (JBFLOAT*)D;
+		*DD -= k * *EE;
+		k *= *HH;
+		H += size;
+		HH = (JBFLOAT*)H;
+		*HH -= k;
+	}
+	*HH /= *DD;
+	while (--i > 0)
+	{
+		E -= size;
+		EE = (JBFLOAT*)E;
+		k = *EE * *HH; 
+		D -= size;
+		DD = (JBFLOAT*)D;
+		H -= size;
+		HH = (JBFLOAT*)H;
+		*HH = (*HH - k) / *DD;
+	}
+}
+#if INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL
+	#define jbm_varray_solve_tridiagonal _jbm_varray_solve_tridiagonal
+#else
+	void jbm_varray_solve_tridiagonal(void*, void*, void*, void*, int, int);
+#endif
+
+static inline void _jbm_varray_solve_tridiagonal_zero
+	(void *C, void *D, void *E, void *H, int size, int n)
+{
+	int i;
+	register JBDOUBLE k;
+	register JBFLOAT *CC, *DD, *EE, *HH;
+	DD = (JBFLOAT*)D;
+	HH = (JBFLOAT*)H;
+	for (i = 0; ++i <= n; C += size, E += size)
+	{
+		CC = (JBFLOAT*)C;
+		EE = (JBFLOAT*)E;
+		if (*DD != 0.)
+		{
+			k = *CC / *DD;
+			D += size;
+			DD = (JBFLOAT*)D;
+			*DD -= k * *EE;
+			k *= *HH;
+			H += size;
+			HH = (JBFLOAT*)H;
+			*HH -= k;
+		}
+		else D += size, H += size;
+	}
+	if (*DD != 0.) *HH /= *DD;
+	while (--i > 0)
+	{
+		E -= size;
+		EE = (JBFLOAT*)E;
+		k = *EE * *HH; 
+		D -= size;
+		DD = (JBFLOAT*)D;
+		H -= size;
+		HH = (JBFLOAT*)H;
+		if (*DD != 0.) *HH = (*HH - k) / *DD; else *HH = 0.;
+	}
+}
+#if INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL_ZERO
+	#define jbm_varray_solve_tridiagonal_zero _jbm_varray_solve_tridiagonal_zero
+#else
+	void jbm_varray_solve_tridiagonal_zero
+		(void*, void*, void*, void*, int, int);
+#endif
+
 static inline JBDOUBLE _jbm_file_mean_square_error(char *namea, int ixa,
 	int ifa, int na, char *namer, int ixr, int ifr, int nr)
 {
@@ -2202,104 +2287,6 @@ static inline JBDOUBLE _jbm_file_root_mean_square_error(char *namea, int ixa,
 #else
 	JBDOUBLE jbm_file_root_mean_square_error
 		(char*, int, int, int, char*, int, int, int);
-#endif
-
-static inline void _jbm_varray_solve_tridiagonal
-	(void *v1, void *v2, void *v3, *v4, int size, int n)
-{
-
-/*
-	Resuelve una estructura tridiagonal de forma:
-		(v2)0 (v3)0                                (v4)0
-		(v1)0 (v2)1 (v3)1                          (v4)1
-
-		                   (v1)n-2 (v2)n-1 (v3)n-1 (v4)n-1
-		                           (v1)n-1 (v2)n   (v4)n
-	La solución se almacena en v4
-	Modifica los campos v2, v3, v4
-*/
-
-	int i;
-	register JBDOUBLE k;
-	register JBFLOAT *C, *D, *E, *H;
-	D = (JBFLOAT*)v2;
-	H = (JBFLOAT*)v4;
-	for (i = 0; ++i <= n; v1 += size, v3 += size)
-	{
-		C = (JBFLOAT*)v1;
-		E = (JBFLOAT*)v3;
-		k = *C / *D;
-		v2 += size;
-		D = (JBFLOAT*)v2;
-		*D -= k * *E;
-		k *= *H;
-		v4 += size;
-		H = (JBFLOAT*)v4;
-		*H -= k;
-	}
-	*F /= *D;
-	while (--i > 0)
-	{
-		v3 -= size;
-		E = (JBFLOAT*)v3;
-		k = *E * *F; 
-		v2 -= size;
-		D = (JBFLOAT*)v2;
-		v4 -= size;
-		H = (JBFLOAT*)v4;
-		*H = (*H - k) / *D;
-	}
-}
-#if INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY
-	#define jbm_solve_tridiagonal_varray _jbm_solve_tridiagonal_varray
-#else
-	void jbm_solve_tridiagonal_varray(void*, int, int);
-#endif
-
-static inline void _jbm_solve_tridiagonal_varray_zero(void *v, int size, int n)
-{
-
-/*
-	Resuelve una estructura tridiagonal de forma:
-		(v)0 (v+2)0                                 (v+3)0
-		(v)0 (v+1)1 v(+2)1                          (v+3)1
-
-		                   (v)n-2 (v+1)n-1 (v+2)n-1 (v+3)n-1
-		                            (v)n-1 (v+1)n   (v+3)n
-	evitando divisiones por 0. La solución se almacena en v+3
-	Modifica los campos v+1, v+2, v+3
-*/
-
-	int i;
-	register JBDOUBLE k;
-	register JBFLOAT *C, *CC;
-	for (i=0; ++i<=n;)
-	{
-		C=(JBFLOAT*)v;
-		v+=size;
-		CC=(JBFLOAT*)v;
-		if (*(C+1) != 0.)
-		{
-			k = *C / *(C+1);
-			*(CC+1) -= k * *(C+2);
-			*(CC+3) -= k * *(C+3);
-		}
-	}
-	if (*(CC+1) != 0.) *(CC+3) /= *(CC+1);
-	while (--i>0)
-	{
-		C=(JBFLOAT*)v;
-		v-=size;
-		CC=(JBFLOAT*)v;
-		if (*(CC+1) != 0.) *(CC+3) = (*(CC+3) - *(CC+2) * *(C+3)) / *(CC+1);
-		else *(CC+3) = 0.;
-	}
-}
-
-#if INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY_ZERO
-	#define jbm_solve_tridiagonal_varray_zero _jbm_solve_tridiagonal_varray_zero
-#else
-	void jbm_solve_tridiagonal_varray_zero(void*, int, int);
 #endif
 
 #endif

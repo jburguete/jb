@@ -65,12 +65,12 @@
 
 /**
  * \def JBW_GRAPHIC_N_LABELS
- * \brief Number of maximum labels in a JBWGraphic
+ * \brief Number of maximum labels in a JBWGraphic.
  */
 #define JBW_GRAPHIC_N_LABELS	6
 /**
  * \def JBW_GRAPHIC_N_CHARS
- * \brief Number of characters displayed in a graphical label
+ * \brief Number of characters displayed in a graphical label.
  */
 #define JBW_GRAPHIC_N_CHARS		12
 /**
@@ -167,20 +167,20 @@
 #define JB_XML_NODE_SET_FLOAT_WITH_DEFAULT	1
 /**
  * \def JB_XML_NODE_GET_INT_WITH_DEFAULT
- * \brief Macro deciding if the function jb_xml_node_get_int_with_default()
- *   has to be compiled.
+ * \brief Macro deciding if the function jb_xml_node_get_int_with_default() has
+ *   to be compiled.
  */
 #define JB_XML_NODE_GET_INT_WITH_DEFAULT	1
 /**
  * \def JB_XML_NODE_SET_INT_WITH_DEFAULT
- * \brief Macro deciding if the function jb_xml_node_set_int_with_default()
- *   has to be compiled.
+ * \brief Macro deciding if the function jb_xml_node_set_int_with_default() has
+ *   to be compiled.
  */
 #define JB_XML_NODE_SET_INT_WITH_DEFAULT	1
 /**
  * \def JB_XML_NODE_GET_TIME_WITH_DEFAULT
- * \brief Macro deciding if the function jb_xml_node_get_time_with_default()
- *   has to be compiled.
+ * \brief Macro deciding if the function jb_xml_node_get_time_with_default() has
+ *   to be compiled.
  */
 #define JB_XML_NODE_GET_TIME_WITH_DEFAULT	1
 /**
@@ -226,8 +226,7 @@
 #define INLINE_JB_GET_TIME		0
 /**
  * \def INLINE_JB_GET_TIME_FILE
- * \brief Macro deciding if the function jb_get_time_file() has to be
- *   inlined.
+ * \brief Macro deciding if the function jb_get_time_file() has to be inlined.
  */
 #define INLINE_JB_GET_TIME_FILE	0
 /**
@@ -357,14 +356,12 @@
 #define INLINE_JBM_FDBL								1
 /**
  * \def INLINE_JBM_EXTRAPOLATE
- * \brief Macro deciding if the function jbm_extrapolate() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbm_extrapolate() has to be inlined.
  */
 #define INLINE_JBM_EXTRAPOLATE						1
 /**
  * \def INLINE_JBM_INTERPOLATE
- * \brief Macro deciding if the function jbm_interpolate() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbm_interpolate() has to be inlined.
  */
 #define INLINE_JBM_INTERPOLATE						1
 /**
@@ -374,14 +371,13 @@
 #define INLINE_JBM_INTEGRAL							1
 /**
  * \def INLINE_JBM_FARRAY_SEARCH
- * \brief Macro deciding if the function jbm_farray_search() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbm_farray_search() has to be inlined.
  */
 #define INLINE_JBM_FARRAY_SEARCH					1
 /**
  * \def INLINE_JBM_FARRAY_SEARCH_EXTENDED
- * \brief Macro deciding if the function jbm_farray_search_extended() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_farray_search_extended() has to be
+ *   inlined.
  */
 #define INLINE_JBM_FARRAY_SEARCH_EXTENDED			1
 /**
@@ -396,14 +392,13 @@
 #define INLINE_JBM_FARRAY_MIN						1
 /**
  * \def INLINE_JBM_FARRAY_MAXMIN
- * \brief Macro deciding if the function jbm_farray_maxmin() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbm_farray_maxmin() has to be inlined.
  */
 #define INLINE_JBM_FARRAY_MAXMIN					1
 /**
  * \def INLINE_JBM_FARRAY_INTERPOLATE
- * \brief Macro deciding if the function jbm_farray_interpolate() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_farray_interpolate() has to be
+ *   inlined.
  */
 #define INLINE_JBM_FARRAY_INTERPOLATE				1
 /**
@@ -419,8 +414,8 @@
 #define INLINE_JBM_FARRAY_INTEGRAL					1
 /**
  * \def INLINE_JBM_FARRAY_MEAN_SQUARE_ERROR
- * \brief Macro deciding if the function jbm_farray_mean_square_error() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbm_farray_mean_square_error() has to
+ *   be inlined.
  */
 #define INLINE_JBM_FARRAY_MEAN_SQUARE_ERROR			1
 /**
@@ -441,8 +436,8 @@
 #define INLINE_JBM_V3_LENGTH						1
 /**
  * \def INLINE_JBM_SOLVE_CUADRATIC_REDUCED
- * \brief Macro deciding if the function jbm_solve_cuadratic_reduced() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbm_solve_cuadratic_reduced() has to be
+ *   inlined.
  */
 #define INLINE_JBM_SOLVE_CUADRATIC_REDUCED			1
 /**
@@ -470,8 +465,8 @@
 #define INLINE_JBM_INDEX_SORT_INSERTION				1
 /**
  * \def INLINE_JBM_INDEX_SORT_INTERCHANGE
- * \brief Macro deciding if the function jbm_index_sort_interchange() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_index_sort_interchange() has to be
+ *   inlined.
  */
 #define INLINE_JBM_INDEX_SORT_INTERCHANGE			1
 /**
@@ -492,41 +487,34 @@
  */
 #define INLINE_JBM_INDEX_SORT_EXTENDED				1
 /**
- * \def INLINE_JBM_SOLVE_MATRIX
- * \brief Macro deciding if the function jbm_solve_matrix() has to be
- *   inlined.
+ * \def INLINE_JBM_MATRIX_SOLVE
+ * \brief Macro deciding if the function jbm_matrix_solve() has to be inlined.
  */
-#define INLINE_JBM_SOLVE_MATRIX						1
+#define INLINE_JBM_MATRIX_SOLVE						1
 /**
- * \def INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX
- * \brief Macro deciding if the function jbm_solve_tridiagonal_matrix() has
+ * \def INLINE_JBM_MATRIX_SOLVE_TRIDIAGONAL
+ * \brief Macro deciding if the function jbm_matrix_solve_tridiagonal() has to
+ *   be inlined.
+ */
+#define INLINE_JBM_MATRIX_SOLVE_TRIDIAGONAL			1
+/**
+ * \def INLINE_JBM_MATRIX_SOLVE_TRIDIAGONAL_ZERO
+ * \brief Macro deciding if the function jbm_matrix_solve_tridiagonal_zero() has
  *   to be inlined.
  */
-#define INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX			1
+#define INLINE_JBM_MATRIX_SOLVE_TRIDIAGONAL_ZERO	1
 /**
- * \def INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO
- * \brief Macro deciding if the function jbm_solve_pentadiagonal_matrix()
+ * \def INLINE_JBM_MATRIX_SOLVE_PENTADIAGONAL
+ * \brief Macro deciding if the function jbm_matrix_solve_pentadiagonal() has to
+ *   be inlined.
+ */
+#define INLINE_JBM_MATRIX_SOLVE_PENTADIAGONAL		1
+/**
+ * \def INLINE_JBM_MATRIX_SOLVE_PENTADIAGONAL_ZERO
+ * \brief Macro deciding if the function jbm_matrix_solve_pentadiagonal_zero()
  *   has to be inlined.
  */
-#define INLINE_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO	1
-/**
- * \def INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX
- * \brief Macro deciding if the function jbm_solve_tridiagonal_matrix_zero()
- *   has to be inlined.
- */
-#define INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX		1
-/**
- * \def INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO
- * \brief Macro deciding if the function jbm_solve_tridiagonal_matrix_zero()
- *   has to be inlined.
- */
-#define INLINE_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO	1
-/**
- * \def INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY
- * \brief Macro deciding if the function jbm_solve_tridiagonal_varray() has
- *   to be inlined.
- */
-#define INLINE_JBM_SOLVE_TRIDIAGONAL_VARRAY			1
+#define INLINE_JBM_MATRIX_SOLVE_PENTADIAGONAL_ZERO	1
 /**
  * \def INLINE_JBM_REGRESSION
  * \brief Macro deciding if the function jbm_regression() has to be inlined.
@@ -540,20 +528,20 @@
 #define INLINE_JBM_REGRESSION_LINEAR				1
 /**
  * \def INLINE_JBM_REGRESSION_EXPONENTIAL
- * \brief Macro deciding if the function jbm_regression_exponential() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_regression_exponential() has to be
+ *   inlined.
  */
 #define INLINE_JBM_REGRESSION_EXPONENTIAL			1
 /**
  * \def INLINE_JBM_REGRESSION_MULTILINEAR
- * \brief Macro deciding if the function jbm_regression_multilinear() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_regression_multilinear() has to be
+ *   inlined.
  */
 #define INLINE_JBM_REGRESSION_MULTILINEAR			1
 /**
  * \def INLINE_JBM_REGRESSION_MULTIEXPONENTIAL
- * \brief Macro deciding if the function jbm_regression_multiexponential()
- *   has to be inlined.
+ * \brief Macro deciding if the function jbm_regression_multiexponential() has
+ *   to be inlined.
  */
 #define INLINE_JBM_REGRESSION_MULTIEXPONENTIAL		1
 /**
@@ -563,20 +551,20 @@
 #define INLINE_JBM_SPLINE_CUBIC						1
 /**
  * \def INLINE_JBM_FLUX_LIMITER_SUPERBEE
- * \brief Macro deciding if the function jbm_flux_limiter_superbee() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_flux_limiter_superbee() has to be
+ *   inlined.
  */
 #define INLINE_JBM_FLUX_LIMITER_SUPERBEE			1
 /**
  * \def INLINE_JBM_FLUX_LIMITER_VANLEER
- * \brief Macro deciding if the function jbm_flux_limiter_VanLeer() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_flux_limiter_VanLeer() has to be
+ *   inlined.
  */
 #define INLINE_JBM_FLUX_LIMITER_VANLEER				1
 /**
  * \def INLINE_JBM_FLUX_LIMITER_VANALBADA
- * \brief Macro deciding if the function jbm_flux_limiter_VanAlbada() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_flux_limiter_VanAlbada() has to be
+ *   inlined.
  */
 #define INLINE_JBM_FLUX_LIMITER_VANALBADA			1
 /**
@@ -587,14 +575,14 @@
 #define INLINE_JBM_FLUX_LIMITER_MINMOD				1
 /**
  * \def INLINE_JBM_FLUX_LIMITER_SUPERMIN
- * \brief Macro deciding if the function jbm_flux_limiter_supermin() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_flux_limiter_supermin() has to be
+ *   inlined.
  */
 #define INLINE_JBM_FLUX_LIMITER_SUPERMIN			1
 /**
  * \def INLINE_JBM_FLUX_LIMITER_MINSUPER
- * \brief Macro deciding if the function jbm_flux_limiter_minsuper() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_flux_limiter_minsuper() has to be
+ *   inlined.
  */
 #define INLINE_JBM_FLUX_LIMITER_MINSUPER			1
 /**
@@ -605,8 +593,8 @@
 #define INLINE_JBM_FLUX_LIMITER_NULL				1
 /**
  * \def INLINE_JBM_FLUX_LIMITER_CENTRED
- * \brief Macro deciding if the function jbm_flux_limiter_centred() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_flux_limiter_centred() has to be
+ *   inlined.
  */
 #define INLINE_JBM_FLUX_LIMITER_CENTRED				1
 /**
@@ -647,14 +635,13 @@
 #define INLINE_JBM_TRANSVERSAL_SECTION_REGIONS		1
 /**
  * \def INLINE_JBM_VARRAY_SEARCH
- * \brief Macro deciding if the function jbm_varray_search() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbm_varray_search() has to be inlined.
  */
 #define INLINE_JBM_VARRAY_SEARCH					1
 /**
  * \def INLINE_JBM_VARRAY_SEARCH_EXTENDED
- * \brief Macro deciding if the function jbm_varray_search_extended() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbm_varray_search_extended() has to be
+ *   inlined.
  */
 #define INLINE_JBM_VARRAY_SEARCH_EXTENDED			1
 /**
@@ -669,8 +656,7 @@
 #define INLINE_JBM_VARRAY_MIN						1
 /**
  * \def INLINE_JBM_VARRAY_MAXMIN
- * \brief Macro deciding if the function jbm_varray_maxmin() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbm_varray_maxmin() has to be inlined.
  */
 #define INLINE_JBM_VARRAY_MAXMIN					1
 /**
@@ -692,6 +678,18 @@
  */
 #define INLINE_JBM_FILE_MEAN_SQUARE_ERROR			1
 /**
+ * \def INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL
+ * \brief Macro deciding if the function jbm_varray_solve_tridiagonal() has to
+ *   be inlined.
+ */
+#define INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL			1
+/**
+ * \def INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL_ZERO
+ * \brief Macro deciding if the function jbm_varray_solve_tridiagonal_zero() has
+ *   to be inlined.
+ */
+#define INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL_ZERO	1
+/**
  * \def INLINE_JBM_FILE_ROOT_MEAN_SQUARE_ERROR
  * \brief Macro deciding if the function jbm_file_root_mean_square_error() has
  *   to be inlined.
@@ -699,20 +697,20 @@
 #define INLINE_JBM_FILE_ROOT_MEAN_SQUARE_ERROR		1
 /**
  * \def INLINE_JBW_BUTTON_NEW_FROM_STOCK
- * \brief Macro deciding if the function jbw_button_new_from_stock() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_button_new_from_stock() has to be
+ *   inlined.
  */
 #define INLINE_JBW_BUTTON_NEW_FROM_STOCK				1
 /**
  * \def INLINE_JBW_ARRAY_RADIO_BUTTONS_SET_ACTIVE
- * \brief Macro deciding if the function
- *   jbw_array_radio_buttons_set_active() has to be inlined.
+ * \brief Macro deciding if the function jbw_array_radio_buttons_set_active()
+ *   has to be inlined.
  */
 #define INLINE_JBW_ARRAY_RADIO_BUTTONS_SET_ACTIVE		1
 /**
  * \def INLINE_JBW_ARRAY_RADIO_BUTTONS_GET_ACTIVE
- * \brief Macro deciding if the function
- *   jbw_array_radio_buttons_get_active() has to be inlined.
+ * \brief Macro deciding if the function jbw_array_radio_buttons_get_active()
+ *   has to be inlined.
  */
 #define INLINE_JBW_ARRAY_RADIO_BUTTONS_GET_ACTIVE		1
 /**
@@ -723,8 +721,8 @@
 #define INLINE_JBW_INT_ENTRY_SET_VALUE					1
 /**
  * \def INLINE_JBW_INT_ENTRY_SET_VALE_WITH_FORMAT
- * \brief Macro deciding if the function
- *   jbw_int_entry_set_vale_with_format() has to be inlined.
+ * \brief Macro deciding if the function jbw_int_entry_set_vale_with_format()
+ *   has to be inlined.
  */
 #define INLINE_JBW_INT_ENTRY_SET_VALE_WITH_FORMAT		1
 /**
@@ -735,8 +733,8 @@
 #define INLINE_JBW_INT_ENTRY_GET_VALUE					1
 /**
  * \def INLINE_JBW_FLOAT_ENTRY_SET_VALUE
- * \brief Macro deciding if the function jbw_float_entry_set_value() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_float_entry_set_value() has to be
+ *   inlined.
  */
 #define INLINE_JBW_FLOAT_ENTRY_SET_VALUE				1
 /**
@@ -747,32 +745,30 @@
 #define INLINE_JBW_FLOAT_ENTRY_SET_VALUE_WITH_FORMAT	1
 /**
  * \def INLINE_JBW_FLOAT_ENTRY_GET_VALUE
- * \brief Macro deciding if the function jbw_float_entry_get_value() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_float_entry_get_value() has to be
+ *   inlined.
  */
 #define INLINE_JBW_FLOAT_ENTRY_GET_VALUE				1
 /**
  * \def INLINE_JBW_COMBO_BOX_SET_STRINGS
- * \brief Macro deciding if the function jbw_combo_box_set_strings() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_combo_box_set_strings() has to be
+ *   inlined.
  */
 #define INLINE_JBW_COMBO_BOX_SET_STRINGS				1
 /**
  * \def INLINE_JBW_COMBO_BOX_NEW_WITH_STRINGS
- * \brief Macro deciding if the function jbw_combo_box_new_with_strings()
- *   has to be inlined.
+ * \brief Macro deciding if the function jbw_combo_box_new_with_strings() has to
+ *   be inlined.
  */
 #define INLINE_JBW_COMBO_BOX_NEW_WITH_STRINGS			1
 /**
  * \def INLINE_JBW_MENU_ITEM_NEW
- * \brief Macro deciding if the function jbw_menu_item_new() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_menu_item_new() has to be inlined.
  */
 #define INLINE_JBW_MENU_ITEM_NEW						1
 /**
  * \def INLINE_JBW_SHOW_MESSAGE
- * \brief Macro deciding if the function jbw_show_message() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_show_message() has to be inlined.
  */
 #define INLINE_JBW_SHOW_MESSAGE							1
 /**
@@ -782,20 +778,17 @@
 #define INLINE_JBW_SHOW_ERROR							0
 /**
  * \def INLINE_JBW_SHOW_ERROR2
- * \brief Macro deciding if the function jbw_show_error2() has to be
- * inlined.
+ * \brief Macro deciding if the function jbw_show_error2() has to be inlined.
  */
 #define INLINE_JBW_SHOW_ERROR2							0
 /**
  * \def INLINE_JBW_SHOW_ERROR3
- * \brief Macro deciding if the function jbw_show_error3() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_show_error3() has to be inlined.
  */
 #define INLINE_JBW_SHOW_ERROR3							0
 /**
  * \def INLINE_JBW_SHOW_WARNING
- * \brief Macro deciding if the function jbw_show_warning() has to be
- * inlined.
+ * \brief Macro deciding if the function jbw_show_warning() has to be inlined.
  */
 #define INLINE_JBW_SHOW_WARNING							1
 /**
@@ -806,14 +799,12 @@
 #define INLINE_JBW_DIALOG_FILE_DESTROY					1
 /**
  * \def INLINE_JBW_DIALOG_FILE_OK
- * \brief Macro deciding if the function jbw_dialog_file_ok() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_dialog_file_ok() has to be inlined.
  */
 #define INLINE_JBW_DIALOG_FILE_OK						1
 /**
  * \def INLINE_JBW_DIALOG_FILE
- * \brief Macro deciding if the function jbw_dialog_file() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_dialog_file() has to be inlined.
  */
 #define INLINE_JBW_DIALOG_FILE							1
 /**
@@ -830,8 +821,7 @@
 #define INLINE_JBW_DRAW_RECTANGLED						1
 /**
  * \def INLINE_JBW_DRAW_RECTANGLE
- * \brief Macro deciding if the function jbw_draw_rectangle() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_draw_rectangle() has to be inlined.
  */
 #define INLINE_JBW_DRAW_RECTANGLE						1
 /**
@@ -841,26 +831,22 @@
 #define INLINE_JBW_DRAW_CLEAR							1
 /**
  * \def INLINE_JBW_DRAW_LINESF
- * \brief Macro deciding if the function jbw_draw_linesf() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_draw_linesf() has to be inlined.
  */
 #define INLINE_JBW_DRAW_LINESF							1
 /**
  * \def INLINE_JBW_DRAW_LINESD
- * \brief Macro deciding if the function jbw_draw_linesd() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_draw_linesd() has to be inlined.
  */
 #define INLINE_JBW_DRAW_LINESD							1
 /**
  * \def INLINE_JBW_DRAW_SEGMENTSF
- * \brief Macro deciding if the function jbw_draw_segmentsf() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_draw_segmentsf() has to be inlined.
  */
 #define INLINE_JBW_DRAW_SEGMENTSF						1
 /**
  * \def INLINE_JBW_DRAW_SEGMENTSD
- * \brief Macro deciding if the function jbw_draw_segmentsd() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_draw_segmentsd() has to be inlined.
  */
 #define INLINE_JBW_DRAW_SEGMENTSD						1
 /**
@@ -870,8 +856,7 @@
 #define INLINE_JBW_DRAW_LINES							1
 /**
  * \def INLINE_JBW_DRAW_LINESVF
- * \brief Macro deciding if the function jbw_draw_linesvf() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_draw_linesvf() has to be inlined.
  */
 #define INLINE_JBW_DRAW_LINESVF							0
 /**
@@ -881,14 +866,12 @@
 #define INLINE_JBW_DRAW_LINESVD							0
 /**
  * \def INLINE_JBW_DRAW_LINESV
- * \brief Macro deciding if the function jbw_draw_linesv() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_draw_linesv() has to be inlined.
  */
 #define INLINE_JBW_DRAW_LINESV							0
 /**
  * \def INLINE_JBW_DRAW_STRING
- * \brief Macro deciding if the function jbw_draw_string() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_draw_string() has to be inlined.
  */
 #define INLINE_JBW_DRAW_STRING							0
 /**
@@ -903,38 +886,37 @@
 #define INLINE_JBW_DRAW_LINEV							0
 /**
  * \def INLINE_JBW_DRAW_SEGMENT_WITH_LIMITS
- * \brief Macro deciding if the function jbw_draw_segment_with_limits() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_draw_segment_with_limits() has to
+ *   be inlined.
  */
 #define INLINE_JBW_DRAW_SEGMENT_WITH_LIMITS				0
 /**
  * \def INLINE_JBW_DRAW_LINE_WITH_LIMITS
- * \brief Macro deciding if the function jbw_draw_line_with_limits() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_draw_line_with_limits() has to be
+ *   inlined.
  */
 #define INLINE_JBW_DRAW_LINE_WITH_LIMITS				0
 /**
  * \def INLINE_JBW_DRAW_LINE_WITH_LIMITSV
- * \brief Macro deciding if the function jbw_draw_line_with_limitsv() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_draw_line_with_limitsv() has to be
+ *   inlined.
  */
 #define INLINE_JBW_DRAW_LINE_WITH_LIMITSV				0
 /**
  * \def INLINE_JBW_DRAW_LINES_WITH_LIMITS
- * \brief Macro deciding if the function jbw_draw_lines_with_limits() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_draw_lines_with_limits() has to be
+ *   inlined.
  */
 #define INLINE_JBW_DRAW_LINES_WITH_LIMITS				0
 /**
  * \def INLINE_JBW_DRAW_LINES_WITH_LIMITSV
- * \brief Macro deciding if the function jbw_draw_lines_with_limitsv() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_draw_lines_with_limitsv() has to be
+ *   inlined.
  */
 #define INLINE_JBW_DRAW_LINES_WITH_LIMITSV				0
 /**
  * \def INLINE_JBW_DRAW_SEGMENT
- * \brief Macro deciding if the function jbw_draw_segment() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_draw_segment() has to be inlined.
  */
 #define INLINE_JBW_DRAW_SEGMENT							0
 /**
@@ -959,8 +941,7 @@
 #define INLINE_JBW_LOGO_NEW								1
 /**
  * \def INLINE_JBW_GRAPHIC_STRING
- * \brief Macro deciding if the function jbw_graphic_string() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_graphic_string() has to be inlined.
  */
 #define INLINE_JBW_GRAPHIC_STRING						0
 /**
@@ -1019,8 +1000,7 @@
 #define INLINE_JBW_GRAPHIC_DRAW_STRING					0
 /**
  * \def INLINE_JBW_GRAPHIC_LABELS
- * \brief Macro deciding if the function jbw_graphic_labels() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_graphic_labels() has to be inlined.
  */
 #define INLINE_JBW_GRAPHIC_LABELS						0
 /**
@@ -1049,8 +1029,8 @@
 #define INLINE_JBW_GRAPHIC_REALIZE						1
 /**
  * \def INLINE_JBW_GRAPHIC_EXPOSE_EVENT
- * \brief Macro deciding if the function jbw_graphic_expose_event() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_graphic_expose_event() has to be
+ *   inlined.
  */
 #define INLINE_JBW_GRAPHIC_EXPOSE_EVENT					1
 /**
@@ -1061,38 +1041,36 @@
 #define INLINE_JBW_GRAPHIC_DESTROY						0
 /**
  * \def INLINE_JBW_GRAPHIC_NEW
- * \brief Macro deciding if the function jbw_graphic_new() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_graphic_new() has to be inlined.
  */
 #define INLINE_JBW_GRAPHIC_NEW							0
 /**
  * \def INLINE_JBW_GRAPHIC_INIT
- * \brief Macro deciding if the function jbw_graphic_new() has to be
- *   inlined.
+ * \brief Macro deciding if the function jbw_graphic_new() has to be inlined.
  */
 #define INLINE_JBW_GRAPHIC_INIT							1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_SET_ELEMENT
- * \brief Macro deciding if the function jbw_array_editor_set_element() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_set_element() has to
+ *   be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_SET_ELEMENT				1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_GET_ELEMENT
- * \brief Macro deciding if the function jbw_array_editor_get_element() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_get_element() has to
+ *   be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_GET_ELEMENT				1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_SET_ELEMENT_INT
- * \brief Macro deciding if the function jbw_array_editor_set_element_int()
- *   has to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_set_element_int() has
+ *   to be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_SET_ELEMENT_INT			1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_GET_ELEMENT_INT
- * \brief Macro deciding if the function jbw_array_editor_get_element_int()
- *   has to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_get_element_int() has
+ *   to be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_GET_ELEMENT_INT			1
 /**
@@ -1109,38 +1087,38 @@
 #define INLINE_JBW_ARRAY_EDITOR_GET_ELEMENT_FLOAT		1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_SET_COLUMN
- * \brief Macro deciding if the function jbw_array_editor_set_column() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_set_column() has to be
+ *   inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_SET_COLUMN				1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_GET_COLUMN
- * \brief Macro deciding if the function jbw_array_editor_get_column() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_get_column() has to be
+ *   inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_GET_COLUMN				1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_INT
- * \brief Macro deciding if the function jbw_array_editor_set_column_int()
- *   has to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_set_column_int() has
+ *   to be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_INT			1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_INT
- * \brief Macro deciding if the function jbw_array_editor_get_column_int()
- *   has to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_get_column_int() has
+ *   to be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_INT			1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_FLOAT
- * \brief Macro deciding if the function jbw_array_editor_set_column_float()
- *   has to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_set_column_float() has
+ *   to be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_FLOAT		1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_FLOAT
- * \brief Macro deciding if the function jbw_array_editor_get_column_float()
- *   has to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_get_column_float() has
+ *   to be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_FLOAT		1
 /**
@@ -1151,26 +1129,26 @@
 #define INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_SENSITIVE	1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_SHOW_COLUMN
- * \brief Macro deciding if the function jbw_array_editor_show_column() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_show_column() has to
+ *   be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_SHOW_COLUMN				1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_HIDE_COLUMN
- * \brief Macro deciding if the function jbw_array_editor_hide_column() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_hide_column() has to
+ *   be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_HIDE_COLUMN				1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_INSERT_BUTTON
- * \brief Macro deciding if the function jbw_array_editor_insert_button()
- *   has to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_insert_button() has to
+ *   be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_INSERT_BUTTON			1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_INSERT_ENTRY
- * \brief Macro deciding if the function jbw_array_editor_insert_entry() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_insert_entry() has to
+ *   be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_INSERT_ENTRY			1
 /**
@@ -1181,20 +1159,20 @@
 #define INLINE_JBW_ARRAY_EDITOR_INSERT					1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_UP_ROWS
- * \brief Macro deciding if the function jbw_array_editor_up_rows() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_up_rows() has to be
+ *   inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_UP_ROWS					1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_INSERT_ROW
- * \brief Macro deciding if the function jbw_array_editor_insert_row() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_insert_row() has to be
+ *   inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_INSERT_ROW				1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_REMOVE_ENTRY
- * \brief Macro deciding if the function jbw_array_editor_remove_entry() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_remove_entry() has to
+ *   be inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_REMOVE_ENTRY			1
 /**
@@ -1205,26 +1183,26 @@
 #define INLINE_JBW_ARRAY_EDITOR_REMOVE					1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_DOWN_ROWS
- * \brief Macro deciding if the function jbw_array_editor_down_rows() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_down_rows() has to be
+ *   inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_DOWN_ROWS				1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_REMOVE_ROW
- * \brief Macro deciding if the function jbw_array_editor_remove_row() has
- *   to be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_remove_row() has to be
+ *   inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_REMOVE_ROW				1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_SET_ROWS
- * \brief Macro deciding if the function jbw_array_editor_set_rows() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_set_rows() has to be
+ *   inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_SET_ROWS				1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_SET_TITLE
- * \brief Macro deciding if the function jbw_array_editor_set_title() has to
- *   be inlined.
+ * \brief Macro deciding if the function jbw_array_editor_set_title() has to be
+ *   inlined.
  */
 #define INLINE_JBW_ARRAY_EDITOR_SET_TITLE				1
 /**
@@ -1374,8 +1352,7 @@
 #define DEBUG_JBM_FDBL								0
 /**
  * \def DEBUG_JBM_EXTRAPOLATE
- * \brief Macro deciding if the function jbm_extrapolate() has to be
- *   debugged.
+ * \brief Macro deciding if the function jbm_extrapolate() has to be debugged.
  */
 #define DEBUG_JBM_EXTRAPOLATE						0
 /**
@@ -1397,26 +1374,23 @@
 #define DEBUG_JBM_FARRAY_SEARCH						0
 /**
  * \def DEBUG_JBM_FARRAY_SEARCH_EXTENDED
- * \brief Macro deciding if the function jbm_farray_search_extended() has to
- *   be debugged.
+ * \brief Macro deciding if the function jbm_farray_search_extended() has to be
+ *   debugged.
  */
 #define DEBUG_JBM_FARRAY_SEARCH_EXTENDED			0
 /**
  * \def DEBUG_JBM_FARRAY_MAX
- * \brief Macro deciding if the function jbm_farray_max() has to be
- *   debugged.
+ * \brief Macro deciding if the function jbm_farray_max() has to be debugged.
  */
 #define DEBUG_JBM_FARRAY_MAX						0
 /**
  * \def DEBUG_JBM_FARRAY_MIN
- * \brief Macro deciding if the function jbm_farray_min() has to be
- *   debugged.
+ * \brief Macro deciding if the function jbm_farray_min() has to be debugged.
  */
 #define DEBUG_JBM_FARRAY_MIN						0
 /**
  * \def DEBUG_JBM_FARRAY_MAXMIN
- * \brief Macro deciding if the function jbm_farray_maxmin() has to be
- *   debugged.
+ * \brief Macro deciding if the function jbm_farray_maxmin() has to be debugged.
  */
 #define DEBUG_JBM_FARRAY_MAXMIN						0
 /**
@@ -1439,8 +1413,8 @@
 #define DEBUG_JBM_FARRAY_INTEGRAL					0
 /**
  * \def DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR
- * \brief Macro deciding if the function jbm_farray_mean_square_error() has
- *   to be debugged.
+ * \brief Macro deciding if the function jbm_farray_mean_square_error() has to
+ *   be debugged.
  */
 #define DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR			0
 /**
@@ -1461,8 +1435,8 @@
 #define DEBUG_JBM_V3_LENGTH							1
 /**
  * \def DEBUG_JBM_SOLVE_CUADRATIC_REDUCED
- * \brief Macro deciding if the function jbm_solve_cuadratic_reduced() has
- *   to be debugged.
+ * \brief Macro deciding if the function jbm_solve_cuadratic_reduced() has to be
+ *   debugged.
  */
 #define DEBUG_JBM_SOLVE_CUADRATIC_REDUCED			0
 /**
@@ -1479,8 +1453,7 @@
 #define DEBUG_JBM_SOLVE_CUBIC_REDUCED				1
 /**
  * \def DEBUG_JBM_SOLVE_CUBIC
- * \brief Macro deciding if the function jbm_solve_cubic() has to be
- *   debugged.
+ * \brief Macro deciding if the function jbm_solve_cubic() has to be debugged.
  */
 #define DEBUG_JBM_SOLVE_CUBIC						1
 /**
@@ -1520,35 +1493,35 @@
  */
 #define DEBUG_JBM_INDEX_SORT_EXTENDED				0
 /**
- * \def DEBUG_JBM_SOLVE_MATRIX
- * \brief Macro deciding if the function jbm_solve_matrix() has to be
+ * \def DEBUG_JBM_MATRIX_SOLVE
+ * \brief Macro deciding if the function jbm_matrix_solve() has to be
  *   debugged.
  */
-#define DEBUG_JBM_SOLVE_MATRIX						1
+#define DEBUG_JBM_MATRIX_SOLVE						1
 /**
- * \def DEBUG_JBM_SOLVE_TRIDIAGONAL_MATRIX
- * \brief Macro deciding if the function jbm_solve_tridiagonal_matrix() has
+ * \def DEBUG_JBM_MATRIX_SOLVE_TRIDIAGONAL
+ * \brief Macro deciding if the function jbm_matrix_solve_tridiagonal() has to
+ *   be debugged.
+ */
+#define DEBUG_JBM_MATRIX_SOLVE_TRIDIAGONAL			1
+/**
+ * \def DEBUG_JBM_MATRIX_SOLVE_TRIDIAGONAL_ZERO
+ * \brief Macro deciding if the function jbm_matrix_solve_tridiagonal_zero() has
  *   to be debugged.
  */
-#define DEBUG_JBM_SOLVE_TRIDIAGONAL_MATRIX			1
+#define DEBUG_JBM_MATRIX_SOLVE_TRIDIAGONAL_ZERO		1
 /**
- * \def DEBUG_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO
- * \brief Macro deciding if the function jbm_solve_tridiagonal_matrix_zero()
+ * \def DEBUG_JBM_MATRIX_SOLVE_PENTADIAGONAL
+ * \brief Macro deciding if the function jbm_matrix_solve_pentadiagonal() has to
+ *   be debugged.
+ */
+#define DEBUG_JBM_MATRIX_SOLVE_PENTADIAGONAL		1
+/**
+ * \def DEBUG_JBM_MATRIX_SOLVE_PENTADIAGONAL_ZERO
+ * \brief Macro deciding if the function jbm_matrix_solve_pentadiagonal_zero()
  *   has to be debugged.
  */
-#define DEBUG_JBM_SOLVE_TRIDIAGONAL_MATRIX_ZERO		1
-/**
- * \def DEBUG_JBM_SOLVE_PENTADIAGONAL_MATRIX
- * \brief Macro deciding if the function jbm_solve_pentadiagonal_matrix() has
- *   to be debugged.
- */
-#define DEBUG_JBM_SOLVE_PENTADIAGONAL_MATRIX		1
-/**
- * \def DEBUG_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO
- * \brief Macro deciding if the function jbm_solve_pentadiagonal_matrix_zero()
- *   has to be debugged.
- */
-#define DEBUG_JBM_SOLVE_PENTADIAGONAL_MATRIX_ZERO	1
+#define DEBUG_JBM_MATRIX_SOLVE_PENTADIAGONAL_ZERO	1
 /**
  * \def DEBUG_JBM_REGRESSION
  * \brief Macro deciding if the function jbm_regression() has to be debugged.
@@ -1562,20 +1535,20 @@
 #define DEBUG_JBM_REGRESSION_LINEAR					0
 /**
  * \def DEBUG_JBM_REGRESSION_EXPONENTIAL
- * \brief Macro deciding if the function jbm_regression_exponential() has to
- *   be debugged.
+ * \brief Macro deciding if the function jbm_regression_exponential() has to be
+ *   debugged.
  */
 #define DEBUG_JBM_REGRESSION_EXPONENTIAL			1
 /**
  * \def DEBUG_JBM_REGRESSION_MULTILINEAR
- * \brief Macro deciding if the function jbm_regression_multilinear() has to
- *   be debugged.
+ * \brief Macro deciding if the function jbm_regression_multilinear() has to be
+ *   debugged.
  */
 #define DEBUG_JBM_REGRESSION_MULTILINEAR			0
 /**
  * \def DEBUG_JBM_REGRESSION_MULTIEXPONENTIAL
- * \brief Macro deciding if the function jbm_regression_multiexponential()
- *   has to be debugged.
+ * \brief Macro deciding if the function jbm_regression_multiexponential() has
+ *   to be debugged.
  */
 #define DEBUG_JBM_REGRESSION_MULTIEXPONENTIAL		0
 /**
@@ -1585,20 +1558,20 @@
 #define DEBUG_JBM_SPLINE_CUBIC						1
 /**
  * \def DEBUG_JBM_FLUX_LIMITER_SUPERBEE
- * \brief Macro deciding if the function jbm_flux_limiter_superbee() has to
- *   be debugged.
+ * \brief Macro deciding if the function jbm_flux_limiter_superbee() has to be
+ *   debugged.
  */
 #define DEBUG_JBM_FLUX_LIMITER_SUPERBEE				1
 /**
  * \def DEBUG_JBM_FLUX_LIMITER_VANLEER
- * \brief Macro deciding if the function jbm_flux_limiter_VanLeer() has to
- *   be debugged.
+ * \brief Macro deciding if the function jbm_flux_limiter_VanLeer() has to be
+ *   debugged.
  */
 #define DEBUG_JBM_FLUX_LIMITER_VANLEER				1
 /**
  * \def DEBUG_JBM_FLUX_LIMITER_VANALBADA
- * \brief Macro deciding if the function jbm_flux_limiter_VanAlbada() has to
- *   be debugged.
+ * \brief Macro deciding if the function jbm_flux_limiter_VanAlbada() has to be
+ *   debugged.
  */
 #define DEBUG_JBM_FLUX_LIMITER_VANALBADA			1
 /**
@@ -1609,14 +1582,14 @@
 #define DEBUG_JBM_FLUX_LIMITER_MINMOD				1
 /**
  * \def DEBUG_JBM_FLUX_LIMITER_SUPERMIN
- * \brief Macro deciding if the function jbm_flux_limiter_supermin() has to
- *   be debugged.
+ * \brief Macro deciding if the function jbm_flux_limiter_supermin() has to be
+ *   debugged.
  */
 #define DEBUG_JBM_FLUX_LIMITER_SUPERMIN				1
 /**
  * \def DEBUG_JBM_FLUX_LIMITER_MINSUPER
- * \brief Macro deciding if the function jbm_flux_limiter_minsuper() has to
- *   be debugged.
+ * \brief Macro deciding if the function jbm_flux_limiter_minsuper() has to be
+ *   debugged.
  */
 #define DEBUG_JBM_FLUX_LIMITER_MINSUPER				1
 /**
@@ -1657,14 +1630,14 @@
 #define DEBUG_JBM_FLUX_LIMITER_SELECT				1
 /**
  * \def DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS_SORT
- * \brief Macro deciding if the function
- *   jbm_transversal_section_regions_sort() has to be debugged.
+ * \brief Macro deciding if the function jbm_transversal_section_regions_sort()
+ *   has to be debugged.
  */
 #define DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS_SORT	0
 /**
  * \def DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS
- * \brief Macro deciding if the function jbm_transversal_section_regions()
- *   has to be debugged.
+ * \brief Macro deciding if the function jbm_transversal_section_regions() has
+ *   to be debugged.
  */
 #define DEBUG_JBM_TRANSVERSAL_SECTION_REGIONS		0
 /**
@@ -1681,26 +1654,23 @@
 #define DEBUG_JBM_VARRAY_SEARCH_EXTENDED			0
 /**
  * \def DEBUG_JBM_VARRAY_MAX
- * \brief Macro deciding if the function jbm_varray_max() has to be
- *   debugged.
+ * \brief Macro deciding if the function jbm_varray_max() has to be debugged.
  */
 #define DEBUG_JBM_VARRAY_MAX						0
 /**
  * \def DEBUG_JBM_VARRAY_MIN
- * \brief Macro deciding if the function jbm_varray_min() has to be
- *   debugged.
+ * \brief Macro deciding if the function jbm_varray_min() has to be debugged.
  */
 #define DEBUG_JBM_VARRAY_MIN						0
 /**
  * \def DEBUG_JBM_VARRAY_MAXMIN
- * \brief Macro deciding if the function jbm_varray_maxmin() has to be
- *   debugged.
+ * \brief Macro deciding if the function jbm_varray_maxmin() has to be debugged.
  */
 #define DEBUG_JBM_VARRAY_MAXMIN						0
 /**
  * \def DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR
- * \brief Macro deciding if the function jbm_varray_mean_square_error() has
- *   to be debugged.
+ * \brief Macro deciding if the function jbm_varray_mean_square_error() has to
+ *   be debugged.
  */
 #define DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR			0
 /**
@@ -1710,10 +1680,28 @@
  */
 #define DEBUG_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR		0
 /**
- * \def DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
- * \brief Macro deciding if the function jbm_file_mean_square_error() has to
+ * \def DEBUG_JBM_VARRAY_SOLVE_TRIDIAGONAL
+ * \brief Macro deciding if the function jbm_varray_solve_tridiagonal() has to
  *   be debugged.
  */
+#define DEBUG_JBM_VARRAY_SOLVE_TRIDIAGONAL			1
+/**
+ * \def DEBUG_JBM_VARRAY_SOLVE_TRIDIAGONAL_ZERO
+ * \brief Macro deciding if the function jbm_varray_solve_tridiagonal_zero() has
+ *   to be debugged.
+ */
+#define DEBUG_JBM_VARRAY_SOLVE_TRIDIAGONAL_ZERO		1
+/**
+ * \def DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_file_mean_square_error() has to be
+ *   debugged.
+ */
 #define DEBUG_JBM_FILE_MEAN_SQUARE_ERROR			0
+/**
+ * \def DEBUG_JBM_FILE_ROOT_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_file_root_mean_square_error() has
+ *   to be debugged.
+ */
+#define DEBUG_JBM_FILE_ROOT_MEAN_SQUARE_ERROR		0
 
 #endif
