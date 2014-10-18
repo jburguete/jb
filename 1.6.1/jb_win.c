@@ -32,43 +32,82 @@
  */
 #include "jb_win.h"
 
+#if JBW == JBW_GTK
 /**
  * \var window_parent
  * \brief pointer to the parent GtkWindow struct.
+ */
+GtkWindow *window_parent;
+#endif
+
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+/**
  * \var jbw_graphic_queue
  * \brief GLUT graphic queue.
  * \var jbw_graphic_draw
  * \brief pointer to the function drawing in the GLUT window.
  */
-
-#if JBW == JBW_GTK
-GtkWindow *window_parent;
-#endif
-
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 GQueue jbw_graphic_queue = G_QUEUE_INIT;
 void (*jbw_graphic_draw)();
 #endif
 
+/**
+ * \fn void jbw_show_message(char *title, char *message)
+ * \brief Function to display a message.
+ * \param title
+ * \brief message title.
+ * \param message
+ * \brief message.
+ */
 #if !INLINE_JBW_SHOW_MESSAGE
-void jbw_show_message(char *title, char *message, char *image)
-{_jbw_show_message(title, message, image);}
+void jbw_show_message(char *title, char *message)
+{_jbw_show_message(title, message);}
 #endif
 
+/**
+ * \fn void jbw_show_error(char *message)
+ * \brief Function to display an error message.
+ * \param message
+ * \brief error message.
+ */
 #if !INLINE_JBW_SHOW_ERROR
 void jbw_show_error(char *message) {_jbw_show_error(message);}
 #endif
 
+/**
+ * \fn void jbw_show_error2(char *message1, char* message2)
+ * \brief Function to display two error message2.
+ * \param message1
+ * \brief 1st error message.
+ * \param message2
+ * \brief 2nd error message.
+ */
 #if !INLINE_JBW_SHOW_ERROR2
 void jbw_show_error2(char *message1, char* message2)
 {_jbw_show_error2(message1, message2);}
 #endif
 
+/**
+ * \fn void jbw_show_error3(char *message1, char* message2, char *message3)
+ * \brief Function to display three error message2.
+ * \param message1
+ * \brief 1st error message.
+ * \param message2
+ * \brief 2nd error message.
+ * \param message3
+ * \brief 3rd error message.
+ */
 #if !INLINE_JBW_SHOW_ERROR3
 void jbw_show_error3(char *message1, char* message2, char *message3)
 {_jbw_show_error3(message1, message2, message3);}
 #endif
 
+/**
+ * \fn void jbw_show_warning(char *message)
+ * \brief Function to display a warning message.
+ * \param message
+ * \brief warning message.
+ */
 #if !INLINE_JBW_SHOW_WARNING
 void jbw_show_warning(char *message) {_jbw_show_warning(message);}
 #endif

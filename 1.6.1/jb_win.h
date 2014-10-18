@@ -37,16 +37,16 @@
 
 #if JBW == JBW_NO
 
-static inline void _jbw_show_message(char *title, char *message, char *image)
+static inline void _jbw_show_message(char *title, char *message)
 {printf("%s: %s\n", title, message);}
 #if INLINE_JBW_SHOW_MESSAGE
 	#define jbw_show_message _jbw_show_message
 #else
-	void jbw_show_message(char*, char*, char*);
+	void jbw_show_message(char*, char*);
 #endif
 
 static inline void _jbw_show_error(char *message)
-{jbw_show_message(gettext("Error!"), message, 0);}
+{jbw_show_message(gettext("Error!"), message);}
 #if INLINE_JBW_SHOW_ERROR
 	#define jbw_show_error _jbw_show_error
 #else
@@ -54,7 +54,7 @@ static inline void _jbw_show_error(char *message)
 #endif
 
 static inline void _jbw_show_warning(char *message)
-{jbw_show_message(gettext("Warning!"), message, 0);}
+{jbw_show_message(gettext("Warning!"), message);}
 #if INLINE_JBW_SHOW_WARNING
 	#define jbw_show_warning _jbw_show_warning
 #else
