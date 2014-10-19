@@ -78,37 +78,6 @@ static inline void _jbw_show_warning(char *message)
 	#include <clutter-gtk/clutter-gtk.h>
 #endif
 
-#if GTK_MAJOR_VERSION < 3
-
-#define gtk_widget_get_allocated_width(widget) widget->allocation.width
-#define gtk_widget_get_allocated_height(widget) widget->allocation.height
-
-#if GTK_MINOR_VERSION < 24
-
-typedef GtkComboBox GtkComboBoxText;
-#define GTK_COMBO_BOX_TEXT GTK_COMBO_BOX
-#define gtk_combo_box_text_new gtk_combo_box_new_text
-#define gtk_combo_box_text_append_text gtk_combo_box_append_text
-#define gtk_combo_box_text_prepend_text gtk_combo_box_prepend_text
-#define gtk_combo_box_text_insert_text gtk_combo_box_insert_text
-#define gtk_combo_box_text_remove gtk_combo_box_remove_text
-#define gtk_combo_box_text_get_active_text gtk_combo_box_get_active_text
-
-#endif
-
-static inline void gtk_combo_box_text_remove_all(GtkComboBoxText *combo)
-{
-	do
-	{
-		gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
-		if (gtk_combo_box_get_active(GTK_COMBO_BOX(combo))) break;
-		gtk_combo_box_remove_text(GTK_COMBO_BOX(combo), 0);
-	}
-	while (1);
-}
-
-#endif
-
 extern GtkWindow *window_parent;
 
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
@@ -2551,7 +2520,7 @@ typedef struct _JBWArrayEditor
 	GtkScrolledWindow *scrolled;
 	GtkButton **button_numeric, **button_title;
 	GtkEntry ***matrix_entry;
-	GtkTable *table;
+	GtkGrid *table;
 	int ncolumn, d, n;
 } JBWArrayEditor;
 
@@ -2804,8 +2773,8 @@ static inline void _jbw_array_editor_insert_button
 	editor->button_numeric[row]=(GtkButton*)gtk_button_new_with_label(buffer);
 	gtk_widget_set_sensitive((GtkWidget*)editor->button_numeric[row], 0);
 	k=row+row;
-	gtk_table_attach(editor->table, (GtkWidget*)editor->button_numeric[row],
-		0, 1, k+1, k+3, GTK_FILL, GTK_FILL, 0, 0);
+	gtk_grid_attach(editor->table, (GtkWidget*)editor->button_numeric[row],
+		0, k+1, 1, 2);
 }
 
 #if INLINE_JBW_ARRAY_EDITOR_INSERT_BUTTON
@@ -2821,8 +2790,8 @@ static inline void _jbw_array_editor_insert_entry
 		jb_realloc(editor->matrix_entry[i], (j+1)*sizeof(GtkEntry*));
 	editor->matrix_entry[i][j]=(GtkEntry*)gtk_entry_new();
 	gtk_entry_set_text(editor->matrix_entry[i][j], "0");
-	gtk_table_attach_defaults(editor->table,
-		(GtkWidget*)editor->matrix_entry[i][j], i+1, i+2, k, k+2);
+	gtk_grid_attach(editor->table,
+		(GtkWidget*)editor->matrix_entry[i][j], i+1, k, 1, 2);
 }
 
 #if INLINE_JBW_ARRAY_EDITOR_INSERT_ENTRY
@@ -2837,10 +2806,10 @@ static inline void _jbw_array_editor_insert(JBWArrayEditor *editor)
 	j = editor->n++;
 	jbw_array_editor_insert_button(editor, j);
 	k=j+j;
-	for (i=0; i<editor->d; ++i) jbw_array_editor_insert_entry(editor, i, j, k+1);
+	for (i=0; i<editor->d; ++i)
+		jbw_array_editor_insert_entry(editor, i, j, k+1);
 	if (j>0) for (; i<editor->ncolumn; ++i)
 		jbw_array_editor_insert_entry(editor, i, j-1, k);
-	gtk_table_resize(editor->table, i+1, k+3);
 	gtk_widget_show_all((GtkWidget*)editor->table);
 }
 
@@ -2999,7 +2968,7 @@ static inline JBWArrayEditor* _jbw_array_editor_new
 	JBWArrayEditor *editor;
 	editor=(JBWArrayEditor*)g_malloc(sizeof(JBWArrayEditor));
 	editor->scrolled=(GtkScrolledWindow*)gtk_scrolled_window_new(0, 0);
-	editor->table=(GtkTable*)gtk_table_new(0, 0, 0);
+	editor->table=(GtkGrid*)gtk_grid_new();
 	editor->matrix_entry=(GtkEntry***)g_malloc(ncolumn*sizeof(GtkEntry**));
 	editor->button_title=(GtkButton**)g_malloc(ncolumn*sizeof(GtkButton*));
 	for (i=0; i<ncolumn; ++i)
@@ -3007,8 +2976,8 @@ static inline JBWArrayEditor* _jbw_array_editor_new
 		editor->matrix_entry[i]=0;
 		editor->button_title[i]=(GtkButton*)gtk_button_new_with_label(label[i]);
 		gtk_widget_set_sensitive((GtkWidget*)editor->button_title[i], 0);
-		gtk_table_attach(editor->table, (GtkWidget*)editor->button_title[i],
-			i+1, i+2, 0, 1, GTK_EXPAND|GTK_FILL, GTK_FILL, 0, 0);
+		gtk_grid_attach(editor->table, (GtkWidget*)editor->button_title[i],
+			i+1, 0, 1, 1);
 	}
 	editor->button_numeric=0;
 	editor->ncolumn = ncolumn;
