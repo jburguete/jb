@@ -313,6 +313,7 @@ static inline void _jb_make_time
 	sys_date->tm_year -= 1900;
 	sys_date->tm_mon -= 1;
 	sys_date->tm_sec = 0;
+    sys_date->tm_isdst = 0;
 	sys_t = mktime(sys_date);
 	if (sys_t == -1) *error = -1;
 	*sys_sec += (JBDOUBLE)sys_t;

@@ -1398,7 +1398,7 @@
  * \brief Macro deciding if the function jbm_farray_interpolate() has to be
  *   debugged.
  */
-#define DEBUG_JBM_FARRAY_INTERPOLATE				1
+#define DEBUG_JBM_FARRAY_INTERPOLATE				0
 /**
  * \def DEBUG_JBM_FARRAY_ADD
  * \brief Macro deciding if the function jbm_farray_add() has to be
