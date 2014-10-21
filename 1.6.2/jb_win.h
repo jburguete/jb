@@ -90,9 +90,8 @@ static inline void _jbw_combo_box_set_strings
 {
 	int i;
 	gtk_combo_box_text_remove_all(combo);
-	for (i=0; i<n; ++i) gtk_combo_box_text_append_text(combo, strings[i]);
+	for (i = 0; i < n; ++i) gtk_combo_box_text_append_text(combo, strings[i]);
 }
-
 #if INLINE_JBW_COMBO_BOX_SET_STRINGS
 	#define jbw_combo_box_set_strings _jbw_combo_box_set_strings
 #else
@@ -100,16 +99,15 @@ static inline void _jbw_combo_box_set_strings
 #endif
 
 static inline GtkComboBoxText*
-	_jbw_combo_box_new_with_strings(char **string, int n)
+	_jbw_combo_box_new_with_strings(char **strings, int n)
 {
 	int i;
-	GtkComboBoxText *combo=(GtkComboBoxText*)gtk_combo_box_text_new();
+	GtkComboBoxText *combo = (GtkComboBoxText*)gtk_combo_box_text_new();
 	if (!combo) return 0;
-	for (i=0; i<n; ++i) gtk_combo_box_text_append_text(combo, string[i]);
+	for (i = 0; i < n; ++i) gtk_combo_box_text_append_text(combo, string[i]);
 	gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
 	return combo;
 }
-
 #if INLINE_JBW_COMBO_BOX_NEW_WITH_STRINGS
 	#define jbw_combo_box_new_with_strings _jbw_combo_box_new_with_strings
 #else

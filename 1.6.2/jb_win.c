@@ -114,14 +114,35 @@ void jbw_show_warning(char *message) {_jbw_show_warning(message);}
 
 #if JBW == JBW_GTK
 
+/**
+ * \fn void jbw_combo_box_set_strings(GtkComboBoxText *combo, char **strings, \
+ *   int n)
+ * \brief Function to set the strings of a GtkComboBoxText from an array of
+ *   strings.
+ * \param combo
+ * \brief GtkComboBoxText struct.
+ * \param strings
+ * \brief array of strings.
+ * \param n
+ * \brief strings number.
+ */
 #if !INLINE_JBW_COMBO_BOX_SET_STRINGS
 void jbw_combo_box_set_strings(GtkComboBoxText *combo, char **strings, int n)
 {_jbw_combo_box_set_strings(combo, strings, n);}
 #endif
 
+/**
+ * \fn GtkComboBoxText* jbw_combo_box_new_with_strings(char **strings, int n)
+ * \brief Function to create a GtkComboBoxText from an array of strings.
+ * \param strings
+ * \brief array of strings.
+ * \param n
+ * \brief strings number.
+ * \return new GtkComboBoxText struct data.
+ */
 #if !INLINE_JBW_COMBO_BOX_NEW_WITH_STRINGS
-GtkComboBoxText* jbw_combo_box_new_with_strings(char **string, int n)
-{return _jbw_combo_box_new_with_strings(string, n);}
+GtkComboBoxText* jbw_combo_box_new_with_strings(char **strings, int n)
+{return _jbw_combo_box_new_with_strings(strings, n);}
 #endif
 
 #if !INLINE_JBW_BUTTON_NEW_FROM_STOCK
