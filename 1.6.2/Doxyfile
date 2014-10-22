@@ -2054,6 +2054,8 @@ PREDEFINED             = \
 	INLINE_JBW_SHOW_WARNING=0 \
 	INLINE_JBW_COMBO_BOX_SET_STRINGS=0 \
 	INLINE_JBW_COMBO_BOX_NEW_WITH_STRINGS=0 \
+	INLINE_JBW_ARRAY_RADIO_BUTTONS_SET_ACTIVE=0 \
+	INLINE_JBW_ARRAY_RADIO_BUTTONS_GET_ACTIVE=0 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

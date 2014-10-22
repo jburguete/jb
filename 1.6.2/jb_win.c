@@ -150,12 +150,30 @@ JBWButton* jbw_button_new_from_stock(char *image)
 {return _jbw_button_new_from_stock(char *image);}
 #endif
 
+/**
+ * \fn void jbw_array_radio_buttons_set_active(GtkRadioButton **array, int n, \
+ *   int is_active)
+ * \brief Function to set active a GtkRadioButton of an array.
+ * \param array
+ * \brief array of GtkRadioButton structs.
+ * \param n
+ * \brief number of GtkRadioButton structs.
+ * \param is_active
+ * \brief number of the GtkRadioButton struct to active.
+ */
 #if !INLINE_JBW_ARRAY_RADIO_BUTTONS_SET_ACTIVE
 void jbw_array_radio_buttons_set_active
 	(GtkRadioButton **array, int n, int is_active)
 {_jbw_array_radio_buttons_set_active(array, n, is_active);}
 #endif
 
+/**
+ * \fn int jbw_array_radio_buttons_get_active(GtkRadioButton **array)
+ * \brief Function to get the active GtkRadioButton of an array.
+ * \param array
+ * \brief array of GtkRadioButton structs.
+ * \brief element number of the active GtkRadioButton struct.
+ */
 #if !INLINE_JBW_ARRAY_RADIO_BUTTONS_GET_ACTIVE
 int jbw_array_radio_buttons_get_active(GtkRadioButton **array)
 {return _jbw_array_radio_buttons_get_active(array);}

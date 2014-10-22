@@ -145,7 +145,6 @@ static inline JBWButton* _jbw_button_new_from_stock(char *image)
 static inline void _jbw_array_radio_buttons_set_active
 	(GtkRadioButton **array, int n, int is_active)
 {gtk_toggle_button_set_active((GtkToggleButton*)array[n], is_active);}
-
 #if INLINE_JBW_ARRAY_RADIO_BUTTONS_SET_ACTIVE
 	#define jbw_array_radio_buttons_set_active \
 		_jbw_array_radio_buttons_set_active
@@ -155,11 +154,10 @@ static inline void _jbw_array_radio_buttons_set_active
 
 static inline int _jbw_array_radio_buttons_get_active(GtkRadioButton **array)
 {
-	register int i=0;
+	register int i = 0;
 	while (!gtk_toggle_button_get_active((GtkToggleButton*)array[i])) ++i;
 	return i;
 }
-
 #if INLINE_JBW_ARRAY_RADIO_BUTTONS_GET_ACTIVE
 	#define jbw_array_radio_buttons_get_active \
 		_jbw_array_radio_buttons_get_active
