@@ -157,9 +157,9 @@ JBWButton* jbw_button_new_from_stock(char *image)
  * \param array
  * \brief array of GtkRadioButton structs.
  * \param n
- * \brief number of GtkRadioButton structs.
+ * \brief number of the GtkRadioButton struct to set active.
  * \param is_active
- * \brief number of the GtkRadioButton struct to active.
+ * \brief 1 on active, 0 on deactive.
  */
 #if !INLINE_JBW_ARRAY_RADIO_BUTTONS_SET_ACTIVE
 void jbw_array_radio_buttons_set_active
