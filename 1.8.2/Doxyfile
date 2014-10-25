@@ -38,7 +38,7 @@ PROJECT_NAME           = "JB"
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = "1.8.0"
+PROJECT_NUMBER         = "1.8.2"
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -2056,6 +2056,12 @@ PREDEFINED             = \
 	INLINE_JBW_COMBO_BOX_NEW_WITH_STRINGS=0 \
 	INLINE_JBW_ARRAY_RADIO_BUTTONS_SET_ACTIVE=0 \
 	INLINE_JBW_ARRAY_RADIO_BUTTONS_GET_ACTIVE=0 \
+	INLINE_JBW_INT_ENTRY_SET_VALUE_WITH_FORMAT=0 \
+	INLINE_JBW_INT_ENTRY_SET_VALUE=0 \
+	INLINE_JBW_INT_ENTRY_GET_VALUE=0 \
+	INLINE_JBW_FLOAT_ENTRY_SET_VALUE_WITH_FORMAT=0 \
+	INLINE_JBW_FLOAT_ENTRY_SET_VALUE=0 \
+	INLINE_JBW_FLOAT_ENTRY_GET_VALUE=0 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

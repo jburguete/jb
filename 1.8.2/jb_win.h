@@ -152,7 +152,6 @@ static inline void _jbw_int_entry_set_value_with_format
 	snprintf(buffer, 64, format, value);
 	gtk_entry_set_text((GtkEntry*)entry, buffer);
 }
-
 #if INLINE_JBW_INT_ENTRY_SET_VALUE_WITH_FORMAT
 	#define jbw_int_entry_set_value_with_format \
 		_jbw_int_entry_set_value_with_format
@@ -164,7 +163,6 @@ static inline void _jbw_int_entry_set_value(JBWIntEntry *entry, long value)
 {
 	jbw_int_entry_set_value_with_format(entry, "%ld", value);
 }
-
 #if INLINE_JBW_INT_ENTRY_SET_VALUE
 	#define jbw_int_entry_set_value _jbw_int_entry_set_value
 #else
@@ -177,7 +175,6 @@ static inline long _jbw_int_entry_get_value(JBWIntEntry *entry)
 	sscanf(gtk_entry_get_text((GtkEntry*)entry), "%ld", &value);
 	return value;
 }
-
 #if INLINE_JBW_INT_ENTRY_GET_VALUE
 	#define jbw_int_entry_get_value _jbw_int_entry_get_value
 #else
@@ -194,7 +191,6 @@ static inline void _jbw_float_entry_set_value_with_format
 	snprintf(buffer, 64, format, value);
 	gtk_entry_set_text((GtkEntry*)entry, buffer);
 }
-
 #if INLINE_JBW_FLOAT_ENTRY_SET_VALUE_WITH_FORMAT
 	#define jbw_float_entry_set_value_with_format \
 		_jbw_float_entry_set_value_with_format
@@ -208,7 +204,6 @@ static inline void _jbw_float_entry_set_value
 {
 	jbw_float_entry_set_value_with_format(entry, FPL, value);
 }
-
 #if INLINE_JBW_FLOAT_ENTRY_SET_VALUE
 	#define jbw_float_entry_set_value _jbw_float_entry_set_value
 #else
@@ -221,7 +216,6 @@ static inline JBDOUBLE _jbw_float_entry_get_value(JBWFloatEntry *entry)
 	sscanf(gtk_entry_get_text((GtkEntry*)entry), FRL, &value);
 	return value;
 }
-
 #if INLINE_JBW_FLOAT_ENTRY_GET_VALUE
 	#define jbw_float_entry_get_value _jbw_float_entry_get_value
 #else
@@ -2325,7 +2319,8 @@ static inline void _jbw_graphic_dialog_save(JBWGraphic *graphic)
 	dlg = (GtkFileChooserDialog*)gtk_file_chooser_dialog_new
 		(gettext("Save graphical"), window_parent,
 		GTK_FILE_CHOOSER_ACTION_SAVE,
-		GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+		gettext("_OK"), GTK_RESPONSE_OK,
+		gettext("_Cancel"), GTK_RESPONSE_CANCEL, NULL);
 	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dlg), filter);
 	gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER(dlg), 1);
 	if (gtk_dialog_run((GtkDialog*)dlg) == GTK_RESPONSE_OK)

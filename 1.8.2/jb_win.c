@@ -174,33 +174,86 @@ int jbw_array_radio_buttons_get_active(GtkRadioButton **array)
 {return _jbw_array_radio_buttons_get_active(array);}
 #endif
 
+/**
+ * \fn void jbw_int_entry_set_value_with_format(JBWIntEntry *entry, \
+ *   char *format, long value)
+ * \brief Function to set a JBWIntEntry struct with a formated integer value.
+ * \param entry
+ * \brief JBWIntEntry struct.
+ * \param format
+ * \brief c-format string.
+ * \param value
+ * \brief integer value.
+ */
 #if !INLINE_JBW_INT_ENTRY_SET_VALUE_WITH_FORMAT
 void jbw_int_entry_set_value_with_format
 	(JBWIntEntry *entry, char *format, long value)
 {_jbw_int_entry_set_value_with_format(entry, format, value);}
 #endif
 
+/**
+ * \fn void jbw_int_entry_set_value(JBWIntEntry *entry, long value)
+ * \brief Function to set a JBWIntEntry struct with an integer value.
+ * \param entry
+ * \brief JBWIntEntry struct.
+ * \param value
+ * \brief integer value.
+ */
 #if !INLINE_JBW_INT_ENTRY_SET_VALUE
 void jbw_int_entry_set_value(JBWIntEntry *entry, long value)
 {_jbw_int_entry_set_value(entry, value);}
 #endif
 
+/**
+ * \fn long jbw_int_entry_get_value(JBWIntEntry *entry)
+ * \brief Function to get an integer value from a JBWIntEntry struct.
+ * \param entry
+ * \brief JBWIntEntry struct.
+ * \return integer value.
+ */
 #if !INLINE_JBW_INT_ENTRY_GET_VALUE
 long jbw_int_entry_get_value(JBWIntEntry *entry)
 {return _jbw_int_entry_get_value(entry);}
 #endif
 
+/**
+ * \fn void jbw_float_entry_set_value_with_format(JBWFloatEntry *entry, \
+ *   char *format, JBDOUBLE value)
+ * \brief Function to set a JBWFloatEntry struct with a formated floating point
+ *   value.
+ * \param entry
+ * \brief JBWFloatEntry struct.
+ * \param format
+ * \brief c-format string.
+ * \param value
+ * \brief floating point value.
+ */
 #if !INLINE_JBW_FLOAT_ENTRY_SET_VALUE_WITH_FORMAT
 void jbw_float_entry_set_value_with_format
 	(JBWFloatEntry *entry, char *format, JBDOUBLE value)
 {_jbw_float_entry_set_value_with_format(entry, format, value);}
 #endif
 
+/**
+ * \fn void jbw_float_entry_set_value(JBWFloatEntry *entry, JBDOUBLE value)
+ * \brief Function to set a JBWFloatEntry struct with a floating point value.
+ * \param entry
+ * \brief JBWFloatEntry struct.
+ * \param value
+ * \brief floating point value.
+ */
 #if !INLINE_JBW_FLOAT_ENTRY_SET_VALUE
 void jbw_float_entry_set_value(JBWFloatEntry *entry, JBDOUBLE value)
 {_jbw_float_entry_set_value(entry, value);}
 #endif
 
+/**
+ * \fn JBDOUBLE jbw_float_entry_get_value(JBWFloatEntry *entry)
+ * \brief Function to get a floating point value from a JBWFloatEntry struct.
+ * \param entry
+ * \brief JBWFloatEntry struct.
+ * \return floating point value.
+ */
 #if !INLINE_JBW_FLOAT_ENTRY_GET_VALUE
 JBDOUBLE jbw_float_entry_get_value(JBWFloatEntry *entry)
 {return _jbw_float_entry_get_value(entry);}
