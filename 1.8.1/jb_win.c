@@ -145,11 +145,6 @@ GtkComboBoxText* jbw_combo_box_new_with_strings(char **strings, int n)
 {return _jbw_combo_box_new_with_strings(strings, n);}
 #endif
 
-#if !INLINE_JBW_BUTTON_NEW_FROM_STOCK
-JBWButton* jbw_button_new_from_stock(char *image)
-{return _jbw_button_new_from_stock(char *image);}
-#endif
-
 /**
  * \fn void jbw_array_radio_buttons_set_active(GtkRadioButton **array, int n, \
  *   int is_active)

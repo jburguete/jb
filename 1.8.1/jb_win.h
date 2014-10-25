@@ -119,29 +119,6 @@ static inline GtkComboBoxText*
     	g_signal_connect_data((instance), (detailed_signal), (c_handler), \
 			(data), 0, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
 
-#define JBWButton GtkButton
-
-#define jbw_button_ok_new() \
-	((JBWButton*)gtk_button_new_from_stock(GTK_STOCK_OK))
-#define jbw_button_cancel_new() \
-	((JBWButton*)gtk_button_new_from_stock(GTK_STOCK_CANCEL))
-
-static inline JBWButton* _jbw_button_new_from_stock(char *image)
-{
-	register JBWButton *button;
-	button=(JBWButton*)gtk_button_new();
-	if (image) gtk_container_add((GtkContainer*)button,
-		(GtkWidget*)gtk_image_new_from_icon_name(image,
-			GTK_ICON_SIZE_SMALL_TOOLBAR));
-	return button;
-}
-
-#if INLINE_JBW_BUTTON_NEW_FROM_STOCK
-	#define jbw_button_new_from_stock _jbw_button_new_from_stock
-#else
-	JBWButton* jbw_button_new_from_stock(char*);
-#endif
-
 static inline void _jbw_array_radio_buttons_set_active
 	(GtkRadioButton **array, int n, int is_active)
 {gtk_toggle_button_set_active((GtkToggleButton*)array[n], is_active);}
