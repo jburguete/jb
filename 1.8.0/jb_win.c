@@ -211,11 +211,6 @@ JBDOUBLE jbw_float_entry_get_value(JBWFloatEntry *entry)
 {return _jbw_float_entry_get_value(entry);}
 #endif
 
-#if !INLINE_JBW_MENU_ITEM_NEW
-JBWMenuItem* jbw_menu_item_new(char *string, char *image)
-{return _jbw_menu_item_new(string, image);}
-#endif
-
 #if JBW_DRAW == JBW_DRAW_CAIRO
 
 #if !INLINE_JBW_DRAW_RECTANGLE
