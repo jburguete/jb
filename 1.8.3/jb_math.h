@@ -36,6 +36,11 @@
 #include "jb_def.h"
 #include <sys/param.h>
 
+// To work in some BSD systems
+#ifndef M_PIl
+	#define M_PIl M_PI
+#endif
+
 /**
  * \def JBM_G
  * \brief Gravity constant
