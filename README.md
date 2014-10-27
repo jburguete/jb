@@ -1,4 +1,4 @@
-JB (1.8.2 version)
+JB (1.8.3 version)
 ==================
 
 A library with some useful functions of mathematics, graphics, widgets and XML
@@ -20,7 +20,7 @@ FILES
 MAKING REFERENCE MANUAL INSTRUCTIONS
 ------------------------------------
 
-* cd 1.8.2
+* cd 1.8.3
 * doxygen
 * cd doc/latex
 * make
