@@ -1,4 +1,4 @@
-JB (1.8.3 version)
+JB (1.8.4 version)
 ==================
 
 A library with some useful functions of mathematics, graphics, widgets and XML
@@ -17,10 +17,10 @@ FILES
 * *.c: Source files.
 * Doxyfile: configuration file to generate doxygen documentation.
 
-MAKING REFERENCE MANUAL INSTRUCTIONS
-------------------------------------
+MAKING REFERENCE MANUAL INSTRUCTIONS (doc/latex/refman.pdf file)
+----------------------------------------------------------------
 
-> $ cd 1.8.3
+> $ cd 1.8.4
 >
 > $ doxygen
 >

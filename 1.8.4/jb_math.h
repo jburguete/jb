@@ -1000,9 +1000,9 @@ static inline JBDOUBLE _jbm_solve_cubic_reduced
 	{
 		k1 = sqrtl(k2);
 		k2 = k0 + k1;
-		if (k2 < 0.L) k2 = -powl(-k2, 1.L/3.L); else k2 = powl(k2, 1.L/3.L);
+		k2 = cbrtl(k2);
 		k0 -= k1;
-		if (k0 < 0.L) k2 -= powl(-k0, 1.L/3.L); else k2 += powl(k0, 1.L/3.L);
+		k2 += cbrtl(k0);
 		k2 -= a;
 	}
 	#if DEBUG_JBM_SOLVE_CUBIC_REDUCED
