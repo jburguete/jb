@@ -1110,7 +1110,7 @@ static inline void _jbm_index_sort_merge(JBFLOAT *x, int *ni, int n)
 		for (i = 0; i <= n; ++i)
 			fprintf(stderr, "JBM ism i=%d x="FWF" ni=%d\n", i, x[ni[i]], ni[i]);
 	#endif
-	j=JBM_INDEX_SORT_MERGE_MIN;
+	j = JBM_INDEX_SORT_MERGE_MIN;
 	for (i = 0; i <= n - j; i += j) jbm_index_sort_insertion(x, ni + i, j - 1);
 	if (i < n) jbm_index_sort_insertion(x, ni + i, n - i);
 	#if DEBUG_JBM_INDEX_SORT_MERGE
