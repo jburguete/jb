@@ -28,9 +28,9 @@ BUILDING THIS LIBRARY ON OTHER PROGRAMS
 > $ ln -s PATH_TO_THE_JB_LIBRARY/1.8.4 jb
 
 2. Include the config and the used utility headers on your source code i.e.:
-> \#include <jb/jb_config.h>
+> \#include \<jb/jb_config.h\>
 >
-> \#include <jb/jb_math.h>
+> \#include \<jb/jb_math.h\>
 
 3. Build the used utility source code i.e.:
 > $ gcc -c jb/jb_math.c -o jb_math.o
