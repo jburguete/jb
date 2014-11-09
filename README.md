@@ -12,10 +12,12 @@ AUTHORS
 FILES
 -----
 
+* README.md: Readme file
 * TODO: List of tasks TO DO (in spanish)
 * *.h: Header files.
 * *.c: Source files.
 * Doxyfile: configuration file to generate doxygen documentation.
+* makefile: to build the tests.
 
 MAKING REFERENCE MANUAL INSTRUCTIONS (doc/latex/refman.pdf file)
 ----------------------------------------------------------------
