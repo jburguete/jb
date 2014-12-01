@@ -407,7 +407,7 @@ void jb_xml_node_set_content_file(xmlNode *node, FILE *file)
 	fseek(file, 0, SEEK_SET);
 	l = fread(buffer, 1, l, file);
 	buffer[l] = 0;
-	xmlNodeSetContent(node, buffer);
+	xmlNodeSetContent(node, (const xmlChar*)buffer);
 	g_free(buffer);
 }
 #endif
