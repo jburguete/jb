@@ -324,11 +324,11 @@ static inline void _jb_make_time
 	void jb_make_time(struct tm *sys_date, JBDOUBLE *sys_sec, int *error);
 #endif
 
-static inline JBDOUBLE _jb_get_time(char *string,int *error)
+static inline JBDOUBLE _jb_get_time(char *string, int *error)
 {
 	struct tm sys_date[1];
 	JBDOUBLE sys_sec;
-	*error = sscanf(string,"%d%d%d%d%d"FRL,
+	*error = sscanf(string, "%d%d%d%d%d"FRL,
 		&sys_date->tm_year,
 		&sys_date->tm_mon,
 		&sys_date->tm_mday,
