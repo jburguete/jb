@@ -2912,12 +2912,14 @@ static inline void _jbw_array_editor_destroy(JBWArrayEditor *editor)
 #endif
 
 static inline JBWArrayEditor* _jbw_array_editor_new
-	(int ncolumn, int d, int n, char **label)
+	(int ncolumn, int d, int n, const char **label)
 {
 	register int i;
 	JBWArrayEditor *editor;
 	editor = (JBWArrayEditor*)g_malloc(sizeof(JBWArrayEditor));
 	editor->scrolled = (GtkScrolledWindow*)gtk_scrolled_window_new(0, 0);
+	gtk_widget_set_hexpand(GTK_WIDGET(editor->scrolled), TRUE);
+	gtk_widget_set_vexpand(GTK_WIDGET(editor->scrolled), TRUE);
 	editor->table = (GtkGrid*)gtk_grid_new();
 	editor->matrix_entry = (GtkEntry***)g_malloc(ncolumn * sizeof(GtkEntry**));
 	editor->button_title = (GtkButton**)g_malloc(ncolumn * sizeof(GtkButton*));
@@ -2944,7 +2946,7 @@ static inline JBWArrayEditor* _jbw_array_editor_new
 #if INLINE_JBW_ARRAY_EDITOR_NEW
 	#define jbw_array_editor_new _jbw_array_editor_new
 #else
-	JBWArrayEditor* jbw_array_editor_new(int, int, int, char**);
+	JBWArrayEditor* jbw_array_editor_new(int, int, int, const char**);
 #endif
 
 #endif

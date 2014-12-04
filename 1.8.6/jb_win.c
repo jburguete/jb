@@ -814,7 +814,8 @@ void jbw_array_editor_destroy(JBWArrayEditor *editor)
 #endif
 
 #if !INLINE_JBW_ARRAY_EDITOR_NEW
-JBWArrayEditor* jbw_array_editor_new(int ncolumn, int d, int n, char **label)
+JBWArrayEditor* jbw_array_editor_new
+	(int ncolumn, int d, int n, const char **label)
 {return _jbw_array_editor_new(ncolumn, d, n, label);}
 #endif
 

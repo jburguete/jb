@@ -1,0 +1,6 @@
+#!/bin/bash
+sed -i 's/$1/$2/g' $1/{Doxyfile,README.md}
+cp $1/README.md .
+git mv $1 $2
+rm jb
+ln -s $2 jb
