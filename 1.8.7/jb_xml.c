@@ -372,7 +372,7 @@ FILE* jb_xml_node_get_content_file(xmlNode *node, char **buffer)
 	*buffer = (char*)xmlNodeGetContent(node);
 	if (!*buffer) return 0;
 	l = strlen(*buffer);
-	#if defined(G_OS_WIN32) || defined(BSD) || defined(sun)
+	#if defined(G_OS_WIN32) || defined(BSD) || defined(__sun)
 		int k;
 		file = g_fopen("node.tmp", "w");
 		if (!file) goto exit1;
