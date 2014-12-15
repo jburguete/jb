@@ -1572,6 +1572,26 @@ static inline void _jbw_graphic_set_logo(JBWGraphic *graphic, char *name)
 	void jbw_graphic_set_logo(JBWGraphic*, char*);
 #endif
 
+static inline void _jbw_graphic_get_display_size(JBWGraphic *graphic)
+{
+	graphic->x1 = graphic->y1 = 0;
+#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
+	graphic->x2 =
+		gtk_widget_get_allocated_width(GTK_WIDGET(graphic->drawing_area));
+	graphic->y2 =
+		gtk_widget_get_allocated_height(GTK_WIDGET(graphic->drawing_area));
+#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+	graphic->x2 = glutGet(GLUT_WINDOW_WIDTH);
+	graphic->y2 = glutGet(GLUT_WINDOW_HEIGHT);
+#endif
+}
+
+#if INLINE_JBW_GRAPHIC_GET_DISPLAY_SIZE
+	#define jbw_graphic_get_display_size _jbw_graphic_get_display_size
+#else
+	void jbw_graphic_get_display_size(JBWGraphic *graphic);
+#endif
+
 static inline void _jbw_graphic_draw_string
 	(JBWGraphic *graphic, char *string, double x, double y)
 {
@@ -1585,8 +1605,72 @@ static inline void _jbw_graphic_draw_string
 #if INLINE_JBW_GRAPHIC_DRAW_STRING
 	#define jbw_graphic_draw_string _jbw_graphic_draw_string
 #else
-void jbw_graphic_draw_string
-	(JBWGraphic *graphic, char *string, double x, double y);
+	void jbw_graphic_draw_string
+		(JBWGraphic *graphic, char *string, double x, double y);
+#endif
+
+static inline void _jbw_graphic_map_resize(JBWGraphic *graphic)
+{
+	register JBDOUBLE vw, vh, cw, ch;
+	vw = graphic->x2 - graphic->x1;
+	vh = graphic->y2 - graphic->y1;
+	cw = graphic->xmax - graphic->xmin;
+	ch = graphic->ymax - graphic->ymin;
+	vw /= cw;
+	vh /= ch;
+	vw /= vh;
+	if (vw>1.)
+	{
+		vw-=1.;
+		vw/=2;
+		vw*=cw;
+		graphic->xmax += vw;
+		graphic->xmin -= vw;
+	}
+	else
+	{
+		vh=1./vw;
+		vh-=1.;
+		vh/=2;
+		vh*=ch;
+		graphic->ymax += vh;
+		graphic->ymin -= vh;
+	}
+}
+
+#if INLINE_JBW_GRAPHIC_MAP_RESIZE
+	#define jbw_graphic_map_resize _jbw_graphic_map_resize
+#else
+	void jbw_graphic_map_resize(JBWGraphic*);
+#endif
+
+static inline void _jbw_graphic_draw_resize
+	(JBWGraphic *graphic, JBFLOAT *x, JBFLOAT *y1, JBFLOAT *y2, JBFLOAT *z1, JBFLOAT *z2, int n)
+{
+	JBDOUBLE k1, k2;
+	int i=n-1;
+	jbm_farray_maxmin(x, i, &graphic->xmax, &graphic->xmin);
+	if (y1) jbm_farray_maxmin(y1, i, &graphic->ymax, &graphic->ymin);
+	if (y2)
+	{
+		jbm_farray_maxmin(y2, i, &k2, &k1);
+		graphic->ymax = fmaxl(graphic->ymax, k2);
+		graphic->ymin = fminl(graphic->ymin, k1);
+	}
+	if (z1) jbm_farray_maxmin(z1, i, &graphic->zmax, &graphic->zmin);
+	if (z2)
+	{
+		jbm_farray_maxmin(z2, i, &k2, &k1);
+		graphic->zmax = fmaxl(graphic->zmax, k2);
+		graphic->zmin = fminl(graphic->zmin, k1);
+	}
+}
+
+#if INLINE_JBW_GRAPHIC_DRAW_RESIZE
+	#define jbw_graphic_draw_resize _jbw_graphic_draw_resize
+#else
+	void jbw_graphic_draw_resize
+		(JBWGraphic*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
 #endif
 
 static inline void _jbw_graphic_labels(JBWGraphic *graphic)
@@ -1597,16 +1681,7 @@ static inline void _jbw_graphic_labels(JBWGraphic *graphic)
 	JBDOUBLE w, h, x1, x2, y1, y2;
 #endif
 	char buffer[512];
-	graphic->x1 = graphic->y1 = 0;
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-	graphic->x2 =
-		gtk_widget_get_allocated_width(GTK_WIDGET(graphic->drawing_area));
-	graphic->y2 =
-		gtk_widget_get_allocated_height(GTK_WIDGET(graphic->drawing_area));
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
-	graphic->x2 = glutGet(GLUT_WINDOW_WIDTH);
-	graphic->y2 = glutGet(GLUT_WINDOW_HEIGHT);
-#endif
+	jbw_graphic_get_display_size(graphic);
 #if JBW_DRAW == JBW_DRAW_CAIRO
 	cairo_select_font_face(graphic->cr, "Courier",
 		CAIRO_FONT_SLANT_NORMAL,
@@ -1672,6 +1747,7 @@ static inline void _jbw_graphic_labels(JBWGraphic *graphic)
 	if (!graphic->str_y && !graphic->str_yy) graphic->ny = 0;
 	if (!graphic->str_z && !graphic->str_zz) graphic->nz = 0;
 	cairo_set_source_rgb(graphic->cr, 0., 0., 0.);
+	if (graphic->map) jbw_graphic_map_resize(graphic);
 	for (i=0; i<graphic->nx; ++i)
 	{
 		sprintf(buffer, FGL, graphic->xtic[i]);
@@ -1813,6 +1889,7 @@ static inline void _jbw_graphic_labels(JBWGraphic *graphic)
 		graphic->x2 -= (JBW_GRAPHIC_N_CHARS + 1) * graphic->wchar;
 	else 
 		graphic->x2 -= 0.5 * JBW_GRAPHIC_N_CHARS * graphic->wchar;
+	if (graphic->map) jbw_graphic_map_resize(graphic);
 	x1 = ((JBDOUBLE)graphic->x1) / graphic->wchar;
 	x2 = ((JBDOUBLE)graphic->x2) / graphic->wchar;
 	y1 = ((JBDOUBLE)graphic->y1) / graphic->hchar;
@@ -1925,70 +2002,6 @@ static inline void _jbw_graphic_labels(JBWGraphic *graphic)
 	void jbw_graphic_labels(JBWGraphic *graphic);
 #endif
 
-static inline void _jbw_graphic_map_resize(JBWGraphic *graphic)
-{
-	register JBDOUBLE vw, vh, cw, ch;
-	vw = graphic->x2 - graphic->x1;
-	vh = graphic->y2 - graphic->y1;
-	cw = graphic->xmax - graphic->xmin;
-	ch = graphic->ymax - graphic->ymin;
-	vw /= cw;
-	vh /= ch;
-	vw /= vh;
-	if (vw>1.)
-	{
-		vw-=1.;
-		vw/=2;
-		vw*=cw;
-		graphic->xmax += vw;
-		graphic->xmin -= vw;
-	}
-	else
-	{
-		vh=1./vw;
-		vh-=1.;
-		vh/=2;
-		vh*=ch;
-		graphic->ymax += vh;
-		graphic->ymin -= vh;
-	}
-}
-
-#if INLINE_JBW_GRAPHIC_MAP_RESIZE
-	#define jbw_graphic_map_resize _jbw_graphic_map_resize
-#else
-	void jbw_graphic_map_resize(JBWGraphic*);
-#endif
-
-static inline void _jbw_graphic_draw_resize
-	(JBWGraphic *graphic, JBFLOAT *x, JBFLOAT *y1, JBFLOAT *y2, JBFLOAT *z1, JBFLOAT *z2, int n)
-{
-	JBDOUBLE k1, k2;
-	int i=n-1;
-	jbm_farray_maxmin(x, i, &graphic->xmax, &graphic->xmin);
-	if (y1) jbm_farray_maxmin(y1, i, &graphic->ymax, &graphic->ymin);
-	if (y2)
-	{
-		jbm_farray_maxmin(y2, i, &k2, &k1);
-		graphic->ymax = fmaxl(graphic->ymax, k2);
-		graphic->ymin = fminl(graphic->ymin, k1);
-	}
-	if (z1) jbm_farray_maxmin(z1, i, &graphic->zmax, &graphic->zmin);
-	if (z2)
-	{
-		jbm_farray_maxmin(z2, i, &k2, &k1);
-		graphic->zmax = fmaxl(graphic->zmax, k2);
-		graphic->zmin = fminl(graphic->zmin, k1);
-	}
-}
-
-#if INLINE_JBW_GRAPHIC_DRAW_RESIZE
-	#define jbw_graphic_draw_resize _jbw_graphic_draw_resize
-#else
-	void jbw_graphic_draw_resize
-		(JBWGraphic*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, JBFLOAT*, int);
-#endif
-
 static inline void _jbw_graphic_draw_line(JBWGraphic *graphic,
 	double red, double green, double blue, JBFLOAT *x, JBFLOAT *y1, int n)
 {
@@ -1998,7 +2011,6 @@ static inline void _jbw_graphic_draw_line(JBWGraphic *graphic,
 		return;
 	}
 	if (graphic->resize) jbw_graphic_draw_resize(graphic, x, y1, 0, 0, 0, n);
-	if (graphic->map) jbw_graphic_map_resize(graphic);
 	jbw_graphic_labels(graphic);
 #if JBW_DRAW == JBW_DRAW_CAIRO
 	jbw_draw_lines_with_limits(graphic->cr, red, green, blue, 0., 0., 0.,
@@ -2026,7 +2038,6 @@ static inline void _jbw_graphic_draw_lines
 		return;
 	}
 	if (graphic->resize) jbw_graphic_draw_resize(graphic, x, y1, y2, z1, z2, n);
-	if (graphic->map) jbw_graphic_map_resize(graphic);
 	jbw_graphic_labels(graphic);
 #if JBW_DRAW == JBW_DRAW_CAIRO
 	jbw_draw_lines_with_limits(graphic->cr, 0., 0., 1., 0., 1., 0.,
@@ -2074,7 +2085,6 @@ static inline void _jbw_graphic_draw_linesv(JBWGraphic *graphic, void *x,
 			graphic->zmin = fminl(graphic->zmin, k1);
 		}
 	}
-	if (graphic->map) jbw_graphic_map_resize(graphic);
 	jbw_graphic_labels(graphic);
 #if JBW_DRAW == JBW_DRAW_CAIRO
 	jbw_draw_lines_with_limitsv(graphic->cr, 0., 0., 1., 0., 1., 0.,

@@ -583,14 +583,15 @@ void jbw_graphic_set_logo(JBWGraphic *graphic, char *name)
 {_jbw_graphic_set_logo(graphic, name);}
 #endif
 
+#if !INLINE_JBW_GRAPHIC_GET_DISPLAY_SIZE
+void jbw_graphic_get_display_size(JBWGraphic *graphic)
+{_jbw_graphic_get_display_size(graphic);}
+#endif
+
 #if !INLINE_JBW_GRAPHIC_DRAW_STRING
 void jbw_graphic_draw_string
 	(JBWGraphic *graphic, char *string, double x, double y)
 {_jbw_graphic_draw_string(graphic, string, x, y);}
-#endif
-
-#if !INLINE_JBW_GRAPHIC_LABELS
-void jbw_graphic_labels(JBWGraphic *graphic) {_jbw_graphic_labels(graphic);}
 #endif
 
 #if !INLINE_JBW_GRAPHIC_MAP_RESIZE
@@ -602,6 +603,10 @@ void jbw_graphic_map_resize(JBWGraphic *graphic)
 void jbw_graphic_draw_resize(JBWGraphic *graphic, JBFLOAT *x, JBFLOAT *y1,
 	JBFLOAT *y2, JBFLOAT *z1, JBFLOAT *z2, int n)
 {_jbw_graphic_draw_resize(graphic, x, y1, y2, z1, z2, n);}
+#endif
+
+#if !INLINE_JBW_GRAPHIC_LABELS
+void jbw_graphic_labels(JBWGraphic *graphic) {_jbw_graphic_labels(graphic);}
 #endif
 
 #if !INLINE_JBW_GRAPHIC_DRAW_LINE

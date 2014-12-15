@@ -993,16 +993,40 @@
  */
 #define INLINE_JBW_GRAPHIC_SET_LOGO						0
 /**
+ * \def INLINE_JBW_GRAPHIC_GET_DISPLAY_SIZE
+ * \brief Macro deciding if the function jbw_graphic_get_display_size() has to
+ *   be inlined.
+ */
+#define INLINE_JBW_GRAPHIC_GET_DISPLAY_SIZE				0
+/**
  * \def INLINE_JBW_GRAPHIC_DRAW_STRING
  * \brief Macro deciding if the function jbw_graphic_draw_string() has to be
  *   inlined.
  */
 #define INLINE_JBW_GRAPHIC_DRAW_STRING					0
 /**
+ * \def INLINE_JBW_GRAPHIC_MAP_RESIZE
+ * \brief Macro deciding if the function jbw_graphic_map_resize() has to be
+ *   inlined.
+ */
+#define INLINE_JBW_GRAPHIC_MAP_RESIZE					1
+/**
+ * \def INLINE_JBW_GRAPHIC_DRAW_RESIZE
+ * \brief Macro deciding if the function jbw_graphic_draw_resize() has to be
+ *   inlined.
+ */
+#define INLINE_JBW_GRAPHIC_DRAW_RESIZE					0
+/**
  * \def INLINE_JBW_GRAPHIC_LABELS
  * \brief Macro deciding if the function jbw_graphic_labels() has to be inlined.
  */
 #define INLINE_JBW_GRAPHIC_LABELS						0
+/**
+ * \def INLINE_JBW_GRAPHIC_DRAW_LINE
+ * \brief Macro deciding if the function jbw_graphic_draw_line() has to be
+ *   inlined.
+ */
+#define INLINE_JBW_GRAPHIC_DRAW_LINE					1
 /**
  * \def INLINE_JBW_GRAPHIC_DRAW_LINES
  * \brief Macro deciding if the function jbw_graphic_draw_lines() has to be
