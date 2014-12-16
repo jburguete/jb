@@ -2942,7 +2942,7 @@ static inline JBWArrayEditor* _jbw_array_editor_new
 		gtk_grid_attach(editor->table, GTK_WIDGET(editor->button_title[i]),
 			i + 1, 0, 1, 1);
 	}
-	editor->button_numeric=0;
+	editor->button_numeric = 0;
 	editor->ncolumn = ncolumn;
 	editor->d = d;
 	editor->n = 0;
