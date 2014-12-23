@@ -1264,7 +1264,7 @@ static inline void _jbw_draw_range(JBDOUBLE *xmin, JBDOUBLE *xmax)
 	if (m == 0.)
 	{
 		*xmin=-1.;
-		*xmax=1.;
+		*xmax = 1.;
 	}
 	else if ((*xmax - *xmin) / m < 0.0001)
 	{
@@ -1289,7 +1289,7 @@ static inline void _jbw_draw_tics
 	if (h<=0.) return;
 	s=exp10(floor(log10(h)));
 	k=h/s;
-	if (k>5.) s*=10.;
+	if (k>5.) s *= 10.;
 	else if (k>2.5) s*=5.;
 	else if (k>2.) s*=2.5;
 	else if (k>1.) s+=s;
@@ -1308,14 +1308,14 @@ static inline void _jbw_draw_tics
 
 typedef struct
 {
-	int width, height;
+	int width, height, nbytes;
 	GLubyte *image;
 } JBWLogo;
 
 static inline void _jbw_logo_destroy(JBWLogo *logo)
 {
-	g_free(logo->image);
-	g_free(logo);
+	g_slice_free1(logo->nbytes, logo->image);
+	g_slice_free(JBWLogo, logo);
 }
 
 #if INLINE_JBW_LOGO_DESTROY
@@ -1352,17 +1352,19 @@ static inline JBWLogo* _jbw_logo_new(char *name)
 		NULL);
 
 	// creating the logo struct data
-	logo = g_try_malloc(sizeof(JBWLogo));
+	logo = g_slice_new(JBWLogo);
 	if (!logo) goto error2;
 
 	// copying pixels in the OpenGL order
 	logo->width = png_get_image_width(png, info);
 	logo->height = png_get_image_height(png, info);
 	row_bytes = png_get_rowbytes(png, info);
-	logo->image = (GLubyte*)g_try_malloc(row_bytes * logo->height);
+	logo->nbytes = row_bytes * logo->height;
+	logo->image = (GLubyte*)g_slice_alloc(logo->nbytes);
 	if (!logo->image)
 	{
-		jb_free_null((void**)&logo);
+		g_slice_free(JBWLogo, logo);
+		logo = NULL;
 		goto error2;
 	}
 	row_pointers = png_get_rows(png, info);
@@ -1391,7 +1393,7 @@ error1:
 typedef enum
 {
 	JBW_GRAPHIC_TYPE_JPG=0,
-	JBW_GRAPHIC_TYPE_PNG=1,
+	JBW_GRAPHIC_TYPE_PNG = 1,
 	JBW_GRAPHIC_TYPE_XPM=2,
 	JBW_GRAPHIC_TYPE_TIFF=3,
 	JBW_GRAPHIC_TYPE_BMP=4,
@@ -1621,7 +1623,7 @@ static inline void _jbw_graphic_map_resize(JBWGraphic *graphic)
 	vw /= vh;
 	if (vw>1.)
 	{
-		vw-=1.;
+		vw -= 1.;
 		vw/=2;
 		vw*=cw;
 		graphic->xmax += vw;
@@ -1629,8 +1631,8 @@ static inline void _jbw_graphic_map_resize(JBWGraphic *graphic)
 	}
 	else
 	{
-		vh=1./vw;
-		vh-=1.;
+		vh = 1./vw;
+		vh -= 1.;
 		vh/=2;
 		vh*=ch;
 		graphic->ymax += vh;
@@ -1814,7 +1816,7 @@ static inline void _jbw_graphic_labels(JBWGraphic *graphic)
 			k = jbm_extrapolate(graphic->xtic[i], graphic->xmin, graphic->xmax,
 				graphic->x1, graphic->x2);
 			cairo_move_to(graphic->cr, k, graphic->y1);
-			cairo_line_to(graphic->cr, k, graphic->y1+1.);
+			cairo_line_to(graphic->cr, k, graphic->y1 + 1.);
 			cairo_move_to(graphic->cr, k, graphic->y2);
 			cairo_line_to(graphic->cr, k, graphic->y2-1.);
 		}
@@ -1823,7 +1825,7 @@ static inline void _jbw_graphic_labels(JBWGraphic *graphic)
 			k = jbm_extrapolate(graphic->ytic[i], graphic->ymin, graphic->ymax,
 				graphic->y2, graphic->y1);
 			cairo_move_to(graphic->cr, graphic->x1, k);
-			cairo_line_to(graphic->cr, graphic->x1+1., k);
+			cairo_line_to(graphic->cr, graphic->x1 + 1., k);
 		}
 		for (i=0; i<graphic->nz; ++i)
 		{
@@ -1850,14 +1852,14 @@ static inline void _jbw_graphic_labels(JBWGraphic *graphic)
 	k=h;
 	if (graphic->str_title)
 	{
-		k-=1.;
+		k -= 1.;
 		graphic->y2 -= graphic->hchar;
 		jbw_graphic_draw_string(graphic, graphic->str_title,
 			0.5 * (w - strlen(graphic->str_title)), k);
 	}
 	if (graphic->str_y || graphic->str_z)
 	{
-		k-=1.;
+		k -= 1.;
 		graphic->y2 -= graphic->hchar;
 		glColor3f(0., 0., 1.);
 		jbw_graphic_draw_string(graphic, graphic->str_y, 0., k);
@@ -1870,7 +1872,7 @@ static inline void _jbw_graphic_labels(JBWGraphic *graphic)
 	}
 	if (graphic->str_yy || graphic->str_zz)
 	{
-		k-=1.;
+		k -= 1.;
 		graphic->y2 -= graphic->hchar;
 		glColor3f(0., 1., 0.);
 		jbw_graphic_draw_string(graphic, graphic->str_yy, 0., k);
@@ -1924,7 +1926,7 @@ static inline void _jbw_graphic_labels(JBWGraphic *graphic)
 		jbw_graphic_draw_string(graphic, buffer, w - strlen(buffer), k - 0.3);
 	}
 	glColor3f(1., 0., 0.);
-	w=x2+1.;
+	w=x2 + 1.;
 	for (i=0; i<graphic->nz; ++i)
 	{
 		sprintf(buffer, FGL, graphic->ztic[i]);
@@ -2238,7 +2240,7 @@ static inline void _jbw_graphic_save
 	g_object_unref(pixbuf);
 #elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 	int i, x2, y2;
-	unsigned int row_bytes;
+	unsigned int row_bytes, pointers_bytes, pixels_bytes;
 	GLubyte *pixels;
 	FILE *file;
 	png_struct *png;
@@ -2281,13 +2283,15 @@ static inline void _jbw_graphic_save
 	png_write_info(png, info);
 	glViewport(0, 0, x2, y2);
 	row_bytes = 4 * x2;
-	pixels = (GLubyte*)malloc(row_bytes * y2);
+	pixels_bytes = row_bytes * y2;
+	pixels = (GLubyte*)g_slice_alloc(pixels_bytes);
 	glReadPixels
 		(0, 0, x2, y2, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-	row_pointers = (png_byte**)malloc(y2 * sizeof(png_byte*));
+	pointers_bytes = y2 * sizeof(png_byte*);
+	row_pointers = (png_byte**)g_slice_alloc(pointers_bytes);
 	for (i = 0; i < y2; ++i)
 	{
-		row_pointers[i] = (png_byte*)malloc(row_bytes);
+		row_pointers[i] = (png_byte*)g_slice_alloc(row_bytes);
 		memcpy(row_pointers[i], pixels + (y2 - 1 - i) * row_bytes,
 			row_bytes);
 	}
@@ -2297,9 +2301,9 @@ static inline void _jbw_graphic_save
 		exit(0);
 	}
 	png_write_image(png, row_pointers);
-	for (i = 0; i < y2; ++i) free(row_pointers[i]);
-	free(row_pointers);
-	free(pixels);
+	for (i = 0; i < y2; ++i) g_slice_free1(row_bytes, row_pointers[i]);
+	g_slice_free1(pointers_bytes, row_pointers);
+	g_slice_free1(pixels_bytes, pixels);
 	if (setjmp(png_jmpbuf(png)))
 	{
 		printf("Error png_write_end\n");
@@ -2379,7 +2383,7 @@ static inline void _jbw_graphic_destroy(JBWGraphic *graphic)
 	}
 	else glutDestroyWindow(graphic->window);
 #endif
-	g_free(graphic);
+	g_slice_free(JBWGraphic, graphic);
 }
 
 #if INLINE_JBW_GRAPHIC_DESTROY
@@ -2393,7 +2397,7 @@ static inline JBWGraphic* _jbw_graphic_new
 {
 	register JBWGraphic *graphic;
 
-	graphic=(JBWGraphic*)g_malloc(sizeof(JBWGraphic));
+	graphic = g_slice_new(JBWGraphic);
 
 	graphic->resize = graphic->grid = 1;
 	graphic->map = 0;
@@ -2726,15 +2730,15 @@ static inline void _jbw_array_editor_insert_button
 {
 	register int k;
 	char buffer[32];
-	k=row+1;
+	k = row + 1;
 	sprintf(buffer, "%d", k);
 	editor->button_numeric =
-		(GtkButton**)jb_realloc(editor->button_numeric, k*sizeof(GtkButton*));
+		(GtkButton**)jb_realloc(editor->button_numeric, k * sizeof(GtkButton*));
 	editor->button_numeric[row]=(GtkButton*)gtk_button_new_with_label(buffer);
 	gtk_widget_set_sensitive((GtkWidget*)editor->button_numeric[row], 0);
-	k=row+row;
+	k = row + row;
 	gtk_grid_attach(editor->table, (GtkWidget*)editor->button_numeric[row],
-		0, k+1, 1, 2);
+		0, k + 1, 1, 2);
 }
 
 #if INLINE_JBW_ARRAY_EDITOR_INSERT_BUTTON
@@ -2747,11 +2751,11 @@ static inline void _jbw_array_editor_insert_entry
 	(JBWArrayEditor *editor, int i, int j, int k)
 {
 	editor->matrix_entry[i]=(GtkEntry**)
-		jb_realloc(editor->matrix_entry[i], (j+1)*sizeof(GtkEntry*));
+		jb_realloc(editor->matrix_entry[i], (j + 1)*sizeof(GtkEntry*));
 	editor->matrix_entry[i][j]=(GtkEntry*)gtk_entry_new();
 	gtk_entry_set_text(editor->matrix_entry[i][j], "0");
 	gtk_grid_attach(editor->table,
-		(GtkWidget*)editor->matrix_entry[i][j], i+1, k, 1, 2);
+		(GtkWidget*)editor->matrix_entry[i][j], i + 1, k, 1, 2);
 }
 
 #if INLINE_JBW_ARRAY_EDITOR_INSERT_ENTRY
@@ -2767,7 +2771,7 @@ static inline void _jbw_array_editor_insert(JBWArrayEditor *editor)
 	jbw_array_editor_insert_button(editor, j);
 	k=j+j;
 	for (i=0; i<editor->d; ++i)
-		jbw_array_editor_insert_entry(editor, i, j, k+1);
+		jbw_array_editor_insert_entry(editor, i, j, k + 1);
 	if (j>0) for (; i<editor->ncolumn; ++i)
 		jbw_array_editor_insert_entry(editor, i, j-1, k);
 	gtk_widget_show_all((GtkWidget*)editor->table);
@@ -2912,7 +2916,9 @@ static inline void _jbw_array_editor_destroy(JBWArrayEditor *editor)
 	for (i=editor->ncolumn; --i>=0;)
 		jb_free_null((void**)&editor->matrix_entry[i]);
 	jb_free_null((void**)&editor->button_numeric);
-	g_free(editor);
+	g_free(editor->button_title);
+	g_free(editor->matrix_entry);
+	g_slice_free(JBWArrayEditor, editor);
 }
 
 #if INLINE_JBW_ARRAY_EDITOR_DESTROY
@@ -2926,7 +2932,7 @@ static inline JBWArrayEditor* _jbw_array_editor_new
 {
 	register int i;
 	JBWArrayEditor *editor;
-	editor = (JBWArrayEditor*)g_malloc(sizeof(JBWArrayEditor));
+	editor = g_slice_new(JBWArrayEditor);
 	editor->scrolled = (GtkScrolledWindow*)gtk_scrolled_window_new(0, 0);
 	gtk_widget_set_hexpand(GTK_WIDGET(editor->scrolled), TRUE);
 	gtk_widget_set_vexpand(GTK_WIDGET(editor->scrolled), TRUE);
@@ -2935,14 +2941,14 @@ static inline JBWArrayEditor* _jbw_array_editor_new
 	editor->button_title = (GtkButton**)g_malloc(ncolumn * sizeof(GtkButton*));
 	for (i = 0; i < ncolumn; ++i)
 	{
-		editor->matrix_entry[i] = 0;
+		editor->matrix_entry[i] = NULL;
 		editor->button_title[i]
 			= (GtkButton*)gtk_button_new_with_label(label[i]);
 		gtk_widget_set_sensitive(GTK_WIDGET(editor->button_title[i]), 0);
 		gtk_grid_attach(editor->table, GTK_WIDGET(editor->button_title[i]),
 			i + 1, 0, 1, 1);
 	}
-	editor->button_numeric = 0;
+	editor->button_numeric = NULL;
 	editor->ncolumn = ncolumn;
 	editor->d = d;
 	editor->n = 0;
