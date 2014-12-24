@@ -1,4 +1,4 @@
-JB (1.8.9 version)
+JB (1.8.10 version)
 ==================
 
 A library with some useful functions of mathematics, graphics, widgets and XML
@@ -25,7 +25,7 @@ BUILDING THIS LIBRARY ON OTHER PROGRAMS
 1. Linking the latest version on a jb directory i.e.:
 > $ cd YOUR_PROGRAM_PATH
 >
-> $ ln -s PATH_TO_THE_JB_LIBRARY/1.8.9 jb
+> $ ln -s PATH_TO_THE_JB_LIBRARY/1.8.10 jb
 
 2. Include the config and the used utility headers on your source code i.e.:
 > \#include \<jb/jb_config.h\>
@@ -42,7 +42,7 @@ MAKING REFERENCE MANUAL INSTRUCTIONS (doc/latex/refman.pdf file)
 ----------------------------------------------------------------
 
 Execute on a terminal:
-> $ cd PATH_TO_JB_LIBRARY/1.8.9
+> $ cd PATH_TO_JB_LIBRARY/1.8.10
 >
 > $ doxygen
 >

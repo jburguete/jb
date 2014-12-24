@@ -2370,7 +2370,7 @@ static inline void _jbw_graphic_destroy(JBWGraphic *graphic)
 	g_free(graphic->str_yy);
 	g_free(graphic->str_z);
 	g_free(graphic->str_zz);
-	g_free(graphic->logo);
+	jbw_logo_destroy(graphic->logo);
 #if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
 	gtk_widget_destroy((GtkWidget*)graphic->drawing_area);
 #elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
