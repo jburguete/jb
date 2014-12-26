@@ -900,6 +900,437 @@ static inline JBDOUBLE _jbm_farray_root_mean_square_error
 		(JBFLOAT*, JBFLOAT*, int, JBFLOAT*, JBFLOAT*, int);
 #endif
 
+static inline int _jbm_darray_search(JBDOUBLE x, JBDOUBLE *fa, int n)
+{
+	register int i, j;
+	#if DEBUG_JBM_DARRAY_SEARCH
+		fprintf(stderr, "JBM double array search\n");
+	#endif
+	for (i = 0; n - i > 1;)
+	{
+		j = (i + n) >> 1;
+		if (x <= fa[j]) n = j; else i = j;
+	}
+	#if DEBUG_JBM_DARRAY_SEARCH
+		fprintf(stderr, "JBM double array search i=%d\n", i);
+	#endif
+	return i;
+}
+#if INLINE_JBM_DARRAY_SEARCH
+	#define jbm_darray_search _jbm_darray_search
+#else
+	int jbm_darray_search(JBDOUBLE, JBDOUBLE*, int);
+#endif
+
+static inline int _jbm_darray_search_extended(JBDOUBLE x, JBDOUBLE *fa, int n)
+{
+	register int i;
+	#if DEBUG_JBM_DARRAY_SEARCH_EXTENDED
+		fprintf(stderr, "JBM double array search_extended\n");
+	#endif
+	if (x < fa[0]) i = -1;
+	else if (x >= fa[n]) i = n;
+	else i = jbm_darray_search(x, fa, n);
+	#if DEBUG_JBM_DARRAY_SEARCH_EXTENDED
+		fprintf(stderr, "JBM double array search_extended i=%d\n", i);
+	#endif
+	return i;
+}
+#if INLINE_JBM_DARRAY_SEARCH_EXTENDED
+	#define jbm_darray_search_extended _jbm_darray_search_extended
+#else
+	int jbm_darray_search_extended(JBDOUBLE, JBDOUBLE*, int);
+#endif
+
+static inline JBDOUBLE _jbm_darray_max(JBDOUBLE *fa, int n)
+{
+	register int i;
+	register JBDOUBLE k;
+	#if DEBUG_JBM_DARRAY_MAX
+		fprintf(stderr, "JBM double array max\n");
+	#endif
+	k = *fa;
+	for (i = 0; ++i <= n;) k = fmaxl(k, *(++fa));
+	#if DEBUG_JBM_DARRAY_MAX
+		fprintf(stderr, "JBM double array max="FWL"\n", k);
+	#endif
+	return k;
+}
+#if INLINE_JBM_DARRAY_MAX
+	#define jbm_darray_max _jbm_darray_max
+#else
+	JBDOUBLE jbm_darray_max(JBDOUBLE*, int);
+#endif
+
+static inline JBDOUBLE _jbm_darray_min(JBDOUBLE *fa, int n)
+{
+	register int i;
+	register JBDOUBLE k;
+	#if DEBUG_JBM_DARRAY_MIN
+		fprintf(stderr, "JBM double array min\n");
+	#endif
+	k = *fa;
+	for (i = 0; ++i <= n;) k = fminl(k, *(++fa));
+	#if DEBUG_JBM_DARRAY_MIN
+		fprintf(stderr, "JBM double array min="FWL"\n", k);
+	#endif
+	return k;
+}
+#if INLINE_JBM_DARRAY_MIN
+	#define jbm_darray_min _jbm_darray_min
+#else
+	JBDOUBLE jbm_darray_min(JBDOUBLE*, int);
+#endif
+
+static inline void _jbm_darray_maxmin
+	(JBDOUBLE *fa, int n, JBDOUBLE *max, JBDOUBLE *min)
+{
+	register int i;
+	register JBDOUBLE kmax, kmin;
+	#if DEBUG_JBM_DARRAY_MAXMIN
+		fprintf(stderr, "JBM double array maxmin\n");
+	#endif
+	kmax = kmin = *fa;
+	for (i = 0; ++i <= n;)
+	{
+		++fa;
+		if (kmax < *fa) kmax = *fa; else if (kmin > *fa) kmin = *fa;
+	}
+	*max = kmax, *min = kmin;
+	#if DEBUG_JBM_DARRAY_MAXMIN
+		fprintf(stderr, "JBM double array max="FWL" min="FWL"\n", kmax, kmin);
+	#endif
+}
+#if INLINE_JBM_DARRAY_MAXMIN
+	#define jbm_darray_maxmin _jbm_darray_maxmin
+#else
+	void jbm_darray_maxmin(JBDOUBLE*, int, JBDOUBLE*, JBDOUBLE*);
+#endif
+
+static inline JBDOUBLE _jbm_darray_farray_interpolate
+	(JBDOUBLE x, JBDOUBLE *fa, JBFLOAT *fb, int n)
+{
+	register int i;
+	register JBDOUBLE k;
+	#if DEBUG_JBM_DARRAY_FARRAY_INTERPOLATE
+		fprintf(stderr, "JBM double and float array interpolate\n");
+	#endif
+	i = jbm_darray_search(x, fa, n);
+	if (i == n) k = fb[i];
+	else k = jbm_interpolate(x, fa[i], fa[i + 1], fb[i], fb[i + 1]);
+	#if DEBUG_JBM_DARRAY_FARRAY_INTERPOLATE
+		fprintf(stderr, "JBM double and float array interpolate k="FWL"\n", k);
+	#endif
+	return k;
+}
+#if INLINE_JBM_DARRAY_FARRAY_INTERPOLATE
+	#define jbm_darray_farray_interpolate _jbm_darray_farray_interpolate
+#else
+	JBDOUBLE jbm_darray_farray_interpolate(JBDOUBLE, JBDOUBLE*, JBFLOAT*, int);
+#endif
+
+static inline JBDOUBLE _jbm_darray_interpolate
+	(JBDOUBLE x, JBDOUBLE *fa, JBDOUBLE *fb, int n)
+{
+	register int i;
+	register JBDOUBLE k;
+	#if DEBUG_JBM_DARRAY_INTERPOLATE
+		fprintf(stderr, "JBM double array interpolate\n");
+	#endif
+	i = jbm_darray_search(x, fa, n);
+	if (i == n) k = fb[i];
+	else k = jbm_interpolate(x, fa[i], fa[i + 1], fb[i], fb[i + 1]);
+	#if DEBUG_JBM_DARRAY_INTERPOLATE
+		fprintf(stderr, "JBM double array interpolate k="FWL"\n", k);
+	#endif
+	return k;
+}
+#if INLINE_JBM_DARRAY_INTERPOLATE
+	#define jbm_darray_interpolate _jbm_darray_interpolate
+#else
+	JBDOUBLE jbm_darray_interpolate(JBDOUBLE, JBDOUBLE*, JBDOUBLE*, int);
+#endif
+
+static inline JBDOUBLE* _jbm_darray_add
+	(JBDOUBLE *fa, int na, JBDOUBLE *fb, int nb, JBDOUBLE **fc, int *nc)
+{
+	register int i, j, k;
+	register JBDOUBLE *x;
+	#if DEBUG_JBM_DARRAY_ADD
+		fprintf(stderr, "JBM double array add: start\n");
+	#endif
+	*fc = x = (JBDOUBLE*)g_try_malloc((na + nb + 2) * sizeof(JBDOUBLE));
+	if (!x) return 0;
+	for (i = j = k = 0; i <= na || j <= nb;)
+	{
+		if (*fa > *fb)
+		{
+			++j;
+			*x = *(fb++);
+		}
+		else if (*fa < *fb)
+		{
+			++i;
+			*x = *(fa++);
+		}
+		else
+		{
+			++i;
+			++j;
+			++fa;
+			*x = *(fb++);
+		}
+		++k;
+		++x;
+	}
+	*fc = (JBDOUBLE*)jb_try_realloc(*fc, k * sizeof(JBDOUBLE));
+	*nc = --k;
+	#if DEBUG_JBM_DARRAY_ADD
+		fprintf(stderr, "JBM double array add: end\n");
+	#endif
+	return *fc;
+}
+#if INLINE_JBM_DARRAY_ADD
+	#define jbm_darray_add _jbm_darray_add
+#else
+	JBDOUBLE* jbm_darray_add(JBDOUBLE*, int, JBDOUBLE*, int, JBDOUBLE**, int*);
+#endif
+
+static inline JBDOUBLE _jbm_darray_farray_integral
+	(JBDOUBLE *x, JBFLOAT *y, int n, JBDOUBLE x1, JBDOUBLE x2)
+{
+	register int i;
+	register JBDOUBLE *yy, *xx;
+	register JBDOUBLE I, y1;
+
+	#if DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
+		fprintf(stderr, "JBM double and float array integral: start\n");
+	#endif
+	if (n == 0)
+	{
+		I = y[0] * (x2 - x1);
+		goto exit1;
+	}
+	i = jbm_darray_search_extended(x1, x, n);
+	if (i < 0)
+	{
+		i = 0;
+		I = y[0] * (x2 - x1);
+		x1 = x[0];
+		y1 = y[0];
+		xx = x;
+		yy = y;
+		#if DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
+			fprintf(stderr, "JBMDI a I="FWL"\n", I);
+		#endif
+	}
+	else if (i == n)
+	{
+		I = y[i] * (x2 - x1);
+		goto exit1;
+	}
+	else
+	{
+		I = 0.;
+		xx = x + i;
+		yy = y + i;
+		y1 = jbm_extrapolate(x1, xx[0], xx[1], yy[0], yy[1]);
+		#if DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
+			fprintf(stderr, "JBMDI b I="FWL"\n", I);
+		#endif
+	}
+	if (x2 < xx[1])
+	{
+		I += 0.5 * (y1 + jbm_extrapolate(x2, xx[0], xx[1], yy[0], yy[1]))
+			* (x2 - x1);
+		#if DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
+			fprintf(stderr, "JBMDI c I="FWL"\n", I);
+		#endif
+		goto exit1;
+	}
+	I += 0.5 * (y1 + yy[1]) * (xx[1] - x1);
+	#if DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
+		fprintf(stderr, "JBMDI d I="FWL"\n", I);
+	#endif
+	if (++i == n)
+	{
+		I += yy[1] * (x2 - xx[1]);
+		#if DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
+			fprintf(stderr, "JBMDI e I="FWL"\n", I);
+		#endif
+		goto exit1;
+	}
+	while (++i < n && x2 > xx[2])
+	{
+		++xx, ++yy;
+		I += 0.5 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
+		#if DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
+			fprintf(stderr, "JBMDI i=%d I="FWL"\n", i, I);
+		#endif
+	}
+	if (i == n) I += yy[2] * (x2 - xx[1]);
+	else if (x2 < xx[2]) I += 0.5 * (yy[1]
+		+ jbm_extrapolate(x2, xx[1], xx[2], yy[1], yy[2])) * (x2 - xx[1]);
+exit1:
+	#if DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
+		fprintf(stderr, "JBMDI I="FWL"\n", I);
+		fprintf(stderr, "JBM double and float array integral: end\n");
+	#endif
+	return I;
+}
+#if INLINE_JBM_DARRAY_FARRAY_INTEGRAL
+	#define jbm_darray_farray_integral _jbm_darray_farray_integral
+#else
+	JBDOUBLE jbm_darray_farray_integral
+		(JBDOUBLE*, JBFLOAT*, int, JBDOUBLE, JBDOUBLE);
+#endif
+
+static inline JBDOUBLE _jbm_darray_integral
+	(JBDOUBLE *x, JBDOUBLE *y, int n, JBDOUBLE x1, JBDOUBLE x2)
+{
+	register int i;
+	register JBDOUBLE *yy, *xx;
+	register JBDOUBLE I, y1;
+
+	#if DEBUG_JBM_DARRAY_INTEGRAL
+		fprintf(stderr, "JBM double array integral: start\n");
+	#endif
+	if (n == 0)
+	{
+		I = y[0] * (x2 - x1);
+		goto exit1;
+	}
+	i = jbm_darray_search_extended(x1, x, n);
+	if (i < 0)
+	{
+		i = 0;
+		I = y[0] * (x2 - x1);
+		x1 = x[0];
+		y1 = y[0];
+		xx = x;
+		yy = y;
+		#if DEBUG_JBM_DARRAY_INTEGRAL
+			fprintf(stderr, "JBMDI a I="FWL"\n", I);
+		#endif
+	}
+	else if (i == n)
+	{
+		I = y[i] * (x2 - x1);
+		goto exit1;
+	}
+	else
+	{
+		I = 0.;
+		xx = x + i;
+		yy = y + i;
+		y1 = jbm_extrapolate(x1, xx[0], xx[1], yy[0], yy[1]);
+		#if DEBUG_JBM_DARRAY_INTEGRAL
+			fprintf(stderr, "JBMDI b I="FWL"\n", I);
+		#endif
+	}
+	if (x2 < xx[1])
+	{
+		I += 0.5 * (y1 + jbm_extrapolate(x2, xx[0], xx[1], yy[0], yy[1]))
+			* (x2 - x1);
+		#if DEBUG_JBM_DARRAY_INTEGRAL
+			fprintf(stderr, "JBMDI c I="FWL"\n", I);
+		#endif
+		goto exit1;
+	}
+	I += 0.5 * (y1 + yy[1]) * (xx[1] - x1);
+	#if DEBUG_JBM_DARRAY_INTEGRAL
+		fprintf(stderr, "JBMDI d I="FWL"\n", I);
+	#endif
+	if (++i == n)
+	{
+		I += yy[1] * (x2 - xx[1]);
+		#if DEBUG_JBM_DARRAY_INTEGRAL
+			fprintf(stderr, "JBMDI e I="FWL"\n", I);
+		#endif
+		goto exit1;
+	}
+	while (++i < n && x2 > xx[2])
+	{
+		++xx, ++yy;
+		I += 0.5 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
+		#if DEBUG_JBM_DARRAY_INTEGRAL
+			fprintf(stderr, "JBMDI i=%d I="FWL"\n", i, I);
+		#endif
+	}
+	if (i == n) I += yy[2] * (x2 - xx[1]);
+	else if (x2 < xx[2]) I += 0.5 * (yy[1]
+		+ jbm_extrapolate(x2, xx[1], xx[2], yy[1], yy[2])) * (x2 - xx[1]);
+exit1:
+	#if DEBUG_JBM_DARRAY_INTEGRAL
+		fprintf(stderr, "JBMDI I="FWL"\n", I);
+		fprintf(stderr, "JBM double array integral: end\n");
+	#endif
+	return I;
+}
+#if INLINE_JBM_DARRAY_INTEGRAL
+	#define jbm_darray_integral _jbm_darray_integral
+#else
+	JBDOUBLE jbm_darray_integral(JBDOUBLE*, JBDOUBLE*, int, JBDOUBLE, JBDOUBLE);
+#endif
+
+static inline JBDOUBLE _jbm_darray_mean_square_error
+	(JBDOUBLE *xa, JBDOUBLE *fa, int na, JBDOUBLE *xr, JBDOUBLE *fr, int nr)
+{
+	register int i, j;
+	JBDOUBLE k = 0.;
+	#if DEBUG_JBM_DARRAY_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM double array mean square error\n");
+	#endif
+	for (i = 0; i <= na && xa[i] < xr[0]; ++i) k += jbm_fsqr(fa[i] - fr[0]);
+	#if DEBUG_JBM_DARRAY_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBMDMSE i=%d k="FWL"\n", i, k);
+	#endif
+	for (j = 0; i <= na; ++i)
+	{
+		while (j < nr && xa[i] > xr[j+1]) ++j;
+		#if DEBUG_JBM_DARRAY_MEAN_SQUARE_ERROR
+			fprintf(stderr, "JBMDMSE j=%d\n", j);
+		#endif
+		if (j == nr) for (; i<=na; ++i) k += jbm_fsqr(fa[i] - fr[nr]);
+		else k += jbm_fsqr
+			(fa[i] - jbm_extrapolate(xa[i], xr[j], xr[j+1], fr[j], fr[j+1]));
+		#if DEBUG_JBM_DARRAY_MEAN_SQUARE_ERROR
+			fprintf(stderr, "JBMDMSE i=%d j=%d k="FWL"\n", i, j, k);
+		#endif
+	}
+	k /= na + 1;
+	#if DEBUG_JBM_DARRAY_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM double array mean square error="FWL"\n", k);
+	#endif
+	return k;
+}
+#if INLINE_JBM_DARRAY_MEAN_SQUARE_ERROR
+	#define jbm_darray_mean_square_error _jbm_darray_mean_square_error
+#else
+	JBDOUBLE jbm_darray_mean_square_error
+		(JBDOUBLE*, JBDOUBLE*, int, JBDOUBLE*, JBDOUBLE*, int);
+#endif
+
+static inline JBDOUBLE _jbm_darray_root_mean_square_error
+	(JBDOUBLE *xa, JBDOUBLE *fa, int na, JBDOUBLE *xr, JBDOUBLE *fr, int nr)
+{
+	JBDOUBLE k;
+	#if DEBUG_JBM_DARRAY_ROOT_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM double array root_mean square error\n");
+	#endif
+	k = sqrtl(jbm_darray_mean_square_error(xa, fa, na, xr, fr, nr));
+	#if DEBUG_JBM_DARRAY_ROOT_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM double array root_mean square error="FWL"\n", k);
+	#endif
+	return k;
+}
+#if INLINE_JBM_DARRAY_ROOT_MEAN_SQUARE_ERROR
+	#define jbm_darray_root_mean_square_error _jbm_darray_root_mean_square_error
+#else
+	JBDOUBLE jbm_darray_root_mean_square_error
+		(JBDOUBLE*, JBDOUBLE*, int, JBDOUBLE*, JBDOUBLE*, int);
+#endif
+
 static inline JBDOUBLE _jbm_v2_length
 	(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2, JBDOUBLE y2)
 {

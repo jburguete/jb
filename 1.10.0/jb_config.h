@@ -425,6 +425,73 @@
  */
 #define INLINE_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR	1
 /**
+ * \def INLINE_JBM_DARRAY_SEARCH
+ * \brief Macro deciding if the function jbm_darray_search() has to be inlined.
+ */
+#define INLINE_JBM_DARRAY_SEARCH					1
+/**
+ * \def INLINE_JBM_DARRAY_SEARCH_EXTENDED
+ * \brief Macro deciding if the function jbm_darray_search_extended() has to be
+ *   inlined.
+ */
+#define INLINE_JBM_DARRAY_SEARCH_EXTENDED			1
+/**
+ * \def INLINE_JBM_DARRAY_MAX
+ * \brief Macro deciding if the function jbm_darray_max() has to be inlined.
+ */
+#define INLINE_JBM_DARRAY_MAX						1
+/**
+ * \def INLINE_JBM_DARRAY_MIN
+ * \brief Macro deciding if the function jbm_darray_min() has to be inlined.
+ */
+#define INLINE_JBM_DARRAY_MIN						1
+/**
+ * \def INLINE_JBM_DARRAY_MAXMIN
+ * \brief Macro deciding if the function jbm_darray_maxmin() has to be inlined.
+ */
+#define INLINE_JBM_DARRAY_MAXMIN					1
+/**
+ * \def INLINE_JBM_DARRAY_FARRAY_INTERPOLATE
+ * \brief Macro deciding if the function jbm_darray_farray_interpolate() has to
+ *   be inlined.
+ */
+#define INLINE_JBM_DARRAY_FARRAY_INTERPOLATE		1
+/**
+ * \def INLINE_JBM_DARRAY_INTERPOLATE
+ * \brief Macro deciding if the function jbm_darray_interpolate() has to be
+ *   inlined.
+ */
+#define INLINE_JBM_DARRAY_INTERPOLATE				1
+/**
+ * \def INLINE_JBM_DARRAY_ADD
+ * \brief Macro deciding if the function jbm_darray_add() has to be inlined.
+ */
+#define INLINE_JBM_DARRAY_ADD						1
+/**
+ * \def INLINE_JBM_DARRAY_FARRAY_INTEGRAL
+ * \brief Macro deciding if the function jbm_darray_farray_integral() has to be
+ *   inlined.
+ */
+#define INLINE_JBM_DARRAY_FARRAY_INTEGRAL			1
+/**
+ * \def INLINE_JBM_DARRAY_INTEGRAL
+ * \brief Macro deciding if the function jbm_darray_integral() has to be
+ *   inlined.
+ */
+#define INLINE_JBM_DARRAY_INTEGRAL					1
+/**
+ * \def INLINE_JBM_DARRAY_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_darray_mean_square_error() has to
+ *   be inlined.
+ */
+#define INLINE_JBM_DARRAY_MEAN_SQUARE_ERROR			1
+/**
+ * \def INLINE_JBM_DARRAY_ROOT_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_darray_root_mean_square_error() has
+ *   to be inlined.
+ */
+#define INLINE_JBM_DARRAY_ROOT_MEAN_SQUARE_ERROR	1
+/**
  * \def INLINE_JBM_V2_LENGTH
  * \brief Macro deciding if the function jbm_v2_length() has to be inlined.
  */
@@ -1447,6 +1514,75 @@
  *   to be debugged.
  */
 #define DEBUG_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR		0
+/**
+ * \def DEBUG_JBM_DARRAY_SEARCH
+ * \brief Macro deciding if the function jbm_darray_search() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_DARRAY_SEARCH						0
+/**
+ * \def DEBUG_JBM_DARRAY_SEARCH_EXTENDED
+ * \brief Macro deciding if the function jbm_darray_search_extended() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_DARRAY_SEARCH_EXTENDED			0
+/**
+ * \def DEBUG_JBM_DARRAY_MAX
+ * \brief Macro deciding if the function jbm_darray_max() has to be debugged.
+ */
+#define DEBUG_JBM_DARRAY_MAX						0
+/**
+ * \def DEBUG_JBM_DARRAY_MIN
+ * \brief Macro deciding if the function jbm_darray_min() has to be debugged.
+ */
+#define DEBUG_JBM_DARRAY_MIN						0
+/**
+ * \def DEBUG_JBM_DARRAY_MAXMIN
+ * \brief Macro deciding if the function jbm_darray_maxmin() has to be debugged.
+ */
+#define DEBUG_JBM_DARRAY_MAXMIN						0
+/**
+ * \def DEBUG_JBM_DARRAY_FARRAY_INTERPOLATE
+ * \brief Macro deciding if the function jbm_darray_farray_interpolate() has to
+ *   be debugged.
+ */
+#define DEBUG_JBM_DARRAY_FARRAY_INTERPOLATE			0
+/**
+ * \def DEBUG_JBM_DARRAY_INTERPOLATE
+ * \brief Macro deciding if the function jbm_darray_interpolate() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_DARRAY_INTERPOLATE				0
+/**
+ * \def DEBUG_JBM_DARRAY_ADD
+ * \brief Macro deciding if the function jbm_darray_add() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_DARRAY_ADD						1
+/**
+ * \def DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
+ * \brief Macro deciding if the function jbm_darray_farray_integral() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_DARRAY_FARRAY_INTEGRAL			0
+/**
+ * \def DEBUG_JBM_DARRAY_INTEGRAL
+ * \brief Macro deciding if the function jbm_darray_integral() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_DARRAY_INTEGRAL					0
+/**
+ * \def DEBUG_JBM_DARRAY_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_darray_mean_square_error() has to
+ *   be debugged.
+ */
+#define DEBUG_JBM_DARRAY_MEAN_SQUARE_ERROR			0
+/**
+ * \def DEBUG_JBM_DARRAY_ROOT_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_darray_root_mean_square_error() has
+ *   to be debugged.
+ */
+#define DEBUG_JBM_DARRAY_ROOT_MEAN_SQUARE_ERROR		0
 /**
  * \def DEBUG_JBM_V2_LENGTH
  * \brief Macro deciding if the function jbm_v2_length() has to be debugged.

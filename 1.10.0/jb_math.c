@@ -620,6 +620,260 @@ JBDOUBLE jbm_farray_root_mean_square_error
 #endif
 
 /**
+ * \fn int jbm_darray_search(JBDOUBLE x, JBDOUBLE *fa, int n)
+ * \brief Function to search the interval where a number is in a increasingly
+ *   sorted array of JBDOUBLE numbers.
+ * \param x
+ * \brief number.
+ * \param fa
+ * \brief array of JBDOUBLE numbers.
+ * \param n
+ * \brief number of the highest array element.
+ * \return interval number.
+ */
+#if !INLINE_JBM_DARRAY_SEARCH
+int jbm_darray_search(JBDOUBLE x, JBDOUBLE *fa, int n)
+{return _jbm_darray_search(x, fa, n);}
+#endif
+
+/**
+ * \fn int jbm_darray_search_extended(JBDOUBLE x, JBDOUBLE *fa, int n)
+ * \brief Function to search the interval where a number is in a increasingly
+ *   sorted array of JBDOUBLE numbers.
+ * \param x
+ * \brief number.
+ * \param fa
+ * \brief array of JBDOUBLE numbers.
+ * \param n
+ * \brief number of the highest array element.
+ * \return interval number, -1 if x<fa[0] or n if x>fa[n].
+ */
+#if !INLINE_JBM_DARRAY_SEARCH_EXTENDED
+int jbm_darray_search_extended(JBDOUBLE x, JBDOUBLE *fa, int n)
+{return _jbm_darray_search_extended(x, fa, n);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_darray_max(JBDOUBLE *fa, int n)
+ * \brief Function to find the highest element of an array of JBDOUBLE numbers.
+ * \param fa
+ * \brief array of JBDOUBLE numbers.
+ * \param n
+ * \brief number of the ending array element.
+ * \return the highest value.
+ */
+#if !INLINE_JBM_DARRAY_MAX
+JBDOUBLE jbm_darray_max(JBDOUBLE *fa, int n) {return _jbm_darray_max(fa, n);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_darray_min(JBDOUBLE *fa, int n)
+ * \brief Function to find the lowest element of an array of JBDOUBLE numbers.
+ * \param fa
+ * \brief array of JBDOUBLE numbers.
+ * \param n
+ * \brief number of the ending array element.
+ * \return the lowest value.
+ */
+#if !INLINE_JBM_DARRAY_MIN
+JBDOUBLE jbm_darray_min(JBDOUBLE *fa, int n) {return _jbm_darray_min(fa, n);}
+#endif
+
+/**
+ * \fn void jbm_darray_maxmin(JBDOUBLE *fa, int n, JBDOUBLE *max, JBDOUBLE *min)
+ * \brief Function to find the highest and the lowest elements of an array of
+ *   JBDOUBLE numbers.
+ * \param fa
+ * \brief array of JBDOUBLE numbers.
+ * \param n
+ * \brief number of the ending array element.
+ * \param max
+ * \brief the highest value.
+ * \param min
+ * \brief the lowest value.
+ */
+#if !INLINE_JBM_DARRAY_MAXMIN
+void jbm_darray_maxmin(JBDOUBLE *fa, int n, JBDOUBLE *max, JBDOUBLE *min)
+{_jbm_darray_maxmin(fa, n, max, min);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_darray_farray_interpolate(JBDOUBLE x, JBDOUBLE *fa, \
+ *   JBFLOAT *fb, int n)
+ * \brief Function to calculate the y-coordinate of a 2D point interpolated
+ *   between a tabular function defined by 2 arrays of JBDOUBLE numbers.
+ * \param x
+ * \brief x-coordinate of the point.
+ * \param fa
+ * \brief increasingly sorted array of x-coordinates of the tabular function.
+ * \param fb
+ * \brief array of y-coordinates of the tabular function.
+ * \param n
+ * \brief the highest element number of the arrays.
+ * \return y-coordinate of the interpolated point.
+ */
+#if !INLINE_JBM_DARRAY_FARRAY_INTERPOLATE
+JBDOUBLE jbm_darray_farray_interpolate
+	(JBDOUBLE x, JBDOUBLE *fa, JBFLOAT *fb, int n)
+{return _jbm_darray_farray_interpolate(x, fa, fb, n);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_darray_interpolate(JBDOUBLE x, JBDOUBLE *fa, JBDOUBLE *fb, \
+ *   int n)
+ * \brief Function to calculate the y-coordinate of a 2D point interpolated
+ *   between a tabular function defined by 2 arrays of JBDOUBLE numbers.
+ * \param x
+ * \brief x-coordinate of the point.
+ * \param fa
+ * \brief increasingly sorted array of x-coordinates of the tabular function.
+ * \param fb
+ * \brief array of y-coordinates of the tabular function.
+ * \param n
+ * \brief the highest element number of the arrays.
+ * \return y-coordinate of the interpolated point.
+ */
+#if !INLINE_JBM_DARRAY_INTERPOLATE
+JBDOUBLE jbm_darray_interpolate(JBDOUBLE x, JBDOUBLE *fa, JBDOUBLE *fb, int n)
+{return _jbm_darray_interpolate(x, fa, fb, n);}
+#endif
+
+/**
+ * \fn JBDOUBLE* jbm_darray_add(JBDOUBLE *fa, int na, JBDOUBLE *fb, int nb, \
+ *   JBDOUBLE **fc, int *nc)
+ * \brief Function to add 2 increasingly sorted arrays of JBDOUBLE numbers.
+ * \param fa
+ * \brief 1st increasingly sorted array of JBDOUBLE numbers.
+ * \param na
+ * \brief the highest element number of the 1st array.
+ * \param fb
+ * \brief 2nd increasingly sorted array of JBDOUBLE numbers.
+ * \param nb
+ * \brief the highest element number of the 2nd array.
+ * \param fc
+ * \brief pointer to the resulting increasingly sorted array of JBDOUBLE
+ *   numbers.
+ * \param nc
+ * \brief pointer to the highest element number of the resulting array.
+ * \return resulting array.
+ */
+#if !INLINE_JBM_DARRAY_ADD
+JBDOUBLE* jbm_darray_add
+	(JBDOUBLE *fa, int na, JBDOUBLE *fb, int nb, JBDOUBLE **fc, int *nc)
+{return _jbm_darray_add(fa, na, fb, nb, fc, nc);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_darray_farray_integral(JBDOUBLE *x, JBFLOAT *y, int n, \
+ *   JBDOUBLE x1, JBDOUBLE x2)
+ * \brief Function to integrate a tabular function in an interval.
+ * \param x
+ * \brief incresingly sorted array of JBDOUBLE numbers defining the
+ *   x-coordinates of the tabular function.
+ * \param y
+ * \brief array of JBFLOAT numbers defining the y-coordinates of the tabular
+ *   function.
+ * \param n
+ * \brief the highest element number of the arrays.
+ * \param x1
+ * \brief left limit of the integration interval.
+ * \param x2
+ * \brief right limit of the integration interval.
+ * \return integral value.
+ */
+#if !INLINE_JBM_DARRAY_FARRAY_INTEGRAL
+JBDOUBLE jbm_darray_farray_integral
+	(JBDOUBLE *x, JBFARRAY *y, int n, JBDOUBLE x1, JBDOUBLE x2)
+{return _jbm_darray_integral(x, y, n, x1, x2);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_darray_integral(JBDOUBLE *x, JBDOUBLE *y, int n, \
+ *   JBDOUBLE x1, JBDOUBLE x2)
+ * \brief Function to integrate a tabular function in an interval.
+ * \param x
+ * \brief incresingly sorted array of JBDOUBLE numbers defining the
+ *   x-coordinates of the tabular function.
+ * \param y
+ * \brief array of JBDOUBLE numbers defining the y-coordinates of the tabular
+ *   function.
+ * \param n
+ * \brief the highest element number of the arrays.
+ * \param x1
+ * \brief left limit of the integration interval.
+ * \param x2
+ * \brief right limit of the integration interval.
+ * \return integral value.
+ */
+#if !INLINE_JBM_DARRAY_INTEGRAL
+JBDOUBLE jbm_darray_integral
+	(JBDOUBLE *x, JBDOUBLE *y, int n, JBDOUBLE x1, JBDOUBLE x2)
+{return _jbm_darray_integral(x, y, n, x1, x2);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_darray_mean_square_error(JBDOUBLE *xa, JBDOUBLE *fa, int na, \
+ *   JBDOUBLE *xr, JBDOUBLE *fr, int nr)
+ * \brief Function to calculate the mean square error between 2 tabular
+ *   functions.
+ * \param xa
+ * \brief incresingly sorted array of JBDOUBLE numbers defining the
+ *   x-coordinates of the 1st tabular function.
+ * \param fa
+ * \brief array of JBDOUBLE numbers defining the y-coordinates of the 1st
+ *   tabular function.
+ * \param na
+ * \brief the highest element number of the arrays defining the 1st tabular
+ *   function.
+ * \param xr
+ * \brief incresingly sorted array of JBDOUBLE numbers defining the
+ *   x-coordinates of the 2nd tabular function.
+ * \param fr
+ * \brief array of JBDOUBLE numbers defining the y-coordinates of the 2nd
+ *   tabular function.
+ * \param nr
+ * \brief the highest element number of the arrays defining the 2nd tabular
+ *   function.
+ * \return mean square error.
+ */
+#if !INLINE_JBM_DARRAY_MEAN_SQUARE_ERROR
+JBDOUBLE jbm_darray_mean_square_error
+	(JBDOUBLE *xa, JBDOUBLE *fa, int na, JBDOUBLE *xr, JBDOUBLE *fr, int nr)
+{return _jbm_darray_mean_square_error(xa, fa, na, xr, fr, nr);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_darray_root_mean_square_error(JBDOUBLE *xa, JBDOUBLE *fa, \
+ *   int na, JBDOUBLE *xr, JBDOUBLE *fr, int nr)
+ * \brief Function to calculate the root mean square error between 2 tabular
+ *   functions.
+ * \param xa
+ * \brief incresingly sorted array of JBDOUBLE numbers defining the
+ *   x-coordinates of the 1st tabular function.
+ * \param fa
+ * \brief array of JBDOUBLE numbers defining the y-coordinates of the 1st
+ *   tabular function.
+ * \param na
+ * \brief the highest element number of the arrays defining the 1st tabular
+ *   function.
+ * \param xr
+ * \brief incresingly sorted array of JBDOUBLE numbers defining the
+ *   x-coordinates of the 2nd tabular function.
+ * \param fr
+ * \brief array of JBDOUBLE numbers defining the y-coordinates of the 2nd
+ *   tabular function.
+ * \param nr
+ * \brief the highest element number of the arrays defining the 2nd tabular
+ *   function.
+ * \return root mean square error.
+ */
+#if !INLINE_JBM_DARRAY_ROOT_MEAN_SQUARE_ERROR
+JBDOUBLE jbm_darray_root_mean_square_error
+	(JBDOUBLE *xa, JBDOUBLE *fa, int na, JBDOUBLE *xr, JBDOUBLE *fr, int nr)
+{return _jbm_darray_root_mean_square_error(xa, fa, na, xr, fr, nr);}
+#endif
+
+/**
  * \fn JBDOUBLE jbm_v2_length(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2, \
  *   JBDOUBLE y2)
  * \brief Function to calculate the length of a 2D segement.
