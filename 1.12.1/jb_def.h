@@ -324,7 +324,7 @@ static inline void _jb_make_time
 	void jb_make_time(struct tm *sys_date, JBDOUBLE *sys_sec, int *error);
 #endif
 
-static inline JBDOUBLE _jb_get_time(char *string, int *error)
+static inline JBDOUBLE _jb_get_time(const char *string, int *error)
 {
 	struct tm sys_date[1];
 	JBDOUBLE sys_sec;
@@ -342,7 +342,7 @@ static inline JBDOUBLE _jb_get_time(char *string, int *error)
 #if INLINE_JB_GET_TIME
 	#define jb_get_time _jb_get_time
 #else
-	JBDOUBLE jb_get_time(char *string, int *error);
+	JBDOUBLE jb_get_time(const char *string, int *error);
 #endif
 
 static inline JBDOUBLE _jb_get_time_file(FILE *file, int *error)

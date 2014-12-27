@@ -188,7 +188,7 @@ void jb_make_time(struct tm *sys_date, JBDOUBLE *sys_sec, int *error)
 #endif
 
 /**
- * \fn JBDOUBLE jb_get_time(char *string, int *error)
+ * \fn JBDOUBLE jb_get_time(const char *string, int *error)
  * \brief Function to code a date in string format to a JBDOUBLE number.
  * \param string
  * \brief Date in string format.
@@ -197,7 +197,7 @@ void jb_make_time(struct tm *sys_date, JBDOUBLE *sys_sec, int *error)
  * \return Date in JBDOUBLE format.
  */
 #if !INLINE_JB_GET_TIME
-JBDOUBLE jb_get_time(char *string, int *error)
+JBDOUBLE jb_get_time(const char *string, int *error)
 {return _jb_get_time(string, error);}
 #endif
 

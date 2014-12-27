@@ -2589,7 +2589,7 @@ static inline void _jbw_array_editor_set_column_time
 	if (column >= editor->d) --j;
 	for (i = 0; ++i <= j;)
 	{
-		buffer = jb_get_time(*(x++));
+		buffer = jb_set_time(*(t++));
 		gtk_entry_set_text(*(array++), buffer);
 		g_free(buffer);
 	}
@@ -2601,7 +2601,7 @@ static inline void _jbw_array_editor_set_column_time
 #endif
 
 static inline void _jbw_array_editor_get_column_time
-	(JBWArrayEditor *editor, int column, JBDOUBLE *x)
+	(JBWArrayEditor *editor, int column, JBDOUBLE *t)
 {
 	int i, j, e;
 	JBWFloatEntry **array;
@@ -2609,7 +2609,7 @@ static inline void _jbw_array_editor_get_column_time
 	j = editor->n;
 	if (column >= editor->d) --j;
 	for (i = 0; ++i <= j;)
-		*(x++) = jb_get_time(gtk_entry_get_text(*(array++)), &e);
+		*(t++) = jb_get_time(gtk_entry_get_text(*(array++)), &e);
 }
 #if INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_TIME
 	#define jbw_array_editor_get_column_time _jbw_array_editor_get_column_time
