@@ -1211,6 +1211,18 @@
  * \brief Macro deciding if the function jbw_array_editor_get_column_float() has
  *   to be inlined.
  */
+#define INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_TIME			1
+/**
+ * \def INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_TIME
+ * \brief Macro deciding if the function jbw_array_editor_set_column_time() has
+ *   to be inlined.
+ */
+#define INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_TIME			1
+/**
+ * \def INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_TIME
+ * \brief Macro deciding if the function jbw_array_editor_get_column_time() has
+ *   to be inlined.
+ */
 #define INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_FLOAT		1
 /**
  * \def INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_SENSITIVE

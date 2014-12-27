@@ -742,6 +742,18 @@ void jbw_array_editor_get_column_float
 {_jbw_array_editor_get_column_float(editor, column, x);}
 #endif
 
+#if !INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_TIME
+void jbw_array_editor_set_column_time
+	(JBWArrayEditor *editor, int column, JBDOUBLE *x)
+{_jbw_array_editor_set_column_time(editor, column, x);}
+#endif
+
+#if !INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_TIME
+void jbw_array_editor_get_column_time
+	(JBWArrayEditor *editor, int column, JBDOUBLE *x)
+{_jbw_array_editor_get_column_time(editor, column, x);}
+#endif
+
 #if !INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_SENSITIVE
 void jbw_array_editor_set_column_sensitive
 	(JBWArrayEditor *editor, int column, int sensitive)
