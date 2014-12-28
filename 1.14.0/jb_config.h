@@ -739,12 +739,6 @@
  */
 #define INLINE_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR	1
 /**
- * \def INLINE_JBM_FILE_MEAN_SQUARE_ERROR
- * \brief Macro deciding if the function jbm_file_mean_square_error() has to be
- *   inlined.
- */
-#define INLINE_JBM_FILE_MEAN_SQUARE_ERROR			1
-/**
  * \def INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL
  * \brief Macro deciding if the function jbm_varray_solve_tridiagonal() has to
  *   be inlined.
@@ -756,6 +750,62 @@
  *   to be inlined.
  */
 #define INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL_ZERO	1
+/**
+ * \def INLINE_JBM_VDARRAY_SEARCH
+ * \brief Macro deciding if the function jbm_vdarray_search() has to be inlined.
+ */
+#define INLINE_JBM_VDARRAY_SEARCH					1
+/**
+ * \def INLINE_JBM_VDARRAY_SEARCH_EXTENDED
+ * \brief Macro deciding if the function jbm_vdarray_search_extended() has to be
+ *   inlined.
+ */
+#define INLINE_JBM_VDARRAY_SEARCH_EXTENDED			1
+/**
+ * \def INLINE_JBM_VDARRAY_MAX
+ * \brief Macro deciding if the function jbm_vdarray_max() has to be inlined.
+ */
+#define INLINE_JBM_VDARRAY_MAX						1
+/**
+ * \def INLINE_JBM_VDARRAY_MIN
+ * \brief Macro deciding if the function jbm_vdarray_min() has to be inlined.
+ */
+#define INLINE_JBM_VDARRAY_MIN						1
+/**
+ * \def INLINE_JBM_VDARRAY_MAXMIN
+ * \brief Macro deciding if the function jbm_vdarray_maxmin() has to be inlined.
+ */
+#define INLINE_JBM_VDARRAY_MAXMIN					1
+/**
+ * \def INLINE_JBM_VDARRAY_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_vdarray_mean_square_error() has to
+ *   be inlined.
+ */
+#define INLINE_JBM_VDARRAY_MEAN_SQUARE_ERROR		1
+/**
+ * \def INLINE_JBM_VDARRAY_ROOT_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_vdarray_root_mean_square_error()
+ *   has to be inlined.
+ */
+#define INLINE_JBM_VDARRAY_ROOT_MEAN_SQUARE_ERROR	1
+/**
+ * \def INLINE_JBM_VDARRAY_SOLVE_TRIDIAGONAL
+ * \brief Macro deciding if the function jbm_vdarray_solve_tridiagonal() has to
+ *   be inlined.
+ */
+#define INLINE_JBM_VDARRAY_SOLVE_TRIDIAGONAL		1
+/**
+ * \def INLINE_JBM_VDARRAY_SOLVE_TRIDIAGONAL_ZERO
+ * \brief Macro deciding if the function jbm_vdarray_solve_tridiagonal_zero()
+ *   has to be inlined.
+ */
+#define INLINE_JBM_VDARRAY_SOLVE_TRIDIAGONAL_ZERO	1
+/**
+ * \def INLINE_JBM_FILE_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_file_mean_square_error() has to be
+ *   inlined.
+ */
+#define INLINE_JBM_FILE_MEAN_SQUARE_ERROR			1
 /**
  * \def INLINE_JBM_FILE_ROOT_MEAN_SQUARE_ERROR
  * \brief Macro deciding if the function jbm_file_root_mean_square_error() has
@@ -1863,6 +1913,58 @@
  *   to be debugged.
  */
 #define DEBUG_JBM_VARRAY_SOLVE_TRIDIAGONAL_ZERO		1
+/**
+ * \def DEBUG_JBM_VDARRAY_SEARCH
+ * \brief Macro deciding if the function jbm_vdarray_search() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_VDARRAY_SEARCH					0
+/**
+ * \def DEBUG_JBM_VDARRAY_SEARCH_EXTENDED
+ * \brief Macro deciding if the function jbm_vdarray_search_extended() has to
+ *   be debugged.
+ */
+#define DEBUG_JBM_VDARRAY_SEARCH_EXTENDED			0
+/**
+ * \def DEBUG_JBM_VDARRAY_MAX
+ * \brief Macro deciding if the function jbm_vdarray_max() has to be debugged.
+ */
+#define DEBUG_JBM_VDARRAY_MAX						0
+/**
+ * \def DEBUG_JBM_VDARRAY_MIN
+ * \brief Macro deciding if the function jbm_vdarray_min() has to be debugged.
+ */
+#define DEBUG_JBM_VDARRAY_MIN						0
+/**
+ * \def DEBUG_JBM_VDARRAY_MAXMIN
+ * \brief Macro deciding if the function jbm_vdarray_maxmin() has to be
+ *   debugged.
+ */
+#define DEBUG_JBM_VDARRAY_MAXMIN					0
+/**
+ * \def DEBUG_JBM_VDARRAY_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_vdarray_mean_square_error() has to
+ *   be debugged.
+ */
+#define DEBUG_JBM_VDARRAY_MEAN_SQUARE_ERROR			0
+/**
+ * \def DEBUG_JBM_VDARRAY_ROOT_MEAN_SQUARE_ERROR
+ * \brief Macro deciding if the function jbm_vdarray_root_mean_square_error()
+ *   has to be debugged.
+ */
+#define DEBUG_JBM_VDARRAY_ROOT_MEAN_SQUARE_ERROR	0
+/**
+ * \def DEBUG_JBM_VDARRAY_SOLVE_TRIDIAGONAL
+ * \brief Macro deciding if the function jbm_vdarray_solve_tridiagonal() has to
+ *   be debugged.
+ */
+#define DEBUG_JBM_VDARRAY_SOLVE_TRIDIAGONAL			1
+/**
+ * \def DEBUG_JBM_VDARRAY_SOLVE_TRIDIAGONAL_ZERO
+ * \brief Macro deciding if the function jbm_vdarray_solve_tridiagonal_zero()
+ *   has to be debugged.
+ */
+#define DEBUG_JBM_VDARRAY_SOLVE_TRIDIAGONAL_ZERO	1
 /**
  * \def DEBUG_JBM_FILE_MEAN_SQUARE_ERROR
  * \brief Macro deciding if the function jbm_file_mean_square_error() has to be

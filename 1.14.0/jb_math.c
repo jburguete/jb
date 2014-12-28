@@ -1925,6 +1925,231 @@ void jbm_varray_solve_tridiagonal_zero
 #endif
 
 /**
+ * \fn int jbm_vdarray_search(JBDOUBLE x, void *v, int size, int n)
+ * \brief Function to find the segment number where a number is in an array of
+ *   segments defined in an array of structs.
+ * \param x
+ * \brief number to search.
+ * \param v
+ * \brief pointer to the field in JBDOUBLE format of the 1st element of the \
+ *   array of structs.
+ * \param size
+ * \brief size of the structs.
+ * \param n
+ * \brief number of structs.
+ * \return segement number.
+ */
+#if !INLINE_JBM_VDARRAY_SEARCH
+int jbm_vdarray_search(JBDOUBLE x, void *v, int size, int n)
+{return _jbm_vdarray_search(x, v, size, n);}
+#endif
+
+/**
+ * \fn int jbm_vdarray_search_extended(JBDOUBLE x, void *v, int size, int n)
+ * \brief Function to find the segment number where a number is in an array of
+ *   segments defined in an array of structs checking if the number is out.
+ * \param x
+ * \brief number to search.
+ * \param v
+ * \brief pointer to the field in JBDOUBLE format of the 1st element of the
+ *   array of structs.
+ * \param size
+ * \brief size of the structs.
+ * \param n
+ * \brief number of the last element of the structs array.
+ * \return segement number, -1 if \f$x<v_0\f$ or \f$n\f$ if \f$x>v_n\f$.
+ */
+#if !INLINE_JBM_VDARRAY_SEARCH_EXTENDED
+int jbm_vdarray_search_extended(JBDOUBLE x, void *v, int size, int n)
+{return _jbm_vdarray_search_extended(x, v, size, n);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_vdarray_max(void *va, int size, int n)
+ * \brief Function to find the highest value in an array of structs.
+ * \param va
+ * \brief pointer to the field in JBDOUBLE format of the 1st element of the
+ *   array of structs.
+ * \param size
+ * \brief size of the structs.
+ * \param n
+ * \brief number of the last element of the structs array.
+ * \return the highest value.
+ */
+#if !INLINE_JBM_VDARRAY_MAX
+JBDOUBLE jbm_vdarray_max(void *va, int size, int n)
+{return _jbm_vdarray_max(va, size, n);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_vdarray_min(void *va, int size, int n)
+ * \brief Function to find the lowest value in an array of structs.
+ * \param va
+ * \brief pointer to the field in JBDOUBLE format of the 1st element of the
+ *   array of structs.
+ * \param size
+ * \brief size of the structs.
+ * \param n
+ * \brief number of the last element of the structs array.
+ * \return the lowest value.
+ */
+#if !INLINE_JBM_VDARRAY_MIN
+JBDOUBLE jbm_vdarray_min(void *va, int size, int n)
+{return _jbm_vdarray_min(va, size, n);}
+#endif
+
+/**
+ * \fn void jbm_vdarray_maxmin(void *va, int size, int n, JBDOUBLE *max, \
+ *   JBDOUBLE *min)
+ * \brief Function to find the highest value in an array of structs.
+ * \param va
+ * \brief pointer to the field in JBDOUBLE format of the 1st element of the
+ *   array of structs.
+ * \param size
+ * \brief size of the structs.
+ * \param n
+ * \brief number of the last element of the structs array.
+ * \param max
+ * \brief pointer to the highest value.
+ * \param min
+ * \brief pointer to the lowest value.
+ */
+#if !INLINE_JBM_VDARRAY_MAXMIN
+void jbm_vdarray_maxmin(void *va, int size, int n, JBDOUBLE *max, JBDOUBLE *min)
+{_jbm_vdarray_maxmin(va, size, n, max, min);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_vdarray_mean_square_error(void *xa, void *fa, int sizea, \
+ *   int na, void *xr, void *fr, int sizer, int nr)
+ * \brief Function to calculate the mean square error between 2 functions
+ *   tabulated in 2 arrays of structs.
+ * \param xa
+ * \brief x-coordinates tabulating the 1st function.
+ * \param fa
+ * \brief values of the 1st function.
+ * \param sizea
+ * \brief size of the structs of the 1st array.
+ * \param na
+ * \brief the highest point number tabulating the 1st function.
+ * \param xr
+ * \brief x-coordinates tabulating the 2nd function.
+ * \param fr
+ * \brief values of the 2nd function.
+ * \param sizer
+ * \brief size of the structs of the 2nd array.
+ * \param nr
+ * \brief the highest point number tabulating the 2nd function.
+ * \return mean square error value.
+ */
+#if !INLINE_JBM_VDARRAY_MEAN_SQUARE_ERROR
+JBDOUBLE jbm_vdarray_mean_square_error(void *xa, void *fa, int sizea, int na,
+	void *xr, void *fr, int sizer, int nr)
+{return _jbm_vdarray_mean_square_error(xa, fa, sizea, na, xr, fr, sizer, nr);}
+#endif
+
+/**
+ * \fn JBDOUBLE jbm_vdarray_root_mean_square_error(void *xa, void *fa, \
+ * int sizea, int na, void *xr, void *fr, int sizer, int nr)
+ * \brief Function to calculate the root mean square error between 2 functions
+ *   tabulated in 2 arrays of structs.
+ * \param xa
+ * \brief x-coordinates tabulating the 1st function.
+ * \param fa
+ * \brief values of the 1st function.
+ * \param sizea
+ * \brief size of the structs of the 1st array.
+ * \param na
+ * \brief the highest point number tabulating the 1st function.
+ * \param xr
+ * \brief x-coordinates tabulating the 2nd function.
+ * \param fr
+ * \brief values of the 2nd function.
+ * \param sizer
+ * \brief size of the structs of the 2nd array.
+ * \param nr
+ * \brief the highest point number tabulating the 2nd function.
+ * \return root mean square error value.
+ */
+#if !INLINE_JBM_VDARRAY_ROOT_MEAN_SQUARE_ERROR
+JBDOUBLE jbm_vdarray_root_mean_square_error(void *xa, void *fa, int sizea,
+	int na, void *xr, void *fr, int sizer, int nr)
+{
+	return _jbm_vdarray_root_mean_square_error
+		(xa, fa, sizea, na, xr, fr, sizer, nr);
+}
+#endif
+
+/**
+ * \fn void jbm_vdarray_solve_tridiagonal(void *C, void *D, void *E, void *H,
+ *   int size, int n)
+ * \brief Function to solve a tridiagonal linear equations system stored in the
+ *   fields of a struct array with format: \f$\left(\begin{array}{cccc|c}
+ *   D_0 & E_0    &         &        & H_0\\
+ *   C_0 & D_1    & E_1     &        & H_1\\
+ *       & \ddots & \ddots  & \ddots & \vdots\\
+ *       &        & C_{n-1} & D_n    & H_n
+ *   \end{array}\right)\f$.
+ *   Results are stored in the H fields. It modifies D and H fields.
+ * \param C
+ * \brief field address of first element of the struct array containing the left
+ *   diagonal equation system values.
+ * \param D
+ * \brief field addres of first element of the struct array containing the
+ *   central diagonal equation system values.
+ * \param E
+ * \brief field address of first element of the struct array containing the
+ *   right diagonal equation system values.
+ * \param H
+ * \brief field address of first element of the struct array containing the
+ *   final equation system values.
+ * \param size
+ * \brief struct size.
+ * \param n
+ * \brief the latest struct array element.
+ */
+#if !INLINE_JBM_VDARRAY_SOLVE_TRIDIAGONAL
+void jbm_vdarray_solve_tridiagonal
+	(void *C, void *D, void *E, void *H, int size, int n)
+{_jbm_vdarray_solve_tridiagonal(C, D, E, H, size, n);}
+#endif
+
+/**
+ * \fn void jbm_vdarray_solve_tridiagonal_zero(void *C, void *D, void *E, \
+ *   void *H, int size, int n)
+ * \brief Function to solve a tridiagonal linear equations system stored in the
+ *   fields of a struct array with format: \f$\left(\begin{array}{cccc|c}
+ *   D_0 & E_0    &         &        & H_0\\
+ *   C_0 & D_1    & E_1     &        & H_1\\
+ *       & \ddots & \ddots  & \ddots & \vdots\\
+ *       &        & C_{n-1} & D_n    & H_n
+ *   \end{array}\right)\f$.
+ *   avoiding zero divisions. Results are stored in the H fields. It modifies D
+ *   and H fields.
+ * \param C
+ * \brief field address of first element of the struct array containing the left
+ *   diagonal equation system values.
+ * \param D
+ * \brief field addres of first element of the struct array containing the
+ *   central diagonal equation system values.
+ * \param E
+ * \brief field address of first element of the struct array containing the
+ *   right diagonal equation system values.
+ * \param H
+ * \brief field address of first element of the struct array containing the
+ *   final equation system values.
+ * \param size
+ * \brief struct size.
+ * \param n
+ * \brief the latest struct array element.
+ */
+#if !INLINE_JBM_VDARRAY_SOLVE_TRIDIAGONAL_ZERO
+void jbm_vdarray_solve_tridiagonal_zero
+	(void *C, void *D, void *E, void *H, int size, int n)
+{_jbm_vdarray_solve_tridiagonal_zero(C, D, E, H, size, n);}
+#endif
+
+/**
  * \fn JBDOUBLE jbm_file_mean_square_error(char *namea, int ixa, int ifa, \
  *   int na, char *namer, int ixr, int ifr, int nr)
  * \brief Function to calculate the mean square error between 2 functions

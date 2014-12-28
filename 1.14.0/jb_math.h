@@ -2619,6 +2619,287 @@ static inline void _jbm_varray_solve_tridiagonal_zero
 		(void*, void*, void*, void*, int, int);
 #endif
 
+static inline int _jbm_vdarray_search(JBDOUBLE x, void *v, int size, int n)
+{
+	register int i, j;
+	#if DEBUG_JBM_VDARRAY_SEARCH
+		fprintf(stderr, "JBM vdarray search\n");
+	#endif
+	for (i = 0; n - i > 1;)
+	{
+		j = (i + n) >> 1;
+		if (x <= *(JBDOUBLE*)(v + j * size)) n = j; else i = j;
+	}
+	#if DEBUG_JBM_VDARRAY_SEARCH
+		fprintf(stderr, "JBM vdarray search i=%d\n", i);
+	#endif
+	return i;
+}
+#if INLINE_JBM_VDARRAY_SEARCH
+	#define jbm_vdarray_search _jbm_vdarray_search
+#else
+	int jbm_vdarray_search(JBDOUBLE, void*, int, int);
+#endif
+
+static inline int _jbm_vdarray_search_extended
+	(JBDOUBLE x, void *v, int size, int n)
+{
+	register int i;
+	#if DEBUG_JBM_VDARRAY_SEARCH_EXTENDED
+		fprintf(stderr, "JBM vdarray search_extended\n");
+	#endif
+	if (x < *(JBDOUBLE*)v) i = -1;
+	else if (x >= *(JBDOUBLE*)(v + n * size)) i = n;
+	else i = jbm_vdarray_search(x, v, size, n);
+	#if DEBUG_JBM_VDARRAY_SEARCH_EXTENDED
+		fprintf(stderr, "JBM vdarray search_extended i=%d\n", i);
+	#endif
+	return i;
+}
+#if INLINE_JBM_VDARRAY_SEARCH_EXTENDED
+	#define jbm_vdarray_search_extended _jbm_vdarray_search_extended
+#else
+	int jbm_vdarray_search_extended(JBDOUBLE, void*, int, int);
+#endif
+
+static inline JBDOUBLE _jbm_vdarray_max(void *v, int size, int n)
+{
+	register int i;
+	register JBDOUBLE k;
+	#if DEBUG_JBM_VDARRAY_MAX
+		fprintf(stderr, "JBM vdarray max\n");
+	#endif
+	k = *(JBDOUBLE*)v;
+	for (i = 0; ++i <= n;) k = fmaxl(k, *(JBDOUBLE*)(v += size));
+	#if DEBUG_JBM_VDARRAY_MAX
+		fprintf(stderr, "JBM vdarray max="FWL"\n", k);
+	#endif
+	return k;
+}
+#if INLINE_JBM_VDARRAY_MAX
+	#define jbm_vdarray_max _jbm_vdarray_max
+#else
+	JBDOUBLE jbm_vdarray_max(void*, int, int);
+#endif
+
+static inline JBDOUBLE _jbm_vdarray_min(void *v, int size, int n)
+{
+	register int i;
+	register JBDOUBLE k;
+	#if DEBUG_JBM_VDARRAY_MIN
+		fprintf(stderr, "JBM vdarray min\n");
+	#endif
+	k = *(JBDOUBLE*)v;
+	for (i = 0; ++i <= n;) k = fminl(k, *(JBDOUBLE*)(v += size));
+	#if DEBUG_JBM_VDARRAY_MIN
+		fprintf(stderr, "JBM vdarray min="FWL"\n", k);
+	#endif
+	return k;
+}
+#if INLINE_JBM_VDARRAY_MIN
+	#define jbm_vdarray_min _jbm_vdarray_min
+#else
+	JBDOUBLE jbm_vdarray_min(void*, int, int);
+#endif
+
+static inline void
+	_jbm_vdarray_maxmin(void *v, int size, int n, JBDOUBLE *max, JBDOUBLE *min)
+{
+	register int i;
+	register JBDOUBLE kmax, kmin;
+	#if DEBUG_JBM_VDARRAY_MAXMIN
+		fprintf(stderr, "JBM vdarray maxmin\n");
+	#endif
+	kmax = kmin = *(JBDOUBLE*)v;
+	for (i = 0; ++i <= n;)
+	{
+		v += size;
+		if (kmax < *(JBDOUBLE*)v) kmax = *(JBDOUBLE*)v;
+		else if (kmin > *(JBDOUBLE*)v) kmin = *(JBDOUBLE*)v;
+	}
+	*max = kmax, *min = kmin;
+	#if DEBUG_JBM_VDARRAY_MAXMIN
+		fprintf(stderr, "JBM vdarray max="FWL" min="FWL"\n", kmax, kmin);
+	#endif
+}
+#if INLINE_JBM_VDARRAY_MAXMIN
+	#define jbm_vdarray_maxmin _jbm_vdarray_maxmin
+#else
+	void jbm_vdarray_maxmin(void*, int, int, JBDOUBLE*, JBDOUBLE*);
+#endif
+
+static inline JBDOUBLE _jbm_vdarray_mean_square_error(void *xa, void *fa,
+	int sizea, int na, void *xr, void *fr, int sizer, int nr)
+{
+	register int i, j;
+	JBDOUBLE k=0., k2;
+	#if DEBUG_JBM_VDARRAY_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM vdarray mean square error\n");
+	#endif
+	for (i = 0; i <= na && *(JBDOUBLE*)xa < *(JBDOUBLE*)xr;
+		++i, xa += sizea, fa += sizea)
+	{
+		k += jbm_fsqr(*(JBDOUBLE*)fa - *(JBDOUBLE*)fr);
+		#if DEBUG_JBM_VDARRAY_MEAN_SQUARE_ERROR
+			fprintf(stderr, "JBMVMSE i=%d fa="FWF" fr="FWF" k="FWL"\n",
+				i, *(JBDOUBLE*)fa, *(JBDOUBLE*)fr, k);
+		#endif
+	}
+	for (j = 0; i <= na; ++i, xa += sizea, fa += sizea)
+	{
+		while (j < nr && *(JBDOUBLE*)xa > *(JBDOUBLE*)(xr + sizer))
+			++j, xr += sizer, fr += sizer;
+		#if DEBUG_JBM_VDARRAY_MEAN_SQUARE_ERROR
+			fprintf(stderr, "JBMVMSE j=%d\n", j);
+		#endif
+		if (j == nr)
+		{
+			for (; i <= na; ++i, xa += sizea, fa += sizea)
+			{
+				k += jbm_fsqr(*(JBDOUBLE*)fa - *(JBDOUBLE*)fr);
+				#if DEBUG_JBM_VDARRAY_MEAN_SQUARE_ERROR
+					fprintf(stderr, "JBMVMSE i=%d fa="FWF" fr="FWF" k="FWL"\n",
+						i, *(JBDOUBLE*)fa, *(JBDOUBLE*)fr, k);
+				#endif
+			}
+		}
+		else
+		{
+			
+			k2 = jbm_extrapolate(*(JBDOUBLE*)xa, *(JBDOUBLE*)xr,
+				*(JBDOUBLE*)(xr + sizer), *(JBDOUBLE*)fr,
+				*(JBDOUBLE*)(fr + sizer));
+			k += jbm_fsqr(*(JBDOUBLE*)fa - k2);
+			#if DEBUG_JBM_VDARRAY_MEAN_SQUARE_ERROR
+				fprintf(stderr, "JBMVMSE xa="FWF" xr="FWF" xr2="FWF"\n",
+					*(JBDOUBLE*)xa, *(JBDOUBLE*)xr, *(JBDOUBLE*)(xr + sizer));
+				fprintf(stderr, "JBMVMSE k2="FWL" yr="FWF" yr2="FWF"\n",
+					k2, *(JBDOUBLE*)fr, *(JBDOUBLE*)(fr + sizer));
+				fprintf(stderr, "JBMVMSE i=%d j=%d k="FWL"\n", i, j, k);
+			#endif
+		}
+	}
+	k /= na + 1;
+	#if DEBUG_JBM_VDARRAY_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM vdarray mean square error="FWL"\n", k);
+	#endif
+	return k;
+}
+#if INLINE_JBM_VDARRAY_MEAN_SQUARE_ERROR
+	#define jbm_vdarray_mean_square_error _jbm_vdarray_mean_square_error
+#else
+	JBDOUBLE jbm_vdarray_mean_square_error
+		(void*, void*, int, int, void*, void*, int, int);
+#endif
+
+static inline JBDOUBLE _jbm_vdarray_root_mean_square_error(void *xa, void *fa,
+	int sizea, int na, void *xr, void *fr, int sizer, int nr)
+{
+	JBDOUBLE k;
+	#if DEBUG_JBM_VDARRAY_ROOT_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM vdarray root mean square error\n");
+	#endif
+	k = sqrtl
+		(jbm_vdarray_mean_square_error(xa, fa, na, sizea, xr, fr, nr, sizer));
+	#if DEBUG_JBM_VDARRAY_ROOT_MEAN_SQUARE_ERROR
+		fprintf(stderr, "JBM vdarray root mean square error="FWL"\n", k);
+	#endif
+	return k;
+}
+#if INLINE_JBM_VDARRAY_ROOT_MEAN_SQUARE_ERROR
+	#define jbm_vdarray_root_mean_square_error \
+		_jbm_vdarray_root_mean_square_error
+#else
+	JBDOUBLE jbm_vdarray_root_mean_square_error
+		(void*, void*, int, int, void*, void*, int, int);
+#endif
+
+static inline void _jbm_vdarray_solve_tridiagonal
+	(void *C, void *D, void *E, void *H, int size, int n)
+{
+	int i;
+	register JBDOUBLE k;
+	register JBDOUBLE *CC, *DD, *EE, *HH;
+	DD = (JBDOUBLE*)D;
+	HH = (JBDOUBLE*)H;
+	for (i = 0; ++i <= n; C += size, E += size)
+	{
+		CC = (JBDOUBLE*)C;
+		EE = (JBDOUBLE*)E;
+		k = *CC / *DD;
+		D += size;
+		DD = (JBDOUBLE*)D;
+		*DD -= k * *EE;
+		k *= *HH;
+		H += size;
+		HH = (JBDOUBLE*)H;
+		*HH -= k;
+	}
+	*HH /= *DD;
+	while (--i > 0)
+	{
+		E -= size;
+		EE = (JBDOUBLE*)E;
+		k = *EE * *HH; 
+		D -= size;
+		DD = (JBDOUBLE*)D;
+		H -= size;
+		HH = (JBDOUBLE*)H;
+		*HH = (*HH - k) / *DD;
+	}
+}
+#if INLINE_JBM_VDARRAY_SOLVE_TRIDIAGONAL
+	#define jbm_vdarray_solve_tridiagonal _jbm_vdarray_solve_tridiagonal
+#else
+	void jbm_vdarray_solve_tridiagonal(void*, void*, void*, void*, int, int);
+#endif
+
+static inline void _jbm_vdarray_solve_tridiagonal_zero
+	(void *C, void *D, void *E, void *H, int size, int n)
+{
+	int i;
+	register JBDOUBLE k;
+	register JBDOUBLE *CC, *DD, *EE, *HH;
+	DD = (JBDOUBLE*)D;
+	HH = (JBDOUBLE*)H;
+	for (i = 0; ++i <= n; C += size, E += size)
+	{
+		CC = (JBDOUBLE*)C;
+		EE = (JBDOUBLE*)E;
+		if (*DD != 0.)
+		{
+			k = *CC / *DD;
+			D += size;
+			DD = (JBDOUBLE*)D;
+			*DD -= k * *EE;
+			k *= *HH;
+			H += size;
+			HH = (JBDOUBLE*)H;
+			*HH -= k;
+		}
+		else D += size, H += size;
+	}
+	if (*DD != 0.) *HH /= *DD;
+	while (--i > 0)
+	{
+		E -= size;
+		EE = (JBDOUBLE*)E;
+		k = *EE * *HH; 
+		D -= size;
+		DD = (JBDOUBLE*)D;
+		H -= size;
+		HH = (JBDOUBLE*)H;
+		if (*DD != 0.) *HH = (*HH - k) / *DD; else *HH = 0.;
+	}
+}
+#if INLINE_JBM_VDARRAY_SOLVE_TRIDIAGONAL_ZERO
+	#define jbm_vdarray_solve_tridiagonal_zero \
+		_jbm_vdarray_solve_tridiagonal_zero
+#else
+	void jbm_vdarray_solve_tridiagonal_zero
+		(void*, void*, void*, void*, int, int);
+#endif
+
 static inline JBDOUBLE _jbm_file_mean_square_error(char *namea, int ixa,
 	int ifa, int na, char *namer, int ixr, int ifr, int nr)
 {
