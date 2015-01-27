@@ -225,9 +225,9 @@ static inline JBDOUBLE _jbw_float_entry_get_value(JBWFloatEntry *entry)
 static inline void
 	_jbw_show_message(char *title, char *message, GtkMessageType type)
 {
-	register GtkMessageDialog *dlg;
-	dlg=(GtkMessageDialog*)gtk_message_dialog_new
-		(window_parent, GTK_DIALOG_MODAL, type, GTK_BUTTONS_OK, message);
+	GtkMessageDialog *dlg;
+	dlg = (GtkMessageDialog*)gtk_message_dialog_new
+		(window_parent, GTK_DIALOG_MODAL, type, GTK_BUTTONS_OK, "%s", message);
 	gtk_window_set_title((GtkWindow*)dlg, title);
 	gtk_dialog_run((GtkDialog*)dlg);
 	gtk_widget_destroy((GtkWidget*)dlg);
