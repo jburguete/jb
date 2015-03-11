@@ -772,8 +772,13 @@ static inline JBDOUBLE _jbm_farray_integral
 	i = jbm_farray_search_extended(x1, x, n);
 	if (i < 0)
 	{
+		if (x2 <= x[0])
+		{
+			I = y[0] * (x2 - x1);
+			goto exit1;
+		}
+		I = y[0] * (x[0] - x1);
 		i = 0;
-		I = y[0] * (x2 - x1);
 		x1 = x[0];
 		y1 = y[0];
 		xx = x;
@@ -927,6 +932,9 @@ static inline int _jbm_darray_search_extended(JBDOUBLE x, JBDOUBLE *fa, int n)
 	register int i;
 	#if DEBUG_JBM_DARRAY_SEARCH_EXTENDED
 		fprintf(stderr, "JBM double array search_extended\n");
+		fprintf(stderr,
+			"JBM double array search_extended n=%d x="FWL" f0="FWL" fn="FWL"\n",
+			n, x, fa[0], fa[n]);
 	#endif
 	if (x < fa[0]) i = -1;
 	else if (x >= fa[n]) i = n;
@@ -1105,6 +1113,7 @@ static inline JBDOUBLE _jbm_darray_farray_integral
 
 	#if DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
 		fprintf(stderr, "JBM double and float array integral: start\n");
+		fprintf(stderr, "JBMDI x1="FWL" x2="FWL" x0="FWL"\n", x1, x2, x[0]);
 	#endif
 	if (n == 0)
 	{
@@ -1114,8 +1123,13 @@ static inline JBDOUBLE _jbm_darray_farray_integral
 	i = jbm_darray_search_extended(x1, x, n);
 	if (i < 0)
 	{
+		if (x2 <= x[0])
+		{
+			I = y[0] * (x2 - x1);
+			goto exit1;
+		}
+		I = y[0] * (x[0] - x1);
 		i = 0;
-		I = y[0] * (x2 - x1);
 		x1 = x[0];
 		y1 = y[0];
 		xx = x;
@@ -1203,8 +1217,13 @@ static inline JBDOUBLE _jbm_darray_integral
 	i = jbm_darray_search_extended(x1, x, n);
 	if (i < 0)
 	{
+		if (x2 <= x[0])
+		{
+			I = y[0] * (x2 - x1);
+			goto exit1;
+		}
+		I = y[0] * (x[0] - x1);
 		i = 0;
-		I = y[0] * (x2 - x1);
 		x1 = x[0];
 		y1 = y[0];
 		xx = x;
