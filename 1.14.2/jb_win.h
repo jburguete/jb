@@ -1558,8 +1558,8 @@ static inline void _jbw_graphic_map_resize(JBWGraphic *graphic)
 	if (vw>1.)
 	{
 		vw -= 1.;
-		vw/=2;
-		vw*=cw;
+		vw /= 2;
+		vw *= cw;
 		graphic->xmax += vw;
 		graphic->xmin -= vw;
 	}
@@ -1567,8 +1567,8 @@ static inline void _jbw_graphic_map_resize(JBWGraphic *graphic)
 	{
 		vh = 1./vw;
 		vh -= 1.;
-		vh/=2;
-		vh*=ch;
+		vh /= 2;
+		vh *= ch;
 		graphic->ymax += vh;
 		graphic->ymin -= vh;
 	}
