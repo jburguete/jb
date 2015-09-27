@@ -22,73 +22,85 @@
 #include <stdlib.h>
 
 /*****************************************************/
-int creaInterfaz(char *nombre){
-	umask(0);
-	return(mknod(nombre, S_IFIFO|0666, 0));
+int creaInterfaz(char *nombre)
+{
+    umask(0);
+    return(mknod(nombre, S_IFIFO|0666, 0));
 }
 /*****************************************************/
-void eliminaInterfaz(char *nombre){
-	NULL;
+void eliminaInterfaz(char *nombre)
+{
+    NULL;
 }
 /*****************************************************/
-int abrirInterfazEnv(char *nombre){
-	return(open(nombre, O_WRONLY));
+int abrirInterfazEnv(char *nombre)
+{
+    return(open(nombre, O_WRONLY));
 }
 /*****************************************************/
-int cerrarInterfazEnv(int idInt){
-	return(close(idInt));
+int cerrarInterfazEnv(int idInt)
+{
+    return(close(idInt));
 }
 /*****************************************************/
-int abrirInterfazRec(char *nombre){
-	return(open(nombre,O_RDONLY));
+int abrirInterfazRec(char *nombre)
+{
+    return(open(nombre,O_RDONLY));
 }
 /*****************************************************/
-int cerrarInterfazRec(int idInt){
-	return(close(idInt));
+int cerrarInterfazRec(int idInt)
+{
+    return(close(idInt));
 }
 /*****************************************************/
-int enviaChar(char *cadena,int idInt){
-	int leng;
-	strcat(cadena,"\n");
-	leng=strlen(cadena);
-	return(write(idInt,cadena,leng));
+int enviaChar(char *cadena,int idInt)
+{
+    int leng;
+    strcat(cadena,"\n");
+    leng=strlen(cadena);
+    return(write(idInt,cadena,leng));
 }
 /*****************************************************/
-int enviaFloat(float numero,int idInt){
-	char flo[100];
-	sprintf(flo,"%f\n",numero);
-	return(write(idInt,flo,strlen(flo)));	
+int enviaFloat(float numero,int idInt)
+{
+    char flo[100];
+    sprintf(flo,"%f\n",numero);
+    return(write(idInt,flo,strlen(flo)));
 }
 /*****************************************************/
-int enviaInt(int numero,int idInt){
-	char flo[100];
-	sprintf(flo,"%d\n",numero);
-	return(write(idInt,flo,strlen(flo)));	
+int enviaInt(int numero,int idInt)
+{
+    char flo[100];
+    sprintf(flo,"%d\n",numero);
+    return(write(idInt,flo,strlen(flo)));
 }
 /*****************************************************/
-void recibeChar(int idInt, char* cadena){
-	read(idInt,cadena,23);
-}	
-/*****************************************************/
-double recibeFloat(int idInt, double *numero){
-	char flo[22];
-	double aux;
-	int res;
-	while(!read(idInt,flo,23));
-	aux=atof(flo);
-	*numero=aux;
-	return(*numero);
+void recibeChar(int idInt, char* cadena)
+{
+    read(idInt,cadena,23);
 }
 /*****************************************************/
-double recibeInt(int idInt, int *numero){
-	char flo[22];
-	int aux;
-	int res;
-	int L;	
-	while(!read(idInt,flo,23));
-	aux=atol(flo);
-	*numero=aux;
-	return(*numero);
+double recibeFloat(int idInt, double *numero)
+{
+    char flo[22];
+    double aux;
+    int res;
+    while(!read(idInt,flo,23));
+    aux=atof(flo);
+    *numero=aux;
+    return(*numero);
+}
+/*****************************************************/
+double recibeInt(int idInt, int *numero)
+{
+    char flo[22];
+    int aux;
+    int res;
+    int L;
+    while(!read(idInt,flo,23));
+    aux=atol(flo);
+    *numero=aux;
+    return(*numero);
 }
 /*****************************************************/
 
