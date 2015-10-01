@@ -4,14 +4,14 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  * 	1. Redistributions of source code must retain the above copyright notice,
  * 		this list of conditions and the following disclaimer.
- * 
+ *
  * 	2. Redistributions in binary form must reproduce the above copyright notice,
  * 		this list of conditions and the following disclaimer in the
  * 		documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY Javier Burguete Tolosa ``AS IS'' AND ANY EXPRESS
  * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -41,7 +41,10 @@
  * \brief A pointer to interchange.
  */
 #if !INLINE_JB_CHANGE
-void JBChange(void **a, void **b) {_JBChange(a,b);}
+void JBChange(void **a, void **b)
+{
+    _JBChange(a,b);
+}
 #endif
 
 /**
@@ -52,7 +55,11 @@ void JBChange(void **a, void **b) {_JBChange(a,b);}
  * \brief A pointer to free.
  */
 #if JB_FREE_NULL
-void jb_free_null(void **p) {g_free(*p); *p=0;}
+void jb_free_null(void **p)
+{
+    g_free(*p);
+    *p=0;
+}
 #endif
 
 /**
@@ -76,10 +83,10 @@ void jb_function_null() {}
 #if JB_REALLOC
 void* jb_realloc(void *p, const int n)
 {
-	register void *q;
-	q = g_realloc(p, n);
-	if (!q && n) g_free(p);
-	return q;
+    register void *q;
+    q = g_realloc(p, n);
+    if (!q && n) g_free(p);
+    return q;
 }
 #endif
 
@@ -96,10 +103,10 @@ void* jb_realloc(void *p, const int n)
 #if JB_TRY_REALLOC
 void* jb_try_realloc(void *p, const int n)
 {
-	register void *q;
-	q = g_try_realloc(p, n);
-	if (!q) g_free(p);
-	return q;
+    register void *q;
+    q = g_try_realloc(p, n);
+    if (!q) g_free(p);
+    return q;
 }
 #endif
 
@@ -111,7 +118,10 @@ void* jb_try_realloc(void *p, const int n)
  * \return Pointer to the string copy or NULL on error.
  */
 #if JB_STRDUP
-char* jb_strdup(char *buffer) {return g_strndup(buffer, JB_BUFFER_SIZE - 1);}
+char* jb_strdup(char *buffer)
+{
+    return g_strndup(buffer, JB_BUFFER_SIZE - 1);
+}
 #endif
 
 /**
@@ -122,7 +132,10 @@ char* jb_strdup(char *buffer) {return g_strndup(buffer, JB_BUFFER_SIZE - 1);}
  * \return File length.
  */
 #if !INLINE_JB_FLENGTH
-long int jb_flength(FILE *file) {return _jb_flength(file);}
+long int jb_flength(FILE *file)
+{
+    return _jb_flength(file);
+}
 #endif
 
 /**
@@ -135,13 +148,13 @@ long int jb_flength(FILE *file) {return _jb_flength(file);}
 #if JB_SLIST_FREE
 void jb_slist_free(GSList **list)
 {
-	GSList *l;
-	if (*list)
-	{
-		for (l = *list; l; l = l->next) g_free(l->data);
-		g_slist_free(*list);
-		*list = 0;
-	}
+    GSList *l;
+    if (*list)
+        {
+            for (l = *list; l; l = l->next) g_free(l->data);
+            g_slist_free(*list);
+            *list = 0;
+        }
 }
 #endif
 
@@ -156,7 +169,10 @@ void jb_slist_free(GSList **list)
  * \return 0 on error, >0 on success.
  */
 #if !INLINE_JB_BIN_READ
-int jb_bin_read(FILE *file,char *buffer) {return _jb_bin_read(file, buffer);}
+int jb_bin_read(FILE *file,char *buffer)
+{
+    return _jb_bin_read(file, buffer);
+}
 #endif
 
 /**
@@ -169,7 +185,10 @@ int jb_bin_read(FILE *file,char *buffer) {return _jb_bin_read(file, buffer);}
  * \brief String.
  */
 #if !INLINE_JB_BIN_WRITE
-void jb_bin_write(FILE *file, char *buffer) {_jb_bin_write(file, buffer);}
+void jb_bin_write(FILE *file, char *buffer)
+{
+    _jb_bin_write(file, buffer);
+}
 #endif
 
 /**
@@ -184,7 +203,9 @@ void jb_bin_write(FILE *file, char *buffer) {_jb_bin_write(file, buffer);}
  */
 #if !INLINE_JB_MAKE_TIME
 void jb_make_time(struct tm *sys_date, JBDOUBLE *sys_sec, int *error)
-{_jb_make_time(sys_date, sys_sec, error);}
+{
+    _jb_make_time(sys_date, sys_sec, error);
+}
 #endif
 
 /**
@@ -198,7 +219,9 @@ void jb_make_time(struct tm *sys_date, JBDOUBLE *sys_sec, int *error)
  */
 #if !INLINE_JB_GET_TIME
 JBDOUBLE jb_get_time(const char *string, int *error)
-{return _jb_get_time(string, error);}
+{
+    return _jb_get_time(string, error);
+}
 #endif
 
 /**
@@ -213,7 +236,9 @@ JBDOUBLE jb_get_time(const char *string, int *error)
  */
 #if !INLINE_JB_GET_TIME_FILE
 JBDOUBLE jb_get_time_file(FILE *file, int *error)
-{return _jb_get_time_file(file, error);}
+{
+    return _jb_get_time_file(file, error);
+}
 #endif
 
 /**
@@ -225,5 +250,8 @@ JBDOUBLE jb_get_time_file(FILE *file, int *error)
  * \return String on success, 0 on error
  */
 #if !INLINE_JB_SET_TIME
-char* jb_set_time(JBDOUBLE time) {return _jb_set_time(time);}
+char* jb_set_time(JBDOUBLE time)
+{
+    return _jb_set_time(time);
+}
 #endif

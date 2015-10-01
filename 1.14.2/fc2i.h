@@ -50,7 +50,7 @@ int cerrarInterfazEnv(int idInt);
 *****************************************************/
 int enviaChar(char *cadena,int idInt);
 /* Pre: Existe interfaz idInt
-   post: Devuelve 1 si ok.  
+   post: Devuelve 1 si ok.
 *****************************************************/
 int enviaFloat(float numero,int idInt);
 /* Pre: Existe interfaz idInt
@@ -62,15 +62,15 @@ int enviaInt(int numero,int idInt);
 *****************************************************/
 void recibeChar(int idInt, char* cadena);
 /* Pre: Existe interfaz idInt
-   post: 
+   post:
 *****************************************************/
 int recibeFloat(int idInt, double *numero);
 /* Pre: Existe interfaz idInt
-   post: 
+   post:
 *****************************************************/
 double recibeInt(int idInt, int *numero);
 /* Pre: Existe interfaz idInt
-   post: 
-*****************************************************/	
+   post:
+*****************************************************/
 
 #endif
