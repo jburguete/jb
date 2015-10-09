@@ -236,9 +236,9 @@ _jbw_show_message(char *title, char *message, GtkMessageType type)
     GtkMessageDialog *dlg;
     dlg = (GtkMessageDialog*)gtk_message_dialog_new
           (window_parent, GTK_DIALOG_MODAL, type, GTK_BUTTONS_OK, "%s", message);
-    gtk_window_set_title((GtkWindow*)dlg, title);
-    gtk_dialog_run((GtkDialog*)dlg);
-    gtk_widget_destroy((GtkWidget*)dlg);
+    gtk_window_set_title(GTK_WINDOW(dlg), title);
+    gtk_dialog_run(GTK_DIALOG(dlg));
+    gtk_widget_destroy(GTK_WIDGET(dlg));
 }
 #if INLINE_JBW_SHOW_MESSAGE
 #define jbw_show_message _jbw_show_message
