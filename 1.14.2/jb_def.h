@@ -224,15 +224,17 @@ extern FILE *stderr;
  */
 #define JB_CHANGE(a, b, c) (c = a, a = b, b = c)
 
-static inline void _JBChange(void **a, void **b)
+static inline void
+_JBChange (void **a, void **b)
 {
-    register void *c;
-    JB_CHANGE(*a, *b, c);
+  register void *c;
+  JB_CHANGE (*a, *b, c);
 }
+
 #if INLINE_JB_CHANGE
 #define JBChange _JBChange
 #else
-void JBChange(void **a, void **b);
+void JBChange (void **a, void **b);
 #endif
 
 /**
@@ -242,205 +244,220 @@ void JBChange(void **a, void **b);
 #define jb_change(a, b) (JBChange((void**)&a, (void**)&b))
 
 #if JB_FREE_NULL
-void jb_free_null(void**);
+void jb_free_null (void **);
 #endif
 
 #if JB_FUNCTION_NULL
-void jb_function_null();
+void jb_function_null ();
 #endif
 
 #if JB_REALLOC
-void* jb_realloc(void*, const int);
+void *jb_realloc (void *, const int);
 #endif
 
 #if JB_TRY_REALLOC
-void* jb_try_realloc(void*, const int);
+void *jb_try_realloc (void *, const int);
 #endif
 
 #if JB_STRDUP
-char* jb_strdup(char*);
+char *jb_strdup (char *);
 #endif
 
-static inline long int _jb_flength(FILE *file)
+static inline long int
+_jb_flength (FILE * file)
 {
-    register long int p, q;
-    q = ftell(file);
-    fseek(file, 0l, SEEK_END);
-    p = ftell(file);
-    fseek(file, q, SEEK_SET);
-    return p;
+  register long int p, q;
+  q = ftell (file);
+  fseek (file, 0l, SEEK_END);
+  p = ftell (file);
+  fseek (file, q, SEEK_SET);
+  return p;
 }
+
 #if INLINE_JB_FLENGTH
 #define jb_flength _jb_flength
 #else
-long int jb_flength(FILE* file);
+long int jb_flength (FILE * file);
 #endif
 
 #if JB_SLIST_FREE
-void jb_slist_free(GSList **list);
+void jb_slist_free (GSList ** list);
 #endif
 
-static inline int _jb_bin_read(FILE *file, char *buffer)
+static inline int
+_jb_bin_read (FILE * file, char *buffer)
 {
-    uint32_t n;
-    fread(&n, sizeof(uint32_t), 1, file);
-    if (n == 0 || n > JB_BUFFER_SIZE) return 0;
-    return fread(buffer, n, 1, file);
+  uint32_t n;
+  fread (&n, sizeof (uint32_t), 1, file);
+  if (n == 0 || n > JB_BUFFER_SIZE)
+    return 0;
+  return fread (buffer, n, 1, file);
 }
+
 #if INLINE_JB_BIN_READ
 #define jb_bin_read _jb_bin_read
 #else
-int jb_bin_read(FILE *file, char *buffer);
+int jb_bin_read (FILE * file, char *buffer);
 #endif
 
-static inline void _jb_bin_write(FILE *file, char *buffer)
+static inline void
+_jb_bin_write (FILE * file, char *buffer)
 {
-    uint32_t n;
-    n = strlen(buffer) + 1;
-    fwrite(&n, sizeof(uint32_t), 1, file);
-    fwrite(buffer, n, 1, file);
+  uint32_t n;
+  n = strlen (buffer) + 1;
+  fwrite (&n, sizeof (uint32_t), 1, file);
+  fwrite (buffer, n, 1, file);
 }
+
 #if INLINE_JB_BIN_WRITE
 #define jb_bin_write _jb_bin_write
 #else
-void jb_bin_write(FILE *file, char *buffer);
+void jb_bin_write (FILE * file, char *buffer);
 #endif
 
 static inline void _jb_make_time
-(struct tm *sys_date, JBDOUBLE *sys_sec, int *error)
+  (struct tm *sys_date, JBDOUBLE * sys_sec, int *error)
 {
-    time_t sys_t;
-    sys_date->tm_year -= 1900;
-    sys_date->tm_mon -= 1;
-    sys_date->tm_sec = 0;
-    sys_date->tm_isdst = 0;
-    sys_t = mktime(sys_date);
-    if (sys_t == -1) *error = -1;
-    *sys_sec += (JBDOUBLE)sys_t;
+  time_t sys_t;
+  sys_date->tm_year -= 1900;
+  sys_date->tm_mon -= 1;
+  sys_date->tm_sec = 0;
+  sys_date->tm_isdst = 0;
+  sys_t = mktime (sys_date);
+  if (sys_t == -1)
+    *error = -1;
+  *sys_sec += (JBDOUBLE) sys_t;
 }
+
 #if INLINE_JB_MAKE_TIME
 #define jb_make_time _jb_make_time
 #else
-void jb_make_time(struct tm *sys_date, JBDOUBLE *sys_sec, int *error);
+void jb_make_time (struct tm *sys_date, JBDOUBLE * sys_sec, int *error);
 #endif
 
-static inline JBDOUBLE _jb_get_time(const char *string, int *error)
+static inline JBDOUBLE
+_jb_get_time (const char *string, int *error)
 {
-    struct tm sys_date[1];
-    JBDOUBLE sys_sec;
-    *error = sscanf(string, "%d%d%d%d%d"FRL,
-                    &sys_date->tm_year,
-                    &sys_date->tm_mon,
-                    &sys_date->tm_mday,
-                    &sys_date->tm_hour,
-                    &sys_date->tm_min,
-                    &sys_sec);
-    if (*error < 0) *error = 0;
-    if (*error == 6) jb_make_time(sys_date, &sys_sec, error);
-    return sys_sec;
+  struct tm sys_date[1];
+  JBDOUBLE sys_sec;
+  *error = sscanf (string, "%d%d%d%d%d" FRL,
+                   &sys_date->tm_year,
+                   &sys_date->tm_mon,
+                   &sys_date->tm_mday,
+                   &sys_date->tm_hour, &sys_date->tm_min, &sys_sec);
+  if (*error < 0)
+    *error = 0;
+  if (*error == 6)
+    jb_make_time (sys_date, &sys_sec, error);
+  return sys_sec;
 }
+
 #if INLINE_JB_GET_TIME
 #define jb_get_time _jb_get_time
 #else
-JBDOUBLE jb_get_time(const char *string, int *error);
+JBDOUBLE jb_get_time (const char *string, int *error);
 #endif
 
-static inline JBDOUBLE _jb_get_time_file(FILE *file, int *error)
+static inline JBDOUBLE
+_jb_get_time_file (FILE * file, int *error)
 {
-    struct tm sys_date[1];
-    JBDOUBLE sys_sec;
-    *error = fscanf(file, "%d%d%d%d%d"FRL,
-                    &sys_date->tm_year,
-                    &sys_date->tm_mon,
-                    &sys_date->tm_mday,
-                    &sys_date->tm_hour,
-                    &sys_date->tm_min,
-                    &sys_sec);
-    if (*error < 0) *error = 0;
-    if (*error == 6) jb_make_time(sys_date, &sys_sec, error);
-    return sys_sec;
+  struct tm sys_date[1];
+  JBDOUBLE sys_sec;
+  *error = fscanf (file, "%d%d%d%d%d" FRL,
+                   &sys_date->tm_year,
+                   &sys_date->tm_mon,
+                   &sys_date->tm_mday,
+                   &sys_date->tm_hour, &sys_date->tm_min, &sys_sec);
+  if (*error < 0)
+    *error = 0;
+  if (*error == 6)
+    jb_make_time (sys_date, &sys_sec, error);
+  return sys_sec;
 }
+
 #if INLINE_JB_GET_TIME_FILE
 #define jb_get_time_file _jb_get_time_file
 #else
-JBDOUBLE jb_get_time_file(FILE *file, int *error);
+JBDOUBLE jb_get_time_file (FILE * file, int *error);
 #endif
 
-static inline char* _jb_set_time(JBDOUBLE time)
+static inline char *
+_jb_set_time (JBDOUBLE time)
 {
-    char *buffer;
-    time_t sys_t;
-    struct tm *sys_date;
-    buffer = (char*)g_try_malloc(JB_BUFFER_SIZE * sizeof(char));
-    if (buffer)
-        {
-            sys_t = (time_t)time;
-            time -= (JBDOUBLE)sys_t;
-            sys_date = localtime(&sys_t);
-            snprintf(buffer, JB_BUFFER_SIZE, "%d %d %d %d %d "FWL,
-                     sys_date->tm_year + 1900,
-                     sys_date->tm_mon + 1,
-                     sys_date->tm_mday,
-                     sys_date->tm_hour,
-                     sys_date->tm_min,
-                     time + sys_date->tm_sec);
-            buffer = (char*)jb_realloc(buffer, (1 + strlen(buffer)) * sizeof(char));
-        }
-    return buffer;
+  char *buffer;
+  time_t sys_t;
+  struct tm *sys_date;
+  buffer = (char *) g_try_malloc (JB_BUFFER_SIZE * sizeof (char));
+  if (buffer)
+    {
+      sys_t = (time_t) time;
+      time -= (JBDOUBLE) sys_t;
+      sys_date = localtime (&sys_t);
+      snprintf (buffer, JB_BUFFER_SIZE, "%d %d %d %d %d " FWL,
+                sys_date->tm_year + 1900,
+                sys_date->tm_mon + 1,
+                sys_date->tm_mday,
+                sys_date->tm_hour, sys_date->tm_min, time + sys_date->tm_sec);
+      buffer =
+        (char *) jb_realloc (buffer, (1 + strlen (buffer)) * sizeof (char));
+    }
+  return buffer;
 }
+
 #if INLINE_JB_SET_TIME
 #define jb_set_time _jb_set_time
 #else
-char* jb_set_time(JBDOUBLE time);
+char *jb_set_time (JBDOUBLE time);
 #endif
 
 /**
  * \fn static inline int jb_cores()
  * \brief Function to calculate the number of cores.
  */
-static inline int jb_cores()
+static inline int
+jb_cores ()
 {
 #if defined(G_OS_WIN32)
-    SYSTEM_INFO sysinfo;
-    GetSystemInfo(&sysinfo);
-    return sysinfo.dwNumberOfProcessors;
-    /*
-    #elif defined(BSD)
-        int cores, mib[2];
-        size_t len = sizeof(cores);
-        mib[0] = CTL_HW;
-        mib[1] = HW_NCPU;
-        if (sysctl(mib, 2, &cores, &len, NULL, 0) != 0)
-    	{
-            perror("sysctl");
-            cores = -1;
-        }
-    	return cores;
-    */
+  SYSTEM_INFO sysinfo;
+  GetSystemInfo (&sysinfo);
+  return sysinfo.dwNumberOfProcessors;
+  /*
+     #elif defined(BSD)
+     int cores, mib[2];
+     size_t len = sizeof(cores);
+     mib[0] = CTL_HW;
+     mib[1] = HW_NCPU;
+     if (sysctl(mib, 2, &cores, &len, NULL, 0) != 0)
+     {
+     perror("sysctl");
+     cores = -1;
+     }
+     return cores;
+   */
 #else
-    return (int)sysconf(_SC_NPROCESSORS_ONLN);
+  return (int) sysconf (_SC_NPROCESSORS_ONLN);
 #endif
-    /*
-    MacOS X:
-        MPProcessorsScheduled();
+  /*
+     MacOS X:
+     MPProcessorsScheduled();
 
-    HPUX:
-        struct pst_dynamic psd;
+     HPUX:
+     struct pst_dynamic psd;
 
-        if (pstat_getdynamic(&psd, sizeof(psd), 1, 0) == -1) {
-            perror("pstat_getdynamic");
-            cores = -1;
-        } else {
-            cores = (int)psd.psd_proc_cnt;
-        }
+     if (pstat_getdynamic(&psd, sizeof(psd), 1, 0) == -1) {
+     perror("pstat_getdynamic");
+     cores = -1;
+     } else {
+     cores = (int)psd.psd_proc_cnt;
+     }
 
-    "integrity" OS, symbian: hard-coded to one core.
+     "integrity" OS, symbian: hard-coded to one core.
 
-    VXWorks: a loop to check if CPU #n exists until it fails (see link)
+     VXWorks: a loop to check if CPU #n exists until it fails (see link)
 
-    IRIX:
-        cores = (int)sysconf(_SC_NPROC_ONLN);
-    */
+     IRIX:
+     cores = (int)sysconf(_SC_NPROC_ONLN);
+   */
 }
 
 #endif

@@ -24,51 +24,51 @@
 #include <fcntl.h>
 
 /*****************************************************/
-int creaInterfaz(char *nombre);
+int creaInterfaz (char *nombre);
 /* Pre: nombre!=NULL
    post: Devuelve el identificador de la interfaz
 *****************************************************/
-void eliminaInterfaz(char *nombre);
+void eliminaInterfaz (char *nombre);
 /* Pre: nombre!=NULL
    post: -
 *****************************************************/
-int abrirInterfazEnv(char *nombre);
+int abrirInterfazEnv (char *nombre);
 /* Pre: nombre!=NULL
    post: -
 *****************************************************/
-int abrirInterfazRec(char *nombre);
+int abrirInterfazRec (char *nombre);
 /* Pre: nombre!=NULL
    post: -
 *****************************************************/
-int cerrarInterfazRec(int idInt);
+int cerrarInterfazRec (int idInt);
 /* Pre: nombre!=NULL
    post: -
 *****************************************************/
-int cerrarInterfazEnv(int idInt);
+int cerrarInterfazEnv (int idInt);
 /* Pre: nombre!=NULL
    post: -
 *****************************************************/
-int enviaChar(char *cadena,int idInt);
+int enviaChar (char *cadena, int idInt);
 /* Pre: Existe interfaz idInt
    post: Devuelve 1 si ok.
 *****************************************************/
-int enviaFloat(float numero,int idInt);
+int enviaFloat (float numero, int idInt);
 /* Pre: Existe interfaz idInt
    post: Cuidado! La resolución es baja.
 *****************************************************/
-int enviaInt(int numero,int idInt);
+int enviaInt (int numero, int idInt);
 /* Pre: Existe interfaz idInt
    post: Devuelve 1 si ok.
 *****************************************************/
-void recibeChar(int idInt, char* cadena);
+void recibeChar (int idInt, char *cadena);
 /* Pre: Existe interfaz idInt
    post:
 *****************************************************/
-int recibeFloat(int idInt, double *numero);
+int recibeFloat (int idInt, double *numero);
 /* Pre: Existe interfaz idInt
    post:
 *****************************************************/
-double recibeInt(int idInt, int *numero);
+double recibeInt (int idInt, int *numero);
 /* Pre: Existe interfaz idInt
    post:
 *****************************************************/

@@ -48,18 +48,19 @@
  * \brief error code (1 on success, 0 on error).
  * \return floating number value in JBDOUBLE format.
  */
-JBDOUBLE jb_xml_node_get_float(xmlNode *node, const xmlChar *prop, int *error)
+JBDOUBLE
+jb_xml_node_get_float (xmlNode * node, const xmlChar * prop, int *error)
 {
-    char *buffer;
-    JBDOUBLE x = 0.;
-    *error = 0;
-    buffer = (char*)xmlGetProp(node, prop);
-    if (buffer)
-        {
-            *error = sscanf(buffer, FRL, &x);
-            xmlFree(buffer);
-        }
-    return x;
+  char *buffer;
+  JBDOUBLE x = 0.;
+  *error = 0;
+  buffer = (char *) xmlGetProp (node, prop);
+  if (buffer)
+    {
+      *error = sscanf (buffer, FRL, &x);
+      xmlFree (buffer);
+    }
+  return x;
 }
 #endif
 
@@ -80,14 +81,14 @@ JBDOUBLE jb_xml_node_get_float(xmlNode *node, const xmlChar *prop, int *error)
  * \return floating number value in JBDOUBLE format.
  */
 JBDOUBLE jb_xml_node_get_float_with_default
-(xmlNode *node, const xmlChar *prop, int *error, JBDOUBLE def)
+  (xmlNode * node, const xmlChar * prop, int *error, JBDOUBLE def)
 {
-    if (!xmlHasProp(node, prop))
-        {
-            *error = 1;
-            return def;
-        }
-    return jb_xml_node_get_float(node, prop, error);
+  if (!xmlHasProp (node, prop))
+    {
+      *error = 1;
+      return def;
+    }
+  return jb_xml_node_get_float (node, prop, error);
 }
 #endif
 
@@ -108,11 +109,11 @@ JBDOUBLE jb_xml_node_get_float_with_default
  * \brief floating number value in JBDOUBLE format.
  */
 void jb_xml_node_set_float_with_format
-(xmlNode *node, const xmlChar *prop, char *format, JBDOUBLE x)
+  (xmlNode * node, const xmlChar * prop, char *format, JBDOUBLE x)
 {
-    char buffer[JB_BUFFER_SIZE];
-    snprintf(buffer, JB_BUFFER_SIZE, format, x);
-    xmlSetProp(node, prop, (xmlChar*)buffer);
+  char buffer[JB_BUFFER_SIZE];
+  snprintf (buffer, JB_BUFFER_SIZE, format, x);
+  xmlSetProp (node, prop, (xmlChar *) buffer);
 }
 
 /**
@@ -127,9 +128,10 @@ void jb_xml_node_set_float_with_format
  * \param x
  * \brief floating number value in JBDOUBLE format.
  */
-void jb_xml_node_set_float(xmlNode *node, const xmlChar *prop, JBDOUBLE x)
+void
+jb_xml_node_set_float (xmlNode * node, const xmlChar * prop, JBDOUBLE x)
 {
-    jb_xml_node_set_float_with_format(node, prop, FWL, x);
+  jb_xml_node_set_float_with_format (node, prop, FWL, x);
 }
 
 #endif
@@ -151,9 +153,10 @@ void jb_xml_node_set_float(xmlNode *node, const xmlChar *prop, JBDOUBLE x)
  * \brief default value.
  */
 void jb_xml_node_set_float_with_default
-(xmlNode *node, const xmlChar *prop, JBDOUBLE x, JBDOUBLE def)
+  (xmlNode * node, const xmlChar * prop, JBDOUBLE x, JBDOUBLE def)
 {
-    if (x != def) jb_xml_node_set_float(node, prop, x);
+  if (x != def)
+    jb_xml_node_set_float (node, prop, x);
 }
 #endif
 
@@ -170,18 +173,19 @@ void jb_xml_node_set_float_with_default
  * \brief error code (1 on success, 0 on error).
  * \return integer number value in long int format.
  */
-long jb_xml_node_get_int(xmlNode *node, const xmlChar *prop, int *error)
+long
+jb_xml_node_get_int (xmlNode * node, const xmlChar * prop, int *error)
 {
-    char *buffer;
-    long x = 0;
-    *error = 0;
-    buffer = (char*)xmlGetProp(node, prop);
-    if (buffer)
-        {
-            *error = sscanf(buffer, "%ld", &x);
-            xmlFree(buffer);
-        }
-    return x;
+  char *buffer;
+  long x = 0;
+  *error = 0;
+  buffer = (char *) xmlGetProp (node, prop);
+  if (buffer)
+    {
+      *error = sscanf (buffer, "%ld", &x);
+      xmlFree (buffer);
+    }
+  return x;
 }
 #endif
 
@@ -202,14 +206,14 @@ long jb_xml_node_get_int(xmlNode *node, const xmlChar *prop, int *error)
  * \return integer number value in long int format.
  */
 long jb_xml_node_get_int_with_default
-(xmlNode *node, const xmlChar *prop, int *error, long def)
+  (xmlNode * node, const xmlChar * prop, int *error, long def)
 {
-    if (!xmlHasProp(node, prop))
-        {
-            *error = 1;
-            return def;
-        }
-    return jb_xml_node_get_int(node, prop, error);
+  if (!xmlHasProp (node, prop))
+    {
+      *error = 1;
+      return def;
+    }
+  return jb_xml_node_get_int (node, prop, error);
 }
 #endif
 
@@ -224,11 +228,12 @@ long jb_xml_node_get_int_with_default
  * \param x
  * \brief integer number value in long int format.
  */
-void jb_xml_node_set_int(xmlNode *node, const xmlChar *prop, long x)
+void
+jb_xml_node_set_int (xmlNode * node, const xmlChar * prop, long x)
 {
-    char buffer[JB_BUFFER_SIZE];
-    snprintf(buffer,JB_BUFFER_SIZE, "%ld", x);
-    xmlSetProp(node, prop, (xmlChar*)buffer);
+  char buffer[JB_BUFFER_SIZE];
+  snprintf (buffer, JB_BUFFER_SIZE, "%ld", x);
+  xmlSetProp (node, prop, (xmlChar *) buffer);
 }
 #endif
 
@@ -248,9 +253,10 @@ void jb_xml_node_set_int(xmlNode *node, const xmlChar *prop, long x)
  * \brief default value.
  */
 void jb_xml_node_set_int_with_default
-(xmlNode *node, const xmlChar *prop, long x, long def)
+  (xmlNode * node, const xmlChar * prop, long x, long def)
 {
-    if (x != def) jb_xml_node_set_int(node, prop, x);
+  if (x != def)
+    jb_xml_node_set_int (node, prop, x);
 }
 #endif
 
@@ -268,17 +274,20 @@ void jb_xml_node_set_int_with_default
  * \brief error code (1 on success, 0 on error).
  * \return date in floating point format.
  */
-JBDOUBLE jb_xml_node_get_time(xmlNode *node, const xmlChar *prop, int *error)
+JBDOUBLE
+jb_xml_node_get_time (xmlNode * node, const xmlChar * prop, int *error)
 {
-    char *buffer;
-    JBDOUBLE t;
+  char *buffer;
+  JBDOUBLE t;
+  *error = 0;
+  buffer = (char *) xmlGetProp (node, prop);
+  if (!buffer)
+    return 0.;
+  t = jb_get_time (buffer, error);
+  if (*error != 6)
     *error = 0;
-    buffer = (char*)xmlGetProp(node, prop);
-    if (!buffer) return 0.;
-    t = jb_get_time(buffer, error);
-    if (*error != 6) *error = 0;
-    xmlFree(buffer);
-    return t;
+  xmlFree (buffer);
+  return t;
 }
 #endif
 
@@ -300,14 +309,14 @@ JBDOUBLE jb_xml_node_get_time(xmlNode *node, const xmlChar *prop, int *error)
  * \return date in floating point format.
  */
 JBDOUBLE jb_xml_node_get_time_with_default
-(xmlNode *node, const xmlChar *prop, int *error, JBDOUBLE def)
+  (xmlNode * node, const xmlChar * prop, int *error, JBDOUBLE def)
 {
-    if (!xmlHasProp(node, prop))
-        {
-            *error = 1;
-            return def;
-        }
-    return jb_xml_node_get_time(node, prop, error);
+  if (!xmlHasProp (node, prop))
+    {
+      *error = 1;
+      return def;
+    }
+  return jb_xml_node_get_time (node, prop, error);
 }
 #endif
 
@@ -323,11 +332,12 @@ JBDOUBLE jb_xml_node_get_time_with_default
  * \param t
  * \brief date in floating point format.
  */
-void jb_xml_node_set_time(xmlNode *node, const xmlChar *prop, JBDOUBLE t)
+void
+jb_xml_node_set_time (xmlNode * node, const xmlChar * prop, JBDOUBLE t)
 {
-    const xmlChar *buffer;
-    buffer = (const xmlChar*)jb_set_time(t);
-    xmlSetProp(node, prop, buffer);
+  const xmlChar *buffer;
+  buffer = (const xmlChar *) jb_set_time (t);
+  xmlSetProp (node, prop, buffer);
 }
 #endif
 
@@ -348,9 +358,10 @@ void jb_xml_node_set_time(xmlNode *node, const xmlChar *prop, JBDOUBLE t)
  * \brief default value.
  */
 void jb_xml_node_set_time_with_default
-(xmlNode *node, const xmlChar *prop, JBDOUBLE t, JBDOUBLE def)
+  (xmlNode * node, const xmlChar * prop, JBDOUBLE t, JBDOUBLE def)
 {
-    if (t != def) jb_xml_node_set_time(node, prop, t);
+  if (t != def)
+    jb_xml_node_set_time (node, prop, t);
 }
 #endif
 
@@ -365,27 +376,32 @@ void jb_xml_node_set_time_with_default
  *   xmlFree.
  * \return file struct with the content.
  */
-FILE* jb_xml_node_get_content_file(xmlNode *node, char **buffer)
+FILE *
+jb_xml_node_get_content_file (xmlNode * node, char **buffer)
 {
-    int l;
-    FILE *file;
-    *buffer = (char*)xmlNodeGetContent(node);
-    if (!*buffer) return 0;
-    l = strlen(*buffer);
+  int l;
+  FILE *file;
+  *buffer = (char *) xmlNodeGetContent (node);
+  if (!*buffer)
+    return 0;
+  l = strlen (*buffer);
 #if defined(G_OS_WIN32) || defined(BSD) || defined(__sun)
-    int k;
-    file = g_fopen("node.tmp", "w");
-    if (!file) goto exit1;
-    k = fwrite(*buffer, sizeof(char), l, file);
-    fclose(file);
-    if (k != l) goto exit1;
-    file = g_fopen("node.tmp", "r");
+  int k;
+  file = g_fopen ("node.tmp", "w");
+  if (!file)
+    goto exit1;
+  k = fwrite (*buffer, sizeof (char), l, file);
+  fclose (file);
+  if (k != l)
+    goto exit1;
+  file = g_fopen ("node.tmp", "r");
 exit1:
 #else
-    file = (FILE*)fmemopen(*buffer, l, "r");
+  file = (FILE *) fmemopen (*buffer, l, "r");
 #endif
-    if (!file) xmlFree(*buffer);
-    return file;
+  if (!file)
+    xmlFree (*buffer);
+  return file;
 }
 #endif
 
@@ -398,16 +414,17 @@ exit1:
  * \param file
  * \brief file struct with the content.
  */
-void jb_xml_node_set_content_file(xmlNode *node, FILE *file)
+void
+jb_xml_node_set_content_file (xmlNode * node, FILE * file)
 {
-    long int l;
-    char *buffer;
-    l = ftell(file);
-    buffer = (char*)g_malloc(l + 1);
-    fseek(file, 0, SEEK_SET);
-    l = fread(buffer, 1, l, file);
-    buffer[l] = 0;
-    xmlNodeSetContent(node, (const xmlChar*)buffer);
-    g_free(buffer);
+  long int l;
+  char *buffer;
+  l = ftell (file);
+  buffer = (char *) g_malloc (l + 1);
+  fseek (file, 0, SEEK_SET);
+  l = fread (buffer, 1, l, file);
+  buffer[l] = 0;
+  xmlNodeSetContent (node, (const xmlChar *) buffer);
+  g_free (buffer);
 }
 #endif
