@@ -5,12 +5,12 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * 	1. Redistributions of source code must retain the above copyright notice,
- * 		this list of conditions and the following disclaimer.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
  *
- * 	2. Redistributions in binary form must reproduce the above copyright notice,
- * 		this list of conditions and the following disclaimer in the
- * 		documentation and/or other materials provided with the distribution.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY Javier Burguete Tolosa ``AS IS'' AND ANY EXPRESS
  * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -45,48 +45,20 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 
-/**
- * \def JBW_NO
- * \brief Macro to use on terminal programs.
- */
-#define JBW_NO			1
-/**
- * \def JBW_GTK
- * \brief Macro to use the Gtk+ library on visual programs.
- */
-#define JBW_GTK			2
+#define JBW_NO 1                ///< Macro to use on terminal programs.
+#define JBW_GTK 2               ///< Macro to use the Gtk+ library on visual
+                                ///< programs.
+#define JBW_DRAW_CAIRO 1        ///< Macro to draw plots with the Cairo library.
+#define JBW_DRAW_OPENGL 2       ///< Macro to draw plots with the OpenGL
+                                ///< library.
+#define JBW_DRAW_COGL 3         ///< Macro to draw plots with the COGL library.
 
-/**
- * \def JBW_DRAW_CAIRO
- * \brief Macro to draw plots with the Cairo library.
- */
-#define JBW_DRAW_CAIRO	1
-/**
- * \def JBW_DRAW_OPENGL
- * \brief Macro to draw plots with the OpenGL library.
- */
-#define JBW_DRAW_OPENGL	2
-/**
- * \def JBW_DRAW_COGL
- * \brief Macro to draw plots with the COGL library.
- */
-#define JBW_DRAW_COGL	3
-
-/**
- * \def JBW_GRAPHIC_CAIRO
- * \brief Macro to using the Cairo library in graphical widgets.
- */
-#define JBW_GRAPHIC_CAIRO		1
-/**
- * \def JBW_GRAPHIC_GLUT
- * \brief Macro to using the FreeGLUT library in graphical widgets.
- */
-#define JBW_GRAPHIC_GLUT		2
-/**
- * \def JBW_GRAPHIC_CLUTTER
- * \brief Macro to using the Clutter library in graphical widgets.
- */
-#define JBW_GRAPHIC_CLUTTER		3
+#define JBW_GRAPHIC_CAIRO 1
+  ///< Macro to using the Cairo library in graphical widgets.
+#define JBW_GRAPHIC_GLUT 2
+  ///< Macro to using the FreeGLUT library in graphical widgets.
+#define JBW_GRAPHIC_CLUTTER 3
+  ///< Macro to using the Clutter library in graphical widgets.
 
 #include "jb_config.h"
 
@@ -205,24 +177,15 @@ extern FILE *stderr;
 #endif
 #define FWF2 FWF " "
 
-/**
- * \def JB_PROTECT
- * \brief Macro returning FALSE if a is in [b,c].
- */
 #define JB_PROTECT(a, b, c) ((a < b)? 1: (a > c)? 1: 0)
+  ///< Macro returning FALSE if a is in [b,c].
 
-/**
- * \def JB_POINTER_SIZE
- * \brief Macro to calculate the size between two fields of a structure.
- */
 #define JB_POINTER_SIZE(a, b) ((size_t)&(a) - (size_t)&(b))
+  ///< Macro to calculate the size between two fields of a structure.
 
-/**
- * \def JB_CHANGE
- * \brief Macro to interchange two variables (change a and b using the auxiliary
- *   c).
- */
 #define JB_CHANGE(a, b, c) (c = a, a = b, b = c)
+  ///< Macro to interchange two variables (change a and b using the auxiliary
+  ///< c).
 
 static inline void
 _JBChange (void **a, void **b)
@@ -237,11 +200,8 @@ _JBChange (void **a, void **b)
 void JBChange (void **a, void **b);
 #endif
 
-/**
- * \def jb_change
- * \brief Macro to interchange two pointers.
- */
 #define jb_change(a, b) (JBChange((void**)&a, (void**)&b))
+  ///< Macro to interchange two pointers.
 
 #if JB_FREE_NULL
 void jb_free_null (void **);
@@ -417,7 +377,7 @@ char *jb_set_time (JBDOUBLE time);
 static inline int
 jb_cores ()
 {
-#if defined(G_OS_WIN32)
+#ifdef G_OS_WIN32
   SYSTEM_INFO sysinfo;
   GetSystemInfo (&sysinfo);
   return sysinfo.dwNumberOfProcessors;

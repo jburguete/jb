@@ -33,22 +33,13 @@
 #include "jb_win.h"
 
 #if JBW == JBW_GTK
-/**
- * \var window_parent
- * \brief pointer to the parent GtkWindow struct.
- */
-GtkWindow *window_parent;
+GtkWindow *window_parent;       ///< pointer to the parent GtkWindow struct.
 #endif
 
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
-/**
- * \var jbw_graphic_queue
- * \brief GLUT graphic queue.
- * \var jbw_graphic_draw
- * \brief pointer to the function drawing in the GLUT window.
- */
-GQueue jbw_graphic_queue = G_QUEUE_INIT;
+GQueue jbw_graphic_queue = G_QUEUE_INIT;        ///< GLUT graphic queue.
 void (*jbw_graphic_draw) ();
+  ///< pointer to the function drawing in the GLUT window.
 #endif
 
 /**

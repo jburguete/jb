@@ -41,33 +41,17 @@
 #define M_PIl M_PI
 #endif
 
-/**
- * \def JBM_G
- * \brief Gravity constant
- */
-#define JBM_G 9.81
-/**
- * \def JBM_INDEX_SORT_FLASH_MIN
- * \brief Minimum number of elements to select the jbm_index_sort_flash_min()
- *   function as default sort method.
- */
+#define JBM_G 9.81              ///< Gravity constant.
 #define JBM_INDEX_SORT_FLASH_MIN 32
-/**
- * \def JBM_INDEX_SORT_MERGE_MIN
- * \brief Minimum number of elements to select the jbm_index_sort_merge_min()
- *   function as default sort method.
- */
+  ///< Minimum number of elements to select the jbm_index_sort_flash_min()
+  ///< function as default sort method.
 #define JBM_INDEX_SORT_MERGE_MIN 32
-/**
- * \def JBM_MAX
- * \brief Macro calculating the maximum number.
- */
+  ///< Minimum number of elements to select the jbm_index_sort_merge_min()
+  ///< function as default sort method.
 #define JBM_MAX(a, b) (((a) > (b))? (a): (b))
-/**
- * \def JBM_MIN
- * \brief Macro calculating the minimum number.
- */
+  ///< Macro calculating the maximum number.
 #define JBM_MIN(a, b) (((a) < (b))? (a): (b))
+  ///< Macro calculating the minimum number.
 /**
  * \def JBM_MODMIN
  * \brief Macro calculating the number with the lower module in the [a, b]
@@ -119,22 +103,11 @@
 #define JBM_FMODMIN(a, b) (((a) * (b) <= 0.L)? 0.L: \
 		(fabsl(a) < fabsl(b))? (a): (b))
 #endif
-/**
- * \def JBM_SQR
- * \brief Macro calculating the square of a number.
- */
-#define JBM_SQR(x) ((x) * (x))
-/**
- * \def JBM_DBL
- * \brief Macro calculating the double of a number.
- */
-#define JBM_DBL(x) ((x) + (x))
-/**
- * \def JBM_EXTRAPOLATE
- * \brief Macro calculating a linear extrapolation.
- */
+#define JBM_SQR(x) ((x) * (x))  ///< Macro calculating the square of a number.
+#define JBM_DBL(x) ((x) + (x))  ///< Macro calculating the double of a number.
 #define JBM_EXTRAPOLATE(x, x1, x2, y1, y2) \
-	((y1) + (x - (x1)) * ((y2) - (y1)) / ((x2) - (x1)))
+  ((y1) + (x - (x1)) * ((y2) - (y1)) / ((x2) - (x1)))
+  ///< Macro calculating a linear extrapolation.
 
 // Needed in no GNU systems
 #if defined(BSD) || defined(sun) || defined(G_OS_WIN32)
