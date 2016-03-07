@@ -294,140 +294,6 @@ jbw_float_entry_get_value (JBWFloatEntry * entry)
 }
 #endif
 
-#if JBW_DRAW == JBW_DRAW_CAIRO
-
-#if !INLINE_JBW_DRAW_RECTANGLE
-void
-jbw_draw_rectangle (cairo_t * cr, double red, double green,
-                    double blue, double x, double y, double width,
-                    double height)
-{
-  _jbw_draw_rectangle (cr, red, green, blue, x, y, width, height);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_BAR
-void
-jbw_draw_bar (cairo_t * cr, double red, double green,
-              double blue, double x, double y, double width, double height)
-{
-  _jbw_draw_bar (cr, red, green, blue, x, y, width, height);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_CLEAR
-void
-jbw_draw_clear (cairo_t * cr, double red, double green, double blue,
-                double width, double height)
-{
-  _jbw_draw_clear (cairo_t * cr, red, green, blue, width, height);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_LINE
-void
-jbw_draw_line (cairo_t * cr, double red, double green, double blue,
-               JBFLOAT * x, JBFLOAT * y, int n)
-{
-  _jbw_draw_line (cr, red, green, blue, x, y, n);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_LINEV
-void
-jbw_draw_linev (cairo_t * cr,
-                double red, double green, double blue, void *x, void *y,
-                int size, int n)
-{
-  _jbw_draw_linev (cr, red, green, blue, x, y, size, n);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_SEGMENT_WITH_LIMITS
-void
-jbw_draw_segment_with_limits (cairo_t * cr, double xmin, double ymin,
-                              double xmax, double ymax, double x1, double y1,
-                              double x2, double y2)
-{
-  _jbw_draw_segment_with_limits (cr, xmin, ymin, xmax, ymax, x1, y1, x2, y2);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_LINE_WITH_LIMITS
-void
-jbw_draw_line_with_limits (cairo_t * cr,
-                           double red, double green, double blue,
-                           double xmin, double ymin, double xmax, double ymax,
-                           double x1, double y1, double x2, double y2,
-                           JBFLOAT * x, JBFLOAT * y, int n)
-{
-  _jbw_draw_line_with_limits (cr, red, green, blue, xmin, ymin, xmax, ymax,
-                              x1, y1, x2, y2, x, y, n);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_LINE_WITH_LIMITSV
-void
-jbw_draw_line_with_limitsv (cairo_t * cr,
-                            double red, double green, double blue,
-                            double xmin, double ymin, double xmax, double ymax,
-                            double x1, double y1, double x2, double y2,
-                            void *x, void *y, int size, int n)
-{
-  _jbw_draw_line_with_limitsv (cr, red, green, blue, xmin, ymin, xmax, ymax,
-                               x1, y1, x2, y2, x, y, size, n);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_LINES_WITH_LIMITS
-void jbw_draw_lines_with_limits
-  (cairo_t * cr,
-   double red1, double green1, double blue1,
-   double red2, double green2, double blue2,
-   double xmin, double ymin, double xmax, double ymax,
-   double x1, double y1, double x2, double y2,
-   JBFLOAT * x, JBFLOAT * y, JBFLOAT * yy, int n)
-{
-  _jbw_draw_lines_with_limits (cr, red1, green1, blue1, red2, green2, blue2,
-                               xmin, ymin, xmax, ymax, x1, y1, x2, y2, x, y, yy,
-                               n);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_LINES_WITH_LIMITSV
-void jbw_draw_lines_with_limitsv
-  (cairo_t * cr,
-   double red1, double green1, double blue1,
-   double red2, double green2, double blue2,
-   double xmin, double ymin, double xmax, double ymax,
-   double x1, double y1, double x2, double y2,
-   void *x, void *y, void *yy, int size, int n)
-{
-  _jbw_draw_lines_with_limitsv (cr, red1, green1, blue1, red2, green2, blue2,
-                                xmin, ymin, xmax, ymax, x1, y1, x2, y2, x, y,
-                                yy, size, n);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_SEGMENT
-void
-jbw_draw_segment (cairo_t * cr, double red, double green, double blue,
-                  JBFLOAT * x, JBFLOAT * y, int n)
-{
-  _jbw_draw_segment (cr, red, green, blue, x, y, n);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_STRING
-void
-jbw_draw_string (cairo_t * cr, char *string, double x, double y)
-{
-  _jbw_draw_string (cr, string, x, y);
-}
-#endif
-
-#elif JBW_DRAW == JBW_DRAW_OPENGL
-
 #if !INLINE_JBW_DRAW_RECTANGLEF
 void jbw_draw_rectanglef
   (float red, float green, float blue, float x1, float y1, float x2, float y2)
@@ -604,8 +470,6 @@ jbw_draw_string (char *string, double x, double y, int font_list_base)
 {
   _jbw_draw_string (string, x, y, font_list_base);
 }
-#endif
-
 #endif
 
 #if !INLINE_JBW_DRAW_RANGE
@@ -790,13 +654,7 @@ jbw_graphic_draw_logo (JBWGraphic * graphic)
 #endif
 
 #if !INLINE_JBW_GRAPHIC_REALIZE
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO
-void
-jbw_graphic_realize (GtkWidget * widget, JBWGraphic * graphic)
-{
-  _jbw_graphic_realize (widget, graphic);
-}
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 void jbw_graphic_realize (JBWGraphic * graphic);
 {
   _jbw_graphic_realize (*graphic);
@@ -805,13 +663,7 @@ void jbw_graphic_realize (JBWGraphic * graphic);
 #endif
 
 #if !INLINE_JBW_GRAPHIC_EXPOSE_EVENT
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO
-void jbw_graphic_expose_event
-  (GtkWidget * widget, GdkEventExpose * event, JBWGraphic * graphic)
-{
-  _jbw_graphic_expose_event (widget, event, graphic);
-}
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 void
 jbw_graphic_expose_event ()
 {

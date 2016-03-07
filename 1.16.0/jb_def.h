@@ -48,17 +48,13 @@
 #define JBW_NO 1                ///< Macro to use on terminal programs.
 #define JBW_GTK 2               ///< Macro to use the Gtk+ library on visual
                                 ///< programs.
-#define JBW_DRAW_CAIRO 1        ///< Macro to draw plots with the Cairo library.
-#define JBW_DRAW_OPENGL 2       ///< Macro to draw plots with the OpenGL
-                                ///< library.
-#define JBW_DRAW_COGL 3         ///< Macro to draw plots with the COGL library.
 
-#define JBW_GRAPHIC_CAIRO 1
-  ///< Macro to using the Cairo library in graphical widgets.
-#define JBW_GRAPHIC_GLUT 2
+#define JBW_GRAPHIC_GLUT 1
   ///< Macro to using the FreeGLUT library in graphical widgets.
-#define JBW_GRAPHIC_CLUTTER 3
-  ///< Macro to using the Clutter library in graphical widgets.
+#define JBW_GRAPHIC_SDL 2
+  ///< Macro to using the SDL library in graphical widgets.
+#define JBW_GRAPHIC_GLFW 3
+  ///< Macro to using the GLFW library in graphical widgets.
 
 #include "jb_config.h"
 
@@ -67,10 +63,7 @@
 #error "Unknown JB windows"
 #endif
 #if (JBW != JBW_NO)
-#if (JBW_DRAW < JBW_DRAW_CAIRO || JBW_DRAW > JBW_DRAW_OPENGL)
-#error "Unknown JB windows draw"
-#endif
-#if (JBW_GRAPHIC < JBW_GRAPHIC_CAIRO || JBW_GRAPHIC > JBW_GRAPHIC_CLUTTER)
+#if (JBW_GRAPHIC < JBW_GRAPHIC_GLUT || JBW_GRAPHIC > JBW_GRAPHIC_GLFW)
 #error "Unknown JB windows graphic"
 #endif
 #endif

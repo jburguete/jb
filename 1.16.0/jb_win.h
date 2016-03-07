@@ -76,14 +76,9 @@ void jbw_show_warning (char *);
 #elif JBW == JBW_GTK
 
 #include <gtk/gtk.h>
-
-#if JBW_DRAW == JBW_DRAW_CAIRO
-#include <cairo.h>
-#elif JBW_DRAW == JBW_DRAW_OPENGL
 #include <GL/gl.h>
 #include <GL/freeglut.h>
 #include <png.h>
-#endif
 
 #if JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
 #include <clutter/clutter.h>
@@ -293,353 +288,6 @@ _jbw_show_warning (char *message)
 #else
 void jbw_show_warning (char *);
 #endif
-
-#if JBW_DRAW == JBW_DRAW_CAIRO
-
-static inline void
-_jbw_draw_rectangle (cairo_t * cr, double red, double green,
-                     double blue, double x, double y, double width,
-                     double height)
-{
-  cairo_set_source_rgb (cr, red, green, blue);
-  cairo_rectangle (cr, x, y, width, height);
-  cairo_stroke (cr);
-}
-
-#if INLINE_JBW_DRAW_RECTANGLE
-#define jbw_draw_rectangle _jbw_draw_rectangle
-#else
-void jbw_draw_rectangle
-  (cairo_t *, double, double, double, double, double, double, double);
-#endif
-
-static inline void
-_jbw_draw_bar (cairo_t * cr, double red, double green,
-               double blue, double x, double y, double width, double height)
-{
-  cairo_set_source_rgb (cr, red, green, blue);
-  cairo_rectangle (cr, x, y, width, height);
-  cairo_fill (cr);
-}
-
-#if INLINE_JBW_DRAW_BAR
-#define jbw_draw_bar _jbw_draw_bar
-#else
-void jbw_draw_bar
-  (cairo_t *, double, double, double, double, double, double, double);
-#endif
-
-static inline void _jbw_draw_clear
-  (cairo_t * cr, double red, double green, double blue, double width,
-   double height)
-{
-  jbw_draw_bar (cr, red, green, blue, 0, 0, width, height);
-}
-
-#if INLINE_JBW_DRAW_CLEAR
-#define jbw_draw_clear _jbw_draw_clear
-#else
-void jbw_draw_clear (cairo_t *, double, double, double, double, double);
-#endif
-
-static inline void _jbw_draw_line
-  (cairo_t * cr, double red, double green, double blue, JBFLOAT * x,
-   JBFLOAT * y, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  cairo_set_source_rgb (cr, red, green, blue);
-  cairo_move_to (cr, x[0], y[0]);
-  for (i = 0; ++i < n;)
-    cairo_line_to (cr, x[i], y[i]);
-  cairo_stroke (cr);
-}
-
-#if INLINE_JBW_DRAW_LINE
-#define jbw_draw_line _jbw_draw_line
-#else
-void jbw_draw_line (cairo_t *, double, double, double, JBFLOAT *, JBFLOAT *,
-                    int);
-#endif
-
-static inline void
-_jbw_draw_linev (cairo_t * cr,
-                 double red, double green, double blue, void *x, void *y,
-                 int size, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  cairo_set_source_rgb (cr, red, green, blue);
-  cairo_move_to (cr, *((JBFLOAT *) x), -*((JBFLOAT *) y));
-  for (i = 0; ++i < n;)
-    {
-      x += size, y += size;
-      cairo_line_to (cr, *((JBFLOAT *) x), -*((JBFLOAT *) y));
-    }
-  cairo_stroke (cr);
-}
-
-#if INLINE_JBW_DRAW_LINEV
-#define jbw_draw_linev _jbw_draw_linev
-#else
-void jbw_draw_linev (cairo_t *, double, double, double, void *, void *, int,
-                     int);
-#endif
-
-static inline void
-_jbw_draw_segment_with_limits (cairo_t * cr, double xmin,
-                               double ymin, double xmax, double ymax, double x1,
-                               double y1, double x2, double y2)
-{
-  double xa, ya, xb, yb, m;
-  if (x1 == x2)
-    {
-      xa = xb = x1;
-      ya = fmin (y1, ymax);
-      ya = fmax (ya, ymin);
-      yb = fmin (y2, ymax);
-      yb = fmax (yb, ymin);
-    }
-  else if (y1 == y2)
-    {
-      ya = yb = y1;
-      xa = fmin (x1, xmax);
-      xa = fmax (xa, xmin);
-      xb = fmin (x2, xmax);
-      xb = fmax (xb, xmin);
-    }
-  else
-    {
-      m = (y2 - y1) / (x2 - x1);
-      xa = x1 + (ymin - y1) / m;
-      if (xa < xmin)
-        {
-          xa = xmin;
-          ya = y1 + (xmin - x1) * m;
-        }
-      else
-        ya = ymin;
-      xb = x1 + (ymax - y1) / m;
-      if (xb > xmax)
-        {
-          xb = xmax;
-          yb = y1 + (xmax - x1) * m;
-        }
-      else
-        yb = ymax;
-      if (xa > xb)
-        {
-          JB_CHANGE (xa, xb, m);
-          JB_CHANGE (ya, yb, m);
-        }
-      if (x1 < xa)
-        {
-          if (x2 < xa)
-            return;
-          if (x2 < xb)
-            {
-              xb = x2;
-              yb = y2;
-            }
-        }
-      else if (x1 < xb)
-        {
-          if (x2 > xb)
-            {
-              xa = x1;
-              ya = y1;
-            }
-          else if (x2 > xa)
-            {
-              xa = x1;
-              ya = y1;
-              xb = x2;
-              yb = y2;
-            }
-          else
-            {
-              xb = x1;
-              yb = y1;
-            }
-        }
-      else
-        {
-          if (x2 > xb)
-            return;
-          if (x2 > xa)
-            {
-              xa = x2;
-              ya = y2;
-            }
-        }
-    }
-  if ((ya > ymax && yb > ymax) || (ya < ymin && yb < ymin))
-    return;
-  cairo_move_to (cr, xa, ya);
-  cairo_line_to (cr, xb, yb);
-}
-
-#if INLINE_JBW_DRAW_SEGMENT_WITH_LIMITS
-#define jbw_draw_segment_with_limits _jbw_draw_segment_with_limits
-#else
-void jbw_draw_segment_with_limits
-  (cairo_t *, double, double, double, double, double, double, double, double);
-#endif
-
-static inline void
-_jbw_draw_line_with_limits (cairo_t * cr,
-                            double red, double green, double blue,
-                            double xmin, double ymin, double xmax, double ymax,
-                            double x1, double y1, double x2, double y2,
-                            JBFLOAT * x, JBFLOAT * y, int n)
-{
-  register int i;
-  double xx[n], yy[n];
-  if (!x || !y)
-    return;
-  cairo_set_source_rgb (cr, red, green, blue);
-  for (i = 0; i < n; ++i)
-    {
-      xx[i] = jbm_extrapolate (x[i], xmin, xmax, x1, x2);
-      yy[i] = jbm_extrapolate (y[i], ymin, ymax, y2, y1);
-    }
-  for (i = 0; ++i < n;)
-    jbw_draw_segment_with_limits
-      (cr, x1, y1, x2, y2, xx[i - 1], yy[i - 1], xx[i], yy[i]);
-  cairo_stroke (cr);
-}
-
-#if INLINE_JBW_DRAW_LINE_WITH_LIMITS
-#define jbw_draw_line_with_limits _jbw_draw_line_with_limits
-#else
-void jbw_draw_line_with_limits (cairo_t *, double, double, double, double,
-                                double, double, double, double, double, double,
-                                double, JBFLOAT *, JBFLOAT *, int);
-#endif
-
-static inline void
-_jbw_draw_line_with_limitsv (cairo_t * cr,
-                             double red, double green, double blue,
-                             double xmin, double ymin, double xmax, double ymax,
-                             double x1, double y1, double x2, double y2,
-                             void *x, void *y, int size, int n)
-{
-  register int i;
-  double xx[n], yy[n];
-  if (!x || !y)
-    return;
-  cairo_set_source_rgb (cr, red, green, blue);
-  for (i = 0; i < n; ++i, x += size, y += size)
-    {
-      xx[i] = jbm_extrapolate (*((JBFLOAT *) x), xmin, xmax, x1, x2);
-      yy[i] = jbm_extrapolate (*((JBFLOAT *) y), ymin, ymax, y2, y1);
-    }
-  for (i = 0; ++i < n;)
-    jbw_draw_segment_with_limits
-      (cr, x1, y1, x2, y2, xx[i - 1], yy[i - 1], xx[i], yy[i]);
-  cairo_stroke (cr);
-}
-
-#if INLINE_JBW_DRAW_LINE_WITH_LIMITSV
-#define jbw_draw_line_with_limitsv _jbw_draw_line_with_limitsv
-#else
-void jbw_draw_line_with_limitsv (cairo_t *, double, double, double, double,
-                                 double, double, double, double, double, double,
-                                 double, void *, void *, int, int);
-#endif
-
-static inline void _jbw_draw_lines_with_limits
-  (cairo_t * cr,
-   double red1, double green1, double blue1,
-   double red2, double green2, double blue2,
-   double xmin, double ymin, double xmax, double ymax,
-   double x1, double y1, double x2, double y2,
-   JBFLOAT * x, JBFLOAT * y, JBFLOAT * yy, int n)
-{
-  jbw_draw_line_with_limits
-    (cr, red1, green1, blue1, xmin, ymin, xmax, ymax, x1, y1, x2, y2, x, y, n);
-  jbw_draw_line_with_limits
-    (cr, red2, green2, blue2, xmin, ymin, xmax, ymax, x1, y1, x2, y2, x, yy, n);
-}
-
-#if INLINE_JBW_DRAW_LINES_WITH_LIMITS
-#define jbw_draw_lines_with_limits _jbw_draw_lines_with_limits
-#else
-void jbw_draw_lines_with_limits (cairo_t *, double, double, double, double,
-                                 double, double, double, double, double, double,
-                                 double, double, double, double, JBFLOAT *,
-                                 JBFLOAT *, JBFLOAT *, int);
-#endif
-
-static inline void _jbw_draw_lines_with_limitsv
-  (cairo_t * cr,
-   double red1, double green1, double blue1,
-   double red2, double green2, double blue2,
-   double xmin, double ymin, double xmax, double ymax,
-   double x1, double y1, double x2, double y2,
-   void *x, void *y, void *yy, int size, int n)
-{
-  jbw_draw_line_with_limitsv
-    (cr, red1, green1, blue1, xmin, ymin, xmax, ymax, x1, y1, x2, y2, x, y,
-     size, n);
-  jbw_draw_line_with_limitsv (cr, red2, green2, blue2, xmin, ymin, xmax, ymax,
-                              x1, y1, x2, y2, x, yy, size, n);
-}
-
-#if INLINE_JBW_DRAW_LINES_WITH_LIMITSV
-#define jbw_draw_lines_with_limitsv _jbw_draw_lines_with_limitsv
-#else
-void jbw_draw_lines_with_limitsv (cairo_t *, double, double, double, double,
-                                  double, double, double, double, double,
-                                  double, double, double, double, double,
-                                  void *, void *, void *, int, int);
-#endif
-
-static inline void _jbw_draw_segment
-  (cairo_t * cr, double red, double green, double blue, JBFLOAT * x,
-   JBFLOAT * y, int n)
-{
-  register int i;
-  if (!x || !y || n < 2)
-    return;
-
-  cairo_set_source_rgb (cr, red, green, blue);
-  cairo_move_to (cr, x[0], y[0]);
-  cairo_line_to (cr, x[1], y[1]);
-  for (i = 2; i < n - 1; ++i)
-    {
-      cairo_move_to (cr, x[i], y[i]);
-      ++i;
-      cairo_line_to (cr, x[i], y[i]);
-    }
-  cairo_stroke (cr);
-}
-
-#if INLINE_JBW_DRAW_SEGMENT
-#define jbw_draw_segment _jbw_draw_segment
-#else
-void jbw_draw_segment (cairo_t *, double, double, double, JBFLOAT *, JBFLOAT *,
-                       int);
-#endif
-
-static inline void
-_jbw_draw_string (cairo_t * cr, char *string, double x, double y)
-{
-  if (!string)
-    return;
-  cairo_move_to (cr, x, y);
-  cairo_show_text (cr, string);
-}
-
-#if INLINE_JBW_DRAW_STRING
-#define jbw_draw_string _jbw_draw_string
-#else
-void jbw_draw_string (cairo_t *, char *, double, double);
-#endif
-
-#elif JBW_DRAW == JBW_DRAW_OPENGL
 
 static inline void _jbw_draw_rectanglef
   (float red, float green, float blue, float x1, float y1, float x2, float y2)
@@ -993,368 +641,6 @@ static inline void _jbw_draw_string
 void jbw_draw_string (char *, double, double, int);
 #endif
 
-#elif JBW_DRAW == JBW_DRAW_COGL
-
-static inline void _jbw_draw_rectanglef
-  (float red, float green, float blue, float x1, float y1, float x2, float y2)
-{
-  ClutterColor color[1] = { 256 * red, 256 * green, 256 * blue, 0 };
-  ClutterStage *stage;
-  ClutterActor *actor;
-  stage = clutter_stage_get_default ();
-  clutter_stage_set_color (stage, color);
-  actor = clutter_actor_new ();
-  clutter_container_add (CLUTTER_CONTAINER (stage));
-  glBegin (GL_LINE_LOOP);
-  glVertex2f (x1, y1);
-  glVertex2f (x2, y1);
-  glVertex2f (x2, y2);
-  glVertex2f (x1, y2);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_RECTANGLEF
-#define jbw_draw_rectanglef _jbw_draw_rectanglef
-#else
-void jbw_draw_rectanglef (float, float, float, float, float, float, float);
-#endif
-
-static inline void _jbw_draw_rectangled
-  (float red, float green, float blue, double x1,
-   double y1, double x2, double y2)
-{
-  glColor3f (red, green, blue);
-  glBegin (GL_LINE_LOOP);
-  glVertex2d (x1, y1);
-  glVertex2d (x2, y1);
-  glVertex2d (x2, y2);
-  glVertex2d (x1, y2);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_RECTANGLED
-#define jbw_draw_rectangled _jbw_draw_rectangled
-#else
-void jbw_draw_rectangled (float, float, float, double, double, double, double);
-#endif
-
-static inline void
-_jbw_draw_clear (float red, float green, float blue, float alpha)
-{
-  glClearColor (red, green, blue, alpha);
-  glClear (GL_COLOR_BUFFER_BIT);
-}
-
-#if INLINE_JBW_DRAW_CLEAR
-#define jbw_draw_clear _jbw_draw_clear
-#else
-void jbw_draw_clear (float, float, float, float);
-#endif
-
-static inline void _jbw_draw_pointsf
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  glColor3f (red, green, blue);
-  glBegin (GL_POINTS);
-  for (i = n; --i >= 0;)
-    glVertex2f (x[i], y[i]);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_POINTSF
-#define jbw_draw_pointsf _jbw_draw_pointsf
-#else
-void jbw_draw_pointsf (float, float, float, JBFLOAT *, JBFLOAT *, int);
-#endif
-
-static inline void _jbw_draw_pointsd
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  glColor3f (red, green, blue);
-  glBegin (GL_POINTS);
-  for (i = n; --i >= 0;)
-    glVertex2d (x[i], y[i]);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_POINTSD
-#define jbw_draw_pointsd _jbw_draw_pointsd
-#else
-void jbw_draw_pointsd (float, float, float, JBFLOAT *, JBFLOAT *, int);
-#endif
-
-static inline void _jbw_draw_linesf
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  glColor3f (red, green, blue);
-  glBegin (GL_LINE_STRIP);
-  for (i = n; --i >= 0;)
-    glVertex2f (x[i], y[i]);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_LINESF
-#define jbw_draw_linesf _jbw_draw_linesf
-#else
-void jbw_draw_linesf (float, float, float, JBFLOAT *, JBFLOAT *, int);
-#endif
-
-static inline void _jbw_draw_linesd
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  glColor3f (red, green, blue);
-  glBegin (GL_LINE_STRIP);
-  for (i = n; --i >= 0;)
-    glVertex2d (x[i], y[i]);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_LINESD
-#define jbw_draw_linesd _jbw_draw_linesd
-#else
-void jbw_draw_linesd (float, float, float, JBFLOAT *, JBFLOAT *, int);
-#endif
-
-static inline void _jbw_draw_segmentsf
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  glColor3f (red, green, blue);
-  glBegin (GL_LINES);
-  for (i = n; --i >= 0;)
-    glVertex2f (x[i], y[i]);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_SEGMENTSF
-#define jbw_draw_segmentsf _jbw_draw_segmentsf
-#else
-void jbw_draw_segmentsf (float, float, float, JBFLOAT *, JBFLOAT *, int);
-#endif
-
-static inline void _jbw_draw_segmentsd
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  glColor3f (red, green, blue);
-  glBegin (GL_LINES);
-  for (i = n; --i >= 0;)
-    glVertex2d (x[i], y[i]);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_SEGMENTSD
-#define jbw_draw_segmentsd _jbw_draw_segmentsd
-#else
-void jbw_draw_segmentsd (float, float, float, JBFLOAT *, JBFLOAT *, int);
-#endif
-
-static inline void _jbw_draw_points
-  (float red1, float green1, float blue1, float red2,
-   float green2, float blue2, JBDOUBLE xmin, JBDOUBLE xmax,
-   JBDOUBLE ymin, JBDOUBLE ymax, JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2, int n)
-{
-  glLoadIdentity ();
-  glOrtho (xmin, xmax, ymin, ymax, -1., 1.);
-#if JB_PRECISION == 1
-  jbw_draw_pointsf (red1, green1, blue1, x, y1, n);
-  jbw_draw_pointsf (red2, green2, blue2, x, y2, n);
-#else
-  jbw_draw_pointsd (red1, green1, blue1, x, y1, n);
-  jbw_draw_pointsd (red2, green2, blue2, x, y2, n);
-#endif
-}
-
-#if INLINE_JBW_DRAW_POINTS
-#define jbw_draw_points _jbw_draw_points
-#else
-void jbw_draw_points (float, float, float, float, float,
-                      float, JBDOUBLE, JBDOUBLE,
-                      JBDOUBLE, JBDOUBLE, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
-#endif
-
-static inline void _jbw_draw_pointsvf
-  (float red, float green, float blue, void *x, void *y, int size, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  glColor3f (red, green, blue);
-  glBegin (GL_POINTS);
-  for (i = n; --i >= 0; x += size, y += size)
-    glVertex2f (*(JBFLOAT *) x, *(JBFLOAT *) y);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_POINTSVF
-#define jbw_draw_pointsvf _jbw_draw_pointsvf
-#else
-void jbw_draw_pointsvf (float, float, float, void *, void *, int, int);
-#endif
-
-static inline void _jbw_draw_pointsvd
-  (float red, float green, float blue, void *x, void *y, int size, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  glColor3f (red, green, blue);
-  glBegin (GL_POINTS);
-  for (i = n; --i >= 0; x += size, y += size)
-    glVertex2d (*(JBFLOAT *) x, *(JBFLOAT *) y);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_POINTSVD
-#define jbw_draw_pointsvd _jbw_draw_pointsvd
-#else
-void jbw_draw_pointsvd (float, float, float, void *, void *, int, int);
-#endif
-
-static inline void _jbw_draw_pointsv
-  (float red1, float green1, float blue1, float red2,
-   float green2, float blue2, JBDOUBLE xmin, JBDOUBLE xmax,
-   JBDOUBLE ymin, JBDOUBLE ymax, void *x, void *y1, void *y2, int size, int n)
-{
-  glLoadIdentity ();
-  glOrtho (xmin, xmax, ymin, ymax, -1., 1.);
-#if JB_PRECISION == 1
-  jbw_draw_pointsvf (red1, green1, blue1, x, y1, size, n);
-  jbw_draw_pointsvf (red2, green2, blue2, x, y2, size, n);
-#else
-  jbw_draw_pointsvd (red1, green1, blue1, x, y1, size, n);
-  jbw_draw_pointsvd (red2, green2, blue2, x, y2, size, n);
-#endif
-}
-
-#if INLINE_JBW_DRAW_POINTSV
-#define jbw_draw_pointsv _jbw_draw_pointsv
-#else
-void jbw_draw_pointsv (float, float, float, float, float,
-                       float, JBDOUBLE, JBDOUBLE,
-                       JBDOUBLE, JBDOUBLE, void *, void *, void *, int, int);
-#endif
-
-static inline void _jbw_draw_lines
-  (float red1, float green1, float blue1, float red2,
-   float green2, float blue2, JBDOUBLE xmin, JBDOUBLE xmax,
-   JBDOUBLE ymin, JBDOUBLE ymax, JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2, int n)
-{
-  glLoadIdentity ();
-  glOrtho (xmin, xmax, ymin, ymax, -1., 1.);
-#if JB_PRECISION == 1
-  jbw_draw_linesf (red1, green1, blue1, x, y1, n);
-  jbw_draw_linesf (red2, green2, blue2, x, y2, n);
-#else
-  jbw_draw_linesd (red1, green1, blue1, x, y1, n);
-  jbw_draw_linesd (red2, green2, blue2, x, y2, n);
-#endif
-}
-
-#if INLINE_JBW_DRAW_LINES
-#define jbw_draw_lines _jbw_draw_lines
-#else
-void jbw_draw_lines (float, float, float, float, float,
-                     float, JBDOUBLE, JBDOUBLE, JBDOUBLE,
-                     JBDOUBLE, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
-#endif
-
-static inline void _jbw_draw_linesvf
-  (float red, float green, float blue, void *x, void *y, int size, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  glColor3f (red, green, blue);
-  glBegin (GL_LINE_STRIP);
-  for (i = n; --i >= 0; x += size, y += size)
-    glVertex2f (*(JBFLOAT *) x, *(JBFLOAT *) y);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_LINESVF
-#define jbw_draw_linesvf _jbw_draw_linesvf
-#else
-void jbw_draw_linesvf (float, float, float, void *, void *, int, int);
-#endif
-
-static inline void _jbw_draw_linesvd
-  (float red, float green, float blue, void *x, void *y, int size, int n)
-{
-  register int i;
-  if (!x || !y)
-    return;
-  glColor3f (red, green, blue);
-  glBegin (GL_LINE_STRIP);
-  for (i = n; --i >= 0; x += size, y += size)
-    glVertex2d (*(JBFLOAT *) x, *(JBFLOAT *) y);
-  glEnd ();
-}
-
-#if INLINE_JBW_DRAW_LINESVD
-#define jbw_draw_linesvd _jbw_draw_linesvd
-#else
-void jbw_draw_linesvd (float, float, float, void *, void *, int, int);
-#endif
-
-static inline void _jbw_draw_linesv
-  (float red1, float green1, float blue1, float red2,
-   float green2, float blue2, JBDOUBLE xmin, JBDOUBLE xmax,
-   JBDOUBLE ymin, JBDOUBLE ymax, void *x, void *y1, void *y2, int size, int n)
-{
-  glLoadIdentity ();
-  glOrtho (xmin, xmax, ymin, ymax, -1., 1.);
-#if JB_PRECISION == 1
-  jbw_draw_linesvf (red1, green1, blue1, x, y1, size, n);
-  jbw_draw_linesvf (red2, green2, blue2, x, y2, size, n);
-#else
-  jbw_draw_linesvd (red1, green1, blue1, x, y1, size, n);
-  jbw_draw_linesvd (red2, green2, blue2, x, y2, size, n);
-#endif
-}
-
-#if INLINE_JBW_DRAW_LINESV
-#define jbw_draw_linesv _jbw_draw_linesv
-#else
-void jbw_draw_linesv (float, float, float, float, float,
-                      float, JBDOUBLE, JBDOUBLE,
-                      JBDOUBLE, JBDOUBLE, void *, void *, void *, int, int);
-#endif
-
-static inline void _jbw_draw_string
-  (char *string, double x, double y, int font_list_base)
-{
-  if (!string)
-    return;
-  glRasterPos2d (x, y);
-  glListBase (font_list_base);
-  glCallLists (strlen (string), GL_UNSIGNED_BYTE, string);
-}
-
-#if INLINE_JBW_DRAW_STRING
-#define jbw_draw_string _jbw_draw_string
-#else
-void jbw_draw_string (char *, double, double, int);
-#endif
-
-#endif
-
 static inline void
 _jbw_draw_range (JBDOUBLE * xmin, JBDOUBLE * xmax)
 {
@@ -1532,22 +818,14 @@ typedef struct
   JBDOUBLE xtic[JBW_GRAPHIC_N_LABELS],
     ytic[JBW_GRAPHIC_N_LABELS], ztic[JBW_GRAPHIC_N_LABELS];
   char *font;
-#if JBW_DRAW == JBW_DRAW_CAIRO
-  cairo_t *cr;
-#elif JBW_DRAW == JBW_DRAW_OPENGL
   /* font_list_base: OpenGL font list base */
   int font_list_base;
-#endif
   /* Ranges */
   JBDOUBLE xmin, xmax, ymin, ymax, zmin, zmax;
   /* Labels */
   char *str_title, *str_x, *str_y, *str_yy, *str_z, *str_zz;
   /* Util variables (Viewport coordinates) */
-#if JBW_DRAW == JBW_DRAW_CAIRO
-  double x1, x2, y1, y2;
-#elif JBW_DRAW == JBW_DRAW_OPENGL
   int x1, x2, y1, y2;
-#endif
   /* Logo */
   JBWLogo *logo;
   /* Pointer to draw function */
@@ -1689,12 +967,7 @@ static inline void
 _jbw_graphic_get_display_size (JBWGraphic * graphic)
 {
   graphic->x1 = graphic->y1 = 0;
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-  graphic->x2 =
-    gtk_widget_get_allocated_width (GTK_WIDGET (graphic->drawing_area));
-  graphic->y2 =
-    gtk_widget_get_allocated_height (GTK_WIDGET (graphic->drawing_area));
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   graphic->x2 = glutGet (GLUT_WINDOW_WIDTH);
   graphic->y2 = glutGet (GLUT_WINDOW_HEIGHT);
 #endif
@@ -1709,11 +982,7 @@ void jbw_graphic_get_display_size (JBWGraphic * graphic);
 static inline void _jbw_graphic_draw_string
   (JBWGraphic * graphic, char *string, double x, double y)
 {
-#if JBW_DRAW == JBW_DRAW_CAIRO
-  jbw_draw_string (graphic->cr, string, x, y);
-#elif JBW_DRAW == JBW_DRAW_OPENGL
   jbw_draw_string (string, x, y, graphic->font_list_base);
-#endif
 }
 
 #if INLINE_JBW_GRAPHIC_DRAW_STRING
@@ -1796,196 +1065,9 @@ _jbw_graphic_labels (JBWGraphic * graphic)
 {
   int i;
   JBDOUBLE k;
-#if JBW_DRAW == JBW_DRAW_OPENGL
   JBDOUBLE w, h, x1, x2, y1, y2;
-#endif
   char buffer[512];
   jbw_graphic_get_display_size (graphic);
-#if JBW_DRAW == JBW_DRAW_CAIRO
-  cairo_select_font_face (graphic->cr, "Courier",
-                          CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-  cairo_set_font_size (graphic->cr, 10);
-  jbw_draw_clear (graphic->cr, 1., 1., 1., graphic->x2, graphic->y2);
-  cairo_set_source_rgb (graphic->cr, 0., 0., 0.);
-  if (graphic->str_x)
-    jbw_graphic_draw_string (graphic,
-                             graphic->str_x,
-                             0.5 *
-                             (graphic->x2 -
-                              graphic->wchar *
-                              strlen
-                              (graphic->str_x)),
-                             graphic->y2 - 0.5 * graphic->hchar);
-  if (graphic->str_title)
-    {
-      graphic->y1 += graphic->hchar;
-      jbw_graphic_draw_string (graphic, graphic->str_title,
-                               0.5 * (graphic->x2 -
-                                      graphic->wchar *
-                                      strlen (graphic->str_title)), 0.);
-    }
-  if (graphic->str_y || graphic->str_z)
-    {
-      graphic->y1 += graphic->hchar;
-      cairo_set_source_rgb (graphic->cr, 0., 0., 1.);
-      jbw_graphic_draw_string (graphic, graphic->str_y, 0., graphic->y1);
-      if (graphic->str_z)
-        {
-          cairo_set_source_rgb (graphic->cr, 1., 0., 0.);
-          jbw_graphic_draw_string (graphic, graphic->str_z,
-                                   graphic->x2 -
-                                   graphic->wchar * (1. +
-                                                     strlen
-                                                     (graphic->str_z)),
-                                   graphic->y1);
-        }
-    }
-  if (graphic->str_yy || graphic->str_zz)
-    {
-      graphic->y1 += graphic->hchar;
-      cairo_set_source_rgb (graphic->cr, 0., 1., 0.);
-      jbw_graphic_draw_string (graphic, graphic->str_yy, 0., graphic->y1);
-      if (graphic->str_zz)
-        {
-          cairo_set_source_rgb (graphic->cr, 0.5, 0.5, 0.);
-          jbw_graphic_draw_string (graphic, graphic->str_zz,
-                                   graphic->x2 -
-                                   graphic->wchar * (1. +
-                                                     strlen
-                                                     (graphic->str_zz)),
-                                   graphic->y1);
-        }
-    }
-  graphic->y2 -= 2.5 * graphic->hchar;
-  graphic->y1 += 0.5 * graphic->hchar;
-  if (graphic->str_y || graphic->str_yy)
-    graphic->x1 = (JBW_GRAPHIC_N_CHARS + 1) * graphic->wchar;
-  if (graphic->str_z || graphic->str_zz)
-    graphic->x2 -= (JBW_GRAPHIC_N_CHARS + 1) * graphic->wchar;
-  else
-    graphic->x2 -= 0.5 * JBW_GRAPHIC_N_CHARS * graphic->wchar;
-  jbw_draw_range (&graphic->xmin, &graphic->xmax);
-  jbw_draw_tics (graphic->xmin, graphic->xmax,
-                 graphic->nxmax, &graphic->nx, graphic->xtic);
-  jbw_draw_range (&graphic->ymin, &graphic->ymax);
-  jbw_draw_tics (graphic->ymin, graphic->ymax,
-                 graphic->nymax, &graphic->ny, graphic->ytic);
-  jbw_draw_range (&graphic->zmin, &graphic->zmax);
-  jbw_draw_tics (graphic->zmin, graphic->zmax,
-                 graphic->nzmax, &graphic->nz, graphic->ztic);
-  if (!graphic->str_x)
-    graphic->nx = 0;
-  if (!graphic->str_y && !graphic->str_yy)
-    graphic->ny = 0;
-  if (!graphic->str_z && !graphic->str_zz)
-    graphic->nz = 0;
-  cairo_set_source_rgb (graphic->cr, 0., 0., 0.);
-  if (graphic->map)
-    jbw_graphic_map_resize (graphic);
-  for (i = 0; i < graphic->nx; ++i)
-    {
-      sprintf (buffer, FGL, graphic->xtic[i]);
-      k =
-        jbm_extrapolate (graphic->xtic[i], graphic->xmin,
-                         graphic->xmax, graphic->x1, graphic->x2);
-      jbw_graphic_draw_string (graphic, buffer,
-                               k -
-                               0.5 * graphic->wchar *
-                               strlen (buffer), graphic->y2 + graphic->hchar);
-    }
-  cairo_set_source_rgb (graphic->cr, 0., 0., 1.);
-  for (i = 0; i < graphic->ny; ++i)
-    {
-      sprintf (buffer, FGL, graphic->ytic[i]);
-      k =
-        jbm_extrapolate (graphic->ytic[i], graphic->ymin,
-                         graphic->ymax, graphic->y2, graphic->y1);
-      jbw_graphic_draw_string (graphic, buffer,
-                               graphic->x1 -
-                               graphic->wchar * (1. +
-                                                 strlen
-                                                 (buffer)),
-                               k + 0.3 * graphic->hchar);
-    }
-  cairo_set_source_rgb (graphic->cr, 1., 0., 0.);
-  for (i = 0; i < graphic->nz; ++i)
-    {
-      sprintf (buffer, FGL, graphic->ztic[i]);
-      k =
-        jbm_extrapolate (graphic->ztic[i], graphic->zmin,
-                         graphic->zmax, graphic->y2, graphic->y1);
-      jbw_graphic_draw_string (graphic, buffer,
-                               graphic->x2 + graphic->wchar,
-                               k + 0.3 * graphic->hchar);
-    }
-  if (graphic->grid)
-    {
-      cairo_set_source_rgb (graphic->cr, 0.9, 0.9, 0.9);
-      for (i = 0; i < graphic->nx; ++i)
-        {
-          k =
-            jbm_extrapolate (graphic->xtic[i], graphic->xmin,
-                             graphic->xmax, graphic->x1, graphic->x2);
-          cairo_move_to (graphic->cr, k, graphic->y1);
-          cairo_line_to (graphic->cr, k, graphic->y2);
-        }
-      cairo_stroke (graphic->cr);
-      cairo_set_source_rgb (graphic->cr, 0.85, 0.85, 1.);
-      for (i = 0; i < graphic->ny; ++i)
-        {
-          k =
-            jbm_extrapolate (graphic->ytic[i], graphic->ymin,
-                             graphic->ymax, graphic->y2, graphic->y1);
-          cairo_move_to (graphic->cr, graphic->x1, k);
-          cairo_line_to (graphic->cr, graphic->x2, k);
-        }
-      cairo_stroke (graphic->cr);
-      cairo_set_source_rgb (graphic->cr, 1., 0.85, 0.85);
-      for (i = 0; i < graphic->nz; ++i)
-        {
-          k =
-            jbm_extrapolate (graphic->ztic[i], graphic->zmin,
-                             graphic->zmax, graphic->y2, graphic->y1);
-          cairo_move_to (graphic->cr, graphic->x1, k);
-          cairo_line_to (graphic->cr, graphic->x2, k);
-        }
-      cairo_stroke (graphic->cr);
-    }
-  else
-    {
-      cairo_set_source_rgb (graphic->cr, 0., 0., 0.);
-      for (i = 0; i < graphic->nx; ++i)
-        {
-          k =
-            jbm_extrapolate (graphic->xtic[i], graphic->xmin,
-                             graphic->xmax, graphic->x1, graphic->x2);
-          cairo_move_to (graphic->cr, k, graphic->y1);
-          cairo_line_to (graphic->cr, k, graphic->y1 + 1.);
-          cairo_move_to (graphic->cr, k, graphic->y2);
-          cairo_line_to (graphic->cr, k, graphic->y2 - 1.);
-        }
-      for (i = 0; i < graphic->ny; ++i)
-        {
-          k =
-            jbm_extrapolate (graphic->ytic[i], graphic->ymin,
-                             graphic->ymax, graphic->y2, graphic->y1);
-          cairo_move_to (graphic->cr, graphic->x1, k);
-          cairo_line_to (graphic->cr, graphic->x1 + 1., k);
-        }
-      for (i = 0; i < graphic->nz; ++i)
-        {
-          k =
-            jbm_extrapolate (graphic->ztic[i], graphic->zmin,
-                             graphic->zmax, graphic->y2, graphic->y1);
-          cairo_move_to (graphic->cr, graphic->x2, k);
-          cairo_line_to (graphic->cr, graphic->x2 - 1., k);
-        }
-      cairo_stroke (graphic->cr);
-    }
-  jbw_draw_rectangle (graphic->cr, 0., 0., 0., graphic->x1,
-                      graphic->y1,
-                      graphic->x2 - graphic->x1, graphic->y2 - graphic->y1);
-#elif JBW_DRAW == JBW_DRAW_OPENGL
   w = ((JBDOUBLE) graphic->x2) / graphic->wchar;
   h = ((JBDOUBLE) graphic->y2) / graphic->hchar;
   jbw_draw_clear (1., 1., 1., 0.);
@@ -2146,7 +1228,6 @@ _jbw_graphic_labels (JBWGraphic * graphic)
   jbw_draw_rectangled (0., 0., 0., x1, y1, x2, y2);
   glViewport (graphic->x1, graphic->y1,
               graphic->x2 - graphic->x1, graphic->y2 - graphic->y1);
-#endif
 }
 
 #if INLINE_JBW_GRAPHIC_LABELS
@@ -2170,18 +1251,9 @@ _jbw_graphic_draw_line (JBWGraphic *
   if (graphic->resize)
     jbw_graphic_draw_resize (graphic, x, y1, 0, 0, 0, n);
   jbw_graphic_labels (graphic);
-#if JBW_DRAW == JBW_DRAW_CAIRO
-  jbw_draw_lines_with_limits (graphic->cr, red, green,
-                              blue, 0., 0., 0.,
-                              graphic->xmin, graphic->ymin,
-                              graphic->xmax, graphic->ymax,
-                              graphic->x1, graphic->y1,
-                              graphic->x2, graphic->y2, x, y1, 0, n);
-#elif JBW_DRAW == JBW_DRAW_OPENGL
   jbw_draw_lines (red, green, blue, 0., 0., 0.,
                   graphic->xmin, graphic->xmax,
                   graphic->ymin, graphic->ymax, x, y1, 0, n);
-#endif
 }
 
 #if INLINE_JBW_GRAPHIC_DRAW_LINE
@@ -2203,26 +1275,11 @@ static inline void _jbw_graphic_draw_lines
   if (graphic->resize)
     jbw_graphic_draw_resize (graphic, x, y1, y2, z1, z2, n);
   jbw_graphic_labels (graphic);
-#if JBW_DRAW == JBW_DRAW_CAIRO
-  jbw_draw_lines_with_limits (graphic->cr, 0., 0., 1., 0.,
-                              1., 0., graphic->xmin,
-                              graphic->ymin, graphic->xmax,
-                              graphic->ymax, graphic->x1,
-                              graphic->y1, graphic->x2,
-                              graphic->y2, x, y1, y2, n);
-  jbw_draw_lines_with_limits (graphic->cr, 1., 0., 0., 0.5,
-                              0.5, 0., graphic->xmin,
-                              graphic->zmin, graphic->xmax,
-                              graphic->zmax, graphic->x1,
-                              graphic->y1, graphic->x2,
-                              graphic->y2, x, z1, z2, n);
-#elif JBW_DRAW == JBW_DRAW_OPENGL
   jbw_draw_lines (0., 0., 1., 0., 1., 0.,
                   graphic->xmin, graphic->xmax,
                   graphic->ymin, graphic->ymax, x, y1, y2, n);
   jbw_draw_lines (1., 0., 0., 0.5, 0.5, 0., graphic->xmin,
                   graphic->xmax, graphic->zmin, graphic->zmax, x, z1, z2, n);
-#endif
 }
 
 #if INLINE_JBW_GRAPHIC_DRAW_LINES
@@ -2264,29 +1321,12 @@ _jbw_graphic_draw_linesv (JBWGraphic *
         }
     }
   jbw_graphic_labels (graphic);
-#if JBW_DRAW == JBW_DRAW_CAIRO
-  jbw_draw_lines_with_limitsv (graphic->cr, 0., 0., 1., 0.,
-                               1., 0., graphic->xmin,
-                               graphic->ymin,
-                               graphic->xmax,
-                               graphic->ymax, graphic->x1,
-                               graphic->y1, graphic->x2,
-                               graphic->y2, x, y1, y2, size, n);
-  jbw_draw_lines_with_limitsv (graphic->cr, 1., 0., 0.,
-                               0.5, 0.5, 0., graphic->xmin,
-                               graphic->zmin,
-                               graphic->xmax,
-                               graphic->zmax, graphic->x1,
-                               graphic->y1, graphic->x2,
-                               graphic->y2, x, z1, z2, size, n);
-#elif JBW_DRAW == JBW_DRAW_OPENGL
   jbw_draw_linesv (0., 0., 1., 0., 1., 0.,
                    graphic->xmin, graphic->xmax,
                    graphic->ymin, graphic->ymax, x, y1, y2, size, n);
   jbw_draw_linesv (1., 0., 0., 0.5, 0.5, 0., graphic->xmin,
                    graphic->xmax, graphic->zmin,
                    graphic->zmax, x, z1, z2, size, n);
-#endif
 }
 
 #if INLINE_JBW_GRAPHIC_DRAW_LINESV
@@ -2319,10 +1359,7 @@ _jbw_graphic_draw_logo (JBWGraphic * graphic)
 void jbw_graphic_draw_logo (JBWGraphic * graphic);
 #endif
 
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-static inline void
-_jbw_graphic_realize (GtkWidget * widget, JBWGraphic * graphic)
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 static inline void
 _jbw_graphic_realize (JBWGraphic * graphic)
 #endif
@@ -2330,7 +1367,6 @@ _jbw_graphic_realize (JBWGraphic * graphic)
   int i;
   graphic->wchar = 8;
   graphic->hchar = 13;
-#if JBW_DRAW == JBW_DRAW_OPENGL
   graphic->font_list_base = glGenLists (256);
   for (i = 0; i < 256; ++i)
     {
@@ -2338,17 +1374,8 @@ _jbw_graphic_realize (JBWGraphic * graphic)
       glutBitmapCharacter (GLUT_BITMAP_8_BY_13, i);
       glEndList ();
     }
-#endif
 
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-  gtk_widget_set_size_request ((GtkWidget *) widget,
-                               (graphic->nxmax +
-                                1) * FG_LENGTH *
-                               graphic->wchar,
-                               (jbm_max
-                                (graphic->nymax,
-                                 graphic->nzmax) + 5) * graphic->hchar);
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   glutReshapeWindow ((graphic->nxmax +
                       1) * FG_LENGTH * graphic->wchar,
                      (jbm_max
@@ -2358,38 +1385,23 @@ _jbw_graphic_realize (JBWGraphic * graphic)
 
 #if INLINE_JBW_GRAPHIC_REALIZE
 #define jbw_graphic_realize _jbw_graphic_realize
-#elif JBW_GRAPHIC == JBW_GRAPHIC_CAIRO
-void jbw_graphic_realize (GtkWidget *, JBWGraphic *);
 #elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 void _jbw_graphic_realize (JBWGraphic * graphic);
 #endif
 
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-static inline void _jbw_graphic_expose_event
-  (GtkWidget * widget, GdkEventExpose * event, JBWGraphic * graphic)
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 static inline void
 _jbw_graphic_expose_event ()
 #endif
 {
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO
-  graphic->cr =
-    gdk_cairo_create (((GtkWidget *) graphic->drawing_area)->window);
-  graphic->draw ();
-  cairo_destroy (graphic->cr);
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   jbw_graphic_draw ();
   glutSwapBuffers ();
-#elif JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-  graphic->draw ();
-  glFlush ();
 #endif
 }
 
 #if INLINE_JBW_GRAPHIC_EXPOSE_EVENT
 #define jbw_graphic_expose_event _jbw_graphic_expose_event
-#elif JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-void jbw_graphic_expose_event (GtkWidget *, GdkEventExpose *, JBWGraphic *);
 #elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 void jbw_graphic_expose_event ();
 #endif
@@ -2397,53 +1409,7 @@ void jbw_graphic_expose_event ();
 static inline void _jbw_graphic_save
   (JBWGraphic * graphic, char *file_name, JBWGraphicType type)
 {
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-  GdkPixbuf *pixbuf;
-#if GTK_MAJOR_VERSION < 3
-  pixbuf = gdk_pixbuf_get_from_drawable (0,
-                                         gtk_widget_get_window
-                                         (GTK_WIDGET
-                                          (graphic->drawing_area)),
-                                         0, 0, 0, 0, 0,
-                                         gtk_widget_get_allocated_width
-                                         (GTK_WIDGET
-                                          (graphic->drawing_area)),
-                                         gtk_widget_get_allocated_height
-                                         (GTK_WIDGET (graphic->drawing_area)));
-#else
-  pixbuf =
-    gdk_pixbuf_get_from_window (gtk_widget_get_window
-                                (GTK_WIDGET
-                                 (graphic->drawing_area)), 0,
-                                0,
-                                gtk_widget_get_allocated_width
-                                (GTK_WIDGET
-                                 (graphic->drawing_area)),
-                                gtk_widget_get_allocated_height
-                                (GTK_WIDGET (graphic->drawing_area)));
-#endif
-  switch (type)
-    {
-    case JBW_GRAPHIC_TYPE_JPG:
-      gdk_pixbuf_save (pixbuf, file_name, "jpeg", 0, "quality", "100", NULL);
-      break;
-    case JBW_GRAPHIC_TYPE_PNG:
-      gdk_pixbuf_save (pixbuf, file_name, "png", 0, "compression", "9", NULL);
-      break;
-    case JBW_GRAPHIC_TYPE_TIFF:
-      gdk_pixbuf_save (pixbuf, file_name, "tiff", 0, NULL);
-      break;
-    case JBW_GRAPHIC_TYPE_BMP:
-      gdk_pixbuf_save (pixbuf, file_name, "bmp", 0, NULL);
-      break;
-    case JBW_GRAPHIC_TYPE_GIF:
-      gdk_pixbuf_save (pixbuf, file_name, "gif", 0, NULL);
-      break;
-    default:
-      gdk_pixbuf_save (pixbuf, file_name, "xpm", 0, NULL);
-    }
-  g_object_unref (pixbuf);
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   int i, x2, y2;
   unsigned int row_bytes, pointers_bytes, pixels_bytes;
   GLubyte *pixels;
@@ -2552,10 +1518,7 @@ _jbw_graphic_dialog_save (JBWGraphic * graphic)
   gtk_widget_destroy ((GtkWidget *) dlg);
   if (buffer)
     {
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-      jbw_graphic_expose_event ((GtkWidget *) graphic->drawing_area, 0,
-                                graphic);
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
       jbw_graphic_expose_event ();
 #endif
       while (gtk_events_pending ())
@@ -2584,9 +1547,7 @@ _jbw_graphic_destroy (JBWGraphic * graphic)
   g_free (graphic->str_z);
   g_free (graphic->str_zz);
   jbw_logo_destroy (graphic->logo);
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO || JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-  gtk_widget_destroy ((GtkWidget *) graphic->drawing_area);
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   g_queue_pop_head (&jbw_graphic_queue);
   if (jbw_graphic_queue.head)
     {
@@ -2624,29 +1585,13 @@ static inline JBWGraphic *_jbw_graphic_new
   else
     graphic->font = JBW_GRAPHIC_FONT;
   graphic->draw = draw;
-#if JBW_GRAPHIC == JBW_GRAPHIC_CAIRO
-  graphic->drawing_area = (GtkDrawingArea *) gtk_drawing_area_new ();
-  g_signal_connect_after (graphic->drawing_area, "realize",
-                          (void (*)()) jbw_graphic_realize, graphic);
-  g_signal_connect (graphic->drawing_area, "expose_event",
-                    (void (*)()) jbw_graphic_expose_event, graphic);
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   if (!jbw_graphic_queue.head)
     graphic->window = glutCreateWindow ("");
   jbw_graphic_draw = draw;
   jbw_graphic_realize (graphic);
   glutDisplayFunc (jbw_graphic_expose_event);
   g_queue_push_head (&jbw_graphic_queue, graphic);
-#elif JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-  graphic->drawing_area = (GtkClutterEmbed *) gtk_clutter_embed_new ();
-  graphic->stage =
-    (ClutterStage *) gtk_clutter_embed_get_stage (graphic->drawing_area);
-  g_signal_connect_after (graphic->drawing_area, "realize",
-                          (void (*)()) jbw_graphic_realize, graphic);
-  g_signal_connect (graphic->drawing_area, "expose_event",
-                    (void (*)()) jbw_graphic_expose_event, graphic);
-  gtk_widget_show (GTK_WIDGET (graphic->drawing_area));
-  clutter_actor_show (CLUTTER_ACTOR (graphic->stage));
 #endif
   return graphic;
 }
@@ -2661,9 +1606,7 @@ static inline int
 _jbw_graphic_init (int *argn, char ***argc)
 {
   gtk_disable_setlocale ();
-#if JBW_DRAW == JBW_DRAW_OPENGL
   glutInit (argn, *argc);
-#endif
 #if JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
   gtk_clutter_init (argn, argc);
 #else
