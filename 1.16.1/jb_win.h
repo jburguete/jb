@@ -75,22 +75,21 @@ void jbw_show_warning (char *);
 
 #elif JBW == JBW_GTK
 
-#include <gtk/gtk.h>
-#include <GL/gl.h>
-#include <GL/freeglut.h>
 #include <png.h>
-
-#if JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-#include <clutter/clutter.h>
-#include <clutter-gtk/clutter-gtk.h>
+#include <gtk/gtk.h>
+#include <GL/glew.h>
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#include <GL/freeglut.h>
+#elif JBW_GRAPHIC == JBW_GRAPHIC_SDL
+#include <SDL.h>
+#elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW
+#include <GLFW/glfw3.h>
 #endif
 
 extern GtkWindow *window_parent;
 
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 extern GQueue jbw_graphic_queue;
 extern void (*jbw_graphic_draw) ();
-#endif
 
 static inline void _jbw_combo_box_set_strings
   (GtkComboBoxText * combo, char **strings, int n)
@@ -831,13 +830,14 @@ typedef struct
   /* Pointer to draw function */
   void (*draw) ();
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
-  /* Glut window */
+  /* GLUT window */
   int window;
-#elif JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-  /* clutter stage */
-  ClutterStage *stage;
-  /* Gtk+ Widget */
-  GtkClutterEmbed *drawing_area;
+#elif JBW_GRAPHIC == JBW_GRAPHIC_SDL
+  /* SDL window */
+  SDL_Window *window;
+#elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW
+  /* GLFW window */
+  GLFWwindow *window;
 #endif
 } JBWGraphic;
 
@@ -970,6 +970,10 @@ _jbw_graphic_get_display_size (JBWGraphic * graphic)
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   graphic->x2 = glutGet (GLUT_WINDOW_WIDTH);
   graphic->y2 = glutGet (GLUT_WINDOW_HEIGHT);
+#elif JBW_GRAPHIC == JBW_GRAPHIC_SDL
+  SDL_GL_GetDrawableSize (graphic->window, &graphic->x2, &graphic->y2);
+#elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW
+  glfwGetFramebufferSize (graphic->window, &graphic->x2, &graphic->y2);
 #endif
 }
 
@@ -1359,12 +1363,11 @@ _jbw_graphic_draw_logo (JBWGraphic * graphic)
 void jbw_graphic_draw_logo (JBWGraphic * graphic);
 #endif
 
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 static inline void
 _jbw_graphic_realize (JBWGraphic * graphic)
-#endif
 {
   int i;
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   graphic->wchar = 8;
   graphic->hchar = 13;
   graphic->font_list_base = glGenLists (256);
@@ -1374,8 +1377,6 @@ _jbw_graphic_realize (JBWGraphic * graphic)
       glutBitmapCharacter (GLUT_BITMAP_8_BY_13, i);
       glEndList ();
     }
-
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   glutReshapeWindow ((graphic->nxmax +
                       1) * FG_LENGTH * graphic->wchar,
                      (jbm_max
@@ -1385,31 +1386,32 @@ _jbw_graphic_realize (JBWGraphic * graphic)
 
 #if INLINE_JBW_GRAPHIC_REALIZE
 #define jbw_graphic_realize _jbw_graphic_realize
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+#else
 void _jbw_graphic_realize (JBWGraphic * graphic);
 #endif
 
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 static inline void
-_jbw_graphic_expose_event ()
-#endif
+_jbw_graphic_expose_event (JBWGraphic * graphic)
 {
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   jbw_graphic_draw ();
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   glutSwapBuffers ();
+#elif JBW_GRAPHIC == JBW_GRAPHIC_SDL
+  SDL_GL_SwapWindow (graphic->window);
+#elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW
+  glfwSwapBuffers (graphic->window);
 #endif
 }
 
 #if INLINE_JBW_GRAPHIC_EXPOSE_EVENT
 #define jbw_graphic_expose_event _jbw_graphic_expose_event
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLUT
-void jbw_graphic_expose_event ();
+#else
+void jbw_graphic_expose_event (JBWGraphic * graphic);
 #endif
 
 static inline void _jbw_graphic_save
   (JBWGraphic * graphic, char *file_name, JBWGraphicType type)
 {
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   int i, x2, y2;
   unsigned int row_bytes, pointers_bytes, pixels_bytes;
   GLubyte *pixels;
@@ -1417,8 +1419,9 @@ static inline void _jbw_graphic_save
   png_struct *png;
   png_info *info;
   png_byte **row_pointers;
-  x2 = glutGet (GLUT_WINDOW_WIDTH);
-  y2 = glutGet (GLUT_WINDOW_HEIGHT);
+  jbw_graphic_get_display_size (graphic);
+  x2 = graphic->x2;
+  y2 = graphic->y2;
   png = png_create_write_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (!png)
     return;
@@ -1483,7 +1486,6 @@ static inline void _jbw_graphic_save
   png_write_end (png, NULL);
   fclose (file);
   png_destroy_write_struct (&png, &info);
-#endif
 }
 
 #if INLINE_JBW_GRAPHIC_SAVE
@@ -1518,9 +1520,7 @@ _jbw_graphic_dialog_save (JBWGraphic * graphic)
   gtk_widget_destroy ((GtkWidget *) dlg);
   if (buffer)
     {
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
-      jbw_graphic_expose_event ();
-#endif
+      jbw_graphic_expose_event (graphic);
       while (gtk_events_pending ())
         gtk_main_iteration ();
       jbw_graphic_save (graphic, buffer, JBW_GRAPHIC_TYPE_PNG);
@@ -1537,9 +1537,7 @@ void jbw_graphic_dialog_save (JBWGraphic *);
 static inline void
 _jbw_graphic_destroy (JBWGraphic * graphic)
 {
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   JBWGraphic *graphic_old;
-#endif
   g_free (graphic->str_title);
   g_free (graphic->str_x);
   g_free (graphic->str_y);
@@ -1547,7 +1545,6 @@ _jbw_graphic_destroy (JBWGraphic * graphic)
   g_free (graphic->str_z);
   g_free (graphic->str_zz);
   jbw_logo_destroy (graphic->logo);
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   g_queue_pop_head (&jbw_graphic_queue);
   if (jbw_graphic_queue.head)
     {
@@ -1556,7 +1553,12 @@ _jbw_graphic_destroy (JBWGraphic * graphic)
       jbw_graphic_realize (graphic_old);
     }
   else
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
     glutDestroyWindow (graphic->window);
+#elif JBW_GRAPHIC == JBW_GRAPHIC_SDL
+    SDL_DestroyWindow (graphic->window);
+#elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW
+    glfwDestroyWindow (graphic->window);
 #endif
   g_slice_free (JBWGraphic, graphic);
 }
@@ -1584,15 +1586,14 @@ static inline JBWGraphic *_jbw_graphic_new
     graphic->font = font;
   else
     graphic->font = JBW_GRAPHIC_FONT;
-  graphic->draw = draw;
+  graphic->draw = jbw_graphic_draw = draw;
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   if (!jbw_graphic_queue.head)
     graphic->window = glutCreateWindow ("");
-  jbw_graphic_draw = draw;
   jbw_graphic_realize (graphic);
-  glutDisplayFunc (jbw_graphic_expose_event);
-  g_queue_push_head (&jbw_graphic_queue, graphic);
+  glutDisplayFunc ((void (*))jbw_graphic_expose_event);
 #endif
+  g_queue_push_head (&jbw_graphic_queue, graphic);
   return graphic;
 }
 
@@ -1605,18 +1606,22 @@ JBWGraphic *jbw_graphic_new (char *, int, int, int, void (*)());
 static inline int
 _jbw_graphic_init (int *argn, char ***argc)
 {
-  gtk_disable_setlocale ();
-  glutInit (argn, *argc);
-#if JBW_GRAPHIC == JBW_GRAPHIC_CLUTTER
-  gtk_clutter_init (argn, argc);
-#else
-  gtk_init (argn, argc);
-#endif
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+  glutInit (argn, *argc);
   glutInitDisplayMode (GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
   glutSetOption (GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION);
   glutInitWindowSize (640, 480);
-#endif
+#elif JBW_GRAPHIC == JBW_GRAPHIC_SDL
+  SDL_Init (SDL_INIT_VIDEO);
+#elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW
+  if (!glfwInit ())
+    {
+      jbw_show_error (gettext ("unable to init GLFW"));
+      return 0;
+    }
+ #endif
+  gtk_disable_setlocale ();
+  gtk_init (argn, argc);
   return 1;
 }
 

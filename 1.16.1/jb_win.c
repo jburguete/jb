@@ -663,13 +663,11 @@ void jbw_graphic_realize (JBWGraphic * graphic);
 #endif
 
 #if !INLINE_JBW_GRAPHIC_EXPOSE_EVENT
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 void
-jbw_graphic_expose_event ()
+jbw_graphic_expose_event (JBWGraphic * graphic)
 {
-  _jbw_graphic_expose_event ();
+  _jbw_graphic_expose_event (graphic);
 }
-#endif
 #endif
 
 #if !INLINE_JBW_GRAPHIC_SAVE
