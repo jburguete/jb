@@ -1377,10 +1377,9 @@ _jbw_graphic_realize (JBWGraphic * graphic)
       glutBitmapCharacter (GLUT_BITMAP_8_BY_13, i);
       glEndList ();
     }
-  glutReshapeWindow ((graphic->nxmax +
-                      1) * FG_LENGTH * graphic->wchar,
-                     (jbm_max
-                      (graphic->nymax, graphic->nzmax) + 5) * graphic->hchar);
+  glutReshapeWindow ((graphic->nxmax + 1) * FG_LENGTH * graphic->wchar,
+                     (jbm_max (graphic->nymax, graphic->nzmax) + 5)
+					 * graphic->hchar);
 #endif
 }
 
@@ -1572,7 +1571,8 @@ void jbw_graphic_destroy (JBWGraphic *);
 static inline JBWGraphic *_jbw_graphic_new
   (char *font, int nx, int ny, int nz, void (*draw) ())
 {
-  register JBWGraphic *graphic;
+  JBWGraphic *graphic;
+  GLenum glew_status;
   graphic = g_slice_new (JBWGraphic);
   graphic->resize = graphic->grid = 1;
   graphic->map = 0;
@@ -1587,10 +1587,47 @@ static inline JBWGraphic *_jbw_graphic_new
   else
     graphic->font = JBW_GRAPHIC_FONT;
   graphic->draw = jbw_graphic_draw = draw;
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   if (!jbw_graphic_queue.head)
-    graphic->window = glutCreateWindow ("");
+	{
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+      graphic->window = glutCreateWindow ("");
+#elif JBW_GRAPHIC == JBW_GRAPHIC_SDL
+	  graphic->window
+        = SDL_CreateWindow ("",
+                            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                            640, 480,
+                            SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+      if (!graphic->window)
+        {
+          printf ("ERROR! unable to create the window: %s\n", SDL_GetError ());
+          return NULL;
+        }
+      SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+      if (!SDL_GL_CreateContext (graphic->window))
+        {
+          printf ("ERROR! SDL_GL_CreateContext: %s\n", SDL_GetError ());
+          return NULL;
+        }
+#elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW 
+      graphic->window
+        = glfwCreateWindow (640, 480, "", NULL, NULL);
+      if (!graphic->window)
+        {
+          printf ("ERROR! unable to open the window\n");
+          glfwTerminate ();
+          return NULL;
+        }
+      glfwMakeContextCurrent (window);
+#endif
+      glew_status = glewInit ();
+      if (glew_status != GLEW_OK)
+        {
+          printf ("ERROR! glewInit: %s\n", glewGetErrorString (glew_status));
+          return NULL;
+        }
+	}
   jbw_graphic_realize (graphic);
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   glutDisplayFunc ((void (*))jbw_graphic_expose_event);
 #endif
   g_queue_push_head (&jbw_graphic_queue, graphic);
