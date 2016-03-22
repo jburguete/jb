@@ -78,6 +78,8 @@ void jbw_show_warning (char *);
 #include <png.h>
 #include <gtk/gtk.h>
 #include <GL/glew.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 #include <GL/freeglut.h>
 #elif JBW_GRAPHIC == JBW_GRAPHIC_SDL
@@ -87,6 +89,7 @@ void jbw_show_warning (char *);
 #endif
 
 extern GtkWindow *window_parent;
+extern int jbw_graphic_width, jbw_graphic_height;
 
 extern GQueue jbw_graphic_queue;
 extern void (*jbw_graphic_draw) ();
@@ -1638,6 +1641,76 @@ static inline JBWGraphic *_jbw_graphic_new
 #define jbw_graphic_new _jbw_graphic_new
 #else
 JBWGraphic *jbw_graphic_new (char *, int, int, int, void (*)());
+#endif
+
+static inline void
+_jbw_graphic_resize (int width, int height)
+{
+  jbw_graphic_width = width;
+  jbw_graphic_height = height;
+  glViewport (0, 0, width, height);
+}
+
+#if INLINE_JBW_GRAPHIC_RESIZE
+#define jbw_graphic_resize _jbw_graphic_resize
+#else
+void jbw_graphic_resize (int, int);
+#endif
+
+static inline void
+_jbw_graphic_main_loop ()
+{
+#if JBW_GRAPHIC == JBW_GRAPHIC_SDL
+  SDL_Event event[1];
+#endif
+
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+
+  // Passing the GTK+ signals to the FreeGLUT main loop
+  glutIdleFunc ((void (*)) gtk_main_iteration);
+  // Setting our draw resize function as the FreeGLUT reshape function
+  glutReshapeFunc (jbw_graphic_resize);
+  // Setting our draw function as the FreeGLUT display function
+  glutDisplayFunc (jbw_graphic_draw);
+  // FreeGLUT main loop
+  glutMainLoop ();
+
+#else
+
+#if JBW_GRAPHIC == JBW_GRAPHIC_SDL
+  while (1)
+    {
+      while (gtk_events_pending ())
+        gtk_main_iteration ();
+      while (SDL_PollEvent (event))
+        {
+          if (event->type == SDL_QUIT)
+            return;
+          if (event->type == SDL_WINDOWEVENT
+              && event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+            jbw_graphic_resize (event->window.data1, event->window.data2);
+        }
+
+#elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW
+
+  while (!glfwWindowShouldClose (window))
+    {
+      while (gtk_events_pending ())
+        gtk_main_iteration ();
+      glfwPollEvents ();
+
+#endif
+
+      jbw_graphic_draw ();
+    }
+
+#endif
+}
+
+#if INLINE_JBW_GRAPHIC_MAIN_LOOP
+#define jbw_graphic_main_loop _jbw_graphic_main_loop
+#else
+void jbw_graphic_main_loop ();
 #endif
 
 static inline int

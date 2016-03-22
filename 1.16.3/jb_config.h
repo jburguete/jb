@@ -549,6 +549,10 @@
   ///< inlined.
 #define INLINE_JBW_GRAPHIC_NEW							0
   ///< Macro deciding if the function jbw_graphic_new() has to be inlined.
+#define INLINE_JBW_GRAPHIC_RESIZE   					1
+  ///< Macro deciding if the function jbw_graphic_resize() has to be inlined.
+#define INLINE_JBW_GRAPHIC_MAIN_LOOP					1
+  ///< Macro deciding if the function jbw_graphic_main_loop() has to be inlined.
 #define INLINE_JBW_GRAPHIC_INIT							1
   ///< Macro deciding if the function jbw_graphic_new() has to be inlined.
 #define INLINE_JBW_ARRAY_EDITOR_SET_ELEMENT				1

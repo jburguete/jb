@@ -38,8 +38,13 @@ GtkWindow *window_parent;       ///< pointer to the parent GtkWindow struct.
 
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 GQueue jbw_graphic_queue = G_QUEUE_INIT;        ///< GLUT graphic queue.
+#endif
+
+#if JBW != JBW_NO
 void (*jbw_graphic_draw) ();
-  ///< pointer to the function drawing in the GLUT window.
+  ///< pointer to the function drawing in the graphic window.
+int jbw_graphic_width;          ///< graphic window width.
+int jbw_graphic_height;         ///< graphic window height.
 #endif
 
 /**
@@ -691,6 +696,22 @@ JBWGraphic *
 jbw_graphic_new (char *font, int nx, int ny, int nz, void (*draw) ())
 {
   return _jbw_graphic_new (font, nx, ny, nz, draw);
+}
+#endif
+
+#if !INLINE_JBW_GRAPHIC_RESIZE
+void
+jbw_graphic_resize (int width, int height)
+{
+  _jbw_graphic_main_loop (width, height);
+}
+#endif
+
+#if !INLINE_JBW_GRAPHIC_MAIN_LOOP
+void
+jbw_graphic_main_loop ()
+{
+  _jbw_graphic_main_loop ();
 }
 #endif
 
