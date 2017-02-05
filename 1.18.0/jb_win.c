@@ -330,7 +330,7 @@ jbw_draw_rectanglef (float red, float green, float blue, float x1, float y1,
 /**
  * \fn void jbw_draw_rectangled (float red, float green, float blue, \
  *   double x1, double y1, double x2, double y2)
- * \brief Function to draw a rectangle with simple precision coordinates.
+ * \brief Function to draw a rectangle with double precision coordinates.
  * \param red
  * \brief red color.
  * \param green
@@ -355,23 +355,23 @@ jbw_draw_rectangled (float red, float green, float blue, double x1,
 }
 #endif
 
-#if !INLINE_JBW_DRAW_CLEAR
-void jbw_draw_clear
-  (cairo_t * cr, float red, float green, float blue, int width, int height)
-{
-  _jbw_draw_clear (cr, red, green, blue, width, height);
-}
-#endif
-
-#if !INLINE_JBW_DRAW_RECTANGLE
-void
-jbw_draw_rectangle (cairo_t * cr, float red, float green, float blue, int x,
-                    int y, int width, int height)
-{
-  _jbw_draw_rectangle (cr, red, green, blue, x, y, width, height);
-}
-#endif
-
+/**
+ * \fn void jbw_draw_pointsf (float red, float green, float blue, JBFLOAT *x, \
+ *   JBFLOAT *y, int n)
+ * \brief Function to draw an array of points with simple precision coordinates.
+ * \param red
+ * \brief red color.
+ * \param green
+ * \brief green color.
+ * \param blue
+ * \brief blue color.
+ * \param x
+ * \brief array of point x-coordinates.
+ * \param y
+ * \brief array of point y-coordinates.
+ * \param n
+ * \brief number of points.
+ */
 #if !INLINE_JBW_DRAW_POINTSF
 void jbw_draw_pointsf
   (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
@@ -380,6 +380,23 @@ void jbw_draw_pointsf
 }
 #endif
 
+/**
+ * \fn void jbw_draw_pointsd (float red, float green, float blue, JBFLOAT *x, \
+ *   JBFLOAT *y, int n)
+ * \brief Function to draw an array of points with double precision coordinates.
+ * \param red
+ * \brief red color.
+ * \param green
+ * \brief green color.
+ * \param blue
+ * \brief blue color.
+ * \param x
+ * \brief array of point x-coordinates.
+ * \param y
+ * \brief array of point y-coordinates.
+ * \param n
+ * \brief number of points.
+ */
 #if !INLINE_JBW_DRAW_POINTSD
 void jbw_draw_pointsd
   (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
@@ -388,6 +405,23 @@ void jbw_draw_pointsd
 }
 #endif
 
+/**
+ * \fn void jbw_draw_linesf (float red, float green, float blue, JBFLOAT *x, \
+ *   JBFLOAT *y, int n)
+ * \brief Function to draw an array of lines with simple precision coordinates.
+ * \param red
+ * \brief red color.
+ * \param green
+ * \brief green color.
+ * \param blue
+ * \brief blue color.
+ * \param x
+ * \brief array of vertex x-coordinates.
+ * \param y
+ * \brief array of vertex y-coordinates.
+ * \param n
+ * \brief number of vertices.
+ */
 #if !INLINE_JBW_DRAW_LINESF
 void jbw_draw_linesf
   (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
@@ -396,6 +430,23 @@ void jbw_draw_linesf
 }
 #endif
 
+/**
+ * \fn void jbw_draw_linesd (float red, float green, float blue, JBFLOAT *x, \
+ *   JBFLOAT *y, int n)
+ * \brief Function to draw an array of lines with double precision coordinates.
+ * \param red
+ * \brief red color.
+ * \param green
+ * \brief green color.
+ * \param blue
+ * \brief blue color.
+ * \param x
+ * \brief array of vertex x-coordinates.
+ * \param y
+ * \brief array of vertex y-coordinates.
+ * \param n
+ * \brief number of vertices.
+ */
 #if !INLINE_JBW_DRAW_LINESD
 void jbw_draw_linesd
   (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
@@ -404,6 +455,24 @@ void jbw_draw_linesd
 }
 #endif
 
+/**
+ * \fn void jbw_draw_segmentsf (float red, float green, float blue, \
+ *   JBFLOAT *x, JBFLOAT *y, int n)
+ * \brief Function to draw an array of segments with simple precision
+ *   coordinates.
+ * \param red
+ * \brief red color.
+ * \param green
+ * \brief green color.
+ * \param blue
+ * \brief blue color.
+ * \param x
+ * \brief array of vertex x-coordinates.
+ * \param y
+ * \brief array of vertex y-coordinates.
+ * \param n
+ * \brief number of vertices.
+ */
 #if !INLINE_JBW_DRAW_SEGMENTSF
 void jbw_draw_segmentsf
   (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
@@ -412,6 +481,24 @@ void jbw_draw_segmentsf
 }
 #endif
 
+/**
+ * \fn void jbw_draw_segmentsd (float red, float green, float blue, \
+ *   JBFLOAT *x, JBFLOAT *y, int n)
+ * \brief Function to draw an array of segments with double precision
+ *   coordinates.
+ * \param red
+ * \brief red color.
+ * \param green
+ * \brief green color.
+ * \param blue
+ * \brief blue color.
+ * \param x
+ * \brief array of vertex x-coordinates.
+ * \param y
+ * \brief array of vertex y-coordinates.
+ * \param n
+ * \brief number of vertices.
+ */
 #if !INLINE_JBW_DRAW_SEGMENTSD
 void jbw_draw_segmentsd
   (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)

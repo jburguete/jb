@@ -22,6 +22,33 @@ FILES
 BUILDING THIS LIBRARY ON OTHER PROGRAMS
 ---------------------------------------
 
+REQUIRED LIBRARIES AND UTILITIES
+________________________________
+
+Mandatory:
+* gcc or clang (to compile the source code)
+* autoconf (to generate the Makefile in different systems)
+* automake (to detect the system)
+* pkg-config (to find the libraries to compile)
+* gettext (to work with different international locales and languages)
+* gthreads (to use multicores in shared memory machines)
+* glib (extended utilities of C to work with data, lists, random numbers, ...)
+
+Optional if including jb_xml utilites:
+* libxml2 (to work with XML files)
+
+Optional if including jb_win utilities and compiling with -DJBW=2 flag.
+* png (to work with PNG files)
+* gtk+ (to make the interface windows)
+  Three additional options to interact with OpenGL to draw graphics:
+  * freeglut (compiling with -DJBW_GRAPHIC=1 flag).
+  * sdl2 (compiling with -DJBW_GRAPHIC=2 flag).
+  * glfw (compiling with -DJBW_GRAPHIC=3 flag).
+
+Optional to build documentation:
+* doxygen (standard comments format to generate documentation)
+* latex (to build the PDF manuals)
+
 COMPILING FLAGS
 _______________
 
@@ -62,10 +89,18 @@ ___________________
 >
 > $ gcc -c -DJBW=1 jb/jb_math.c -o jb_math.o
 > \`pkg-config --cflags glib-2.0\`
+Note that if you uses XML of graphical utilities you have to add corresponding
+libraries to "pkg-config" i.e.:
+> $ gcc -c -DJBW=1 jb/jb_xml.c -o jb_xml.o
+> \`pkg-config --cflags glib-2.0 libxml-2.0\`
+or:
+> $ gcc -c -DJBW=2 -DJBW_GRAPHIC=2 jb/jb_win.c -o jb_win.o
+> \`pkg-config --cflags glib-2.0 gtk+-3.0 gl glu glew sdl2\`
 
 5. Link the used utility object file to your executable i.e.:
 > $ gcc YOUR_SOURCE_CODE.c jb_def.o jb_win.o jb_math.o -o YOUR_EXECUTABLE_FILE 
 > \`pkg-config --libs glib-2.0\`
+Note that you can also need additional libraries to "pkg-config" command.
 
 BUILDING DINAMICALLY
 ____________________

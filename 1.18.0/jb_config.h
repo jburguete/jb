@@ -418,10 +418,6 @@
 ///< Macro deciding if the function jbw_draw_rectanglef() has to be inlined.
 #define INLINE_JBW_DRAW_RECTANGLED						1
 ///< Macro deciding if the function jbw_draw_rectangled() has to be inlined.
-#define INLINE_JBW_DRAW_RECTANGLE						1
-///< Macro deciding if the function jbw_draw_rectangle() has to be inlined.
-#define INLINE_JBW_DRAW_CLEAR							1
-///< Macro deciding if the function jbw_draw_clear() has to be inlined.
 #define INLINE_JBW_DRAW_LINESF							1
 ///< Macro deciding if the function jbw_draw_linesf() has to be inlined.
 #define INLINE_JBW_DRAW_LINESD							1
