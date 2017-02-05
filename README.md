@@ -14,8 +14,8 @@ FILES
 
 * README.md: Readme file.
 * TODO: List of tasks TO DO.
-* *.h: Header files.
-* *.c: Source files.
+* \*.h: Header files.
+* \*.c: Source files.
 * Doxyfile: configuration file to generate doxygen documentation.
 * makefile: to build the tests.
 
@@ -27,25 +27,25 @@ ________________________________
 
 Mandatory:
 * [gcc](https://gcc.gnu.org) or [clang](http://clang.llvm.org) (to compile the
-source code)
+  source code)
 * [make](http://www.gnu.org/software/make) (to build the executable file)
 * [autoconf](http://www.gnu.org/software/autoconf) (to generate the Makefile in
-different operative systems)
+  different operative systems)
 * [automake](http://www.gnu.org/software/automake) (to check the operative
-system)
+  system)
 * [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config) (to find the
-libraries to compile)
+  libraries to compile)
 * [glib](https://developer.gnome.org/glib) (extended utilities of C to work with
-data, lists, mapped files, regular expressions, using multicores in shared
-memory machines, ...)
+  data, lists, mapped files, regular expressions, using multicores in shared
+  memory machines, ...)
 * [gettext](http://www.gnu.org/software/gettext) (to work with different
-locales and languages)
+  locales and languages)
 
 Optional if including jb_xml utilites:
 * [libxml](http://xmlsoft.org) (to deal with XML files)
 
 Optional if including jb\_win utilities and compiling with -DJBW=2 flag.
-* png (to work with PNG files)
+* [png](http://libpng.sourceforge.net) (to work with PNG files)
 * [gtk+3](http://www.gtk.org) (to create the interactive GUI tool)
   Three additional options to interact with OpenGL to draw graphics:
   * [freeglut](http://freeglut.sourceforge.net) (compiling with -DJBW\_GRAPHIC=1
@@ -54,8 +54,9 @@ Optional if including jb\_win utilities and compiling with -DJBW=2 flag.
   * [glfw](http://www.glfw.org) (compiling with -DJBW\_GRAPHIC=3 flag).
 
 Optional to build documentation:
-* doxygen (standard comments format to generate documentation)
-* latex (to build the PDF manuals)
+* [doxygen](http://www.stack.nl/~dimitri/doxygen) (standard comments format to
+  generate documentation)
+* [latex](https://www.latex-project.org/) (to build the PDF manuals)
 
 COMPILING FLAGS
 _______________
