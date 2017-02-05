@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2014, Javier Burguete Tolosa.
+ * Copyright 2005-2017, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_math.h
  * \brief Header file with useful mathematical functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2014, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2017, Javier Burguete Tolosa.
  */
 #ifndef JB_MATH__H
 #define JB_MATH__H 1
@@ -43,15 +43,16 @@
 
 #define JBM_G 9.81              ///< Gravity constant.
 #define JBM_INDEX_SORT_FLASH_MIN 32
-  ///< Minimum number of elements to select the jbm_index_sort_flash_min()
-  ///< function as default sort method.
+///< Minimum number of elements to select the jbm_index_sort_flash_min()
+///< function as default sort method.
 #define JBM_INDEX_SORT_MERGE_MIN 32
-  ///< Minimum number of elements to select the jbm_index_sort_merge_min()
-  ///< function as default sort method.
+///< Minimum number of elements to select the jbm_index_sort_merge_min()
+///< function as default sort method.
 #define JBM_MAX(a, b) (((a) > (b))? (a): (b))
-  ///< Macro calculating the maximum number.
+///< Macro calculating the maximum number.
 #define JBM_MIN(a, b) (((a) < (b))? (a): (b))
-  ///< Macro calculating the minimum number.
+///< Macro calculating the minimum number.
+
 /**
  * \def JBM_MODMIN
  * \brief Macro calculating the number with the lower module in the [a, b]
@@ -107,7 +108,7 @@
 #define JBM_DBL(x) ((x) + (x))  ///< Macro calculating the double of a number.
 #define JBM_EXTRAPOLATE(x, x1, x2, y1, y2) \
   ((y1) + (x - (x1)) * ((y2) - (y1)) / ((x2) - (x1)))
-  ///< Macro calculating a linear extrapolation.
+///< Macro calculating a linear extrapolation.
 
 // Needed in no GNU systems
 #if defined(BSD) || defined(sun) || defined(G_OS_WIN32)
@@ -921,7 +922,8 @@ static inline JBDOUBLE _jbm_farray_mean_square_error
           k += jbm_fsqr (fa[i] - fr[nr]);
       else
         k += jbm_fsqr
-          (fa[i] - jbm_extrapolate (xa[i], xr[j], xr[j + 1], fr[j], fr[j + 1]));
+          (fa[i] -
+           jbm_extrapolate (xa[i], xr[j], xr[j + 1], fr[j], fr[j + 1]));
 #if DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR
       fprintf (stderr, "JBMFMSE i=%d j=%d k=" FWL "\n", i, j, k);
 #endif
@@ -995,8 +997,8 @@ _jbm_darray_search_extended (JBDOUBLE x, JBDOUBLE * fa, int n)
 #if DEBUG_JBM_DARRAY_SEARCH_EXTENDED
   fprintf (stderr, "JBM double array search_extended\n");
   fprintf (stderr,
-           "JBM double array search_extended n=%d x=" FWL " f0=" FWL " fn=" FWL
-           "\n", n, x, fa[0], fa[n]);
+           "JBM double array search_extended n=%d x=" FWL " f0=" FWL " fn="
+           FWL "\n", n, x, fa[0], fa[n]);
 #endif
   if (x < fa[0])
     i = -1;
@@ -1185,7 +1187,8 @@ static inline JBDOUBLE *_jbm_darray_add
 #if INLINE_JBM_DARRAY_ADD
 #define jbm_darray_add _jbm_darray_add
 #else
-JBDOUBLE *jbm_darray_add (JBDOUBLE *, int, JBDOUBLE *, int, JBDOUBLE **, int *);
+JBDOUBLE *jbm_darray_add (JBDOUBLE *, int, JBDOUBLE *, int, JBDOUBLE **,
+                          int *);
 #endif
 
 static inline JBDOUBLE _jbm_darray_farray_integral
@@ -1381,7 +1384,8 @@ exit1:
 #if INLINE_JBM_DARRAY_INTEGRAL
 #define jbm_darray_integral _jbm_darray_integral
 #else
-JBDOUBLE jbm_darray_integral (JBDOUBLE *, JBDOUBLE *, int, JBDOUBLE, JBDOUBLE);
+JBDOUBLE jbm_darray_integral (JBDOUBLE *, JBDOUBLE *, int, JBDOUBLE,
+                              JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_darray_mean_square_error
@@ -1409,7 +1413,8 @@ static inline JBDOUBLE _jbm_darray_mean_square_error
           k += jbm_fsqr (fa[i] - fr[nr]);
       else
         k += jbm_fsqr
-          (fa[i] - jbm_extrapolate (xa[i], xr[j], xr[j + 1], fr[j], fr[j + 1]));
+          (fa[i] -
+           jbm_extrapolate (xa[i], xr[j], xr[j + 1], fr[j], fr[j + 1]));
 #if DEBUG_JBM_DARRAY_MEAN_SQUARE_ERROR
       fprintf (stderr, "JBMDMSE i=%d j=%d k=" FWL "\n", i, j, k);
 #endif
@@ -1481,8 +1486,8 @@ static inline JBDOUBLE _jbm_solve_cuadratic_reduced
   register JBDOUBLE k;
 #if DEBUG_JBM_SOLVE_CUADRATIC_REDUCED
   fprintf (stderr,
-           "JBM Solve cuadratic reduced\na=" FWL " b=" FWL " x1=" FWL " x2=" FWL
-           "\n", a, b, x1, x2);
+           "JBM Solve cuadratic reduced\na=" FWL " b=" FWL " x1=" FWL " x2="
+           FWL "\n", a, b, x1, x2);
 #endif
   a /= 2.L;
   b = sqrtl (a * a - b);
@@ -1507,8 +1512,8 @@ static inline JBDOUBLE _jbm_solve_cuadratic
   register JBDOUBLE k;
 #if DEBUG_JBM_SOLVE_CUADRATIC
   fprintf (stderr,
-           "JBM solve cuadratic\na=" FWL " b=" FWL " c=" FWL "\nx1=" FWL " x2="
-           FWL "\n", a, b, c, x1, x2);
+           "JBM solve cuadratic\na=" FWL " b=" FWL " c=" FWL "\nx1=" FWL
+           " x2=" FWL "\n", a, b, c, x1, x2);
 #endif
   if (a == 0.L)
     k = -c / b;
@@ -1523,7 +1528,8 @@ static inline JBDOUBLE _jbm_solve_cuadratic
 #if INLINE_JBM_SOLVE_CUADRATIC
 #define jbm_solve_cuadratic _jbm_solve_cuadratic
 #else
-JBDOUBLE jbm_solve_cuadratic (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
+JBDOUBLE jbm_solve_cuadratic (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE,
+                              JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_solve_cubic_reduced
@@ -2106,7 +2112,8 @@ _jbm_regression_linear (JBFLOAT * x, JBFLOAT * y, int n,
 #if INLINE_JBM_REGRESSION_LINEAR
 #define jbm_regression_linear _jbm_regression_linear
 #else
-void jbm_regression_linear (JBFLOAT *, JBFLOAT *, int, JBDOUBLE *, JBDOUBLE *);
+void jbm_regression_linear (JBFLOAT *, JBFLOAT *, int, JBDOUBLE *,
+                            JBDOUBLE *);
 #endif
 
 static inline void _jbm_regression_exponential
@@ -2191,7 +2198,8 @@ _jbm_regression_multiexponential (JBFLOAT ** x, int n, JBFLOAT * a, int m)
 #if INLINE_JBM_REGRESSION_MULTIEXPONENTIAL
 #define jbm_regression_multiexponential _jbm_regression_multiexponential
 #else
-void jbm_regression_multiexponential (JBFLOAT ** x, int n, JBFLOAT * a, int m);
+void jbm_regression_multiexponential (JBFLOAT ** x, int n, JBFLOAT * a,
+                                      int m);
 #endif
 
 static inline void _jbm_spline_cubic
@@ -2547,7 +2555,8 @@ _jbm_transversal_section_regions (JBFLOAT * l, JBFLOAT * z,
     {
       fprintf (stderr, "JBM tsr i=%d (*nj)=%d\n", i, (*nj)[i]);
       for (j = 0; j < (*nj)[i]; ++j)
-        fprintf (stderr, "JBM tsr i=%d j=%d nij=%d\n", i, j, (*nij)[n * i + j]);
+        fprintf (stderr, "JBM tsr i=%d j=%d nij=%d\n", i, j,
+                 (*nij)[n * i + j]);
     }
 #endif
   *nmin = jbm_min ((*ni)[0], (*ni)[n]);
@@ -2712,8 +2721,8 @@ void jbm_varray_maxmin (void *, int, int, JBDOUBLE *, JBDOUBLE *);
 
 static inline JBDOUBLE
 _jbm_varray_mean_square_error (void *xa, void *fa,
-                               int sizea, int na, void *xr, void *fr, int sizer,
-                               int nr)
+                               int sizea, int na, void *xr, void *fr,
+                               int sizer, int nr)
 {
   register int i, j;
   JBDOUBLE k = 0., k2;
@@ -2742,8 +2751,9 @@ _jbm_varray_mean_square_error (void *xa, void *fa,
             {
               k += jbm_fsqr (*(JBFLOAT *) fa - *(JBFLOAT *) fr);
 #if DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR
-              fprintf (stderr, "JBMVMSE i=%d fa=" FWF " fr=" FWF " k=" FWL "\n",
-                       i, *(JBFLOAT *) fa, *(JBFLOAT *) fr, k);
+              fprintf (stderr,
+                       "JBMVMSE i=%d fa=" FWF " fr=" FWF " k=" FWL "\n", i,
+                       *(JBFLOAT *) fa, *(JBFLOAT *) fr, k);
 #endif
             }
         }
@@ -2756,9 +2766,10 @@ _jbm_varray_mean_square_error (void *xa, void *fa,
           k += jbm_fsqr (*(JBFLOAT *) fa - k2);
 #if DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR
           fprintf (stderr, "JBMVMSE xa=" FWF " xr=" FWF " xr2=" FWF "\n",
-                   *(JBFLOAT *) xa, *(JBFLOAT *) xr, *(JBFLOAT *) (xr + sizer));
-          fprintf (stderr, "JBMVMSE k2=" FWL " yr=" FWF " yr2=" FWF "\n",
-                   k2, *(JBFLOAT *) fr, *(JBFLOAT *) (fr + sizer));
+                   *(JBFLOAT *) xa, *(JBFLOAT *) xr,
+                   *(JBFLOAT *) (xr + sizer));
+          fprintf (stderr, "JBMVMSE k2=" FWL " yr=" FWF " yr2=" FWF "\n", k2,
+                   *(JBFLOAT *) fr, *(JBFLOAT *) (fr + sizer));
           fprintf (stderr, "JBMVMSE i=%d j=%d k=" FWL "\n", i, j, k);
 #endif
         }
@@ -3052,8 +3063,9 @@ _jbm_vdarray_mean_square_error (void *xa, void *fa,
             {
               k += jbm_fsqr (*(JBDOUBLE *) fa - *(JBDOUBLE *) fr);
 #if DEBUG_JBM_VDARRAY_MEAN_SQUARE_ERROR
-              fprintf (stderr, "JBMVMSE i=%d fa=" FWF " fr=" FWF " k=" FWL "\n",
-                       i, *(JBDOUBLE *) fa, *(JBDOUBLE *) fr, k);
+              fprintf (stderr,
+                       "JBMVMSE i=%d fa=" FWF " fr=" FWF " k=" FWL "\n", i,
+                       *(JBDOUBLE *) fa, *(JBDOUBLE *) fr, k);
 #endif
             }
         }

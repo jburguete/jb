@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2014, Javier Burguete Tolosa.
+ * Copyright 2005-2017, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_xml.h
  * \brief Header file with useful XML functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2014, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2017, Javier Burguete Tolosa.
  */
 #ifndef JB_XML__H
 #define JB_XML__H 1
@@ -61,7 +61,8 @@ long jb_xml_node_get_int (xmlNode *, const xmlChar *, int *);
 #endif
 
 #if JB_XML_NODE_GET_INT_WITH_DEFAULT
-long jb_xml_node_get_int_with_default (xmlNode *, const xmlChar *, int *, long);
+long jb_xml_node_get_int_with_default (xmlNode *, const xmlChar *, int *,
+                                       long);
 #endif
 
 #if JB_XML_NODE_SET_INT
@@ -69,7 +70,8 @@ void jb_xml_node_set_int (xmlNode *, const xmlChar *, long);
 #endif
 
 #if JB_XML_NODE_SET_INT_WITH_DEFAULT
-void jb_xml_node_set_int_with_default (xmlNode *, const xmlChar *, long, long);
+void jb_xml_node_set_int_with_default (xmlNode *, const xmlChar *, long,
+                                       long);
 #endif
 
 #if JB_XML_NODE_GET_TIME

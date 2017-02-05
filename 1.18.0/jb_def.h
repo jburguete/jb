@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2014, Javier Burguete Tolosa.
+ * Copyright 2005-2017, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_def.h
  * \brief Header file to define the basic macros and functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2014.
+ * \copyright Copyright 2005-2017.
  */
 #ifndef JB_DEF__H
 #define JB_DEF__H 1
@@ -43,20 +43,24 @@
 #include <unistd.h>
 #include <glib.h>
 #include <glib/gstdio.h>
-#include <glib/gi18n.h>
+#include <libintl.h>
 
-#define JBW_NO 1                ///< Macro to use on terminal programs.
-#define JBW_GTK 2               ///< Macro to use the Gtk+ library on visual
-                                ///< programs.
+#define JBW_NO 1
+///< Macro to use on terminal programs.
+#define JBW_GTK 2
+///< Macro to use the Gtk+ library on visual programs.
 
 #define JBW_GRAPHIC_GLUT 1
-  ///< Macro to using the FreeGLUT library in graphical widgets.
+///< Macro to using the FreeGLUT library in graphical widgets.
 #define JBW_GRAPHIC_SDL 2
-  ///< Macro to using the SDL library in graphical widgets.
+///< Macro to using the SDL library in graphical widgets.
 #define JBW_GRAPHIC_GLFW 3
-  ///< Macro to using the GLFW library in graphical widgets.
+///< Macro to using the GLFW library in graphical widgets.
 
 #include "jb_config.h"
+
+// Simplifying gettext
+#define _(str) gettext(str)
 
 // Detecting configuration errors
 #if (JBW < JBW_NO || JBW > JBW_GTK)
@@ -171,14 +175,13 @@ extern FILE *stderr;
 #define FWF2 FWF " "
 
 #define JB_PROTECT(a, b, c) ((a < b)? 1: (a > c)? 1: 0)
-  ///< Macro returning FALSE if a is in [b,c].
+///< Macro returning FALSE if a is in [b,c].
 
 #define JB_POINTER_SIZE(a, b) ((size_t)&(a) - (size_t)&(b))
-  ///< Macro to calculate the size between two fields of a structure.
+///< Macro to calculate the size between two fields of a structure.
 
 #define JB_CHANGE(a, b, c) (c = a, a = b, b = c)
-  ///< Macro to interchange two variables (change a and b using the auxiliary
-  ///< c).
+///< Macro to interchange two variables (change a and b using the auxiliary c).
 
 static inline void
 _JBChange (void **a, void **b)
@@ -194,7 +197,7 @@ void JBChange (void **a, void **b);
 #endif
 
 #define jb_change(a, b) (JBChange((void**)&a, (void**)&b))
-  ///< Macro to interchange two pointers.
+///< Macro to interchange two pointers.
 
 #if JB_FREE_NULL
 void jb_free_null (void **);

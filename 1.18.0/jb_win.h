@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2014, Javier Burguete Tolosa.
+ * Copyright 2005-2017, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_win.h
  * \brief Header file with useful display functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2014, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2017, Javier Burguete Tolosa.
  */
 #ifndef JB_WIN__H
 #define JB_WIN__H 1
@@ -52,7 +52,7 @@ void jbw_show_message (char *, char *);
 static inline void
 _jbw_show_error (char *message)
 {
-  jbw_show_message (gettext ("Error!"), message);
+  jbw_show_message (_("Error!"), message);
 }
 
 #if INLINE_JBW_SHOW_ERROR
@@ -64,7 +64,7 @@ void jbw_show_error (char *);
 static inline void
 _jbw_show_warning (char *message)
 {
-  jbw_show_message (gettext ("Warning!"), message);
+  jbw_show_message (_("Warning!"), message);
 }
 
 #if INLINE_JBW_SHOW_WARNING
@@ -270,7 +270,7 @@ void jbw_show_message (char *, char *, char *);
 static inline void
 _jbw_show_error (char *message)
 {
-  jbw_show_message (gettext ("Error!"), message, GTK_MESSAGE_ERROR);
+  jbw_show_message (_("Error!"), message, GTK_MESSAGE_ERROR);
 }
 
 #if INLINE_JBW_SHOW_ERROR
@@ -282,7 +282,7 @@ void jbw_show_error (char *);
 static inline void
 _jbw_show_warning (char *message)
 {
-  jbw_show_message (gettext ("Warning!"), message, GTK_MESSAGE_WARNING);
+  jbw_show_message (_("Warning!"), message, GTK_MESSAGE_WARNING);
 }
 
 #if INLINE_JBW_SHOW_WARNING
@@ -1508,13 +1508,11 @@ _jbw_graphic_dialog_save (JBWGraphic * graphic)
   gtk_file_filter_add_pattern (filter, "*.PNG");
   dlg =
     (GtkFileChooserDialog *)
-    gtk_file_chooser_dialog_new (gettext ("Save graphical"),
+    gtk_file_chooser_dialog_new (_("Save graphical"),
                                  window_parent,
                                  GTK_FILE_CHOOSER_ACTION_SAVE,
-                                 gettext ("_OK"),
-                                 GTK_RESPONSE_OK,
-                                 gettext ("_Cancel"),
-                                 GTK_RESPONSE_CANCEL, NULL);
+                                 _("_OK"), GTK_RESPONSE_OK,
+                                 _("_Cancel"), GTK_RESPONSE_CANCEL, NULL);
   gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dlg), filter);
   gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dlg), 1);
   if (gtk_dialog_run ((GtkDialog *) dlg) == GTK_RESPONSE_OK)
@@ -1726,7 +1724,7 @@ _jbw_graphic_init (int *argn, char ***argc)
 #elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW
   if (!glfwInit ())
     {
-      jbw_show_error (gettext ("unable to init GLFW"));
+      jbw_show_error (_("unable to init GLFW"));
       return 0;
     }
  #endif

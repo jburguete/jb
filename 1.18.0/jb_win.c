@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2014, Javier Burguete Tolosa.
+ * Copyright 2005-2017, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_win.c
  * \brief Source file with useful display functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2014, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2017, Javier Burguete Tolosa.
  */
 #include "jb_win.h"
 
@@ -299,14 +299,53 @@ jbw_float_entry_get_value (JBWFloatEntry * entry)
 }
 #endif
 
+/**
+ * \fn void jbw_draw_rectanglef (float red, float green, float blue, float x1, \
+ *   float y1, float x2, float y2)
+ * \brief Function to draw a rectangle with simple precision coordinates.
+ * \param red
+ * \brief red color.
+ * \param green
+ * \brief green color.
+ * \param blue
+ * \brief blue color.
+ * \param x1
+ * \brief x-coordinate of the fist rectangle vertex.
+ * \param y1
+ * \brief y-coordinate of the fist rectangle vertex.
+ * \param x2
+ * \brief x-coordinate of the second rectangle vertex.
+ * \param y2
+ * \brief y-coordinate of the second rectangle vertex.
+ */
 #if !INLINE_JBW_DRAW_RECTANGLEF
-void jbw_draw_rectanglef
-  (float red, float green, float blue, float x1, float y1, float x2, float y2)
+void
+jbw_draw_rectanglef (float red, float green, float blue, float x1, float y1,
+                     float x2, float y2)
 {
   _jbw_draw_rectanglef (red, green, blue, x1, y1, x2, y2);
 }
 #endif
 
+/**
+ * \fn void jbw_draw_rectangled (float red, float green, float blue, \
+ *   double x1, double y1, double x2, double y2)
+ * \brief Function to draw a rectangle with simple precision coordinates.
+ * \param red
+ * \brief red color.
+ * \param green
+ * \brief green color.
+ * \param blue
+ * \brief blue color.
+ * \param x1
+ * \brief x-coordinate of the fist rectangle vertex.
+ * \param y1
+ * \brief y-coordinate of the fist rectangle vertex.
+ * \param x2
+ * \brief x-coordinate of the second rectangle vertex.
+ * \param y2
+ * \brief y-coordinate of the second rectangle vertex.
+ */
 #if !INLINE_JBW_DRAW_RECTANGLED
 void
 jbw_draw_rectangled (float red, float green, float blue, double x1,
@@ -396,8 +435,8 @@ void jbw_draw_points
    JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
    JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2, int n)
 {
-  _jbw_draw_points (red1, green1, blue1, red2, green2, blue2, xmin, xmax, ymin,
-                    ymax, x, y1, y2, n);
+  _jbw_draw_points (red1, green1, blue1, red2, green2, blue2, xmin, xmax,
+                    ymin, ymax, x, y1, y2, n);
 }
 #endif
 
@@ -464,8 +503,8 @@ void jbw_draw_linesv
    JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
    void *x, void *y1, void *y2, int size, int n)
 {
-  _jbw_draw_linesv (red1, green1, blue1, red2, green2, blue2, xmin, xmax, ymin,
-                    ymax, x, y1, y2, size, n);
+  _jbw_draw_linesv (red1, green1, blue1, red2, green2, blue2, xmin, xmax,
+                    ymin, ymax, x, y1, y2, size, n);
 }
 #endif
 
