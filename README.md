@@ -27,26 +27,26 @@ ________________________________
 
 Mandatory:
 * [gcc](https://gcc.gnu.org) or [clang](http://clang.llvm.org) (to compile the
-  source code)
-* [make](http://www.gnu.org/software/make) (to build the executable file)
+  source code).
+* [make](http://www.gnu.org/software/make) (to build the executable file).
 * [autoconf](http://www.gnu.org/software/autoconf) (to generate the Makefile in
-  different operative systems)
+  different operative systems).
 * [automake](http://www.gnu.org/software/automake) (to check the operative
-  system)
+  system).
 * [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config) (to find the
-  libraries to compile)
+  libraries to compile).
 * [glib](https://developer.gnome.org/glib) (extended utilities of C to work with
   data, lists, mapped files, regular expressions, using multicores in shared
-  memory machines, ...)
+  memory machines, ...).
 * [gettext](http://www.gnu.org/software/gettext) (to work with different
-  locales and languages)
+  locales and languages).
 
 Optional if including jb_xml utilites:
-* [libxml](http://xmlsoft.org) (to deal with XML files)
+* [libxml](http://xmlsoft.org) (to deal with XML files).
 
 Optional if including jb\_win utilities and compiling with -DJBW=2 flag.
 * [png](http://libpng.sourceforge.net) (to work with PNG files)
-* [gtk+3](http://www.gtk.org) (to create the interactive GUI tool)
+* [gtk+3](http://www.gtk.org) (to create the interactive GUI tool).
   Three additional options to interact with OpenGL to draw graphics:
   * [freeglut](http://freeglut.sourceforge.net) (compiling with -DJBW\_GRAPHIC=1
     flag).
@@ -55,8 +55,8 @@ Optional if including jb\_win utilities and compiling with -DJBW=2 flag.
 
 Optional to build documentation:
 * [doxygen](http://www.stack.nl/~dimitri/doxygen) (standard comments format to
-  generate documentation)
-* [latex](https://www.latex-project.org/) (to build the PDF manuals)
+  generate documentation).
+* [latex](https://www.latex-project.org/) (to build the PDF manuals).
 
 COMPILING FLAGS
 _______________
