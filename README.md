@@ -72,7 +72,7 @@ ____________________
 
 4. Build the used utility source codes with absolute paths i.e.:
 > $ gcc -c -fPIC jb/jb_def.c -o jb_def.o
-> `pkg-config --cflags glib-2.0`
+> \`pkg-config --cflags glib-2.0\`
 >
 > $ gcc -c -fPIC jb/jb_win.c -o jb_win.o
 > `pkg-config --cflags glib-2.0`
