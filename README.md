@@ -55,17 +55,17 @@ ___________________
 
 4. Build the used utility source codes i.e.:
 > $ gcc -c -DJBW=1 jb/jb_def.c -o jb_def.o
-> `pkg-config --cflags glib-2.0`
+> \`pkg-config --cflags glib-2.0\`
 >
 > $ gcc -c -DJBW=1 jb/jb_win.c -o jb_win.o
-> `pkg-config --cflags glib-2.0`
+> \`pkg-config --cflags glib-2.0\`
 >
 > $ gcc -c -DJBW=1 jb/jb_math.c -o jb_math.o
-> `pkg-config --cflags glib-2.0`
+> \`pkg-config --cflags glib-2.0\`
 
 5. Link the used utility object file to your executable i.e.:
 > $ gcc YOUR_SOURCE_CODE.c jb_def.o jb_win.o jb_math.o -o YOUR_EXECUTABLE_FILE 
-> `pkg-config --libs glib-2.0`
+> \`pkg-config --libs glib-2.0\`
 
 BUILDING DINAMICALLY
 ____________________
@@ -75,18 +75,18 @@ ____________________
 > \`pkg-config --cflags glib-2.0\`
 >
 > $ gcc -c -fPIC jb/jb_win.c -o jb_win.o
-> `pkg-config --cflags glib-2.0`
+> \`pkg-config --cflags glib-2.0\`
 >
 > $ gcc -c -fPIC jb/jb_math.c -o jb_math.o
-> `pkg-config --cflags glib-2.0`
+> \`pkg-config --cflags glib-2.0\`
 
 5. Build the shared library object:
 > $ gcc -shared jb_def.o jb_win.o jb_math.o -o libjb.so
-> `pkg-config --libs glib-2.0`
+> \`pkg-config --libs glib-2.0\`
 
 6. Link the shared library to your executable i.e.:
 > $ gcc YOUR_SOURCE_CODE.c -o YOUR_EXECUTABLE_FILE -L. -Wl,-rpath=. -ljb
-> `pkg-config --libs glib-2.0`
+> \`pkg-config --libs glib-2.0\`
 
 
 MAKING REFERENCE MANUAL INSTRUCTIONS (doc/latex/refman.pdf file)
