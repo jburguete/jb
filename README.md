@@ -26,24 +26,32 @@ REQUIRED LIBRARIES AND UTILITIES
 ________________________________
 
 Mandatory:
-* gcc or clang (to compile the source code)
-* autoconf (to generate the Makefile in different systems)
-* automake (to detect the system)
-* pkg-config (to find the libraries to compile)
-* gettext (to work with different international locales and languages)
-* gthreads (to use multicores in shared memory machines)
-* glib (extended utilities of C to work with data, lists, random numbers, ...)
+* [gcc](https://gcc.gnu.org) or [clang](http://clang.llvm.org) (to compile the
+source code)
+* [make](http://www.gnu.org/software/make) (to build the executable file)
+* [autoconf](http://www.gnu.org/software/autoconf) (to generate the Makefile in
+different operative systems)
+* [automake](http://www.gnu.org/software/automake) (to check the operative
+system)
+* [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config) (to find the
+libraries to compile)
+* [glib](https://developer.gnome.org/glib) (extended utilities of C to work with
+data, lists, mapped files, regular expressions, using multicores in shared
+memory machines, ...)
+* [gettext](http://www.gnu.org/software/gettext) (to work with different
+locales and languages)
 
 Optional if including jb_xml utilites:
-* libxml2 (to work with XML files)
+* [libxml](http://xmlsoft.org) (to deal with XML files)
 
-Optional if including jb_win utilities and compiling with -DJBW=2 flag.
+Optional if including jb\_win utilities and compiling with -DJBW=2 flag.
 * png (to work with PNG files)
-* gtk+ (to make the interface windows)
+* [gtk+3](http://www.gtk.org) (to create the interactive GUI tool)
   Three additional options to interact with OpenGL to draw graphics:
-  * freeglut (compiling with -DJBW_GRAPHIC=1 flag).
-  * sdl2 (compiling with -DJBW_GRAPHIC=2 flag).
-  * glfw (compiling with -DJBW_GRAPHIC=3 flag).
+  * [freeglut](http://freeglut.sourceforge.net) (compiling with -DJBW\_GRAPHIC=1
+    flag).
+  * [sdl](https://www.libsdl.org) (compiling with -DJBW\_GRAPHIC=2 flag).
+  * [glfw](http://www.glfw.org) (compiling with -DJBW\_GRAPHIC=3 flag).
 
 Optional to build documentation:
 * doxygen (standard comments format to generate documentation)
@@ -57,9 +65,9 @@ To compile with JB library you has to define the JBW flag. They are 2 options:
 * -DJBW=2: for graphical applications.
   In this case you have to define the JBW_GRAPHIC flag to selec the graphical
   library to interact with OpenGL. They are 3 options:
-  * -DJBW_GRAPHIC=1: FreeGLUT.
-  * -DJBW_GRAPHIC=2: SDL.
-  * -DJBW_GRAPHIC=3: GLFW.
+  * -DJBW\_GRAPHIC=1: FreeGLUT.
+  * -DJBW\_GRAPHIC=2: SDL.
+  * -DJBW\_GRAPHIC=3: GLFW.
 
 COMMON BUILDING INSTRUCTIONS
 ____________________________
