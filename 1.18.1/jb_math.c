@@ -462,7 +462,7 @@ jbm_fdbl (JBDOUBLE x)
  */
 #if !INLINE_JBM_EXTRAPOLATE
 JBDOUBLE jbm_extrapolate
-  (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2)
+    (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2)
 {
   return _jbm_extrapolate (x, x1, x2, y1, y2);
 }
@@ -486,7 +486,7 @@ JBDOUBLE jbm_extrapolate
  */
 #if !INLINE_JBM_INTERPOLATE
 JBDOUBLE jbm_interpolate
-  (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2)
+    (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2)
 {
   return _jbm_interpolate (x, x1, x2, y1, y2);
 }
@@ -649,7 +649,7 @@ jbm_farray_interpolate (JBDOUBLE x, JBFLOAT * fa, JBFLOAT * fb, int n)
  */
 #if !INLINE_JBM_FARRAY_ADD
 JBFLOAT *jbm_farray_add
-  (JBFLOAT * fa, int na, JBFLOAT * fb, int nb, JBFLOAT ** fc, int *nc)
+    (JBFLOAT * fa, int na, JBFLOAT * fb, int nb, JBFLOAT ** fc, int *nc)
 {
   return _jbm_farray_add (fa, na, fb, nb, fc, nc);
 }
@@ -675,7 +675,7 @@ JBFLOAT *jbm_farray_add
  */
 #if !INLINE_JBM_FARRAY_INTEGRAL
 JBDOUBLE jbm_farray_integral
-  (JBFLOAT * x, JBFLOAT * y, int n, JBDOUBLE x1, JBDOUBLE x2)
+    (JBFLOAT * x, JBFLOAT * y, int n, JBDOUBLE x1, JBDOUBLE x2)
 {
   return _jbm_farray_integral (x, y, n, x1, x2);
 }
@@ -708,7 +708,7 @@ JBDOUBLE jbm_farray_integral
  */
 #if !INLINE_JBM_FARRAY_MEAN_SQUARE_ERROR
 JBDOUBLE jbm_farray_mean_square_error
-  (JBFLOAT * xa, JBFLOAT * fa, int na, JBFLOAT * xr, JBFLOAT * fr, int nr)
+    (JBFLOAT * xa, JBFLOAT * fa, int na, JBFLOAT * xr, JBFLOAT * fr, int nr)
 {
   return _jbm_farray_mean_square_error (xa, fa, na, xr, fr, nr);
 }
@@ -741,7 +741,7 @@ JBDOUBLE jbm_farray_mean_square_error
  */
 #if !INLINE_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR
 JBDOUBLE jbm_farray_root_mean_square_error
-  (JBFLOAT * xa, JBFLOAT * fa, int na, JBFLOAT * xr, JBFLOAT * fr, int nr)
+    (JBFLOAT * xa, JBFLOAT * fa, int na, JBFLOAT * xr, JBFLOAT * fr, int nr)
 {
   return _jbm_farray_root_mean_square_error (xa, fa, na, xr, fr, nr);
 }
@@ -859,7 +859,7 @@ jbm_darray_maxmin (JBDOUBLE * fa, int n, JBDOUBLE * max, JBDOUBLE * min)
  */
 #if !INLINE_JBM_DARRAY_FARRAY_INTERPOLATE
 JBDOUBLE jbm_darray_farray_interpolate
-  (JBDOUBLE x, JBDOUBLE * fa, JBFLOAT * fb, int n)
+    (JBDOUBLE x, JBDOUBLE * fa, JBFLOAT * fb, int n)
 {
   return _jbm_darray_farray_interpolate (x, fa, fb, n);
 }
@@ -909,7 +909,7 @@ jbm_darray_interpolate (JBDOUBLE x, JBDOUBLE * fa, JBDOUBLE * fb, int n)
  */
 #if !INLINE_JBM_DARRAY_ADD
 JBDOUBLE *jbm_darray_add
-  (JBDOUBLE * fa, int na, JBDOUBLE * fb, int nb, JBDOUBLE ** fc, int *nc)
+    (JBDOUBLE * fa, int na, JBDOUBLE * fb, int nb, JBDOUBLE ** fc, int *nc)
 {
   return _jbm_darray_add (fa, na, fb, nb, fc, nc);
 }
@@ -935,7 +935,7 @@ JBDOUBLE *jbm_darray_add
  */
 #if !INLINE_JBM_DARRAY_FARRAY_INTEGRAL
 JBDOUBLE jbm_darray_farray_integral
-  (JBDOUBLE * x, JBFARRAY * y, int n, JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE * x, JBFARRAY * y, int n, JBDOUBLE x1, JBDOUBLE x2)
 {
   return _jbm_darray_integral (x, y, n, x1, x2);
 }
@@ -961,7 +961,7 @@ JBDOUBLE jbm_darray_farray_integral
  */
 #if !INLINE_JBM_DARRAY_INTEGRAL
 JBDOUBLE jbm_darray_integral
-  (JBDOUBLE * x, JBDOUBLE * y, int n, JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE * x, JBDOUBLE * y, int n, JBDOUBLE x1, JBDOUBLE x2)
 {
   return _jbm_darray_integral (x, y, n, x1, x2);
 }
@@ -994,7 +994,7 @@ JBDOUBLE jbm_darray_integral
  */
 #if !INLINE_JBM_DARRAY_MEAN_SQUARE_ERROR
 JBDOUBLE jbm_darray_mean_square_error
-  (JBDOUBLE * xa, JBDOUBLE * fa, int na, JBDOUBLE * xr, JBDOUBLE * fr, int nr)
+    (JBDOUBLE * xa, JBDOUBLE * fa, int na, JBDOUBLE * xr, JBDOUBLE * fr, int nr)
 {
   return _jbm_darray_mean_square_error (xa, fa, na, xr, fr, nr);
 }
@@ -1027,7 +1027,7 @@ JBDOUBLE jbm_darray_mean_square_error
  */
 #if !INLINE_JBM_DARRAY_ROOT_MEAN_SQUARE_ERROR
 JBDOUBLE jbm_darray_root_mean_square_error
-  (JBDOUBLE * xa, JBDOUBLE * fa, int na, JBDOUBLE * xr, JBDOUBLE * fr, int nr)
+    (JBDOUBLE * xa, JBDOUBLE * fa, int na, JBDOUBLE * xr, JBDOUBLE * fr, int nr)
 {
   return _jbm_darray_root_mean_square_error (xa, fa, na, xr, fr, nr);
 }
@@ -1099,7 +1099,7 @@ jbm_v3_length (JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE z1,
  */
 #if !INLINE_JBM_SOLVE_CUADRATIC_REDUCED
 JBDOUBLE jbm_solve_cuadratic_reduced
-  (JBDOUBLE a, JBDOUBLE b, JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE a, JBDOUBLE b, JBDOUBLE x1, JBDOUBLE x2)
 {
   return _jbm_solve_cuadratic_reduced (a, b, x1, x2);
 }
@@ -1124,7 +1124,7 @@ JBDOUBLE jbm_solve_cuadratic_reduced
  */
 #if !INLINE_JBM_SOLVE_CUADRATIC
 JBDOUBLE jbm_solve_cuadratic
-  (JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
 {
   return _jbm_solve_cuadratic (a, b, c, x1, x2);
 }
@@ -1149,7 +1149,7 @@ JBDOUBLE jbm_solve_cuadratic
  */
 #if !INLINE_JBM_SOLVE_CUBIC_REDUCED
 JBDOUBLE jbm_solve_cubic_reduced
-  (JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
 {
   return _jbm_solve_cubic_reduced (a, b, c, x1, x2);
 }
@@ -1443,7 +1443,7 @@ jbm_matrix_solve (JBFLOAT * x, int n)
  */
 #if !INLINE_JBM_MATRIX_SOLVE_TRIDIAGONAL
 void jbm_matrix_solve_tridiagonal
-  (JBFLOAT * C, JBFLOAT * D, JBFLOAT * E, JBFLOAT * H, int n)
+    (JBFLOAT * C, JBFLOAT * D, JBFLOAT * E, JBFLOAT * H, int n)
 {
   _jbm_matrix_solve_tridiagonal (C, D, E, H, n);
 }
@@ -1474,7 +1474,7 @@ void jbm_matrix_solve_tridiagonal
  */
 #if !INLINE_JBM_MATRIX_SOLVE_TRIDIAGONAL_ZERO
 void jbm_matrix_solve_tridiagonal_zero
-  (JBFLOAT * C, JBFLOAT * D, JBFLOAT * E, JBFLOAT * H, int n)
+    (JBFLOAT * C, JBFLOAT * D, JBFLOAT * E, JBFLOAT * H, int n)
 {
   _jbm_matrix_solve_tridiagonal_zero (C, D, E, H, n);
 }
@@ -1598,7 +1598,7 @@ jbm_regression (JBFLOAT * x, JBFLOAT * y, int n, JBFLOAT ** A, int m)
  */
 #if !INLINE_JBM_REGRESSION_LINEAR
 void jbm_regression_linear
-  (JBFLOAT * x, JBFLOAT * y, int n, JBDOUBLE * a, JBDOUBLE * b)
+    (JBFLOAT * x, JBFLOAT * y, int n, JBDOUBLE * a, JBDOUBLE * b)
 {
   _jbm_regression_linear (x, y, n, a, b);
 }
@@ -1623,7 +1623,7 @@ void jbm_regression_linear
  */
 #if !INLINE_JBM_REGRESSION_EXPONENTIAL
 void jbm_regression_exponential
-  (JBFLOAT * x, JBFLOAT * y, int n, JBDOUBLE * a, JBDOUBLE * b)
+    (JBFLOAT * x, JBFLOAT * y, int n, JBDOUBLE * a, JBDOUBLE * b)
 {
   _jbm_regression_exponential (x, y, n, a, b);
 }
@@ -1697,7 +1697,7 @@ jbm_regression_multiexponential (JBFLOAT ** x, int n, JBFLOAT * a, int m)
  */
 #if !INLINE_JBM_SPLINE_CUBIC
 void jbm_spline_cubic
-  (JBFLOAT * x, JBFLOAT * y, int n, JBFLOAT ** b, JBFLOAT ** c, JBFLOAT ** d)
+    (JBFLOAT * x, JBFLOAT * y, int n, JBFLOAT ** b, JBFLOAT ** c, JBFLOAT ** d)
 {
   _jbm_spline_cubic (x, y, n, b, c, d);
 }
@@ -2146,7 +2146,7 @@ jbm_varray_root_mean_square_error (void *xa, void *fa, int sizea,
                                    int nr)
 {
   return _jbm_varray_root_mean_square_error
-    (xa, fa, sizea, na, xr, fr, sizer, nr);
+      (xa, fa, sizea, na, xr, fr, sizer, nr);
 }
 #endif
 
@@ -2180,7 +2180,7 @@ jbm_varray_root_mean_square_error (void *xa, void *fa, int sizea,
  */
 #if !INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL
 void jbm_varray_solve_tridiagonal
-  (void *C, void *D, void *E, void *H, int size, int n)
+    (void *C, void *D, void *E, void *H, int size, int n)
 {
   _jbm_varray_solve_tridiagonal (C, D, E, H, size, n);
 }
@@ -2217,7 +2217,7 @@ void jbm_varray_solve_tridiagonal
  */
 #if !INLINE_JBM_VARRAY_SOLVE_TRIDIAGONAL_ZERO
 void jbm_varray_solve_tridiagonal_zero
-  (void *C, void *D, void *E, void *H, int size, int n)
+    (void *C, void *D, void *E, void *H, int size, int n)
 {
   _jbm_varray_solve_tridiagonal_zero (C, D, E, H, size, n);
 }
@@ -2395,7 +2395,7 @@ jbm_vdarray_root_mean_square_error (void *xa, void *fa, int sizea,
                                     int nr)
 {
   return _jbm_vdarray_root_mean_square_error
-    (xa, fa, sizea, na, xr, fr, sizer, nr);
+      (xa, fa, sizea, na, xr, fr, sizer, nr);
 }
 #endif
 
@@ -2429,7 +2429,7 @@ jbm_vdarray_root_mean_square_error (void *xa, void *fa, int sizea,
  */
 #if !INLINE_JBM_VDARRAY_SOLVE_TRIDIAGONAL
 void jbm_vdarray_solve_tridiagonal
-  (void *C, void *D, void *E, void *H, int size, int n)
+    (void *C, void *D, void *E, void *H, int size, int n)
 {
   _jbm_vdarray_solve_tridiagonal (C, D, E, H, size, n);
 }
@@ -2466,7 +2466,7 @@ void jbm_vdarray_solve_tridiagonal
  */
 #if !INLINE_JBM_VDARRAY_SOLVE_TRIDIAGONAL_ZERO
 void jbm_vdarray_solve_tridiagonal_zero
-  (void *C, void *D, void *E, void *H, int size, int n)
+    (void *C, void *D, void *E, void *H, int size, int n)
 {
   _jbm_vdarray_solve_tridiagonal_zero (C, D, E, H, size, n);
 }
@@ -2533,6 +2533,6 @@ jbm_file_root_mean_square_error (char *namea, int ixa, int ifa, int na,
                                  char *namer, int ixr, int ifr, int nr)
 {
   return _jbm_file_root_mean_square_error
-    (namea, ixa, ifa, na, namer, ixr, ifr, nr);
+      (namea, ixa, ifa, na, namer, ixr, ifr, nr);
 }
 #endif

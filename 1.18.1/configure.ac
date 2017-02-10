@@ -1,5 +1,5 @@
 AC_PREREQ([2.67])
-AC_INIT([jb], [1.18.0], [https://github.com/jburguete/jb])
+AC_INIT([jb], [1.18.1], [https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_SYSTEM
@@ -16,7 +16,7 @@ elif test $host = "i686-w64-mingw32"; then
 fi
 
 # Checks for programs
-AC_PROG_CC([egcc gcc clang])
+AC_PROG_CC([gcc6 gcc5 egcc gcc clang])
 AC_MSG_NOTICE([Compiler: $CC])
 AC_PROG_MAKE_SET
 AC_LANG([C])
@@ -67,10 +67,10 @@ if test $gtk = 1; then
 				PKG_CHECK_MODULES([SDL], [sdl2], sdl="yes", 
 						  sdl="no")
 				if test $sdl = "yes"; then
-					AC_SUBST(GRAPHIC, "-DHAVE_SDL=2")
+					AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=2")
 				else
 					PKG_CHECK_MODULES([GLFW], [glfw3])
-					AC_SUBST(GRAPHIC, "-DHAVE_GLFW=3")
+					AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=3")
 				fi
 			fi
 		fi

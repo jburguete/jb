@@ -503,7 +503,7 @@ JBDOUBLE jbm_fdbl (JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_extrapolate
-  (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2)
+    (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2)
 {
 #if DEBUG_JBM_EXTRAPOLATE
   fprintf (stderr, "JBM extrapolate x=" FWL " x1=" FWL " x2=" FWL "\n",
@@ -519,11 +519,11 @@ static inline JBDOUBLE _jbm_extrapolate
 #define jbm_extrapolate _jbm_extrapolate
 #else
 JBDOUBLE jbm_extrapolate
-  (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2);
+    (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2);
 #endif
 
 static inline JBDOUBLE _jbm_interpolate
-  (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2)
+    (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2)
 {
   register JBDOUBLE k;
 #if DEBUG_JBM_INTERPOLATE
@@ -547,11 +547,11 @@ static inline JBDOUBLE _jbm_interpolate
 #define jbm_interpolate _jbm_interpolate
 #else
 JBDOUBLE jbm_interpolate
-  (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2);
+    (JBDOUBLE x, JBDOUBLE x1, JBDOUBLE x2, JBDOUBLE y1, JBDOUBLE y2);
 #endif
 
 static inline JBDOUBLE _jbm_integral
-  (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE x1, JBDOUBLE x2)
 {
   register int i;
   register JBDOUBLE k, k2, x, dx;
@@ -580,9 +580,8 @@ static inline JBDOUBLE _jbm_integral
     0.1294849661688696932706114L
   }, b[4] =
   {
-  0.L,
-      0.4058451513773971669066064L,
-      0.7415311855993944398638648L, 0.9491079123427585245261897L};
+  0.L, 0.4058451513773971669066064L,
+        0.7415311855993944398638648L, 0.9491079123427585245261897L};
 #endif
   dx = 0.5L * (x2 - x1);
   x = 0.5L * (x1 + x2);
@@ -700,7 +699,7 @@ JBDOUBLE jbm_farray_min (JBFLOAT *, int);
 #endif
 
 static inline void _jbm_farray_maxmin
-  (JBFLOAT * fa, int n, JBDOUBLE * max, JBDOUBLE * min)
+    (JBFLOAT * fa, int n, JBDOUBLE * max, JBDOUBLE * min)
 {
   register int i;
   register JBDOUBLE kmax, kmin;
@@ -729,7 +728,7 @@ void jbm_farray_maxmin (JBFLOAT *, int, JBDOUBLE *, JBDOUBLE *);
 #endif
 
 static inline JBDOUBLE _jbm_farray_interpolate
-  (JBDOUBLE x, JBFLOAT * fa, JBFLOAT * fb, int n)
+    (JBDOUBLE x, JBFLOAT * fa, JBFLOAT * fb, int n)
 {
   register int i;
   register JBDOUBLE k;
@@ -754,7 +753,7 @@ JBDOUBLE jbm_farray_interpolate (JBDOUBLE, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline JBFLOAT *_jbm_farray_add
-  (JBFLOAT * fa, int na, JBFLOAT * fb, int nb, JBFLOAT ** fc, int *nc)
+    (JBFLOAT * fa, int na, JBFLOAT * fb, int nb, JBFLOAT ** fc, int *nc)
 {
   register int i, j, k;
   register JBFLOAT *x;
@@ -801,7 +800,7 @@ JBFLOAT *jbm_farray_add (JBFLOAT *, int, JBFLOAT *, int, JBFLOAT **, int *);
 #endif
 
 static inline JBDOUBLE _jbm_farray_integral
-  (JBFLOAT * x, JBFLOAT * y, int n, JBDOUBLE x1, JBDOUBLE x2)
+    (JBFLOAT * x, JBFLOAT * y, int n, JBDOUBLE x1, JBDOUBLE x2)
 {
   register int i;
   register JBFLOAT *yy, *xx;
@@ -851,7 +850,7 @@ static inline JBDOUBLE _jbm_farray_integral
   if (x2 < xx[1])
     {
       I += 0.5 * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1]))
-        * (x2 - x1);
+          * (x2 - x1);
 #if DEBUG_JBM_FARRAY_INTEGRAL
       fprintf (stderr, "JBMFI c I=" FWL "\n", I);
 #endif
@@ -898,7 +897,7 @@ JBDOUBLE jbm_farray_integral (JBFLOAT *, JBFLOAT *, int, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_farray_mean_square_error
-  (JBFLOAT * xa, JBFLOAT * fa, int na, JBFLOAT * xr, JBFLOAT * fr, int nr)
+    (JBFLOAT * xa, JBFLOAT * fa, int na, JBFLOAT * xr, JBFLOAT * fr, int nr)
 {
   register int i, j;
   JBDOUBLE k = 0.;
@@ -922,8 +921,8 @@ static inline JBDOUBLE _jbm_farray_mean_square_error
           k += jbm_fsqr (fa[i] - fr[nr]);
       else
         k += jbm_fsqr
-          (fa[i] -
-           jbm_extrapolate (xa[i], xr[j], xr[j + 1], fr[j], fr[j + 1]));
+            (fa[i] -
+             jbm_extrapolate (xa[i], xr[j], xr[j + 1], fr[j], fr[j + 1]));
 #if DEBUG_JBM_FARRAY_MEAN_SQUARE_ERROR
       fprintf (stderr, "JBMFMSE i=%d j=%d k=" FWL "\n", i, j, k);
 #endif
@@ -939,11 +938,11 @@ static inline JBDOUBLE _jbm_farray_mean_square_error
 #define jbm_farray_mean_square_error _jbm_farray_mean_square_error
 #else
 JBDOUBLE jbm_farray_mean_square_error
-  (JBFLOAT *, JBFLOAT *, int, JBFLOAT *, JBFLOAT *, int);
+    (JBFLOAT *, JBFLOAT *, int, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline JBDOUBLE _jbm_farray_root_mean_square_error
-  (JBFLOAT * xa, JBFLOAT * fa, int na, JBFLOAT * xr, JBFLOAT * fr, int nr)
+    (JBFLOAT * xa, JBFLOAT * fa, int na, JBFLOAT * xr, JBFLOAT * fr, int nr)
 {
   JBDOUBLE k;
 #if DEBUG_JBM_FARRAY_ROOT_MEAN_SQUARE_ERROR
@@ -960,7 +959,7 @@ static inline JBDOUBLE _jbm_farray_root_mean_square_error
 #define jbm_farray_root_mean_square_error _jbm_farray_root_mean_square_error
 #else
 JBDOUBLE jbm_farray_root_mean_square_error
-  (JBFLOAT *, JBFLOAT *, int, JBFLOAT *, JBFLOAT *, int);
+    (JBFLOAT *, JBFLOAT *, int, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline int
@@ -1065,7 +1064,7 @@ JBDOUBLE jbm_darray_min (JBDOUBLE *, int);
 #endif
 
 static inline void _jbm_darray_maxmin
-  (JBDOUBLE * fa, int n, JBDOUBLE * max, JBDOUBLE * min)
+    (JBDOUBLE * fa, int n, JBDOUBLE * max, JBDOUBLE * min)
 {
   register int i;
   register JBDOUBLE kmax, kmin;
@@ -1094,7 +1093,7 @@ void jbm_darray_maxmin (JBDOUBLE *, int, JBDOUBLE *, JBDOUBLE *);
 #endif
 
 static inline JBDOUBLE _jbm_darray_farray_interpolate
-  (JBDOUBLE x, JBDOUBLE * fa, JBFLOAT * fb, int n)
+    (JBDOUBLE x, JBDOUBLE * fa, JBFLOAT * fb, int n)
 {
   register int i;
   register JBDOUBLE k;
@@ -1119,7 +1118,7 @@ JBDOUBLE jbm_darray_farray_interpolate (JBDOUBLE, JBDOUBLE *, JBFLOAT *, int);
 #endif
 
 static inline JBDOUBLE _jbm_darray_interpolate
-  (JBDOUBLE x, JBDOUBLE * fa, JBDOUBLE * fb, int n)
+    (JBDOUBLE x, JBDOUBLE * fa, JBDOUBLE * fb, int n)
 {
   register int i;
   register JBDOUBLE k;
@@ -1144,7 +1143,7 @@ JBDOUBLE jbm_darray_interpolate (JBDOUBLE, JBDOUBLE *, JBDOUBLE *, int);
 #endif
 
 static inline JBDOUBLE *_jbm_darray_add
-  (JBDOUBLE * fa, int na, JBDOUBLE * fb, int nb, JBDOUBLE ** fc, int *nc)
+    (JBDOUBLE * fa, int na, JBDOUBLE * fb, int nb, JBDOUBLE ** fc, int *nc)
 {
   register int i, j, k;
   register JBDOUBLE *x;
@@ -1187,12 +1186,11 @@ static inline JBDOUBLE *_jbm_darray_add
 #if INLINE_JBM_DARRAY_ADD
 #define jbm_darray_add _jbm_darray_add
 #else
-JBDOUBLE *jbm_darray_add (JBDOUBLE *, int, JBDOUBLE *, int, JBDOUBLE **,
-                          int *);
+JBDOUBLE *jbm_darray_add (JBDOUBLE *, int, JBDOUBLE *, int, JBDOUBLE **, int *);
 #endif
 
 static inline JBDOUBLE _jbm_darray_farray_integral
-  (JBDOUBLE * x, JBFLOAT * y, int n, JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE * x, JBFLOAT * y, int n, JBDOUBLE x1, JBDOUBLE x2)
 {
   register int i;
   register JBDOUBLE *yy, *xx;
@@ -1243,7 +1241,7 @@ static inline JBDOUBLE _jbm_darray_farray_integral
   if (x2 < xx[1])
     {
       I += 0.5 * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1]))
-        * (x2 - x1);
+          * (x2 - x1);
 #if DEBUG_JBM_DARRAY_FARRAY_INTEGRAL
       fprintf (stderr, "JBMDI c I=" FWL "\n", I);
 #endif
@@ -1287,11 +1285,11 @@ exit1:
 #define jbm_darray_farray_integral _jbm_darray_farray_integral
 #else
 JBDOUBLE jbm_darray_farray_integral
-  (JBDOUBLE *, JBFLOAT *, int, JBDOUBLE, JBDOUBLE);
+    (JBDOUBLE *, JBFLOAT *, int, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_darray_integral
-  (JBDOUBLE * x, JBDOUBLE * y, int n, JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE * x, JBDOUBLE * y, int n, JBDOUBLE x1, JBDOUBLE x2)
 {
   register int i;
   register JBDOUBLE *yy, *xx;
@@ -1341,7 +1339,7 @@ static inline JBDOUBLE _jbm_darray_integral
   if (x2 < xx[1])
     {
       I += 0.5 * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1]))
-        * (x2 - x1);
+          * (x2 - x1);
 #if DEBUG_JBM_DARRAY_INTEGRAL
       fprintf (stderr, "JBMDI c I=" FWL "\n", I);
 #endif
@@ -1384,12 +1382,11 @@ exit1:
 #if INLINE_JBM_DARRAY_INTEGRAL
 #define jbm_darray_integral _jbm_darray_integral
 #else
-JBDOUBLE jbm_darray_integral (JBDOUBLE *, JBDOUBLE *, int, JBDOUBLE,
-                              JBDOUBLE);
+JBDOUBLE jbm_darray_integral (JBDOUBLE *, JBDOUBLE *, int, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_darray_mean_square_error
-  (JBDOUBLE * xa, JBDOUBLE * fa, int na, JBDOUBLE * xr, JBDOUBLE * fr, int nr)
+    (JBDOUBLE * xa, JBDOUBLE * fa, int na, JBDOUBLE * xr, JBDOUBLE * fr, int nr)
 {
   register int i, j;
   JBDOUBLE k = 0.;
@@ -1413,8 +1410,8 @@ static inline JBDOUBLE _jbm_darray_mean_square_error
           k += jbm_fsqr (fa[i] - fr[nr]);
       else
         k += jbm_fsqr
-          (fa[i] -
-           jbm_extrapolate (xa[i], xr[j], xr[j + 1], fr[j], fr[j + 1]));
+            (fa[i] -
+             jbm_extrapolate (xa[i], xr[j], xr[j + 1], fr[j], fr[j + 1]));
 #if DEBUG_JBM_DARRAY_MEAN_SQUARE_ERROR
       fprintf (stderr, "JBMDMSE i=%d j=%d k=" FWL "\n", i, j, k);
 #endif
@@ -1430,11 +1427,11 @@ static inline JBDOUBLE _jbm_darray_mean_square_error
 #define jbm_darray_mean_square_error _jbm_darray_mean_square_error
 #else
 JBDOUBLE jbm_darray_mean_square_error
-  (JBDOUBLE *, JBDOUBLE *, int, JBDOUBLE *, JBDOUBLE *, int);
+    (JBDOUBLE *, JBDOUBLE *, int, JBDOUBLE *, JBDOUBLE *, int);
 #endif
 
 static inline JBDOUBLE _jbm_darray_root_mean_square_error
-  (JBDOUBLE * xa, JBDOUBLE * fa, int na, JBDOUBLE * xr, JBDOUBLE * fr, int nr)
+    (JBDOUBLE * xa, JBDOUBLE * fa, int na, JBDOUBLE * xr, JBDOUBLE * fr, int nr)
 {
   JBDOUBLE k;
 #if DEBUG_JBM_DARRAY_ROOT_MEAN_SQUARE_ERROR
@@ -1451,11 +1448,11 @@ static inline JBDOUBLE _jbm_darray_root_mean_square_error
 #define jbm_darray_root_mean_square_error _jbm_darray_root_mean_square_error
 #else
 JBDOUBLE jbm_darray_root_mean_square_error
-  (JBDOUBLE *, JBDOUBLE *, int, JBDOUBLE *, JBDOUBLE *, int);
+    (JBDOUBLE *, JBDOUBLE *, int, JBDOUBLE *, JBDOUBLE *, int);
 #endif
 
 static inline JBDOUBLE _jbm_v2_length
-  (JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2, JBDOUBLE y2)
+    (JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2, JBDOUBLE y2)
 {
   return sqrtl (jbm_fsqr (x2 - x1) + jbm_fsqr (y2 - y1));
 }
@@ -1477,11 +1474,11 @@ _jbm_v3_length (JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE z1,
 #define jbm_v3_length _jbm_v3_length
 #else
 JBDOUBLE jbm_v3_length
-  (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
+    (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_solve_cuadratic_reduced
-  (JBDOUBLE a, JBDOUBLE b, JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE a, JBDOUBLE b, JBDOUBLE x1, JBDOUBLE x2)
 {
   register JBDOUBLE k;
 #if DEBUG_JBM_SOLVE_CUADRATIC_REDUCED
@@ -1507,7 +1504,7 @@ JBDOUBLE jbm_solve_cuadratic_reduced (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_solve_cuadratic
-  (JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
 {
   register JBDOUBLE k;
 #if DEBUG_JBM_SOLVE_CUADRATIC
@@ -1528,12 +1525,11 @@ static inline JBDOUBLE _jbm_solve_cuadratic
 #if INLINE_JBM_SOLVE_CUADRATIC
 #define jbm_solve_cuadratic _jbm_solve_cuadratic
 #else
-JBDOUBLE jbm_solve_cuadratic (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE,
-                              JBDOUBLE);
+JBDOUBLE jbm_solve_cuadratic (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_solve_cubic_reduced
-  (JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
+    (JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
 {
   JBDOUBLE k0, k1, k2;
 #if DEBUG_JBM_SOLVE_CUBIC_REDUCED
@@ -1605,7 +1601,7 @@ _jbm_solve_cubic (JBDOUBLE a, JBDOUBLE b,
 #define jbm_solve_cubic _jbm_solve_cubic
 #else
 JBDOUBLE jbm_solve_cubic
-  (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
+    (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline void
@@ -1781,7 +1777,7 @@ void jbm_index_sort (JBFLOAT *, int *, int);
 #endif
 
 static inline int _jbm_index_sort_extended
-  (JBFLOAT * x, JBFLOAT ** xr, int **ni, int n)
+    (JBFLOAT * x, JBFLOAT ** xr, int **ni, int n)
 {
   register int i, j = 0;
   register JBDOUBLE k1, k2;
@@ -1890,7 +1886,7 @@ void jbm_matrix_solve (JBFLOAT *, int);
 #endif
 
 static inline void _jbm_matrix_solve_tridiagonal
-  (JBFLOAT * C, JBFLOAT * D, JBFLOAT * E, JBFLOAT * H, int n)
+    (JBFLOAT * C, JBFLOAT * D, JBFLOAT * E, JBFLOAT * H, int n)
 {
   register int i;
   register JBDOUBLE k;
@@ -1913,11 +1909,11 @@ static inline void _jbm_matrix_solve_tridiagonal
 #define jbm_matrix_solve_tridiagonal _jbm_matrix_solve_tridiagonal
 #else
 void jbm_matrix_solve_tridiagonal
-  (JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
+    (JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void _jbm_matrix_solve_tridiagonal_zero
-  (JBFLOAT * C, JBFLOAT * D, JBFLOAT * E, JBFLOAT * H, int n)
+    (JBFLOAT * C, JBFLOAT * D, JBFLOAT * E, JBFLOAT * H, int n)
 {
   register int i;
   register JBDOUBLE k;
@@ -1951,7 +1947,7 @@ static inline void _jbm_matrix_solve_tridiagonal_zero
 #define jbm_matrix_solve_tridiagonal_zero _jbm_matrix_solve_tridiagonal_zero
 #else
 void jbm_matrix_solve_tridiagonal_zero
-  (JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
+    (JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void
@@ -1988,7 +1984,7 @@ _jbm_matrix_solve_pentadiagonal (JBFLOAT * B, JBFLOAT * C,
 #define jbm_matrix_solve_pentadiagonal _jbm_matrix_solve_pentadiagonal
 #else
 void jbm_matrix_solve_pentadiagonal
-  (JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
+    (JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void
@@ -2037,11 +2033,11 @@ _jbm_matrix_solve_pentadiagonal_zero (JBFLOAT * B, JBFLOAT * C,
 		_jbm_matrix_solve_pentadiagonal_zero
 #else
 void jbm_matrix_solve_pentadiagonal_zero
-  (JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
+    (JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void _jbm_regression
-  (JBFLOAT * x, JBFLOAT * y, int n, JBFLOAT ** A, int m)
+    (JBFLOAT * x, JBFLOAT * y, int n, JBFLOAT ** A, int m)
 {
   JBFLOAT *B;
   JBDOUBLE xx[m + m + 1], yx[m + 1];
@@ -2112,12 +2108,11 @@ _jbm_regression_linear (JBFLOAT * x, JBFLOAT * y, int n,
 #if INLINE_JBM_REGRESSION_LINEAR
 #define jbm_regression_linear _jbm_regression_linear
 #else
-void jbm_regression_linear (JBFLOAT *, JBFLOAT *, int, JBDOUBLE *,
-                            JBDOUBLE *);
+void jbm_regression_linear (JBFLOAT *, JBFLOAT *, int, JBDOUBLE *, JBDOUBLE *);
 #endif
 
 static inline void _jbm_regression_exponential
-  (JBFLOAT * x, JBFLOAT * y, int n, JBDOUBLE * a, JBDOUBLE * b)
+    (JBFLOAT * x, JBFLOAT * y, int n, JBDOUBLE * a, JBDOUBLE * b)
 {
   register int i;
   for (i = n + 1; --i >= 0;)
@@ -2130,11 +2125,11 @@ static inline void _jbm_regression_exponential
 #define jbm_regression_exponential _jbm_regression_exponential
 #else
 void jbm_regression_exponential
-  (JBFLOAT *, JBFLOAT *, int, JBDOUBLE *, JBDOUBLE *);
+    (JBFLOAT *, JBFLOAT *, int, JBDOUBLE *, JBDOUBLE *);
 #endif
 
 static inline void _jbm_regression_multilinear
-  (JBFLOAT ** x, int n, JBFLOAT * a, int m)
+    (JBFLOAT ** x, int n, JBFLOAT * a, int m)
 {
   register int i, j, k;
   JBFLOAT *c, *d, *xj, *xk;
@@ -2198,12 +2193,11 @@ _jbm_regression_multiexponential (JBFLOAT ** x, int n, JBFLOAT * a, int m)
 #if INLINE_JBM_REGRESSION_MULTIEXPONENTIAL
 #define jbm_regression_multiexponential _jbm_regression_multiexponential
 #else
-void jbm_regression_multiexponential (JBFLOAT ** x, int n, JBFLOAT * a,
-                                      int m);
+void jbm_regression_multiexponential (JBFLOAT ** x, int n, JBFLOAT * a, int m);
 #endif
 
 static inline void _jbm_spline_cubic
-  (JBFLOAT * x, JBFLOAT * y, int n, JBFLOAT ** b, JBFLOAT ** c, JBFLOAT ** d)
+    (JBFLOAT * x, JBFLOAT * y, int n, JBFLOAT ** b, JBFLOAT ** c, JBFLOAT ** d)
 {
   register int i, j, m;
   register JBFLOAT dx;
@@ -2231,7 +2225,7 @@ static inline void _jbm_spline_cubic
       j = 3 * i + 1;
       dx = x[i + 1] - x[i];
       B[j - 2] = D[j + 2] = F[j] = F[j + 1] = F[j + 2] = H[j + 1] = H[j + 2]
-        = 0.;
+          = 0.;
       B[j - 1] = B[j] = 1.;
       E[j + 1] = E[j + 2] = -1.;
       C[j - 1] = dx;
@@ -2402,7 +2396,7 @@ JBDOUBLE jbm_flux_limiter_total (JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_flux_limiter_monotonized_central
-  (JBDOUBLE d1, JBDOUBLE d2)
+    (JBDOUBLE d1, JBDOUBLE d2)
 {
   register JBDOUBLE k;
   if (d1 * d2 <= 0.L)
@@ -2437,7 +2431,7 @@ JBDOUBLE jbm_flux_limiter_mean (JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE
-  (*_jbm_flux_limiter_select (int type)) (JBDOUBLE, JBDOUBLE)
+    (*_jbm_flux_limiter_select (int type)) (JBDOUBLE, JBDOUBLE)
 {
   switch (type)
     {
@@ -2472,7 +2466,7 @@ JBDOUBLE (*jbm_flux_limiter_select (int)) (JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline void _jbm_transversal_section_regions_sort
-  (int i, int nj, int *nk, JBFLOAT * l, JBFLOAT * z, JBFLOAT * zz)
+    (int i, int nj, int *nk, JBFLOAT * l, JBFLOAT * z, JBFLOAT * zz)
 {
   register int j, k;
   register JBDOUBLE t;
@@ -2507,7 +2501,7 @@ static inline void _jbm_transversal_section_regions_sort
 		_jbm_transversal_section_regions_sort
 #else
 void jbm_transversal_section_regions_sort
-  (int, int *, int *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int *);
+    (int, int *, int *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int *);
 #endif
 
 static inline int
@@ -2555,8 +2549,7 @@ _jbm_transversal_section_regions (JBFLOAT * l, JBFLOAT * z,
     {
       fprintf (stderr, "JBM tsr i=%d (*nj)=%d\n", i, (*nj)[i]);
       for (j = 0; j < (*nj)[i]; ++j)
-        fprintf (stderr, "JBM tsr i=%d j=%d nij=%d\n", i, j,
-                 (*nij)[n * i + j]);
+        fprintf (stderr, "JBM tsr i=%d j=%d nij=%d\n", i, j, (*nij)[n * i + j]);
     }
 #endif
   *nmin = jbm_min ((*ni)[0], (*ni)[n]);
@@ -2589,7 +2582,7 @@ exit1:
 #define jbm_transversal_section_regions _jbm_transversal_section_regions
 #else
 int jbm_transversal_section_regions
-  (JBFLOAT *, JBFLOAT *, int, JBFLOAT **, int **, int **, int **, int *);
+    (JBFLOAT *, JBFLOAT *, int, JBFLOAT **, int **, int **, int **, int *);
 #endif
 
 static inline int
@@ -2620,7 +2613,7 @@ int jbm_varray_search (JBDOUBLE, void *, int, int);
 #endif
 
 static inline int _jbm_varray_search_extended
-  (JBDOUBLE x, void *v, int size, int n)
+    (JBDOUBLE x, void *v, int size, int n)
 {
   register int i;
 #if DEBUG_JBM_VARRAY_SEARCH_EXTENDED
@@ -2766,8 +2759,7 @@ _jbm_varray_mean_square_error (void *xa, void *fa,
           k += jbm_fsqr (*(JBFLOAT *) fa - k2);
 #if DEBUG_JBM_VARRAY_MEAN_SQUARE_ERROR
           fprintf (stderr, "JBMVMSE xa=" FWF " xr=" FWF " xr2=" FWF "\n",
-                   *(JBFLOAT *) xa, *(JBFLOAT *) xr,
-                   *(JBFLOAT *) (xr + sizer));
+                   *(JBFLOAT *) xa, *(JBFLOAT *) xr, *(JBFLOAT *) (xr + sizer));
           fprintf (stderr, "JBMVMSE k2=" FWL " yr=" FWF " yr2=" FWF "\n", k2,
                    *(JBFLOAT *) fr, *(JBFLOAT *) (fr + sizer));
           fprintf (stderr, "JBMVMSE i=%d j=%d k=" FWL "\n", i, j, k);
@@ -2785,7 +2777,7 @@ _jbm_varray_mean_square_error (void *xa, void *fa,
 #define jbm_varray_mean_square_error _jbm_varray_mean_square_error
 #else
 JBDOUBLE jbm_varray_mean_square_error
-  (void *, void *, int, int, void *, void *, int, int);
+    (void *, void *, int, int, void *, void *, int, int);
 #endif
 
 static inline JBDOUBLE
@@ -2798,7 +2790,7 @@ _jbm_varray_root_mean_square_error (void *xa, void *fa,
   fprintf (stderr, "JBM varray root mean square error\n");
 #endif
   k = sqrtl
-    (jbm_varray_mean_square_error (xa, fa, na, sizea, xr, fr, nr, sizer));
+      (jbm_varray_mean_square_error (xa, fa, na, sizea, xr, fr, nr, sizer));
 #if DEBUG_JBM_VARRAY_ROOT_MEAN_SQUARE_ERROR
   fprintf (stderr, "JBM varray root mean square error=" FWL "\n", k);
 #endif
@@ -2809,11 +2801,11 @@ _jbm_varray_root_mean_square_error (void *xa, void *fa,
 #define jbm_varray_root_mean_square_error _jbm_varray_root_mean_square_error
 #else
 JBDOUBLE jbm_varray_root_mean_square_error
-  (void *, void *, int, int, void *, void *, int, int);
+    (void *, void *, int, int, void *, void *, int, int);
 #endif
 
 static inline void _jbm_varray_solve_tridiagonal
-  (void *C, void *D, void *E, void *H, int size, int n)
+    (void *C, void *D, void *E, void *H, int size, int n)
 {
   int i;
   register JBDOUBLE k;
@@ -2854,7 +2846,7 @@ void jbm_varray_solve_tridiagonal (void *, void *, void *, void *, int, int);
 #endif
 
 static inline void _jbm_varray_solve_tridiagonal_zero
-  (void *C, void *D, void *E, void *H, int size, int n)
+    (void *C, void *D, void *E, void *H, int size, int n)
 {
   int i;
   register JBDOUBLE k;
@@ -2901,7 +2893,7 @@ static inline void _jbm_varray_solve_tridiagonal_zero
 #define jbm_varray_solve_tridiagonal_zero _jbm_varray_solve_tridiagonal_zero
 #else
 void jbm_varray_solve_tridiagonal_zero
-  (void *, void *, void *, void *, int, int);
+    (void *, void *, void *, void *, int, int);
 #endif
 
 static inline int
@@ -2932,7 +2924,7 @@ int jbm_vdarray_search (JBDOUBLE, void *, int, int);
 #endif
 
 static inline int _jbm_vdarray_search_extended
-  (JBDOUBLE x, void *v, int size, int n)
+    (JBDOUBLE x, void *v, int size, int n)
 {
   register int i;
 #if DEBUG_JBM_VDARRAY_SEARCH_EXTENDED
@@ -3097,7 +3089,7 @@ _jbm_vdarray_mean_square_error (void *xa, void *fa,
 #define jbm_vdarray_mean_square_error _jbm_vdarray_mean_square_error
 #else
 JBDOUBLE jbm_vdarray_mean_square_error
-  (void *, void *, int, int, void *, void *, int, int);
+    (void *, void *, int, int, void *, void *, int, int);
 #endif
 
 static inline JBDOUBLE
@@ -3110,7 +3102,7 @@ _jbm_vdarray_root_mean_square_error (void *xa, void *fa,
   fprintf (stderr, "JBM vdarray root mean square error\n");
 #endif
   k = sqrtl
-    (jbm_vdarray_mean_square_error (xa, fa, na, sizea, xr, fr, nr, sizer));
+      (jbm_vdarray_mean_square_error (xa, fa, na, sizea, xr, fr, nr, sizer));
 #if DEBUG_JBM_VDARRAY_ROOT_MEAN_SQUARE_ERROR
   fprintf (stderr, "JBM vdarray root mean square error=" FWL "\n", k);
 #endif
@@ -3122,11 +3114,11 @@ _jbm_vdarray_root_mean_square_error (void *xa, void *fa,
 		_jbm_vdarray_root_mean_square_error
 #else
 JBDOUBLE jbm_vdarray_root_mean_square_error
-  (void *, void *, int, int, void *, void *, int, int);
+    (void *, void *, int, int, void *, void *, int, int);
 #endif
 
 static inline void _jbm_vdarray_solve_tridiagonal
-  (void *C, void *D, void *E, void *H, int size, int n)
+    (void *C, void *D, void *E, void *H, int size, int n)
 {
   int i;
   register JBDOUBLE k;
@@ -3167,7 +3159,7 @@ void jbm_vdarray_solve_tridiagonal (void *, void *, void *, void *, int, int);
 #endif
 
 static inline void _jbm_vdarray_solve_tridiagonal_zero
-  (void *C, void *D, void *E, void *H, int size, int n)
+    (void *C, void *D, void *E, void *H, int size, int n)
 {
   int i;
   register JBDOUBLE k;
@@ -3215,7 +3207,7 @@ static inline void _jbm_vdarray_solve_tridiagonal_zero
 		_jbm_vdarray_solve_tridiagonal_zero
 #else
 void jbm_vdarray_solve_tridiagonal_zero
-  (void *, void *, void *, void *, int, int);
+    (void *, void *, void *, void *, int, int);
 #endif
 
 static inline JBDOUBLE
@@ -3314,7 +3306,7 @@ exit_mse:
 #define jbm_file_mean_square_error _jbm_file_mean_square_error
 #else
 JBDOUBLE jbm_file_mean_square_error
-  (char *, int, int, int, char *, int, int, int);
+    (char *, int, int, int, char *, int, int, int);
 #endif
 
 static inline JBDOUBLE
@@ -3327,7 +3319,7 @@ _jbm_file_root_mean_square_error (char *namea, int ixa,
   fprintf (stderr, "JBM file root mean square error\n");
 #endif
   k = sqrtl
-    (jbm_file_mean_square_error (namea, ixa, ifa, na, namer, ixr, ifr, nr));
+      (jbm_file_mean_square_error (namea, ixa, ifa, na, namer, ixr, ifr, nr));
 #if DEBUG_JBM_FILE_ROOT_MEAN_SQUARE_ERROR
   fprintf (stderr, "JBM file root mean square error=" FWL "\n", k);
 #endif
@@ -3338,7 +3330,7 @@ _jbm_file_root_mean_square_error (char *namea, int ixa,
 #define jbm_file_root_mean_square_error _jbm_file_root_mean_square_error
 #else
 JBDOUBLE jbm_file_root_mean_square_error
-  (char *, int, int, int, char *, int, int, int);
+    (char *, int, int, int, char *, int, int, int);
 #endif
 
 #endif

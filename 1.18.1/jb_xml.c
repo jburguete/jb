@@ -81,7 +81,7 @@ jb_xml_node_get_float (xmlNode * node, const xmlChar * prop, int *error)
  * \return floating number value in JBDOUBLE format.
  */
 JBDOUBLE jb_xml_node_get_float_with_default
-  (xmlNode * node, const xmlChar * prop, int *error, JBDOUBLE def)
+    (xmlNode * node, const xmlChar * prop, int *error, JBDOUBLE def)
 {
   if (!xmlHasProp (node, prop))
     {
@@ -109,7 +109,7 @@ JBDOUBLE jb_xml_node_get_float_with_default
  * \brief floating number value in JBDOUBLE format.
  */
 void jb_xml_node_set_float_with_format
-  (xmlNode * node, const xmlChar * prop, char *format, JBDOUBLE x)
+    (xmlNode * node, const xmlChar * prop, char *format, JBDOUBLE x)
 {
   char buffer[JB_BUFFER_SIZE];
   snprintf (buffer, JB_BUFFER_SIZE, format, x);
@@ -153,7 +153,7 @@ jb_xml_node_set_float (xmlNode * node, const xmlChar * prop, JBDOUBLE x)
  * \brief default value.
  */
 void jb_xml_node_set_float_with_default
-  (xmlNode * node, const xmlChar * prop, JBDOUBLE x, JBDOUBLE def)
+    (xmlNode * node, const xmlChar * prop, JBDOUBLE x, JBDOUBLE def)
 {
   if (x != def)
     jb_xml_node_set_float (node, prop, x);
@@ -206,7 +206,7 @@ jb_xml_node_get_int (xmlNode * node, const xmlChar * prop, int *error)
  * \return integer number value in long int format.
  */
 long jb_xml_node_get_int_with_default
-  (xmlNode * node, const xmlChar * prop, int *error, long def)
+    (xmlNode * node, const xmlChar * prop, int *error, long def)
 {
   if (!xmlHasProp (node, prop))
     {
@@ -253,7 +253,7 @@ jb_xml_node_set_int (xmlNode * node, const xmlChar * prop, long x)
  * \brief default value.
  */
 void jb_xml_node_set_int_with_default
-  (xmlNode * node, const xmlChar * prop, long x, long def)
+    (xmlNode * node, const xmlChar * prop, long x, long def)
 {
   if (x != def)
     jb_xml_node_set_int (node, prop, x);
@@ -309,7 +309,7 @@ jb_xml_node_get_time (xmlNode * node, const xmlChar * prop, int *error)
  * \return date in floating point format.
  */
 JBDOUBLE jb_xml_node_get_time_with_default
-  (xmlNode * node, const xmlChar * prop, int *error, JBDOUBLE def)
+    (xmlNode * node, const xmlChar * prop, int *error, JBDOUBLE def)
 {
   if (!xmlHasProp (node, prop))
     {
@@ -358,7 +358,7 @@ jb_xml_node_set_time (xmlNode * node, const xmlChar * prop, JBDOUBLE t)
  * \brief default value.
  */
 void jb_xml_node_set_time_with_default
-  (xmlNode * node, const xmlChar * prop, JBDOUBLE t, JBDOUBLE def)
+    (xmlNode * node, const xmlChar * prop, JBDOUBLE t, JBDOUBLE def)
 {
   if (t != def)
     jb_xml_node_set_time (node, prop, t);

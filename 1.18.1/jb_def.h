@@ -272,7 +272,7 @@ void jb_bin_write (FILE * file, char *buffer);
 #endif
 
 static inline void _jb_make_time
-  (struct tm *sys_date, JBDOUBLE * sys_sec, int *error)
+    (struct tm *sys_date, JBDOUBLE * sys_sec, int *error)
 {
   time_t sys_t;
   sys_date->tm_year -= 1900;
@@ -355,7 +355,7 @@ _jb_set_time (JBDOUBLE time)
                 sys_date->tm_mday,
                 sys_date->tm_hour, sys_date->tm_min, time + sys_date->tm_sec);
       buffer =
-        (char *) jb_realloc (buffer, (1 + strlen (buffer)) * sizeof (char));
+          (char *) jb_realloc (buffer, (1 + strlen (buffer)) * sizeof (char));
     }
   return buffer;
 }

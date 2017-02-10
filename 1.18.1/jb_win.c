@@ -34,9 +34,6 @@
 
 #if JBW == JBW_GTK
 GtkWindow *window_parent;       ///< pointer to the parent GtkWindow struct.
-#endif
-
-#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
 GQueue jbw_graphic_queue = G_QUEUE_INIT;        ///< GLUT graphic queue.
 #endif
 
@@ -177,7 +174,7 @@ jbw_combo_box_new_with_strings (char **strings, int n)
  */
 #if !INLINE_JBW_ARRAY_RADIO_BUTTONS_SET_ACTIVE
 void jbw_array_radio_buttons_set_active
-  (GtkRadioButton ** array, int n, int is_active)
+    (GtkRadioButton ** array, int n, int is_active)
 {
   _jbw_array_radio_buttons_set_active (array, n, is_active);
 }
@@ -211,7 +208,7 @@ jbw_array_radio_buttons_get_active (GtkRadioButton ** array)
  */
 #if !INLINE_JBW_INT_ENTRY_SET_VALUE_WITH_FORMAT
 void jbw_int_entry_set_value_with_format
-  (JBWIntEntry * entry, char *format, long value)
+    (JBWIntEntry * entry, char *format, long value)
 {
   _jbw_int_entry_set_value_with_format (entry, format, value);
 }
@@ -262,7 +259,7 @@ jbw_int_entry_get_value (JBWIntEntry * entry)
  */
 #if !INLINE_JBW_FLOAT_ENTRY_SET_VALUE_WITH_FORMAT
 void jbw_float_entry_set_value_with_format
-  (JBWFloatEntry * entry, char *format, JBDOUBLE value)
+    (JBWFloatEntry * entry, char *format, JBDOUBLE value)
 {
   _jbw_float_entry_set_value_with_format (entry, format, value);
 }
@@ -374,7 +371,7 @@ jbw_draw_rectangled (float red, float green, float blue, double x1,
  */
 #if !INLINE_JBW_DRAW_POINTSF
 void jbw_draw_pointsf
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   _jbw_draw_pointsf (red, green, blue, x, y, n);
 }
@@ -399,7 +396,7 @@ void jbw_draw_pointsf
  */
 #if !INLINE_JBW_DRAW_POINTSD
 void jbw_draw_pointsd
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   _jbw_draw_pointsd (red, green, blue, x, y, n);
 }
@@ -424,7 +421,7 @@ void jbw_draw_pointsd
  */
 #if !INLINE_JBW_DRAW_LINESF
 void jbw_draw_linesf
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   _jbw_draw_linesf (red, green, blue, x, y, n);
 }
@@ -449,7 +446,7 @@ void jbw_draw_linesf
  */
 #if !INLINE_JBW_DRAW_LINESD
 void jbw_draw_linesd
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   _jbw_draw_linesd (red, green, blue, x, y, n);
 }
@@ -475,7 +472,7 @@ void jbw_draw_linesd
  */
 #if !INLINE_JBW_DRAW_SEGMENTSF
 void jbw_draw_segmentsf
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   _jbw_draw_segmentsf (red, green, blue, x, y, n);
 }
@@ -501,7 +498,7 @@ void jbw_draw_segmentsf
  */
 #if !INLINE_JBW_DRAW_SEGMENTSD
 void jbw_draw_segmentsd
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   _jbw_draw_segmentsd (red, green, blue, x, y, n);
 }
@@ -517,10 +514,10 @@ jbw_draw_clear (float red, float green, float blue, float alpha)
 
 #if !INLINE_JBW_DRAW_POINTS
 void jbw_draw_points
-  (float red1, float green1, float blue1,
-   float red2, float green2, float blue2,
-   JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
-   JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2, int n)
+    (float red1, float green1, float blue1,
+     float red2, float green2, float blue2,
+     JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
+     JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2, int n)
 {
   _jbw_draw_points (red1, green1, blue1, red2, green2, blue2, xmin, xmax,
                     ymin, ymax, x, y1, y2, n);
@@ -529,7 +526,7 @@ void jbw_draw_points
 
 #if !INLINE_JBW_DRAW_POINTSVF
 void jbw_draw_pointsvf
-  (float red, float green, float blue, void *x, void *y, int size, int n)
+    (float red, float green, float blue, void *x, void *y, int size, int n)
 {
   _jbw_draw_pointsvf (red, green, blue, x, y, size, n);
 }
@@ -537,7 +534,7 @@ void jbw_draw_pointsvf
 
 #if !INLINE_JBW_DRAW_POINTSVD
 void jbw_draw_pointsvd
-  (float red, float green, float blue, void *x, void *y, int size, int n)
+    (float red, float green, float blue, void *x, void *y, int size, int n)
 {
   _jbw_draw_pointsvd (red, green, blue, x, y, size, n);
 }
@@ -545,10 +542,10 @@ void jbw_draw_pointsvd
 
 #if !INLINE_JBW_DRAW_POINTSV
 void jbw_draw_pointsv
-  (float red1, float green1, float blue1,
-   float red2, float green2, float blue2,
-   JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
-   void *x, void *y1, void *y2, int size, int n)
+    (float red1, float green1, float blue1,
+     float red2, float green2, float blue2,
+     JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
+     void *x, void *y1, void *y2, int size, int n)
 {
   _jbw_draw_pointsv (red1, green1, blue1, red2, green2, blue2, xmin, xmax,
                      ymin, ymax, x, y1, y2, size, n);
@@ -557,10 +554,10 @@ void jbw_draw_pointsv
 
 #if !INLINE_JBW_DRAW_LINES
 void jbw_draw_lines
-  (JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2,
-   float red1, float green1, float blue1,
-   float red2, float green2, float blue2,
-   JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax, int n)
+    (JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2,
+     float red1, float green1, float blue1,
+     float red2, float green2, float blue2,
+     JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax, int n)
 {
   _jbw_draw_lines (x, y1, y2, red1, green1, blue1, red2, green2, blue2, xmin,
                    xmax, ymin, ymax, n);
@@ -569,7 +566,7 @@ void jbw_draw_lines
 
 #if !INLINE_JBW_DRAW_LINESVF
 void jbw_draw_linesvf
-  (float red, float green, float blue, void *x, void *y, int size, int n)
+    (float red, float green, float blue, void *x, void *y, int size, int n)
 {
   _jbw_draw_linesvf (red, green, blue, x, y, size, n);
 }
@@ -577,7 +574,7 @@ void jbw_draw_linesvf
 
 #if !INLINE_JBW_DRAW_LINESVD
 void jbw_draw_linesvd
-  (float red, float green, float blue, void *x, void *y, int size, int n)
+    (float red, float green, float blue, void *x, void *y, int size, int n)
 {
   _jbw_draw_linesvd (red, green, blue, x, y, size, n);
 }
@@ -585,10 +582,10 @@ void jbw_draw_linesvd
 
 #if !INLINE_JBW_DRAW_LINESV
 void jbw_draw_linesv
-  (float red1, float green1, float blue1,
-   float red2, float green2, float blue2,
-   JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
-   void *x, void *y1, void *y2, int size, int n)
+    (float red1, float green1, float blue1,
+     float red2, float green2, float blue2,
+     JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
+     void *x, void *y1, void *y2, int size, int n)
 {
   _jbw_draw_linesv (red1, green1, blue1, red2, green2, blue2, xmin, xmax,
                     ymin, ymax, x, y1, y2, size, n);
@@ -613,7 +610,7 @@ jbw_draw_range (JBDOUBLE * xmin, JBDOUBLE * xmax)
 
 #if !INLINE_JBW_DRAW_TICS
 void jbw_draw_tics
-  (JBDOUBLE xmin, JBDOUBLE xmax, int nlabels, int *n, JBDOUBLE * tic)
+    (JBDOUBLE xmin, JBDOUBLE xmax, int nlabels, int *n, JBDOUBLE * tic)
 {
   _jbw_draw_tics (xmin, xmax, nlabels, n, tic);
 }
@@ -717,7 +714,7 @@ jbw_graphic_get_display_size (JBWGraphic * graphic)
 
 #if !INLINE_JBW_GRAPHIC_DRAW_STRING
 void jbw_graphic_draw_string
-  (JBWGraphic * graphic, char *string, double x, double y)
+    (JBWGraphic * graphic, char *string, double x, double y)
 {
   _jbw_graphic_draw_string (graphic, string, x, y);
 }
@@ -829,15 +826,15 @@ jbw_graphic_new (char *font, int nx, int ny, int nz, void (*draw) ())
 void
 jbw_graphic_resize (int width, int height)
 {
-  _jbw_graphic_main_loop (width, height);
+  _jbw_graphic_resize (width, height);
 }
 #endif
 
 #if !INLINE_JBW_GRAPHIC_MAIN_LOOP
 void
-jbw_graphic_main_loop ()
+jbw_graphic_main_loop (JBWGraphic * graphic)
 {
-  _jbw_graphic_main_loop ();
+  _jbw_graphic_main_loop (graphic);
 }
 #endif
 
@@ -859,7 +856,7 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)
 
 #if !INLINE_JBW_ARRAY_EDITOR_SET_ELEMENT
 void jbw_array_editor_set_element
-  (JBWArrayEditor * editor, int row, int column, char *str)
+    (JBWArrayEditor * editor, int row, int column, char *str)
 {
   _jbw_array_editor_set_element (editor, row, column, str);
 }
@@ -875,7 +872,7 @@ jbw_array_editor_get_element (JBWArrayEditor * editor, int row, int column)
 
 #if !INLINE_JBW_ARRAY_EDITOR_SET_ELEMENT_INT
 void jbw_array_editor_set_element_int
-  (JBWArrayEditor * editor, int row, int column, long int x)
+    (JBWArrayEditor * editor, int row, int column, long int x)
 {
   _jbw_array_editor_set_element_int (editor, row, column, x);
 }
@@ -883,7 +880,7 @@ void jbw_array_editor_set_element_int
 
 #if !INLINE_JBW_ARRAY_EDITOR_GET_ELEMENT_INT
 long int jbw_array_editor_get_element_int
-  (JBWArrayEditor * editor, int row, int column)
+    (JBWArrayEditor * editor, int row, int column)
 {
   return _jbw_array_editor_get_element_int (editor, row, column);
 }
@@ -891,7 +888,7 @@ long int jbw_array_editor_get_element_int
 
 #if !INLINE_JBW_ARRAY_EDITOR_SET_ELEMENT_FLOAT
 void jbw_array_editor_set_element_float
-  (JBWArrayEditor * editor, int row, int column, JBDOUBLE x)
+    (JBWArrayEditor * editor, int row, int column, JBDOUBLE x)
 {
   _jbw_array_editor_set_element_float (editor, row, column, x);
 }
@@ -899,7 +896,7 @@ void jbw_array_editor_set_element_float
 
 #if !INLINE_JBW_ARRAY_EDITOR_GET_ELEMENT_FLOAT
 JBDOUBLE jbw_array_editor_get_element_float
-  (JBWArrayEditor * editor, int row, int column)
+    (JBWArrayEditor * editor, int row, int column)
 {
   return _jbw_array_editor_get_element_float (editor, row, column);
 }
@@ -939,7 +936,7 @@ jbw_array_editor_get_column_int (JBWArrayEditor * editor, int column, int *x)
 
 #if !INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_FLOAT
 void jbw_array_editor_set_column_float
-  (JBWArrayEditor * editor, int column, JBFLOAT * x)
+    (JBWArrayEditor * editor, int column, JBFLOAT * x)
 {
   _jbw_array_editor_set_column_float (editor, column, x);
 }
@@ -947,7 +944,7 @@ void jbw_array_editor_set_column_float
 
 #if !INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_FLOAT
 void jbw_array_editor_get_column_float
-  (JBWArrayEditor * editor, int column, JBFLOAT * x)
+    (JBWArrayEditor * editor, int column, JBFLOAT * x)
 {
   _jbw_array_editor_get_column_float (editor, column, x);
 }
@@ -955,7 +952,7 @@ void jbw_array_editor_get_column_float
 
 #if !INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_TIME
 void jbw_array_editor_set_column_time
-  (JBWArrayEditor * editor, int column, JBDOUBLE * x)
+    (JBWArrayEditor * editor, int column, JBDOUBLE * x)
 {
   _jbw_array_editor_set_column_time (editor, column, x);
 }
@@ -963,7 +960,7 @@ void jbw_array_editor_set_column_time
 
 #if !INLINE_JBW_ARRAY_EDITOR_GET_COLUMN_TIME
 void jbw_array_editor_get_column_time
-  (JBWArrayEditor * editor, int column, JBDOUBLE * x)
+    (JBWArrayEditor * editor, int column, JBDOUBLE * x)
 {
   _jbw_array_editor_get_column_time (editor, column, x);
 }
@@ -971,7 +968,7 @@ void jbw_array_editor_get_column_time
 
 #if !INLINE_JBW_ARRAY_EDITOR_SET_COLUMN_SENSITIVE
 void jbw_array_editor_set_column_sensitive
-  (JBWArrayEditor * editor, int column, int sensitive)
+    (JBWArrayEditor * editor, int column, int sensitive)
 {
   _jbw_array_editor_set_column_sensitive (editor, column, sensitive);
 }
@@ -1091,7 +1088,7 @@ jbw_array_editor_destroy (JBWArrayEditor * editor)
 
 #if !INLINE_JBW_ARRAY_EDITOR_NEW
 JBWArrayEditor *jbw_array_editor_new
-  (int ncolumn, int d, int n, const char **label)
+    (int ncolumn, int d, int n, const char **label)
 {
   return _jbw_array_editor_new (ncolumn, d, n, label);
 }

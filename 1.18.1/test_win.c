@@ -41,7 +41,9 @@ cb_open1 ()
   else
     printf ("Head was %lu\n", (size_t) list);
   graphic = jbw_graphic_new (NULL, 5, 5, 5, draw1);
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
   glutPostRedisplay ();
+#endif
   list = jbw_graphic_queue.head;
   printf ("Head is %lu %lu\n", (size_t) list, (size_t) graphic);
 }
@@ -57,7 +59,9 @@ cb_open2 ()
   else
     printf ("Head was %lu\n", (size_t) list);
   graphic = jbw_graphic_new (NULL, 5, 5, 5, draw2);
-  glutPostRedisplay ();
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+  jbw_graphic_expose_event (graphic);
+#endif
   list = jbw_graphic_queue.head;
   printf ("Head is %lu %lu\n", (size_t) list, (size_t) graphic);
 }
@@ -70,8 +74,6 @@ cb_close ()
   if (list)
     jbw_graphic_destroy ((JBWGraphic *) list->data);
   list = jbw_graphic_queue.head;
-  if (list)
-    glutPostRedisplay ();
 }
 
 int
@@ -79,7 +81,7 @@ main (int argn, char **argc)
 {
   GList *list;
   GtkButton *button_open1, *button_open2, *button_close;
-  GtkBox *box;
+  GtkGrid *grid;
   GtkWindow *window;
   JBWGraphic *graphic;
 
@@ -93,24 +95,24 @@ main (int argn, char **argc)
   g_signal_connect (button_open2, "clicked", cb_open2, NULL);
   g_signal_connect (button_close, "clicked", cb_close, NULL);
 
-  box = (GtkBox *) gtk_hbox_new (0, 0);
-  gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (button_open1));
-  gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (button_open2));
-  gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (button_close));
+  grid = (GtkGrid *) gtk_grid_new ();
+  gtk_grid_attach (grid, GTK_WIDGET (button_open1), 0, 0, 1, 1);
+  gtk_grid_attach (grid, GTK_WIDGET (button_open2), 1, 0, 1, 1);
+  gtk_grid_attach (grid, GTK_WIDGET (button_close), 2, 0, 1, 1);
 
   window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (box));
+  gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (grid));
   gtk_widget_show_all (GTK_WIDGET (window));
-  g_signal_connect (window, "destroy", glutLeaveMainLoop, NULL);
 
   graphic = jbw_graphic_new (NULL, 5, 5, 5, draw1);
+  g_signal_connect_swapped (window, "destroy", G_CALLBACK (jbw_graphic_destroy),
+                            graphic);
   printf ("Graphic is %lu\n", (size_t) graphic);
   list = jbw_graphic_queue.head;
   printf ("Head is %lu %lu\n", (size_t) list, (size_t) list->data);
 
-  glutIdleFunc ((void (*)) gtk_main_iteration);
-  printf ("glutMainLoop\n");
-  glutMainLoop ();
+  printf ("main loop\n");
+  jbw_graphic_main_loop (graphic);
   printf ("end\n");
 
   return 0;

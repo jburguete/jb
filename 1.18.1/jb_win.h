@@ -95,7 +95,7 @@ extern GQueue jbw_graphic_queue;
 extern void (*jbw_graphic_draw) ();
 
 static inline void _jbw_combo_box_set_strings
-  (GtkComboBoxText * combo, char **strings, int n)
+    (GtkComboBoxText * combo, char **strings, int n)
 {
   int i;
   gtk_combo_box_text_remove_all (combo);
@@ -134,7 +134,7 @@ GtkComboBoxText *jbw_combo_box_new_with_strings (char **, int);
 			(data), 0, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
 
 static inline void _jbw_array_radio_buttons_set_active
-  (GtkRadioButton ** array, int n, int is_active)
+    (GtkRadioButton ** array, int n, int is_active)
 {
   gtk_toggle_button_set_active ((GtkToggleButton *) array[n], is_active);
 }
@@ -166,7 +166,7 @@ typedef GtkEntry JBWIntEntry;
 #define jbw_int_entry_new (JBWIntEntry*)gtk_entry_new
 
 static inline void _jbw_int_entry_set_value_with_format
-  (JBWIntEntry * entry, char *format, long value)
+    (JBWIntEntry * entry, char *format, long value)
 {
   char buffer[64];
   snprintf (buffer, 64, format, value);
@@ -210,7 +210,7 @@ typedef GtkEntry JBWFloatEntry;
 #define jbw_float_entry_new (JBWFloatEntry*)gtk_entry_new
 
 static inline void _jbw_float_entry_set_value_with_format
-  (JBWFloatEntry * entry, char *format, JBDOUBLE value)
+    (JBWFloatEntry * entry, char *format, JBDOUBLE value)
 {
   char buffer[64];
   snprintf (buffer, 64, format, value);
@@ -225,7 +225,7 @@ void jbw_float_entry_set_value_with_format (JBWFloatEntry *, char *, JBDOUBLE);
 #endif
 
 static inline void _jbw_float_entry_set_value
-  (JBWFloatEntry * entry, JBDOUBLE value)
+    (JBWFloatEntry * entry, JBDOUBLE value)
 {
   jbw_float_entry_set_value_with_format (entry, FPL, value);
 }
@@ -255,7 +255,7 @@ _jbw_show_message (char *title, char *message, GtkMessageType type)
 {
   GtkMessageDialog *dlg;
   dlg = (GtkMessageDialog *) gtk_message_dialog_new
-    (window_parent, GTK_DIALOG_MODAL, type, GTK_BUTTONS_OK, "%s", message);
+      (window_parent, GTK_DIALOG_MODAL, type, GTK_BUTTONS_OK, "%s", message);
   gtk_window_set_title (GTK_WINDOW (dlg), title);
   gtk_dialog_run (GTK_DIALOG (dlg));
   gtk_widget_destroy (GTK_WIDGET (dlg));
@@ -292,7 +292,7 @@ void jbw_show_warning (char *);
 #endif
 
 static inline void _jbw_draw_rectanglef
-  (float red, float green, float blue, float x1, float y1, float x2, float y2)
+    (float red, float green, float blue, float x1, float y1, float x2, float y2)
 {
   glColor3f (red, green, blue);
   glBegin (GL_LINE_LOOP);
@@ -310,8 +310,8 @@ void jbw_draw_rectanglef (float, float, float, float, float, float, float);
 #endif
 
 static inline void _jbw_draw_rectangled
-  (float red, float green, float blue, double x1, double y1, double x2,
-   double y2)
+    (float red, float green, float blue, double x1, double y1, double x2,
+     double y2)
 {
   glColor3f (red, green, blue);
   glBegin (GL_LINE_LOOP);
@@ -342,7 +342,7 @@ void jbw_draw_clear (float, float, float, float);
 #endif
 
 static inline void _jbw_draw_pointsf
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   register int i;
   if (!x || !y)
@@ -361,7 +361,7 @@ void jbw_draw_pointsf (float, float, float, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void _jbw_draw_pointsd
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   register int i;
   if (!x || !y)
@@ -380,7 +380,7 @@ void jbw_draw_pointsd (float, float, float, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void _jbw_draw_linesf
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   register int i;
   if (!x || !y)
@@ -399,7 +399,7 @@ void jbw_draw_linesf (float, float, float, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void _jbw_draw_linesd
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   register int i;
   if (!x || !y)
@@ -418,7 +418,7 @@ void jbw_draw_linesd (float, float, float, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void _jbw_draw_segmentsf
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   register int i;
   if (!x || !y)
@@ -437,7 +437,7 @@ void jbw_draw_segmentsf (float, float, float, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void _jbw_draw_segmentsd
-  (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
+    (float red, float green, float blue, JBFLOAT * x, JBFLOAT * y, int n)
 {
   register int i;
   if (!x || !y)
@@ -456,9 +456,9 @@ void jbw_draw_segmentsd (float, float, float, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void _jbw_draw_points
-  (float red1, float green1, float blue1, float red2, float green2, float blue2,
-   JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
-   JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2, int n)
+    (float red1, float green1, float blue1, float red2, float green2,
+     float blue2, JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
+     JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2, int n)
 {
   glLoadIdentity ();
   glOrtho (xmin, xmax, ymin, ymax, -1., 1.);
@@ -480,7 +480,7 @@ void jbw_draw_points (float, float, float, float, float, float,
 #endif
 
 static inline void _jbw_draw_pointsvf
-  (float red, float green, float blue, void *x, void *y, int size, int n)
+    (float red, float green, float blue, void *x, void *y, int size, int n)
 {
   register int i;
   if (!x || !y)
@@ -499,7 +499,7 @@ void jbw_draw_pointsvf (float, float, float, void *, void *, int, int);
 #endif
 
 static inline void _jbw_draw_pointsvd
-  (float red, float green, float blue, void *x, void *y, int size, int n)
+    (float red, float green, float blue, void *x, void *y, int size, int n)
 {
   register int i;
   if (!x || !y)
@@ -518,9 +518,9 @@ void jbw_draw_pointsvd (float, float, float, void *, void *, int, int);
 #endif
 
 static inline void _jbw_draw_pointsv
-  (float red1, float green1, float blue1, float red2, float green2, float blue2,
-   JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
-   void *x, void *y1, void *y2, int size, int n)
+    (float red1, float green1, float blue1, float red2, float green2,
+     float blue2, JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
+     void *x, void *y1, void *y2, int size, int n)
 {
   glLoadIdentity ();
   glOrtho (xmin, xmax, ymin, ymax, -1., 1.);
@@ -542,9 +542,9 @@ void jbw_draw_pointsv (float, float, float, float, float, float,
 #endif
 
 static inline void _jbw_draw_lines
-  (float red1, float green1, float blue1, float red2, float green2, float blue2,
-   JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
-   JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2, int n)
+    (float red1, float green1, float blue1, float red2, float green2,
+     float blue2, JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
+     JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2, int n)
 {
   glLoadIdentity ();
   glOrtho (xmin, xmax, ymin, ymax, -1., 1.);
@@ -566,7 +566,7 @@ void jbw_draw_lines (float, float, float, float, float, float,
 #endif
 
 static inline void _jbw_draw_linesvf
-  (float red, float green, float blue, void *x, void *y, int size, int n)
+    (float red, float green, float blue, void *x, void *y, int size, int n)
 {
   register int i;
   if (!x || !y)
@@ -585,7 +585,7 @@ void jbw_draw_linesvf (float, float, float, void *, void *, int, int);
 #endif
 
 static inline void _jbw_draw_linesvd
-  (float red, float green, float blue, void *x, void *y, int size, int n)
+    (float red, float green, float blue, void *x, void *y, int size, int n)
 {
   register int i;
   if (!x || !y)
@@ -604,9 +604,9 @@ void jbw_draw_linesvd (float, float, float, void *, void *, int, int);
 #endif
 
 static inline void _jbw_draw_linesv
-  (float red1, float green1, float blue1, float red2, float green2, float blue2,
-   JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
-   void *x, void *y1, void *y2, int size, int n)
+    (float red1, float green1, float blue1, float red2, float green2,
+     float blue2, JBDOUBLE xmin, JBDOUBLE xmax, JBDOUBLE ymin, JBDOUBLE ymax,
+     void *x, void *y1, void *y2, int size, int n)
 {
   glLoadIdentity ();
   glOrtho (xmin, xmax, ymin, ymax, -1., 1.);
@@ -628,7 +628,7 @@ void jbw_draw_linesv (float, float, float, float, float, float,
 #endif
 
 static inline void _jbw_draw_string
-  (char *string, double x, double y, int font_list_base)
+    (char *string, double x, double y, int font_list_base)
 {
   if (!string)
     return;
@@ -667,7 +667,7 @@ void jbw_draw_range (JBDOUBLE *, JBDOUBLE *);
 #endif
 
 static inline void _jbw_draw_tics
-  (JBDOUBLE xmin, JBDOUBLE xmax, int nlabels, int *n, JBDOUBLE * tic)
+    (JBDOUBLE xmin, JBDOUBLE xmax, int nlabels, int *n, JBDOUBLE * tic)
 {
   int k1, k2;
   JBDOUBLE h, s, k;
@@ -816,9 +816,9 @@ typedef struct
   /* ztic: z axis tics */
   /* font: font description (default JBW_GRAPHIC_FONT) */
   int type, resize, grid, map, legend, legend_z, wchar,
-    hchar, nx, ny, nz, nxmax, nymax, nzmax;
+      hchar, nx, ny, nz, nxmax, nymax, nzmax;
   JBDOUBLE xtic[JBW_GRAPHIC_N_LABELS],
-    ytic[JBW_GRAPHIC_N_LABELS], ztic[JBW_GRAPHIC_N_LABELS];
+      ytic[JBW_GRAPHIC_N_LABELS], ztic[JBW_GRAPHIC_N_LABELS];
   char *font;
   /* font_list_base: OpenGL font list base */
   int font_list_base;
@@ -987,7 +987,7 @@ void jbw_graphic_get_display_size (JBWGraphic * graphic);
 #endif
 
 static inline void _jbw_graphic_draw_string
-  (JBWGraphic * graphic, char *string, double x, double y)
+    (JBWGraphic * graphic, char *string, double x, double y)
 {
   jbw_draw_string (string, x, y, graphic->font_list_base);
 }
@@ -996,7 +996,7 @@ static inline void _jbw_graphic_draw_string
 #define jbw_graphic_draw_string _jbw_graphic_draw_string
 #else
 void jbw_graphic_draw_string
-  (JBWGraphic * graphic, char *string, double x, double y);
+    (JBWGraphic * graphic, char *string, double x, double y);
 #endif
 
 static inline void
@@ -1036,8 +1036,8 @@ void jbw_graphic_map_resize (JBWGraphic *);
 #endif
 
 static inline void _jbw_graphic_draw_resize
-  (JBWGraphic * graphic, JBFLOAT * x, JBFLOAT * y1,
-   JBFLOAT * y2, JBFLOAT * z1, JBFLOAT * z2, int n)
+    (JBWGraphic * graphic, JBFLOAT * x, JBFLOAT * y1,
+     JBFLOAT * y2, JBFLOAT * z1, JBFLOAT * z2, int n)
 {
   JBDOUBLE k1, k2;
   int i = n - 1;
@@ -1064,7 +1064,7 @@ static inline void _jbw_graphic_draw_resize
 #define jbw_graphic_draw_resize _jbw_graphic_draw_resize
 #else
 void jbw_graphic_draw_resize
-  (JBWGraphic *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
+    (JBWGraphic *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void
@@ -1084,7 +1084,7 @@ _jbw_graphic_labels (JBWGraphic * graphic)
   glColor3f (0., 0., 0.);
   if (graphic->str_x)
     jbw_graphic_draw_string
-      (graphic, graphic->str_x, 0.5 * (w - strlen (graphic->str_x)), 0.);
+        (graphic, graphic->str_x, 0.5 * (w - strlen (graphic->str_x)), 0.);
   k = h;
   if (graphic->str_title)
     {
@@ -1103,7 +1103,7 @@ _jbw_graphic_labels (JBWGraphic * graphic)
         {
           glColor3f (1., 0., 0.);
           jbw_graphic_draw_string
-            (graphic, graphic->str_z, w - 1. - strlen (graphic->str_z), k);
+              (graphic, graphic->str_z, w - 1. - strlen (graphic->str_z), k);
         }
     }
   if (graphic->str_yy || graphic->str_zz)
@@ -1116,7 +1116,7 @@ _jbw_graphic_labels (JBWGraphic * graphic)
         {
           glColor3f (0.5, 0.5, 0.);
           jbw_graphic_draw_string
-            (graphic, graphic->str_zz, w - 1. - strlen (graphic->str_zz), k);
+              (graphic, graphic->str_zz, w - 1. - strlen (graphic->str_zz), k);
         }
     }
   graphic->y1 = 2.5 * graphic->hchar;
@@ -1153,7 +1153,7 @@ _jbw_graphic_labels (JBWGraphic * graphic)
     {
       sprintf (buffer, FGL, graphic->xtic[i]);
       k = jbm_extrapolate
-        (graphic->xtic[i], graphic->xmin, graphic->xmax, x1, x2);
+          (graphic->xtic[i], graphic->xmin, graphic->xmax, x1, x2);
       jbw_graphic_draw_string (graphic, buffer, k - 0.5 * strlen (buffer), 1.);
     }
   glColor3f (0., 0., 1.);
@@ -1162,7 +1162,7 @@ _jbw_graphic_labels (JBWGraphic * graphic)
     {
       sprintf (buffer, FGL, graphic->ytic[i]);
       k = jbm_extrapolate
-        (graphic->ytic[i], graphic->ymin, graphic->ymax, y1, y2);
+          (graphic->ytic[i], graphic->ymin, graphic->ymax, y1, y2);
       jbw_graphic_draw_string (graphic, buffer, w - strlen (buffer), k - 0.3);
     }
   glColor3f (1., 0., 0.);
@@ -1171,7 +1171,7 @@ _jbw_graphic_labels (JBWGraphic * graphic)
     {
       sprintf (buffer, FGL, graphic->ztic[i]);
       k = jbm_extrapolate
-        (graphic->ztic[i], graphic->zmin, graphic->zmax, y1, y2);
+          (graphic->ztic[i], graphic->zmin, graphic->zmax, y1, y2);
       jbw_graphic_draw_string (graphic, buffer, w, k - 0.3);
     }
   if (graphic->grid)
@@ -1181,7 +1181,7 @@ _jbw_graphic_labels (JBWGraphic * graphic)
       for (i = 0; i < graphic->nx; ++i)
         {
           k = jbm_extrapolate
-            (graphic->xtic[i], graphic->xmin, graphic->xmax, x1, x2);
+              (graphic->xtic[i], graphic->xmin, graphic->xmax, x1, x2);
           glVertex2d (k, y1);
           glVertex2d (k, y2);
         }
@@ -1189,7 +1189,7 @@ _jbw_graphic_labels (JBWGraphic * graphic)
       for (i = 0; i < graphic->ny; ++i)
         {
           k = jbm_extrapolate
-            (graphic->ytic[i], graphic->ymin, graphic->ymax, y1, y2);
+              (graphic->ytic[i], graphic->ymin, graphic->ymax, y1, y2);
           glVertex2d (x1, k);
           glVertex2d (x2, k);
         }
@@ -1197,7 +1197,7 @@ _jbw_graphic_labels (JBWGraphic * graphic)
       for (i = 0; i < graphic->nz; ++i)
         {
           k = jbm_extrapolate
-            (graphic->ztic[i], graphic->zmin, graphic->zmax, y1, y2);
+              (graphic->ztic[i], graphic->zmin, graphic->zmax, y1, y2);
           glVertex2d (x1, k);
           glVertex2d (x2, k);
         }
@@ -1210,7 +1210,7 @@ _jbw_graphic_labels (JBWGraphic * graphic)
       for (i = 0; i < graphic->nx; ++i)
         {
           k = jbm_extrapolate
-            (graphic->xtic[i], graphic->xmin, graphic->xmax, x1, x2);
+              (graphic->xtic[i], graphic->xmin, graphic->xmax, x1, x2);
           glVertex2d (k, y1);
           glVertex2d (k, y1 + 0.5);
           glVertex2d (k, y2);
@@ -1219,14 +1219,14 @@ _jbw_graphic_labels (JBWGraphic * graphic)
       for (i = 0; i < graphic->ny; ++i)
         {
           k = jbm_extrapolate
-            (graphic->ytic[i], graphic->ymin, graphic->ymax, y1, y2);
+              (graphic->ytic[i], graphic->ymin, graphic->ymax, y1, y2);
           glVertex2d (x1, k);
           glVertex2d (x1 + 0.5, k);
         }
       for (i = 0; i < graphic->nz; ++i)
         {
           k = jbm_extrapolate
-            (graphic->ztic[i], graphic->zmin, graphic->zmax, y1, y2);
+              (graphic->ztic[i], graphic->zmin, graphic->zmax, y1, y2);
           glVertex2d (x2, k);
           glVertex2d (x2 - 0.5, k);
         }
@@ -1267,12 +1267,12 @@ _jbw_graphic_draw_line (JBWGraphic *
 #define jbw_graphic_draw_line _jbw_graphic_draw_line
 #else
 void jbw_graphic_draw_line
-  (JBWGraphic *, double, double, double, JBFLOAT *, JBFLOAT *, int);
+    (JBWGraphic *, double, double, double, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void _jbw_graphic_draw_lines
-  (JBWGraphic * graphic, JBFLOAT * x, JBFLOAT * y1,
-   JBFLOAT * y2, JBFLOAT * z1, JBFLOAT * z2, int n)
+    (JBWGraphic * graphic, JBFLOAT * x, JBFLOAT * y1,
+     JBFLOAT * y2, JBFLOAT * z1, JBFLOAT * z2, int n)
 {
   if (!x)
     {
@@ -1293,7 +1293,7 @@ static inline void _jbw_graphic_draw_lines
 #define jbw_graphic_draw_lines _jbw_graphic_draw_lines
 #else
 void jbw_graphic_draw_lines
-  (JBWGraphic *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
+    (JBWGraphic *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, JBFLOAT *, int);
 #endif
 
 static inline void
@@ -1340,7 +1340,7 @@ _jbw_graphic_draw_linesv (JBWGraphic *
 #define jbw_graphic_draw_linesv _jbw_graphic_draw_linesv
 #else
 void jbw_graphic_draw_linesv
-  (JBWGraphic *, void *, void *, void *, void *, void *, int, int);
+    (JBWGraphic *, void *, void *, void *, void *, void *, int, int);
 #endif
 
 static inline void
@@ -1369,8 +1369,8 @@ void jbw_graphic_draw_logo (JBWGraphic * graphic);
 static inline void
 _jbw_graphic_realize (JBWGraphic * graphic)
 {
-  int i;
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+  int i;
   graphic->wchar = 8;
   graphic->hchar = 13;
   graphic->font_list_base = glGenLists (256);
@@ -1382,7 +1382,7 @@ _jbw_graphic_realize (JBWGraphic * graphic)
     }
   glutReshapeWindow ((graphic->nxmax + 1) * FG_LENGTH * graphic->wchar,
                      (jbm_max (graphic->nymax, graphic->nzmax) + 5)
-					 * graphic->hchar);
+                     * graphic->hchar);
 #endif
 }
 
@@ -1412,7 +1412,7 @@ void jbw_graphic_expose_event (JBWGraphic * graphic);
 #endif
 
 static inline void _jbw_graphic_save
-  (JBWGraphic * graphic, char *file_name, JBWGraphicType type)
+    (JBWGraphic * graphic, char *file_name, JBWGraphicType type)
 {
   int i, x2, y2;
   unsigned int row_bytes, pointers_bytes, pixels_bytes;
@@ -1507,12 +1507,12 @@ _jbw_graphic_dialog_save (JBWGraphic * graphic)
   gtk_file_filter_add_pattern (filter, "*.png");
   gtk_file_filter_add_pattern (filter, "*.PNG");
   dlg =
-    (GtkFileChooserDialog *)
-    gtk_file_chooser_dialog_new (_("Save graphical"),
-                                 window_parent,
-                                 GTK_FILE_CHOOSER_ACTION_SAVE,
-                                 _("_OK"), GTK_RESPONSE_OK,
-                                 _("_Cancel"), GTK_RESPONSE_CANCEL, NULL);
+      (GtkFileChooserDialog *)
+      gtk_file_chooser_dialog_new (_("Save graphical"),
+                                   window_parent,
+                                   GTK_FILE_CHOOSER_ACTION_SAVE,
+                                   _("_OK"), GTK_RESPONSE_OK,
+                                   _("_Cancel"), GTK_RESPONSE_CANCEL, NULL);
   gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dlg), filter);
   gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dlg), 1);
   if (gtk_dialog_run ((GtkDialog *) dlg) == GTK_RESPONSE_OK)
@@ -1544,7 +1544,8 @@ _jbw_graphic_destroy (JBWGraphic * graphic)
   g_free (graphic->str_yy);
   g_free (graphic->str_z);
   g_free (graphic->str_zz);
-  jbw_logo_destroy (graphic->logo);
+  if (graphic->logo)
+    jbw_logo_destroy (graphic->logo);
   g_queue_pop_head (&jbw_graphic_queue);
   if (jbw_graphic_queue.head)
     {
@@ -1561,6 +1562,11 @@ _jbw_graphic_destroy (JBWGraphic * graphic)
     glfwDestroyWindow (graphic->window);
 #endif
   g_slice_free (JBWGraphic, graphic);
+#if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
+  glutLeaveMainLoop ();
+#else
+  gtk_main_quit ();
+#endif
 }
 
 #if INLINE_JBW_GRAPHIC_DESTROY
@@ -1570,7 +1576,7 @@ void jbw_graphic_destroy (JBWGraphic *);
 #endif
 
 static inline JBWGraphic *_jbw_graphic_new
-  (char *font, int nx, int ny, int nz, void (*draw) ())
+    (char *font, int nx, int ny, int nz, void (*draw) ())
 {
   JBWGraphic *graphic;
   GLenum glew_status;
@@ -1578,7 +1584,7 @@ static inline JBWGraphic *_jbw_graphic_new
   graphic->resize = graphic->grid = 1;
   graphic->map = 0;
   graphic->str_title = graphic->str_x = graphic->str_y =
-    graphic->str_yy = graphic->str_z = graphic->str_zz = NULL;
+      graphic->str_yy = graphic->str_z = graphic->str_zz = NULL;
   graphic->logo = NULL;
   graphic->nxmax = nx;
   graphic->nymax = ny;
@@ -1589,15 +1595,15 @@ static inline JBWGraphic *_jbw_graphic_new
     graphic->font = JBW_GRAPHIC_FONT;
   graphic->draw = jbw_graphic_draw = draw;
   if (!jbw_graphic_queue.head)
-	{
+    {
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
       graphic->window = glutCreateWindow ("");
 #elif JBW_GRAPHIC == JBW_GRAPHIC_SDL
-	  graphic->window
-        = SDL_CreateWindow ("",
-                            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                            640, 480,
-                            SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+      graphic->window
+          = SDL_CreateWindow ("",
+                              SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                              640, 480,
+                              SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
       if (!graphic->window)
         {
           printf ("ERROR! unable to create the window: %s\n", SDL_GetError ());
@@ -1609,16 +1615,15 @@ static inline JBWGraphic *_jbw_graphic_new
           printf ("ERROR! SDL_GL_CreateContext: %s\n", SDL_GetError ());
           return NULL;
         }
-#elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW 
-      graphic->window
-        = glfwCreateWindow (640, 480, "", NULL, NULL);
+#elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW
+      graphic->window = glfwCreateWindow (640, 480, "", NULL, NULL);
       if (!graphic->window)
         {
           printf ("ERROR! unable to open the window\n");
           glfwTerminate ();
           return NULL;
         }
-      glfwMakeContextCurrent (window);
+      glfwMakeContextCurrent (graphic->window);
 #endif
       glew_status = glewInit ();
       if (glew_status != GLEW_OK)
@@ -1626,10 +1631,10 @@ static inline JBWGraphic *_jbw_graphic_new
           printf ("ERROR! glewInit: %s\n", glewGetErrorString (glew_status));
           return NULL;
         }
-	}
+    }
   jbw_graphic_realize (graphic);
 #if JBW_GRAPHIC == JBW_GRAPHIC_GLUT
-  glutDisplayFunc ((void (*))jbw_graphic_expose_event);
+  glutDisplayFunc ((void (*)) jbw_graphic_expose_event);
 #endif
   g_queue_push_head (&jbw_graphic_queue, graphic);
   return graphic;
@@ -1656,7 +1661,7 @@ void jbw_graphic_resize (int, int);
 #endif
 
 static inline void
-_jbw_graphic_main_loop ()
+_jbw_graphic_main_loop (JBWGraphic * graphic)
 {
 #if JBW_GRAPHIC == JBW_GRAPHIC_SDL
   SDL_Event event[1];
@@ -1691,7 +1696,7 @@ _jbw_graphic_main_loop ()
 
 #elif JBW_GRAPHIC == JBW_GRAPHIC_GLFW
 
-  while (!glfwWindowShouldClose (window))
+  while (!glfwWindowShouldClose (graphic->window))
     {
       while (gtk_events_pending ())
         gtk_main_iteration ();
@@ -1727,7 +1732,7 @@ _jbw_graphic_init (int *argn, char ***argc)
       jbw_show_error (_("unable to init GLFW"));
       return 0;
     }
- #endif
+#endif
   gtk_disable_setlocale ();
   gtk_init (argn, argc);
   return 1;
@@ -1749,7 +1754,7 @@ typedef struct _JBWArrayEditor
 } JBWArrayEditor;
 
 static inline void _jbw_array_editor_set_element
-  (JBWArrayEditor * editor, int row, int column, char *str)
+    (JBWArrayEditor * editor, int row, int column, char *str)
 {
   GtkEntry *element = editor->matrix_entry[column][row];
   gtk_entry_set_text (element, str);
@@ -1762,7 +1767,7 @@ void jbw_array_editor_set_element (JBWArrayEditor *, int, int, char *);
 #endif
 
 static inline char *_jbw_array_editor_get_element
-  (JBWArrayEditor * editor, int row, int column)
+    (JBWArrayEditor * editor, int row, int column)
 {
   GtkEntry *element = editor->matrix_entry[column][row];
   return g_strdup (gtk_entry_get_text (element));
@@ -1775,7 +1780,7 @@ char *jbw_array_editor_get_element (JBWArrayEditor *, int, int);
 #endif
 
 static inline void _jbw_array_editor_set_element_int
-  (JBWArrayEditor * editor, int row, int column, long int x)
+    (JBWArrayEditor * editor, int row, int column, long int x)
 {
   JBWIntEntry *element = editor->matrix_entry[column][row];
   jbw_int_entry_set_value (element, x);
@@ -1788,7 +1793,7 @@ void jbw_array_editor_set_element_int (JBWArrayEditor *, int, int, long int);
 #endif
 
 static inline long int _jbw_array_editor_get_element_int
-  (JBWArrayEditor * editor, int row, int column)
+    (JBWArrayEditor * editor, int row, int column)
 {
   JBWIntEntry *element = editor->matrix_entry[column][row];
   return jbw_int_entry_get_value (element);
@@ -1801,7 +1806,7 @@ long int jbw_array_editor_get_element_int (JBWArrayEditor *, int, int);
 #endif
 
 static inline void _jbw_array_editor_set_element_float
-  (JBWArrayEditor * editor, int row, int column, JBDOUBLE x)
+    (JBWArrayEditor * editor, int row, int column, JBDOUBLE x)
 {
   JBWFloatEntry *element = editor->matrix_entry[column][row];
   jbw_float_entry_set_value (element, x);
@@ -1830,7 +1835,7 @@ JBDOUBLE jbw_array_editor_get_element_float (JBWArrayEditor *, int, int);
 #endif
 
 static inline void _jbw_array_editor_set_column
-  (JBWArrayEditor * editor, int column, char **c)
+    (JBWArrayEditor * editor, int column, char **c)
 {
   register int i, j;
   JBWIntEntry **array;
@@ -1849,7 +1854,7 @@ void jbw_array_editor_set_column (JBWArrayEditor *, int, char **);
 #endif
 
 static inline void _jbw_array_editor_get_column
-  (JBWArrayEditor * editor, int column, char **c)
+    (JBWArrayEditor * editor, int column, char **c)
 {
   register int i, j;
   JBWIntEntry **array;
@@ -1887,7 +1892,7 @@ void jbw_array_editor_set_column_int (JBWArrayEditor *, int, int *);
 #endif
 
 static inline void _jbw_array_editor_get_column_int
-  (JBWArrayEditor * editor, int column, int *x)
+    (JBWArrayEditor * editor, int column, int *x)
 {
   register int i, j;
   JBWIntEntry **array;
@@ -1906,7 +1911,7 @@ void jbw_array_editor_get_column_int (JBWArrayEditor *, int, int *);
 #endif
 
 static inline void _jbw_array_editor_set_column_float
-  (JBWArrayEditor * editor, int column, JBFLOAT * x)
+    (JBWArrayEditor * editor, int column, JBFLOAT * x)
 {
   register int i, j;
   JBWFloatEntry **array;
@@ -1925,7 +1930,7 @@ void jbw_array_editor_set_column_float (JBWArrayEditor *, int, JBFLOAT *);
 #endif
 
 static inline void _jbw_array_editor_get_column_float
-  (JBWArrayEditor * editor, int column, JBFLOAT * x)
+    (JBWArrayEditor * editor, int column, JBFLOAT * x)
 {
   register int i, j;
   JBWFloatEntry **array;
@@ -1944,7 +1949,7 @@ void jbw_array_editor_get_column_float (JBWArrayEditor *, int, JBFLOAT *);
 #endif
 
 static inline void _jbw_array_editor_set_column_time
-  (JBWArrayEditor * editor, int column, JBDOUBLE * t)
+    (JBWArrayEditor * editor, int column, JBDOUBLE * t)
 {
   register int i, j;
   char *buffer;
@@ -1968,7 +1973,7 @@ void jbw_array_editor_set_column_time (JBWArrayEditor *, int, JBDOUBLE *);
 #endif
 
 static inline void _jbw_array_editor_get_column_time
-  (JBWArrayEditor * editor, int column, JBDOUBLE * t)
+    (JBWArrayEditor * editor, int column, JBDOUBLE * t)
 {
   int i, j, e;
   JBWFloatEntry **array;
@@ -1987,7 +1992,7 @@ void jbw_array_editor_get_column_time (JBWArrayEditor *, int, JBFLOAT *);
 #endif
 
 static inline void _jbw_array_editor_set_column_sensitive
-  (JBWArrayEditor * editor, int column, int sensitive)
+    (JBWArrayEditor * editor, int column, int sensitive)
 {
   register int i, j;
   JBWFloatEntry **array;
@@ -2007,7 +2012,7 @@ void jbw_array_editor_set_column_sensitive (JBWArrayEditor *, int, int);
 #endif
 
 static inline void _jbw_array_editor_show_column
-  (JBWArrayEditor * editor, int column)
+    (JBWArrayEditor * editor, int column)
 {
   register int i, j;
   JBWIntEntry **array;
@@ -2027,7 +2032,7 @@ void jbw_array_editor_show_column (JBWArrayEditor *, int);
 #endif
 
 static inline void _jbw_array_editor_hide_column
-  (JBWArrayEditor * editor, int column)
+    (JBWArrayEditor * editor, int column)
 {
   register int i, j;
   JBWIntEntry **array;
@@ -2047,17 +2052,17 @@ void jbw_array_editor_hide_column (JBWArrayEditor *, int);
 #endif
 
 static inline void _jbw_array_editor_insert_button
-  (JBWArrayEditor * editor, int row)
+    (JBWArrayEditor * editor, int row)
 {
   register int k;
   char buffer[32];
   k = row + 1;
   sprintf (buffer, "%d", k);
   editor->button_numeric =
-    (GtkButton **) jb_realloc (editor->button_numeric,
-                               k * sizeof (GtkButton *));
+      (GtkButton **) jb_realloc (editor->button_numeric,
+                                 k * sizeof (GtkButton *));
   editor->button_numeric[row] =
-    (GtkButton *) gtk_button_new_with_label (buffer);
+      (GtkButton *) gtk_button_new_with_label (buffer);
   gtk_widget_set_sensitive ((GtkWidget *) editor->button_numeric[row], 0);
   k = row + row;
   gtk_grid_attach (editor->table,
@@ -2071,10 +2076,10 @@ void jbw_array_editor_insert_button (JBWArrayEditor *, int);
 #endif
 
 static inline void _jbw_array_editor_insert_entry
-  (JBWArrayEditor * editor, int i, int j, int k)
+    (JBWArrayEditor * editor, int i, int j, int k)
 {
   editor->matrix_entry[i] = (GtkEntry **)
-    jb_realloc (editor->matrix_entry[i], (j + 1) * sizeof (GtkEntry *));
+      jb_realloc (editor->matrix_entry[i], (j + 1) * sizeof (GtkEntry *));
   editor->matrix_entry[i][j] = (GtkEntry *) gtk_entry_new ();
   gtk_entry_set_text (editor->matrix_entry[i][j], "0");
   gtk_grid_attach (editor->table,
@@ -2109,7 +2114,7 @@ void jbw_array_editor_insert (JBWArrayEditor *);
 #endif
 
 static inline void _jbw_array_editor_up_rows
-  (JBWArrayEditor * editor, int i, int row, int n)
+    (JBWArrayEditor * editor, int i, int row, int n)
 {
   GtkEntry **entry1, **entry2;
   entry1 = editor->matrix_entry[i] + (--n);
@@ -2145,11 +2150,12 @@ void jbw_array_editor_insert_row (JBWArrayEditor *, int);
 #endif
 
 static inline void _jbw_array_editor_remove_entry
-  (JBWArrayEditor * editor, int i, int j)
+    (JBWArrayEditor * editor, int i, int j)
 {
   gtk_widget_destroy ((GtkWidget *) editor->matrix_entry[i][j]);
   editor->matrix_entry[i] =
-    (GtkEntry **) jb_realloc (editor->matrix_entry[i], j * sizeof (GtkEntry *));
+      (GtkEntry **) jb_realloc (editor->matrix_entry[i],
+                                j * sizeof (GtkEntry *));
 }
 
 #if INLINE_JBW_ARRAY_EDITOR_REMOVE_ENTRY
@@ -2180,7 +2186,7 @@ void jbw_array_editor_remove (JBWArrayEditor *);
 #endif
 
 static inline void _jbw_array_editor_down_rows
-  (JBWArrayEditor * editor, int i, int row, int n)
+    (JBWArrayEditor * editor, int i, int row, int n)
 {
   GtkEntry **entry1, **entry2;
   entry1 = editor->matrix_entry[i] + row;
@@ -2232,7 +2238,7 @@ void jbw_array_editor_set_rows (JBWArrayEditor *, int);
 #endif
 
 static inline void _jbw_array_editor_set_title
-  (JBWArrayEditor * editor, int i, char *title)
+    (JBWArrayEditor * editor, int i, char *title)
 {
   gtk_button_set_label (editor->button_title[i], title);
 }
@@ -2263,7 +2269,7 @@ void jbw_array_editor_destroy (JBWArrayEditor *);
 #endif
 
 static inline JBWArrayEditor *_jbw_array_editor_new
-  (int ncolumn, int d, int n, const char **label)
+    (int ncolumn, int d, int n, const char **label)
 {
   register int i;
   JBWArrayEditor *editor;
@@ -2273,14 +2279,14 @@ static inline JBWArrayEditor *_jbw_array_editor_new
   gtk_widget_set_vexpand (GTK_WIDGET (editor->scrolled), TRUE);
   editor->table = (GtkGrid *) gtk_grid_new ();
   editor->matrix_entry =
-    (GtkEntry ***) g_malloc (ncolumn * sizeof (GtkEntry **));
+      (GtkEntry ***) g_malloc (ncolumn * sizeof (GtkEntry **));
   editor->button_title =
-    (GtkButton **) g_malloc (ncolumn * sizeof (GtkButton *));
+      (GtkButton **) g_malloc (ncolumn * sizeof (GtkButton *));
   for (i = 0; i < ncolumn; ++i)
     {
       editor->matrix_entry[i] = NULL;
       editor->button_title[i]
-        = (GtkButton *) gtk_button_new_with_label (label[i]);
+          = (GtkButton *) gtk_button_new_with_label (label[i]);
       gtk_widget_set_sensitive (GTK_WIDGET (editor->button_title[i]), 0);
       gtk_grid_attach (editor->table,
                        GTK_WIDGET (editor->button_title[i]), i + 1, 0, 1, 1);
@@ -2320,7 +2326,7 @@ void jbw_show_error2 (char *, char *);
 #endif
 
 static inline void _jbw_show_error3
-  (char *message1, char *message2, char *message3)
+    (char *message1, char *message2, char *message3)
 {
   char buffer[1024];
   snprintf (buffer, 1024, "%s: %s\n%s", message1, message2, message3);
