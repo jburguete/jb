@@ -1,7 +1,7 @@
 CC = @CC@ @ARCH@ @LTO@ @STD@
 CFLAGS = @CFLAGS@ @XML_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@ @GLEW_CFLAGS@ \
 	@SDL_CFLAGS@ @GLFW_CFLAGS@ @JBW@ @GRAPHIC@ -O3 -Wall
-LDFLAGS = @LDFLAGS@ @XML_LIBS@ @GLIB_LIBS@@GTK_LIBS@ @GLEW_LIBS@ @SDL_LIBS@ \
+LDFLAGS = @LDFLAGS@ @XML_LIBS@ @GLIB_LIBS@ @GTK_LIBS@ @GLEW_LIBS@ @SDL_LIBS@ \
 	@GLFW_LIBS@ @LIBS@
 EXEFLAGS = $(LDFLAGS) -L. -Wl,-rpath=. -ljb
 src = jb_config.h jb_def.h jb_def.c jb_math.h jb_math.c jb_win.h jb_win.c \
