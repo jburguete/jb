@@ -50,6 +50,9 @@ AC_ARG_WITH([sdl], AS_HELP_STRING([--with-sdl],
 AC_ARG_WITH([glfw], AS_HELP_STRING([--with-glfw], 
 	    [Build with GLFW graphic interface]))
 if test $gtk = 1; then
+	AC_SEARCH_LIBS([glViewport], [GL opengl32], 
+		       AC_MSG_NOTICE([OpenGL OK]),
+		       AC_MSG_ERROR([OpenGL not found]))
 	PKG_CHECK_MODULES([GLEW], [glew])
 	if test "x$with_sdl" = "xyes"; then
 		AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=2")
