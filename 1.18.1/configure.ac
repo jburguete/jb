@@ -13,6 +13,10 @@ if test $host = "x86_64-w64-mingw32"; then
 elif test $host = "i686-w64-mingw32"; then
 	AC_MSG_NOTICE([Microsoft Windows 32 bits])
 	win=1
+elif test `uname -s` = "OpenBSD"; then
+	AC_MSG_NOTICE([OpenBSD])
+	LDFLAGS="$LDFLAGS -L/usr/X11R6/lib"
+	CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
 fi
 
 # Checks for programs
