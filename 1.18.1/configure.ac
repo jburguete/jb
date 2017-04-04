@@ -7,12 +7,14 @@ AM_INIT_AUTOMAKE
 AC_MSG_NOTICE([Build: $build])
 AC_MSG_NOTICE([Host: $host])
 win=0
+win32=0
 if test $host = "x86_64-w64-mingw32"; then
 	AC_MSG_NOTICE([Microsoft Windows 64 bits])
 	win=1
 elif test $host = "i686-w64-mingw32"; then
 	AC_MSG_NOTICE([Microsoft Windows 32 bits])
 	win=1
+	win32=1
 elif test `uname -s` = "OpenBSD"; then
 	AC_MSG_NOTICE([OpenBSD])
 	LDFLAGS="$LDFLAGS -L/usr/X11R6/lib"
@@ -53,7 +55,11 @@ AC_ARG_WITH([sdl], AS_HELP_STRING([--with-sdl],
 	    [Build with SDL graphic interface]))
 AC_ARG_WITH([glfw], AS_HELP_STRING([--with-glfw], 
 	    [Build with GLFW graphic interface]))
-if test $gtk = 1; then
+if test $win32 = 1; then
+	LDFLAGS="$LDFLAGS -lfreeglut -lopengl32"
+	PKG_CHECK_MODULES([GLEW], [glew])
+	AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=1")
+elif test $gtk = 1; then
 	AC_SEARCH_LIBS([glViewport], [GL opengl32], 
 		       AC_MSG_NOTICE([OpenGL OK]),
 		       AC_MSG_ERROR([OpenGL not found]))
