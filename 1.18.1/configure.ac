@@ -19,6 +19,10 @@ elif test `uname -s` = "OpenBSD"; then
 	AC_MSG_NOTICE([OpenBSD])
 	LDFLAGS="$LDFLAGS -L/usr/X11R6/lib"
 	CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
+elif test `uname -s` = "DragonFly"; then
+	AC_MSG_NOTICE([DragonFly BSD])
+	LDFLAGS="$LDFLAGS -L/usr/local/lib"
+	CPPFLAGS="$CPPFLAGS -I/usr/local/include"
 fi
 
 # Checks for programs
