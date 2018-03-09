@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2017, Javier Burguete Tolosa.
+ * Copyright 2005-2018, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_math.h
  * \brief Header file with useful mathematical functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2017, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2018, Javier Burguete Tolosa.
  */
 #ifndef JB_MATH__H
 #define JB_MATH__H 1
@@ -1477,13 +1477,13 @@ JBDOUBLE jbm_v3_length
     (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
 #endif
 
-static inline JBDOUBLE _jbm_solve_cuadratic_reduced
+static inline JBDOUBLE _jbm_solve_quadratic_reduced
     (JBDOUBLE a, JBDOUBLE b, JBDOUBLE x1, JBDOUBLE x2)
 {
   register JBDOUBLE k;
-#if DEBUG_JBM_SOLVE_CUADRATIC_REDUCED
+#if DEBUG_JBM_SOLVE_QUADRATIC_REDUCED
   fprintf (stderr,
-           "JBM Solve cuadratic reduced\na=" FWL " b=" FWL " x1=" FWL " x2="
+           "JBM Solve quadratic reduced\na=" FWL " b=" FWL " x1=" FWL " x2="
            FWL "\n", a, b, x1, x2);
 #endif
   a /= 2.L;
@@ -1491,41 +1491,41 @@ static inline JBDOUBLE _jbm_solve_cuadratic_reduced
   k = b - a;
   if (k < x1 || k > x2)
     k = -b - a;
-#if DEBUG_JBM_SOLVE_CUADRATIC_REDUCED
-  fprintf (stderr, "JBM Solve cuadratic reduced solution=" FWL "\n", k);
+#if DEBUG_JBM_SOLVE_QUADRATIC_REDUCED
+  fprintf (stderr, "JBM Solve quadratic reduced solution=" FWL "\n", k);
 #endif
   return k;
 }
 
-#if INLINE_JBM_SOLVE_CUADRATIC_REDUCED
-#define jbm_solve_cuadratic_reduced _jbm_solve_cuadratic_reduced
+#if INLINE_JBM_SOLVE_QUADRATIC_REDUCED
+#define jbm_solve_quadratic_reduced _jbm_solve_quadratic_reduced
 #else
-JBDOUBLE jbm_solve_cuadratic_reduced (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
+JBDOUBLE jbm_solve_quadratic_reduced (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
 #endif
 
-static inline JBDOUBLE _jbm_solve_cuadratic
+static inline JBDOUBLE _jbm_solve_quadratic
     (JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
 {
   register JBDOUBLE k;
-#if DEBUG_JBM_SOLVE_CUADRATIC
+#if DEBUG_JBM_SOLVE_QUADRATIC
   fprintf (stderr,
-           "JBM solve cuadratic\na=" FWL " b=" FWL " c=" FWL "\nx1=" FWL
+           "JBM solve quadratic\na=" FWL " b=" FWL " c=" FWL "\nx1=" FWL
            " x2=" FWL "\n", a, b, c, x1, x2);
 #endif
   if (a == 0.L)
     k = -c / b;
   else
-    k = jbm_solve_cuadratic_reduced (b / a, c / a, x1, x2);
-#if DEBUG_JBM_SOLVE_CUADRATIC
-  fprintf (stderr, "JBM solve cuadratic solution=" FWL "\n", k);
+    k = jbm_solve_quadratic_reduced (b / a, c / a, x1, x2);
+#if DEBUG_JBM_SOLVE_QUADRATIC
+  fprintf (stderr, "JBM solve quadratic solution=" FWL "\n", k);
 #endif
   return k;
 }
 
-#if INLINE_JBM_SOLVE_CUADRATIC
-#define jbm_solve_cuadratic _jbm_solve_cuadratic
+#if INLINE_JBM_SOLVE_QUADRATIC
+#define jbm_solve_quadratic _jbm_solve_quadratic
 #else
-JBDOUBLE jbm_solve_cuadratic (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
+JBDOUBLE jbm_solve_quadratic (JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE);
 #endif
 
 static inline JBDOUBLE _jbm_solve_cubic_reduced
@@ -1588,7 +1588,7 @@ _jbm_solve_cubic (JBDOUBLE a, JBDOUBLE b,
            " x2=" FWL "\n", a, b, c, d, x1, x2);
 #endif
   if (a == 0.)
-    k = jbm_solve_cuadratic (b, c, d, x1, x2);
+    k = jbm_solve_quadratic (b, c, d, x1, x2);
   else
     k = jbm_solve_cubic_reduced (b / a, c / a, d / a, x1, x2);
 #if DEBUG_JBM_SOLVE_CUBIC

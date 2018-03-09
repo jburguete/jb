@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2017, Javier Burguete Tolosa.
+ * Copyright 2005-2018, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_math.c
  * \brief Source file with useful mathematical functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2017, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2018, Javier Burguete Tolosa.
  */
 #include "jb_math.h"
 
@@ -1083,9 +1083,9 @@ jbm_v3_length (JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE z1,
 #endif
 
 /**
- * \fn JBDOUBLE jbm_solve_cuadratic_reduced(JBDOUBLE a, JBDOUBLE b, \
+ * \fn JBDOUBLE jbm_solve_quadratic_reduced(JBDOUBLE a, JBDOUBLE b, \
  *   JBDOUBLE x1, JBDOUBLE x2)
- * \brief Function to calculate the solution of a reduced cuadratic equation in
+ * \brief Function to calculate the solution of a reduced quadratic equation in
  *   an interval.
  * \param a
  * \brief 1st order coefficient of the equation.
@@ -1097,18 +1097,18 @@ jbm_v3_length (JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE z1,
  * \brief right limit of the solution interval.
  * \return solution value.
  */
-#if !INLINE_JBM_SOLVE_CUADRATIC_REDUCED
-JBDOUBLE jbm_solve_cuadratic_reduced
+#if !INLINE_JBM_SOLVE_QUADRATIC_REDUCED
+JBDOUBLE jbm_solve_quadratic_reduced
     (JBDOUBLE a, JBDOUBLE b, JBDOUBLE x1, JBDOUBLE x2)
 {
-  return _jbm_solve_cuadratic_reduced (a, b, x1, x2);
+  return _jbm_solve_quadratic_reduced (a, b, x1, x2);
 }
 #endif
 
 /**
- * \fn JBDOUBLE jbm_solve_cuadratic(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, \
+ * \fn JBDOUBLE jbm_solve_quadratic(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, \
  *   JBDOUBLE x1, JBDOUBLE x2)
- * \brief Function to calculate the solution of a cuadratic equation in an
+ * \brief Function to calculate the solution of a quadratic equation in an
  *   interval.
  * \param a
  * \brief 2nd order coefficient of the equation.
@@ -1122,11 +1122,11 @@ JBDOUBLE jbm_solve_cuadratic_reduced
  * \brief right limit of the solution interval.
  * \return solution value.
  */
-#if !INLINE_JBM_SOLVE_CUADRATIC
-JBDOUBLE jbm_solve_cuadratic
+#if !INLINE_JBM_SOLVE_QUADRATIC
+JBDOUBLE jbm_solve_quadratic
     (JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)
 {
-  return _jbm_solve_cuadratic (a, b, c, x1, x2);
+  return _jbm_solve_quadratic (a, b, c, x1, x2);
 }
 #endif
 

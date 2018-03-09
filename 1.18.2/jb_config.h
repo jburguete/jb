@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2017, Javier Burguete Tolosa.
+ * Copyright 2005-2018, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_config.h
  * \brief Header file to configure the jb library.
  * \author Javier Burguete Tolosa,
- * \copyright Copyright 2005-2017, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2018, Javier Burguete Tolosa.
  */
 #ifndef JB_CONFIG__H
 #define JB_CONFIG__H 1
@@ -225,11 +225,11 @@
 ///< Macro deciding if the function jbm_v2_length() has to be inlined.
 #define INLINE_JBM_V3_LENGTH						1
 ///< Macro deciding if the function jbm_v3_length() has to be inlined.
-#define INLINE_JBM_SOLVE_CUADRATIC_REDUCED			1
-///< Macro deciding if the function jbm_solve_cuadratic_reduced() has to be
+#define INLINE_JBM_SOLVE_QUADRATIC_REDUCED			1
+///< Macro deciding if the function jbm_solve_quadratic_reduced() has to be
 ///< inlined.
-#define INLINE_JBM_SOLVE_CUADRATIC					1
-///< Macro deciding if the function jbm_solve_cuadratic() has to be inlined.
+#define INLINE_JBM_SOLVE_QUADRATIC					1
+///< Macro deciding if the function jbm_solve_quadratic() has to be inlined.
 #define INLINE_JBM_SOLVE_CUBIC_REDUCED				1
 ///< Macro deciding if the function jbm_solve_cubic_reduced() has to be inlined.
 #define INLINE_JBM_SOLVE_CUBIC						1
@@ -721,11 +721,11 @@
 ///< Macro deciding if the function jbm_v2_length() has to be debugged.
 #define DEBUG_JBM_V3_LENGTH							1
 ///< Macro deciding if the function jbm_v3_length() has to be debugged.
-#define DEBUG_JBM_SOLVE_CUADRATIC_REDUCED			0
-///< Macro deciding if the function jbm_solve_cuadratic_reduced() has to be
+#define DEBUG_JBM_SOLVE_QUADRATIC_REDUCED			0
+///< Macro deciding if the function jbm_solve_quadratic_reduced() has to be
 ///< debugged.
-#define DEBUG_JBM_SOLVE_CUADRATIC					0
-///< Macro deciding if the function jbm_solve_cuadratic() has to be debugged.
+#define DEBUG_JBM_SOLVE_QUADRATIC					0
+///< Macro deciding if the function jbm_solve_quadratic() has to be debugged.
 #define DEBUG_JBM_SOLVE_CUBIC_REDUCED				1
 ///< Macro deciding if the function jbm_solve_cubic_reduced() has to be
 ///< debugged.
