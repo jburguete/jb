@@ -2,7 +2,7 @@
 <tagfile>
   <compound kind="file">
     <name>jb_config.h</name>
-    <path>/home/burguete/programas/jb/1.18.1/</path>
+    <path>/home/burguete/programas/jb/1.18.2/</path>
     <filename>jb__config_8h</filename>
     <member kind="define">
       <type>#define</type>
@@ -608,16 +608,16 @@
     </member>
     <member kind="define">
       <type>#define</type>
-      <name>INLINE_JBM_SOLVE_CUADRATIC_REDUCED</name>
+      <name>INLINE_JBM_SOLVE_QUADRATIC_REDUCED</name>
       <anchorfile>jb__config_8h.html</anchorfile>
-      <anchor>a41240528b834063bea5f520da43e6d44</anchor>
+      <anchor>a888e373d5d3aca080ac670eebf540757</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
       <type>#define</type>
-      <name>INLINE_JBM_SOLVE_CUADRATIC</name>
+      <name>INLINE_JBM_SOLVE_QUADRATIC</name>
       <anchorfile>jb__config_8h.html</anchorfile>
-      <anchor>a761442627f9d336f43f4c442b042efb3</anchor>
+      <anchor>ae99c9515b87c9eb34b108bd5ea5edd82</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
@@ -2043,16 +2043,16 @@
     </member>
     <member kind="define">
       <type>#define</type>
-      <name>DEBUG_JBM_SOLVE_CUADRATIC_REDUCED</name>
+      <name>DEBUG_JBM_SOLVE_QUADRATIC_REDUCED</name>
       <anchorfile>jb__config_8h.html</anchorfile>
-      <anchor>aa76ef1055732885507e2603e4fad5459</anchor>
+      <anchor>a69ca09851acc44e3f2b50ff27aba821f</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
       <type>#define</type>
-      <name>DEBUG_JBM_SOLVE_CUADRATIC</name>
+      <name>DEBUG_JBM_SOLVE_QUADRATIC</name>
       <anchorfile>jb__config_8h.html</anchorfile>
-      <anchor>a479100b4bb6721821c7edc5a44e8706f</anchor>
+      <anchor>a495d4cbb2952f4f044ce2543e8fb93a3</anchor>
       <arglist></arglist>
     </member>
     <member kind="define">
@@ -2429,7 +2429,7 @@
   </compound>
   <compound kind="file">
     <name>jb_def.c</name>
-    <path>/home/burguete/programas/jb/1.18.1/</path>
+    <path>/home/burguete/programas/jb/1.18.2/</path>
     <filename>jb__def_8c</filename>
     <includes id="jb__def_8h" name="jb_def.h" local="yes" imported="no">jb_def.h</includes>
     <member kind="function">
@@ -2533,7 +2533,7 @@
   </compound>
   <compound kind="file">
     <name>jb_def.h</name>
-    <path>/home/burguete/programas/jb/1.18.1/</path>
+    <path>/home/burguete/programas/jb/1.18.2/</path>
     <filename>jb__def_8h</filename>
     <includes id="jb__config_8h" name="jb_config.h" local="yes" imported="no">jb_config.h</includes>
     <member kind="define">
@@ -2784,7 +2784,7 @@
   </compound>
   <compound kind="file">
     <name>jb_math.c</name>
-    <path>/home/burguete/programas/jb/1.18.1/</path>
+    <path>/home/burguete/programas/jb/1.18.2/</path>
     <filename>jb__math_8c</filename>
     <includes id="jb__math_8h" name="jb_math.h" local="yes" imported="no">jb_math.h</includes>
     <member kind="function">
@@ -3136,20 +3136,6 @@
       <anchorfile>jb__math_8c.html</anchorfile>
       <anchor>a6d4b3eb76ed99d4a92471993ed9dd938</anchor>
       <arglist>(JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE z1, JBDOUBLE x2, JBDOUBLE y2, JBDOUBLE z2)</arglist>
-    </member>
-    <member kind="function">
-      <type>JBDOUBLE</type>
-      <name>jbm_solve_cuadratic_reduced</name>
-      <anchorfile>jb__math_8c.html</anchorfile>
-      <anchor>a6c28eb5576c6a63f42fbbb6919b1e6eb</anchor>
-      <arglist>(JBDOUBLE a, JBDOUBLE b, JBDOUBLE x1, JBDOUBLE x2)</arglist>
-    </member>
-    <member kind="function">
-      <type>JBDOUBLE</type>
-      <name>jbm_solve_cuadratic</name>
-      <anchorfile>jb__math_8c.html</anchorfile>
-      <anchor>a5822ab8840beccae0adb6f70f139214e</anchor>
-      <arglist>(JBDOUBLE a, JBDOUBLE b, JBDOUBLE c, JBDOUBLE x1, JBDOUBLE x2)</arglist>
     </member>
     <member kind="function">
       <type>JBDOUBLE</type>
@@ -3518,7 +3504,7 @@
   </compound>
   <compound kind="file">
     <name>jb_math.h</name>
-    <path>/home/burguete/programas/jb/1.18.1/</path>
+    <path>/home/burguete/programas/jb/1.18.2/</path>
     <filename>jb__math_8h</filename>
     <includes id="jb__def_8h" name="jb_def.h" local="yes" imported="no">jb_def.h</includes>
     <member kind="define">
@@ -3964,20 +3950,6 @@
     </member>
     <member kind="function">
       <type>JBDOUBLE</type>
-      <name>jbm_solve_cuadratic_reduced</name>
-      <anchorfile>jb__math_8h.html</anchorfile>
-      <anchor>a0a01e36a81b080b44663ba9a6708e6b2</anchor>
-      <arglist>(JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE)</arglist>
-    </member>
-    <member kind="function">
-      <type>JBDOUBLE</type>
-      <name>jbm_solve_cuadratic</name>
-      <anchorfile>jb__math_8h.html</anchorfile>
-      <anchor>ab841e9c85847e9f2c384cd96f53e8646</anchor>
-      <arglist>(JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE, JBDOUBLE)</arglist>
-    </member>
-    <member kind="function">
-      <type>JBDOUBLE</type>
       <name>jbm_solve_cubic_reduced</name>
       <anchorfile>jb__math_8h.html</anchorfile>
       <anchor>a5ccf95e41ad94c6926c2391e1ccceac6</anchor>
@@ -4336,7 +4308,7 @@
   </compound>
   <compound kind="file">
     <name>jb_win.c</name>
-    <path>/home/burguete/programas/jb/1.18.1/</path>
+    <path>/home/burguete/programas/jb/1.18.2/</path>
     <filename>jb__win_8c</filename>
     <includes id="jb__win_8h" name="jb_win.h" local="yes" imported="no">jb_win.h</includes>
     <member kind="function">
@@ -4489,7 +4461,7 @@
   </compound>
   <compound kind="file">
     <name>jb_win.h</name>
-    <path>/home/burguete/programas/jb/1.18.1/</path>
+    <path>/home/burguete/programas/jb/1.18.2/</path>
     <filename>jb__win_8h</filename>
     <includes id="jb__math_8h" name="jb_math.h" local="yes" imported="no">jb_math.h</includes>
     <member kind="function">
@@ -4530,7 +4502,7 @@
   </compound>
   <compound kind="file">
     <name>jb_xml.c</name>
-    <path>/home/burguete/programas/jb/1.18.1/</path>
+    <path>/home/burguete/programas/jb/1.18.2/</path>
     <filename>jb__xml_8c</filename>
     <includes id="jb__xml_8h" name="jb_xml.h" local="yes" imported="no">jb_xml.h</includes>
     <member kind="function">
@@ -4641,7 +4613,7 @@
   </compound>
   <compound kind="file">
     <name>jb_xml.h</name>
-    <path>/home/burguete/programas/jb/1.18.1/</path>
+    <path>/home/burguete/programas/jb/1.18.2/</path>
     <filename>jb__xml_8h</filename>
     <includes id="jb__math_8h" name="jb_math.h" local="yes" imported="no">jb_math.h</includes>
     <member kind="function">
@@ -4752,7 +4724,7 @@
   </compound>
   <compound kind="page">
     <name>md_README</name>
-    <title>JB (1.18.1 version)</title>
+    <title>JB (1.18.2 version)</title>
     <filename>md_README</filename>
   </compound>
 </tagfile>
