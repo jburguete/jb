@@ -48,7 +48,7 @@
 #define JBW_NO 1
 ///< Macro to use on terminal programs.
 #define JBW_GTK 2
-///< Macro to use the Gtk+ library on visual programs.
+///< Macro to use the GTK+ library on visual programs.
 
 #define JBW_GRAPHIC_GLUT 1
 ///< Macro to using the FreeGLUT library in graphical widgets.
