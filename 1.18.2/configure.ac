@@ -26,7 +26,7 @@ elif test `uname -s` = "DragonFly"; then
 fi
 
 # Checks for programs
-AC_PROG_CC([gcc7 gcc6 gcc5 egcc gcc clang])
+AC_PROG_CC([gcc8 gcc7 gcc6 gcc5 egcc gcc clang])
 AC_MSG_NOTICE([Compiler: $CC])
 AC_PROG_MAKE_SET
 AC_LANG([C])
