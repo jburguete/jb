@@ -70,6 +70,35 @@ To compile with JB library you has to define the JBW flag. They are 2 options:
   * -DJBW\_GRAPHIC=2: SDL.
   * -DJBW\_GRAPHIC=3: GLFW.
 
+OPERATIVE SYSTEMS
+_________________
+
+On Microsoft Windows systems you have to install
+[MSYS2](http://sourceforge.net/projects/msys2) and the required
+libraries and utilities. You can follow detailed instructions in
+[install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf)
+
+On NetBSD 7.0 you have to do first on the building terminal:
+> $ export PATH=/usr/pkg/gcc5/bin:$PATH"
+
+On OpenBSD 6.4 you have to do first on the building terminal:
+> $ export AUTOCONF_VERSION=2.69 AUTOMAKE_VERSION=1.16
+
+This software has been built and tested in the following operative systems:
+* Debian 9 (Linux, kFreeBSD and Hurd)
+* DragonFly BSD 5.2
+* Dyson Illumos
+* Fedora Linux 29
+* FreeBSD 11.2
+* Manjaro Linux
+* Microsoft Windows 7
+* Microsoft Windows 10
+* NetBSD 7.0 (with modular xorg)
+* OpenBSD 6.4
+* OpenInidiana Hipster
+* OpenSUSE Linux Leap 15
+* Xubuntu Linux 18.10
+
 COMMON BUILDING INSTRUCTIONS
 ____________________________
 
