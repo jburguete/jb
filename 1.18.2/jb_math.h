@@ -1674,24 +1674,24 @@ void jbm_index_sort_interchange (JBFLOAT *, int *, int);
 static inline void
 _jbm_index_sort_merge (JBFLOAT * x, int *ni, int n)
 {
-  int i, j, i1, i2, k, l;
   int *ni1, *ni2, *nj, *nk, *nt, nn[n + 1];
+  int i, j, i1, i2, k, l;
 #if DEBUG_JBM_INDEX_SORT_MERGE
   fprintf (stderr, "JBM index sort merge\n");
   for (i = 0; i <= n; ++i)
     fprintf (stderr, "JBM ism i=%d x=" FWF " ni=%d\n", i, x[ni[i]], ni[i]);
 #endif
   j = JBM_INDEX_SORT_MERGE_MIN;
-  for (i = 0; i <= n - j; i += j)
+  for (i = 0; i <= (int) n - j; i += j)
     jbm_index_sort_insertion (x, ni + i, j - 1);
-  if (i < n)
+  if (i < (int) n)
     jbm_index_sort_insertion (x, ni + i, n - i);
 #if DEBUG_JBM_INDEX_SORT_MERGE
   for (i = 0; i <= n; ++i)
     fprintf (stderr, "JBM ism i=%d x=" FWF " ni=%d\n", i, x[ni[i]], ni[i]);
 #endif
   ++n;
-  for (nk = ni, nj = nn; j <= n; j *= 2)
+  for (nk = ni, nj = nn; j <= (int) n; j *= 2)
     {
       for (ni1 = nk, l = 0, k = n / j; (k -= 2) >= 0; ni1 = ni2 + j)
         {
