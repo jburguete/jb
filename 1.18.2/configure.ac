@@ -1,5 +1,5 @@
 AC_PREREQ([2.67])
-AC_INIT([jb], [1.18.1], [https://github.com/jburguete/jb])
+AC_INIT([jb], [1.18.2], [https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_SYSTEM
