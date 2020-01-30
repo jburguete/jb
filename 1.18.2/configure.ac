@@ -18,11 +18,15 @@ elif test $host = "i686-w64-mingw32"; then
 elif test `uname -s` = "OpenBSD"; then
 	AC_MSG_NOTICE([OpenBSD])
 	LDFLAGS="$LDFLAGS -L/usr/X11R6/lib"
-	CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
+	CFLAGS="$CFLAGS -I/usr/X11R6/include"
 elif test `uname -s` = "DragonFly"; then
 	AC_MSG_NOTICE([DragonFly BSD])
 	LDFLAGS="$LDFLAGS -L/usr/local/lib"
-	CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+	CFLAGS="$CFLAGS -I/usr/local/include"
+elif test `uname -s` = "Darwin"; then
+	AC_MSG_NOTICE([Darwin])
+	LDFLAGS="$LDFLAGS -L/opt/X11/lib"
+	export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
 fi
 
 # Checks for programs
@@ -64,6 +68,7 @@ if test $win32 = 1; then
 	PKG_CHECK_MODULES([GLEW], [glew])
 	AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=1")
 elif test $gtk = 1; then
+	PKG_CHECK_MODULES([PNG], [libpng])
 	AC_SEARCH_LIBS([glViewport], [GL opengl32], 
 		       AC_MSG_NOTICE([OpenGL OK]),
 		       AC_MSG_ERROR([OpenGL not found]))

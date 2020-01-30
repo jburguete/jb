@@ -2,8 +2,8 @@
 <tagfile>
   <compound kind="file">
     <name>jb_config.h</name>
-    <path>/home/burguete/programas/jb/1.18.2/</path>
-    <filename>jb__config_8h</filename>
+    <path>/Users/burguete/programas/jb/1.18.2/</path>
+    <filename>jb__config_8h.html</filename>
     <member kind="define">
       <type>#define</type>
       <name>JB_PRECISION</name>
@@ -2429,8 +2429,8 @@
   </compound>
   <compound kind="file">
     <name>jb_def.c</name>
-    <path>/home/burguete/programas/jb/1.18.2/</path>
-    <filename>jb__def_8c</filename>
+    <path>/Users/burguete/programas/jb/1.18.2/</path>
+    <filename>jb__def_8c.html</filename>
     <includes id="jb__def_8h" name="jb_def.h" local="yes" imported="no">jb_def.h</includes>
     <member kind="function">
       <type>void</type>
@@ -2533,8 +2533,8 @@
   </compound>
   <compound kind="file">
     <name>jb_def.h</name>
-    <path>/home/burguete/programas/jb/1.18.2/</path>
-    <filename>jb__def_8h</filename>
+    <path>/Users/burguete/programas/jb/1.18.2/</path>
+    <filename>jb__def_8h.html</filename>
     <includes id="jb__config_8h" name="jb_config.h" local="yes" imported="no">jb_config.h</includes>
     <member kind="define">
       <type>#define</type>
@@ -2784,8 +2784,8 @@
   </compound>
   <compound kind="file">
     <name>jb_math.c</name>
-    <path>/home/burguete/programas/jb/1.18.2/</path>
-    <filename>jb__math_8c</filename>
+    <path>/Users/burguete/programas/jb/1.18.2/</path>
+    <filename>jb__math_8c.html</filename>
     <includes id="jb__math_8h" name="jb_math.h" local="yes" imported="no">jb_math.h</includes>
     <member kind="function">
       <type>int</type>
@@ -3504,8 +3504,8 @@
   </compound>
   <compound kind="file">
     <name>jb_math.h</name>
-    <path>/home/burguete/programas/jb/1.18.2/</path>
-    <filename>jb__math_8h</filename>
+    <path>/Users/burguete/programas/jb/1.18.2/</path>
+    <filename>jb__math_8h.html</filename>
     <includes id="jb__def_8h" name="jb_def.h" local="yes" imported="no">jb_def.h</includes>
     <member kind="define">
       <type>#define</type>
@@ -4308,8 +4308,8 @@
   </compound>
   <compound kind="file">
     <name>jb_win.c</name>
-    <path>/home/burguete/programas/jb/1.18.2/</path>
-    <filename>jb__win_8c</filename>
+    <path>/Users/burguete/programas/jb/1.18.2/</path>
+    <filename>jb__win_8c.html</filename>
     <includes id="jb__win_8h" name="jb_win.h" local="yes" imported="no">jb_win.h</includes>
     <member kind="function">
       <type>void</type>
@@ -4327,183 +4327,43 @@
     </member>
     <member kind="function">
       <type>void</type>
-      <name>jbw_show_error2</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>ab8436d37b5a62803dfc9ed4f2d0cfd5f</anchor>
-      <arglist>(char *message1, char *message2)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_show_error3</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>aa39e248086b184e3719cb72c624f5dd6</anchor>
-      <arglist>(char *message1, char *message2, char *message3)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
       <name>jbw_show_warning</name>
       <anchorfile>jb__win_8c.html</anchorfile>
       <anchor>a30731d6e332c95f9fb835cc94c4d88a7</anchor>
       <arglist>(char *message)</arglist>
     </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_combo_box_set_strings</name>
+    <member kind="variable">
+      <type>void(*</type>
+      <name>jbw_graphic_draw</name>
       <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>acdf97c6885d8b2d15f2d9a7a35d64861</anchor>
-      <arglist>(GtkComboBoxText *combo, char **strings, int n)</arglist>
-    </member>
-    <member kind="function">
-      <type>GtkComboBoxText *</type>
-      <name>jbw_combo_box_new_with_strings</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>aea6278dca82981f0edf1ceb2afa1ef08</anchor>
-      <arglist>(char **strings, int n)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_array_radio_buttons_set_active</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>a51159391776b6c7132d1675583fc0b32</anchor>
-      <arglist>(GtkRadioButton **array, int n, int is_active)</arglist>
-    </member>
-    <member kind="function">
-      <type>int</type>
-      <name>jbw_array_radio_buttons_get_active</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>ad1f4cf13cf6e816b3c0d92144e2a2fe1</anchor>
-      <arglist>(GtkRadioButton **array)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_int_entry_set_value_with_format</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>ad979a60425e25e50e849c23cf4ef46ad</anchor>
-      <arglist>(JBWIntEntry *entry, char *format, long value)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_int_entry_set_value</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>a5217f0c1d53bfece4b4618323a57f170</anchor>
-      <arglist>(JBWIntEntry *entry, long value)</arglist>
-    </member>
-    <member kind="function">
-      <type>long</type>
-      <name>jbw_int_entry_get_value</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>aa6ed48fdd590ddc2470caef359886b9a</anchor>
-      <arglist>(JBWIntEntry *entry)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_float_entry_set_value_with_format</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>a67672b70f85cdb3743312538990ea3b2</anchor>
-      <arglist>(JBWFloatEntry *entry, char *format, JBDOUBLE value)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_float_entry_set_value</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>a57206dadb3057d04442162998f85968a</anchor>
-      <arglist>(JBWFloatEntry *entry, JBDOUBLE value)</arglist>
-    </member>
-    <member kind="function">
-      <type>JBDOUBLE</type>
-      <name>jbw_float_entry_get_value</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>a4cb88834d411d564232b693c1ea37219</anchor>
-      <arglist>(JBWFloatEntry *entry)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_draw_rectanglef</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>ae1406d41526575773943571e90f0fffe</anchor>
-      <arglist>(float red, float green, float blue, float x1, float y1, float x2, float y2)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_draw_rectangled</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>aabf675bc625ddc5041d137eee4f670b8</anchor>
-      <arglist>(float red, float green, float blue, double x1, double y1, double x2, double y2)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_draw_pointsf</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>ab868920178785dec14596ad7bcba11f6</anchor>
-      <arglist>(float red, float green, float blue, JBFLOAT *x, JBFLOAT *y, int n)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_draw_pointsd</name>
-      <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>a7c8c86792f50f82b7e0f366892b029a7</anchor>
-      <arglist>(float red, float green, float blue, JBFLOAT *x, JBFLOAT *y, int n)</arglist>
+      <anchor>a271b2d37ab5f07b9aeea91061be0c244</anchor>
+      <arglist>)()</arglist>
     </member>
     <member kind="variable">
-      <type>GtkWindow *</type>
-      <name>window_parent</name>
+      <type>int</type>
+      <name>jbw_graphic_width</name>
       <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>acf8d2ed7ee98235806a7e6772e5fcf68</anchor>
+      <anchor>a66390dce95528397201c53cb8c0ca7e0</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>GQueue</type>
-      <name>jbw_graphic_queue</name>
+      <type>int</type>
+      <name>jbw_graphic_height</name>
       <anchorfile>jb__win_8c.html</anchorfile>
-      <anchor>a944286c5f23e413c2d994efd23bb121c</anchor>
+      <anchor>a23096e7b36733ec5035f43dc045e8b22</anchor>
       <arglist></arglist>
     </member>
   </compound>
   <compound kind="file">
     <name>jb_win.h</name>
-    <path>/home/burguete/programas/jb/1.18.2/</path>
-    <filename>jb__win_8h</filename>
+    <path>/Users/burguete/programas/jb/1.18.2/</path>
+    <filename>jb__win_8h.html</filename>
     <includes id="jb__math_8h" name="jb_math.h" local="yes" imported="no">jb_math.h</includes>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_show_message</name>
-      <anchorfile>jb__win_8h.html</anchorfile>
-      <anchor>a456d963d4468c236cbfb83c6dba498de</anchor>
-      <arglist>(char *, char *)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_show_error</name>
-      <anchorfile>jb__win_8h.html</anchorfile>
-      <anchor>a8bd82208534c3729b1850e31fa8fced1</anchor>
-      <arglist>(char *)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_show_warning</name>
-      <anchorfile>jb__win_8h.html</anchorfile>
-      <anchor>a06456bd10ca119126265f7885351345f</anchor>
-      <arglist>(char *)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_show_error2</name>
-      <anchorfile>jb__win_8h.html</anchorfile>
-      <anchor>afc402d63701af1e7c2b7156185cf3c7b</anchor>
-      <arglist>(char *, char *)</arglist>
-    </member>
-    <member kind="function">
-      <type>void</type>
-      <name>jbw_show_error3</name>
-      <anchorfile>jb__win_8h.html</anchorfile>
-      <anchor>ad27cdd124c8269217f6aadf8a4173605</anchor>
-      <arglist>(char *, char *, char *)</arglist>
-    </member>
   </compound>
   <compound kind="file">
     <name>jb_xml.c</name>
-    <path>/home/burguete/programas/jb/1.18.2/</path>
-    <filename>jb__xml_8c</filename>
+    <path>/Users/burguete/programas/jb/1.18.2/</path>
+    <filename>jb__xml_8c.html</filename>
     <includes id="jb__xml_8h" name="jb_xml.h" local="yes" imported="no">jb_xml.h</includes>
     <member kind="function">
       <type>JBDOUBLE</type>
@@ -4613,8 +4473,8 @@
   </compound>
   <compound kind="file">
     <name>jb_xml.h</name>
-    <path>/home/burguete/programas/jb/1.18.2/</path>
-    <filename>jb__xml_8h</filename>
+    <path>/Users/burguete/programas/jb/1.18.2/</path>
+    <filename>jb__xml_8h.html</filename>
     <includes id="jb__math_8h" name="jb_math.h" local="yes" imported="no">jb_math.h</includes>
     <member kind="function">
       <type>JBDOUBLE</type>
