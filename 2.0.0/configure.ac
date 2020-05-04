@@ -128,7 +128,7 @@ else
 fi
 
 # Set precision
-AC_SUBST(PRECISION, "-DJBM_PRECISION=4")
+AC_SUBST(PRECISION, "-DJBM_PRECISION=2")
 
 # Final output
 AC_CONFIG_FILES([Makefile])
