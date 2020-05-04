@@ -85,6 +85,7 @@ On Microsoft Windows systems you have to install
 [MSYS2](http://sourceforge.net/projects/msys2) and the required
 libraries and utilities. You can follow detailed instructions in
 [install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf)
+tutorial.
 
 On NetBSD 7.0 you have to do first on the building terminal:
 > $ export PATH=/usr/pkg/gcc5/bin:$PATH"
