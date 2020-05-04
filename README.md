@@ -144,6 +144,7 @@ ___________________
 > $ gcc -DJBW=2 -DJBM_PRECISION=2 YOUR_SOURCE_CODE.c jb_def.o jb_math.o
 > jb_win.o jb_xml.o -o YOUR_EXECUTABLE_FILE
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
+
 Note that your code could also need additional libraries to "pkg-config"
 command.
 
