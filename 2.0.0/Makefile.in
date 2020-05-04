@@ -1,0 +1,48 @@
+CC = @CC@ @ARCH@ @LTO@ @STD@
+CFLAGS = @CFLAGS@ @XML_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@ @GLEW_CFLAGS@ \
+	@JBW@ @FONT@ @PRECISION@ -O3 -pedantic -Wall -Wextra
+LDFLAGS = @LDFLAGS@ @XML_LIBS@ @GLIB_LIBS@ @GTK_LIBS@ @GLEW_LIBS@ @LIBS@
+EXEFLAGS = $(LDFLAGS) -L. -Wl,-rpath=. -ljb
+src = jb_config.h jb_def.h jb_def.c jb_math.h jb_math.c jb_win.h jb_win.c \
+	jb_xml.h jb_xml.c
+obj = jb_def.o jb_math.o jb_win.o jb_xml.o
+exe = libjb@SO@ libjbm@SO@ libjbw@SO@ libjbxml@SO@ test_math test_win
+
+all: $(exe) doc/latex/refman.pdf
+
+libjb@SO@: jb_def.o
+	$(CC) -shared jb_def.o $(LDFLAGS) -o libjb@SO@
+
+jb_def.o: jb_def.c jb_def.h jb_config.h Makefile
+	$(CC) $(CFLAGS) -c -fPIC jb_def.c -o jb_def.o
+
+libjbm@SO@: jb_math.o libjb@SO@
+	$(CC) -shared jb_math.o $(EXEFLAGS) -o libjbm@SO@ -ljb
+
+jb_math.o: jb_math.c jb_math.h jb_def.h jb_config.h Makefile
+	$(CC) $(CFLAGS) -c -fPIC jb_math.c -o jb_math.o
+
+libjbw@SO@: jb_win.o libjb@SO@ libjbm@SO@
+	$(CC) -shared jb_win.o $(EXEFLAGS) -o libjbw@SO@ -ljb -ljbm
+
+jb_win.o: jb_win.c jb_win.h jb_math.h jb_def.h jb_config.h Makefile
+	$(CC) $(CFLAGS) -c -fPIC jb_win.c -o jb_win.o
+
+libjbxml@SO@: jb_xml.o libjb@SO@ libjbm@SO@
+	$(CC) -shared jb_xml.o $(EXEFLAGS) -o libjbxml@SO@ -ljb -ljbm
+
+jb_xml.o: jb_xml.c jb_xml.h jb_math.h jb_def.h jb_config.h Makefile
+	$(CC) $(CFLAGS) -c -fPIC jb_xml.c -o jb_xml.o
+
+test_math: test_math.c libjb@SO@ libjbm@SO@
+	$(CC) $(CFLAGS) test_math.c -o test_math $(EXEFLAGS) -ljbm
+
+test_win: test_win.c libjb@SO@ libjbm@SO@ libjbw@SO@
+	$(CC) $(CFLAGS) test_win.c -o test_win $(EXEFLAGS) -ljbm -ljbw
+
+doc/latex/refman.pdf: $(src) Doxyfile Makefile
+	doxygen
+	cd doc/latex; pdflatex refman; pdflatex refman;
+
+strip: $(exe)
+	strip $(exe)

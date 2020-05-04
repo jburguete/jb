@@ -1,5 +1,6 @@
 AC_PREREQ([2.67])
 AC_INIT([jb], [1.18.1], [https://github.com/jburguete/jb])
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
 AC_CANONICAL_SYSTEM
@@ -44,55 +45,19 @@ PKG_CHECK_MODULES([XML], [libxml-2.0])
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 
 # Checks for GTK+ interface
-AC_ARG_WITH([gtk], AS_HELP_STRING([--with-gtk], [Build with GTK+ interface]))
-if test "x$with_gtk" = "xyes"; then
-	PKG_CHECK_MODULES([GTK], [gtk+-3.0])
-	AC_SUBST(JBW, [-DJBW=2])
-	gtk=1
-else
-	AC_SUBST(JBW, [-DJBW=1])
-	gtk=0
-fi
+PKG_CHECK_MODULES([GTK], [gtk+-3.0])
+AC_SUBST(JBW, [-DJBW=2])
+gtk=1
 
 # Checks for graphic interface
-AC_ARG_WITH([sdl], AS_HELP_STRING([--with-sdl], 
-	    [Build with SDL graphic interface]))
-AC_ARG_WITH([glfw], AS_HELP_STRING([--with-glfw], 
-	    [Build with GLFW graphic interface]))
 if test $win32 = 1; then
-	LDFLAGS="$LDFLAGS -lfreeglut -lopengl32"
-	PKG_CHECK_MODULES([GLEW], [glew])
-	AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=1")
+	LDFLAGS="$LDFLAGS -lopengl32"
 elif test $gtk = 1; then
 	AC_SEARCH_LIBS([glViewport], [GL opengl32], 
 		       AC_MSG_NOTICE([OpenGL OK]),
 		       AC_MSG_ERROR([OpenGL not found]))
-	PKG_CHECK_MODULES([GLEW], [glew])
-	if test "x$with_sdl" = "xyes"; then
-		AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=2")
-		PKG_CHECK_MODULES([SDL], [sdl2])
-	else
-		if test "x$with_glfw" = "xyes"; then
-			AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=3")
-			PKG_CHECK_MODULES([GLFW], [glfw3])
-		else
-			AC_SEARCH_LIBS([glutInit], [freeglut glut], glut="yes", 
-				       glut="no")
-			if test $glut = "yes"; then
-				AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=1")
-			else
-				PKG_CHECK_MODULES([SDL], [sdl2], sdl="yes", 
-						  sdl="no")
-				if test $sdl = "yes"; then
-					AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=2")
-				else
-					PKG_CHECK_MODULES([GLFW], [glfw3])
-					AC_SUBST(GRAPHIC, "-DJBW_GRAPHIC=3")
-				fi
-			fi
-		fi
-	fi
 fi
+PKG_CHECK_MODULES([GLEW], [glew])
 
 # Checks for header files
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
@@ -150,10 +115,20 @@ else
 fi
 
 # Checks for library functions
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
-AC_FUNC_ALLOCA
-AC_CHECK_FUNCS([strtoul])
+AC_CHECK_FUNC([exp10], [AC_DEFINE([HAVE_EXP10], [1])])
+AC_CHECK_FUNC([fmemopen], [AC_DEFINE([HAVE_FMEMOPEN], [1])])
+
+# Check for font
+font=`find /usr -type f -iname freemono.ttf`
+if test "x$font" = "x"; then
+	AC_MSG_ERROR([FreeMono font not found])
+else
+	AC_MSG_NOTICE([Font: $font])
+	AC_SUBST(FONT, "-DFONT=\\\"$font\\\"")
+fi
+
+# Set precision
+AC_SUBST(PRECISION, "-DJBM_PRECISION=4")
 
 # Final output
 AC_CONFIG_FILES([Makefile])

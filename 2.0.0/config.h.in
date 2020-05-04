@@ -1,0 +1,7 @@
+#ifndef JB__CONFIG__H
+#define JB__CONFIG__H 1
+
+#undef HAVE_EXP10
+#undef HAVE_FMEMOPEN
+
+#endif
