@@ -1,10 +1,6 @@
 AC_PREREQ([2.67])
-<<<<<<< HEAD:2.0.0/configure.ac
-AC_INIT([jb], [1.18.1], [https://github.com/jburguete/jb])
+AC_INIT([jb], [2.0.0], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
-=======
-AC_INIT([jb], [1.18.2], [https://github.com/jburguete/jb])
->>>>>>> a5c3bb53c758c4b3dd1ee8979036ff11a0eb3c80:1.18.2/configure.ac
 
 # Checks for operative systems
 AC_CANONICAL_SYSTEM
@@ -23,15 +19,11 @@ elif test $host = "i686-w64-mingw32"; then
 elif test `uname -s` = "OpenBSD"; then
 	AC_MSG_NOTICE([OpenBSD])
 	LDFLAGS="$LDFLAGS -L/usr/X11R6/lib"
-	CFLAGS="$CFLAGS -I/usr/X11R6/include"
+	CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
 elif test `uname -s` = "DragonFly"; then
 	AC_MSG_NOTICE([DragonFly BSD])
 	LDFLAGS="$LDFLAGS -L/usr/local/lib"
-	CFLAGS="$CFLAGS -I/usr/local/include"
-elif test `uname -s` = "Darwin"; then
-	AC_MSG_NOTICE([Darwin])
-	LDFLAGS="$LDFLAGS -L/opt/X11/lib"
-	export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
+	CPPFLAGS="$CPPFLAGS -I/usr/local/include"
 fi
 
 # Checks for programs
@@ -61,7 +53,6 @@ gtk=1
 if test $win32 = 1; then
 	LDFLAGS="$LDFLAGS -lopengl32"
 elif test $gtk = 1; then
-	PKG_CHECK_MODULES([PNG], [libpng])
 	AC_SEARCH_LIBS([glViewport], [GL opengl32], 
 		       AC_MSG_NOTICE([OpenGL OK]),
 		       AC_MSG_ERROR([OpenGL not found]))
