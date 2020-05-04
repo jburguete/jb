@@ -1,8 +1,17 @@
 CC = @CC@ @ARCH@ @LTO@ @STD@
+<<<<<<< HEAD:2.0.0/Makefile.in
 CFLAGS = @CFLAGS@ @XML_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@ @GLEW_CFLAGS@ \
 	@JBW@ @FONT@ @PRECISION@ -O3 -pedantic -Wall -Wextra
 LDFLAGS = @LDFLAGS@ @XML_LIBS@ @GLIB_LIBS@ @GTK_LIBS@ @GLEW_LIBS@ @LIBS@
 EXEFLAGS = $(LDFLAGS) -L. -Wl,-rpath=. -ljb
+=======
+CFLAGS = @CFLAGS@ @XML_CFLAGS@ @GLIB_CFLAGS@ @GTK_CFLAGS@ @PNG_CFLAGS@ \
+	@GLEW_CFLAGS@ @SDL_CFLAGS@ @GLFW_CFLAGS@ @JBW@ @GRAPHIC@ -O3 -pedantic \
+	-Wall -Wextra
+LDFLAGS = @LDFLAGS@ @XML_LIBS@ @GLIB_LIBS@ @GTK_LIBS@ @PNG_LIBS@ @GLEW_LIBS@ \
+	@SDL_LIBS@ @GLFW_LIBS@ @LIBS@
+EXEFLAGS = $(LDFLAGS) -L. -Wl,-rpath,. -ljb
+>>>>>>> a5c3bb53c758c4b3dd1ee8979036ff11a0eb3c80:1.18.2/Makefile.in
 src = jb_config.h jb_def.h jb_def.c jb_math.h jb_math.c jb_win.h jb_win.c \
 	jb_xml.h jb_xml.c
 obj = jb_def.o jb_math.o jb_win.o jb_xml.o
