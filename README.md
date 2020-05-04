@@ -78,6 +78,9 @@ In default building shared libraries are using the precision level 2.
 OPERATIVE SYSTEMS
 _________________
 
+You can install all required utilities and libraries using the instructions of
+[install-unix](https://github.com/jburguete/install-unix).
+
 On Microsoft Windows systems you have to install
 [MSYS2](http://sourceforge.net/projects/msys2) and the required
 libraries and utilities. You can follow detailed instructions in
