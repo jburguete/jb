@@ -52,7 +52,7 @@ Optional if including jb\_xml utilites:
 Optional if including jb\_win utilities and compiling with -DJBW=2 flag.
 * [png](http://libpng.sourceforge.net) to work with PNG files.
 * [gtk3](http://www.gtk.org) to create the interactive GUI tool.
-* [glew](https://www.libsdl.org) high level OpenGL functions.
+* [glew](http://glew.sourceforge.net) high level OpenGL functions.
 
 Optional to build documentation:
 * [doxygen](http://www.stack.nl/~dimitri/doxygen) standard comments format to
