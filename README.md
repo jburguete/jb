@@ -9,7 +9,8 @@ input/output.
 AUTHORS
 -------
 
-* Javier Burguete Tolosa (jburguete@eead.csic.es).
+* Javier Burguete Tolosa
+  [jburguete@eead.csic.es](mailto:jburguete@eead.csic.es).
 
 FILES
 -----

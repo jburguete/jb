@@ -1,7 +1,7 @@
 JB (versión 2.0.0)
 ==================
 
-[english](README.md) [español](README.es.md)
+(:en:)[english](README.md) (:es:)[español](README.es.md)
 
 Una biblioteca con funciones útiles de matemáticas, gráficos, widgets y
 entrada/salida XML.
@@ -9,7 +9,8 @@ entrada/salida XML.
 AUTORES
 -------
 
-* Javier Burguete Tolosa (jburguete@eead.csic.es).
+* Javier Burguete Tolosa
+  [jburguete@eead.csic.es](mailto:jburguete@eead.csic.es).
 
 FICHEROS
 --------
