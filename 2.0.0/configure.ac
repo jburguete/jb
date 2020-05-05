@@ -119,6 +119,7 @@ AC_CHECK_FUNC([exp10], [AC_DEFINE([HAVE_EXP10], [1])])
 AC_CHECK_FUNC([fmemopen], [AC_DEFINE([HAVE_FMEMOPEN], [1])])
 
 # Check for font
+AC_MSG_NOTICE([Searching font...])
 font=`find /usr -type f -iname freemono.ttf`
 if test "x$font" = "x"; then
 	AC_MSG_ERROR([FreeMono font not found])

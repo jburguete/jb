@@ -1,65 +1,66 @@
-JB (2.0.0 version)
+JB (versión 2.0.0)
 ==================
 
 [english](README.md) [español](README.es.md)
 
-A library with some useful functions of mathematics, graphics, widgets and XML
-input/output.
+Una biblioteca con funciones útiles de matemáticas, gráficos, widgets y
+entrada/salida XML.
 
-AUTHORS
--------
+AUTHORES
+--------
 
 * Javier Burguete Tolosa (jburguete@eead.csic.es).
 
-FILES
------
+FICHEROS
+--------
 
-* TODO: List of tasks TO DO.
-* jb\*.h: Header code files.
-* jb\*.c: Source code files.
-* Doxyfile: configuration file to generate doxygen documentation.
-* build.sh: default build script.
-* configure.ac: to configure the Makefile building.
-* Makefile.in: template to generate the Makefile.
-* Doxyfile: to configure the documentation building.
-* test.png: figure to check graphical functions.
-* text\*.c: test source files.
-* locale/\*/LC\_MESSAGES/jb.po: translation files.
+* TODO: Lista de tareas a realizar.
+* jb\*.h: Ficheros de código de cabecera.
+* jb\*.c: Ficheros de código fuente.
+* Doxyfile: fichero de configuración para generar documentación doxygen.
+* build.sh: script de construcción por defecto.
+* configure.ac: para configurar la construcción del Makefile.
+* Makefile.in: plantilla para generar del Makefile.
+* Doxyfile: para configurar la construcción de la documentación.
+* test.png: figura para probar funciones gráficas.
+* text\*.c: ficheros fuente de prueba.
+* locale/\*/LC\_MESSAGES/jb.po: ficheros de traducción.
 
-BUILDING THIS LIBRARY ON OTHER PROGRAMS
----------------------------------------
+CONSTRUYENDO LA BIBLITECA EN OTROS PROGRAMAS
+--------------------------------------------
 
-REQUIRED LIBRARIES AND UTILITIES
-________________________________
+BIBLIOTECAS Y UTILIDADES REQUERIDAS
+___________________________________
 
-Mandatory:
-* [gcc](https://gcc.gnu.org) or [clang](http://clang.llvm.org) to compile the
-  source code.
-* [make](http://www.gnu.org/software/make) to build the executable file.
-* [autoconf](http://www.gnu.org/software/autoconf) to generate the Makefile in
-  different operative systems.
-* [automake](http://www.gnu.org/software/automake) to check the operative
-  system.
-* [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config) to find the
-  libraries to compile.
-* [glib](https://developer.gnome.org/glib) extended utilities of C to work with
-  data, lists, mapped files, regular expressions, using multicores in shared
-  memory machines, ...
-* [gettext](http://www.gnu.org/software/gettext) to work with different
-  international locales and languages.
+Obligatorio:
+* [gcc](https://gcc.gnu.org) o [clang](http://clang.llvm.org) para compilar el
+  código fuente.
+* [make](http://www.gnu.org/software/make) para construir el fichero ejecutable.
+* [autoconf](http://www.gnu.org/software/autoconf) para generar el Makefile en
+  diferentes sistemas operativos.
+* [automake](http://www.gnu.org/software/automake) para detectar el sistema
+  operativo.
+* [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config) para
+  encontrar las bibliotecas para compilar.
+* [glib](https://developer.gnome.org/glib) utilidades extendidas de C para
+  trabajar con datos, listas, ficheros mapeados, expresiones regulares, usar
+  multiprocesador en máquinas de memoria compartida, ...
+* [gettext](http://www.gnu.org/software/gettext) para trabajar con diferentes
+  códigos y lenguajes internacionales.
 
-Optional if including jb\_xml utilites:
-* [libxml](http://xmlsoft.org) to deal with XML files.
+Opcional si se incluye las utilidades jb\_xml:
+* [libxml](http://xmlsoft.org) para trabajar con ficheros XML.
 
-Optional if including jb\_win utilities and compiling with -DJBW=2 flag.
-* [png](http://libpng.sourceforge.net) to work with PNG files.
-* [gtk3](http://www.gtk.org) to work with interactive windows.
-* [glew](http://glew.sourceforge.net) high level OpenGL functions.
+Opcional si se incluyen las utilidades jb\_win y se compila usando el flag
+-DJBW=2.
+* [png](http://libpng.sourceforge.net) para trabajar con ficheros PNG.
+* [gtk3](http://www.gtk.org) para trabajar con ventanas interactivas.
+* [glew](http://glew.sourceforge.net) funciones OpenGL de alto nivel.
 
-Optional to build documentation:
-* [doxygen](http://www.stack.nl/~dimitri/doxygen) standard comments format to
-  generate documentation.
-* [latex](https://www.latex-project.org/) to build the PDF manuals.
+Opcional para construir la documentación:
+* [doxygen](http://www.stack.nl/~dimitri/doxygen) formato de comentarios
+  estándar para generar documentación.
+* [latex](https://www.latex-project.org/) para construir los manuales PDF.
 
 COMPILING FLAGS
 _______________
