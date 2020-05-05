@@ -94,7 +94,7 @@ On NetBSD 7.0 you have to do first on the building terminal:
 > $ export PATH=/usr/pkg/gcc5/bin:$PATH"
 
 On OpenBSD 6.4 you have to do first on the building terminal:
-> $ export AUTOCONF_VERSION=2.69 AUTOMAKE_VERSION=1.16
+> $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 This software has been built and tested in the following operative systems:
 * Debian 9 (Linux, kFreeBSD and Hurd)
@@ -118,9 +118,9 @@ ____________________________
 > $ git clone https://github.com/jburguete/jb
 
 2. Link the latest version on a jb directory i.e.:
-> $ cd YOUR_PROGRAM_PATH
+> $ cd YOUR\_PROGRAM\_PATH
 >
-> $ ln -s PATH_TO_THE_JB_LIBRARY/2.0.0 jb
+> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/2.0.0 jb
 
 3. Include the config and the used utility headers on your source code i.e.:
 > \#include "jb/jb_config.h"
