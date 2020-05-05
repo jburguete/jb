@@ -179,7 +179,6 @@ _____________________
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 6. Enlazar la biblioteca compartida en su ejecutable p.e.: 
-6. Link the shared library to your executable i.e.:
 > $ gcc -DJBW=2 -DJBM_PRECISION=2 SU_CÓDIGO_FUENTE.c -o SU_FICHERO_EJECUTABLE
 > -L. -Wl,-rpath=. -ljb
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
