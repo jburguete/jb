@@ -4,6 +4,7 @@ BUGS:
 DEBUGS:
 
 FEATURES:
+	- check performance of sort functions
 	- Using GtkTreeModel in JBWArrayEditor?
 	- Optimizing JBWArrayEditor
 	- Showing coordinates when moving the cursor over JBWGraphics

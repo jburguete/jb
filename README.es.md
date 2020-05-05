@@ -82,14 +82,13 @@ Las bibliotecas construidas por defecto usan el nivel de precisión 2.
 SISTEMAS OPERATIVOS
 ___________________
 
-You can install all required utilities and libraries using the instructions of
-[install-unix](https://github.com/jburguete/install-unix).
+Puede instalarse todas las bibliotecas y utilidades requeridas usando las
+instrucciones de [install-unix](https://github.com/jburguete/install-unix).
 
-On Microsoft Windows systems you have to install
-[MSYS2](http://sourceforge.net/projects/msys2) and the required
-libraries and utilities. You can follow detailed instructions in
-[install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf)
-tutorial.
+En sistemas Microsoft Windows hay que instalar
+[MSYS2](http://sourceforge.net/projects/msys2) además de las bibliotecas y
+utilidades requeridas. Puede seguir instrucciones detalladas en el tutorial
+[install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf).
 
 On NetBSD 7.0 you have to do first on the building terminal:
 > $ export PATH=/usr/pkg/gcc5/bin:$PATH"
