@@ -6,17 +6,17 @@ JB (versión 2.0.0)
 Una biblioteca con funciones útiles de matemáticas, gráficos, widgets y
 entrada/salida XML.
 
-AUTHORES
---------
+AUTORES
+-------
 
 * Javier Burguete Tolosa (jburguete@eead.csic.es).
 
 FICHEROS
 --------
 
-* TODO: Lista de tareas a realizar.
-* jb\*.h: Ficheros de código de cabecera.
-* jb\*.c: Ficheros de código fuente.
+* TODO: lista de tareas a realizar.
+* jb\*.h: ficheros de código de cabecera.
+* jb\*.c: ficheros de código fuente.
 * Doxyfile: fichero de configuración para generar documentación doxygen.
 * build.sh: script de construcción por defecto.
 * configure.ac: para configurar la construcción del Makefile.
@@ -62,24 +62,25 @@ Opcional para construir la documentación:
   estándar para generar documentación.
 * [latex](https://www.latex-project.org/) para construir los manuales PDF.
 
-COMPILING FLAGS
-_______________
+FLAGS DE COMPILACIÓN
+____________________
 
-To compile with JB library you has to define the JBW flag. They are 2 options:
-* -DJBW=1: for terminal applications.
-* -DJBW=2: for graphical applications.
+Para compilar con la biblioteca JB hay que definir el flag JBW. Hay 2 opciones:
+* -DJBW=1: para aplicaciones de terminal.
+* -DJBW=2: para aplicaciones gráficas.
 
-It is also needed to set the precision level flag:
-* -DJBM\_PRECISION=1: all math variables are defined as float.
-* -DJBM\_PRECISION=2: math variables are defined as float or double.
-* -DJBM\_PRECISION=3: all math variables are defined as double.
-* -DJBM\_PRECISION=4: math variables are defined as double or long double.
-* -DJBM\_PRECISION=5: all math variables are defined as long double.
+Se necesita también definir el flag de nivel de precisión:
+* -DJBM\_PRECISION=1: todas variables matemáticas se definen como float.
+* -DJBM\_PRECISION=2: las variables matemáticas se definen como float o double.
+* -DJBM\_PRECISION=3: todas variables matemáticas se definen como double.
+* -DJBM\_PRECISION=4: las variables matemáticas se definen como double o long
+  double.
+* -DJBM\_PRECISION=5: todas variables matemáticas se definen como long double.
 
-In default building shared libraries are using the precision level 2.
+Las bibliotecas construidas por defecto usan el nivel de precisión 2.
 
-OPERATIVE SYSTEMS
-_________________
+SISTEMAS OPERATIVOS
+___________________
 
 You can install all required utilities and libraries using the instructions of
 [install-unix](https://github.com/jburguete/install-unix).
@@ -111,18 +112,19 @@ This software has been built and tested in the following operative systems:
 * OpenSUSE Linux Leap 15
 * Xubuntu Linux 18.10
 
-COMMON BUILDING INSTRUCTIONS
-____________________________
+INSTRUCCIONES DE CONSTRUCCIÓN COMUNES
+_____________________________________
 
-1. Load the last library version:
+1. Descargar la última versión de la biblioteca:
 > $ git clone https://github.com/jburguete/jb
 
-2. Link the latest version on a jb directory i.e.:
-> $ cd YOUR_PROGRAM_PATH
+2. Enlazar la última versión de una carpeta jb p.e.:
+> $ cd CARPETA_DE_SU_PROGRAMA
 >
-> $ ln -s PATH_TO_THE_JB_LIBRARY/2.0.0 jb
+> $ ln -s RUTA_DE_LA_BIBLIOTECA_JB/2.0.0 jb
 
-3. Include the config and the used utility headers on your source code i.e.:
+3. Incluir el fichero de configuración y las utilidades requeridas en su código
+   fuente p.e.:
 > \#include "jb/jb_config.h"
 >
 > \#include "jb/jb_math.h"
@@ -131,10 +133,10 @@ ____________________________
 >
 > \#include "jb/jb_xml.h"
 
-BUILDING STATICALLY
-___________________
+CONSTRUCCIÓN ESTÁTICA
+_____________________
 
-4. Build the used utility source codes i.e.:
+4. Compilar los códigos fuente de las utilidades usadas p.e.:
 > $ gcc -c -DJBW=2 -DJBM_PRECISION=2 jb/jb_def.c -o jb_def.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
@@ -147,20 +149,21 @@ ___________________
 > $ gcc -c -DJBW=2 -DJBM_PRECISION=2 jb/jb_xml.c -o jb_xml.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-5. Link the used utility object file to your executable i.e.:
-> $ gcc -DJBW=2 -DJBM_PRECISION=2 YOUR_SOURCE_CODE.c jb_def.o jb_math.o
-> jb_win.o jb_xml.o -o YOUR_EXECUTABLE_FILE
+5. Enlazar los ficheros objeto de las utilidades usadas en su ejecutable p.e.:
+> $ gcc -DJBW=2 -DJBM_PRECISION=2 SU_CÓDIGO_FUENTE.c jb_def.o jb_math.o
+> jb_win.o jb_xml.o -o SU_FICHERO_EJECUTABLE
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-Note that your code could also need additional libraries to "pkg-config"
-command.
+Nótese que su código podría también necesitar bibliotecas adicionales en el
+comando "pkg-config"
 
-Note also that you can set another precision level.
+Nótese asimismo que se puede usar otro nivel de precisión (JBM\_PRECISION).
 
-BUILDING DINAMICALLY
-____________________
+CONSTRUCCIÓN DINÁMICA
+_____________________
 
-4. Build the used utility source codes with absolute paths i.e.:
+4. Compilar los códigos fuente de las utilidades usadas con rutas absolutas
+   p.e.:
 > $ gcc -c -fPIC -DJBW=2 -DJBM_PRECISION=2 jb/jb_def.c -o jb_def.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
@@ -170,21 +173,22 @@ ____________________
 > $ gcc -c -fPIC -DJBW=2 -DJBM_PRECISION=2 jb/jb_win.c -o jb_win.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-5. Build the shared library object:
+5. Construir la biblioteca compartida:
 > $ gcc -shared -DJBW=2 -DJBM_PRECISION=2 jb_def.o jb_win.o jb_math.o
 > -o libjb.so
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
+6. Enlazar la biblioteca compartida en su ejecutable p.e.: 
 6. Link the shared library to your executable i.e.:
-> $ gcc -DJBW=2 -DJBM_PRECISION=2 YOUR_SOURCE_CODE.c -o YOUR_EXECUTABLE_FILE
+> $ gcc -DJBW=2 -DJBM_PRECISION=2 SU_CÓDIGO_FUENTE.c -o SU_FICHERO_EJECUTABLE
 > -L. -Wl,-rpath=. -ljb
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-MAKING REFERENCE MANUAL INSTRUCTIONS (doc/latex/refman.pdf file)
-----------------------------------------------------------------
+INSTRUCCIONES PARA HACER EL MANUAL DE REFERENCIA (fichero doc/latex/refman.pdf)
+-------------------------------------------------------------------------------
 
-Execute on a terminal:
-> $ cd PATH_TO_JB_LIBRARY/2.0.0
+Ejecutar en un terminal:
+> $ cd RUTA_DE_LA_BIBLIOTECA_JB/2.0.0
 >
 > $ doxygen
 >

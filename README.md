@@ -14,9 +14,9 @@ AUTHORS
 FILES
 -----
 
-* TODO: List of tasks TO DO.
-* jb\*.h: Header code files.
-* jb\*.c: Source code files.
+* TODO: list of tasks to do.
+* jb\*.h: header code files.
+* jb\*.c: source code files.
 * Doxyfile: configuration file to generate doxygen documentation.
 * build.sh: default build script.
 * configure.ac: to configure the Makefile building.
@@ -154,7 +154,7 @@ ___________________
 Note that your code could also need additional libraries to "pkg-config"
 command.
 
-Note also that you can set another precision level.
+Note also that you can set another precision level (JBM\_PRECISION).
 
 BUILDING DINAMICALLY
 ____________________
@@ -169,7 +169,7 @@ ____________________
 > $ gcc -c -fPIC -DJBW=2 -DJBM_PRECISION=2 jb/jb_win.c -o jb_win.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-5. Build the shared library object:
+5. Build the shared library:
 > $ gcc -shared -DJBW=2 -DJBM_PRECISION=2 jb_def.o jb_win.o jb_math.o
 > -o libjb.so
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
