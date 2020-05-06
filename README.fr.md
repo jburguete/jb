@@ -1,19 +1,19 @@
-JB (versión 2.0.1)
+JB (version 2.0.1)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
 :fr:[français](README.fr.md)
 
-Una biblioteca con funciones útiles de matemáticas, gráficos, widgets y
-entrada/salida XML.
+Une bibliothèque avec fonctions utiles de mathématiques, graphiques, widgets et
+entrée/sortie XML.
 
-AUTORES
+AUTEURS
 -------
 
 * Javier Burguete Tolosa
   [jburguete@eead.csic.es](mailto:jburguete@eead.csic.es).
 
-FICHEROS
+FICHIERS
 --------
 
 * TODO: lista de tareas a realizar.

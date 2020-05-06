@@ -2,6 +2,7 @@ JB (2.0.1 version)
 ==================
 
 :uk:[english](README.md) :es:[español](README.es.md)
+:fr:[français](README.fr.md)
 
 A library with some useful functions of mathematics, graphics, widgets and XML
 input/output.
