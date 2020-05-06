@@ -64,14 +64,15 @@ Opcional para construir la documentación:
   estándar para generar documentación.
 * [latex](https://www.latex-project.org/) para construir los manuales PDF.
 
-FLAGS DE COMPILACIÓN
-____________________
+OPCIONES DE COMPILACIÓN
+_______________________
 
-Para compilar con la biblioteca JB hay que definir el flag JBW. Hay 2 opciones:
+Para compilar con la biblioteca JB hay que definir la opción JBW. Hay 2
+posibilidades:
 * -DJBW=1: para aplicaciones de terminal.
 * -DJBW=2: para aplicaciones gráficas.
 
-Se necesita también definir el flag de nivel de precisión:
+Se necesita también definir la opción de nivel de precisión:
 * -DJBM\_PRECISION=1: todas variables matemáticas se definen como float.
 * -DJBM\_PRECISION=2: las variables matemáticas se definen como float o double.
 * -DJBM\_PRECISION=3: todas variables matemáticas se definen como double.

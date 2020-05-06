@@ -31,8 +31,8 @@ FICHIERS
 CONSTRUCTION DE LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
 ------------------------------------------------------
 
-BIBLIOTHÈQUES ET OUTILS REQUISES
-________________________________
+BIBLIOTHÈQUES ET OUTILS REQUIS
+______________________________
 
 Obligatoire:
 * [gcc](https://gcc.gnu.org) o [clang](http://clang.llvm.org) pour compiler le
@@ -51,22 +51,22 @@ Obligatoire:
 * [gettext](http://www.gnu.org/software/gettext) pour travailler avec differents
   codes et langues internationaux.
 
-Opcional si se incluye las utilidades jb\_xml:
-* [libxml](http://xmlsoft.org) para trabajar con ficheros XML.
+Optionnel si les outils jb\_xml sont inclus:
+* [libxml](http://xmlsoft.org) pour travailler avec fichiers XML.
 
-Opcional si se incluyen las utilidades jb\_win y se compila usando el flag
+Optionnel si les outils jb\_win sont inclus et on compile en utilisent l'option
 -DJBW=2.
-* [png](http://libpng.sourceforge.net) para trabajar con ficheros PNG.
-* [gtk3](http://www.gtk.org) para trabajar con ventanas interactivas.
-* [glew](http://glew.sourceforge.net) funciones OpenGL de alto nivel.
+* [png](http://libpng.sourceforge.net) pour travailler avec fichiers PNG.
+* [gtk3](http://www.gtk.org) pour travailler avec fenêtres interactives.
+* [glew](http://glew.sourceforge.net) functions OpenGL de haut niveau.
 
-Opcional para construir la documentación:
-* [doxygen](http://www.stack.nl/~dimitri/doxygen) formato de comentarios
-  estándar para generar documentación.
-* [latex](https://www.latex-project.org/) para construir los manuales PDF.
+Optionnel pour construire la documentation:
+* [doxygen](http://www.stack.nl/~dimitri/doxygen) format de commentaires
+  standard pour générer la documentation.
+* [latex](https://www.latex-project.org/) pour construire les manuels PDF.
 
-FLAGS DE COMPILACIÓN
-____________________
+OPTIONS DE COMPILATION
+______________________
 
 Para compilar con la biblioteca JB hay que definir el flag JBW. Hay 2 opciones:
 * -DJBW=1: para aplicaciones de terminal.
