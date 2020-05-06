@@ -16,39 +16,40 @@ AUTEURS
 FICHIERS
 --------
 
-* TODO: lista de tareas a realizar.
-* jb\*.h: ficheros de código de cabecera.
-* jb\*.c: ficheros de código fuente.
-* Doxyfile: fichero de configuración para generar documentación doxygen.
-* build.sh: script de construcción por defecto.
-* configure.ac: para configurar la construcción del Makefile.
-* Makefile.in: plantilla para generar del Makefile.
-* Doxyfile: para configurar la construcción de la documentación.
-* test.png: figura para probar funciones gráficas.
-* text\*.c: ficheros fuente de prueba.
-* locale/\*/LC\_MESSAGES/jb.po: ficheros de traducción.
+* TODO: liste de tâches pour réaliser.
+* jb\*.h: fichiers de code d'en-tête.
+* jb\*.c: fichiers de code source.
+* Doxyfile: fichero de configuration pour générer documentation doxygen.
+* build.sh: script de construction par défaut.
+* configure.ac: pour configurer la construction du Makefile.
+* Makefile.in: modèle pour générer le Makefile.
+* Doxyfile: pour configurer la construction de la documentation.
+* test.png: figure pour vérifier les fonctions graphiques.
+* text\*.c: fichier source de vérification.
+* locale/\*/LC\_MESSAGES/jb.po: fichiers de traduction.
 
-CONSTRUYENDO LA BIBLITECA EN OTROS PROGRAMAS
---------------------------------------------
+CONSTRUCTION DE LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
+------------------------------------------------------
 
-BIBLIOTECAS Y UTILIDADES REQUERIDAS
-___________________________________
+BIBLIOTHÈQUES ET OUTILS REQUISES
+________________________________
 
-Obligatorio:
-* [gcc](https://gcc.gnu.org) o [clang](http://clang.llvm.org) para compilar el
-  código fuente.
-* [make](http://www.gnu.org/software/make) para construir el fichero ejecutable.
-* [autoconf](http://www.gnu.org/software/autoconf) para generar el Makefile en
-  diferentes sistemas operativos.
-* [automake](http://www.gnu.org/software/automake) para detectar el sistema
-  operativo.
-* [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config) para
-  encontrar las bibliotecas para compilar.
-* [glib](https://developer.gnome.org/glib) utilidades extendidas de C para
-  trabajar con datos, listas, ficheros mapeados, expresiones regulares, usar
-  multiprocesador en máquinas de memoria compartida, ...
-* [gettext](http://www.gnu.org/software/gettext) para trabajar con diferentes
-  códigos y lenguajes internacionales.
+Obligatoire:
+* [gcc](https://gcc.gnu.org) o [clang](http://clang.llvm.org) pour compiler le
+  code source.
+* [make](http://www.gnu.org/software/make) pour construire le fichier
+  executable.
+* [autoconf](http://www.gnu.org/software/autoconf) pour générer le Makefile en
+  differents systèmes d'exploitation.
+* [automake](http://www.gnu.org/software/automake) pour détecter le système
+  d'exploitation.
+* [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config) pour trouver
+  les bibliothèques pour compiler.
+* [glib](https://developer.gnome.org/glib) outils étendues de C pour travailler
+  avec données, listes, fichiers mappés, expressions régulières, utiliser
+  multiprocesseurs en machines à mémoire partagée, ...
+* [gettext](http://www.gnu.org/software/gettext) pour travailler avec differents
+  codes et langues internationaux.
 
 Opcional si se incluye las utilidades jb\_xml:
 * [libxml](http://xmlsoft.org) para trabajar con ficheros XML.

@@ -39,8 +39,8 @@ Mandatory:
   source code.
 * [make](http://www.gnu.org/software/make) to build the executable file.
 * [autoconf](http://www.gnu.org/software/autoconf) to generate the Makefile in
-  different operative systems.
-* [automake](http://www.gnu.org/software/automake) to check the operative
+  different operating systems.
+* [automake](http://www.gnu.org/software/automake) to check the operating
   system.
 * [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config) to find the
   libraries to compile.

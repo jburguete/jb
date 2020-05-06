@@ -28,8 +28,8 @@ FICHEROS
 * text\*.c: ficheros fuente de prueba.
 * locale/\*/LC\_MESSAGES/jb.po: ficheros de traducción.
 
-CONSTRUYENDO LA BIBLITECA EN OTROS PROGRAMAS
---------------------------------------------
+CONSTRUYENDO LA BIBLIOTECA EN OTROS PROGRAMAS
+---------------------------------------------
 
 BIBLIOTECAS Y UTILIDADES REQUERIDAS
 ___________________________________
