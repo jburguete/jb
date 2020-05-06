@@ -68,22 +68,27 @@ Optionnel pour construire la documentation:
 OPTIONS DE COMPILATION
 ______________________
 
-Para compilar con la biblioteca JB hay que definir el flag JBW. Hay 2 opciones:
-* -DJBW=1: para aplicaciones de terminal.
-* -DJBW=2: para aplicaciones gráficas.
+Pour compiler la bibliothèque JB on doit définir l'option JBW. Il y a 2
+possibilités:
+* -DJBW=1: pour interfaces de terminal.
+* -DJBW=2: pour interfaces graphiques.
 
-Se necesita también definir el flag de nivel de precisión:
-* -DJBM\_PRECISION=1: todas variables matemáticas se definen como float.
-* -DJBM\_PRECISION=2: las variables matemáticas se definen como float o double.
-* -DJBM\_PRECISION=3: todas variables matemáticas se definen como double.
-* -DJBM\_PRECISION=4: las variables matemáticas se definen como double o long
+On doit aussi définir l'option de niveau de précision:
+* -DJBM\_PRECISION=1: tous les variables mathématiques sont définies comme
+  float.
+* -DJBM\_PRECISION=2: les variables mathématiques son définies comme float ou
   double.
-* -DJBM\_PRECISION=5: todas variables matemáticas se definen como long double.
+* -DJBM\_PRECISION=3: tous les variables mathématiques sont définies comme
+  double.
+* -DJBM\_PRECISION=4: les variables mathématiques son définies comme double ou
+  long double.
+* -DJBM\_PRECISION=5: tous les variables mathématiques sont définies comme
+  long double.
 
-Las bibliotecas construidas por defecto usan el nivel de precisión 2.
+Les bibliothèques construits par défaut utilisent le niveau de précision 2.
 
-SISTEMAS OPERATIVOS
-___________________
+SISTÈMES D'EXPLOITATION
+_______________________
 
 Puede instalarse todas las bibliotecas y utilidades requeridas usando las
 instrucciones de [install-unix](https://github.com/jburguete/install-unix).
