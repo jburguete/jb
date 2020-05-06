@@ -5,12 +5,12 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * 	1. Redistributions of source code must retain the above copyright notice,
+ * 		this list of conditions and the following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 	2. Redistributions in binary form must reproduce the above copyright notice,
+ * 		this list of conditions and the following disclaimer in the
+ * 		documentation and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY Javier Burguete Tolosa ``AS IS'' AND ANY EXPRESS
  * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -68,13 +68,20 @@
 #error "Unknown JB graphic output"
 #endif
 
+/**
+ * \def JB_LOCALE
+ * \brief Macro to define the directory to search the locale language files.
+ */
 #ifdef G_OS_WIN32
+#define JB_LOCALE "..\\share\\locale"
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
 #if JB_DEBUG_FILE
 #undef stderr
 extern FILE *stderr;
 #endif
+#else
+#define JB_LOCALE "./locale"
 #endif
 
 #define JB_PROTECT(a, b, c) ((a < b)? 1: (a > c)? 1: 0)
@@ -100,6 +107,7 @@ JBChange (void **a,             ///< a pointer to interchange.
 #define jb_change(a, b) (JBChange((void**)&a, (void**)&b))
 ///< Macro to interchange two pointers.
 
+void jb_init ();
 void jb_function_null ();
 void jb_free_null (void **);
 void *jb_realloc (void *, const int);

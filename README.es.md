@@ -1,4 +1,4 @@
-JB (versión 2.0.0)
+JB (versión 2.0.1)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -95,7 +95,7 @@ On NetBSD 7.0 you have to do first on the building terminal:
 > $ export PATH=/usr/pkg/gcc5/bin:$PATH"
 
 On OpenBSD 6.4 you have to do first on the building terminal:
-> $ export AUTOCONF_VERSION=2.69 AUTOMAKE_VERSION=1.16
+> $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 This software has been built and tested in the following operative systems:
 * Debian 9 (Linux, kFreeBSD and Hurd)
@@ -104,7 +104,6 @@ This software has been built and tested in the following operative systems:
 * Fedora Linux 29
 * FreeBSD 11.2
 * Manjaro Linux
-* Microsoft Windows 7
 * Microsoft Windows 10
 * NetBSD 7.0 (with modular xorg)
 * OpenBSD 6.4
@@ -119,39 +118,39 @@ _____________________________________
 > $ git clone https://github.com/jburguete/jb
 
 2. Enlazar la última versión de una carpeta jb p.e.:
-> $ cd CARPETA_DE_SU_PROGRAMA
+> $ cd CARPETA\_DE\_SU\_PROGRAMA
 >
-> $ ln -s RUTA_DE_LA_BIBLIOTECA_JB/2.0.0 jb
+> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.0.1 jb
 
 3. Incluir el fichero de configuración y las utilidades requeridas en su código
    fuente p.e.:
-> \#include "jb/jb_config.h"
+> \#include "jb/jb\_config.h"
 >
-> \#include "jb/jb_math.h"
+> \#include "jb/jb\_math.h"
 >
-> \#include "jb/jb_win.h"
+> \#include "jb/jb\_win.h"
 >
-> \#include "jb/jb_xml.h"
+> \#include "jb/jb\_xml.h"
 
 CONSTRUCCIÓN ESTÁTICA
 _____________________
 
 4. Compilar los códigos fuente de las utilidades usadas p.e.:
-> $ gcc -c -DJBW=2 -DJBM_PRECISION=2 jb/jb_def.c -o jb_def.o
+> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
-> $ gcc -c -DJBW=2 -DJBM_PRECISION=2 jb/jb_math.c -o jb_math.o
+> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_math.c -o jb\_math.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
-> $ gcc -c -DJBW=2 -DJBM_PRECISION=2 jb/jb_win.c -o jb_win.o
+> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_win.c -o jb\_win.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
-> $ gcc -c -DJBW=2 -DJBM_PRECISION=2 jb/jb_xml.c -o jb_xml.o
+> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_xml.c -o jb\_xml.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 5. Enlazar los ficheros objeto de las utilidades usadas en su ejecutable p.e.:
-> $ gcc -DJBW=2 -DJBM_PRECISION=2 SU_CÓDIGO_FUENTE.c jb_def.o jb_math.o
-> jb_win.o jb_xml.o -o SU_FICHERO_EJECUTABLE
+> $ gcc -DJBW=2 -DJBM\_PRECISION=2 SU\_CÓDIGO\_FUENTE.c jb\_def.o jb\_math.o
+> jb\_win.o jb\_xml.o -o SU\_FICHERO\_EJECUTABLE
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 Nótese que su código podría también necesitar bibliotecas adicionales en el
@@ -164,30 +163,30 @@ _____________________
 
 4. Compilar los códigos fuente de las utilidades usadas con rutas absolutas
    p.e.:
-> $ gcc -c -fPIC -DJBW=2 -DJBM_PRECISION=2 jb/jb_def.c -o jb_def.o
+> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
-> $ gcc -c -fPIC -DJBW=2 -DJBM_PRECISION=2 jb/jb_math.c -o jb_math.o
+> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_math.c -o jb\_math.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
-> $ gcc -c -fPIC -DJBW=2 -DJBM_PRECISION=2 jb/jb_win.c -o jb_win.o
+> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_win.c -o jb\_win.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 5. Construir la biblioteca compartida:
-> $ gcc -shared -DJBW=2 -DJBM_PRECISION=2 jb_def.o jb_win.o jb_math.o
+> $ gcc -shared -DJBW=2 -DJBM\_PRECISION=2 jb\_def.o jb\_win.o jb\_math.o
 > -o libjb.so
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 6. Enlazar la biblioteca compartida en su ejecutable p.e.: 
-> $ gcc -DJBW=2 -DJBM_PRECISION=2 SU_CÓDIGO_FUENTE.c -o SU_FICHERO_EJECUTABLE
-> -L. -Wl,-rpath=. -ljb
+> $ gcc -DJBW=2 -DJBM\_PRECISION=2 SU\_CÓDIGO\_FUENTE.c
+> -o SU\_FICHERO\_EJECUTABLE -L. -Wl,-rpath=. -ljb
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 INSTRUCCIONES PARA HACER EL MANUAL DE REFERENCIA (fichero doc/latex/refman.pdf)
 -------------------------------------------------------------------------------
 
 Ejecutar en un terminal:
-> $ cd RUTA_DE_LA_BIBLIOTECA_JB/2.0.0
+> $ cd RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.0.1
 >
 > $ doxygen
 >

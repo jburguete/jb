@@ -252,6 +252,8 @@ extern const GLfloat jbw_white[4];
 
 extern const GLfloat jbw_identity[16];
 
+void jbw_init (int *argn, char ***argc);
+
 void jbw_show_message (const char *title, const char *message,
                        GtkMessageType type);
 void jbw_show_error (const char *message);

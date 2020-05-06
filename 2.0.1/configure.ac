@@ -1,5 +1,5 @@
 AC_PREREQ([2.67])
-AC_INIT([jb], [2.0.0], [https://github.com/jburguete/jb])
+AC_INIT([jb], [2.0.1], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems

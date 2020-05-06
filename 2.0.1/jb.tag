@@ -75,6 +75,13 @@
     <includes id="jb__def_8h" name="jb_def.h" local="yes" imported="no">jb_def.h</includes>
     <member kind="function">
       <type>void</type>
+      <name>jb_init</name>
+      <anchorfile>jb__def_8c.html</anchorfile>
+      <anchor>af090f9387407fe7b5fac836f78f8b63a</anchor>
+      <arglist>()</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
       <name>jb_free_null</name>
       <anchorfile>jb__def_8c.html</anchorfile>
       <anchor>a65e0a14c5a9cb93010f0e7eeb2fabc29</anchor>
@@ -172,6 +179,13 @@
     </member>
     <member kind="define">
       <type>#define</type>
+      <name>JB_LOCALE</name>
+      <anchorfile>jb__def_8h.html</anchorfile>
+      <anchor>aae8e924ef6ef6ef4bf6c498e3a94fff0</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="define">
+      <type>#define</type>
       <name>JB_PROTECT</name>
       <anchorfile>jb__def_8h.html</anchorfile>
       <anchor>a0a83fac32d093c45709583f194c4bbf2</anchor>
@@ -197,6 +211,13 @@
       <anchorfile>jb__def_8h.html</anchorfile>
       <anchor>a7ffb39efe1e64fb1e394495ec71bc94d</anchor>
       <arglist>(a, b)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>jb_init</name>
+      <anchorfile>jb__def_8h.html</anchorfile>
+      <anchor>af090f9387407fe7b5fac836f78f8b63a</anchor>
+      <arglist>()</arglist>
     </member>
     <member kind="function">
       <type>void</type>

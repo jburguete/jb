@@ -1,4 +1,4 @@
-JB (2.0.0 version)
+JB (2.0.1 version)
 ==================
 
 :uk:[english](README.md) :es:[español](README.es.md)
@@ -103,7 +103,6 @@ This software has been built and tested in the following operative systems:
 * Fedora Linux 29
 * FreeBSD 11.2
 * Manjaro Linux
-* Microsoft Windows 7
 * Microsoft Windows 10
 * NetBSD 7.0 (with modular xorg)
 * OpenBSD 6.4
@@ -120,71 +119,71 @@ ____________________________
 2. Link the latest version on a jb directory i.e.:
 > $ cd YOUR\_PROGRAM\_PATH
 >
-> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/2.0.0 jb
+> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/2.0.1 jb
 
 3. Include the config and the used utility headers on your source code i.e.:
-> \#include "jb/jb_config.h"
+> \#include "jb/jb\_config.h"
 >
-> \#include "jb/jb_math.h"
+> \#include "jb/jb\_math.h"
 >
-> \#include "jb/jb_win.h"
+> \#include "jb/jb\_win.h"
 >
-> \#include "jb/jb_xml.h"
+> \#include "jb/jb\_xml.h"
 
 BUILDING STATICALLY
 ___________________
 
 4. Build the used utility source codes i.e.:
-> $ gcc -c -DJBW=2 -DJBM_PRECISION=2 jb/jb_def.c -o jb_def.o
+> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
-> $ gcc -c -DJBW=2 -DJBM_PRECISION=2 jb/jb_math.c -o jb_math.o
+> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_math.c -o jb\_math.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
-> $ gcc -c -DJBW=2 -DJBM_PRECISION=2 jb/jb_win.c -o jb_win.o
+> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_win.c -o jb\_win.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
-> $ gcc -c -DJBW=2 -DJBM_PRECISION=2 jb/jb_xml.c -o jb_xml.o
+> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_xml.c -o jb\_xml.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 5. Link the used utility object file to your executable i.e.:
-> $ gcc -DJBW=2 -DJBM_PRECISION=2 YOUR_SOURCE_CODE.c jb_def.o jb_math.o
-> jb_win.o jb_xml.o -o YOUR_EXECUTABLE_FILE
+> $ gcc -DJBW=2 -DJBM\_PRECISION=2 YOUR\_SOURCE\_CODE.c jb\_def.o jb\_math.o
+> jb\_win.o jb\_xml.o -o YOUR\_EXECUTABLE\_FILE
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 Note that your code could also need additional libraries to "pkg-config"
 command.
 
-Note also that you can set another precision level (JBM\_PRECISION).
+Note also that you can set another precision level (JBM\\_PRECISION).
 
 BUILDING DINAMICALLY
 ____________________
 
 4. Build the used utility source codes with absolute paths i.e.:
-> $ gcc -c -fPIC -DJBW=2 -DJBM_PRECISION=2 jb/jb_def.c -o jb_def.o
+> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
-> $ gcc -c -fPIC -DJBW=2 -DJBM_PRECISION=2 jb/jb_math.c -o jb_math.o
+> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_math.c -o jb\_math.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
-> $ gcc -c -fPIC -DJBW=2 -DJBM_PRECISION=2 jb/jb_win.c -o jb_win.o
+> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_win.c -o jb\_win.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 5. Build the shared library:
-> $ gcc -shared -DJBW=2 -DJBM_PRECISION=2 jb_def.o jb_win.o jb_math.o
+> $ gcc -shared -DJBW=2 -DJBM\_PRECISION=2 jb\_def.o jb\_win.o jb\_math.o
 > -o libjb.so
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 6. Link the shared library to your executable i.e.:
-> $ gcc -DJBW=2 -DJBM_PRECISION=2 YOUR_SOURCE_CODE.c -o YOUR_EXECUTABLE_FILE
-> -L. -Wl,-rpath=. -ljb
+> $ gcc -DJBW=2 -DJBM\_PRECISION=2 YOUR\_SOURCE\_CODE.c
+> -o YOUR\_EXECUTABLE\_FILE -L. -Wl,-rpath=. -ljb
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 MAKING REFERENCE MANUAL INSTRUCTIONS (doc/latex/refman.pdf file)
 ----------------------------------------------------------------
 
 Execute on a terminal:
-> $ cd PATH_TO_JB_LIBRARY/2.0.0
+> $ cd PATH\_TO\_JB\_LIBRARY/2.0.1
 >
 > $ doxygen
 >
