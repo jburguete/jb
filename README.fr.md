@@ -54,7 +54,7 @@ Obligatoire:
 Optionnel si les outils jb\_xml sont inclus:
 * [libxml](http://xmlsoft.org) pour travailler avec fichiers XML.
 
-Optionnel si les outils jb\_win sont inclus et on compile en utilisent l'option
+Optionnel si les outils jb\_win sont inclus et on compile en utilisant l'option
 -DJBW=2.
 * [png](http://libpng.sourceforge.net) pour travailler avec fichiers PNG.
 * [gtk3](http://www.gtk.org) pour travailler avec fenêtres interactives.
@@ -85,13 +85,13 @@ On doit aussi définir l'option de niveau de précision:
 * -DJBM\_PRECISION=5: tous les variables mathématiques sont définies comme
   long double.
 
-Les bibliothèques construits par défaut utilisent le niveau de précision 2.
+Les bibliothèques construits par défaut utilisant le niveau de précision 2.
 
 SISTÈMES D'EXPLOITATION
 _______________________
 
-Puede instalarse todas las bibliotecas y utilidades requeridas usando las
-instrucciones de [install-unix](https://github.com/jburguete/install-unix).
+On peut installer tous les bibliothèques et outils requis en utilisant les
+instructions en [install-unix](https://github.com/jburguete/install-unix).
 
 En sistemas Microsoft Windows hay que instalar
 [MSYS2](http://sourceforge.net/projects/msys2) además de las bibliotecas y
@@ -118,16 +118,16 @@ This software has been built and tested in the following operative systems:
 * OpenSUSE Linux Leap 15
 * Xubuntu Linux 18.10
 
-INSTRUCCIONES DE CONSTRUCCIÓN COMUNES
+INSTRUCTIONS DE CONSTRUCTION COMMUNES
 _____________________________________
 
-1. Descargar la última versión de la biblioteca:
+1. Télécharger la dernière version de la bibliothèque:
 > $ git clone https://github.com/jburguete/jb
 
-2. Enlazar la última versión de una carpeta jb p.e.:
-> $ cd CARPETA\_DE\_SU\_PROGRAMA
+2. Lier la dernière version dans une répertoire jb, p.e.:
+> $ cd RÉPERTOIRE\_DE\_SON\_PROGRAMME
 >
-> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.0.1 jb
+> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.0.1 jb
 
 3. Incluir el fichero de configuración y las utilidades requeridas en su código
    fuente p.e.:

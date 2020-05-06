@@ -119,7 +119,7 @@ _____________________________________
 1. Descargar la última versión de la biblioteca:
 > $ git clone https://github.com/jburguete/jb
 
-2. Enlazar la última versión de una carpeta jb p.e.:
+2. Enlazar la última versión en una carpeta jb p.e.:
 > $ cd CARPETA\_DE\_SU\_PROGRAMA
 >
 > $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.0.1 jb
