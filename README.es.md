@@ -119,13 +119,13 @@ _____________________________________
 1. Descargar la última versión de la biblioteca:
 > $ git clone https://github.com/jburguete/jb
 
-2. Enlazar la última versión en una carpeta jb p.e.:
+2. Enlazar la última versión en una carpeta jb p.ej.:
 > $ cd CARPETA\_DE\_SU\_PROGRAMA
 >
 > $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.0.1 jb
 
 3. Incluir el fichero de configuración y las utilidades requeridas en su código
-   fuente p.e.:
+   fuente p.ej.:
 > \#include "jb/jb\_config.h"
 >
 > \#include "jb/jb\_math.h"
@@ -137,7 +137,7 @@ _____________________________________
 CONSTRUCCIÓN ESTÁTICA
 _____________________
 
-4. Compilar los códigos fuente de las utilidades usadas p.e.:
+4. Compilar los códigos fuente de las utilidades usadas p.ej.:
 > $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
@@ -150,13 +150,13 @@ _____________________
 > $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_xml.c -o jb\_xml.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-5. Enlazar los ficheros objeto de las utilidades usadas en su ejecutable p.e.:
+5. Enlazar los ficheros objeto de las utilidades usadas en su ejecutable p.ej.:
 > $ gcc -DJBW=2 -DJBM\_PRECISION=2 SU\_CÓDIGO\_FUENTE.c jb\_def.o jb\_math.o
 > jb\_win.o jb\_xml.o -o SU\_FICHERO\_EJECUTABLE
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
 Nótese que su código podría también necesitar bibliotecas adicionales en el
-comando "pkg-config"
+comando "pkg-config".
 
 Nótese asimismo que se puede usar otro nivel de precisión (JBM\_PRECISION).
 
@@ -164,7 +164,7 @@ CONSTRUCCIÓN DINÁMICA
 _____________________
 
 4. Compilar los códigos fuente de las utilidades usadas con rutas absolutas
-   p.e.:
+   p.ej.:
 > $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
@@ -179,7 +179,7 @@ _____________________
 > -o libjb.so
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-6. Enlazar la biblioteca compartida en su ejecutable p.e.: 
+6. Enlazar la biblioteca compartida en su ejecutable p.ej.: 
 > $ gcc -DJBW=2 -DJBM\_PRECISION=2 SU\_CÓDIGO\_FUENTE.c
 > -o SU\_FICHERO\_EJECUTABLE -L. -Wl,-rpath=. -ljb
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
