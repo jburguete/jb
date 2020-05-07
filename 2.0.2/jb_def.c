@@ -171,9 +171,10 @@ jb_get_ncores ()
   SYSTEM_INFO sysinfo;
   GetSystemInfo (&sysinfo);
   return sysinfo.dwNumberOfProcessors;
-#else
-  // return (int) sysconf (_SC_NPROCESSORS_ONLN);
+#elif HAVE_GET_NPROCS
   return get_nprocs ();
+#else
+  return (int) sysconf (_SC_NPROCESSORS_ONLN);
 #endif
   /*
      BSD:

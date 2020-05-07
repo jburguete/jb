@@ -4,5 +4,7 @@
 
 #define HAVE_EXP10 1
 #define HAVE_FMEMOPEN 1
+#define HAVE_SYSINFO 1
+#define HAVE_GET_NPROCS 1
 
 #endif

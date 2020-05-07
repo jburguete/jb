@@ -34,13 +34,16 @@
 #define JB_DEF__H 1
 
 #define _GNU_SOURCE
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#if HAVE_SYSINFO
 #include <sys/sysinfo.h>
+#endif
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <libintl.h>

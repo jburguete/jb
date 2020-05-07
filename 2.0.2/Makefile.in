@@ -46,19 +46,18 @@ test_win: test_win.c libjb@SO@ libjbm@SO@ libjbw@SO@
 	$(CC) $(CFLAGS) test_win.c -o test_win $(EXEFLAGS) -ljbm -ljbw
 
 # Locales
+locales = es fr
 $(pot): $(src) Makefile
 	if ! test -d $(locale); then mkdir -p $(locale); fi
 	xgettext -k_ -d jb -o $(pot) --from-code=UTF-8 $(src)
-	for i in $(es) $(fr); do \ 
-		if ! test -d $i; then mkdir -p $i; fi \
-	done
-#	  if ! test -f $ijb.po; then \
-			msginit -l es -i $(pot) -o $ijb.po --no-translator; \
+	$(foreach i,$(locales), \
+		if ! test -d $i; then mkdir -p $i; fi; \
+	  if ! test -f $($i)jb.po; then \
+			msginit -l es -i $(pot) -o $($i)jb.po --no-translator; \
 		else \
-			msgmerge -U $i jb.po $(pot); \
+			msgmerge -U $($i)jb.po $(pot); \
 		fi; \
-		vim $ijb.po; \
-
+		vim $($i)jb.po;)
 $(es)jb.mo: $(pot) $(es)jb.po
 	msgfmt -c -v $(es)jb.po -o $(es)jb.mo
 $(fr)jb.mo: $(pot) $(fr)jb.po

@@ -1,5 +1,5 @@
 AC_PREREQ([2.67])
-AC_INIT([jb], [2.0.1], [https://github.com/jburguete/jb])
+AC_INIT([jb], [2.0.2], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -60,7 +60,9 @@ fi
 PKG_CHECK_MODULES([GLEW], [glew])
 
 # Checks for header files
-AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h],,
+								 AC_MSG_ERROR([Missing standard headers]))
+AC_CHECK_HEADER([sys/sysinfo.h], AC_DEFINE([HAVE_SYSINFO], [1]))
 
 # Checking -march=native compiler flag
 if test $win = 0; then
@@ -117,6 +119,7 @@ fi
 # Checks for library functions
 AC_CHECK_FUNC([exp10], [AC_DEFINE([HAVE_EXP10], [1])])
 AC_CHECK_FUNC([fmemopen], [AC_DEFINE([HAVE_FMEMOPEN], [1])])
+AC_CHECK_FUNC([get_nprocs], [AC_DEFINE([HAVE_GET_NPROCS], [1])])
 
 # Check for font
 AC_MSG_NOTICE([Searching font...])

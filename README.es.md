@@ -1,4 +1,4 @@
-JB (versión 2.0.1)
+JB (versión 2.0.2)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -122,7 +122,7 @@ _____________________________________
 2. Enlazar la última versión en una carpeta jb p.ej.:
 > $ cd CARPETA\_DE\_SU\_PROGRAMA
 >
-> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.0.1 jb
+> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.0.2 jb
 
 3. Incluir el fichero de configuración y las utilidades requeridas en su código
    fuente p.ej.:
@@ -188,7 +188,7 @@ INSTRUCCIONES PARA HACER EL MANUAL DE REFERENCIA (fichero doc/latex/refman.pdf)
 -------------------------------------------------------------------------------
 
 Ejecutar en un terminal:
-> $ cd RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.0.1
+> $ cd RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.0.2
 >
 > $ doxygen
 >
