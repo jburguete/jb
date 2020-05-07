@@ -50,9 +50,7 @@ AC_SUBST(JBW, [-DJBW=2])
 gtk=1
 
 # Checks for graphic interface
-if test $win32 = 1; then
-	LDFLAGS="$LDFLAGS -lopengl32"
-elif test $gtk = 1; then
+if test $gtk = 1; then
 	AC_SEARCH_LIBS([glViewport], [GL opengl32], 
 		       AC_MSG_NOTICE([OpenGL OK]),
 		       AC_MSG_ERROR([OpenGL not found]))
