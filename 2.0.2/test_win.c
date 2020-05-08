@@ -10,7 +10,7 @@ draw1 (JBWGraphic * graphic)
   const JBFLOAT zz[3] = { 2., 0.5, 0. };
   jbw_draw_clear (1.f, 1.f, 1.f, 0.f);
   jbw_graphic_draw_lines (graphic, (JBFLOAT *) x, (JBFLOAT *) y, (JBFLOAT *) yy,
-		                      (JBFLOAT *) z, (JBFLOAT *) zz, 2);
+                          (JBFLOAT *) z, (JBFLOAT *) zz, 2);
   jbw_graphic_draw_logo (graphic);
 }
 

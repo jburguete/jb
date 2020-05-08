@@ -2,14 +2,14 @@
 ** Fichero: fc2i.h (Fortran & C Communication Interface)
 ** Fecha: 21 de octubre de 2010
 ** Revision: 28 de octubre de 2010
-**	     Añadido recibir y enviar int_type
+**       Añadido recibir y enviar int_type
 ** Autor: Asier Lacasta Soto (asierlacasta@gmail.com)
 ** Desc.: Interfaz de comunicación entre programas
-**	 C y Fortran de manera bidireccional. Esta
-**	 interfaz permite al programador transferir
-**	 Datos entre programas de estos dos tipos.
+**   C y Fortran de manera bidireccional. Esta
+**   interfaz permite al programador transferir
+**   Datos entre programas de estos dos tipos.
 ** Ackn.: Jose Manuel Colom (jm@unizar.es)
-**	  Mario Morales (mmorales@unizar.es)
+**    Mario Morales (mmorales@unizar.es)
 ******************************************************/
 
 #ifndef _LIBRERIA_FC2I

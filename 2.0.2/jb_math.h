@@ -5,12 +5,12 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * 	1. Redistributions of source code must retain the above copyright notice,
- * 		this list of conditions and the following disclaimer.
+ *   1. Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
  *
- * 	2. Redistributions in binary form must reproduce the above copyright notice,
- * 		this list of conditions and the following disclaimer in the
- * 		documentation and/or other materials provided with the distribution.
+ *   2. Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY Javier Burguete Tolosa ``AS IS'' AND ANY EXPRESS
  * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -327,7 +327,7 @@
  * \end{array}\right.\f$.
  */
 #define JBM_MODMINLL(a, b) (((a) * (b) <= 0L)? 0L: \
-	(llabs(a) < llabs(b))? (a): (b))
+  (llabs(a) < llabs(b))? (a): (b))
 /**
  * macro calculating the number with the lower module in the [a, b] interval 
  * (JBFLOAT arguments).
@@ -338,7 +338,7 @@
  * \end{array}\right.\f$.
  */
 #define JBM_FMODMIN(a, b) (((a) * (b) <= 0.)? 0.: \
-		(FABS(a) < FABS(b))? (a): (b))
+    (FABS(a) < FABS(b))? (a): (b))
 /**
  * macro calculating the number with the lower module in the [a, b] interval 
  * (JBDOUBLE arguments).
@@ -349,7 +349,7 @@
  * \end{array}\right.\f$.
  */
 #define JBM_FMODMINL(a, b) (((a) * (b) <= 0.L)? 0.L: \
-		(FABSL(a) < FABSL(b))? (a): (b))
+    (FABSL(a) < FABSL(b))? (a): (b))
 #define JBM_SQR(x) ((x) * (x))  ///< macro calculating the square of a number.
 #define JBM_DBL(x) ((x) + (x))  ///< macro calculating the double of a number.
 #define JBM_EXTRAPOLATE(x, x1, x2, y1, y2) \

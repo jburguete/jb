@@ -5,12 +5,12 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * 	1. Redistributions of source code must retain the above copyright notice,
- * 		this list of conditions and the following disclaimer.
+ *   1. Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
  *
- * 	2. Redistributions in binary form must reproduce the above copyright notice,
- * 		this list of conditions and the following disclaimer in the
- * 		documentation and/or other materials provided with the distribution.
+ *   2. Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY Javier Burguete Tolosa ``AS IS'' AND ANY EXPRESS
  * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -224,9 +224,9 @@ typedef struct
 } JBWArrayEditor;               ///< widget to edit matrices.
 
 #define jbw_signal_connect_swapped_after(instance, detailed_signal, c_handler, \
-	data) \
-    	g_signal_connect_data((instance), (detailed_signal), (c_handler), \
-			(data), 0, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
+  data) \
+      g_signal_connect_data((instance), (detailed_signal), (c_handler), \
+      (data), 0, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
 
 #define jbw_float_entry_new (JBWFloatEntry*)gtk_entry_new
 
