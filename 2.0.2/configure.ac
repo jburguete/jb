@@ -121,13 +121,15 @@ AC_CHECK_FUNC([get_nprocs], [AC_DEFINE([HAVE_GET_NPROCS], [1])])
 
 # Check for font
 AC_MSG_NOTICE([Searching font...])
-font=`find /usr -type f -iname freemono.ttf`
+font=`find /usr -type f -iname freemono.otf`
 if test "x$font" = "x"; then
-	AC_MSG_ERROR([FreeMono font not found])
-else
-	AC_MSG_NOTICE([Font: $font])
-	AC_SUBST(FONT, "-DFONT=\\\"$font\\\"")
+	font=`find /usr -type f -iname freemono.ttf`
+	if test "x$font" = "x"; then
+		AC_MSG_ERROR([FreeMono font not found])
+	fi
 fi
+AC_MSG_NOTICE([Font: $font])
+AC_SUBST(FONT, "-DFONT=\\\"$font\\\"")
 
 # Set precision
 AC_SUBST(PRECISION, "-DJBM_PRECISION=2")
