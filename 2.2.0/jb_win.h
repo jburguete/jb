@@ -88,6 +88,13 @@ jbw_show_error3 (const char *message1,  ///< 1st error message.
 #include FT_MODULE_H
 #include <GL/glew.h>
 #include <gtk/gtk.h>
+#if HAVE_FREEGLUT
+#include <GL/freeglut.h>
+#elif HAVE_SDL
+#include <SDL.h>
+#elif HAVE_GLFW
+#include <GLFW/glfw3.h>
+#endif
 
 /**
  * \def JBW_GRAPHIC_N_TYPES
@@ -147,11 +154,20 @@ struct _JBWGraphic
   JBDOUBLE ytic[JBW_GRAPHIC_N_TICS];    ///< y-axis tics.
   JBDOUBLE ztic[JBW_GRAPHIC_N_TICS];    ///< z-axis tics.
   void (*draw) (JBWGraphic * graphic);  ///< pointer to the draw function.
+  int (*calculate) (JBWGraphic * graphic);
+  ///< pointer to a calculate function.
   JBWImage *logo;               ///< logo.
+#if HAVE_GTKGLAREA
   GtkWindow *window;            ///< GtkWindow window.
   GtkGLArea *widget;            ///< GtkGLArea widget.
+#elif HAVE_SDL
+  SDL_Window *window;           ///< SDL window.
+#elif HAVE_GLFW
+  GLFWwindow *window;           ///< GLFW window.
+#endif
   FT_Library *ft;               ///< FreeType data.
   FT_Face *face;                ///< FreeType face to draw text.
+  void *data;                   ///< user data.
   const char *str_title;        ///< title label.
   const char *str_x;            ///< x label.
   const char *str_y;            ///< 1st y label.
@@ -183,6 +199,8 @@ struct _JBWGraphic
   int x2;                       ///< maximum viewport x-coordinate.
   int y1;                       ///< minimum viewport y-coordinate.
   int y2;                       ///< maximum viewport y-coordinate.
+  int minimum_width;            ///< minimum screen width.
+  int minimum_height;           ///< maximum screen width.
   int width;                    ///< screen width.
   int height;                   ///< screen width.
   unsigned int char_width;      ///< character width.
@@ -252,7 +270,7 @@ extern const GLfloat jbw_white[4];
 
 extern const GLfloat jbw_identity[16];
 
-void jbw_init (int *argn, char ***argc);
+int jbw_init (int *argn, char ***argc);
 
 void jbw_show_message (const char *title, const char *message,
                        GtkMessageType type);
@@ -294,13 +312,20 @@ void jbw_draw_orthogonal_matrixl (GLint uniform, GLdouble x, GLdouble y,
 
 JBWImage *jbw_image_new (char *name);
 
+#if HAVE_FREEGLUT
+void jbw_freeglut_draw_resize (int width, int height);
+void jbw_freeglut_draw ();
+#endif
+
 void jbw_graphic_destroy (JBWGraphic * graphic);
+void jbw_graphic_init (JBWGraphic * graphic);
 void jbw_graphic_resize (JBWGraphic * graphic, int width, int height);
 void jbw_graphic_render (JBWGraphic * graphic);
+void jbw_graphic_set_title (JBWGraphic *, const char *title);
+void jbw_graphic_set_logo (JBWGraphic *, char *name);
 JBWGraphic *jbw_graphic_new (unsigned int nx, unsigned int ny, unsigned int nz,
                              void (*draw) (JBWGraphic * graphic),
-                             unsigned int window);
-void jbw_graphic_set_logo (JBWGraphic *, char *name);
+                             const char *title);
 void jbw_graphic_get_display_size (JBWGraphic * graphic);
 void jbw_graphic_draw_text (JBWGraphic * graphic, const char *string, GLfloat x,
                             GLfloat y, const GLfloat * color);
@@ -343,6 +368,7 @@ void jbw_graphic_draw_linesvl (JBWGraphic * graphic, void *x, void *y1,
                                int n);
 void jbw_graphic_save (JBWGraphic * graphic, char *file_name);
 void jbw_graphic_dialog_save (JBWGraphic * graphic);
+void jbw_graphic_main_loop (JBWGraphic * graphic);
 
 void jbw_array_editor_check_column (JBWArrayEditor * editor, int column,
                                     int type);
@@ -415,16 +441,6 @@ jbw_graphic_set_grid (JBWGraphic * graphic,     ///< JBWGraphic widget.
 }
 
 /**
- * Function to set the title label of a JBWGraphic widget.
- */
-static inline void
-jbw_graphic_set_title (JBWGraphic * graphic,    ///< JBWGraphic widget.
-                       const char *title)       ///< title label.
-{
-  graphic->str_title = title;
-}
-
-/**
  * Function to set the x label of a JBWGraphic widget.
  */
 static inline void
@@ -493,20 +509,52 @@ jbw_graphic_set_size_request (JBWGraphic * graphic,     ///< JBWGraphic widget.
                               int width,        ///< minimum width.
                               int height)       ///< minimum height.
 {
+  graphic->minimum_width = width;
+  graphic->minimum_height = height;
+#if HAVE_GTKGLAREA
   gtk_widget_set_size_request (GTK_WIDGET (graphic->widget), width, height);
+#elif HAVE_SDL
+  SDL_SetWindowMinimumSize (graphic->window, width, height);
+#elif HAVE_GLFW
+  glfwSetWindowSizeLimits (graphic->window, width, height, GLFW_DONT_CARE,
+                           GLFW_DONT_CARE);
+#endif
+}
+
+/**
+ * Function to set a calculate function on a JBWGraphic widget.
+ */
+static inline void
+jbw_graphic_set_calculate (JBWGraphic * graphic,        ///< JBWGraphic widget.
+                           int (*calculate) (JBWGraphic * graphic))
+                                 ///< calculate function.
+{
+  graphic->calculate = calculate;
+}
+
+/**
+ * Function to set user data on a JBWGraphic widget.
+ */
+static inline void
+jbw_graphic_set_data (JBWGraphic * graphic,     ///< JBWGraphic widget.
+                      void *data)       ///< user data.
+{
+  graphic->data = data;
 }
 
 /**
  * Function to show the JBWGraphic widget.
  */
+#if HAVE_GTKGLAREA
 static inline void
-jbw_graphic_show (JBWGraphic * graphic)
+jbw_graphic_show (JBWGraphic * graphic) ///< JBWGraphic widget.
 {
   GtkWidget *w;
   w = graphic->window ? GTK_WIDGET (graphic->window)
     : GTK_WIDGET (graphic->widget);
   gtk_widget_show_all (w);
 }
+#endif
 
 #endif
 

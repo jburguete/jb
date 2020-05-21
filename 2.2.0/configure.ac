@@ -1,5 +1,5 @@
 AC_PREREQ([2.67])
-AC_INIT([jb], [2.0.2], [https://github.com/jburguete/jb])
+AC_INIT([jb], [2.2.0], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -38,29 +38,6 @@ if test $win = 1; then
 else
 	AC_SUBST(SO, [.so])
 fi
-
-# Checks for libraries
-AC_SEARCH_LIBS([fmaxl], [m])
-PKG_CHECK_MODULES([XML], [libxml-2.0])
-PKG_CHECK_MODULES([GLIB], [glib-2.0])
-
-# Checks for GTK+ interface
-PKG_CHECK_MODULES([GTK], [gtk+-3.0])
-AC_SUBST(JBW, [-DJBW=2])
-gtk=1
-
-# Checks for graphic interface
-if test $gtk = 1; then
-	AC_SEARCH_LIBS([glViewport], [GL opengl32], 
-		       AC_MSG_NOTICE([OpenGL OK]),
-		       AC_MSG_ERROR([OpenGL not found]))
-fi
-PKG_CHECK_MODULES([GLEW], [glew])
-
-# Checks for header files
-AC_CHECK_HEADERS([stdlib.h string.h unistd.h],,
-								 AC_MSG_ERROR([Missing standard headers]))
-AC_CHECK_HEADER([sys/sysinfo.h], AC_DEFINE([HAVE_SYSINFO], [1]))
 
 # Checking -march=native compiler flag
 if test $win = 0; then
@@ -113,6 +90,60 @@ else
 	AC_MSG_NOTICE("checking for -std=gnu11... yes")
 	AC_SUBST(STD, "-std=gnu11")
 fi
+
+# Checks for libraries
+AC_SEARCH_LIBS([fmaxl], [m])
+AC_SEARCH_LIBS([textdomain], [intl])
+PKG_CHECK_MODULES([XML], [libxml-2.0])
+PKG_CHECK_MODULES([GLIB], [glib-2.0])
+PKG_CHECK_MODULES([GTHREAD], [gthread-2.0])
+PKG_CHECK_MODULES([GTOP], [libgtop-2.0])
+
+# Checks for GTK+ interface
+PKG_CHECK_MODULES([GTK], [gtk+-3.0])
+AC_SUBST(JBW, [-DJBW=2])
+gtk=1
+
+# Checks for graphic interface
+if test $gtk = 1; then
+	AC_SEARCH_LIBS([glViewport], [GL opengl32], 
+		       AC_MSG_NOTICE([OpenGL OK]),
+		       AC_MSG_ERROR([OpenGL not found]))
+fi
+PKG_CHECK_MODULES([PNG], [libpng])
+PKG_CHECK_MODULES([FREETYPE], [freetype2])
+PKG_CHECK_MODULES([GLEW], [glew])
+
+# Checks for GtkGLArea, FreeGLUT, GLFW or SDL to draw the graphic window
+AC_ARG_WITH([gtkglarea],
+	AS_HELP_STRING([--with-gtkglarea], [Build graphic window with GtkGLArea]))
+AC_ARG_WITH([freeglut],
+	AS_HELP_STRING([--with-freeglut], [Build graphic window with FreeGLUT]))
+AC_ARG_WITH([glfw],
+	AS_HELP_STRING([--with-glfw], [Build graphic window with GLFW]))
+AC_ARG_WITH([sdl],
+	AS_HELP_STRING([--with-sdl], [Build graphic window with SDL]))
+if test "x$with_freeglut" = "xyes"; then
+	AC_SUBST(GRAPHIC, "-DHAVE_FREEGLUT=1")
+	AC_SEARCH_LIBS([glutInit], [freeglut glut], glut="yes", glut="no")
+else
+	if test "x$with_glfw" = "xyes"; then
+		AC_SUBST(GRAPHIC, "-DHAVE_GLFW=1")
+		PKG_CHECK_MODULES([GLFW], [glfw3])
+	else
+		if test "x$with_sdl" = "xyes"; then
+			AC_SUBST(GRAPHIC, "-DHAVE_SDL=1")
+			PKG_CHECK_MODULES([SDL], [sdl2])
+		else
+			AC_SUBST(GRAPHIC, "-DHAVE_GTKGLAREA=1")
+		fi
+	fi
+fi
+
+# Checks for header files
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h],,
+								 AC_MSG_ERROR([Missing standard headers]))
+AC_CHECK_HEADER([sys/sysinfo.h], AC_DEFINE([HAVE_SYSINFO], [1]))
 
 # Checks for library functions
 AC_CHECK_FUNC([exp10], [AC_DEFINE([HAVE_EXP10], [1])])

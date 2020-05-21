@@ -100,15 +100,34 @@ const GLfloat jbw_identity[16] = {
 
 /**
  * Function to init locales in the JB library with GTK interface.
+ *
+ * \return 1 on success, 0 on error.
  */
-void
+int
 jbw_init (int *argn,
           ///< pointer to the number of command line arguments.
           char ***argc)         ///< pointer to the command line arguments.
 {
   jb_init ();
+#if HAVE_FREEGLUT
+  glutInit (argn, *argc);
+  glutInitDisplayMode (GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+#elif HAVE_SDL
+  if (SDL_Init (SDL_INIT_VIDEO))
+    {
+      printf ("%s:\n%s\n", _("unable to init SDL"), SDL_GetError ());
+      return 0;
+    }
+#elif HAVE_GLFW
+  if (!glfwInit ())
+    {
+      printf ("%s\n", _("unable to init GLFW"));
+      return 0;
+    }
+#endif
   gtk_disable_setlocale ();
   gtk_init (argn, argc);
+  return 1;
 }
 
 /**
@@ -803,10 +822,11 @@ jbw_graphic_delete (JBWGraphic * graphic)       ///< JBWGraphic widget.
 void
 jbw_graphic_destroy (JBWGraphic * graphic)      ///< JBWGraphic widget.
 {
+#if HAVE_GTKGLAREA
   if (graphic->window)
     gtk_widget_destroy (GTK_WIDGET (graphic->window));
-  else
-    gtk_widget_destroy (GTK_WIDGET (graphic->widget));
+#endif
+  jbw_graphic_delete (graphic);
 }
 
 /**
@@ -875,7 +895,9 @@ jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
   GLenum glew_status;
 
   // Selecting current OpenGL area
+#if HAVE_GTKGLAREA
   gtk_gl_area_make_current (graphic->widget);
+#endif
 
   // Initing GLEW library
   glew_status = glewInit ();
@@ -1192,12 +1214,14 @@ jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
   // setting char and window sizes
   graphic->char_width = (*graphic->face)->glyph->advance.x >> 6;
   graphic->char_height = JBW_GRAPHIC_FONT_SIZE;
-  gtk_widget_set_size_request (GTK_WIDGET (graphic->widget),
-                               ((1 + graphic->nxmax) * JBW_GRAPHIC_N_CHARS + 1)
-                               * graphic->char_width,
-                               (5 + graphic->nymax) * graphic->char_height);
-  g_signal_connect_swapped (graphic->widget, "delete-event",
-                            (GCallback) jbw_graphic_delete, graphic);
+  jbw_graphic_set_size_request (graphic,
+                                ((1 + graphic->nxmax) * JBW_GRAPHIC_N_CHARS + 1)
+                                * graphic->char_width,
+                                (5 + graphic->nymax) * graphic->char_height);
+#if HAVE_GTKGLAREA
+  g_signal_connect (graphic->window, "destroy",
+                    (GCallback) gtk_widget_destroyed, &graphic->window);
+#endif
 
   // ending on success
   return;
@@ -1219,8 +1243,13 @@ jbw_graphic_resize (JBWGraphic * graphic,       ///< JBWGraphic widget.
                     int width,  ///< new screen width.
                     int height) ///< new screen height.
 {
+  width = JBM_MAX (width, graphic->minimum_width);
+  height = JBM_MAX (height, graphic->minimum_height);
   graphic->width = width;
   graphic->height = height;
+#if HAVE_FREEGLUT
+  glutReshapeWindow (width, height);
+#endif
   glViewport (0, 0, width, height);
 }
 
@@ -1231,6 +1260,46 @@ void
 jbw_graphic_render (JBWGraphic * graphic)       ///< JBWGraphic widget.
 {
   graphic->draw (graphic);
+#if HAVE_GTKGLAREA
+  gtk_widget_queue_draw (GTK_WIDGET (graphic->widget));
+#elif HAVE_FREEGLUT
+  glutSwapBuffers ();
+#elif HAVE_SDL
+  SDL_GL_SwapWindow (graphic->window);
+#elif HAVE_GLFW
+  glfwSwapBuffers (graphic->window);
+#endif
+}
+
+/**
+ * Function to set the title label of a JBWGraphic widget.
+ */
+void
+jbw_graphic_set_title (JBWGraphic * graphic,    ///< JBWGraphic widget.
+                       const char *title)       ///< title label.
+{
+  graphic->str_title = title;
+#if HAVE_GTKGLAREA
+  gtk_window_set_title (graphic->window, title);
+#elif HAVE_FREEGLUT
+  glutSetWindowTitle (title);
+#elif HAVE_SDL
+  SDL_SetWindowTitle (graphic->window, title);
+#elif HAVE_GLFW
+  glfwSetWindowTitle (graphic->window, title);
+#endif
+}
+
+/**
+ * Function to set the logo on a JBWGraphic widget.
+ */
+void
+jbw_graphic_set_logo (JBWGraphic * graphic,     ///< JBWGraphic widget.
+                      char *name)       ///< logo PNG file name.
+{
+  if (graphic->logo)
+    jbw_image_delete (graphic->logo);
+  graphic->logo = jbw_image_new (name);
 }
 
 /**
@@ -1242,7 +1311,7 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
                  unsigned int nz,       ///< maximum number of x-tics.
                  void (*draw) (JBWGraphic * graphic),
                  ///< pointer to the render function.
-                 unsigned int window)   ///< 1 on new window, 0 otherwise.
+                 const char *title)     ///< title.
 {
   const char *error_msg;
   JBWGraphic *graphic;
@@ -1264,10 +1333,13 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
     }
 
   // Setting default properties
+  graphic->calculate = NULL;
+  graphic->data = NULL;
   graphic->resize = graphic->grid = 1;
   graphic->map = 0;
-  graphic->str_title = graphic->str_x = graphic->str_y =
-    graphic->str_yy = graphic->str_z = graphic->str_zz = NULL;
+  graphic->str_x = graphic->str_y = graphic->str_yy = graphic->str_z
+    = graphic->str_zz = NULL;
+  graphic->str_title = title;
   graphic->logo = NULL;
   graphic->nxmax = nx;
   graphic->nymax = ny;
@@ -1278,7 +1350,9 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
   graphic->face = NULL;
   jbw_graphic_set_draw (graphic, draw);
 
-  // Setting up the GtkGLArea widget
+
+  // Setting up the new window
+#if HAVE_GTKGLAREA
   graphic->widget = (GtkGLArea *) gtk_gl_area_new ();
   if (!graphic->widget)
     {
@@ -1291,38 +1365,51 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
                             (GCallback) jbw_graphic_resize, graphic);
   g_signal_connect_swapped (graphic->widget, "render",
                             (GCallback) jbw_graphic_render, graphic);
-
-  // Setting up the new window
-  if (window)
+  graphic->window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_container_add (GTK_CONTAINER (graphic->window),
+                     GTK_WIDGET (graphic->widget));
+  gtk_window_set_title (graphic->window, title);
+#elif HAVE_FREEGLUT
+  glutInitWindowSize (100, 100);
+  glutCreateWindow (title);
+#elif HAVE_SDL
+  graphic->window
+    = SDL_CreateWindow (title,
+                        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                        100, 100, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+  if (!graphic->window)
     {
-      graphic->window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
-      gtk_container_add (GTK_CONTAINER (graphic->window),
-                         GTK_WIDGET (graphic->widget));
+      error_msg = SDL_GetError ();
+      goto error2;
     }
-  else
-    graphic->window = NULL;
+  SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+  if (!SDL_GL_CreateContext (graphic->window))
+    {
+      error_msg = SDL_GetError ();
+      goto error2;
+    }
+#elif HAVE_GLFW
+  graphic->window = glfwCreateWindow (100, 100, title, NULL, NULL);
+  if (!graphic->window)
+    {
+      error_msg = _("unable to open the window");
+      glfwTerminate ();
+      goto error2;
+    }
+  glfwMakeContextCurrent (graphic->window);
+#endif
 
   // Return the widget pointer
   return graphic;
 
   // Exit and show an error message on error
+#if !HAVE_FREEGLUT
 error2:
+#endif
   jbw_graphic_destroy (graphic);
 error1:
   jbw_show_error (error_msg);
   return NULL;
-}
-
-/**
- * Function to set the logo on a JBWGraphic widget.
- */
-void
-jbw_graphic_set_logo (JBWGraphic * graphic,     ///< JBWGraphic widget.
-                      char *name)       ///< logo PNG file name.
-{
-  if (graphic->logo)
-    jbw_image_delete (graphic->logo);
-  graphic->logo = jbw_image_new (name);
 }
 
 /**
@@ -1331,10 +1418,19 @@ jbw_graphic_set_logo (JBWGraphic * graphic,     ///< JBWGraphic widget.
 void
 jbw_graphic_get_display_size (JBWGraphic * graphic)
 {
+#if HAVE_GTKGLAREA
   graphic->width
     = gtk_widget_get_allocated_width (GTK_WIDGET (graphic->widget));
   graphic->height
     = gtk_widget_get_allocated_height (GTK_WIDGET (graphic->widget));
+#elif HAVE_FREEGLUT
+  graphic->width = glutGet (GLUT_WINDOW_WIDTH);
+  graphic->height = glutGet (GLUT_WINDOW_HEIGHT);
+#elif HAVE_SDL
+  SDL_GetWindowSize (graphic->window, &graphic->width, &graphic->height);
+#elif HAVE_GLFW
+  glfwGetFramebufferSize (graphic->window, &graphic->width, &graphic->height);
+#endif
 }
 
 /**
@@ -2345,7 +2441,7 @@ jbw_graphic_save (JBWGraphic * graphic, ///< JBWGraphic struct.
  * Function to show a dialog to save the JBWGraphic widget on a graphic file.
  */
 void
-jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic file.
+jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
 {
 #if JBW_GRAPHIC_OUTPUT == JBW_GRAPHIC_OUTPUT_GDKPIXBUF
   const char *filter_name[JBW_GRAPHIC_N_TYPES] = {
@@ -2401,6 +2497,75 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic file.
       jbw_graphic_save (graphic, buffer);
       g_free (buffer);
     }
+}
+
+/**
+ * Function to do a main loop in a JBWGraphic widget.
+ */
+void
+jbw_graphic_main_loop (JBWGraphic * graphic __attribute__((unused)))
+  ///< JBWGraphic struct.
+{
+#if HAVE_GTKGLAREA
+
+  if (graphic->calculate)
+    g_idle_add ((GSourceFunc) graphic->calculate, graphic);
+  gtk_main ();
+
+#elif HAVE_FREEGLUT
+
+  // Passing the GTK+ signals to the FreeGLUT main loop
+  glutIdleFunc ((void (*)(void)) gtk_main_iteration);
+  // Setting our draw resize function as the FreeGLUT reshape function
+  glutReshapeFunc (jbw_freeglut_draw_resize);
+  // Setting our draw function as the FreeGLUT display function
+  glutDisplayFunc (jbw_freeglut_draw);
+  // FreeGLUT main loop
+  glutMainLoop ();
+
+#elif HAVE_SDL
+
+  SDL_Event event[1];
+  jbw_graphic_render (graphic);
+  while (1)
+    {
+      while (gtk_events_pending ())
+        gtk_main_iteration ();
+      while (SDL_PollEvent (event))
+        {
+          if (event->type == SDL_QUIT)
+            return;
+          if (event->type == SDL_WINDOWEVENT)
+            {
+              if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                jbw_graphic_resize (graphic, event->window.data1,
+                                    event->window.data2);
+              else
+                jbw_graphic_render (graphic);
+            }
+          if (graphic->calculate)
+            if (!graphic->calculate (graphic))
+              graphic->calculate = NULL;
+        }
+    }
+
+#elif HAVE_GLFW
+
+  jbw_graphic_render (graphic);
+  while (!glfwWindowShouldClose (graphic->window))
+    {
+      while (gtk_events_pending ())
+        gtk_main_iteration ();
+      glfwPollEvents ();
+      if (graphic->calculate)
+        {
+          if (!graphic->calculate (graphic))
+            graphic->calculate = NULL;
+        }
+      jbw_graphic_render (graphic);
+    }
+
+#endif
 }
 
 /**
