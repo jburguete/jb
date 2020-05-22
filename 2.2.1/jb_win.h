@@ -288,8 +288,8 @@ void jbw_array_radio_buttons_set_active (GtkRadioButton ** array, int n,
                                          int is_active);
 int jbw_array_radio_buttons_get_active (GtkRadioButton ** array);
 
-void jbw_float_entry_set_value_with_format (JBWFloatEntry * entry, char *format,
-                                            JBDOUBLE value);
+void jbw_float_entry_set_value_with_format (JBWFloatEntry * entry,
+                                            char *format, JBDOUBLE value);
 #if HIGH_PRECISION > 2
 void jbw_float_entry_set_value (JBWFloatEntry * entry, JBDOUBLE value);
 JBDOUBLE jbw_float_entry_get_value (JBWFloatEntry * entry);
@@ -323,12 +323,13 @@ void jbw_graphic_resize (JBWGraphic * graphic, int width, int height);
 void jbw_graphic_render (JBWGraphic * graphic);
 void jbw_graphic_set_title (JBWGraphic *, const char *title);
 void jbw_graphic_set_logo (JBWGraphic *, char *name);
-JBWGraphic *jbw_graphic_new (unsigned int nx, unsigned int ny, unsigned int nz,
+JBWGraphic *jbw_graphic_new (unsigned int nx, unsigned int ny,
+                             unsigned int nz,
                              void (*draw) (JBWGraphic * graphic),
                              const char *title);
 void jbw_graphic_get_display_size (JBWGraphic * graphic);
-void jbw_graphic_draw_text (JBWGraphic * graphic, const char *string, GLfloat x,
-                            GLfloat y, const GLfloat * color);
+void jbw_graphic_draw_text (JBWGraphic * graphic, const char *string,
+                            GLfloat x, GLfloat y, const GLfloat * color);
 void jbw_graphic_map_resize (JBWGraphic *);
 void jbw_graphic_draw_resize (JBWGraphic * graphic, JBFLOAT * x, JBFLOAT * y1,
                               JBFLOAT * y2, JBFLOAT * z1, JBFLOAT * z2, int n);
@@ -336,19 +337,20 @@ void jbw_graphic_draw_resizel (JBWGraphic * graphic, JBDOUBLE * x,
                                JBDOUBLE * y1, JBDOUBLE * y2, JBDOUBLE * z1,
                                JBDOUBLE * z2, int n);
 void jbw_graphic_draw_resizev (JBWGraphic * graphic, void *x, void *y1,
-                               void *y2, void *z1, void *z2, unsigned int size,
-                               int n);
+                               void *y2, void *z1, void *z2,
+                               unsigned int size, int n);
 void jbw_graphic_draw_resizevl (JBWGraphic * graphic, void *x, void *y1,
-                                void *y2, void *z1, void *z2, unsigned int size,
-                                int n);
-void jbw_graphic_draw_rectangles_color (JBWGraphic * graphic, GLfloat * vertex,
-                                        GLushort * index, unsigned int n);
+                                void *y2, void *z1, void *z2,
+                                unsigned int size, int n);
+void jbw_graphic_draw_rectangles_color (JBWGraphic * graphic,
+                                        GLfloat * vertex, GLushort * index,
+                                        unsigned int n);
 void jbw_graphic_draw_farray (JBWGraphic * graphic, JBFLOAT * x, JBFLOAT * y,
                               unsigned int n, const GLfloat * color,
                               GLenum type);
-void jbw_graphic_draw_darray (JBWGraphic * graphic, JBDOUBLE * x, JBDOUBLE * y,
-                              unsigned int n, const GLfloat * color,
-                              GLenum type);
+void jbw_graphic_draw_darray (JBWGraphic * graphic, JBDOUBLE * x,
+                              JBDOUBLE * y, unsigned int n,
+                              const GLfloat * color, GLenum type);
 void jbw_graphic_draw_rectangle (JBWGraphic * graphic, JBFLOAT x1, JBFLOAT y1,
                                  JBFLOAT x2, JBFLOAT y2, const GLfloat * color);
 void jbw_graphic_draw_rectanglel (JBWGraphic * graphic, JBDOUBLE x1,
@@ -358,22 +360,23 @@ void jbw_graphic_draw_labels (JBWGraphic * graphic);
 void jbw_graphic_draw_logo (JBWGraphic * graphic);
 void jbw_graphic_draw_lines (JBWGraphic * graphic, JBFLOAT * x, JBFLOAT * y1,
                              JBFLOAT * y2, JBFLOAT * z1, JBFLOAT * z2, int n);
-void jbw_graphic_draw_linesl (JBWGraphic * graphic, JBDOUBLE * x, JBDOUBLE * y1,
-                              JBDOUBLE * y2, JBDOUBLE * z1, JBDOUBLE * z2,
+void jbw_graphic_draw_linesl (JBWGraphic * graphic, JBDOUBLE * x,
+                              JBDOUBLE * y1, JBDOUBLE * y2, JBDOUBLE * z1,
+                              JBDOUBLE * z2, int n);
+void jbw_graphic_draw_linesv (JBWGraphic * graphic, void *x, void *y1,
+                              void *y2, void *z1, void *z2, unsigned int size,
                               int n);
-void jbw_graphic_draw_linesv (JBWGraphic * graphic, void *x, void *y1, void *y2,
-                              void *z1, void *z2, unsigned int size, int n);
 void jbw_graphic_draw_linesvl (JBWGraphic * graphic, void *x, void *y1,
-                               void *y2, void *z1, void *z2, unsigned int size,
-                               int n);
+                               void *y2, void *z1, void *z2,
+                               unsigned int size, int n);
 void jbw_graphic_save (JBWGraphic * graphic, char *file_name);
 void jbw_graphic_dialog_save (JBWGraphic * graphic);
 void jbw_graphic_main_loop (JBWGraphic * graphic);
 
 void jbw_array_editor_check_column (JBWArrayEditor * editor, int column,
                                     int type);
-void jbw_array_editor_set_element (JBWArrayEditor * editor, int row, int column,
-                                   const char *str);
+void jbw_array_editor_set_element (JBWArrayEditor * editor, int row,
+                                   int column, const char *str);
 char *jbw_array_editor_get_element (JBWArrayEditor * editor, int row,
                                     int column);
 void jbw_array_editor_set_element_int (JBWArrayEditor * editor, int row,
@@ -408,8 +411,8 @@ void jbw_array_editor_set_column_time (JBWArrayEditor * editor, int column,
                                        JBDOUBLE * t);
 void jbw_array_editor_get_column_time (JBWArrayEditor * editor, int column,
                                        JBDOUBLE * t);
-void jbw_array_editor_set_column_sensitive (JBWArrayEditor * editor, int column,
-                                            int sensitive);
+void jbw_array_editor_set_column_sensitive (JBWArrayEditor * editor,
+                                            int column, int sensitive);
 void jbw_array_editor_show_column (JBWArrayEditor * editor, int column);
 void jbw_array_editor_hide_column (JBWArrayEditor * editor, int column);
 void jbw_array_editor_insert_row (JBWArrayEditor * editor, int row);

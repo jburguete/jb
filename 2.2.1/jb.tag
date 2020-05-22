@@ -2,7 +2,7 @@
 <tagfile>
   <compound kind="file">
     <name>jb_config.h</name>
-    <path>/home/burguete/programas/jb/2.2.0/</path>
+    <path>/home/burguete/programas/jb/2.2.1/</path>
     <filename>jb__config_8h.html</filename>
     <member kind="define">
       <type>#define</type>
@@ -70,7 +70,7 @@
   </compound>
   <compound kind="file">
     <name>jb_def.c</name>
-    <path>/home/burguete/programas/jb/2.2.0/</path>
+    <path>/home/burguete/programas/jb/2.2.1/</path>
     <filename>jb__def_8c.html</filename>
     <includes id="jb__def_8h" name="jb_def.h" local="yes" imported="no">jb_def.h</includes>
     <member kind="function">
@@ -146,7 +146,7 @@
   </compound>
   <compound kind="file">
     <name>jb_def.h</name>
-    <path>/home/burguete/programas/jb/2.2.0/</path>
+    <path>/home/burguete/programas/jb/2.2.1/</path>
     <filename>jb__def_8h.html</filename>
     <includes id="jb__config_8h" name="jb_config.h" local="yes" imported="no">jb_config.h</includes>
     <member kind="define">
@@ -285,7 +285,7 @@
   </compound>
   <compound kind="file">
     <name>jb_math.c</name>
-    <path>/home/burguete/programas/jb/2.2.0/</path>
+    <path>/home/burguete/programas/jb/2.2.1/</path>
     <filename>jb__math_8c.html</filename>
     <includes id="jb__math_8h" name="jb_math.h" local="yes" imported="no">jb_math.h</includes>
     <member kind="function">
@@ -305,7 +305,7 @@
   </compound>
   <compound kind="file">
     <name>jb_math.h</name>
-    <path>/home/burguete/programas/jb/2.2.0/</path>
+    <path>/home/burguete/programas/jb/2.2.1/</path>
     <filename>jb__math_8h.html</filename>
     <includes id="jb__def_8h" name="jb_def.h" local="yes" imported="no">jb_def.h</includes>
     <member kind="define">
@@ -731,19 +731,19 @@
   </compound>
   <compound kind="file">
     <name>jb_win.c</name>
-    <path>/home/burguete/programas/jb/2.2.0/</path>
+    <path>/home/burguete/programas/jb/2.2.1/</path>
     <filename>jb__win_8c.html</filename>
     <includes id="jb__win_8h" name="jb_win.h" local="yes" imported="no">jb_win.h</includes>
   </compound>
   <compound kind="file">
     <name>jb_win.h</name>
-    <path>/home/burguete/programas/jb/2.2.0/</path>
+    <path>/home/burguete/programas/jb/2.2.1/</path>
     <filename>jb__win_8h.html</filename>
     <includes id="jb__math_8h" name="jb_math.h" local="yes" imported="no">jb_math.h</includes>
   </compound>
   <compound kind="file">
     <name>jb_xml.c</name>
-    <path>/home/burguete/programas/jb/2.2.0/</path>
+    <path>/home/burguete/programas/jb/2.2.1/</path>
     <filename>jb__xml_8c.html</filename>
     <includes id="jb__xml_8h" name="jb_xml.h" local="yes" imported="no">jb_xml.h</includes>
     <member kind="function">
@@ -854,7 +854,7 @@
   </compound>
   <compound kind="file">
     <name>jb_xml.h</name>
-    <path>/home/burguete/programas/jb/2.2.0/</path>
+    <path>/home/burguete/programas/jb/2.2.1/</path>
     <filename>jb__xml_8h.html</filename>
     <includes id="jb__math_8h" name="jb_math.h" local="yes" imported="no">jb_math.h</includes>
     <member kind="function">

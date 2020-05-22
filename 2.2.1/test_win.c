@@ -36,8 +36,8 @@ draw1 (JBWGraphic * graphic)
   const JBFLOAT z[3] = { 3., 1., 0. };
   const JBFLOAT zz[3] = { 2., 0.5, 0. };
   jbw_draw_clear (1.f, 1.f, 1.f, 0.f);
-  jbw_graphic_draw_lines (graphic, (JBFLOAT *) x, (JBFLOAT *) y, (JBFLOAT *) yy,
-                          (JBFLOAT *) z, (JBFLOAT *) zz, 2);
+  jbw_graphic_draw_lines (graphic, (JBFLOAT *) x, (JBFLOAT *) y,
+                          (JBFLOAT *) yy, (JBFLOAT *) z, (JBFLOAT *) zz, 2);
   jbw_graphic_draw_logo (graphic);
 }
 
@@ -82,6 +82,7 @@ main (int argn, char **argc)
   GtkGrid *grid;
   GtkButton *button_open1, *button_open2, *button_close;
   const char *title;
+  const char *version;
 
   if (!jbw_init (&argn, &argc))
     return 1;
@@ -118,6 +119,21 @@ main (int argn, char **argc)
 #else
   jbw_graphic_init (graphic);
 #endif
+  if (glewIsSupported ("GL_VERSION_4_0"))
+    version = "OpenGL supported version 4.0";
+  else if (glewIsSupported ("GL_VERSION_3_0"))
+    version = "OpenGL supported version 3.0";
+  else if (glewIsSupported ("GL_VERSION_2_1"))
+    version = "OpenGL supported version 2.1";
+  else if (glewIsSupported ("GL_VERSION_2_0"))
+    version = "OpenGL supported version 2.0";
+  else if (glewIsSupported ("GL_VERSION_1_3"))
+    version = "OpenGL supported version 1.3";
+  else
+    version = "OpenGL unsupported";
+  jbw_show_message ("Info", version, GTK_MESSAGE_INFO);
+  printf ("OpenGL version %s\n", glGetString (GL_VERSION));
+  printf ("GLSL version %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
 
   button_open1 = (GtkButton *) gtk_button_new_with_label ("Draw 1");
   button_open2 = (GtkButton *) gtk_button_new_with_label ("Draw 2");
@@ -130,8 +146,8 @@ main (int argn, char **argc)
   window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (grid));
 #if HAVE_GTKGLAREA
-  g_signal_connect (graphic->window, "delete-event", (GCallback) gtk_main_quit,
-                    NULL);
+  g_signal_connect (graphic->window, "delete-event",
+                    (GCallback) gtk_main_quit, NULL);
   g_signal_connect (button_close, "clicked", (GCallback) gtk_main_quit, NULL);
   g_signal_connect (window, "delete-event", (GCallback) gtk_main_quit, NULL);
 #elif HAVE_FREEGLUT
@@ -140,8 +156,8 @@ main (int argn, char **argc)
   g_signal_connect (window, "delete-event", (GCallback) glutLeaveMainLoop,
                     NULL);
 #elif HAVE_SDL
-  g_signal_connect_swapped (button_close, "clicked", (GCallback) SDL_PushEvent,
-                            exit_event);
+  g_signal_connect_swapped (button_close, "clicked",
+                            (GCallback) SDL_PushEvent, exit_event);
   g_signal_connect_swapped (window, "delete-event", (GCallback) SDL_PushEvent,
                             exit_event);
 #elif HAVE_GLFW

@@ -494,27 +494,27 @@ jbw_image_delete (JBWImage * image)     ///< JBWImage widget.
 /**
  * Function to init the OpenGL functions on a JBWImage widget.
  */
-void
-jbw_image_init (JBWImage * image)
+static void
+jbw_image_init (JBWImage * image,       ///< JBWImage widget.
+                const char *gl_version) ///< OpenGL GLSL version string.
 {
   const char *vs_texture_source =
-    "attribute vec2 position;"
-    "attribute vec2 texture_position;"
-    "varying vec2 t_position;"
+    "in vec2 position;"
+    "in vec2 texture_position;"
     "uniform mat4 matrix;"
+    "out vec2 t_position;"
     "void main()"
     "{"
     "gl_Position=matrix*vec4 (position, 0.f, 1.f);"
     "t_position=texture_position;" "}";
   const char *fs_texture_source =
-    "varying vec2 t_position;"
     "uniform sampler2D texture_image;"
+    "out vec2 t_position;"
     "void main()" "{" "gl_FragColor=texture2D(texture_image,t_position);" "}";
   const char *vertex_name = "position";
   const char *texture_name = "texture_image";
   const char *texture_position_name = "texture_position";
   const char *matrix_name = "matrix";
-  const char *gl_version = "#version 120\n";    // OpenGL 2.1
   const char *vs_texture_sources[2] = { gl_version, vs_texture_source };
   const char *fs_texture_sources[2] = { gl_version, fs_texture_source };
   const GLfloat matrix[16] = {
@@ -835,60 +835,62 @@ jbw_graphic_destroy (JBWGraphic * graphic)      ///< JBWGraphic widget.
 void
 jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
 {
-  const char *gl_version = "#version 120\n";
+  const char *gl_version_120 =
+    "#version 120\n" "#define in attribute\n" "#define out varying\n";
+  const char *gl_version_130 = "#version 130\n";
   const char *fs_source =
-    "varying vec3 fcolor;"
-    "void main()" "{" "gl_FragColor=vec4(fcolor,1.f);" "}";
+    "out vec3 fcolor;" "void main()" "{" "gl_FragColor=vec4(fcolor,1.f);" "}";
   const char *vs_2D_source =
-    "attribute vec2 position;"
+    "in vec2 position;"
     "uniform vec3 color;"
     "uniform mat4 matrix;"
-    "varying vec3 fcolor;"
+    "out vec3 fcolor;"
     "void main()"
     "{" "gl_Position=matrix*vec4(position,0.f,1.f);" "fcolor=color;" "}";
   const char *vs_3D_source =
-    "attribute vec3 position;"
+    "in vec3 position;"
     "uniform vec3 color;"
     "uniform mat4 matrix;"
-    "varying vec3 fcolor;"
+    "out vec3 fcolor;"
     "void main()"
     "{" "gl_Position=matrix*vec4(position,1.f);" "fcolor=color;" "}";
   const char *vs_2Dc_source =
-    "attribute vec2 position;"
-    "attribute vec3 color;"
+    "in vec2 position;"
+    "in vec3 color;"
     "uniform mat4 matrix;"
-    "varying vec3 fcolor;"
+    "out vec3 fcolor;"
     "void main()"
     "{" "gl_Position=matrix*vec4(position,0.f,1.f);" "fcolor=color;" "}";
   const char *vs_3Dc_source =
-    "attribute vec3 position;"
-    "attribute vec3 color;"
+    "in vec3 position;"
+    "in vec3 color;"
     "uniform mat4 matrix;"
-    "varying vec3 fcolor;"
+    "out vec3 fcolor;"
     "void main()"
     "{" "gl_Position=matrix*vec4(position,1.f);" "fcolor=color;" "}";
   const char *vs_text_source =
-    "attribute vec4 position;"
-    "varying vec2 textcoord;"
+    "in vec4 position;"
+    "out vec2 textcoord;"
     "void main()"
     "{" "gl_Position=vec4(position.xy,0.f,1.f);" "textcoord=position.zw;" "}";
   const char *fs_text_source =
-    "varying vec2 textcoord;"
     "uniform sampler2D text;"
     "uniform vec4 color;"
+    "out vec2 textcoord;"
     "void main()"
     "{" "gl_FragColor=vec4(1.f,1.f,1.f,texture2D(text,textcoord).a)*color;" "}";
   const char *position_name = "position";
   const char *color_name = "color";
   const char *matrix_name = "matrix";
   const char *text_name = "text";
-  const char *fs_sources[2] = { gl_version, fs_source };
-  const char *vs_2D_sources[2] = { gl_version, vs_2D_source };
-  const char *vs_3D_sources[2] = { gl_version, vs_3D_source };
-  const char *vs_2Dc_sources[2] = { gl_version, vs_2Dc_source };
-  const char *vs_3Dc_sources[2] = { gl_version, vs_3Dc_source };
-  const char *fs_text_sources[2] = { gl_version, fs_text_source };
-  const char *vs_text_sources[2] = { gl_version, vs_text_source };
+  const char *fs_sources[2];
+  const char *vs_2D_sources[2];
+  const char *vs_3D_sources[2];
+  const char *vs_2Dc_sources[2];
+  const char *vs_3Dc_sources[2];
+  const char *fs_text_sources[2];
+  const char *vs_text_sources[2];
+  const char *gl_version;
   const char *error_msg;
   GLint error_code;
   GLuint fs, vs;
@@ -906,6 +908,24 @@ jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
       error_msg = (const char *) glewGetErrorString (glew_status);
       goto end;
     }
+  if (glewIsSupported ("GL_VERSION_3_0"))
+    gl_version = gl_version_130;
+  else if (glewIsSupported ("GL_VERSION_2_1"))
+    gl_version = gl_version_120;
+  else
+    {
+      error_msg = _("OpenGL 2.1 is not supported");
+      goto end;
+    }
+  fs_sources[0] = vs_2D_sources[0] = vs_3D_sources[0] = vs_2Dc_sources[0]
+    = vs_3Dc_sources[0] = fs_text_sources[0] = vs_text_sources[0] = gl_version;
+  fs_sources[1] = fs_source;
+  vs_2D_sources[1] = vs_2D_source;
+  vs_3D_sources[1] = vs_3D_source;
+  vs_2Dc_sources[1] = vs_2Dc_source;
+  vs_3Dc_sources[1] = vs_3Dc_source;
+  fs_text_sources[1] = fs_text_source;
+  vs_text_sources[1] = vs_text_source;
 
   // Compiling the fragment shader
   fs = glCreateShader (GL_FRAGMENT_SHADER);
@@ -1158,7 +1178,7 @@ jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
 
   // Setting up logo
   if (graphic->logo)
-    jbw_image_init (graphic->logo);
+    jbw_image_init (graphic->logo, gl_version);
 
   // Setting up text attributes
   graphic->in_text_position
@@ -1215,8 +1235,8 @@ jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
   graphic->char_width = (*graphic->face)->glyph->advance.x >> 6;
   graphic->char_height = JBW_GRAPHIC_FONT_SIZE;
   jbw_graphic_set_size_request (graphic,
-                                ((1 + graphic->nxmax) * JBW_GRAPHIC_N_CHARS + 1)
-                                * graphic->char_width,
+                                ((1 + graphic->nxmax) * JBW_GRAPHIC_N_CHARS +
+                                 1) * graphic->char_width,
                                 (5 + graphic->nymax) * graphic->char_height);
 #if HAVE_GTKGLAREA
   g_signal_connect (graphic->window, "destroy",
@@ -2045,8 +2065,8 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
                               (JBDOUBLE) x1, (JBDOUBLE) x2);
           k = (GLfloat) xtic[i];
           jbw_graphic_draw_text (graphic, buffer,
-                                 k - 0.5f * sx * strlen (buffer), sb - 1.f + sy,
-                                 jbw_black);
+                                 k - 0.5f * sx * strlen (buffer),
+                                 sb - 1.f + sy, jbw_black);
         }
     }
   if (graphic->str_y || graphic->str_yy)
