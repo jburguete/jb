@@ -97,7 +97,7 @@ AC_SEARCH_LIBS([textdomain], [intl])
 PKG_CHECK_MODULES([XML], [libxml-2.0])
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 PKG_CHECK_MODULES([GTHREAD], [gthread-2.0])
-PKG_CHECK_MODULES([GTOP], [libgtop-2.0])
+PKG_CHECK_MODULES([GTOP], [libgtop-2.0], ,AC_MSG_NOTICE([No libgtop]))
 
 # Checks for GTK+ interface
 PKG_CHECK_MODULES([GTK], [gtk+-3.0])
