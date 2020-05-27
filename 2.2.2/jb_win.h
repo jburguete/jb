@@ -160,6 +160,8 @@ struct _JBWGraphic
 #if HAVE_GTKGLAREA
   GtkWindow *window;            ///< GtkWindow window.
   GtkGLArea *widget;            ///< GtkGLArea widget.
+#elif HAVE_FREEGLUT
+  int window;                   ///< FreeGLUT window number.
 #elif HAVE_SDL
   SDL_Window *window;           ///< SDL window.
 #elif HAVE_GLFW

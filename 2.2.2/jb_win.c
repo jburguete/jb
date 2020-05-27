@@ -825,6 +825,8 @@ jbw_graphic_destroy (JBWGraphic * graphic)      ///< JBWGraphic widget.
 #if HAVE_GTKGLAREA
   if (graphic->window)
     gtk_widget_destroy (GTK_WIDGET (graphic->window));
+#elif HAVE_FREEGLUT
+  glutDestroyWindow (graphic->window);
 #endif
   jbw_graphic_delete (graphic);
 }
@@ -917,6 +919,9 @@ jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
       error_msg = _("OpenGL 2.1 is not supported");
       goto end;
     }
+
+  // Initing variables
+init:
   fs_sources[0] = vs_2D_sources[0] = vs_3D_sources[0] = vs_2Dc_sources[0]
     = vs_3Dc_sources[0] = fs_text_sources[0] = vs_text_sources[0] = gl_version;
   fs_sources[1] = fs_source;
@@ -1248,11 +1253,13 @@ jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
 
   // ending on error
 end:
-  if (error_msg)
+  if (gl_version != gl_version_120)
     {
-      jbw_show_error2 ("JBWGraphic", error_msg);
-      exit (0);
+      gl_version = gl_version_120;
+      goto init;
     }
+  jbw_show_error2 ("JBWGraphic", error_msg);
+  exit (0);
 }
 
 /**
@@ -1391,7 +1398,7 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
   gtk_window_set_title (graphic->window, title);
 #elif HAVE_FREEGLUT
   glutInitWindowSize (100, 100);
-  glutCreateWindow (title);
+  graphic->window = glutCreateWindow (title);
 #elif HAVE_SDL
   graphic->window
     = SDL_CreateWindow (title,
