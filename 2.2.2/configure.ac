@@ -16,6 +16,9 @@ elif test $host = "i686-w64-mingw32"; then
 	AC_MSG_NOTICE([Microsoft Windows 32 bits])
 	win=1
 	win32=1
+elif test `uname -s` = "FreeBSD"; then
+	AC_MSG_NOTICE([FreeBSD])
+	LDFLAGS="$LDFLAGS -L/usr/local/lib"
 elif test `uname -s` = "OpenBSD"; then
 	AC_MSG_NOTICE([OpenBSD])
 	LDFLAGS="$LDFLAGS -L/usr/X11R6/lib"
