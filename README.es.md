@@ -93,22 +93,22 @@ En sistemas Microsoft Windows hay que instalar
 utilidades requeridas. Puede seguir instrucciones detalladas en el tutorial
 [install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf).
 
-On NetBSD 7.0 you have to do first on the building terminal:
-> $ export PATH=/usr/pkg/gcc5/bin:$PATH"
+On NetBSD 9.0 you have to do first on the building terminal:
+> $ export PATH="/usr/pkg/gcc9/bin:$PATH"
 
-On OpenBSD 6.4 you have to do first on the building terminal:
+On OpenBSD 6.7 you have to do first on the building terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 This software has been built and tested in the following operative systems:
-* Debian 9 (Linux, kFreeBSD and Hurd)
+* Debian 9 (Linux and Hurd)
 * DragonFly BSD 5.2
 * Dyson Illumos
 * Fedora Linux 29
-* FreeBSD 11.2
+* FreeBSD 12.1
 * Manjaro Linux
 * Microsoft Windows 10
-* NetBSD 7.0 (with modular xorg)
-* OpenBSD 6.4
+* NetBSD 9.0
+* OpenBSD 6.7
 * OpenInidiana Hipster
 * OpenSUSE Linux Leap 15
 * Xubuntu Linux 18.10
