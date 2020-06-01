@@ -41,6 +41,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <locale.h>
 #if HAVE_SYSINFO
 #include <sys/sysinfo.h>
 #endif

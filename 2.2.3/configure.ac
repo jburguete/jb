@@ -1,5 +1,5 @@
 AC_PREREQ([2.67])
-AC_INIT([jb], [2.2.2], [https://github.com/jburguete/jb])
+AC_INIT([jb], [2.2.3], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -19,6 +19,10 @@ elif test $host = "i686-w64-mingw32"; then
 elif test `uname -s` = "FreeBSD"; then
 	AC_MSG_NOTICE([FreeBSD])
 	LDFLAGS="$LDFLAGS -L/usr/local/lib"
+elif test `uname -s` = "NetBSD"; then
+	AC_MSG_NOTICE([NetBSD])
+	LDFLAGS="$LDFLAGS -L/usr/X11R7/lib"
+	CPPFLAGS="$CPPFLAGS -I/usr/X11R7/include"
 elif test `uname -s` = "OpenBSD"; then
 	AC_MSG_NOTICE([OpenBSD])
 	LDFLAGS="$LDFLAGS -L/usr/X11R6/lib"
