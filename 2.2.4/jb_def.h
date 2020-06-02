@@ -47,6 +47,10 @@
 #endif
 #include <glib.h>
 #include <glib/gstdio.h>
+#if HAVE_GTOP
+#include <glibtop.h>
+#include <glibtop/close.h>
+#endif
 #include <libintl.h>
 
 #define JBW_NO 1

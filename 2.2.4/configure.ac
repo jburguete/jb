@@ -1,5 +1,5 @@
 AC_PREREQ([2.67])
-AC_INIT([jb], [2.2.3], [https://github.com/jburguete/jb])
+AC_INIT([jb], [2.2.4], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -104,7 +104,9 @@ AC_SEARCH_LIBS([textdomain], [intl])
 PKG_CHECK_MODULES([XML], [libxml-2.0])
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 PKG_CHECK_MODULES([GTHREAD], [gthread-2.0])
-PKG_CHECK_MODULES([GTOP], [libgtop-2.0], ,AC_MSG_NOTICE([No libgtop]))
+PKG_CHECK_MODULES([GTOP], [libgtop-2.0],
+	AC_DEFINE([HAVE_GTOP], [1]),
+	AC_MSG_NOTICE([No gtop]))
 
 # Checks for GTK+ interface
 PKG_CHECK_MODULES([GTK], [gtk+-3.0])
@@ -153,9 +155,9 @@ AC_CHECK_HEADERS([stdlib.h string.h unistd.h],,
 AC_CHECK_HEADER([sys/sysinfo.h], AC_DEFINE([HAVE_SYSINFO], [1]))
 
 # Checks for library functions
-AC_CHECK_FUNC([exp10], [AC_DEFINE([HAVE_EXP10], [1])])
-AC_CHECK_FUNC([fmemopen], [AC_DEFINE([HAVE_FMEMOPEN], [1])])
-AC_CHECK_FUNC([get_nprocs], [AC_DEFINE([HAVE_GET_NPROCS], [1])])
+AC_CHECK_FUNC([exp10], AC_DEFINE([HAVE_EXP10], [1]))
+AC_CHECK_FUNC([fmemopen], AC_DEFINE([HAVE_FMEMOPEN], [1]))
+AC_CHECK_FUNC([get_nprocs], AC_DEFINE([HAVE_GET_NPROCS], [1]))
 
 # Check for font
 AC_MSG_NOTICE([Searching font...])

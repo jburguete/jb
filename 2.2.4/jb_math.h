@@ -1827,7 +1827,7 @@ jbm_solve_quadraticl (JBDOUBLE a,
 
 /**
  * Function to calculate the solution of a reduced cubic equation in an interval
- * \f$\left[x_1,x_2\right]\f$ in the form \fx^3+a\,x^2+b\,x+c=0\f$
+ * \f$\left[x_1,x_2\right]\f$ in the form \f$x^3+a\,x^2+b\,x+c=0\f$
  * (JBFLOAT).
  *
  * \return solution value.
@@ -1877,7 +1877,7 @@ jbm_solve_cubic_reduced (JBFLOAT a,
 
 /**
  * Function to calculate the solution of a reduced cubic equation in an interval
- * \f$\left[x_1,x_2\right]\f$ in the form \fx^3+a\,x^2+b\,x+c=0\f$
+ * \f$\left[x_1,x_2\right]\f$ in the form \f$x^3+a\,x^2+b\,x+c=0\f$
  * (JBDOUBLE).
  *
  * \return solution value.
@@ -1927,7 +1927,7 @@ jbm_solve_cubic_reducedl (JBDOUBLE a,
 
 /**
  * Function to calculate the solution of a cubic equation in an interval
- * \f$\left[x_1,x_2\right]\f$ in the form \fa\,x^3+b\,x^2+c\,x+d=0\f$
+ * \f$\left[x_1,x_2\right]\f$ in the form \f$a\,x^3+b\,x^2+c\,x+d=0\f$
  * (JBFLOAT).
  *
  * \return solution value.
@@ -1953,7 +1953,7 @@ jbm_solve_cubic (JBFLOAT a,
 
 /**
  * Function to calculate the solution of a cubic equation in an interval
- * \f$\left[x_1,x_2\right]\f$ in the form \fa\,x^3+b\,x^2+c\,x+d=0\f$
+ * \f$\left[x_1,x_2\right]\f$ in the form \f$a\,x^3+b\,x^2+c\,x+d=0\f$
  * (JBDOUBLE).
  *
  * \return solution value.

@@ -167,12 +167,19 @@ jb_bin_write (FILE * file,      ///< file.
 int
 jb_get_ncores ()
 {
-#ifdef G_OS_WIN32
+#if HAVE_GTOP
+  int ncores;
+  glibtop *top;
+  top = glibtop_init ();
+  ncores = top->ncpu + 1;
+  glibtop_close ();
+  return ncores;
+#elif HAVE_GET_NPROCS
+  return get_nprocs ();
+#elif defined(G_OS_WIN32)
   SYSTEM_INFO sysinfo;
   GetSystemInfo (&sysinfo);
   return sysinfo.dwNumberOfProcessors;
-#elif HAVE_GET_NPROCS
-  return get_nprocs ();
 #else
   return (int) sysconf (_SC_NPROCESSORS_ONLN);
 #endif
