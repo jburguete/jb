@@ -41,6 +41,7 @@ fi
 # Checks for programs
 AC_PROG_CC([gcc10 gcc9 gcc8 gcc7 egcc gcc clang])
 AC_MSG_NOTICE([Compiler: $CC])
+$CC -v
 AC_PROG_MAKE_SET
 AC_LANG([C])
 PKG_PROG_PKG_CONFIG
