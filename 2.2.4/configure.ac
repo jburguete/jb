@@ -1,4 +1,4 @@
-AC_PREREQ([2.67])
+AC_PREREQ([2.69])
 AC_INIT([jb], [2.2.4], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
@@ -39,7 +39,7 @@ if test "x$win" = "x1"; then
 fi
 
 # Checks for programs
-AC_PROG_CC([gcc9 gcc8 gcc7 gcc6 gcc5 egcc gcc clang])
+AC_PROG_CC([gcc10 gcc9 gcc8 gcc7 egcc gcc clang])
 AC_MSG_NOTICE([Compiler: $CC])
 AC_PROG_MAKE_SET
 AC_LANG([C])
