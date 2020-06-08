@@ -548,6 +548,26 @@ jbw_graphic_set_data (JBWGraphic * graphic,     ///< JBWGraphic widget.
 }
 
 /**
+ * Function to quit a main loop in a JBWGraphic widget.
+ */
+static inline void
+jbw_graphic_main_loop_quit (JBWGraphic * graphic __attribute__((unused)))
+  ///< JBWGraphic struct.
+{
+#if HAVE_GTKGLAREA
+	gtk_main_quit ();
+#elif HAVE_FREEGLUT
+	glutLeaveMainLoop ();
+#elif HAVE_SDL
+	SDL_Event event[1];
+	event->type = SDL_QUIT;
+	SDL_PushEvent (event);
+#elif HAVE_GLFW
+	glfwDestroyWindow (graphic->window);
+#endif
+}
+
+/**
  * Function to show the JBWGraphic widget.
  */
 #if HAVE_GTKGLAREA

@@ -2584,6 +2584,7 @@ jbw_graphic_main_loop (JBWGraphic * graphic __attribute__((unused)))
       while (gtk_events_pending ())
         gtk_main_iteration ();
       glfwPollEvents ();
+			//glfwWaitEvents ();
       if (graphic->calculate)
         {
           if (!graphic->calculate (graphic))
