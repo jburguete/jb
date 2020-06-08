@@ -90,33 +90,37 @@ Les bibliothèques construits par défaut utilisent le niveau de précision 2.
 SISTÈMES D'EXPLOITATION
 _______________________
 
-On peut installer tous les bibliothèques et outils requis en utilisant les
+On peut installer tous les bibliothèques et les outils requis en utilisant les
 instructions en [install-unix](https://github.com/jburguete/install-unix).
 
-En sistemas Microsoft Windows hay que instalar
-[MSYS2](http://sourceforge.net/projects/msys2) además de las bibliotecas y
-utilidades requeridas. Puede seguir instrucciones detalladas en el tutorial
+Avec systèmes Microsoft Windows on doit installer
+[MSYS2](http://sourceforge.net/projects/msys2) et en plus les bibliothèques et
+les outils requis. On peut suivre les instructions détaillées dans le
+didacticiel
 [install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf).
 
-On NetBSD 9.0 you have to do first on the building terminal:
+Avec NetBSD 9.0, pour utiliser le derniére version du compilateur GCC, il faut
+faire avant dans le terminal:
 > $ export PATH=/usr/pkg/gcc9/bin:$PATH"
 
-On OpenBSD 6.7 you have to do first on the building terminal:
+Avec OpenBSD 6.7 on doit faire avant dans le terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
-This software has been built and tested in the following operative systems:
-* Debian 9 (Linux and Hurd)
-* DragonFly BSD 5.2
+Ce programme a été construit et probé avec les suivants systèmes d'exploitation:
+* Debian 10 (Linux)
+* Devuan Linux 3
+* Dragonfly BSD 5.8
 * Dyson Illumos
-* Fedora Linux 29
+* Fedora Linux 32
 * FreeBSD 12.1
+* Linux Mint DE 3
 * Manjaro Linux
 * Microsoft Windows 10
 * NetBSD 9.0
 * OpenBSD 6.7
 * OpenInidiana Hipster
 * OpenSUSE Linux Leap 15
-* Xubuntu Linux 18.10
+* Xubuntu Linux 20.04
 
 INSTRUCTIONS DE CONSTRUCTION COMMUNES
 _____________________________________
@@ -163,7 +167,7 @@ _____________________
 Notez que vôtre code peut aussi avoir besoin de bibliotèques additionnelles au
 command "pkg-config".
 
-Notez aussi qu'on peut utiliser en autre niveau de précision (JBM\_PRECISION).
+Notez aussi qu'on peut utiliser un autre niveau de précision (JBM\_PRECISION).
 
 CONSTRUCTION DYNAMIQUE
 _______________________

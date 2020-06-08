@@ -93,25 +93,29 @@ En sistemas Microsoft Windows hay que instalar
 utilidades requeridas. Puede seguir instrucciones detalladas en el tutorial
 [install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf).
 
-On NetBSD 9.0 you have to do first on the building terminal:
+En NetBSD 9.0, para usar la última versión del compilador GCC, hay que hacer
+primero en el terminal:
 > $ export PATH="/usr/pkg/gcc9/bin:$PATH"
 
-On OpenBSD 6.7 you have to do first on the building terminal:
+En OpenBSD 6.7 hay que hacer antes en el terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
-This software has been built and tested in the following operative systems:
-* Debian 9 (Linux and Hurd)
-* DragonFly BSD 5.2
+Este programa ha sido construido y probado en los siguientes sistemas
+operativos:
+* Debian 10 (Linux)
+* Devuan Linux 3
+* Dragonfly BSD 5.8
 * Dyson Illumos
-* Fedora Linux 29
+* Fedora Linux 32
 * FreeBSD 12.1
+* Linux Mint DE 3
 * Manjaro Linux
 * Microsoft Windows 10
 * NetBSD 9.0
 * OpenBSD 6.7
 * OpenInidiana Hipster
 * OpenSUSE Linux Leap 15
-* Xubuntu Linux 18.10
+* Xubuntu Linux 20.04
 
 INSTRUCCIONES DE CONSTRUCCIÓN COMUNES
 _____________________________________
