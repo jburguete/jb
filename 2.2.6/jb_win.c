@@ -822,11 +822,15 @@ jbw_graphic_delete (JBWGraphic * graphic)       ///< JBWGraphic widget.
 void
 jbw_graphic_destroy (JBWGraphic * graphic)      ///< JBWGraphic widget.
 {
-#if HAVE_GTKGLAREA
   if (graphic->window)
+#if HAVE_GTKGLAREA
     gtk_widget_destroy (GTK_WIDGET (graphic->window));
 #elif HAVE_FREEGLUT
-  glutDestroyWindow (graphic->window);
+    glutDestroyWindow (graphic->window);
+#elif HAVE_SDL
+    SDL_DestroyWindow (graphic->window);
+#elif HAVE_GLFW
+    glfwDestroyWindow (graphic->window);
 #endif
   jbw_graphic_delete (graphic);
 }
@@ -1286,7 +1290,8 @@ jbw_graphic_resize (JBWGraphic * graphic,       ///< JBWGraphic widget.
 void
 jbw_graphic_render (JBWGraphic * graphic)       ///< JBWGraphic widget.
 {
-  graphic->draw (graphic);
+  if (graphic->draw)
+    graphic->draw (graphic);
 #if HAVE_GTKGLAREA
   gtk_widget_queue_draw (GTK_WIDGET (graphic->widget));
 #elif HAVE_FREEGLUT
@@ -2018,8 +2023,6 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
                                1.f - sx * strlen (graphic->str_z), sb + k,
                                jbw_red);
     }
-  else
-    graphic->ny = 0;
   if (graphic->str_yy || graphic->str_zz)
     {
       k -= sy;
@@ -2032,8 +2035,6 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
                                1.f - sx * strlen (graphic->str_zz), sb + k,
                                jbw_brown);
     }
-  else
-    graphic->nz = 0;
   graphic->y1 = ceil (2.5f * graphic->char_height);
   graphic->y2 -= ceil (0.5f * graphic->char_height);
   if (graphic->str_y || graphic->str_yy)
@@ -2044,21 +2045,15 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
     graphic->x2 -= ceil (0.5f * JBW_GRAPHIC_N_CHARS * graphic->char_width);
   if (graphic->map)
     jbw_graphic_map_resize (graphic);
-  jbw_draw_rangel (&graphic->xmin, &graphic->xmax);
-  jbw_draw_ticsl (graphic->xmin, graphic->xmax,
-                  graphic->nxmax, &graphic->nx, graphic->xtic);
-  jbw_draw_rangel (&graphic->ymin, &graphic->ymax);
-  jbw_draw_ticsl (graphic->ymin, graphic->ymax,
-                  graphic->nymax, &graphic->ny, graphic->ytic);
-  jbw_draw_rangel (&graphic->zmin, &graphic->zmax);
-  jbw_draw_ticsl (graphic->zmin, graphic->zmax,
-                  graphic->nzmax, &graphic->nz, graphic->ztic);
   x1 = (2.f * graphic->x1) / graphic->width - 1.f;
   x2 = (2.f * graphic->x2) / graphic->width - 1.f;
   y1 = (2.f * graphic->y1) / graphic->height - 1.f;
   y2 = (2.f * graphic->y2) / graphic->height - 1.f;
   if (graphic->str_x)
     {
+      jbw_draw_rangel (&graphic->xmin, &graphic->xmax);
+      jbw_draw_ticsl (graphic->xmin, graphic->xmax,
+                      graphic->nxmax, &graphic->nx, graphic->xtic);
       jbw_graphic_draw_text (graphic, graphic->str_x,
                              ((float) graphic->x1 + graphic->x2)
                              / graphic->width - 1.f
@@ -2076,8 +2071,13 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
                                  sb - 1.f + sy, jbw_black);
         }
     }
+  else
+    graphic->nx = 0;
   if (graphic->str_y || graphic->str_yy)
     {
+      jbw_draw_rangel (&graphic->ymin, &graphic->ymax);
+      jbw_draw_ticsl (graphic->ymin, graphic->ymax,
+                      graphic->nymax, &graphic->ny, graphic->ytic);
       for (i = 0; i < graphic->ny; ++i)
         {
           sprintf (buffer, FGL, graphic->ytic[i]);
@@ -2090,8 +2090,13 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
                                  sb + k - 0.5f * sy, jbw_blue);
         }
     }
+  else
+    graphic->ny = 0;
   if (graphic->str_z || graphic->str_zz)
     {
+      jbw_draw_rangel (&graphic->zmin, &graphic->zmax);
+      jbw_draw_ticsl (graphic->zmin, graphic->zmax,
+                      graphic->nzmax, &graphic->nz, graphic->ztic);
       for (i = 0; i < graphic->nz; ++i)
         {
           sprintf (buffer, FGL, graphic->ztic[i]);
@@ -2103,6 +2108,8 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
                                  jbw_red);
         }
     }
+  else
+    graphic->nz = 0;
   glUseProgram (graphic->program_2D);
   glUniformMatrix4fv (graphic->uniform_2D_matrix, 1, GL_FALSE, jbw_identity);
   if (graphic->grid)
@@ -2190,24 +2197,30 @@ jbw_graphic_draw_lines (JBWGraphic * graphic,   ///< JBWGraphic widget.
   if (graphic->resize)
     jbw_graphic_draw_resize (graphic, x, y1, y2, z1, z2, n);
   jbw_graphic_draw_labels (graphic);
-  jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
-                               (GLdouble) graphic->xmin,
-                               (GLdouble) graphic->ymin,
-                               (GLdouble) graphic->xmax - graphic->xmin,
-                               (GLdouble) graphic->ymax - graphic->ymin);
-  if (y1)
-    jbw_graphic_draw_farray (graphic, x, y1, n, jbw_blue, GL_LINE_STRIP);
-  if (y2)
-    jbw_graphic_draw_farray (graphic, x, y2, n, jbw_brown, GL_LINE_STRIP);
-  jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
-                               (GLdouble) graphic->xmin,
-                               (GLdouble) graphic->zmin,
-                               (GLdouble) graphic->xmax - graphic->xmin,
-                               (GLdouble) graphic->zmax - graphic->zmin);
-  if (z1)
-    jbw_graphic_draw_farray (graphic, x, z1, n, jbw_red, GL_LINE_STRIP);
-  if (z2)
-    jbw_graphic_draw_farray (graphic, x, z2, n, jbw_green, GL_LINE_STRIP);
+  if (y1 || y2)
+    {
+      jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
+                                   (GLdouble) graphic->xmin,
+                                   (GLdouble) graphic->ymin,
+                                   (GLdouble) graphic->xmax - graphic->xmin,
+                                   (GLdouble) graphic->ymax - graphic->ymin);
+      if (y1)
+        jbw_graphic_draw_farray (graphic, x, y1, n, jbw_blue, GL_LINE_STRIP);
+      if (y2)
+        jbw_graphic_draw_farray (graphic, x, y2, n, jbw_brown, GL_LINE_STRIP);
+    }
+  if (z1 || z2)
+    {
+      jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
+                                   (GLdouble) graphic->xmin,
+                                   (GLdouble) graphic->zmin,
+                                   (GLdouble) graphic->xmax - graphic->xmin,
+                                   (GLdouble) graphic->zmax - graphic->zmin);
+      if (z1)
+        jbw_graphic_draw_farray (graphic, x, z1, n, jbw_red, GL_LINE_STRIP);
+      if (z2)
+        jbw_graphic_draw_farray (graphic, x, z2, n, jbw_green, GL_LINE_STRIP);
+    }
 }
 
 /**
@@ -2231,24 +2244,30 @@ jbw_graphic_draw_linesl (JBWGraphic * graphic,  ///< JBWGraphic widget.
   if (graphic->resize)
     jbw_graphic_draw_resizel (graphic, x, y1, y2, z1, z2, n);
   jbw_graphic_draw_labels (graphic);
-  jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
-                               (GLdouble) graphic->xmin,
-                               (GLdouble) graphic->ymin,
-                               (GLdouble) graphic->xmax - graphic->xmin,
-                               (GLdouble) graphic->ymax - graphic->ymin);
-  if (y1)
-    jbw_graphic_draw_darray (graphic, x, y1, n, jbw_blue, GL_LINE_STRIP);
-  if (y2)
-    jbw_graphic_draw_darray (graphic, x, y2, n, jbw_brown, GL_LINE_STRIP);
-  jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
-                               (GLdouble) graphic->xmin,
-                               (GLdouble) graphic->ymin,
-                               (GLdouble) graphic->xmax - graphic->xmin,
-                               (GLdouble) graphic->ymax - graphic->ymin);
-  if (z1)
-    jbw_graphic_draw_darray (graphic, x, z1, n, jbw_red, GL_LINE_STRIP);
-  if (z2)
-    jbw_graphic_draw_darray (graphic, x, z2, n, jbw_green, GL_LINE_STRIP);
+  if (y1 || y2)
+    {
+      jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
+                                   (GLdouble) graphic->xmin,
+                                   (GLdouble) graphic->ymin,
+                                   (GLdouble) graphic->xmax - graphic->xmin,
+                                   (GLdouble) graphic->ymax - graphic->ymin);
+      if (y1)
+        jbw_graphic_draw_darray (graphic, x, y1, n, jbw_blue, GL_LINE_STRIP);
+      if (y2)
+        jbw_graphic_draw_darray (graphic, x, y2, n, jbw_brown, GL_LINE_STRIP);
+    }
+  if (z1 || z2)
+    {
+      jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
+                                   (GLdouble) graphic->xmin,
+                                   (GLdouble) graphic->ymin,
+                                   (GLdouble) graphic->xmax - graphic->xmin,
+                                   (GLdouble) graphic->ymax - graphic->ymin);
+      if (z1)
+        jbw_graphic_draw_darray (graphic, x, z1, n, jbw_red, GL_LINE_STRIP);
+      if (z2)
+        jbw_graphic_draw_darray (graphic, x, z2, n, jbw_green, GL_LINE_STRIP);
+    }
 }
 
 /**
@@ -2278,24 +2297,34 @@ jbw_graphic_draw_linesv (JBWGraphic * graphic,  ///< JBWGraphic widget.
   if (graphic->resize)
     jbw_graphic_draw_resizev (graphic, x, y1, y2, z1, z2, size, n);
   jbw_graphic_draw_labels (graphic);
-  jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
-                               (GLdouble) graphic->xmin,
-                               (GLdouble) graphic->ymin,
-                               (GLdouble) graphic->xmax - graphic->xmin,
-                               (GLdouble) graphic->ymax - graphic->ymin);
-  if (y1)
-    jbw_graphic_draw_varray (graphic, x, y1, size, n, jbw_blue, GL_LINE_STRIP);
-  if (y2)
-    jbw_graphic_draw_varray (graphic, x, y2, size, n, jbw_brown, GL_LINE_STRIP);
-  jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
-                               (GLdouble) graphic->xmin,
-                               (GLdouble) graphic->zmin,
-                               (GLdouble) graphic->xmax - graphic->xmin,
-                               (GLdouble) graphic->zmax - graphic->zmin);
-  if (z1)
-    jbw_graphic_draw_varray (graphic, x, z1, size, n, jbw_red, GL_LINE_STRIP);
-  if (z2)
-    jbw_graphic_draw_varray (graphic, x, z2, size, n, jbw_green, GL_LINE_STRIP);
+  if (y1 || y2)
+    {
+      jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
+                                   (GLdouble) graphic->xmin,
+                                   (GLdouble) graphic->ymin,
+                                   (GLdouble) graphic->xmax - graphic->xmin,
+                                   (GLdouble) graphic->ymax - graphic->ymin);
+      if (y1)
+        jbw_graphic_draw_varray (graphic, x, y1, size, n, jbw_blue,
+                                 GL_LINE_STRIP);
+      if (y2)
+        jbw_graphic_draw_varray (graphic, x, y2, size, n, jbw_brown,
+                                 GL_LINE_STRIP);
+    }
+  if (z1 || z2)
+    {
+      jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
+                                   (GLdouble) graphic->xmin,
+                                   (GLdouble) graphic->zmin,
+                                   (GLdouble) graphic->xmax - graphic->xmin,
+                                   (GLdouble) graphic->zmax - graphic->zmin);
+      if (z1)
+        jbw_graphic_draw_varray (graphic, x, z1, size, n, jbw_red,
+                                 GL_LINE_STRIP);
+      if (z2)
+        jbw_graphic_draw_varray (graphic, x, z2, size, n, jbw_green,
+                                 GL_LINE_STRIP);
+    }
 }
 
 /**
@@ -2325,26 +2354,34 @@ jbw_graphic_draw_linesvl (JBWGraphic * graphic, ///< JBWGraphic widget.
   if (graphic->resize)
     jbw_graphic_draw_resizevl (graphic, x, y1, y2, z1, z2, size, n);
   jbw_graphic_draw_labels (graphic);
-  jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
-                               (GLdouble) graphic->xmin,
-                               (GLdouble) graphic->ymin,
-                               (GLdouble) graphic->xmax - graphic->xmin,
-                               (GLdouble) graphic->ymax - graphic->ymin);
-  if (y1)
-    jbw_graphic_draw_varrayl (graphic, x, y1, size, n, jbw_blue, GL_LINE_STRIP);
-  if (y2)
-    jbw_graphic_draw_varrayl (graphic, x, y2, size, n, jbw_brown,
-                              GL_LINE_STRIP);
-  jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
-                               (GLdouble) graphic->xmin,
-                               (GLdouble) graphic->zmin,
-                               (GLdouble) graphic->xmax - graphic->xmin,
-                               (GLdouble) graphic->zmax - graphic->zmin);
-  if (z1)
-    jbw_graphic_draw_varrayl (graphic, x, z1, size, n, jbw_red, GL_LINE_STRIP);
-  if (z2)
-    jbw_graphic_draw_varrayl (graphic, x, z2, size, n, jbw_green,
-                              GL_LINE_STRIP);
+  if (y1 || y2)
+    {
+      jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
+                                   (GLdouble) graphic->xmin,
+                                   (GLdouble) graphic->ymin,
+                                   (GLdouble) graphic->xmax - graphic->xmin,
+                                   (GLdouble) graphic->ymax - graphic->ymin);
+      if (y1)
+        jbw_graphic_draw_varrayl (graphic, x, y1, size, n, jbw_blue,
+                                  GL_LINE_STRIP);
+      if (y2)
+        jbw_graphic_draw_varrayl (graphic, x, y2, size, n, jbw_brown,
+                                  GL_LINE_STRIP);
+    }
+  if (z1 || z2)
+    {
+      jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
+                                   (GLdouble) graphic->xmin,
+                                   (GLdouble) graphic->zmin,
+                                   (GLdouble) graphic->xmax - graphic->xmin,
+                                   (GLdouble) graphic->zmax - graphic->zmin);
+      if (z1)
+        jbw_graphic_draw_varrayl (graphic, x, z1, size, n, jbw_red,
+                                  GL_LINE_STRIP);
+      if (z2)
+        jbw_graphic_draw_varrayl (graphic, x, z2, size, n, jbw_green,
+                                  GL_LINE_STRIP);
+    }
 }
 
 /**
@@ -2584,7 +2621,7 @@ jbw_graphic_main_loop (JBWGraphic * graphic __attribute__((unused)))
       while (gtk_events_pending ())
         gtk_main_iteration ();
       glfwPollEvents ();
-			//glfwWaitEvents ();
+      //glfwWaitEvents ();
       if (graphic->calculate)
         {
           if (!graphic->calculate (graphic))

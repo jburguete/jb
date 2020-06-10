@@ -555,15 +555,15 @@ jbw_graphic_main_loop_quit (JBWGraphic * graphic __attribute__((unused)))
   ///< JBWGraphic struct.
 {
 #if HAVE_GTKGLAREA
-	gtk_main_quit ();
+  gtk_main_quit ();
 #elif HAVE_FREEGLUT
-	glutLeaveMainLoop ();
+  glutLeaveMainLoop ();
 #elif HAVE_SDL
-	SDL_Event event[1];
-	event->type = SDL_QUIT;
-	SDL_PushEvent (event);
+  SDL_Event event[1];
+  event->type = SDL_QUIT;
+  SDL_PushEvent (event);
 #elif HAVE_GLFW
-	glfwDestroyWindow (graphic->window);
+  glfwDestroyWindow (graphic->window);
 #endif
 }
 
