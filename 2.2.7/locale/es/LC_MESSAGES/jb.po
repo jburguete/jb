@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: jb 2.2.6\n"
+"Project-Id-Version: jb 2.2.7\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-09 20:32+0200\n"
+"POT-Creation-Date: 2020-06-10 22:09+0200\n"
 "PO-Revision-Date: 2020-05-05 02:59+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -221,70 +221,70 @@ msgstr "no se pudo abrir el widget de área gráfica"
 msgid "unable to open the window"
 msgstr "no se pudo abrir la ventana"
 
-#: jb_win.c:2406
+#: jb_win.c:2408
 msgid "unable to get the GdkPixbuf widget"
 msgstr "no se pudo abrir el widget GdkPixbuf"
 
-#: jb_win.c:2510 jb_win.c:2525
+#: jb_win.c:2512 jb_win.c:2527
 msgid "PNG file"
 msgstr "Fichero PNG"
 
-#: jb_win.c:2511
+#: jb_win.c:2513
 msgid "JPEG file"
 msgstr "Fichero JPEG"
 
-#: jb_win.c:2512
+#: jb_win.c:2514
 msgid "XPM file"
 msgstr "Fichero XPM"
 
-#: jb_win.c:2513
+#: jb_win.c:2515
 msgid "TIFF file"
 msgstr "Fichero TIFF"
 
-#: jb_win.c:2514
+#: jb_win.c:2516
 msgid "BMP file"
 msgstr "Fichero BMP"
 
-#: jb_win.c:2515
+#: jb_win.c:2517
 msgid "GIF file"
 msgstr "Fichero GIF"
 
-#: jb_win.c:2516
+#: jb_win.c:2518
 msgid "ICO file"
 msgstr "Fichero ICO"
 
-#: jb_win.c:2536
+#: jb_win.c:2538
 msgid "Save graphical"
 msgstr "Guardar gráfica"
 
-#: jb_win.c:2539
+#: jb_win.c:2541
 msgid "_OK"
 msgstr "_Aceptar"
 
-#: jb_win.c:2540
+#: jb_win.c:2542
 msgid "_Cancel"
 msgstr "_Cancelar"
 
-#: jb_win.c:2649
+#: jb_win.c:2651
 msgid "no a text editor type"
 msgstr "no es un tipo de editor de texto"
 
-#: jb_win.c:2652
+#: jb_win.c:2654
 msgid "no an integer numbers editor type"
 msgstr "no es un tipo de editor de números enteros"
 
-#: jb_win.c:2655
+#: jb_win.c:2657
 msgid "no a float numbers editor type"
 msgstr "no es un tipo de editor de números reales"
 
-#: jb_win.c:2658
+#: jb_win.c:2660
 msgid "no a date editor type"
 msgstr "no es un tipo de editor de fechas"
 
-#: jb_win.c:3284
+#: jb_win.c:3286
 msgid "bad array editor widget type"
 msgstr "tipo incorrecto de widget de editor de matrices"
 
-#: jb_win.c:3290
+#: jb_win.c:3292
 msgid "not enough memory to open the array editor"
 msgstr "memoria insuficiente para abrir el editor de matrices"

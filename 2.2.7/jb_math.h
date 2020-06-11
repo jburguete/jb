@@ -286,11 +286,13 @@
 #define FWF2 FWF " "
 
 #define JBM_G 9.80665           ///< gravitational constant.
-#define JBM_INDEX_SORT_FLASH_MIN 32
-///< minimum number of elements to select the jbm_index_sort_flash_min()
+#define JBM_INDEX_SORT_FLASH_CLASS 4
+///< number of elements of a class in the jbm_index_sort_flash() function.
+#define JBM_INDEX_SORT_FLASH_MIN 500
+///< minimum number of elements to select the jbm_index_sort_flash()
 ///< function as default sort method.
-#define JBM_INDEX_SORT_MERGE_MIN 32
-///< minimum number of elements to select the jbm_index_sort_merge_min()
+#define JBM_INDEX_SORT_MERGE_MIN 16
+///< minimum number of elements to select the jbm_index_sort_merge()
 ///< function as default sort method.
 #define JBM_MAX(a, b) (((a) > (b))? (a): (b))
 ///< macro calculating the maximum number.
@@ -372,8 +374,8 @@ enum JBMFluxLimiterType
   JBM_FLUX_LIMITER_TYPE_MEAN = 10
 };
 
-void jbm_index_sort_flash (JBFLOAT * x, int *ni, int n);
-void jbm_index_sort_flashl (JBDOUBLE * x, int *ni, int n);
+void jbm_index_sort_flash (JBFLOAT * x, unsigned int *ni, int n);
+void jbm_index_sort_flashl (JBDOUBLE * x, unsigned int *ni, int n);
 
 /**
  * Function to check small JBFLOAT numbers.
@@ -581,7 +583,7 @@ static inline void
 jbm_changel (long int *a,       ///< 1st long int number pointer. 
              long int *b)       ///< 1st long int number pointer. 
 {
-  register int c;
+  register long int c;
   JB_CHANGE (*a, *b, c);
 }
 
@@ -592,7 +594,42 @@ static inline void
 jbm_changell (long long int *a, ///< 1st long long int number pointer. 
               long long int *b) ///< 1st long long int number pointer. 
 {
-  register int c;
+  register long long int c;
+  JB_CHANGE (*a, *b, c);
+}
+
+/**
+ * Function to interchange 2 unsigned int numbers.
+ */
+static inline void
+jbm_changeu (unsigned int *a,   ///< 1st unsigned int number pointer. 
+             unsigned int *b)   ///< 1st unsigned int number pointer. 
+{
+  register unsigned int c;
+  JB_CHANGE (*a, *b, c);
+}
+
+/**
+ * Function to interchange 2 long unsigned int numbers.
+ */
+static inline void
+jbm_changeul (long unsigned int *a,     ///< 1st long unsigned int number pointer. 
+              long unsigned int *b)     ///< 1st long unsigned int number pointer. 
+{
+  register long unsigned int c;
+  JB_CHANGE (*a, *b, c);
+}
+
+/**
+ * Function to interchange 2 long long unsigned int numbers.
+ */
+static inline void
+jbm_changeull (long long unsigned int *a,
+               ///< 1st long long unsigned int number pointer. 
+               long long unsigned int *b)
+               ///< 1st long long unsigned int number pointer. 
+{
+  register long long unsigned int c;
   JB_CHANGE (*a, *b, c);
 }
 
@@ -1983,7 +2020,7 @@ jbm_solve_cubicl (JBDOUBLE a,
  */
 static inline void
 jbm_index_sort_insertion (JBFLOAT * x,  ///< array of JBFLOAT numbers.
-                          int *ni,      ///< array of indexes.
+                          unsigned int *ni,     ///< array of indexes.
                           int n)
                           ///< the highest element number of the arrays.
 {
@@ -2005,7 +2042,7 @@ jbm_index_sort_insertion (JBFLOAT * x,  ///< array of JBFLOAT numbers.
  */
 static inline void
 jbm_index_sort_insertionl (JBDOUBLE * x,        ///< array of JBDOUBLE numbers.
-                           int *ni,     ///< array of indexes.
+                           unsigned int *ni,    ///< array of indexes.
                            int n)
                            ///< the highest element number of the arrays.
 {
@@ -2027,7 +2064,7 @@ jbm_index_sort_insertionl (JBDOUBLE * x,        ///< array of JBDOUBLE numbers.
  */
 static inline void
 jbm_index_sort_interchange (JBFLOAT * x,        ///< array of JBFLOAT numbers.
-                            int *ni,    ///< array of indexes.
+                            unsigned int *ni,   ///< array of indexes.
                             int n)
                             ///< the highest element number of the arrays.
 {
@@ -2042,7 +2079,7 @@ jbm_index_sort_interchange (JBFLOAT * x,        ///< array of JBFLOAT numbers.
           if (xj < xi)
             {
               xi = xj;
-              jbm_change (ni + i, ni + j);
+              jbm_changeu (ni + i, ni + j);
             }
         }
     }
@@ -2054,7 +2091,7 @@ jbm_index_sort_interchange (JBFLOAT * x,        ///< array of JBFLOAT numbers.
  */
 static inline void
 jbm_index_sort_interchangel (JBDOUBLE * x,      ///< array of JBDOUBLE numbers.
-                             int *ni,   ///< array of indexes.
+                             unsigned int *ni,  ///< array of indexes.
                              int n)
                              ///< the highest element number of the arrays.
 {
@@ -2069,7 +2106,7 @@ jbm_index_sort_interchangel (JBDOUBLE * x,      ///< array of JBDOUBLE numbers.
           if (xj < xi)
             {
               xi = xj;
-              jbm_change (ni + i, ni + j);
+              jbm_changeu (ni + i, ni + j);
             }
         }
     }
@@ -2081,18 +2118,29 @@ jbm_index_sort_interchangel (JBDOUBLE * x,      ///< array of JBDOUBLE numbers.
  */
 static inline void
 jbm_index_sort_merge (JBFLOAT * x,      ///< array of JBFLOAT numbers.
-                      int *ni,  ///< array of indexes.
+                      unsigned int *ni, ///< array of indexes.
                       int n)    ///< the highest element number of the arrays.
 {
-  int nn[n + 1];
-  int *ni1, *ni2, *nj, *nk, *nt;
-  int i, j, i1, i2, k, l;
+  unsigned int nn[n + 1];
+  unsigned int *ni1, *ni2, *nj, *nk, *nt;
+  int j, i1, i2, k, l;
   j = JBM_INDEX_SORT_MERGE_MIN;
-  for (i = 0; i <= (int) n - j; i += j)
-    jbm_index_sort_insertion (x, ni + i, j - 1);
-  if (i < (int) n)
-    jbm_index_sort_insertion (x, ni + i, n - i);
-  for (nk = ni, nj = nn; j <= (int) n; j *= 2)
+  if (n <= j)
+    {
+      jbm_index_sort_insertion (x, ni, n);
+      return;
+    }
+  k = n / j;
+  if (n % j)
+    ++k;
+  j = n / k;
+  if (n % k)
+    ++j;
+  for (l = 0; l <= n - j; l += j)
+    jbm_index_sort_insertion (x, ni + l, j - 1);
+  if (l < n)
+    jbm_index_sort_insertion (x, ni + l, n - l);
+  for (nk = ni, nj = nn; j <= n; j *= 2)
     {
       for (ni1 = nk, l = 0, k = n / j; (k -= 2) >= 0; ni1 = ni2 + j)
         {
@@ -2112,26 +2160,26 @@ jbm_index_sort_merge (JBFLOAT * x,      ///< array of JBFLOAT numbers.
       if (k == -1)
         {
           ni2 = ni1 + j;
-          for (k = n - l - j, i1 = i2 = 0; i1 < j && i2 < k;)
+          for (k = n - l - j, i1 = i2 = 0; i1 < j && i2 <= k;)
             {
               if (x[ni1[i1]] > x[ni2[i2]])
                 nj[l++] = ni1[i1++];
               else
                 nj[l++] = ni2[i2++];
             }
-          while (i2 < k)
+          while (i2 <= k)
             nj[l++] = ni2[i2++];
           while (i1 < j)
             nj[l++] = ni1[i1++];
         }
-      for (; l < n; ++l)
+      for (; l <= n; ++l)
         nj[l] = nk[l];
       nt = nk;
       nk = nj;
       nj = nt;
     }
-  if (ni != nj)
-    memcpy (ni, nj, n * sizeof (int));
+  if (ni != nk)
+    memcpy (ni, nk, l * sizeof (unsigned int));
 }
 
 /**
@@ -2140,17 +2188,28 @@ jbm_index_sort_merge (JBFLOAT * x,      ///< array of JBFLOAT numbers.
  */
 static inline void
 jbm_index_sort_mergel (JBDOUBLE * x,    ///< array of JBDOUBLE numbers.
-                       int *ni, ///< array of indexes.
+                       unsigned int *ni,        ///< array of indexes.
                        int n)   ///< the highest element number of the arrays.
 {
-  int nn[n + 1];
-  int *ni1, *ni2, *nj, *nk, *nt;
-  int i, j, i1, i2, k, l;
+  unsigned int nn[n + 1];
+  unsigned int *ni1, *ni2, *nj, *nk, *nt;
+  int j, i1, i2, k, l;
   j = JBM_INDEX_SORT_MERGE_MIN;
-  for (i = 0; i <= (int) n - j; i += j)
-    jbm_index_sort_insertionl (x, ni + i, j - 1);
-  if (i < (int) n)
-    jbm_index_sort_insertionl (x, ni + i, n - i);
+  if (n <= j)
+    {
+      jbm_index_sort_insertionl (x, ni, n);
+      return;
+    }
+  k = n / j;
+  if (n % j)
+    ++k;
+  j = n / k;
+  if (n % k)
+    ++j;
+  for (l = 0; l <= n - j; l += j)
+    jbm_index_sort_insertionl (x, ni + l, j - 1);
+  if (l < n)
+    jbm_index_sort_insertionl (x, ni + l, n - l);
   for (nk = ni, nj = nn; j <= (int) n; j *= 2)
     {
       for (ni1 = nk, l = 0, k = n / j; (k -= 2) >= 0; ni1 = ni2 + j)
@@ -2171,26 +2230,26 @@ jbm_index_sort_mergel (JBDOUBLE * x,    ///< array of JBDOUBLE numbers.
       if (k == -1)
         {
           ni2 = ni1 + j;
-          for (k = n - l - j, i1 = i2 = 0; i1 < j && i2 < k;)
+          for (k = n - l - j, i1 = i2 = 0; i1 < j && i2 <= k;)
             {
               if (x[ni1[i1]] > x[ni2[i2]])
                 nj[l++] = ni1[i1++];
               else
                 nj[l++] = ni2[i2++];
             }
-          while (i2 < k)
+          while (i2 <= k)
             nj[l++] = ni2[i2++];
           while (i1 < j)
             nj[l++] = ni1[i1++];
         }
-      for (; l < n; ++l)
+      for (; l <= n; ++l)
         nj[l] = nk[l];
       nt = nk;
       nk = nj;
       nj = nt;
     }
-  if (ni != nj)
-    memcpy (ni, nj, n * sizeof (int));
+  if (ni != nk)
+    memcpy (ni, nk, l * sizeof (int));
 }
 
 /**
@@ -2199,7 +2258,7 @@ jbm_index_sort_mergel (JBDOUBLE * x,    ///< array of JBDOUBLE numbers.
  */
 static inline void
 jbm_index_sort (JBFLOAT * x,    ///< array of JBFLOAT numbers.
-                int *ni,        ///< array of indexes.
+                unsigned int *ni,       ///< array of indexes.
                 int n)          ///< the highest element number of the arrays.
 {
   register int i;
@@ -2217,7 +2276,7 @@ jbm_index_sort (JBFLOAT * x,    ///< array of JBFLOAT numbers.
  */
 static inline void
 jbm_index_sortl (JBDOUBLE * x,  ///< array of JBDOUBLE numbers.
-                 int *ni,       ///< array of indexes.
+                 unsigned int *ni,      ///< array of indexes.
                  int n)         ///< the highest element number of the arrays.
 {
   register int i;
@@ -2245,7 +2304,7 @@ jbm_index_sort_extended (JBFLOAT * x,   ///< array of JBFLOAT numbers to sort.
                          int n)
 ///< the highest element number of the array to sort.
 {
-  int nk[n + 1], nj[n + 1];
+  unsigned int nk[n + 1], nj[n + 1];
   register JBFLOAT k1, k2;
   register int i, j = 0;
   *ni = (int *) g_try_malloc ((n + 1) * sizeof (int));
@@ -2290,7 +2349,7 @@ jbm_index_sort_extendedl (JBDOUBLE * x, ///< array of JBDOUBLE numbers to sort.
                           int n)
 ///< the highest element number of the array to sort.
 {
-  int nk[n + 1], nj[n + 1];
+  unsigned int nk[n + 1], nj[n + 1];
   register JBDOUBLE k1, k2;
   register int i, j = 0;
   *ni = (int *) g_try_malloc ((n + 1) * sizeof (int));
@@ -3795,7 +3854,7 @@ jbm_transversal_section_regions_sort (int i,    ///< level index.
                                       ///< array of levels.
 {
   JBFLOAT x[nj];
-  int nx[nj], na[nj];
+  unsigned int nx[nj], na[nj];
   register int j, k;
   register JBDOUBLE t;
   t = 0.5 * (zz[i] + zz[i + 1]);

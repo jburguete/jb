@@ -38,13 +38,19 @@
  */
 void
 jbm_index_sort_flash (JBFLOAT * x,      ///< array of JBFLOAT numbers.
-                      int *ni,  ///< array of indexes.
+                      unsigned int *ni, ///< array of indexes.
                       int n)    ///< the highest element number of the arrays.
 {
-  int *nj, *nk, *l1, *l2;
+  unsigned int *nj, *nk, *l1, *l2;
   register JBFLOAT xi, xmin, xmax;
-  register int i, j, m = n / 32 + 1;
-  nj = (int *) g_malloc ((n + m + 2) * 2 * sizeof (int));
+  register int i, j, m;
+  if (n <= JBM_INDEX_SORT_FLASH_MIN)
+    {
+      jbm_index_sort_merge (x, ni, n);
+      return;
+    }
+  m = n / JBM_INDEX_SORT_FLASH_CLASS + 1;
+  nj = (unsigned int *) g_malloc ((n + m + 2) * 2 * sizeof (int));
   nk = nj + n + 1;
   l1 = nk + n + 1;
   l2 = l1 + m + 1;
@@ -60,7 +66,7 @@ jbm_index_sort_flash (JBFLOAT * x,      ///< array of JBFLOAT numbers.
     }
   if (xmax == xmin)
     goto sorted;
-  jbm_change (ni, ni + j);
+  jbm_changeu (ni, ni + j);
   i = m;
   l1[i] = 1;
   while (--i >= 0)
@@ -85,7 +91,7 @@ jbm_index_sort_flash (JBFLOAT * x,      ///< array of JBFLOAT numbers.
       j = l1[i] - 1;
       nk = ni + l2[i];
       if (j < JBM_INDEX_SORT_FLASH_MIN)
-        jbm_index_sort_insertion (x, nk, j);
+        jbm_index_sort_merge (x, nk, j);
       else
         jbm_index_sort_flash (x, nk, j);
     }
@@ -100,13 +106,19 @@ sorted:
  */
 void
 jbm_index_sort_flashl (JBDOUBLE * x,    ///< array of JBDOUBLE numbers.
-                       int *ni, ///< array of indexes.
+                       unsigned int *ni,        ///< array of indexes.
                        int n)   ///< the highest element number of the arrays.
 {
-  int *nj, *nk, *l1, *l2;
+  unsigned int *nj, *nk, *l1, *l2;
   register JBDOUBLE xi, xmin, xmax;
-  register int i, j, m = n / 32 + 1;
-  nj = (int *) g_malloc ((n + m + 2) * 2 * sizeof (int));
+  register int i, j, m;
+  if (n <= JBM_INDEX_SORT_FLASH_MIN)
+    {
+      jbm_index_sort_mergel (x, ni, n);
+      return;
+    }
+  m = n / JBM_INDEX_SORT_FLASH_CLASS + 1;
+  nj = (unsigned int *) g_malloc ((n + m + 2) * 2 * sizeof (unsigned int));
   nk = nj + n + 1;
   l1 = nk + n + 1;
   l2 = l1 + m + 1;
@@ -122,7 +134,7 @@ jbm_index_sort_flashl (JBDOUBLE * x,    ///< array of JBDOUBLE numbers.
     }
   if (xmax == xmin)
     goto sorted;
-  jbm_change (ni, ni + j);
+  jbm_changeu (ni, ni + j);
   i = m;
   l1[i] = 1;
   while (--i >= 0)
@@ -147,7 +159,7 @@ jbm_index_sort_flashl (JBDOUBLE * x,    ///< array of JBDOUBLE numbers.
       j = l1[i] - 1;
       nk = ni + l2[i];
       if (j < JBM_INDEX_SORT_FLASH_MIN)
-        jbm_index_sort_insertionl (x, nk, j);
+        jbm_index_sort_mergel (x, nk, j);
       else
         jbm_index_sort_flashl (x, nk, j);
     }

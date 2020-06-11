@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([jb], [2.2.6], [https://github.com/jburguete/jb])
+AC_INIT([jb], [2.2.7], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -181,5 +181,5 @@ AC_SUBST(FONT, "-DFONT=\\\"$font\\\"")
 AC_SUBST(PRECISION, "-DJBM_PRECISION=2")
 
 # Final output
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile tests/Makefile])
 AC_OUTPUT

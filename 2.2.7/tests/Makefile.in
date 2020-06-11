@@ -1,0 +1,34 @@
+.PHONY: strip clean
+
+# Variables
+CC = @CC@ @ARCH@ @LTO@ @STD@
+CFLAGS = @CFLAGS@ @GLIB_CFLAGS@ @GTOP_CFLAGS@ -DJBW=1 @PRECISION@ \
+	`pkg-config --cflags gsl` -O3 -pedantic -Wall -Wextra
+LDFLAGS = @LDFLAGS@ @GLIB_LIBS@ @GTOP_LIBS@ `pkg-config --libs gsl` @LIBS@
+src = ../jb_config.h ../jb_def.h ../jb_def.c ../jb_math.h ../jb_math.c
+obj = jb_def.o jb_math.o
+exe = index_sort check_sort
+
+# Default building
+all: $(exe)
+
+# Objects
+jb_def.o: ../jb_def.c ../jb_def.h ../jb_config.h Makefile
+	$(CC) $(CFLAGS) -c ../jb_def.c -o jb_def.o
+jb_math.o: ../jb_math.c ../jb_math.h ../jb_def.h ../jb_config.h Makefile
+	$(CC) $(CFLAGS) -c ../jb_math.c -o jb_math.o
+
+# Tests
+index_sort: index_sort.c $(obj)
+	$(CC) $(CFLAGS) index_sort.c $(obj) -o index_sort $(LDFLAGS)
+check_sort: check_sort.c $(obj)
+	$(CC) $(CFLAGS) check_sort.c $(obj) -o check_sort $(LDFLAGS)
+
+# Final version
+strip:
+	make
+	strip $(exe)
+
+# Clean
+clean:
+	rm -rf doc $(exe) *.o 
