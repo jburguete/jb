@@ -160,6 +160,7 @@ struct _JBWGraphic
 #if HAVE_GTKGLAREA
   GtkWindow *window;            ///< GtkWindow window.
   GtkGLArea *widget;            ///< GtkGLArea widget.
+  GMainLoop *loop;              ///< GMainLoop loop.
 #elif HAVE_FREEGLUT
   int window;                   ///< FreeGLUT window number.
 #elif HAVE_SDL
@@ -555,7 +556,7 @@ jbw_graphic_main_loop_quit (JBWGraphic * graphic __attribute__((unused)))
   ///< JBWGraphic struct.
 {
 #if HAVE_GTKGLAREA
-  gtk_main_quit ();
+  g_main_loop_quit (graphic->loop);
 #elif HAVE_FREEGLUT
   glutLeaveMainLoop ();
 #elif HAVE_SDL

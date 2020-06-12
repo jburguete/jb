@@ -795,6 +795,9 @@ jbw_image_draw (JBWImage * image,       ///< JBWImage struct.
 static void
 jbw_graphic_delete (JBWGraphic * graphic)       ///< JBWGraphic widget.
 {
+#if HAVE_GTKGLAREA
+  g_main_loop_unref (graphic->loop);
+#endif
   if (graphic->face)
     {
       FT_Done_Face (*graphic->face);
@@ -1385,6 +1388,7 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
 
   // Setting up the new window
 #if HAVE_GTKGLAREA
+  graphic->loop = g_main_loop_new (NULL, 0);
   graphic->widget = (GtkGLArea *) gtk_gl_area_new ();
   if (!graphic->widget)
     {
@@ -2531,6 +2535,9 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
 #endif
   GtkFileChooserDialog *dlg;
   GtkFileFilter *filter;
+#if HAVE_GTKGLAREA
+  GMainContext *context = g_main_context_default ();
+#endif
   char *buffer = NULL;
   unsigned int i, j;
   dlg =
@@ -2556,8 +2563,10 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
   if (buffer)
     {
       graphic->draw (graphic);
-      while (gtk_events_pending ())
-        gtk_main_iteration ();
+#if HAVE_GTKGLAREA
+      while (g_main_context_pending (context))
+        g_main_context_iteration (context, 0);
+#endif
       jbw_graphic_save (graphic, buffer);
       g_free (buffer);
     }
@@ -2574,7 +2583,7 @@ jbw_graphic_main_loop (JBWGraphic * graphic __attribute__((unused)))
 
   if (graphic->calculate)
     g_idle_add ((GSourceFunc) graphic->calculate, graphic);
-  gtk_main ();
+  g_main_loop_run (graphic->loop);
 
 #elif HAVE_FREEGLUT
 
@@ -2590,11 +2599,12 @@ jbw_graphic_main_loop (JBWGraphic * graphic __attribute__((unused)))
 #elif HAVE_SDL
 
   SDL_Event event[1];
+  GMainContext *context = g_main_context_default ();
   jbw_graphic_render (graphic);
   while (1)
     {
-      while (gtk_events_pending ())
-        gtk_main_iteration ();
+      while (g_main_context_pending (context))
+        g_main_context_iteration (context, 0);
       while (SDL_PollEvent (event))
         {
           if (event->type == SDL_QUIT)
@@ -2615,11 +2625,12 @@ jbw_graphic_main_loop (JBWGraphic * graphic __attribute__((unused)))
 
 #elif HAVE_GLFW
 
+  GMainContext *context = g_main_context_default ();
   jbw_graphic_render (graphic);
   while (!glfwWindowShouldClose (graphic->window))
     {
-      while (gtk_events_pending ())
-        gtk_main_iteration ();
+      while (g_main_context_pending (context))
+        g_main_context_iteration (context, 0);
       glfwPollEvents ();
       //glfwWaitEvents ();
       if (graphic->calculate)

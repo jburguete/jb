@@ -146,10 +146,12 @@ main (int argn, char **argc)
   window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (grid));
 #if HAVE_GTKGLAREA
-  g_signal_connect (graphic->window, "delete-event",
-                    (GCallback) gtk_main_quit, NULL);
-  g_signal_connect (button_close, "clicked", (GCallback) gtk_main_quit, NULL);
-  g_signal_connect (window, "delete-event", (GCallback) gtk_main_quit, NULL);
+  g_signal_connect_swapped (graphic->window, "delete-event",
+                            (GCallback) g_main_loop_quit, graphic->loop);
+  g_signal_connect_swapped (button_close, "clicked",
+                            (GCallback) g_main_loop_quit, graphic->loop);
+  g_signal_connect_swapped (window, "delete-event",
+                            (GCallback) g_main_loop_quit, graphic->loop);
 #elif HAVE_FREEGLUT
   g_signal_connect (button_close, "clicked", (GCallback) glutLeaveMainLoop,
                     NULL);
