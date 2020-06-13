@@ -160,7 +160,6 @@ struct _JBWGraphic
 #if HAVE_GTKGLAREA
   GtkWindow *window;            ///< GtkWindow window.
   GtkGLArea *widget;            ///< GtkGLArea widget.
-  GMainLoop *loop;              ///< GMainLoop loop.
 #elif HAVE_FREEGLUT
   int window;                   ///< FreeGLUT window number.
 #elif HAVE_SDL
@@ -273,7 +272,25 @@ extern const GLfloat jbw_white[4];
 
 extern const GLfloat jbw_identity[16];
 
+#if HAVE_GTKGLAREA
+extern int (*jbw_main_idle) ();
+extern GMainLoop *jbw_main_loop_pointer;
+#elif HAVE_FREEGLUT
+extern void (*jbw_main_idle) ();
+extern void (*jbw_main_resize) (int width, int height);
+extern void (*jbw_main_render) ();
+#elif HAVE_SDL
+extern int (*jbw_main_idle) ();
+extern void (*jbw_main_resize) (int width, int height);
+extern void (*jbw_main_render) ();
+#elif HAVE_GLFW
+extern int (*jbw_main_idle) ();
+extern void (*jbw_main_render) ();
+extern unsigned int jbw_main_exit;
+#endif
+
 int jbw_init (int *argn, char ***argc);
+void jbw_main_loop ();
 
 void jbw_show_message (const char *title, const char *message,
                        GtkMessageType type);
@@ -314,11 +331,6 @@ void jbw_draw_orthogonal_matrixl (GLint uniform, GLdouble x, GLdouble y,
                                   GLdouble w, GLdouble h);
 
 JBWImage *jbw_image_new (char *name);
-
-#if HAVE_FREEGLUT
-void jbw_freeglut_draw_resize (int width, int height);
-void jbw_freeglut_draw ();
-#endif
 
 void jbw_graphic_destroy (JBWGraphic * graphic);
 void jbw_graphic_init (JBWGraphic * graphic);
@@ -374,7 +386,6 @@ void jbw_graphic_draw_linesvl (JBWGraphic * graphic, void *x, void *y1,
                                unsigned int size, int n);
 void jbw_graphic_save (JBWGraphic * graphic, char *file_name);
 void jbw_graphic_dialog_save (JBWGraphic * graphic);
-void jbw_graphic_main_loop (JBWGraphic * graphic);
 
 void jbw_array_editor_check_column (JBWArrayEditor * editor, int column,
                                     int type);
@@ -552,11 +563,10 @@ jbw_graphic_set_data (JBWGraphic * graphic,     ///< JBWGraphic widget.
  * Function to quit a main loop in a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_main_loop_quit (JBWGraphic * graphic __attribute__((unused)))
-  ///< JBWGraphic struct.
+jbw_main_loop_quit ()
 {
 #if HAVE_GTKGLAREA
-  g_main_loop_quit (graphic->loop);
+  g_main_loop_quit (jbw_main_loop_pointer);
 #elif HAVE_FREEGLUT
   glutLeaveMainLoop ();
 #elif HAVE_SDL
@@ -564,7 +574,7 @@ jbw_graphic_main_loop_quit (JBWGraphic * graphic __attribute__((unused)))
   event->type = SDL_QUIT;
   SDL_PushEvent (event);
 #elif HAVE_GLFW
-  glfwDestroyWindow (graphic->window);
+  jbw_main_exit = 1;
 #endif
 }
 

@@ -98,6 +98,33 @@ const GLfloat jbw_identity[16] = {
   0.f, 0.f, 0.f, 1.f
 };                              ///< identity matrix.
 
+#if HAVE_GTKGLAREA
+int (*jbw_main_idle) () = NULL;
+GMainLoop *jbw_main_loop_pointer = NULL;
+///< pointer to the idle function on a main loop.
+#elif HAVE_FREEGLUT
+void (*jbw_main_idle) () = NULL;
+///< pointer to the idle function on a main loop.
+void (*jbw_main_resize) (int width, int height) = NULL;
+///< pointer to the resize function on a main loop.
+void (*jbw_main_render) () = NULL;
+///< pointer to the render function on a main loop.
+#elif HAVE_SDL
+int (*jbw_main_idle) () = NULL;
+///< pointer to the idle function on a main loop.
+void (*jbw_main_resize) (int width, int height) = NULL;
+///< pointer to the resize function on a main loop.
+void (*jbw_main_render) () = NULL;
+///< pointer to the render function on a main loop.
+#elif HAVE_GLFW
+int (*jbw_main_idle) () = NULL;
+///< pointer to the idle function on a main loop.
+void (*jbw_main_render) () = NULL;
+///< pointer to the render function on a main loop.
+unsigned int jbw_main_exit;
+///< 1 on exit main loop, 0 on continue.
+#endif
+
 /**
  * Function to init locales in the JB library with GTK interface.
  *
@@ -128,6 +155,76 @@ jbw_init (int *argn,
   gtk_disable_setlocale ();
   gtk_init (argn, argc);
   return 1;
+}
+
+/**
+ * Function to do a main loop.
+ */
+void
+jbw_main_loop ()
+{
+#if HAVE_GTKGLAREA
+
+  if (jbw_main_idle)
+    g_idle_add ((GSourceFunc) jbw_main_idle, NULL);
+  g_main_loop_run (jbw_main_loop_pointer);
+  g_main_loop_unref (jbw_main_loop_pointer);
+
+#elif HAVE_FREEGLUT
+
+  // Passing the GTK+ signals to the FreeGLUT main loop
+  glutIdleFunc (jbw_main_idle);
+  // Setting our draw resize function as the FreeGLUT reshape function
+  glutReshapeFunc (jbw_main_resize);
+  // Setting our draw function as the FreeGLUT display function
+  glutDisplayFunc (jbw_main_render);
+  // FreeGLUT main loop
+  glutMainLoop ();
+
+#elif HAVE_SDL
+
+  SDL_Event event[1];
+  GMainContext *context = g_main_context_default ();
+  jbw_main_render ();
+  while (1)
+    {
+      while (g_main_context_pending (context))
+        g_main_context_iteration (context, 0);
+      while (SDL_PollEvent (event))
+        {
+          if (event->type == SDL_QUIT)
+            return;
+          if (event->type == SDL_WINDOWEVENT)
+            {
+              if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                {
+                  if (jbw_main_resize)
+                    jbw_main_resize (event->window.data1, event->window.data2);
+                }
+              else if (jbw_main_render)
+                jbw_main_render ();
+            }
+        }
+      if (jbw_main_idle && !jbw_main_idle ())
+        jbw_main_idle = NULL;
+    }
+
+#elif HAVE_GLFW
+
+  GMainContext *context = g_main_context_default ();
+  jbw_main_render ();
+  jbw_main_exit = 0;
+  while (!jbw_main_exit)
+    {
+      while (g_main_context_pending (context))
+        g_main_context_iteration (context, 0);
+      glfwPollEvents ();
+      if (jbw_main_idle && !jbw_main_idle ())
+        jbw_main_idle = NULL;
+      jbw_main_render ();
+    }
+
+#endif
 }
 
 /**
@@ -795,9 +892,6 @@ jbw_image_draw (JBWImage * image,       ///< JBWImage struct.
 static void
 jbw_graphic_delete (JBWGraphic * graphic)       ///< JBWGraphic widget.
 {
-#if HAVE_GTKGLAREA
-  g_main_loop_unref (graphic->loop);
-#endif
   if (graphic->face)
     {
       FT_Done_Face (*graphic->face);
@@ -1388,7 +1482,6 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
 
   // Setting up the new window
 #if HAVE_GTKGLAREA
-  graphic->loop = g_main_loop_new (NULL, 0);
   graphic->widget = (GtkGLArea *) gtk_gl_area_new ();
   if (!graphic->widget)
     {
@@ -2535,9 +2628,7 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
 #endif
   GtkFileChooserDialog *dlg;
   GtkFileFilter *filter;
-#if HAVE_GTKGLAREA
   GMainContext *context = g_main_context_default ();
-#endif
   char *buffer = NULL;
   unsigned int i, j;
   dlg =
@@ -2563,85 +2654,11 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
   if (buffer)
     {
       graphic->draw (graphic);
-#if HAVE_GTKGLAREA
       while (g_main_context_pending (context))
         g_main_context_iteration (context, 0);
-#endif
       jbw_graphic_save (graphic, buffer);
       g_free (buffer);
     }
-}
-
-/**
- * Function to do a main loop in a JBWGraphic widget.
- */
-void
-jbw_graphic_main_loop (JBWGraphic * graphic __attribute__((unused)))
-  ///< JBWGraphic struct.
-{
-#if HAVE_GTKGLAREA
-
-  if (graphic->calculate)
-    g_idle_add ((GSourceFunc) graphic->calculate, graphic);
-  g_main_loop_run (graphic->loop);
-
-#elif HAVE_FREEGLUT
-
-  // Passing the GTK+ signals to the FreeGLUT main loop
-  glutIdleFunc ((void (*)(void)) gtk_main_iteration);
-  // Setting our draw resize function as the FreeGLUT reshape function
-  glutReshapeFunc (jbw_freeglut_draw_resize);
-  // Setting our draw function as the FreeGLUT display function
-  glutDisplayFunc (jbw_freeglut_draw);
-  // FreeGLUT main loop
-  glutMainLoop ();
-
-#elif HAVE_SDL
-
-  SDL_Event event[1];
-  GMainContext *context = g_main_context_default ();
-  jbw_graphic_render (graphic);
-  while (1)
-    {
-      while (g_main_context_pending (context))
-        g_main_context_iteration (context, 0);
-      while (SDL_PollEvent (event))
-        {
-          if (event->type == SDL_QUIT)
-            return;
-          if (event->type == SDL_WINDOWEVENT)
-            {
-              if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-                jbw_graphic_resize (graphic, event->window.data1,
-                                    event->window.data2);
-              else
-                jbw_graphic_render (graphic);
-            }
-          if (graphic->calculate)
-            if (!graphic->calculate (graphic))
-              graphic->calculate = NULL;
-        }
-    }
-
-#elif HAVE_GLFW
-
-  GMainContext *context = g_main_context_default ();
-  jbw_graphic_render (graphic);
-  while (!glfwWindowShouldClose (graphic->window))
-    {
-      while (g_main_context_pending (context))
-        g_main_context_iteration (context, 0);
-      glfwPollEvents ();
-      //glfwWaitEvents ();
-      if (graphic->calculate)
-        {
-          if (!graphic->calculate (graphic))
-            graphic->calculate = NULL;
-        }
-      jbw_graphic_render (graphic);
-    }
-
-#endif
 }
 
 /**

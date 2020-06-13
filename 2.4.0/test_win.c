@@ -4,25 +4,59 @@
 
 JBWGraphic *graphic;
 
-void
+static void
+jbw_freeglut_idle ()
+{
+  GMainContext *context = g_main_context_default ();
+  while (g_main_context_pending (context))
+    g_main_context_iteration (context, 0);
+}
+
+static void
 jbw_freeglut_draw_resize (int width, int height)
 {
   jbw_graphic_resize (graphic, width, height);
   jbw_graphic_render (graphic);
 }
 
-void
-jbw_freeglut_draw ()
+static void
+jbw_freeglut_draw_render ()
+{
+  jbw_graphic_render (graphic);
+}
+
+#elif HAVE_SDL
+
+JBWGraphic *graphic;
+
+static void
+jbw_sdl_draw_resize (int width, int height)
+{
+  jbw_graphic_resize (graphic, width, height);
+  jbw_graphic_render (graphic);
+}
+
+static void
+jbw_sdl_draw_render ()
 {
   jbw_graphic_render (graphic);
 }
 
 #elif HAVE_GLFW
 
-void
+JBWGraphic *graphic;
+
+static void
+jbw_glfw_draw_render ()
+{
+  jbw_graphic_render (graphic);
+}
+
+static void
 jbw_glfw_window_close (JBWGraphic * graphic)
 {
-  glfwSetWindowShouldClose (graphic->window, GL_TRUE);
+  jbw_main_loop_quit ();
+  glfwSetWindowShouldClose (graphic->window, 1);
 }
 
 #endif
@@ -72,11 +106,11 @@ cb_open2 (JBWGraphic * graphic)
 int
 main (int argn, char **argc)
 {
-#if !HAVE_FREEGLUT
+#if HAVE_GTKGLAREA
   JBWGraphic *graphic;
+#endif
 #if HAVE_SDL
   SDL_Event exit_event[1];
-#endif
 #endif
   GtkWindow *window;
   GtkGrid *grid;
@@ -113,11 +147,19 @@ main (int argn, char **argc)
   graphic->zmax = 2.9999;
 #if HAVE_GTKGLAREA
   jbw_graphic_show (graphic);
+#elif HAVE_FREEGLUT
+  jbw_graphic_init (graphic);
+  jbw_main_idle = jbw_freeglut_idle;
+  jbw_main_resize = jbw_freeglut_draw_resize;
+  jbw_main_render = jbw_freeglut_draw_render;
 #elif HAVE_SDL
   exit_event->type = SDL_QUIT;
   jbw_graphic_init (graphic);
-#else
+  jbw_main_resize = jbw_sdl_draw_resize;
+  jbw_main_render = jbw_sdl_draw_render;
+#elif HAVE_GLFW
   jbw_graphic_init (graphic);
+  jbw_main_render = jbw_glfw_draw_render;
 #endif
   if (glewIsSupported ("GL_VERSION_4_0"))
     version = "OpenGL supported version 4.0";
@@ -146,12 +188,16 @@ main (int argn, char **argc)
   window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (grid));
 #if HAVE_GTKGLAREA
+  jbw_main_loop_pointer = g_main_loop_new (NULL, 0);
   g_signal_connect_swapped (graphic->window, "delete-event",
-                            (GCallback) g_main_loop_quit, graphic->loop);
+                            (GCallback) g_main_loop_quit,
+                            jbw_main_loop_pointer);
   g_signal_connect_swapped (button_close, "clicked",
-                            (GCallback) g_main_loop_quit, graphic->loop);
+                            (GCallback) g_main_loop_quit,
+                            jbw_main_loop_pointer);
   g_signal_connect_swapped (window, "delete-event",
-                            (GCallback) g_main_loop_quit, graphic->loop);
+                            (GCallback) g_main_loop_quit,
+                            jbw_main_loop_pointer);
 #elif HAVE_FREEGLUT
   g_signal_connect (button_close, "clicked", (GCallback) glutLeaveMainLoop,
                     NULL);
@@ -176,7 +222,7 @@ main (int argn, char **argc)
                             graphic);
   gtk_widget_show_all (GTK_WIDGET (window));
 
-  jbw_graphic_main_loop (graphic);
+  jbw_main_loop ();
 
   jbw_graphic_destroy (graphic);
   if (window)
