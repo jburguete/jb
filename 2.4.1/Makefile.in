@@ -17,8 +17,9 @@ exe = libjb@SO@ libjbm@SO@ libjbw@SO@ libjbxml@SO@ test_math test_win
 locale = locale/
 es = $(locale)es/LC_MESSAGES/
 fr = $(locale)fr/LC_MESSAGES/
+it = $(locale)it/LC_MESSAGES/
 pot = $(locale)jb.pot
-locales = $(es)jb.mo $(fr)jb.mo
+locales = $(es)jb.mo $(fr)jb.mo $(it)jb.mo
 
 # Default building
 all: $(exe) $(locales) doc/latex/refman.pdf
@@ -50,12 +51,12 @@ test_win: test_win.c libjb@SO@ libjbm@SO@ libjbw@SO@
 	$(CC) $(CFLAGS) test_win.c -o test_win $(EXEFLAGS) -ljbm -ljbw
 
 # Locales
-locales = es fr
+locales = es fr it
 $(pot): $(src) Makefile
 	if ! test -d $(locale); then mkdir -p $(locale); fi
 	xgettext -k_ -d jb -o $(pot) --from-code=UTF-8 $(src)
 	$(foreach i,$(locales), \
-		if ! test -d $i; then mkdir -p $i; fi; \
+		if ! test -d $($i); then mkdir -p $($i); fi; \
 	  if ! test -f $($i)jb.po; then \
 			msginit -l $i -i $(pot) -o $($i)jb.po --no-translator; \
 		else \
@@ -66,6 +67,8 @@ $(es)jb.mo: $(pot) $(es)jb.po
 	msgfmt -c -v $(es)jb.po -o $(es)jb.mo
 $(fr)jb.mo: $(pot) $(fr)jb.po
 	msgfmt -c -v $(fr)jb.po -o $(fr)jb.mo
+$(it)jb.mo: $(pot) $(it)jb.po
+	msgfmt -c -v $(it)jb.po -o $(it)jb.mo
 
 # Documentation
 doc/latex/refman.pdf: $(src) Doxyfile Makefile

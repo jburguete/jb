@@ -584,6 +584,14 @@ static void
 jbw_image_delete (JBWImage * image)     ///< JBWImage widget.
 {
   glDeleteProgram (image->program_texture);
+  if (image->vbo_texture)
+    glDeleteBuffers (1, &image->vbo_texture);
+  if (image->ibo)
+    glDeleteBuffers (1, &image->ibo);
+  if (image->vbo)
+    glDeleteBuffers (1, &image->vbo);
+  if (image->id_texture)
+    glDeleteTextures (1, &image->id_texture);
   g_free (image->image);
   g_free (image);
 }
@@ -641,6 +649,7 @@ jbw_image_init (JBWImage * image,       ///< JBWImage widget.
   GLuint vs, fs;
 
   // setting up matrices and vertices
+  image->id_texture = image->vbo = image->ibo = image->vbo_texture = 0;
   memcpy (image->matrix, matrix, 16 * sizeof (GLfloat));
   memcpy (image->vertices, vertices, 8 * sizeof (GLfloat));
   memcpy (image->square_texture, square_texture, 8 * sizeof (GLfloat));
@@ -889,9 +898,11 @@ jbw_image_draw (JBWImage * image,       ///< JBWImage struct.
 /**
  * Function to free the memory used by a JBWGraphic widget.
  */
-static void
+void
 jbw_graphic_delete (JBWGraphic * graphic)       ///< JBWGraphic widget.
 {
+  if (graphic->vbo_text)
+    glDeleteBuffers (1, &graphic->vbo_text);
   if (graphic->face)
     {
       FT_Done_Face (*graphic->face);
@@ -904,6 +915,10 @@ jbw_graphic_delete (JBWGraphic * graphic)       ///< JBWGraphic widget.
     }
   if (graphic->program_text)
     glDeleteProgram (graphic->program_text);
+  if (graphic->program_3Dc)
+    glDeleteProgram (graphic->program_3D);
+  if (graphic->program_2Dc)
+    glDeleteProgram (graphic->program_2D);
   if (graphic->program_3D)
     glDeleteProgram (graphic->program_3D);
   if (graphic->program_2D)
@@ -1023,6 +1038,8 @@ jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
 
   // Initing variables
 init:
+  graphic->vbo_text = graphic->program_2D = graphic->program_3D
+    = graphic->program_2Dc = graphic->program_3Dc = graphic->program_text = 0;
   fs_sources[0] = vs_2D_sources[0] = vs_3D_sources[0] = vs_2Dc_sources[0]
     = vs_3Dc_sources[0] = fs_text_sources[0] = vs_text_sources[0] = gl_version;
   fs_sources[1] = fs_source;
@@ -1648,6 +1665,7 @@ jbw_graphic_draw_text (JBWGraphic * graphic,    ///< JBWGraphic widget.
 
   // freeing memory
   glDisableVertexAttribArray (graphic->in_text_position);
+  glDeleteTextures (1, &id);
 
   // disabling OpenGL features
   glDisable (GL_BLEND);
@@ -2633,7 +2651,7 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
   unsigned int i, j;
   dlg =
     (GtkFileChooserDialog *)
-    gtk_file_chooser_dialog_new (_("Save graphical"),
+    gtk_file_chooser_dialog_new (_("Save graph"),
                                  window_parent,
                                  GTK_FILE_CHOOSER_ACTION_SAVE,
                                  _("_OK"), GTK_RESPONSE_OK,

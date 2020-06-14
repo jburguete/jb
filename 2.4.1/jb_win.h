@@ -332,6 +332,7 @@ void jbw_draw_orthogonal_matrixl (GLint uniform, GLdouble x, GLdouble y,
 
 JBWImage *jbw_image_new (char *name);
 
+void jbw_graphic_delete (JBWGraphic * graphic);
 void jbw_graphic_destroy (JBWGraphic * graphic);
 void jbw_graphic_init (JBWGraphic * graphic);
 void jbw_graphic_resize (JBWGraphic * graphic, int width, int height);
