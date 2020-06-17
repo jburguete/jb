@@ -101,12 +101,16 @@ didacticiel
 
 Avec NetBSD 9.0, pour utiliser le derniére version du compilateur GCC, il faut
 faire avant dans le terminal:
-> $ export PATH=/usr/pkg/gcc9/bin:$PATH"
+> $ export PATH="/usr/pkg/gcc9/bin:$PATH"
+Pour faire le changement permanent on peut ajouter à la dernière ligne di
+fichier ".profile" dans le répertoire racine du utilisateur:
+> PATH="/usr/pkg/gcc9/bin:$PATH"
 
 Avec OpenBSD 6.7 on doit faire avant dans le terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 Ce programme a été construit et probé avec les suivants systèmes d'exploitation:
+* Arch Linux
 * Debian 10 (Linux)
 * Devuan Linux 3
 * Dragonfly BSD 5.8
@@ -115,7 +119,7 @@ Ce programme a été construit et probé avec les suivants systèmes d'exploitat
 * FreeBSD 12.1
 * Linux Mint DE 3
 * Manjaro Linux
-* Microsoft Windows 10
+* Microsoft Windows 10 + MSYS2
 * NetBSD 9.0
 * OpenBSD 6.7
 * OpenInidiana Hipster

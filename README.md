@@ -93,12 +93,16 @@ tutorial.
 
 On NetBSD 9.0, to use the last GCC version, you have to do first on the
 building terminal:
-> $ export PATH=/usr/pkg/gcc9/bin:$PATH"
+> $ export PATH="/usr/pkg/gcc9/bin:$PATH"
+To do permanent this change the following line can be added to the ".profile"
+file in the user root directory:
+> PATH="/usr/pkg/gcc9/bin:$PATH"
 
 On OpenBSD 6.7 you have to do first on the building terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 This software has been built and tested in the following operative systems:
+* Arch Linux
 * Debian 10 (Linux)
 * Devuan Linux 3
 * Dragonfly BSD 5.8
