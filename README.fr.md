@@ -35,7 +35,7 @@ BIBLIOTHÈQUES ET OUTILS REQUIS
 ______________________________
 
 Obligatoire:
-* [gcc](https://gcc.gnu.org) o [clang](http://clang.llvm.org) pour compiler le
+* [gcc](https://gcc.gnu.org) ou [clang](http://clang.llvm.org) pour compiler le
   code source.
 * [make](http://www.gnu.org/software/make) pour construire le fichier
   executable.
