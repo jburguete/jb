@@ -50,13 +50,22 @@ Mandatory:
 * [gettext](http://www.gnu.org/software/gettext) to work with different
   international locales and languages.
 
-Optional if including jb\_xml utilites:
+Optional to get the processor properties:
+* [libgtop](https://github.com/GNOME/libgtop) to get the processors number.
+
+Required if including jb\_xml utilites:
 * [libxml](http://xmlsoft.org) to deal with XML files.
 
-Optional if including jb\_win utilities and compiling with -DJBW=2 flag.
+Needed if including jb\_win utilities and compiling with -DJBW=2 flag.
 * [png](http://libpng.sourceforge.net) to work with PNG files.
 * [gtk3](http://www.gtk.org) to work with interactive windows.
 * [glew](http://glew.sourceforge.net) high level OpenGL functions.
+
+The following optional libraries can be used as alternative to the GtkGLArea
+widget of the GTK library to interact with OpenGL to draw graphs.
+* [freeglut](http://freeglut.sourceforge.net)
+* [sdl2](https://www.libsdl.org)
+* [glfw](http://www.glfw.org)
 
 Optional to build documentation:
 * [doxygen](http://www.stack.nl/~dimitri/doxygen) standard comments format to

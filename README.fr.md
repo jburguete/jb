@@ -51,14 +51,25 @@ Obligatoire:
 * [gettext](http://www.gnu.org/software/gettext) pour travailler avec differents
   codes et langues internationaux.
 
-Optionnel si les outils jb\_xml sont inclus:
+Optionnel pour détecter les characteristiques du processeur:
+* [libgtop](https://github.com/GNOME/libgtop) pour obtenir le nombre de
+  processeurs.
+
+Obligatoire si les outils jb\_xml sont inclus:
 * [libxml](http://xmlsoft.org) pour travailler avec fichiers XML.
 
-Optionnel si les outils jb\_win sont inclus et on compile en utilisant l'option
--DJBW=2.
+Obligatoire si les outils jb\_win sont inclus et on compile en utilisant
+l'option -DJBW=2.
 * [png](http://libpng.sourceforge.net) pour travailler avec fichiers PNG.
 * [gtk3](http://www.gtk.org) pour travailler avec fenêtres interactives.
 * [glew](http://glew.sourceforge.net) functions OpenGL de haut niveau.
+
+On peut utiliser les bibliothèques graphiques suivantes comme alternative au
+widget GtkGLArea de la bibliothèque GTK pour interagir avec OpenGL pour dessiner
+graphiques:
+* [freeglut](http://freeglut.sourceforge.net)
+* [sdl2](https://www.libsdl.org)
+* [glfw](http://www.glfw.org)
 
 Optionnel pour construire la documentation:
 * [doxygen](http://www.stack.nl/~dimitri/doxygen) format de commentaires
