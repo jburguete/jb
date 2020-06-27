@@ -13,7 +13,7 @@ EXEFLAGS = $(LDFLAGS) -L. -Wl,@RPATH@ -ljb
 src = jb_config.h jb_def.h jb_def.c jb_math.h jb_math.c jb_win.h jb_win.c \
 	jb_xml.h jb_xml.c
 obj = jb_def.o jb_math.o jb_win.o jb_xml.o
-exe = libjb@SO@ libjbm@SO@ libjbw@SO@ libjbxml@SO@ test_math test_win
+exe = libjb@SO@ libjbm@SO@ libjbw@SO@ libjbxml@SO@ test_math@EXE@ test_win@EXE@
 locale = locale/
 es = $(locale)es/LC_MESSAGES/
 fr = $(locale)fr/LC_MESSAGES/
@@ -45,10 +45,10 @@ libjbxml@SO@: jb_xml.o libjb@SO@ libjbm@SO@
 	$(CC) -shared jb_xml.o $(EXEFLAGS) -o libjbxml@SO@ -ljb -ljbm
 
 # Tests
-test_math: test_math.c libjb@SO@ libjbm@SO@
-	$(CC) $(CFLAGS) test_math.c -o test_math $(EXEFLAGS) -ljbm
-test_win: test_win.c libjb@SO@ libjbm@SO@ libjbw@SO@
-	$(CC) $(CFLAGS) test_win.c -o test_win $(EXEFLAGS) -ljbm -ljbw
+test_math@EXE@: test_math.c libjb@SO@ libjbm@SO@
+	$(CC) $(CFLAGS) test_math.c -o test_math@EXE@ $(EXEFLAGS) -ljbm
+test_win@EXE@: test_win.c libjb@SO@ libjbm@SO@ libjbw@SO@
+	$(CC) $(CFLAGS) test_win.c -o test_win@EXE@ $(EXEFLAGS) -ljbm -ljbw
 
 # Locales
 locales = es fr it

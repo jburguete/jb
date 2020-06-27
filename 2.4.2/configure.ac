@@ -41,6 +41,7 @@ elif test `uname -s` = "DragonFly"; then
 fi
 if test "x$win" = "x1"; then
 	native=0
+	AC_SUBST(EXE, [.exe])
 fi
 
 # Checks for programs
