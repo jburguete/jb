@@ -10,7 +10,7 @@ AC_MSG_NOTICE([Host: $host])
 win=0
 win32=0
 native=1
-rpath="-rapth=."
+rpath="-rpath=."
 if test $host = "x86_64-w64-mingw32"; then
 	AC_MSG_NOTICE([Microsoft Windows 64 bits])
 	win=1
