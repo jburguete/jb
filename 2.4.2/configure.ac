@@ -27,7 +27,7 @@ elif test `uname -s` = "FreeBSD"; then
 	LDFLAGS="$LDFLAGS -L/usr/local/lib"
 elif test `uname -s` = "NetBSD"; then
 	AC_MSG_NOTICE([NetBSD])
-	LDFLAGS="$LDFLAGS -L/usr/X11R7/lib"
+	LDFLAGS="$LDFLAGS -L/usr/pkg/lib -L/usr/X11R7/lib"
 	CPPFLAGS="$CPPFLAGS -I/usr/X11R7/include"
 elif test `uname -s` = "OpenBSD"; then
 	AC_MSG_NOTICE([OpenBSD])
