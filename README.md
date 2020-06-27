@@ -1,4 +1,4 @@
-JB (2.4.1 version)
+JB (2.4.2 version)
 ==================
 
 :uk:[english](README.md) :es:[español](README.es.md)
@@ -119,6 +119,7 @@ This software has been built and tested in the following operative systems:
 * Fedora Linux 32
 * FreeBSD 12.1
 * Linux Mint DE 3
+* MacOS Catalina + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10
 * NetBSD 9.0
@@ -136,7 +137,7 @@ ____________________________
 2. Link the latest version on a jb directory i.e.:
 > $ cd YOUR\_PROGRAM\_PATH
 >
-> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/2.4.1 jb
+> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/2.4.2 jb
 
 3. Include the config and the used utility headers on your source code i.e.:
 > \#include "jb/jb\_config.h"
@@ -200,7 +201,7 @@ MAKING REFERENCE MANUAL INSTRUCTIONS (doc/latex/refman.pdf file)
 ----------------------------------------------------------------
 
 Execute on a terminal:
-> $ cd PATH\_TO\_JB\_LIBRARY/2.4.1
+> $ cd PATH\_TO\_JB\_LIBRARY/2.4.2
 >
 > $ doxygen
 >

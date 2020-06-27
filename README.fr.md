@@ -1,4 +1,4 @@
-JB (version 2.4.1)
+JB (version 2.4.2)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -129,6 +129,7 @@ Ce programme a été construit et probé avec les suivants systèmes d'exploitat
 * Fedora Linux 32
 * FreeBSD 12.1
 * Linux Mint DE 3
+* MacOS Catalina + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
 * NetBSD 9.0
@@ -146,7 +147,7 @@ _____________________________________
 2. Lier la dernière version dans une répertoire jb, p.ex.:
 > $ cd RÉPERTOIRE\_DE\_VÔTRE\_PROGRAMME
 >
-> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.4.1 jb
+> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.4.2 jb
 
 3. Inclure le fichier de configuration et les outils requis dans vôtre code
   source p.ex.:
@@ -212,7 +213,7 @@ INSTRUCTIONS POUR FAIRE LE MANUEL DE REFERENCE (fichier doc/latex/refman.pdf)
 -------------------------------------------------------------------------------
 
 Executer dans un terminal:
-> $ cd CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.4.1
+> $ cd CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.4.2
 >
 > $ doxygen
 >

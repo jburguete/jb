@@ -9,7 +9,7 @@ CFLAGS = @CFLAGS@ @XML_CFLAGS@ @GTHREAD_CFLAGS@ @GLIB_CFLAGS@ @GTOP_CFLAGS@ \
 LDFLAGS = @LDFLAGS@ @XML_LIBS@ @GTHREAD_LIBS@ @GLIB_LIBS@ @GTOP_LIBS@ \
 	@PNG_LIBS@ @FREETYPE_LIBS@ @GTK_LIBS@ @GLEW_LIBS@ @SDL_LIBS@ @GLFW_LIBS@ \
 	@LIBS@
-EXEFLAGS = $(LDFLAGS) -L. -Wl,-rpath=. -ljb
+EXEFLAGS = $(LDFLAGS) -L. -Wl,@RPATH@ -ljb
 src = jb_config.h jb_def.h jb_def.c jb_math.h jb_math.c jb_win.h jb_win.c \
 	jb_xml.h jb_xml.c
 obj = jb_def.o jb_math.o jb_win.o jb_xml.o

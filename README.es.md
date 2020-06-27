@@ -1,4 +1,4 @@
-JB (versión 2.4.1)
+JB (versión 2.4.2)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -123,6 +123,7 @@ operativos:
 * Fedora Linux 32
 * FreeBSD 12.1
 * Linux Mint DE 3
+* MacOS Catalina + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
 * NetBSD 9.0
@@ -140,7 +141,7 @@ _____________________________________
 2. Enlazar la última versión en una carpeta jb p.ej.:
 > $ cd CARPETA\_DE\_SU\_PROGRAMA
 >
-> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.4.1 jb
+> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.4.2 jb
 
 3. Incluir el fichero de configuración y las utilidades requeridas en su código
    fuente p.ej.:
@@ -206,7 +207,7 @@ INSTRUCCIONES PARA HACER EL MANUAL DE REFERENCIA (fichero doc/latex/refman.pdf)
 -------------------------------------------------------------------------------
 
 Ejecutar en un terminal:
-> $ cd RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.4.1
+> $ cd RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.4.2
 >
 > $ doxygen
 >

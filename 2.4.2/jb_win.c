@@ -1033,7 +1033,7 @@ jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
   else
     {
       error_msg = _("OpenGL 2.1 is not supported");
-      goto end;
+      goto end2;
     }
 
   // Initing variables
@@ -1376,6 +1376,7 @@ end:
       gl_version = gl_version_120;
       goto init;
     }
+end2:
   jbw_show_error2 ("JBWGraphic", error_msg);
   exit (0);
 }

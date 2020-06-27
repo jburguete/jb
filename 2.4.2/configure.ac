@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([jb], [2.4.1], [https://github.com/jburguete/jb])
+AC_INIT([jb], [2.4.2], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -10,6 +10,7 @@ AC_MSG_NOTICE([Host: $host])
 win=0
 win32=0
 native=1
+rpath="-rapth=."
 if test $host = "x86_64-w64-mingw32"; then
 	AC_MSG_NOTICE([Microsoft Windows 64 bits])
 	win=1
@@ -17,6 +18,10 @@ elif test $host = "i686-w64-mingw32"; then
 	AC_MSG_NOTICE([Microsoft Windows 32 bits])
 	win=1
 	win32=1
+elif test `uname -s` = "Darwin"; then
+	AC_MSG_NOTICE([MacOS])
+	LDFLAGS="$LDFLAGS -L/System/Library/Frameworks -framework GLUT -framework OpenGL"
+	rpath="-rpath,."
 elif test `uname -s` = "FreeBSD"; then
 	AC_MSG_NOTICE([FreeBSD])
 	LDFLAGS="$LDFLAGS -L/usr/local/lib"
@@ -45,6 +50,10 @@ $CC -v
 AC_PROG_MAKE_SET
 AC_LANG([C])
 PKG_PROG_PKG_CONFIG
+if test $CC = "clang"; then
+	rpath="-rpath,."
+fi
+AC_SUBST(RPATH,[$rpath])
 if test $win = 1; then
 	AC_SUBST(SO, [.dll])
 	AC_SUBST(EXE, [.exe])
@@ -140,7 +149,7 @@ AC_ARG_WITH([sdl],
 	AS_HELP_STRING([--with-sdl], [Build graphic window with SDL]))
 if test "x$with_freeglut" = "xyes"; then
 	AC_SUBST(GRAPHIC, "-DHAVE_FREEGLUT=1")
-	AC_SEARCH_LIBS([glutInit], [freeglut glut], glut="yes", glut="no")
+	AC_SEARCH_LIBS([glutLeaveMainLoop], [freeglut glut], glut="yes", glut="no")
 else
 	if test "x$with_glfw" = "xyes"; then
 		AC_SUBST(GRAPHIC, "-DHAVE_GLFW=1")
