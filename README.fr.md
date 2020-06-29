@@ -128,7 +128,7 @@ Ce programme a été construit et probé avec les suivants systèmes d'exploitat
 * Dyson Illumos
 * Fedora Linux 32
 * FreeBSD 12.1
-* Linux Mint DE 3
+* Linux Mint DE 4
 * MacOS Catalina + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
