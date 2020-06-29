@@ -120,7 +120,8 @@ fichier ".profile" dans le répertoire racine du utilisateur:
 Avec OpenBSD 6.7 on doit faire avant dans le terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
-Ce programme a été construit et probé avec les suivants systèmes d'exploitation:
+Ce programme a été construit et prouvé avec les suivants systèmes
+d'exploitation:
 * Arch Linux
 * Debian 10 (Linux)
 * Devuan Linux 3
