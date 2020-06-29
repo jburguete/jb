@@ -19,7 +19,7 @@ FICHIERS
 * TODO: liste de tâches pour réaliser.
 * jb\*.h: fichiers de code d'en-tête.
 * jb\*.c: fichiers de code source.
-* Doxyfile: fichero de configuration pour générer documentation doxygen.
+* Doxyfile: fichier de configuration pour générer documentation doxygen.
 * build.sh: script de construction par défaut.
 * configure.ac: pour configurer la construction du Makefile.
 * Makefile.in: modèle pour générer le Makefile.
