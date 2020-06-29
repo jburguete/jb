@@ -141,15 +141,15 @@ Ce programme a été construit et probé avec les suivants systèmes d'exploitat
 INSTRUCTIONS DE CONSTRUCTION COMMUNES
 _____________________________________
 
-1. Télécharger la dernière version de la bibliothèque:
+1. Téléchargez la dernière version de la bibliothèque:
 > $ git clone https://github.com/jburguete/jb
 
-2. Lier la dernière version dans une répertoire jb, p.ex.:
+2. Liez la dernière version dans une répertoire jb, p.ex.:
 > $ cd RÉPERTOIRE\_DE\_VÔTRE\_PROGRAMME
 >
 > $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.4.2 jb
 
-3. Inclure le fichier de configuration et les outils requis dans vôtre code
+3. Incluez le fichier de configuration et les outils requis dans vôtre code
   source p.ex.:
 > \#include "jb/jb\_config.h"
 >
@@ -162,7 +162,7 @@ _____________________________________
 CONSTRUCTION STATIQUE
 _____________________
 
-4. Compiler les codes source des outils utilisés p.ex.:
+4. Compilez les codes source des outils utilisés p.ex.:
 > $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 >
@@ -175,7 +175,7 @@ _____________________
 > $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_xml.c -o jb\_xml.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-5. Lier les fichiers objet des outils utilisés dans vôtre executable p.ex.:
+5. Liez les fichiers objet des outils utilisés dans vôtre executable p.ex.:
 > $ gcc -DJBW=2 -DJBM\_PRECISION=2 VÔTRE\_CODE\_SOURCE.c jb\_def.o jb\_math.o
 > jb\_win.o jb\_xml.o -o VÔTRE\_FICHIER\_EXECUTABLE
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
@@ -188,7 +188,7 @@ Notez aussi qu'on peut utiliser un autre niveau de précision (JBM\_PRECISION).
 CONSTRUCTION DYNAMIQUE
 _______________________
 
-4. Compiler les codes source des outils utilisés p.ex. avec chemins absolus
+4. Compilez les codes source des outils utilisés p.ex. avec chemins absolus
   p.ex.:
 > $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
@@ -199,12 +199,12 @@ _______________________
 > $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_win.c -o jb\_win.o
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-5. Construire la bibliothèqe partagée:
+5. Construisez la bibliothèqe partagée:
 > $ gcc -shared -DJBW=2 -DJBM\_PRECISION=2 jb\_def.o jb\_win.o jb\_math.o
 > -o libjb.so
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-6. Lier la bibliothèque partagée dans vôtre executable p.ex.:
+6. Liez la bibliothèque partagée dans vôtre executable p.ex.:
 > $ gcc -DJBW=2 -DJBM\_PRECISION=2 VÔTRE\_CODE\_SOURCE.c
 > -o VÔTRE\_FICHIER\_EXECUTABLE -L. -Wl,-rpath=. -ljb
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
@@ -212,7 +212,7 @@ _______________________
 INSTRUCTIONS POUR FAIRE LE MANUEL DE REFERENCE (fichier doc/latex/refman.pdf)
 -------------------------------------------------------------------------------
 
-Executer dans un terminal:
+Exécutez dans un terminal:
 > $ cd CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.4.2
 >
 > $ doxygen
