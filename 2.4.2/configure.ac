@@ -39,10 +39,6 @@ elif test `uname -s` = "DragonFly"; then
 	LDFLAGS="$LDFLAGS -L/usr/local/lib"
 	CPPFLAGS="$CPPFLAGS -I/usr/local/include"
 fi
-if test "x$win" = "x1"; then
-	native=0
-	AC_SUBST(EXE, [.exe])
-fi
 
 # Checks for programs
 AC_PROG_CC([gcc10 gcc9 gcc8 gcc7 egcc gcc clang])
@@ -58,6 +54,7 @@ AC_SUBST(RPATH,[$rpath])
 if test $win = 1; then
 	AC_SUBST(SO, [.dll])
 	AC_SUBST(EXE, [.exe])
+	native=0
 else
 	AC_SUBST(SO, [.so])
 fi
