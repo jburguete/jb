@@ -103,6 +103,7 @@ tutorial.
 On NetBSD 9.0, to use the last GCC version, you have to do first on the
 building terminal:
 > $ export PATH="/usr/pkg/gcc9/bin:$PATH"
+
 To do permanent this change the following line can be added to the ".profile"
 file in the user root directory:
 > PATH="/usr/pkg/gcc9/bin:$PATH"
@@ -172,7 +173,7 @@ ___________________
 Note that your code could also need additional libraries to "pkg-config"
 command.
 
-Note also that you can set another precision level (JBM\\_PRECISION).
+Note also that you can set another precision level (JBM\_PRECISION).
 
 BUILDING DINAMICALLY
 ____________________
@@ -197,8 +198,8 @@ ____________________
 > -o YOUR\_EXECUTABLE\_FILE -L. -Wl,-rpath=. -ljb
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
 
-MAKING REFERENCE MANUAL INSTRUCTIONS (doc/latex/refman.pdf file)
-----------------------------------------------------------------
+INSTRUCTIONS TO MAKE THE REFERENCE MANUAL (doc/latex/refman.pdf file)
+---------------------------------------------------------------------
 
 Execute on a terminal:
 > $ cd PATH\_TO\_JB\_LIBRARY/2.4.2

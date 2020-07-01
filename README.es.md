@@ -57,7 +57,7 @@ Opcional para detectar las características del procesador:
 Obligatorio si se incluyen las utilidades jb\_xml:
 * [libxml](http://xmlsoft.org) para trabajar con ficheros XML.
 
-Obligatoiro si se incluyen las utilidades jb\_win y se compila usando el flag
+Obligatorio si se incluyen las utilidades jb\_win y se compila usando el flag
 -DJBW=2.
 * [png](http://libpng.sourceforge.net) para trabajar con ficheros PNG.
 * [gtk3](http://www.gtk.org) para trabajar con ventanas interactivas.
@@ -106,6 +106,7 @@ utilidades requeridas. Puede seguir instrucciones detalladas en el tutorial
 En NetBSD 9.0, para usar la última versión del compilador GCC, hay que hacer
 primero en el terminal:
 > $ export PATH="/usr/pkg/gcc9/bin:$PATH"
+
 Si se quiere hacer permanente tambien se puede añadir en el fichero ".profile"
 de la carpeta raíz del usuario la línea:
 > PATH="/usr/pkg/gcc9/bin:$PATH"

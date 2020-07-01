@@ -96,7 +96,7 @@ On doit aussi définir l'option de niveau de précision:
 * -DJBM\_PRECISION=5: tous les variables mathématiques sont définies comme
   long double.
 
-Les bibliothèques construits par défaut utilisent le niveau de précision 2.
+Les bibliothèques construites par défaut utilisent le niveau de précision 2.
 
 SISTÈMES D'EXPLOITATION
 _______________________
@@ -113,6 +113,7 @@ didacticiel
 Avec NetBSD 9.0, pour utiliser le derniére version du compilateur GCC, il faut
 faire avant dans le terminal:
 > $ export PATH="/usr/pkg/gcc9/bin:$PATH"
+
 Pour faire le changement permanent on peut ajouter à la dernière ligne di
 fichier ".profile" dans le répertoire racine du utilisateur:
 > PATH="/usr/pkg/gcc9/bin:$PATH"
