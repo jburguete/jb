@@ -94,23 +94,6 @@ _________________
 You can install all required utilities and libraries using the instructions of
 [install-unix](https://github.com/jburguete/install-unix).
 
-On Microsoft Windows systems you have to install
-[MSYS2](http://sourceforge.net/projects/msys2) and the required
-libraries and utilities. You can follow detailed instructions in
-[install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf)
-tutorial.
-
-On NetBSD 9.0, to use the last GCC version, you have to do first on the
-building terminal:
-> $ export PATH="/usr/pkg/gcc9/bin:$PATH"
-
-To do permanent this change the following line can be added to the ".profile"
-file in the user root directory:
-> PATH="/usr/pkg/gcc9/bin:$PATH"
-
-On OpenBSD 6.7 you have to do first on the building terminal:
-> $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
-
 This software has been built and tested in the following operative systems:
 * Arch Linux
 * Debian 10 (Linux)
@@ -128,6 +111,23 @@ This software has been built and tested in the following operative systems:
 * OpenInidiana Hipster
 * OpenSUSE Linux Leap 15
 * Xubuntu Linux 20.04
+
+On Microsoft Windows systems you have to install
+[MSYS2](http://sourceforge.net/projects/msys2) and the required
+libraries and utilities. You can follow detailed instructions in
+[install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf)
+tutorial.
+
+On NetBSD 9.0, to use the last GCC version, you have to do first on the
+building terminal:
+> $ export PATH="/usr/pkg/gcc9/bin:$PATH"
+
+To do permanent this change the following line can be added to the ".profile"
+file in the user root directory:
+> PATH="/usr/pkg/gcc9/bin:$PATH"
+
+On OpenBSD 6.7 you have to do first on the building terminal:
+> $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 COMMON BUILDING INSTRUCTIONS
 ____________________________
