@@ -1,17 +1,15 @@
 /*
 BUGS:
-	* Correct bug on jbw_index_sort_merge function
 
 DEBUGS:
 
 FEATURES:
-	* Check performance of sort functions
 	- Using GtkTreeModel in JBWArrayEditor?
 	- Optimizing JBWArrayEditor
 	- Showing coordinates when moving the cursor over JBWGraphics
 	- 3D figures
 	- Legend in JBWGraphics
-	- Compile with PGO option
+	- Enable Vulkan
 
 STYLE:
 
