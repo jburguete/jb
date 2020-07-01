@@ -6,23 +6,47 @@ CFLAGS = @CFLAGS@ @GLIB_CFLAGS@ @GTOP_CFLAGS@ -DJBW=1 @PRECISION@ \
 	`pkg-config --cflags gsl` -O3 -pedantic -Wall -Wextra
 LDFLAGS = @LDFLAGS@ @GLIB_LIBS@ @GTOP_LIBS@ `pkg-config --libs gsl` @LIBS@
 src = ../jb_config.h ../jb_def.h ../jb_def.c ../jb_math.h ../jb_math.c
-obj = jb_def.o jb_math.o
+obj = ../jb_def.o ../jb_math.o
 exe = index_sort check_sort
+
+indexdep = index_sort.c $(obj)
+checkdep = check_sort.c $(obj)
+PGO = @PGO@
+ifeq ($(PGO), 1)
+	PGOGENERATE = -fprofile-generate
+	PGOUSE = -fprofile-use -fprofile-correction
+	pgoobj = ../jb_def.pgo ../jb_math.pgo
+	INDEXDEP = index_sortpgo index_sort.gcda
+	CHECKDEP = check_sortpgo check_sort.gcda
+else
+	INDEXDEP = $(indexdep)
+	CHECKDEP = $(checkdep)
+endif
 
 # Default building
 all: $(exe)
 
-# Objects
-jb_def.o: ../jb_def.c ../jb_def.h ../jb_config.h Makefile
-	$(CC) $(CFLAGS) -c ../jb_def.c -o jb_def.o
-jb_math.o: ../jb_math.c ../jb_math.h ../jb_def.h ../jb_config.h Makefile
-	$(CC) $(CFLAGS) -c ../jb_math.c -o jb_math.o
+# PGO tests
+index_sortpgo: $(indexdep)
+	$(CC) $(CFLAGS) $(PGOGENERATE) index_sort.c $(pgoobj) -o index_sortpgo \
+		$(LDFLAGS)
+	./index_sortpgo 10000 1000 0 1
+	./index_sortpgo 10000 1000 0 2
+	./index_sortpgo 10000 1000 0 3
+	./index_sortpgo 10000 1000 0 4
+check_sortpgo: $(checkdep)
+	$(CC) $(CFLAGS) $(PGOGENERATE) check_sort.c $(pgoobj) -o check_sortpgo \
+		$(LDFLAGS)
+	./check_sortpgo 1000 1
+	./check_sortpgo 1000 2
+	./check_sortpgo 1000 3
+	./check_sortpgo 1000 4
 
 # Tests
-index_sort: index_sort.c $(obj)
-	$(CC) $(CFLAGS) index_sort.c $(obj) -o index_sort $(LDFLAGS)
-check_sort: check_sort.c $(obj)
-	$(CC) $(CFLAGS) check_sort.c $(obj) -o check_sort $(LDFLAGS)
+index_sort: $(INDEXDEP)
+	$(CC) $(CFLAGS) $(PGOUSE) index_sort.c $(obj) -o index_sort $(LDFLAGS)
+check_sort: $(CHECKDEP)
+	$(CC) $(CFLAGS) $(PGOUSE) check_sort.c $(obj) -o check_sort $(LDFLAGS)
 
 # Final version
 strip:

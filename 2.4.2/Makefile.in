@@ -9,11 +9,33 @@ CFLAGS = @CFLAGS@ @XML_CFLAGS@ @GTHREAD_CFLAGS@ @GLIB_CFLAGS@ @GTOP_CFLAGS@ \
 LDFLAGS = @LDFLAGS@ @XML_LIBS@ @GTHREAD_LIBS@ @GLIB_LIBS@ @GTOP_LIBS@ \
 	@PNG_LIBS@ @FREETYPE_LIBS@ @GTK_LIBS@ @GLEW_LIBS@ @SDL_LIBS@ @GLFW_LIBS@ \
 	@LIBS@
-EXEFLAGS = $(LDFLAGS) -L. -Wl,@RPATH@ -ljb
+EXEFLAGS = $(LDFLAGS) -L. -Wl,@RPATH@
 src = jb_config.h jb_def.h jb_def.c jb_math.h jb_math.c jb_win.h jb_win.c \
 	jb_xml.h jb_xml.c
 obj = jb_def.o jb_math.o jb_win.o jb_xml.o
-exe = libjb@SO@ libjbm@SO@ libjbw@SO@ libjbxml@SO@ test_math@EXE@ test_win@EXE@
+tests = test_math@EXE@ test_win@EXE@ test_xml@EXE@
+exe = libjb@SO@ libjbm@SO@ libjbw@SO@ libjbxml@SO@ $(tests)
+dep = jb_def.h jb_config.h Makefile
+defdep = jb_def.c $(dep)
+mathdep = jb_math.c jb_math.h $(dep)
+windep = jb_win.c jb_win.h jb_math.h $(dep)
+xmldep = jb_xml.c jb_xml.h jb_math.h $(dep)
+PGO = @PGO@
+ifeq ($(PGO), 1)
+	PGOGENERATE = -fprofile-generate
+	PGOUSE = -fprofile-use -fprofile-correction
+	pgoobj = jb_def.pgo jb_math.pgo jb_win.pgo jb_xml.pgo
+	testspgo = test_mathpgo@EXE@ test_winpgo@EXE@ test_xmlpgo@EXE@
+	DEFDEP = $(testspgo) jb_def.gcda
+	MATHDEP = $(testspgo) jb_math.gcda
+	WINDEP = $(testspgo) jb_win.gcda
+	XMLDEP = $(testspgo) jb_xml.gcda
+else
+	DEFDEP = $(defdep)
+	MATHDEP = $(mathdep)
+	WINDEP = $(windep)
+	XMLDEP = $(xmldep)
+endif
 locale = locale/
 es = $(locale)es/LC_MESSAGES/
 fr = $(locale)fr/LC_MESSAGES/
@@ -24,31 +46,72 @@ locales = $(es)jb.mo $(fr)jb.mo $(it)jb.mo
 # Default building
 all: $(exe) $(locales) doc/latex/refman.pdf
 
+# PGO objects
+jb_def.pgo: $(defdep)
+	$(CC) $(CFLAGS) $(PGOGENERATE) -c -fPIC jb_def.c -o jb_def.pgo
+jb_math.pgo: $(mathdep)
+	$(CC) $(CFLAGS) $(PGOGENERATE) -c -fPIC jb_math.c -o jb_math.pgo
+jb_win.pgo: $(windep)
+	$(CC) $(CFLAGS) $(PGOGENERATE) -c -fPIC jb_win.c -o jb_win.pgo
+jb_xml.pgo: $(xmldep)
+	$(CC) $(CFLAGS) $(PGOGENERATE) -c -fPIC jb_xml.c -o jb_xml.pgo
+
+# PGO dynamic libraries
+libjbpgo@SO@: jb_def.pgo
+	$(CC) $(PGOGENERATE) -shared jb_def.pgo $(LDFLAGS) -o libjbpgo@SO@
+libjbmpgo@SO@: jb_math.pgo libjbpgo@SO@
+	$(CC) $(PGOGENERATE) -shared jb_math.pgo $(EXEFLAGS) -o libjbmpgo@SO@ -ljbpgo
+libjbwpgo@SO@: jb_win.pgo libjbpgo@SO@ libjbmpgo@SO@
+	$(CC) $(PGOGENERATE) -shared jb_win.pgo $(EXEFLAGS) -o libjbwpgo@SO@ -ljbpgo \
+		-ljbmpgo
+libjbxmlpgo@SO@: jb_xml.pgo libjbpgo@SO@ libjbmpgo@SO@
+	$(CC) $(PGOGENERATE) -shared jb_xml.pgo $(EXEFLAGS) -o libjbxmlpgo@SO@ \
+		-ljbpgo -ljbmpgo
+
+# PGO tests
+test_mathpgo@EXE@: test_math.c libjbpgo@SO@ libjbmpgo@SO@
+	$(CC) $(CFLAGS) $(PGOGENERATE) test_math.c -o test_mathpgo@EXE@ $(EXEFLAGS) \
+		-ljbpgo -ljbmpgo
+	./test_mathpgo
+	cd tests; make
+test_winpgo@EXE@: test_win.c libjbpgo@SO@ libjbmpgo@SO@ libjbwpgo@SO@
+	$(CC) $(CFLAGS) $(PGOGENERATE) test_win.c -o test_winpgo@EXE@ $(EXEFLAGS) \
+		-ljbpgo -ljbmpgo -ljbwpgo
+	./test_winpgo
+test_xmlpgo@EXE@: test_xml.c libjbpgo@SO@ libjbmpgo@SO@ libjbxmlpgo@SO@
+	$(CC) $(CFLAGS) $(PGOGENERATE) test_xml.c -o test_xmlpgo@EXE@ $(EXEFLAGS) \
+		-ljbpgo -ljbmpgo -ljbxmlpgo
+	./test_xmlpgo
+
 # Objects
-jb_def.o: jb_def.c jb_def.h jb_config.h Makefile
-	$(CC) $(CFLAGS) -c -fPIC jb_def.c -o jb_def.o
-jb_math.o: jb_math.c jb_math.h jb_def.h jb_config.h Makefile
-	$(CC) $(CFLAGS) -c -fPIC jb_math.c -o jb_math.o
-jb_win.o: jb_win.c jb_win.h jb_math.h jb_def.h jb_config.h Makefile
-	$(CC) $(CFLAGS) -c -fPIC jb_win.c -o jb_win.o
-jb_xml.o: jb_xml.c jb_xml.h jb_math.h jb_def.h jb_config.h Makefile
-	$(CC) $(CFLAGS) -c -fPIC jb_xml.c -o jb_xml.o
+jb_def.o: $(DEFDEP)
+	$(CC) $(CFLAGS) $(PGOUSE) -c -fPIC jb_def.c -o jb_def.o
+jb_math.o: $(MATHDEP)
+	$(CC) $(CFLAGS) $(PGOUSE) -c -fPIC jb_math.c -o jb_math.o
+jb_win.o: $(WINDEP)
+	$(CC) $(CFLAGS) $(PGOUSE) -c -fPIC jb_win.c -o jb_win.o
+jb_xml.o: $(XMLDEP)
+	$(CC) $(CFLAGS) $(PGOUSE) -c -fPIC jb_xml.c -o jb_xml.o
 
 # Dynamic libraries
 libjb@SO@: jb_def.o
-	$(CC) -shared jb_def.o $(LDFLAGS) -o libjb@SO@
+	$(CC) $(PGOUSE) -shared jb_def.o $(LDFLAGS) -o libjb@SO@
 libjbm@SO@: jb_math.o libjb@SO@
-	$(CC) -shared jb_math.o $(EXEFLAGS) -o libjbm@SO@ -ljb
+	$(CC) $(PGOUSE) -shared jb_math.o $(EXEFLAGS) -o libjbm@SO@ -ljb
 libjbw@SO@: jb_win.o libjb@SO@ libjbm@SO@
-	$(CC) -shared jb_win.o $(EXEFLAGS) -o libjbw@SO@ -ljb -ljbm
+	$(CC) $(PGOUSE) -shared jb_win.o $(EXEFLAGS) -o libjbw@SO@ -ljb -ljbm
 libjbxml@SO@: jb_xml.o libjb@SO@ libjbm@SO@
-	$(CC) -shared jb_xml.o $(EXEFLAGS) -o libjbxml@SO@ -ljb -ljbm
+	$(CC) $(PGOUSE) -shared jb_xml.o $(EXEFLAGS) -o libjbxml@SO@ -ljb -ljbm
 
 # Tests
 test_math@EXE@: test_math.c libjb@SO@ libjbm@SO@
-	$(CC) $(CFLAGS) test_math.c -o test_math@EXE@ $(EXEFLAGS) -ljbm
+	$(CC) $(CFLAGS) $(PGOUSE) test_math.c -o test_math@EXE@ $(EXEFLAGS) -ljb -ljbm
 test_win@EXE@: test_win.c libjb@SO@ libjbm@SO@ libjbw@SO@
-	$(CC) $(CFLAGS) test_win.c -o test_win@EXE@ $(EXEFLAGS) -ljbm -ljbw
+	$(CC) $(CFLAGS) $(PGOUSE) test_win.c -o test_win@EXE@ $(EXEFLAGS) -ljb -ljbm \
+		-ljbw
+test_xml: test_xml.c libjb.so libjbm.so libjbw.so
+	$(CC) $(CFLAGS) $(PGOUSE) test_xml.c -o test_xml $(EXEFLAGS) -ljb -ljbm \
+		-ljbxml
 
 # Locales
 locales = es fr it
@@ -82,4 +145,4 @@ strip:
 
 # Clean
 clean:
-	rm -rf doc $(exe) *.o 
+	rm -rf doc $(exe) *.o *.pgo *@SO@
