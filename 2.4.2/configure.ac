@@ -58,6 +58,11 @@ if test $win = 1; then
 else
 	AC_SUBST(SO, [.so])
 fi
+if test "`command -v gmake`"; then
+	AC_SUBST(MAKE, [gmake])
+else
+	AC_SUBST(MAKE, [make])
+fi
 
 # Checking -march=native compiler flag
 if test "x$native" = "x1"; then

@@ -73,7 +73,7 @@ test_mathpgo@EXE@: test_math.c libjbpgo@SO@ libjbmpgo@SO@
 	$(CC) $(CFLAGS) $(PGOGENERATE) test_math.c -o test_mathpgo@EXE@ $(EXEFLAGS) \
 		-ljbpgo -ljbmpgo
 	./test_mathpgo
-	cd tests; make
+	cd tests; @MAKE@
 test_winpgo@EXE@: test_win.c libjbpgo@SO@ libjbmpgo@SO@ libjbwpgo@SO@
 	$(CC) $(CFLAGS) $(PGOGENERATE) test_win.c -o test_winpgo@EXE@ $(EXEFLAGS) \
 		-ljbpgo -ljbmpgo -ljbwpgo
@@ -140,7 +140,7 @@ doc/latex/refman.pdf: $(src) Doxyfile Makefile
 
 # Final version
 strip:
-	make
+	@MAKE@
 	strip $(exe)
 
 # Clean

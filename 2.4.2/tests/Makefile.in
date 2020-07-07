@@ -50,7 +50,7 @@ check_sort: $(CHECKDEP)
 
 # Final version
 strip:
-	make
+	@MAKE@
 	strip $(exe)
 
 # Clean
