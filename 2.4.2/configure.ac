@@ -142,6 +142,7 @@ PKG_CHECK_MODULES([GTHREAD], [gthread-2.0])
 PKG_CHECK_MODULES([GTOP], [libgtop-2.0],
 	AC_DEFINE([HAVE_GTOP], [1]),
 	AC_MSG_NOTICE([No gtop]))
+PKG_CHECK_MODULES([GSL], [gsl])
 
 # Checks for GTK+ interface
 PKG_CHECK_MODULES([GTK], [gtk+-3.0])
