@@ -3,8 +3,8 @@
 # Variables
 CC = @CC@ @ARCH@ @LTO@ @STD@
 CFLAGS = @CFLAGS@ @GLIB_CFLAGS@ @GTOP_CFLAGS@ -DJBW=1 @PRECISION@ \
-	`pkg-config --cflags gsl` -O3 -pedantic -Wall -Wextra
-LDFLAGS = @LDFLAGS@ @GLIB_LIBS@ @GTOP_LIBS@ `pkg-config --libs gsl` @LIBS@
+	@GSL_CFLAGS@ -O3 -pedantic -Wall -Wextra
+LDFLAGS = @LDFLAGS@ @GLIB_LIBS@ @GTOP_LIBS@ @GSL_LIBS@ @LIBS@
 src = ../jb_config.h ../jb_def.h ../jb_def.c ../jb_math.h ../jb_math.c
 obj = ../jb_def.o ../jb_math.o
 exe = index_sort check_sort
