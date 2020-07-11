@@ -44,6 +44,7 @@ main ()
                                 &check[0].H, sizeof (Check), 3);
   for (i = 0; i < 4; ++i)
     printf ("x%d=" FWF "\n", i, check[i].H);
+  return 0;
 }
 
 #endif
@@ -85,6 +86,7 @@ main ()
   jbm_regression (x, y, 6, &c, 3);
   for (i = 0; i <= 3; ++i)
     printf ("i=%d c=" FWF "\n", i, c[i]);
+  return 0;
 }
 
 #else
@@ -109,6 +111,7 @@ main ()
   int *ni, *nj, *nij, nmax, nmin;
   stderr = fopen ("log", "w");
   jbm_transversal_section_regions (l, z, n, &zz, &ni, &nj, &nij, &nmax, &nmin);
+  return 0;
 }
 
 #endif
@@ -125,6 +128,7 @@ main ()
 {
   printf ("MSE = " FWL "\n",
           jbm_farray_mean_square_error (xa, ya, na, xr, yr, nr));
+  return 0;
 }
 
 #endif
@@ -151,6 +155,7 @@ main ()
           jbm_varray_mean_square_error
           (&(va->x), &(va->y), sizeof (P2), na,
            &(vr->x), &(vr->y), sizeof (P3), nr));
+  return 0;
 }
 
 #endif
@@ -162,6 +167,7 @@ main ()
   printf
     ("MSE = " FWL "\n",
      jbm_file_mean_square_error ("msea", 1, 2, 2, "mser", 1, 2, 3));
+  return 0;
 }
 
 #endif
@@ -238,6 +244,7 @@ main ()
   for (i = 0; ++i < N;)
     if (z[ni[i]] > z[ni[i - 1]])
       printf ("i=%d x1=" FWF " x2=" FWF "\n", i, x[ni[i]], x[ni[i - 1]]);
+  return 0;
 }
 
 #endif

@@ -14,7 +14,7 @@ main ()
 	xmlDoc *doc;
 	xmlNode *node;
 	FILE *file;
-	char *buffer;
+//	char *buffer;
 	JBDOUBLE x;
 	int i, e1, e2, e3;
 	xmlKeepBlanksDefault (0);
