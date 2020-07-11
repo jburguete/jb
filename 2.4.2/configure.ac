@@ -12,10 +12,17 @@ win32=0
 native=1
 rpath="-rpath=."
 if test $host = "x86_64-w64-mingw32"; then
-	AC_MSG_NOTICE([Microsoft Windows 64 bits])
+	AC_MSG_NOTICE([Microsoft Windows 64 bits + MinGW])
 	win=1
 elif test $host = "i686-w64-mingw32"; then
-	AC_MSG_NOTICE([Microsoft Windows 32 bits])
+	AC_MSG_NOTICE([Microsoft Windows 32 bits + MinGW])
+	win=1
+	win32=1
+elif test $host = "x86_64-pc-cygwin"; then
+	AC_MSG_NOTICE([Microsoft Windows 64 bits + Cygwin])
+	win=1
+elif test $host = "i686-pc-cygwin"; then
+	AC_MSG_NOTICE([Microsoft Windows 32 bits + Cygwin])
 	win=1
 	win32=1
 elif test `uname -s` = "Darwin"; then

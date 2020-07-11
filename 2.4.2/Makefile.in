@@ -109,7 +109,7 @@ test_math@EXE@: test_math.c libjb@SO@ libjbm@SO@
 test_win@EXE@: test_win.c libjb@SO@ libjbm@SO@ libjbw@SO@
 	$(CC) $(CFLAGS) $(PGOUSE) test_win.c -o test_win@EXE@ $(EXEFLAGS) -ljb -ljbm \
 		-ljbw
-test_xml: test_xml.c libjb.so libjbm.so libjbw.so
+test_xml@EXE@: test_xml.c libjb@SO@ libjbm@SO@ libjbw@SO@
 	$(CC) $(CFLAGS) $(PGOUSE) test_xml.c -o test_xml $(EXEFLAGS) -ljb -ljbm \
 		-ljbxml
 
