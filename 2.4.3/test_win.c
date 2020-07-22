@@ -117,7 +117,6 @@ main (int argn, char **argc)
   GtkButton *button_open1, *button_open2, *button_close;
   const char *title;
   const char *version;
-  int i;
 
   if (!jbw_init (&argn, &argc))
     return 1;
