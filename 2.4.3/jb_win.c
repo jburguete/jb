@@ -1367,6 +1367,7 @@ init:
 #endif
 
   // ending on success
+  graphic->init = 1;
   return;
 
   // ending on error
@@ -1378,7 +1379,7 @@ end:
     }
 end2:
   jbw_show_error2 ("JBWGraphic", error_msg);
-  exit (0);
+  return;
 }
 
 /**
@@ -1495,6 +1496,7 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
   graphic->program_2D = graphic->program_3D = graphic->program_text = 0;
   graphic->ft = NULL;
   graphic->face = NULL;
+  graphic->init = 0;
   jbw_graphic_set_draw (graphic, draw);
 
 

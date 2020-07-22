@@ -205,6 +205,7 @@ struct _JBWGraphic
   int minimum_height;           ///< maximum screen width.
   int width;                    ///< screen width.
   int height;                   ///< screen width.
+  int init;                     ///< 1 on initated, 0 otherwise
   unsigned int char_width;      ///< character width.
   unsigned int char_height;     ///< character height.
   GLint in_2D_position;         ///< 2D position.

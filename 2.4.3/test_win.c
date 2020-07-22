@@ -117,6 +117,7 @@ main (int argn, char **argc)
   GtkButton *button_open1, *button_open2, *button_close;
   const char *title;
   const char *version;
+  int i;
 
   if (!jbw_init (&argn, &argc))
     return 1;
@@ -176,6 +177,8 @@ main (int argn, char **argc)
   jbw_show_message ("Info", version, GTK_MESSAGE_INFO);
   printf ("OpenGL version %s\n", glGetString (GL_VERSION));
   printf ("GLSL version %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
+  if (!graphic->init)
+    return 2;
 
   button_open1 = (GtkButton *) gtk_button_new_with_label ("Draw 1");
   button_open2 = (GtkButton *) gtk_button_new_with_label ("Draw 2");
