@@ -110,16 +110,15 @@ d'exploitation:
 * Debian 10 (Linux)
 * Devuan Linux 3
 * Dragonfly BSD 5.8
-* Dyson Illumos
 * Fedora Linux 32
-* FreeBSD 12.1
+* FreeBSD 12.2
 * Gentoo Linux
 * Linux Mint DE 4
 * MacOS Catalina + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
-* NetBSD 9.0
-* OpenBSD 6.7
+* NetBSD 9.1
+* OpenBSD 6.8
 * OpenInidiana Hipster
 * OpenSUSE Linux Leap 15
 * Xubuntu Linux 20.04
@@ -130,7 +129,7 @@ les outils requis. On peut suivre les instructions détaillées dans le
 didacticiel
 [install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf).
 
-Avec NetBSD 9.0, pour utiliser le derniére version du compilateur GCC, il faut
+Avec NetBSD 9.1, pour utiliser le derniére version du compilateur GCC, il faut
 faire avant dans le terminal:
 > $ export PATH="/usr/pkg/gcc9/bin:$PATH"
 
@@ -138,7 +137,7 @@ Pour faire le changement permanent on peut ajouter à la dernière ligne di
 fichier ".profile" dans le répertoire racine du utilisateur:
 > PATH="/usr/pkg/gcc9/bin:$PATH"
 
-Avec OpenBSD 6.7 on doit faire avant dans le terminal:
+Avec OpenBSD 6.8 on doit faire avant dans le terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 INSTRUCTIONS DE CONSTRUCTION COMMUNES
