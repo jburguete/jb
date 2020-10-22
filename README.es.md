@@ -105,7 +105,7 @@ operativos:
 * Devuan Linux 3
 * Dragonfly BSD 5.8
 * Fedora Linux 32
-* FreeBSD 12.2
+* FreeBSD 12.1
 * Gentoo Linux
 * Linux Mint DE 4
 * MacOS Catalina + Homebrew
