@@ -109,9 +109,9 @@ d'exploitation:
 * Arch Linux
 * Debian 10 (Linux)
 * Devuan Linux 3
-* Dragonfly BSD 5.8
-* Fedora Linux 32
-* FreeBSD 12.1
+* Dragonfly BSD 5.8.3
+* Fedora Linux 33
+* FreeBSD 12.2
 * Gentoo Linux
 * Linux Mint DE 4
 * MacOS Catalina + Homebrew
@@ -120,8 +120,8 @@ d'exploitation:
 * NetBSD 9.1
 * OpenBSD 6.8
 * OpenInidiana Hipster
-* OpenSUSE Linux Leap 15
-* Xubuntu Linux 20.04
+* OpenSUSE Linux 15.2
+* Xubuntu Linux 20.10
 
 Avec systèmes Microsoft Windows on doit installer
 [MSYS2](http://sourceforge.net/projects/msys2) et en plus les bibliothèques et

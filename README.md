@@ -98,19 +98,19 @@ This software has been built and tested in the following operative systems:
 * Arch Linux
 * Debian 10 (Linux)
 * Devuan Linux 3
-* Dragonfly BSD 5.8
-* Fedora Linux 32
-* FreeBSD 12.1
+* Dragonfly BSD 5.8.3
+* Fedora Linux 33
+* FreeBSD 12.2
 * Gentoo Linux
-* Linux Mint DE 4
+* Linux Mint 4
 * MacOS Catalina + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10
 * NetBSD 9.1
 * OpenBSD 6.8
 * OpenInidiana Hipster
-* OpenSUSE Linux Leap 15
-* Xubuntu Linux 20.04
+* OpenSUSE Linux 15.2
+* Xubuntu Linux 20.10
 
 On Microsoft Windows systems you have to install
 [MSYS2](http://sourceforge.net/projects/msys2) and the required
