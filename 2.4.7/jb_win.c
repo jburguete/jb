@@ -1146,6 +1146,46 @@ jbw_vk_select_physical_device (JBWVK * vk)      ///< JBWVK data struct.
   return 0;
 }
 
+/**
+ * Function to check the Vulkan extensions.
+ *
+ * \return 0 on success, error code on error.
+ */
+static int
+jbw_vk_check_extensions (JBWVK * vk)    ///< JBWVK struct.
+{
+  VkExtensionProperties *available_extensions;
+  const char *buffer;
+  uint32_t i, j, k, count;
+  vkEnumerateDeviceExtensionProperties (vk->physical_device, NULL, &count,
+                                        NULL);
+  available_extensions = (VkExtensionProperties *)
+    malloc (count * sizeof (VkExtensionProperties));
+  vkEnumerateDeviceExtensionProperties (vk->physical_device, NULL, &count,
+                                        available_extensions);
+#if DEBUG_VULKAN
+  fprintf (stderr, "Number of Vulkan available extensions: %u\n", count);
+  for (i = 0; i < count; ++i)
+    fprintf (stderr, "Vulkan extension: %s\n",
+             available_extensions[i].extensionName);
+#endif
+  for (j = 0; j < JBW_VK_N_DEVICE_EXTENSIONS; ++j)
+    {
+      k = 0;
+      buffer = jbw_required_device_extensions[j];
+      for (i = 0; i < count; ++i)
+        if (!strcmp (available_extensions[i].extensionName, buffer))
+          k = 1;
+      if (!k)
+        {
+          vk->error_message = _("no available Vulkan extension");
+          free (available_extensions);
+          return JBW_VK_ERROR_NO_AVAILABLE_EXTENSION;
+        }
+    }
+  free (available_extensions);
+  return 0;
+}
 
 /**
  * Function to free the memory used by a JBWVK struct.
@@ -1170,12 +1210,16 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
   i = jbw_vk_create_instance (vk);
   if (i)
     return i;
-  // Creating a window surface
+  // Creating a Vulkan window surface
   i = jbw_vk_create_surface (vk);
   if (i)
     return i;
   // Selecting a graphics card
   i = jbw_vk_select_physical_device (vk);
+  if (i)
+    return i;
+  // Checking the Vulkan extensions
+  i = jbw_vk_check_extensions (vk);
   if (i)
     return i;
   return 0;

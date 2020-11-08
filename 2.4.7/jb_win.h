@@ -174,6 +174,8 @@ enum
   ///< Bad Vulkan physical devices.
   JBW_VK_ERROR_NO_SUITABLE_PHYSICAL_DEVICES,
   ///< No suitable physical devices.
+  JBW_VK_ERROR_NO_AVAILABLE_EXTENSION,
+  ///< No available extension.
 } JBWVKError;                   ///< enum to define Vulkan error codes.
 
 typedef struct
