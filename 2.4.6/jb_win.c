@@ -1070,6 +1070,84 @@ jbw_vk_create_surface (JBWVK * vk)      ///< JBWVK data struct.
 }
 
 /**
+ * Function to select a graphic card.
+ *
+ * \return 0 on success, error code on error.
+ */
+static int
+jbw_vk_select_physical_device (JBWVK * vk)      ///< JBWVK data struct.
+{
+  VkPhysicalDevice device;
+  VkPhysicalDeviceProperties device_properties;
+  VkPhysicalDeviceFeatures device_features;
+  VkPhysicalDevice *devices;
+  VkResult result;
+  uint32_t i, count, limits;
+  vkEnumeratePhysicalDevices (vk->instance, &count, NULL);
+  if (!count)
+    {
+      vk->error_message = _("failed to find a GPU with Vulkan support");
+      return JBW_VK_ERROR_NO_VULKAN_PHYSICAL_DEVICES;
+    }
+#if DEBUG_VULKAN
+  fprintf (stderr, "Number of Vulkan physical devices: %u\n",
+           (unsigned int) count);
+#endif
+  devices = (VkPhysicalDevice *) malloc (count * sizeof (VkPhysicalDevice));
+  result = vkEnumeratePhysicalDevices (vk->instance, &count, devices);
+  if (result != VK_SUCCESS)
+    {
+      vk->error_message = _("bad Vulkan physical devices");
+      return JBW_VK_ERROR_BAD_VULKAN_PHYSICAL_DEVICES;
+    }
+  for (i = 0; i < count; ++i)
+    if (devices[i])
+      {
+        vkGetPhysicalDeviceProperties (devices[i], &device_properties);
+#if DEBUG_VULKAN
+        fprintf (stderr, "Vulkan physical device: %s\n",
+                 device_properties.deviceName);
+#endif
+      }
+#if DEBUG_VULKAN
+  fprintf (stderr, "Selecting Vulkan physical device\n");
+#endif
+  for (limits = i = 0; i < count; ++i)
+    {
+      device = devices[i];
+      if (!device)
+        continue;
+      vkGetPhysicalDeviceProperties (device, &device_properties);
+      vkGetPhysicalDeviceFeatures (device, &device_features);
+#if DEBUG_VULKAN
+      fprintf (stderr, "Vulkan physical device: %u\n", i + 1);
+      fprintf (stderr, "Vulkan physical device type: %u\n",
+               device_properties.deviceType);
+      fprintf (stderr, "Vulkan physical geometry shader: %u\n",
+               device_features.geometryShader);
+#endif
+      if ((device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+           || device_properties.deviceType
+           == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
+          && device_features.geometryShader
+          && device_properties.limits.maxImageDimension2D > limits
+          && device_features.samplerAnisotropy)
+        {
+          vk->physical_device = device;
+          limits = device_properties.limits.maxImageDimension2D;
+        }
+    }
+  if (!limits)
+    {
+      vk->error_message = _("no suitable physical devices");
+      return JBW_VK_ERROR_NO_SUITABLE_PHYSICAL_DEVICES;
+    }
+  free (devices);
+  return 0;
+}
+
+
+/**
  * Function to free the memory used by a JBWVK struct.
  */
 static void
@@ -1082,7 +1160,7 @@ jbw_vk_destroy (JBWVK * vk)     ///< JBWVK struct.
 /**
  * Function to init the Vulkan resources.
  *
- * \return JBW_VK_ERROR_NONE (=0) on success, error code on error.
+ * \return 0 on success, error code on error.
  */
 static int
 jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
@@ -1096,7 +1174,11 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
   i = jbw_vk_create_surface (vk);
   if (i)
     return i;
-  return JBW_VK_ERROR_NONE;
+  // Selecting a graphics card
+  i = jbw_vk_select_physical_device (vk);
+  if (i)
+    return i;
+  return 0;
 }
 
 #endif

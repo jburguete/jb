@@ -168,6 +168,12 @@ enum
   ///< No available Vulkan validation layers.
   JBW_VK_ERROR_NO_VULKAN_SURFACE,
   ///< Unable to create a Vulkan surface.
+  JBW_VK_ERROR_NO_VULKAN_PHYSICAL_DEVICES,
+  ///< Failed to find a GPU with Vulkan support.
+  JBW_VK_ERROR_BAD_VULKAN_PHYSICAL_DEVICES,
+  ///< Bad Vulkan physical devices.
+  JBW_VK_ERROR_NO_SUITABLE_PHYSICAL_DEVICES,
+  ///< No suitable physical devices.
 } JBWVKError;                   ///< enum to define Vulkan error codes.
 
 typedef struct
@@ -180,6 +186,7 @@ typedef struct
   ///< graphics window struct pointer.
   VkInstance instance;          ///< Vulkan instance.
   VkSurfaceKHR surface;         ///< Vulkan surface.
+  VkPhysicalDevice physical_device;     ///< Vulkan graphics card handle.
   const char *error_message;    ///< error message.
 } JBWVK;                        ///< struct to pack the Vulkan resources data.
 
