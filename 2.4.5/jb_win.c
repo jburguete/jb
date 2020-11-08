@@ -957,7 +957,7 @@ jbw_validation_layer_check_support ()
 /**
  * Function to create a Vulkan instance.
  *
- * \return JBW_VK_ERROR_NONE (=0) on success, error code on error.
+ * \return 0 on success, error code on error.
  */
 static int
 jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
@@ -1043,7 +1043,30 @@ jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
       return JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_INSTANCE;
     }
   free (window_extensions);
-  return JBW_VK_ERROR_NONE;
+  return 0;
+}
+
+/**
+ * Function to create a Vulkan surface.
+ *
+ * \return 0 on success, error code on error.
+ */
+static int
+jbw_vk_create_surface (JBWVK * vk)      ///< JBWVK data struct.
+{
+#if HAVE_GLFW
+  if (glfwCreateWindowSurface (vk->instance, vk->window, NULL, &vk->surface)
+      != VK_SUCCESS)
+#elif HAVE_SDL
+  if (SDL_Vulkan_CreateSurface (vk->window, (SDL_vulkanInstance) vk->instance,
+                                (SDL_vulkanSurface *) & vk->surface)
+      != SDL_TRUE)
+#endif
+    {
+      vk->error_message = _("unable to create a Vulkan surface");
+      return JBW_VK_ERROR_NO_VULKAN_SURFACE;
+    }
+  return 0;
 }
 
 /**
@@ -1052,6 +1075,7 @@ jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
 static void
 jbw_vk_destroy (JBWVK * vk)     ///< JBWVK struct.
 {
+  vkDestroySurfaceKHR (vk->instance, vk->surface, NULL);
   vkDestroyInstance (vk->instance, NULL);
 }
 
@@ -1064,7 +1088,12 @@ static int
 jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
 {
   int i;
+  // Creating a Vulkan instance
   i = jbw_vk_create_instance (vk);
+  if (i)
+    return i;
+  // Creating a window surface
+  i = jbw_vk_create_surface (vk);
   if (i)
     return i;
   return JBW_VK_ERROR_NONE;

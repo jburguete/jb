@@ -179,6 +179,7 @@ typedef struct
 #endif
   ///< graphics window struct pointer.
   VkInstance instance;          ///< Vulkan instance.
+  VkSurfaceKHR surface;         ///< Vulkan surface.
   const char *error_message;    ///< error message.
 } JBWVK;                        ///< struct to pack the Vulkan resources data.
 
