@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([jb], [2.4.3], [https://github.com/jburguete/jb])
+AC_INIT([jb], [2.4.4], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -146,8 +146,7 @@ AC_SEARCH_LIBS([textdomain], [intl])
 PKG_CHECK_MODULES([XML], [libxml-2.0])
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 PKG_CHECK_MODULES([GTHREAD], [gthread-2.0])
-PKG_CHECK_MODULES([GTOP], [libgtop-2.0],
-	AC_DEFINE([HAVE_GTOP], [1]),
+PKG_CHECK_MODULES([GTOP], [libgtop-2.0], AC_DEFINE([HAVE_GTOP], [1]),
 	AC_MSG_NOTICE([No gtop]))
 PKG_CHECK_MODULES([GSL], [gsl])
 
@@ -165,10 +164,18 @@ fi
 PKG_CHECK_MODULES([PNG], [libpng])
 PKG_CHECK_MODULES([FREETYPE], [freetype2])
 PKG_CHECK_MODULES([GLEW], [glew])
+AC_ARG_WITH([vulkan],
+	AS_HELP_STRING([--with-vulkan],
+		[Build graphic window with Vulkan support]))
+if test "x$with_vulkan" = "xyes"; then
+	PKG_CHECK_MODULES([VULKAN], [vulkan], AC_DEFINE([HAVE_VULKAN], [1]),
+		AC_MSG_NOTICE([No vulkan]))
+fi
 
 # Checks for GtkGLArea, FreeGLUT, GLFW or SDL to draw the graphic window
 AC_ARG_WITH([gtkglarea],
-	AS_HELP_STRING([--with-gtkglarea], [Build graphic window with GtkGLArea]))
+	AS_HELP_STRING([--with-gtkglarea],
+		[Build graphic window with GtkGLArea]))
 AC_ARG_WITH([freeglut],
 	AS_HELP_STRING([--with-freeglut], [Build graphic window with FreeGLUT]))
 AC_ARG_WITH([glfw],

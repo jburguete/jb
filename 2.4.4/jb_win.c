@@ -34,6 +34,22 @@
 
 #if JBW == JBW_GTK
 
+#if HAVE_VULKAN
+
+#define DEBUG_VULKAN 1          ///< macro to debug Vulkan functions.
+
+const char *jbw_required_device_extensions[JBW_VK_N_DEVICE_EXTENSIONS]
+  = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+///< required Vulkan device extensions.
+
+#if DEBUG_VULKAN
+const char *jbw_required_validation_layers[JBW_VK_N_VALIDATION_LAYERS] =
+  { "VK_LAYER_KHRONOS_validation" };
+///< required validation layers.
+#endif
+
+#endif
+
 GtkWindow *window_parent;       ///< pointer to the parent GtkWindow struct.
 
 const GLfloat jbw_black[4] = { 0.f, 0.f, 0.f, 1.f };
@@ -894,6 +910,167 @@ jbw_image_draw (JBWImage * image,       ///< JBWImage struct.
   // enabling OpenGL properties
   glDisable (GL_BLEND);
 }
+
+#if HAVE_VULKAN
+
+#if DEBUG_VULKAN
+
+/**
+ * Function to check the Vulkan validation layers.
+ *
+ * \return 1 on available all validation layers, 0 otherwise.
+ */
+static int
+jbw_validation_layer_check_support ()
+{
+  VkLayerProperties *available_layers;
+  uint32_t i, j, n;
+  unsigned int layer_found;
+  vkEnumerateInstanceLayerProperties (&n, NULL);
+  available_layers
+    = (VkLayerProperties *) malloc (n * sizeof (VkLayerProperties));
+  vkEnumerateInstanceLayerProperties (&n, available_layers);
+  for (i = 0; i < n; ++i)
+    printf ("Vulkan validation layer %s\n", available_layers[i].layerName);
+  for (j = 0; j < JBW_VK_N_VALIDATION_LAYERS; ++j)
+    {
+      layer_found = 0;
+      for (i = 0; i < n; ++i)
+        if (!strcmp (jbw_required_validation_layers[j],
+                     available_layers[i].layerName))
+          {
+            layer_found = 1;
+            break;
+          }
+      if (!layer_found)
+        {
+          free (available_layers);
+          return 0;
+        }
+    }
+  free (available_layers);
+  return 1;
+}
+
+#endif
+
+/**
+ * Function to create a Vulkan instance.
+ *
+ * \return JBW_VK_ERROR_NONE (=0) on success, error code on error.
+ */
+static int
+jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
+{
+  VkApplicationInfo application_info = { 0 };
+  VkInstanceCreateInfo create_info = { 0 };
+#if DEBUG_VULKAN
+  VkExtensionProperties *extensions;
+#endif
+  const char **window_extensions;
+#if HAVE_GLFW
+  const char **glfw_extensions;
+#endif
+  uint32_t i, count;
+  // Checking for extension support
+  vkEnumerateInstanceExtensionProperties (NULL, &count, NULL);
+  if (!count)
+    {
+      vk->error_message = _("no Vulkan instance extensions supported");
+      return JBW_VK_ERROR_NO_VULKAN_INSTANCE_EXTENSIONS;
+    }
+#if DEBUG_VULKAN
+  extensions
+    = (VkExtensionProperties *) malloc (count * sizeof (VkExtensionProperties));
+  vkEnumerateInstanceExtensionProperties (NULL, &count, extensions);
+  for (i = 0; i < count; ++i)
+    fprintf (stderr, "Vulkan available instance extension: %s\n",
+             extensions[i].extensionName);
+  free (extensions);
+#endif
+  // Creating an instance
+  application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+  application_info.pApplicationName = "Check Vulkan";
+  application_info.applicationVersion = VK_MAKE_VERSION (1, 0, 0);
+  application_info.pEngineName = "No Engine";
+  application_info.engineVersion = VK_MAKE_VERSION (1, 0, 0);
+  application_info.apiVersion = VK_API_VERSION_1_0;
+  create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+  create_info.pApplicationInfo = &application_info;
+#if HAVE_GLFW
+  glfw_extensions = glfwGetRequiredInstanceExtensions (&count);
+  window_extensions = (const char **) malloc (count * sizeof (const char *));
+  memcpy (window_extensions, glfw_extensions, count * sizeof (const char *));
+#elif HAVE_SDL
+  SDL_Vulkan_GetInstanceExtensions (vk->window, &count, NULL);
+  window_extensions = (const char **) malloc (count * sizeof (const char *));
+  SDL_Vulkan_GetInstanceExtensions (vk->window, &count, window_extensions);
+#endif
+#if DEBUG_VULKAN
+  for (i = 0; i < count; ++i)
+    fprintf (stderr, "Window extension %u: %s\n", i + 1, window_extensions[i]);
+#endif
+  for (i = 0; i < count; ++i)
+    if (!strcmp (window_extensions[i], "VK_KHR_surface"))
+      break;
+  if (i == count)
+    {
+      vk->error_message = _("no VK_KHR_surface Vulkan extension");
+      return JBW_VK_ERROR_NO_VULKAN_SURFACE_EXTENSION;
+    }
+  // Using validation layers
+#if DEBUG_VULKAN
+  if (jbw_validation_layer_check_support ())
+    {
+      create_info.enabledLayerCount = JBW_VK_N_VALIDATION_LAYERS;
+      create_info.ppEnabledLayerNames = jbw_required_validation_layers;
+      ++count;
+      window_extensions
+        = realloc (window_extensions, count * sizeof (const char *));
+      window_extensions[count - 1] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+    }
+  else
+    {
+      vk->error_message = _("no available Vulkan validation layers");
+      return JBW_VK_ERROR_NO_AVAILABLE_VULKAN_VALIDATION_LAYERS;
+    }
+#endif
+  create_info.enabledExtensionCount = count;
+  create_info.ppEnabledExtensionNames = window_extensions;
+  if (vkCreateInstance (&create_info, NULL, &vk->instance) != VK_SUCCESS)
+    {
+      vk->error_message = _("failed to create Vulkan instance");
+      return JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_INSTANCE;
+    }
+  free (window_extensions);
+  return JBW_VK_ERROR_NONE;
+}
+
+/**
+ * Function to free the memory used by a JBWVK struct.
+ */
+static void
+jbw_vk_destroy (JBWVK * vk)     ///< JBWVK struct.
+{
+  vkDestroyInstance (vk->instance, NULL);
+}
+
+/**
+ * Function to init the Vulkan resources.
+ *
+ * \return JBW_VK_ERROR_NONE (=0) on success, error code on error.
+ */
+static int
+jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
+{
+  int i;
+  i = jbw_vk_create_instance (vk);
+  if (i)
+    return i;
+  return JBW_VK_ERROR_NONE;
+}
+
+#endif
 
 /**
  * Function to free the memory used by a JBWGraphic widget.

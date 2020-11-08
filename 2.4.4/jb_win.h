@@ -87,12 +87,21 @@ jbw_show_error3 (const char *message1,  ///< 1st error message.
 #include FT_FREETYPE_H
 #include FT_MODULE_H
 #include <GL/glew.h>
+#if HAVE_VULKAN
+#include <vulkan/vulkan.h>
+#endif
 #include <gtk/gtk.h>
 #if HAVE_FREEGLUT
 #include <GL/freeglut.h>
 #elif HAVE_SDL
 #include <SDL.h>
+#if HAVE_VULKAN
+#include <SDL_vulkan.h>
+#endif
 #elif HAVE_GLFW
+#if HAVE_VULKAN
+#define GLFW_INCLUDE_VULKAN
+#endif
 #include <GLFW/glfw3.h>
 #endif
 
@@ -141,6 +150,40 @@ typedef struct
   unsigned int nbytes;          ///< number of image bytes.
 } JBWImage;                     ///< image widget.
 
+#if HAVE_VULKAN
+
+#define JBW_VK_N_DEVICE_EXTENSIONS 1    ///< Number or Vulkan device extensions.
+#define JBW_VK_N_VALIDATION_LAYERS 1    ///< Number of Vulkan validation layers.
+
+enum
+{
+  JBW_VK_ERROR_NONE = 0,        ///< no errors.
+  JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_INSTANCE,
+  ///< failed to create a Vulkan instance.
+  JBW_VK_ERROR_NO_VULKAN_INSTANCE_EXTENSIONS,
+  ///< No Vulkan instance extensions.
+  JBW_VK_ERROR_NO_VULKAN_SURFACE_EXTENSION,
+  ///< No VK_KHR_surface Vulkan extension.
+  JBW_VK_ERROR_NO_AVAILABLE_VULKAN_VALIDATION_LAYERS,
+  ///< No available Vulkan validation layers.
+  JBW_VK_ERROR_NO_VULKAN_SURFACE,
+  ///< Unable to create a Vulkan surface.
+} JBWVKError;                   ///< enum to define Vulkan error codes.
+
+typedef struct
+{
+#if HAVE_GLFW
+  GLFWwindow *window;
+#elif HAVE_SDL
+  SDL_Window *window;
+#endif
+  ///< graphics window struct pointer.
+  VkInstance instance;          ///< Vulkan instance.
+  const char *error_message;    ///< error message.
+} JBWVK;                        ///< struct to pack the Vulkan resources data.
+
+#endif
+
 /**
  * \struct JBWGraphic
  * \brief widget to drawing graphics.
@@ -148,8 +191,6 @@ typedef struct
 typedef struct _JBWGraphic JBWGraphic;
 struct _JBWGraphic
 {
-  /* Involved macros */
-  /* JBW_GRAPHIC_N_CHARS=Number of characters in an axis label */
   JBDOUBLE xtic[JBW_GRAPHIC_N_TICS];    ///< x-axis tics.
   JBDOUBLE ytic[JBW_GRAPHIC_N_TICS];    ///< y-axis tics.
   JBDOUBLE ztic[JBW_GRAPHIC_N_TICS];    ///< z-axis tics.

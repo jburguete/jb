@@ -55,4 +55,4 @@ strip:
 
 # Clean
 clean:
-	rm -rf doc $(exe) *.o 
+	rm -rf doc $(exe) *.o *pgo *.gcda

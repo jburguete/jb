@@ -3,12 +3,12 @@
 # Variables
 CC = @CC@ @ARCH@ @LTO@ @STD@
 CFLAGS = @CFLAGS@ @XML_CFLAGS@ @GTHREAD_CFLAGS@ @GLIB_CFLAGS@ @GTOP_CFLAGS@ \
-	@PNG_CFLAGS@ @FREETYPE_CFLAGS@ @GTK_CFLAGS@ @GLEW_CFLAGS@ @SDL_CFLAGS@ \
-	@GLFW_CFLAGS@ @JBW@ @FONT@ @PRECISION@ @GRAPHIC@ -O3 -pedantic -Wall \
-	-Wextra
+	@PNG_CFLAGS@ @FREETYPE_CFLAGS@ @GTK_CFLAGS@ @GLEW_CFLAGS@ \
+	@VULKAN_CFLAGS@ @SDL_CFLAGS@ @GLFW_CFLAGS@ @JBW@ @FONT@ @PRECISION@ \
+	@GRAPHIC@ -O3 -pedantic -Wall -Wextra
 LDFLAGS = @LDFLAGS@ @XML_LIBS@ @GTHREAD_LIBS@ @GLIB_LIBS@ @GTOP_LIBS@ \
-	@PNG_LIBS@ @FREETYPE_LIBS@ @GTK_LIBS@ @GLEW_LIBS@ @SDL_LIBS@ @GLFW_LIBS@ \
-	@LIBS@
+	@PNG_LIBS@ @FREETYPE_LIBS@ @GTK_LIBS@ @GLEW_LIBS@ @VULKAN_LIBS@ \
+	@SDL_LIBS@ @GLFW_LIBS@ @LIBS@
 EXEFLAGS = $(LDFLAGS) -L. -Wl,@RPATH@
 src = jb_config.h jb_def.h jb_def.c jb_math.h jb_math.c jb_win.h jb_win.c \
 	jb_xml.h jb_xml.c
@@ -141,8 +141,10 @@ doc/latex/refman.pdf: $(src) Doxyfile Makefile
 # Final version
 strip:
 	@MAKE@
+	cd tests; @MAKE@ strip
 	strip $(exe)
 
 # Clean
 clean:
-	rm -rf doc $(exe) *.o *.pgo *@SO@
+	cd tests; @MAKE@ clean
+	rm -rf doc $(exe) *.o *.pgo *.gcda *@SO@

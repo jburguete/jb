@@ -2,6 +2,7 @@
 #define JB__CONFIG__H 1
 
 #undef HAVE_GTOP
+#undef HAVE_VULKAN
 #undef HAVE_EXP10
 #undef HAVE_SYSINFO
 #undef HAVE_FMEMOPEN
