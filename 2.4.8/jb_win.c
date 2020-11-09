@@ -924,6 +924,7 @@ static int
 jbw_validation_layer_check_support ()
 {
   VkLayerProperties *available_layers;
+  int err;
   uint32_t i, j, n;
   unsigned int layer_found;
   vkEnumerateInstanceLayerProperties (&n, NULL);
@@ -932,6 +933,7 @@ jbw_validation_layer_check_support ()
   vkEnumerateInstanceLayerProperties (&n, available_layers);
   for (i = 0; i < n; ++i)
     printf ("Vulkan validation layer %s\n", available_layers[i].layerName);
+  err = 1;
   for (j = 0; j < JBW_VK_N_VALIDATION_LAYERS; ++j)
     {
       layer_found = 0;
@@ -945,11 +947,12 @@ jbw_validation_layer_check_support ()
       if (!layer_found)
         {
           free (available_layers);
-          return 0;
+          err = 0;
+          break;
         }
     }
   free (available_layers);
-  return 1;
+  return err;
 }
 
 #endif
@@ -971,6 +974,7 @@ jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
 #if HAVE_GLFW
   const char **glfw_extensions;
 #endif
+  int err;
   uint32_t i, count;
   // Checking for extension support
   vkEnumerateInstanceExtensionProperties (NULL, &count, NULL);
@@ -989,6 +993,7 @@ jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
   free (extensions);
 #endif
   // Creating an instance
+  err = 0;
   application_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
   application_info.pApplicationName = "Check Vulkan";
   application_info.applicationVersion = VK_MAKE_VERSION (1, 0, 0);
@@ -1016,7 +1021,8 @@ jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
   if (i == count)
     {
       vk->error_message = _("no VK_KHR_surface Vulkan extension");
-      return JBW_VK_ERROR_NO_VULKAN_SURFACE_EXTENSION;
+      err = JBW_VK_ERROR_NO_VULKAN_SURFACE_EXTENSION;
+      goto exit_on_error;
     }
   // Using validation layers
 #if DEBUG_VULKAN
@@ -1032,7 +1038,8 @@ jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
   else
     {
       vk->error_message = _("no available Vulkan validation layers");
-      return JBW_VK_ERROR_NO_AVAILABLE_VULKAN_VALIDATION_LAYERS;
+      err = JBW_VK_ERROR_NO_AVAILABLE_VULKAN_VALIDATION_LAYERS;
+      goto exit_on_error;
     }
 #endif
   create_info.enabledExtensionCount = count;
@@ -1040,10 +1047,12 @@ jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
   if (vkCreateInstance (&create_info, NULL, &vk->instance) != VK_SUCCESS)
     {
       vk->error_message = _("failed to create Vulkan instance");
-      return JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_INSTANCE;
+      err = JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_INSTANCE;
+      goto exit_on_error;
     }
+exit_on_error:
   free (window_extensions);
-  return 0;
+  return err;
 }
 
 /**
@@ -1082,6 +1091,7 @@ jbw_vk_select_physical_device (JBWVK * vk)      ///< JBWVK data struct.
   VkPhysicalDeviceFeatures device_features;
   VkPhysicalDevice *devices;
   VkResult result;
+  int err;
   uint32_t i, count, limits;
   vkEnumeratePhysicalDevices (vk->instance, &count, NULL);
   if (!count)
@@ -1089,6 +1099,7 @@ jbw_vk_select_physical_device (JBWVK * vk)      ///< JBWVK data struct.
       vk->error_message = _("failed to find a GPU with Vulkan support");
       return JBW_VK_ERROR_NO_VULKAN_PHYSICAL_DEVICES;
     }
+  err = 0;
 #if DEBUG_VULKAN
   fprintf (stderr, "Number of Vulkan physical devices: %u\n",
            (unsigned int) count);
@@ -1098,7 +1109,8 @@ jbw_vk_select_physical_device (JBWVK * vk)      ///< JBWVK data struct.
   if (result != VK_SUCCESS)
     {
       vk->error_message = _("bad Vulkan physical devices");
-      return JBW_VK_ERROR_BAD_VULKAN_PHYSICAL_DEVICES;
+      err = JBW_VK_ERROR_BAD_VULKAN_PHYSICAL_DEVICES;
+      goto exit_on_error;
     }
   for (i = 0; i < count; ++i)
     if (devices[i])
@@ -1140,10 +1152,12 @@ jbw_vk_select_physical_device (JBWVK * vk)      ///< JBWVK data struct.
   if (!limits)
     {
       vk->error_message = _("no suitable physical devices");
-      return JBW_VK_ERROR_NO_SUITABLE_PHYSICAL_DEVICES;
+      err = JBW_VK_ERROR_NO_SUITABLE_PHYSICAL_DEVICES;
+      goto exit_on_error;
     }
+exit_on_error:
   free (devices);
-  return 0;
+  return err;
 }
 
 /**
@@ -1156,7 +1170,9 @@ jbw_vk_check_extensions (JBWVK * vk)    ///< JBWVK struct.
 {
   VkExtensionProperties *available_extensions;
   const char *buffer;
+  int err;
   uint32_t i, j, k, count;
+  err = 0;
   vkEnumerateDeviceExtensionProperties (vk->physical_device, NULL, &count,
                                         NULL);
   available_extensions = (VkExtensionProperties *)
@@ -1179,11 +1195,97 @@ jbw_vk_check_extensions (JBWVK * vk)    ///< JBWVK struct.
       if (!k)
         {
           vk->error_message = _("no available Vulkan extension");
-          free (available_extensions);
-          return JBW_VK_ERROR_NO_AVAILABLE_EXTENSION;
+          err = JBW_VK_ERROR_NO_AVAILABLE_EXTENSION;
+          break;
         }
     }
   free (available_extensions);
+  return err;
+}
+
+/**
+ * Function to create the logical device and queues.
+ *
+ * \return ERROR_CODE_NONE on succes, error code on error.
+ */
+static int
+jbw_vk_create_logical_device (JBWVK * vk)       ///< JBWVK struct.
+{
+  VkDeviceCreateInfo create_info = { 0 };
+  VkBool32 present_support;
+  VkDeviceQueueCreateInfo queue_create_infos[2] = { 0 };
+  VkPhysicalDeviceFeatures device_features = { 0 };
+  VkQueueFamilyProperties *queue_families;
+  const float queue_priority = 1.0f;
+  uint32_t count, i;
+  // Default window size.
+  vk->extent.width = JBW_WINDOW_WIDTH;
+  vk->extent.height = JBW_WINDOW_HEIGHT;
+  // Queue families
+  vkGetPhysicalDeviceQueueFamilyProperties (vk->physical_device, &count, NULL);
+#if VULKAN_DEBUG
+  fprintf (stderr,
+           "Number of Vulkan physical device queue family properties: %u\n",
+           (unsigned int) count);
+#endif
+  queue_families = (VkQueueFamilyProperties *)
+    malloc (count * sizeof (VkQueueFamilyProperties));
+  vkGetPhysicalDeviceQueueFamilyProperties (vk->physical_device, &count,
+                                            queue_families);
+  for (i = 0; i < count; ++i)
+    if (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+      break;
+  free (queue_families);
+  if (i == count)
+    {
+      vk->error_message = _("no suitable Vulkan physical device queue family");
+      return JBW_VK_ERROR_NO_SUITABLE_QUEUE_FAMILY;
+    }
+  vk->graphics_index = i;
+  // Querying for presentation support
+  present_support = 0;
+  for (i = 0; i < count; ++i)
+    {
+      vkGetPhysicalDeviceSurfaceSupportKHR (vk->physical_device, i, vk->surface,
+                                            &present_support);
+      if (present_support)
+        break;
+    }
+  if (!present_support)
+    {
+      vk->error_message = _("Vulkan device does not support surfaces");
+      return JBW_VK_ERROR_NO_SURFACE;
+    }
+  vk->present_index = i;
+  vk->queue_family_indices[0] = vk->graphics_index;
+  vk->queue_family_indices[1] = vk->present_index;
+  // Specifying the queues to be created
+  queue_create_infos[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  queue_create_infos[0].queueFamilyIndex = vk->graphics_index;
+  queue_create_infos[0].queueCount = 1;
+  queue_create_infos[0].pQueuePriorities = &queue_priority;
+  // Creating the presentation queue
+  queue_create_infos[1].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+  queue_create_infos[1].queueFamilyIndex = vk->present_index;
+  queue_create_infos[1].queueCount = 1;
+  queue_create_infos[1].pQueuePriorities = &queue_priority;
+  // Anisotropy device feature
+  device_features.samplerAnisotropy = VK_TRUE;
+  // Creating the logical device
+  create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+  create_info.pQueueCreateInfos = queue_create_infos;
+  create_info.queueCreateInfoCount = 1;
+  create_info.pEnabledFeatures = &device_features;
+  create_info.enabledExtensionCount = JBW_VK_N_DEVICE_EXTENSIONS;
+  create_info.ppEnabledExtensionNames = jbw_required_device_extensions;
+  if (vkCreateDevice (vk->physical_device, &create_info, NULL, &vk->device)
+      != VK_SUCCESS)
+    {
+      vk->error_message = _("unable to create the Vulkan logical device");
+      return JBW_VK_ERROR_NO_DEVICE;
+    }
+  vkGetDeviceQueue (vk->device, vk->graphics_index, 0, &vk->graphics_queue);
+  vkGetDeviceQueue (vk->device, vk->present_index, 0, &vk->present_queue);
   return 0;
 }
 
@@ -1193,8 +1295,12 @@ jbw_vk_check_extensions (JBWVK * vk)    ///< JBWVK struct.
 static void
 jbw_vk_destroy (JBWVK * vk)     ///< JBWVK struct.
 {
-  vkDestroySurfaceKHR (vk->instance, vk->surface, NULL);
-  vkDestroyInstance (vk->instance, NULL);
+  if (vk->created_device)
+    vkDestroyDevice (vk->device, NULL);
+  if (vk->created_surface)
+    vkDestroySurfaceKHR (vk->instance, vk->surface, NULL);
+  if (vk->created_instance)
+    vkDestroyInstance (vk->instance, NULL);
 }
 
 /**
@@ -1206,23 +1312,38 @@ static int
 jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
 {
   int i;
+  // Initing creation flags
+  vk->created_instance = vk->created_surface = vk->created_device = 0;
   // Creating a Vulkan instance
   i = jbw_vk_create_instance (vk);
   if (i)
-    return i;
+    goto exit_on_error;
+  vk->created_instance = 1;
   // Creating a Vulkan window surface
   i = jbw_vk_create_surface (vk);
   if (i)
-    return i;
+    goto exit_on_error;
+  vk->created_surface = 1;
   // Selecting a graphics card
   i = jbw_vk_select_physical_device (vk);
   if (i)
-    return i;
+    goto exit_on_error;
   // Checking the Vulkan extensions
   i = jbw_vk_check_extensions (vk);
   if (i)
-    return i;
+    goto exit_on_error;
+  // Creating the Vulkan logical device and queues
+  i = jbw_vk_create_logical_device (vk);
+  if (i)
+    goto exit_on_error;
+  vk->created_device = 1;
+  // Exit on success
   return 0;
+
+  // Exit on error
+exit_on_error:
+  jbw_vk_destroy (vk);
+  return i;
 }
 
 #endif
@@ -1851,13 +1972,14 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
                      GTK_WIDGET (graphic->widget));
   gtk_window_set_title (graphic->window, title);
 #elif HAVE_FREEGLUT
-  glutInitWindowSize (100, 100);
+  glutInitWindowSize (JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT);
   graphic->window = glutCreateWindow (title);
 #elif HAVE_SDL
   graphic->window
     = SDL_CreateWindow (title,
                         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                        100, 100, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+                        JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT,
+                        SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
   if (!graphic->window)
     {
       error_msg = SDL_GetError ();
@@ -1870,7 +1992,8 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
       goto error2;
     }
 #elif HAVE_GLFW
-  graphic->window = glfwCreateWindow (100, 100, title, NULL, NULL);
+  graphic->window
+    = glfwCreateWindow (JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT, title, NULL, NULL);
   if (!graphic->window)
     {
       error_msg = _("unable to open the window");

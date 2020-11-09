@@ -119,6 +119,11 @@ jbw_show_error3 (const char *message1,  ///< 1st error message.
 #define JBW_GRAPHIC_N_PATTERNS 2
 #endif
 
+#define JBW_WINDOW_WIDTH 100
+///< macro to define the default JBWGraphics window width.
+#define JBW_WINDOW_HEIGHT 100
+///< macro to define the default JBWGraphics window height.
+
 enum JBWEditorWidgetType
 {
   JBW_EDITOR_WIDGET_TYPE_TEXT = 0,
@@ -176,6 +181,12 @@ enum
   ///< No suitable physical devices.
   JBW_VK_ERROR_NO_AVAILABLE_EXTENSION,
   ///< No available extension.
+  JBW_VK_ERROR_NO_SUITABLE_QUEUE_FAMILY,
+  ///< No suitable queue family.
+  JBW_VK_ERROR_NO_SURFACE,
+  ///< No surface.
+  JBW_VK_ERROR_NO_DEVICE,
+  ///< No logical device.
 } JBWVKError;                   ///< enum to define Vulkan error codes.
 
 typedef struct
@@ -189,7 +200,21 @@ typedef struct
   VkInstance instance;          ///< Vulkan instance.
   VkSurfaceKHR surface;         ///< Vulkan surface.
   VkPhysicalDevice physical_device;     ///< Vulkan graphics card handle.
+  VkDevice device;              ///< Vulkan logical device.
+  VkQueue graphics_queue;       ///< Vulkan graphics queue.
+  VkQueue present_queue;        ///< Vulkan present queue.
+  VkExtent2D extent;            ///< Vulkan extent.
+  uint32_t queue_family_indices[2];
+  ///< array of Vulkan queue family indices.
   const char *error_message;    ///< error message.
+  unsigned int created_instance;
+  ///< flag to check the Vulkan instance creation. 
+  unsigned int created_surface;
+  ///< flag to check the Vulkan surface creation. 
+  unsigned int created_device;
+  ///< flag to check the Vulkan device creation. 
+  uint32_t graphics_index;      ///< Vulkan graphics queue family index.
+  uint32_t present_index;       ///< Vulkan present queue family index.
 } JBWVK;                        ///< struct to pack the Vulkan resources data.
 
 #endif
