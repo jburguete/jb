@@ -1605,6 +1605,46 @@ jbw_vk_create_render_pass (JBWVK * vk)  ///< JBWVK struct.
 }
 
 /**
+ * Function to create the Vulkan descriptor set layout.
+ *
+ * \return 0 on success, error code on error.
+ */
+int
+jbw_vk_create_descriptor_set_layout (JBWVK * vk)
+///< Graphics data struct.
+{
+  VkDescriptorSetLayoutBinding ubo_layout_binding = { 0 };
+  VkDescriptorSetLayoutBinding sampler_layout_binding = { 0 };
+  VkDescriptorSetLayoutBinding bindings[2];
+  VkDescriptorSetLayoutCreateInfo layout_info = { 0 };
+  ubo_layout_binding.binding = 0;
+  ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+  ubo_layout_binding.descriptorCount = 1;
+  ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+  ubo_layout_binding.pImmutableSamplers = NULL;
+  sampler_layout_binding.binding = 1;
+  sampler_layout_binding.descriptorCount = 1;
+  sampler_layout_binding.descriptorType
+    = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+  sampler_layout_binding.pImmutableSamplers = NULL;
+  sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+  bindings[0] = ubo_layout_binding;
+  bindings[1] = sampler_layout_binding;
+  layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+  layout_info.bindingCount = 2;
+  layout_info.pBindings = bindings;
+  if (vkCreateDescriptorSetLayout (vk->device, &layout_info, NULL,
+                                   &vk->descriptor_set_layout) != VK_SUCCESS)
+    {
+      vk->error_message
+        = _("failed to create the Vulkan descriptor set layout");
+      return JBW_VK_ERROR_CODE_FAILED_TO_CREATE_VULKAN_DESCRIPTOR_SET_LAYOUT;
+    }
+  vk->created_descriptor_set_layout = 1;
+  return 0;
+}
+
+/**
  * Function to free the memory used by the Vulkan swap chain.
  */
 static void
@@ -1637,6 +1677,12 @@ static void
 jbw_vk_destroy (JBWVK * vk)     ///< JBWVK struct.
 {
   jbw_vk_destroy_swap_chain (vk);
+  if (vk->created_descriptor_set_layout)
+    {
+      vkDestroyDescriptorSetLayout (vk->device, vk->descriptor_set_layout,
+                                    NULL);
+      vk->created_descriptor_set_layout = 0;
+    }
   if (vk->created_device)
     {
       vkDestroyDevice (vk->device, NULL);
@@ -1666,7 +1712,7 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
   // Initing creation flags
   vk->created_instance = vk->created_surface = vk->created_device
     = vk->created_swap_chain = vk->created_image_views
-    = vk->created_render_pass = 0;
+    = vk->created_render_pass = vk->created_descriptor_set_layout = 0;
   // Creating a Vulkan instance
   i = jbw_vk_create_instance (vk);
   if (i)
@@ -1697,6 +1743,10 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
     goto exit_on_error;
   // Creating the Vulkan render pass
   i = jbw_vk_create_render_pass (vk);
+  if (i)
+    goto exit_on_error;
+  // Creating the Vulkan descriptor set layout
+  i = jbw_vk_create_descriptor_set_layout (vk);
   if (i)
     goto exit_on_error;
   // Exit on success

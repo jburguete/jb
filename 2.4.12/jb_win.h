@@ -193,6 +193,8 @@ enum
   ///< failed to create a Vulkan swap chain image view.
   JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_RENDER_PASS,
   ///< failed to create the Vulkan render pass.
+  JBW_VK_ERROR_CODE_FAILED_TO_CREATE_VULKAN_DESCRIPTOR_SET_LAYOUT,
+  ///< failed to create the Vulkan descriptor set layout.
 } JBWVKError;                   ///< enum to define Vulkan error codes.
 
 /**
@@ -231,6 +233,8 @@ typedef struct
   VkImageView *swap_chain_image_views;
   ///< array of Vulkan swap chain image views.
   VkRenderPass render_pass;     ///< Vulkan render pass.
+  VkDescriptorSetLayout descriptor_set_layout;
+  ///< Vulkan descriptor set layout.
   uint32_t queue_family_indices[2];
   ///< array of Vulkan queue family indices.
   const char *error_message;    ///< error message.
@@ -246,6 +250,8 @@ typedef struct
   ///< flag to check the Vulkan swap chain image views creation. 
   unsigned int created_render_pass;
   ///< flag to check the Vulkan render pass creation. 
+  unsigned int created_descriptor_set_layout;
+  ///< flag to check the Vulkan descriptor set layout creation. 
   uint32_t graphics_index;      ///< Vulkan graphics queue family index.
   uint32_t present_index;       ///< Vulkan present queue family index.
   uint32_t n_image_views;       ///< number of Vulkan swap chain images.
