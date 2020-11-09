@@ -1415,7 +1415,7 @@ exit_on_error:
 }
 
 /**
- * Function to create a Vulkan image view.
+ * Function to create a Vulkan swap chain image view.
  *
  * \return 0 on success, error code on error.
  */
@@ -1449,7 +1449,7 @@ jbw_vk_create_image_view (JBWVK * vk,   ///< JBWVK struct.
 }
 
 /**
- * Function to create the Vulkan image views.
+ * Function to create the Vulkan swap chain image views.
  *
  * \return 0 on success, error code on error.
  */
@@ -1479,12 +1479,143 @@ jbw_vk_create_image_views (JBWVK * vk)  ///< JBWVK struct.
 }
 
 /**
+ * Function to find a supported Vulkan format.
+ *
+ * \return supported Vulkan format on success, 0 on error.
+ */
+static VkFormat
+jbw_vk_find_supported_format (JBWVK * vk,       ///< JBWVK struct.
+                              const VkFormat * candidates,
+                              ///< Array of Vulkan format candidates.
+                              unsigned int n_candidates,
+                              ///< Number of Vulkan format candidates.
+                              VkImageTiling tiling,
+                              ///< Vulkan image tiling.
+                              VkFormatFeatureFlags features)
+                              ///< Vulkan format feature flags.
+{
+  VkFormat format;
+  VkFormatProperties props;
+  unsigned int i;
+  for (i = 0; i < n_candidates; ++i)
+    {
+      format = candidates[i];
+      vkGetPhysicalDeviceFormatProperties (vk->physical_device, format, &props);
+      if (tiling == VK_IMAGE_TILING_LINEAR
+          && (props.linearTilingFeatures & features) == features)
+        return format;
+      if (tiling == VK_IMAGE_TILING_OPTIMAL
+          && (props.optimalTilingFeatures & features) == features)
+        return format;
+    }
+  vk->error_message = _("failed to find supported format");
+  return 0;
+}
+
+/**
+ * Function to find the Vulkan depth format.
+ *
+ * \return Vulkan depth format on success, 0 on error.
+ */
+static VkFormat
+jbw_vk_find_depth_format (JBWVK * vk)   ///< JBWVK struct.
+{
+  const VkFormat formats[3] = {
+    VK_FORMAT_D32_SFLOAT,
+    VK_FORMAT_D32_SFLOAT_S8_UINT,
+    VK_FORMAT_D24_UNORM_S8_UINT
+  };
+  return jbw_vk_find_supported_format
+    (vk,
+     formats,
+     3,
+     VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+}
+
+/**
+ * Function to create the Vulkan render pass.
+ *
+ * \return ERROR_CODE_NONE on success, error code on error.
+ */
+static int
+jbw_vk_create_render_pass (JBWVK * vk)  ///< JBWVK struct.
+{
+  VkAttachmentDescription color_attachment = { 0 };
+  VkAttachmentReference color_attachment_ref = { 0 };
+  VkSubpassDescription subpass = { 0 };
+  VkSubpassDependency dependency = { 0 };
+  VkRenderPassCreateInfo render_pass_info = { 0 };
+  VkAttachmentDescription depth_attachment = { 0 };
+  VkAttachmentReference depth_attachment_ref = { 0 };
+  VkAttachmentDescription attachments[2];
+  // Color attachment description
+  color_attachment.format = vk->surface_format.format;
+  color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+  color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+  color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+  color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+  color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+  color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+  color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+  // Depth attachment description
+  depth_attachment.format = jbw_vk_find_depth_format (vk);
+  depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+  depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+  depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+  depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+  depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+  depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+  depth_attachment.finalLayout
+    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+  // Subpasses and attachment references
+  color_attachment_ref.attachment = 0;
+  color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+  depth_attachment_ref.attachment = 1;
+  depth_attachment_ref.layout
+    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+  subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+  subpass.colorAttachmentCount = 1;
+  subpass.pColorAttachments = &color_attachment_ref;
+  subpass.pDepthStencilAttachment = &depth_attachment_ref;
+  // Subpass dependencies
+  dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+  dependency.dstSubpass = 0;
+  dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+  dependency.srcAccessMask = 0;
+  dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+  dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+  // Render pass
+  attachments[0] = color_attachment;
+  attachments[1] = depth_attachment;
+  render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+  render_pass_info.attachmentCount = 2;
+  render_pass_info.pAttachments = attachments;
+  render_pass_info.subpassCount = 1;
+  render_pass_info.pSubpasses = &subpass;
+  render_pass_info.dependencyCount = 1;
+  render_pass_info.pDependencies = &dependency;
+  if (vkCreateRenderPass (vk->device, &render_pass_info, NULL, &vk->render_pass)
+      != VK_SUCCESS)
+    {
+      vk->error_message = _("failed to create the Vulkan render pass");
+      return JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_RENDER_PASS;
+    }
+  vk->created_render_pass = 1;
+  return 0;
+}
+
+/**
  * Function to free the memory used by the Vulkan swap chain.
  */
 static void
 jbw_vk_destroy_swap_chain (JBWVK * vk)  ///< JBWVK struct.
 {
   uint32_t i;
+  if (vk->created_render_pass)
+    {
+      vkDestroyRenderPass (vk->device, vk->render_pass, NULL);
+      vk->created_render_pass = 0;
+    }
   if (vk->created_image_views)
     {
       for (i = 0; i < vk->n_image_views; ++i)
@@ -1534,7 +1665,8 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
   int i;
   // Initing creation flags
   vk->created_instance = vk->created_surface = vk->created_device
-    = vk->created_swap_chain = vk->created_image_views = 0;
+    = vk->created_swap_chain = vk->created_image_views
+    = vk->created_render_pass = 0;
   // Creating a Vulkan instance
   i = jbw_vk_create_instance (vk);
   if (i)
@@ -1561,6 +1693,10 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
     goto exit_on_error;
   // Creating the Vulkan image views
   i = jbw_vk_create_image_views (vk);
+  if (i)
+    goto exit_on_error;
+  // Creating the Vulkan render pass
+  i = jbw_vk_create_render_pass (vk);
   if (i)
     goto exit_on_error;
   // Exit on success

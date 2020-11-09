@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: jb 2.4.10\n"
+"Project-Id-Version: jb 2.4.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-09 11:22+0100\n"
+"POT-Creation-Date: 2020-11-09 14:33+0100\n"
 "PO-Revision-Date: 2020-05-05 02:59+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -138,214 +138,223 @@ msgstr "on ne peut pas compiler le fragment shader"
 msgid "unable to create the Vulkan swap chain image view"
 msgstr "on ne peut pas compiler le fragment shader"
 
-#: jb_win.c:1714
+#: jb_win.c:1511
+msgid "failed to find supported format"
+msgstr ""
+
+#: jb_win.c:1600
+#, fuzzy
+msgid "failed to create the Vulkan render pass"
+msgstr "on ne peut pas compiler le fragment shader"
+
+#: jb_win.c:1850
 msgid "OpenGL 2.1 is not supported"
 msgstr "OpenGL 2.1 n'est pas prise en charge"
 
-#: jb_win.c:1739
+#: jb_win.c:1875
 msgid "unable to compile the fragment shader"
 msgstr "on ne peut pas compiler le fragment shader"
 
-#: jb_win.c:1751
+#: jb_win.c:1887
 msgid "unable to compile the 2D vertex shader"
 msgstr "on ne peut pas compiler le vertex shader 2D"
 
-#: jb_win.c:1766
+#: jb_win.c:1902
 msgid "unable to link the 2D program"
 msgstr "on ne peut pas lier le programme 2D"
 
-#: jb_win.c:1778
+#: jb_win.c:1914
 msgid "unable to compile the 3D vertex shader"
 msgstr "on ne peut pas compiler le vertex shader 3D"
 
-#: jb_win.c:1793
+#: jb_win.c:1929
 msgid "unable to link the 3D program"
 msgstr "on ne peut pas lier le programm 3D"
 
-#: jb_win.c:1805
+#: jb_win.c:1941
 msgid "unable to compile the 2D with color vertex shader"
 msgstr "on ne peut pas compiler le vertex shader 2D avec couleur"
 
-#: jb_win.c:1820
+#: jb_win.c:1956
 msgid "unable to link the 2D with color program"
 msgstr "on ne peut pas lier le programme 2D avec couleur"
 
-#: jb_win.c:1832
+#: jb_win.c:1968
 msgid "unable to compile the 3D with color vertex shader"
 msgstr "on ne peut pas compile le vertex shader 3D avec couleur"
 
-#: jb_win.c:1847
+#: jb_win.c:1983
 msgid "unable to link the 3D with color program"
 msgstr "on ne peut pas lier le programme 3D avec couleur"
 
-#: jb_win.c:1858
+#: jb_win.c:1994
 msgid "unable to compile the text vertex shader"
 msgstr "on ne peut pas compiler le vertex shader de texte"
 
-#: jb_win.c:1870
+#: jb_win.c:2006
 msgid "unable to compile the text fragment shader"
 msgstr "on ne peut pas compiler le fragment shader de texte"
 
-#: jb_win.c:1885
+#: jb_win.c:2021
 msgid "unable to link the text program"
 msgstr "on ne peut pas lier le programme de texte"
 
-#: jb_win.c:1894
+#: jb_win.c:2030
 msgid "could not bind 2D position attribute"
 msgstr "on ne peut pas lier l'attribut de position 2D"
 
-#: jb_win.c:1901
+#: jb_win.c:2037
 msgid "could not bind 2D color"
 msgstr "on ne peut pas lier la couleur 2D"
 
-#: jb_win.c:1908
+#: jb_win.c:2044
 msgid "could not bind 2D matrix"
 msgstr "on ne peut pas lier la matrice 2D"
 
-#: jb_win.c:1917
+#: jb_win.c:2053
 msgid "could not bind 3D position attribute"
 msgstr "no ne peut pas lier l'attribut de position 3D"
 
-#: jb_win.c:1924
+#: jb_win.c:2060
 msgid "could not bind 3D color"
 msgstr "on ne peut pas lier la couleur 3D"
 
-#: jb_win.c:1931
+#: jb_win.c:2067
 msgid "could not bind 3D matrix"
 msgstr "on ne peut pas lier la matrice 3D"
 
-#: jb_win.c:1940
+#: jb_win.c:2076
 msgid "could not bind 2D with color position attribute"
 msgstr "on ne peut pas lier l'attribut de position 2D avec couleur"
 
-#: jb_win.c:1947
+#: jb_win.c:2083
 msgid "could not bind 2D with color color"
 msgstr "on ne peut pas lier la couleur 2D avec couleur"
 
-#: jb_win.c:1954
+#: jb_win.c:2090
 msgid "could not bind 2D with color matrix"
 msgstr "on ne peut pas lier la matrice 2D avec couleur"
 
-#: jb_win.c:1963
+#: jb_win.c:2099
 msgid "could not bind 3D with color position attribute"
 msgstr "on ne peut pas lier l'attribute de position 3D avec couleur"
 
-#: jb_win.c:1970
+#: jb_win.c:2106
 msgid "could not bind 3D with color color"
 msgstr "on ne peut pas lier la couleur 3D avec couleur"
 
-#: jb_win.c:1977
+#: jb_win.c:2113
 msgid "could not bind 3D with color matrix"
 msgstr "on ne peut pas lier la matrice 3D avec couleur"
 
-#: jb_win.c:1990
+#: jb_win.c:2126
 msgid "could not bind text position attribute"
 msgstr "on ne peut pas lier l'attribut de position de texte"
 
-#: jb_win.c:1997
+#: jb_win.c:2133
 msgid "could not bind text uniform"
 msgstr "on ne peut pas lier le texte uniforme"
 
-#: jb_win.c:2004
+#: jb_win.c:2140
 msgid "could not bind text color uniform"
 msgstr "on ne peut pas lier la couleur de texte uniforme"
 
-#: jb_win.c:2012
+#: jb_win.c:2148
 msgid "not enough memory to init the FreeType library"
 msgstr "mémoire insufissante pour commencer la bibliothèque FreeType"
 
-#: jb_win.c:2017
+#: jb_win.c:2153
 msgid "could not init the FreeType library"
 msgstr "on ne peut pas commencer la bibliothèque FreeType"
 
-#: jb_win.c:2023
+#: jb_win.c:2159
 msgid "not enough memory to open the font"
 msgstr "mémoire insuffisante pour ouvrir la font"
 
-#: jb_win.c:2028
+#: jb_win.c:2164
 msgid "could not open font"
 msgstr "on ne peut pas ouvrir la font"
 
-#: jb_win.c:2150
+#: jb_win.c:2286
 msgid "bad tics number"
 msgstr "nombre de marques érroné"
 
-#: jb_win.c:2158
+#: jb_win.c:2294
 msgid "not enough memory to open the graphic area"
 msgstr "mémoire insuffisante pour ouvrir l'aire graphique"
 
-#: jb_win.c:2187
+#: jb_win.c:2323
 msgid "unable to open the graphic area widget"
 msgstr "on ne peut pas ouvrir le widget d'aire graphique"
 
-#: jb_win.c:2225
+#: jb_win.c:2361
 msgid "unable to open the window"
 msgstr "on ne peut pas ouvrir la fenêtre"
 
-#: jb_win.c:3207
+#: jb_win.c:3343
 msgid "unable to get the GdkPixbuf widget"
 msgstr "on ne peut pas obtenir le widget GdkPixbuf"
 
-#: jb_win.c:3311 jb_win.c:3326
+#: jb_win.c:3447 jb_win.c:3462
 msgid "PNG file"
 msgstr "Fichier PNG"
 
-#: jb_win.c:3312
+#: jb_win.c:3448
 msgid "JPEG file"
 msgstr "Fichier JPG"
 
-#: jb_win.c:3313
+#: jb_win.c:3449
 msgid "XPM file"
 msgstr "Fichier XPM"
 
-#: jb_win.c:3314
+#: jb_win.c:3450
 msgid "TIFF file"
 msgstr "Fichier TIFF"
 
-#: jb_win.c:3315
+#: jb_win.c:3451
 msgid "BMP file"
 msgstr "Fichier BMP"
 
-#: jb_win.c:3316
+#: jb_win.c:3452
 msgid "GIF file"
 msgstr "Fichier GIF"
 
-#: jb_win.c:3317
+#: jb_win.c:3453
 msgid "ICO file"
 msgstr "Fichier ICO"
 
-#: jb_win.c:3338
+#: jb_win.c:3474
 msgid "Save graph"
 msgstr "Enregistrer graphique"
 
-#: jb_win.c:3341
+#: jb_win.c:3477
 msgid "_OK"
 msgstr "_Accepter"
 
-#: jb_win.c:3342
+#: jb_win.c:3478
 msgid "_Cancel"
 msgstr "_Annuler"
 
-#: jb_win.c:3381
+#: jb_win.c:3517
 msgid "no a text editor type"
 msgstr "ce n'est pas un type d'éditeur de texte"
 
-#: jb_win.c:3384
+#: jb_win.c:3520
 msgid "no an integer numbers editor type"
 msgstr "ce n'est pas un type d'éditeur de nombres entiers"
 
-#: jb_win.c:3387
+#: jb_win.c:3523
 msgid "no a float numbers editor type"
 msgstr "ce n'est pas un type d'éditeur de nombres réels"
 
-#: jb_win.c:3390
+#: jb_win.c:3526
 msgid "no a date editor type"
 msgstr "ce n'est pas un type d'éditeur de dates"
 
-#: jb_win.c:4016
+#: jb_win.c:4152
 msgid "bad array editor widget type"
 msgstr "type de widget d'éditeur de tableaux érroné"
 
-#: jb_win.c:4022
+#: jb_win.c:4158
 msgid "not enough memory to open the array editor"
 msgstr "mémoire insuffisante pour ouvrir l'éditeur de tableaux"
