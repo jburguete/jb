@@ -1151,8 +1151,8 @@ jbw_vk_select_physical_device (JBWVK * vk)      ///< JBWVK data struct.
     }
   if (!limits)
     {
-      vk->error_message = _("no suitable physical devices");
-      err = JBW_VK_ERROR_NO_SUITABLE_PHYSICAL_DEVICES;
+      vk->error_message = _("no suitable Vulkan physical devices");
+      err = JBW_VK_ERROR_NO_SUITABLE_VULKAN_PHYSICAL_DEVICES;
       goto exit_on_error;
     }
 exit_on_error:
@@ -1195,7 +1195,7 @@ jbw_vk_check_extensions (JBWVK * vk)    ///< JBWVK struct.
       if (!k)
         {
           vk->error_message = _("no available Vulkan extension");
-          err = JBW_VK_ERROR_NO_AVAILABLE_EXTENSION;
+          err = JBW_VK_ERROR_NO_AVAILABLE_VULKAN_EXTENSION;
           break;
         }
     }
@@ -1239,7 +1239,7 @@ jbw_vk_create_logical_device (JBWVK * vk)       ///< JBWVK struct.
   if (i == count)
     {
       vk->error_message = _("no suitable Vulkan physical device queue family");
-      return JBW_VK_ERROR_NO_SUITABLE_QUEUE_FAMILY;
+      return JBW_VK_ERROR_NO_SUITABLE_VULKAN_QUEUE_FAMILY;
     }
   vk->graphics_index = i;
   // Querying for presentation support
@@ -1254,7 +1254,7 @@ jbw_vk_create_logical_device (JBWVK * vk)       ///< JBWVK struct.
   if (!present_support)
     {
       vk->error_message = _("Vulkan device does not support surfaces");
-      return JBW_VK_ERROR_NO_SURFACE;
+      return JBW_VK_ERROR_UNSUPPORTED_VULKAN_SURFACES;
     }
   vk->present_index = i;
   vk->queue_family_indices[0] = vk->graphics_index;
@@ -1282,11 +1282,147 @@ jbw_vk_create_logical_device (JBWVK * vk)       ///< JBWVK struct.
       != VK_SUCCESS)
     {
       vk->error_message = _("unable to create the Vulkan logical device");
-      return JBW_VK_ERROR_NO_DEVICE;
+      return JBW_VK_ERROR_NO_VULKAN_DEVICE;
     }
   vkGetDeviceQueue (vk->device, vk->graphics_index, 0, &vk->graphics_queue);
   vkGetDeviceQueue (vk->device, vk->present_index, 0, &vk->present_queue);
   return 0;
+}
+
+/**
+ * Function to create the swap chain.
+ *
+ * \return ERROR_CODE_NONE on succes, error code on error.
+ */
+int
+jbw_vk_create_swap_chain (JBWVK * vk)   ///< JBWVK struct.
+{
+  JBWVKSwapChainSupportDetails details = { 0 };
+  VkPresentModeKHR present_mode;
+  VkSwapchainCreateInfoKHR create_info = { 0 };
+  int width, height, err;
+  uint32_t count, i;
+  // Querying details of swap chain support
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR (vk->physical_device, vk->surface,
+                                             &details.capabilities);
+  vkGetPhysicalDeviceSurfaceFormatsKHR (vk->physical_device, vk->surface,
+                                        &count, NULL);
+  if (count)
+    {
+      details.formats = (VkSurfaceFormatKHR *)
+        malloc (count * sizeof (VkSurfaceFormatKHR));
+      vkGetPhysicalDeviceSurfaceFormatsKHR (vk->physical_device, vk->surface,
+                                            &count, details.formats);
+    }
+  for (i = 0; i < count; ++i)
+    {
+      vk->surface_format = details.formats[i];
+      if (vk->surface_format.format == VK_FORMAT_B8G8R8A8_SRGB
+          && vk->surface_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+        break;
+    }
+  if (i == count)
+    vk->surface_format = details.formats[0];
+  vkGetPhysicalDeviceSurfacePresentModesKHR (vk->physical_device, vk->surface,
+                                             &count, NULL);
+  if (count)
+    {
+      details.present_modes = (VkPresentModeKHR *)
+        malloc (count * sizeof (VkPresentModeKHR));
+      vkGetPhysicalDeviceSurfacePresentModesKHR (vk->physical_device,
+                                                 vk->surface,
+                                                 &count, details.present_modes);
+    }
+  present_mode = VK_PRESENT_MODE_FIFO_KHR;
+  for (i = 0; i < count; ++i)
+    {
+      if (details.present_modes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
+        {
+          present_mode = VK_PRESENT_MODE_MAILBOX_KHR;
+          break;
+        }
+    }
+#if HAVE_GLFW
+  glfwGetFramebufferSize (vk->window, &width, &height);
+#elif HAVE_SDL
+  SDL_Vulkan_GetDrawableSize (vk->window, &width, &height);
+#endif
+  vk->extent.width = width;
+  vk->extent.height = height;
+  i = details.capabilities.maxImageExtent.width;
+  if (i < vk->extent.width)
+    vk->extent.width = i;
+  i = details.capabilities.minImageExtent.width;
+  if (i > vk->extent.width)
+    vk->extent.width = i;
+  i = details.capabilities.maxImageExtent.height;
+  if (i < vk->extent.height)
+    vk->extent.height = i;
+  i = details.capabilities.minImageExtent.height;
+  if (i > vk->extent.height)
+    vk->extent.height = i;
+  count = details.capabilities.minImageCount + 1;
+  if (details.capabilities.maxImageCount > 0
+      && details.capabilities.maxImageCount < count)
+    count = details.capabilities.maxImageCount;
+  create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+  create_info.surface = vk->surface;
+  create_info.minImageCount = count;
+  create_info.imageFormat = vk->surface_format.format;
+  create_info.imageColorSpace = vk->surface_format.colorSpace;
+  create_info.imageExtent = vk->extent;
+  create_info.imageArrayLayers = 1;
+  create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+  if (vk->graphics_index != vk->present_index)
+    {
+      create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+      create_info.queueFamilyIndexCount = 2;
+      create_info.pQueueFamilyIndices = vk->queue_family_indices;
+    }
+  else
+    {
+      create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+      create_info.queueFamilyIndexCount = 0;
+      create_info.pQueueFamilyIndices = NULL;
+    }
+  create_info.preTransform = details.capabilities.currentTransform;
+  create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+  create_info.presentMode = present_mode;
+  create_info.clipped = VK_TRUE;
+  create_info.oldSwapchain = VK_NULL_HANDLE;
+  err = 0;
+  if (vkCreateSwapchainKHR (vk->device, &create_info, NULL,
+                            &vk->swap_chain) != VK_SUCCESS)
+    {
+      vk->error_message = _("unable to create the Vulkan swap chain");
+      err = JBW_VK_ERROR_NO_VULKAN_SWAP_CHAIN;
+      goto exit_on_error;
+    }
+  // Retrieving the swap chain images
+  vkGetSwapchainImagesKHR (vk->device, vk->swap_chain, &count, NULL);
+  vk->swap_chain_images = (VkImage *) malloc (count * sizeof (VkImage));
+  vkGetSwapchainImagesKHR (vk->device, vk->swap_chain, &count,
+                           vk->swap_chain_images);
+  vk->n_image_views = count;
+  vk->created_swap_chain = 1;
+exit_on_error:
+  free (details.present_modes);
+  free (details.formats);
+  return err;
+}
+
+/**
+ * Function to free the memory used by the Vulkan swap chain.
+ */
+static void
+jbw_vk_destroy_swap_chain (JBWVK * vk)  ///< JBWVK struct.
+{
+  if (vk->created_swap_chain)
+    {
+      free (vk->swap_chain_images);
+      vkDestroySwapchainKHR (vk->device, vk->swap_chain, NULL);
+      vk->created_swap_chain = 0;
+    }
 }
 
 /**
@@ -1295,12 +1431,22 @@ jbw_vk_create_logical_device (JBWVK * vk)       ///< JBWVK struct.
 static void
 jbw_vk_destroy (JBWVK * vk)     ///< JBWVK struct.
 {
+  jbw_vk_destroy_swap_chain (vk);
   if (vk->created_device)
-    vkDestroyDevice (vk->device, NULL);
+    {
+      vkDestroyDevice (vk->device, NULL);
+      vk->created_device = 0;
+    }
   if (vk->created_surface)
-    vkDestroySurfaceKHR (vk->instance, vk->surface, NULL);
+    {
+      vkDestroySurfaceKHR (vk->instance, vk->surface, NULL);
+      vk->created_surface = 0;
+    }
   if (vk->created_instance)
-    vkDestroyInstance (vk->instance, NULL);
+    {
+      vkDestroyInstance (vk->instance, NULL);
+      vk->created_instance = 0;
+    }
 }
 
 /**
@@ -1313,7 +1459,8 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
 {
   int i;
   // Initing creation flags
-  vk->created_instance = vk->created_surface = vk->created_device = 0;
+  vk->created_instance = vk->created_surface = vk->created_device
+    = vk->created_swap_chain = 0;
   // Creating a Vulkan instance
   i = jbw_vk_create_instance (vk);
   if (i)
@@ -1337,6 +1484,11 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
   if (i)
     goto exit_on_error;
   vk->created_device = 1;
+  // Creating the Vulkan swap chain
+  i = jbw_vk_create_swap_chain (vk);
+  if (i)
+    goto exit_on_error;
+  vk->created_swap_chain = 1;
   // Exit on success
   return 0;
 

@@ -157,8 +157,8 @@ typedef struct
 
 #if HAVE_VULKAN
 
-#define JBW_VK_N_DEVICE_EXTENSIONS 1    ///< Number or Vulkan device extensions.
-#define JBW_VK_N_VALIDATION_LAYERS 1    ///< Number of Vulkan validation layers.
+#define JBW_VK_N_DEVICE_EXTENSIONS 1    ///< number or Vulkan device extensions.
+#define JBW_VK_N_VALIDATION_LAYERS 1    ///< number of Vulkan validation layers.
 
 enum
 {
@@ -166,29 +166,46 @@ enum
   JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_INSTANCE,
   ///< failed to create a Vulkan instance.
   JBW_VK_ERROR_NO_VULKAN_INSTANCE_EXTENSIONS,
-  ///< No Vulkan instance extensions.
+  ///< no Vulkan instance extensions.
   JBW_VK_ERROR_NO_VULKAN_SURFACE_EXTENSION,
-  ///< No VK_KHR_surface Vulkan extension.
+  ///< no VK_KHR_surface Vulkan extension.
   JBW_VK_ERROR_NO_AVAILABLE_VULKAN_VALIDATION_LAYERS,
-  ///< No available Vulkan validation layers.
+  ///< no available Vulkan validation layers.
   JBW_VK_ERROR_NO_VULKAN_SURFACE,
-  ///< Unable to create a Vulkan surface.
+  ///< unable to create a Vulkan surface.
   JBW_VK_ERROR_NO_VULKAN_PHYSICAL_DEVICES,
-  ///< Failed to find a GPU with Vulkan support.
+  ///< failed to find a GPU with Vulkan support.
   JBW_VK_ERROR_BAD_VULKAN_PHYSICAL_DEVICES,
-  ///< Bad Vulkan physical devices.
-  JBW_VK_ERROR_NO_SUITABLE_PHYSICAL_DEVICES,
-  ///< No suitable physical devices.
-  JBW_VK_ERROR_NO_AVAILABLE_EXTENSION,
-  ///< No available extension.
-  JBW_VK_ERROR_NO_SUITABLE_QUEUE_FAMILY,
-  ///< No suitable queue family.
-  JBW_VK_ERROR_NO_SURFACE,
-  ///< No surface.
-  JBW_VK_ERROR_NO_DEVICE,
-  ///< No logical device.
+  ///< bad Vulkan physical devices.
+  JBW_VK_ERROR_NO_SUITABLE_VULKAN_PHYSICAL_DEVICES,
+  ///< no suitable Vulkan physical devices.
+  JBW_VK_ERROR_NO_AVAILABLE_VULKAN_EXTENSION,
+  ///< no available Vulkan extension.
+  JBW_VK_ERROR_NO_SUITABLE_VULKAN_QUEUE_FAMILY,
+  ///< no suitable Vulkan queue family.
+  JBW_VK_ERROR_UNSUPPORTED_VULKAN_SURFACES,
+  ///< unsupported Vulkan surfaces.
+  JBW_VK_ERROR_NO_VULKAN_DEVICE,
+  ///< no Vulkan logical device.
+  JBW_VK_ERROR_NO_VULKAN_SWAP_CHAIN,
+  ///< no Vulkan swap chain.
 } JBWVKError;                   ///< enum to define Vulkan error codes.
 
+/**
+ * \struct JBWVKSwapChainSupportDetails
+ * \brief struct to pack the Vulkan swap chain support details.
+ */
+typedef struct
+{
+  VkSurfaceCapabilitiesKHR capabilities;        ///< Vulkan surface capabilities.
+  VkSurfaceFormatKHR *formats;  ///< Vulkan surface formats array.
+  VkPresentModeKHR *present_modes;      ///< Vulkan present modes.
+} JBWVKSwapChainSupportDetails;
+
+/**
+ * \struct JBWVK
+ * \brief struct to pack the Vulkan resources data.
+ */
 typedef struct
 {
 #if HAVE_GLFW
@@ -204,6 +221,9 @@ typedef struct
   VkQueue graphics_queue;       ///< Vulkan graphics queue.
   VkQueue present_queue;        ///< Vulkan present queue.
   VkExtent2D extent;            ///< Vulkan extent.
+  VkSwapchainKHR swap_chain;    ///< Vulkan swap chain.
+  VkSurfaceFormatKHR surface_format;    ///< Vulkan surface format.
+  VkImage *swap_chain_images;   ///< array of Vulkan swap chain images.
   uint32_t queue_family_indices[2];
   ///< array of Vulkan queue family indices.
   const char *error_message;    ///< error message.
@@ -213,8 +233,11 @@ typedef struct
   ///< flag to check the Vulkan surface creation. 
   unsigned int created_device;
   ///< flag to check the Vulkan device creation. 
+  unsigned int created_swap_chain;
+  ///< flag to check the Vulkan swap chain creation. 
   uint32_t graphics_index;      ///< Vulkan graphics queue family index.
   uint32_t present_index;       ///< Vulkan present queue family index.
+  uint32_t n_image_views;       ///< number of Vulkan swap chain images.
 } JBWVK;                        ///< struct to pack the Vulkan resources data.
 
 #endif
