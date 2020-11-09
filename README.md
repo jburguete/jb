@@ -1,4 +1,4 @@
-JB (2.4.9 version)
+JB (2.4.10 version)
 ==================
 
 :uk:[english](README.md) :es:[español](README.es.md)
@@ -138,7 +138,7 @@ ____________________________
 2. Link the latest version on a jb directory i.e.:
 > $ cd YOUR\_PROGRAM\_PATH
 >
-> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/2.4.9 jb
+> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/2.4.10 jb
 
 3. Include the config and the used utility headers on your source code i.e.:
 > \#include "jb/jb\_config.h"
@@ -202,7 +202,7 @@ INSTRUCTIONS TO MAKE THE REFERENCE MANUAL (doc/latex/refman.pdf file)
 ---------------------------------------------------------------------
 
 Execute on a terminal:
-> $ cd PATH\_TO\_JB\_LIBRARY/2.4.9
+> $ cd PATH\_TO\_JB\_LIBRARY/2.4.10
 >
 > $ doxygen
 >

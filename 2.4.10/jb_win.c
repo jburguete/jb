@@ -1050,6 +1050,7 @@ jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
       err = JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_INSTANCE;
       goto exit_on_error;
     }
+  vk->created_instance = 1;
 exit_on_error:
   free (window_extensions);
   return err;
@@ -1075,6 +1076,7 @@ jbw_vk_create_surface (JBWVK * vk)      ///< JBWVK data struct.
       vk->error_message = _("unable to create a Vulkan surface");
       return JBW_VK_ERROR_NO_VULKAN_SURFACE;
     }
+  vk->created_surface = 1;
   return 0;
 }
 
@@ -1286,6 +1288,7 @@ jbw_vk_create_logical_device (JBWVK * vk)       ///< JBWVK struct.
     }
   vkGetDeviceQueue (vk->device, vk->graphics_index, 0, &vk->graphics_queue);
   vkGetDeviceQueue (vk->device, vk->present_index, 0, &vk->present_queue);
+  vk->created_device = 1;
   return 0;
 }
 
@@ -1412,11 +1415,82 @@ exit_on_error:
 }
 
 /**
+ * Function to create a Vulkan image view.
+ *
+ * \return 0 on success, error code on error.
+ */
+int
+jbw_vk_create_image_view (JBWVK * vk,   ///< JBWVK struct.
+                          VkImage image,        ///< Vulkan image struct.
+                          VkFormat format,      ///< Vulkan image format.
+                          VkImageAspectFlags aspect_flags,
+                          ///< Vulkan image aspect flags.
+                          VkImageView * image_view)
+                          ///< Vulkan image view pointer.
+{
+  VkImageViewCreateInfo view_info = { 0 };
+  view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+  view_info.image = image;
+  view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+  view_info.format = format;
+  view_info.subresourceRange.aspectMask = aspect_flags;
+  view_info.subresourceRange.baseMipLevel = 0;
+  view_info.subresourceRange.levelCount = 1;
+  view_info.subresourceRange.baseArrayLayer = 0;
+  view_info.subresourceRange.layerCount = 1;
+  if (vkCreateImageView (vk->device, &view_info, NULL, image_view)
+      != VK_SUCCESS)
+    {
+      vk->error_message
+        = _("unable to create the Vulkan swap chain image view");
+      return JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_IMAGE_VIEW;
+    }
+  return 0;
+}
+
+/**
+ * Function to create the Vulkan image views.
+ *
+ * \return 0 on success, error code on error.
+ */
+int
+jbw_vk_create_image_views (JBWVK * vk)  ///< JBWVK struct.
+{
+  uint32_t i;
+  int j;
+  // Image views
+  vk->swap_chain_image_views
+    = (VkImageView *) malloc (vk->n_image_views * sizeof (VkImageView));
+  vk->created_image_views = 1;
+  for (i = 0; i < vk->n_image_views; ++i)
+    {
+      j = jbw_vk_create_image_view (vk,
+                                    vk->swap_chain_images[i],
+                                    vk->surface_format.format,
+                                    VK_IMAGE_ASPECT_COLOR_BIT,
+                                    vk->swap_chain_image_views + i);
+      if (j)
+        {
+          vk->n_image_views = i;
+          return j;
+        }
+    }
+  return 0;
+}
+
+/**
  * Function to free the memory used by the Vulkan swap chain.
  */
 static void
 jbw_vk_destroy_swap_chain (JBWVK * vk)  ///< JBWVK struct.
 {
+  uint32_t i;
+  if (vk->created_image_views)
+    {
+      for (i = 0; i < vk->n_image_views; ++i)
+        vkDestroyImageView (vk->device, vk->swap_chain_image_views[i], NULL);
+      free (vk->swap_chain_image_views);
+    }
   if (vk->created_swap_chain)
     {
       free (vk->swap_chain_images);
@@ -1460,17 +1534,15 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
   int i;
   // Initing creation flags
   vk->created_instance = vk->created_surface = vk->created_device
-    = vk->created_swap_chain = 0;
+    = vk->created_swap_chain = vk->created_image_views = 0;
   // Creating a Vulkan instance
   i = jbw_vk_create_instance (vk);
   if (i)
     goto exit_on_error;
-  vk->created_instance = 1;
   // Creating a Vulkan window surface
   i = jbw_vk_create_surface (vk);
   if (i)
     goto exit_on_error;
-  vk->created_surface = 1;
   // Selecting a graphics card
   i = jbw_vk_select_physical_device (vk);
   if (i)
@@ -1483,12 +1555,14 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
   i = jbw_vk_create_logical_device (vk);
   if (i)
     goto exit_on_error;
-  vk->created_device = 1;
   // Creating the Vulkan swap chain
   i = jbw_vk_create_swap_chain (vk);
   if (i)
     goto exit_on_error;
-  vk->created_swap_chain = 1;
+  // Creating the Vulkan image views
+  i = jbw_vk_create_image_views (vk);
+  if (i)
+    goto exit_on_error;
   // Exit on success
   return 0;
 
