@@ -36,6 +36,9 @@ else
 	WINDEP = $(windep)
 	XMLDEP = $(xmldep)
 endif
+shaders = shaders/2D.spv shaders/2Dc.spv shaders/3D.spv shaders/3Dc.spv \
+	shaders/color.spv shaders/text-vert.spv shaders/text-frag.spv \
+	shaders/image-vert.spv shaders/image-frag.spv
 locale = locale/
 es = $(locale)es/LC_MESSAGES/
 fr = $(locale)fr/LC_MESSAGES/
@@ -44,7 +47,7 @@ pot = $(locale)jb.pot
 locales = $(es)jb.mo $(fr)jb.mo $(it)jb.mo
 
 # Default building
-all: $(exe) $(locales) doc/latex/refman.pdf
+all: $(exe) $(shaders) $(locales) doc/latex/refman.pdf
 
 # PGO objects
 jb_def.pgo: $(defdep)
@@ -112,6 +115,26 @@ test_win@EXE@: test_win.c libjb@SO@ libjbm@SO@ libjbw@SO@
 test_xml@EXE@: test_xml.c libjb@SO@ libjbm@SO@ libjbw@SO@
 	$(CC) $(CFLAGS) $(PGOUSE) test_xml.c -o test_xml $(EXEFLAGS) -ljb -ljbm \
 		-ljbxml
+
+# Shaders
+shaders/2D.spv: shaders/2D.vert Makefile
+	glslangValidator -V shaders/2D.vert -o shaders/2D.spv
+shaders/2Dc.spv: shaders/2Dc.vert Makefile
+	glslangValidator -V shaders/2Dc.vert -o shaders/2Dc.spv
+shaders/3D.spv: shaders/3D.vert Makefile
+	glslangValidator -V shaders/3D.vert -o shaders/3D.spv
+shaders/3Dc.spv: shaders/3Dc.vert Makefile
+	glslangValidator -V shaders/3Dc.vert -o shaders/3Dc.spv
+shaders/color.spv: shaders/color.frag Makefile
+	glslangValidator -V shaders/color.frag -o shaders/color.spv
+shaders/text-vert.spv: shaders/text.vert Makefile
+	glslangValidator -V shaders/text.vert -o shaders/text-vert.spv
+shaders/text-frag.spv: shaders/text.frag Makefile
+	glslangValidator -V shaders/text.frag -o shaders/text-frag.spv
+shaders/image-vert.spv: shaders/image.vert Makefile
+	glslangValidator -V shaders/image.vert -o shaders/image-vert.spv
+shaders/image-frag.spv: shaders/image.frag Makefile
+	glslangValidator -V shaders/image.frag -o shaders/image-frag.spv
 
 # Locales
 locales = es fr it

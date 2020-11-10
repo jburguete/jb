@@ -32,6 +32,48 @@
  */
 #include "jb_win.h"
 
+/**
+ * Function to read a binary file on a buffer.
+ *
+ * \return buffer pointer (it has to be freed with free()) on success, NULL
+ * pointer on error.
+ */
+char *
+jbw_read_file (const char *name,        ///< file name string.
+               long int *size)  ///< file size.
+{
+  FILE *file;
+  char *buffer;
+  const char *error_msg;
+  file = fopen (name, "rb");
+  if (!file)
+    {
+      error_msg = _("unable to open the file");
+      goto exit_on_error;
+    }
+  fseek (file, 0l, SEEK_END);
+  *size = ftell (file);
+  buffer = (char *) malloc (*size);
+  if (!buffer)
+    {
+      error_msg = _("not enough memory to open the file");
+      goto exit_on_error;
+    }
+  rewind (file);
+  if (!fread (buffer, *size, 1, file))
+    {
+      error_msg = _("unable to read the file");
+      free (buffer);
+      goto exit_on_error;
+    }
+  fclose (file);
+  return buffer;
+
+exit_on_error:
+  jbw_show_error (error_msg);
+  return NULL;
+}
+
 #if JBW == JBW_GTK
 
 #if HAVE_VULKAN
@@ -626,7 +668,7 @@ jbw_image_init (JBWImage * image,       ///< JBWImage widget.
     "out vec2 t_position;"
     "void main()"
     "{"
-    "gl_Position=matrix*vec4 (position, 0.f, 1.f);"
+    "gl_Position=matrix*vec4 (position,0.f,1.f);"
     "t_position=texture_position;" "}";
   const char *fs_texture_source =
     "uniform sampler2D texture_image;"
@@ -1609,7 +1651,7 @@ jbw_vk_create_render_pass (JBWVK * vk)  ///< JBWVK struct.
  *
  * \return 0 on success, error code on error.
  */
-int
+static int
 jbw_vk_create_descriptor_set_layout (JBWVK * vk)
 ///< Graphics data struct.
 {
@@ -1641,6 +1683,99 @@ jbw_vk_create_descriptor_set_layout (JBWVK * vk)
       return JBW_VK_ERROR_CODE_FAILED_TO_CREATE_VULKAN_DESCRIPTOR_SET_LAYOUT;
     }
   vk->created_descriptor_set_layout = 1;
+  return 0;
+}
+
+/**
+ * Function to create a Vulkan shader module.
+ *
+ * \return 0 on success, error code on error.
+ */
+static int
+jbw_vk_create_shader_module (JBWVK * vk,        ///< JBWVK struct.
+                             const char *name,  ///< shader file name.
+                             VkShaderModule * shader_module)
+                             ///< VkShaderModule struct.
+{
+  VkShaderModuleCreateInfo create_info = { 0 };
+  char *code;
+  long int size;
+  int err;
+  err = 0;
+  code = jbw_read_file (name, &size);
+  if (!code)
+    {
+      vk->error_message = _("failed to open the shader file");
+      err = JBW_VK_ERROR_FAILED_TO_OPEN_SHADER_FILE;
+      goto exit_on_error;
+    }
+  create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+  create_info.codeSize = size;
+  create_info.pCode = (const uint32_t *) code;
+  if (vkCreateShaderModule (vk->device, &create_info, NULL, shader_module)
+      != VK_SUCCESS)
+    {
+      vk->error_message = _("failed to create the Vulkan shader module");
+      err = JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_SHADER_MODULE;
+    }
+exit_on_error:
+  free (code);
+  return err;
+}
+
+/**
+ * Function to create the Vulkan shader modules.
+ *
+ * \return 0 on success, error code on error.
+ */
+static int
+jbw_vk_create_shader_modules (JBWVK * vk)       ///< JBWVK struct.
+{
+  int i;
+  // Initing shader handles
+  vk->vert_2D_shader_module = vk->vert_2Dc_shader_module
+    = vk->vert_3D_shader_module = vk->vert_3Dc_shader_module
+    = vk->frag_color_shader_module = vk->vert_text_shader_module
+    = vk->frag_text_shader_module = vk->vert_image_shader_module
+    = vk->frag_image_shader_module = VK_NULL_HANDLE;
+  // Creating shader modules
+  vk->created_shader_modules = 1;
+  i = jbw_vk_create_shader_module (vk, "shaders/2D.spv",
+                                   &vk->vert_2D_shader_module);
+  if (i)
+    return i;
+  i = jbw_vk_create_shader_module (vk, "shaders/2Dc.spv",
+                                   &vk->vert_2Dc_shader_module);
+  if (i)
+    return i;
+  i = jbw_vk_create_shader_module (vk, "shaders/3D.spv",
+                                   &vk->vert_3D_shader_module);
+  if (i)
+    return i;
+  i = jbw_vk_create_shader_module (vk, "shaders/3Dc.spv",
+                                   &vk->vert_3Dc_shader_module);
+  if (i)
+    return i;
+  i = jbw_vk_create_shader_module (vk, "shaders/color.spv",
+                                   &vk->frag_color_shader_module);
+  if (i)
+    return i;
+  i = jbw_vk_create_shader_module (vk, "shaders/text-vert.spv",
+                                   &vk->vert_text_shader_module);
+  if (i)
+    return i;
+  i = jbw_vk_create_shader_module (vk, "shaders/text-frag.spv",
+                                   &vk->frag_text_shader_module);
+  if (i)
+    return i;
+  i = jbw_vk_create_shader_module (vk, "shaders/image-vert.spv",
+                                   &vk->vert_image_shader_module);
+  if (i)
+    return i;
+  i = jbw_vk_create_shader_module (vk, "shaders/image-frag.spv",
+                                   &vk->frag_image_shader_module);
+  if (i)
+    return i;
   return 0;
 }
 
@@ -1677,6 +1812,19 @@ static void
 jbw_vk_destroy (JBWVK * vk)     ///< JBWVK struct.
 {
   jbw_vk_destroy_swap_chain (vk);
+  if (vk->created_shader_modules)
+    {
+      vkDestroyShaderModule (vk->device, vk->frag_image_shader_module, NULL);
+      vkDestroyShaderModule (vk->device, vk->vert_image_shader_module, NULL);
+      vkDestroyShaderModule (vk->device, vk->frag_text_shader_module, NULL);
+      vkDestroyShaderModule (vk->device, vk->vert_text_shader_module, NULL);
+      vkDestroyShaderModule (vk->device, vk->frag_color_shader_module, NULL);
+      vkDestroyShaderModule (vk->device, vk->vert_3Dc_shader_module, NULL);
+      vkDestroyShaderModule (vk->device, vk->vert_3D_shader_module, NULL);
+      vkDestroyShaderModule (vk->device, vk->vert_2Dc_shader_module, NULL);
+      vkDestroyShaderModule (vk->device, vk->vert_2D_shader_module, NULL);
+      vk->created_shader_modules = 0;
+    }
   if (vk->created_descriptor_set_layout)
     {
       vkDestroyDescriptorSetLayout (vk->device, vk->descriptor_set_layout,
@@ -1712,7 +1860,8 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
   // Initing creation flags
   vk->created_instance = vk->created_surface = vk->created_device
     = vk->created_swap_chain = vk->created_image_views
-    = vk->created_render_pass = vk->created_descriptor_set_layout = 0;
+    = vk->created_render_pass = vk->created_descriptor_set_layout
+    = vk->created_shader_modules = 0;
   // Creating a Vulkan instance
   i = jbw_vk_create_instance (vk);
   if (i)
@@ -1747,6 +1896,10 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
     goto exit_on_error;
   // Creating the Vulkan descriptor set layout
   i = jbw_vk_create_descriptor_set_layout (vk);
+  if (i)
+    goto exit_on_error;
+  // Creating the Vulkan shader modules
+  i = jbw_vk_create_shader_modules (vk);
   if (i)
     goto exit_on_error;
   // Exit on success

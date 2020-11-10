@@ -35,6 +35,8 @@
 
 #include "jb_math.h"
 
+char *jbw_read_file (const char *name, long int *size);
+
 #if JBW == JBW_NO
 
 static inline void
@@ -195,6 +197,10 @@ enum
   ///< failed to create the Vulkan render pass.
   JBW_VK_ERROR_CODE_FAILED_TO_CREATE_VULKAN_DESCRIPTOR_SET_LAYOUT,
   ///< failed to create the Vulkan descriptor set layout.
+  JBW_VK_ERROR_FAILED_TO_OPEN_SHADER_FILE,
+  ///< failed to open the shader file.
+  JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_SHADER_MODULE,
+  ///< failed to create the Vulkan shader module.
 } JBWVKError;                   ///< enum to define Vulkan error codes.
 
 /**
@@ -235,6 +241,22 @@ typedef struct
   VkRenderPass render_pass;     ///< Vulkan render pass.
   VkDescriptorSetLayout descriptor_set_layout;
   ///< Vulkan descriptor set layout.
+  VkShaderModule vert_2D_shader_module; ///< 2D vertex Vulkan shader module.
+  VkShaderModule vert_2Dc_shader_module;
+  ///< 2D with color vertex Vulkan shader module.
+  VkShaderModule vert_3D_shader_module; ///< 3D vertex Vulkan shader module.
+  VkShaderModule vert_3Dc_shader_module;
+  ///< 3D with color vertex Vulkan shader module.
+  VkShaderModule frag_color_shader_module;
+  ///< color fragment Vulkan shader module.
+  VkShaderModule vert_text_shader_module;
+  ///< text vertex Vulkan shader module.
+  VkShaderModule frag_text_shader_module;
+  ///< text fragment Vulkan shader module.
+  VkShaderModule vert_image_shader_module;
+  ///< image vertex Vulkan shader module.
+  VkShaderModule frag_image_shader_module;
+  ///< image fragment Vulkan shader module.
   uint32_t queue_family_indices[2];
   ///< array of Vulkan queue family indices.
   const char *error_message;    ///< error message.
@@ -252,6 +274,8 @@ typedef struct
   ///< flag to check the Vulkan render pass creation. 
   unsigned int created_descriptor_set_layout;
   ///< flag to check the Vulkan descriptor set layout creation. 
+  unsigned int created_shader_modules;
+  ///< flag to check the Vulkan shader modules creation.
   uint32_t graphics_index;      ///< Vulkan graphics queue family index.
   uint32_t present_index;       ///< Vulkan present queue family index.
   uint32_t n_image_views;       ///< number of Vulkan swap chain images.
