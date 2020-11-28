@@ -1,5 +1,6 @@
 /*
 BUGS:
+	- Disable glslangValidator on no Vulkan buildings
 
 DEBUGS:
 
