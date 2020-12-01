@@ -168,8 +168,11 @@ AC_ARG_WITH([vulkan],
 	AS_HELP_STRING([--with-vulkan],
 		[Build graphic window with Vulkan support]))
 if test "x$with_vulkan" = "xyes"; then
-	PKG_CHECK_MODULES([VULKAN], [vulkan], AC_DEFINE([HAVE_VULKAN], [1]),
-		AC_MSG_NOTICE([No vulkan]))
+	PKG_CHECK_MODULES([VULKAN], [vulkan],
+		AC_DEFINE([HAVE_VULKAN], [1])
+		AC_SUBST(VULKAN, "1"),
+		AC_MSG_NOTICE([No vulkan])
+		AC_SUBST(VULKAN, "0"))
 fi
 
 # Checks for GtkGLArea, FreeGLUT, GLFW or SDL to draw the graphic window

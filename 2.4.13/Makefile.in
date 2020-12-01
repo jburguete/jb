@@ -36,9 +36,13 @@ else
 	WINDEP = $(windep)
 	XMLDEP = $(xmldep)
 endif
-shaders = shaders/2D.spv shaders/2Dc.spv shaders/3D.spv shaders/3Dc.spv \
-	shaders/color.spv shaders/text-vert.spv shaders/text-frag.spv \
-	shaders/image-vert.spv shaders/image-frag.spv
+VULKAN = @VULKAN@
+ifeq ($(VULKAN), 1)
+	shaders = shaders/2D.spv shaders/2Dc.spv shaders/3D.spv \
+		shaders/3Dc.spv shaders/color.spv shaders/text-vert.spv \
+		shaders/text-frag.spv shaders/image-vert.spv \
+		shaders/image-frag.spv
+endif
 locale = locale/
 es = $(locale)es/LC_MESSAGES/
 fr = $(locale)fr/LC_MESSAGES/
