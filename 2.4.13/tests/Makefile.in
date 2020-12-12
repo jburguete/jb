@@ -1,7 +1,7 @@
 .PHONY: strip clean
 
 # Variables
-CC = @CC@ @ARCH@ @LTO@ @STD@
+CC = @CC@ @ARCH@ @LTO@
 CFLAGS = @CFLAGS@ @GLIB_CFLAGS@ @GTOP_CFLAGS@ -DJBW=1 @PRECISION@ \
 	@GSL_CFLAGS@ -O3 -pedantic -Wall -Wextra
 LDFLAGS = @LDFLAGS@ @GLIB_LIBS@ @GTOP_LIBS@ @GSL_LIBS@ @LIBS@

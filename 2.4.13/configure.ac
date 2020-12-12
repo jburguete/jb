@@ -72,18 +72,24 @@ else
 fi
 
 # Checking -march=native compiler flag
-if test "x$native" = "x1"; then
-	compiler=$CC
-	CC="$CC -march=native"
-	AC_TRY_LINK([],
-		[int main(int argc, char **argv){return 0;}], [arch=1], [arch=0])
-	CC=$compiler
-	if test $arch = 0; then
-		AC_MSG_NOTICE([checking for -march=native... no])
-		AC_SUBST(ARCH, "")
-	else
-		AC_MSG_NOTICE([checking for -march=native... yes])
-		AC_SUBST(ARCH, "-march=native")
+AC_ARG_WITH([native],
+	AS_HELP_STRING([--with-native],
+		[Build using -march=native compiler flag]))
+if test "x$with_native" = "xyes"; then
+	if test "x$native" = "x1"; then
+		compiler=$CC
+		CC="$CC -march=native"
+		AC_TRY_LINK([],
+			[int main(int argc, char **argv){return 0;}], [arch=1],
+			[arch=0])
+		CC=$compiler
+		if test $arch = 0; then
+			AC_MSG_NOTICE([checking for -march=native... no])
+			AC_SUBST(ARCH, "")
+		else
+			AC_MSG_NOTICE([checking for -march=native... yes])
+			AC_SUBST(ARCH, "-march=native")
+		fi
 	fi
 fi
 
@@ -98,29 +104,6 @@ if test $lto = 0; then
 else
 	AC_MSG_NOTICE([checking for -flto... yes])
 	AC_SUBST(LTO, "-flto")
-fi
-
-# Checking -std compiler flag
-compiler=$CC
-CC="$CC -std=gnu11"
-AC_TRY_LINK([], [int main(int argc, char **argv){return 0;}], [std=1], [std=0])
-CC=$compiler
-if test $std = 0; then
-	AC_MSG_NOTICE("checking for -std=gnu11... no")
-	CC="$CC -std=gnu99"
-	AC_TRY_LINK([], [int main(int argc, char **argv){return 0;}], [std=1],
-		[std=0])
-	CC=$compiler
-	if test $std = 0; then
-		AC_MSG_NOTICE("checking for -std=gnu99... no")
-		AC_SUBST(STD, "")
-	else
-		AC_MSG_NOTICE("checking for -std=gnu99... yes")
-		AC_SUBST(STD, "-std=gnu99")
-	fi
-else
-	AC_MSG_NOTICE("checking for -std=gnu11... yes")
-	AC_SUBST(STD, "-std=gnu11")
 fi
 
 # Checking PGO optimiztion
