@@ -1,6 +1,5 @@
 /*
 BUGS:
-	- Disable glslangValidator on no Vulkan buildings
 
 DEBUGS:
 
@@ -11,6 +10,7 @@ FEATURES:
 	- 3D figures
 	- Legend in JBWGraphics
 	- Enable Vulkan
+	- Enable PGO building with CLang/LLVM
 
 STYLE:
 
