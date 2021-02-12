@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2020, Javier Burguete Tolosa.
+ * Copyright 2005-2021, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_win.h
  * \brief Header file with useful display functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2020, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2021, Javier Burguete Tolosa.
  */
 #ifndef JB_WIN__H
 #define JB_WIN__H 1

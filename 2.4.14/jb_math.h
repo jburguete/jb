@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2020, Javier Burguete Tolosa.
+ * Copyright 2005-2021, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_math.h
  * \brief Header file with useful mathematical functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2020, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2021, Javier Burguete Tolosa.
  */
 #ifndef JB_MATH__H
 #define JB_MATH__H 1
@@ -1043,6 +1043,24 @@ jbm_farray_maxmin (JBFLOAT * fa,        ///< array of JBFLOAT numbers.
 }
 
 /**
+ * Function to interchange 2 arrays of JBFLOAT numbers.
+ */
+static inline JBFLOAT
+jbm_farray_change (JBFLOAT * fa,        ///< 1st array of JBFLOAT numbers.
+                   JBFLOAT * fb,        ///< 2nd array of JBFLOAT numbers.
+                   int n)     ///< the highest element number of the arrays.
+{
+  JBFLOAT *fc;
+  int n1;
+  n1 = n + 1;
+  fc = (JBFLOAT *) malloc (n1 * sizeof (JBFLOAT));
+  memcpy (fc, fa, n1);
+  memcpy (fa, fb, n1);
+  memcpy (fb, fc, n1);
+  free (fc);
+}
+
+/**
  * Function to calculate the y-coordinate of a 2D point interpolated 
  * between a tabular function defined by 2 arrays of JBFLOAT numbers.
  *
@@ -1356,6 +1374,24 @@ jbm_darray_maxmin (JBDOUBLE * fa,       ///< array of JBDOUBLE numbers.
         kmin = fa[i];
     }
   *max = kmax, *min = kmin;
+}
+
+/**
+ * Function to interchange 2 arrays of JBDOUBLE numbers.
+ */
+static inline JBDOUBLE
+jbm_darray_change (JBDOUBLE * fa,       ///< 1st array of JBDOUBLE numbers.
+                   JBDOUBLE * fb,       ///< 2nd array of JBDOUBLE numbers.
+                   int n)     ///< the highest element number of the arrays.
+{
+  JBDOUBLE *fc;
+  int n1;
+  n1 = n + 1;
+  fc = (JBDOUBLE *) malloc (n1 * sizeof (JBDOUBLE));
+  memcpy (fc, fa, n1);
+  memcpy (fa, fb, n1);
+  memcpy (fb, fc, n1);
+  free (fc);
 }
 
 /**
@@ -2397,7 +2433,9 @@ jbm_matrix_solve (JBFLOAT * x,  ///< matrix storing the linear equations system.
   JBFLOAT *f, *g;
   JBFLOAT k1, k2;
   register int i, j, k;
+  // Setting n to the number of row elements
   ++n;
+  // Scaling every equation to reduce rounding effects.
   for (i = n, f = x; --i > 0;)
     {
       jbm_farray_maxmin (f, n, &k1, &k2);
@@ -2405,8 +2443,10 @@ jbm_matrix_solve (JBFLOAT * x,  ///< matrix storing the linear equations system.
       for (j = n; --j >= 0; ++f)
         *f /= k1;
     }
+  // Gaussian elimination
   for (i = n - 1, f = x; --i > 0; f += n + 1)
     {
+      // Obtaining the highest pivot element        
       k1 = FABS (*f);
       for (k = j = i, g = f; --j >= 0;)
         {
@@ -2418,12 +2458,13 @@ jbm_matrix_solve (JBFLOAT * x,  ///< matrix storing the linear equations system.
               k = j;
             }
         }
+      // Interchanging rows
       if (k != i)
         {
           g = f + (i - k) * n;
-          for (j = i + 2; --j >= 0;)
-            jbm_fchange (g + j, f + j);
+          jbm_farray_change (g + j, f + j, i + 1);
         }
+      // Eliminating column
       for (j = i, g = f + n; --j >= 0; g += n)
         {
           k1 = *g / *f;
@@ -2431,10 +2472,13 @@ jbm_matrix_solve (JBFLOAT * x,  ///< matrix storing the linear equations system.
             g[k] -= k1 * f[k];
         }
     }
+  // Retrieving solutions
   f = x + n * (n - 1) - 1;
   for (i = 0; ++i < n; f -= n)
     {
+      // Solution
       k1 = *f /= *(f - i);
+      // Eliminating column
       for (j = n, g = f - n; --j > i; g -= n)
         *g -= *(g - i) * k1;
     }
@@ -2460,7 +2504,9 @@ jbm_matrix_solvel (JBDOUBLE * x,
   JBDOUBLE *f, *g;
   JBDOUBLE k1, k2;
   register int i, j, k;
+  // Setting n to the number of row elements
   ++n;
+  // Scaling every equation to reduce rounding effects.
   for (i = n, f = x; --i > 0;)
     {
       jbm_darray_maxmin (f, n, &k1, &k2);
@@ -2468,8 +2514,10 @@ jbm_matrix_solvel (JBDOUBLE * x,
       for (j = n; --j >= 0; ++f)
         *f /= k1;
     }
+  // Gaussian elimination
   for (i = n - 1, f = x; --i > 0; f += n + 1)
     {
+      // Obtaining the highest pivot element        
       k1 = FABSL (*f);
       for (k = j = i, g = f; --j >= 0;)
         {
@@ -2481,12 +2529,13 @@ jbm_matrix_solvel (JBDOUBLE * x,
               k = j;
             }
         }
+      // Interchanging rows
       if (k != i)
         {
           g = f + (i - k) * n;
-          for (j = i + 2; --j >= 0;)
-            jbm_fchangel (g + j, f + j);
+          jbm_darray_change (g + j, f + j, i + 1);
         }
+      // Eliminating column
       for (j = i, g = f + n; --j >= 0; g += n)
         {
           k1 = *g / *f;
@@ -2494,10 +2543,13 @@ jbm_matrix_solvel (JBDOUBLE * x,
             g[k] -= k1 * f[k];
         }
     }
+  // Retrieving solutions
   f = x + n * (n - 1) - 1;
   for (i = 0; ++i < n; f -= n)
     {
+      // Solution
       k1 = *f /= *(f - i);
+      // Eliminating column
       for (j = n, g = f - n; --j > i; g -= n)
         *g -= *(g - i) * k1;
     }
