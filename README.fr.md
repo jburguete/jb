@@ -110,18 +110,18 @@ d'exploitation:
 * Debian 10 (Linux)
 * Devuan Linux 3
 * Dragonfly BSD 5.8.3
-* Fedora Linux 33
-* FreeBSD 12.2
+* Fedora Linux 34
+* FreeBSD 13.0
 * Gentoo Linux
 * Linux Mint DE 4
 * MacOS Catalina + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
 * NetBSD 9.1
-* OpenBSD 6.8
+* OpenBSD 6.9
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.2
-* Xubuntu Linux 20.10
+* Ubuntu Linux 21.04
 
 Avec systèmes Microsoft Windows on doit installer
 [MSYS2](http://sourceforge.net/projects/msys2) et en plus les bibliothèques et
@@ -137,7 +137,7 @@ Pour faire le changement permanent on peut ajouter à la dernière ligne di
 fichier ".profile" dans le répertoire racine du utilisateur:
 > PATH="/usr/pkg/gcc9/bin:$PATH"
 
-Avec OpenBSD 6.8 on doit faire avant dans le terminal:
+Avec OpenBSD 6.9 on doit faire avant dans le terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 INSTRUCTIONS DE CONSTRUCTION COMMUNES
