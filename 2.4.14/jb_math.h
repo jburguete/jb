@@ -4875,7 +4875,7 @@ jbm_make_time (struct tm *sys_date,     ///< date in struct tm format.
 {
   time_t sys_t;
   sys_date->tm_year -= 1900;
-  sys_date->tm_mon -= 1;
+  --sys_date->tm_mon;
   sys_date->tm_sec = 0;
   sys_date->tm_isdst = 0;
   sys_t = mktime (sys_date);

@@ -134,7 +134,7 @@ enum JBWEditorWidgetType
   JBW_EDITOR_WIDGET_TYPE_TIME = 3
 };
 
-typedef GtkSpinButton JBWFloatEntry;    ///< widget to work with float number.
+typedef GtkEntry JBWFloatEntry;    ///< widget to work with float number.
 
 typedef struct
 {
