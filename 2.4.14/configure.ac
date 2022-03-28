@@ -3,7 +3,7 @@ AC_INIT([jb], [2.4.14], [https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 AC_MSG_NOTICE([Build: $build])
 AC_MSG_NOTICE([Host: $host])
@@ -48,7 +48,7 @@ elif test `uname -s` = "DragonFly"; then
 fi
 
 # Checks for programs
-AC_PROG_CC([gcc-10 gcc10 gcc9 egcc gcc clang])
+AC_PROG_CC([gcc-11 gcc11 gcc-10 gcc10 gcc9 egcc gcc clang])
 AC_MSG_NOTICE([Compiler: $CC])
 $CC -v
 AC_PROG_MAKE_SET
@@ -79,9 +79,8 @@ if test "x$with_native" = "xyes"; then
 	if test "x$native" = "x1"; then
 		compiler=$CC
 		CC="$CC -march=native"
-		AC_TRY_LINK([],
-			[int main(int argc, char **argv){return 0;}], [arch=1],
-			[arch=0])
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]],
+      [[int main(int argc, char **argv){return 0;}]])], [arch=1], [arch=0])
 		CC=$compiler
 		if test $arch = 0; then
 			AC_MSG_NOTICE([checking for -march=native... no])
@@ -96,7 +95,8 @@ fi
 # Checking -flto compiler flag
 compiler=$CC
 CC="$CC -flto"
-AC_TRY_LINK([], [int main(int argc, char **argv){return 0;}], [lto=1], [lto=0])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]],
+  [[int main(int argc, char **argv){return 0;}]])], [lto=1], [lto=0])
 CC=$compiler
 if test $lto = 0; then
 	AC_MSG_NOTICE([checking for -flto... no])
@@ -111,8 +111,8 @@ AC_ARG_WITH([pgo],
 	AS_HELP_STRING([--with-pgo], [Build using PGO]))
 if test "x$with_pgo" = "xyes"; then
 	CC="$CC -fprofile-generate"
-	AC_TRY_LINK([], [int main(int argc, char **argv){return 0;}], [pgo=1],
-		[pgo=0])
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]],
+    [[int main(int argc, char **argv){return 0;}]])], [pgo=1], [pgo=0])
 	CC=$compiler
 	if test "x$pgo" = "x0"; then
 		AC_MSG_NOTICE("checking for PGO... no")

@@ -16,8 +16,8 @@ ifeq ($(PGO), 1)
 	PGOGENERATE = -fprofile-generate
 	PGOUSE = -fprofile-use -fprofile-correction
 	pgoobj = ../jb_def.pgo ../jb_math.pgo
-	INDEXDEP = index_sortpgo index_sort.gcda
-	CHECKDEP = check_sortpgo check_sort.gcda
+	INDEXDEP = index_sortpgo index_sortpgo-index_sort.gcda
+	CHECKDEP = check_sortpgo check_sortpgo-check_sort.gcda
 else
 	INDEXDEP = $(indexdep)
 	CHECKDEP = $(checkdep)
