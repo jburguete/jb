@@ -1,4 +1,4 @@
-#include "../jb_math.h"
+#include "jb_math.h"
 
 #include <time.h>
 #include <gsl/gsl_rng.h>

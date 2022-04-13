@@ -1,12 +1,16 @@
 .PHONY: strip clean
 
 # Variables
+SRC = src/
+OBJ = obj/
+BIN = bin/
 CC = @CC@ @ARCH@ @LTO@
 CFLAGS = @CFLAGS@ @GLIB_CFLAGS@ @GTOP_CFLAGS@ -DJBW=1 @PRECISION@ \
-	@GSL_CFLAGS@ -O3 -pedantic -Wall -Wextra
+	@GSL_CFLAGS@ -I../$(SRC) -O3 -pedantic -Wall -Wextra
 LDFLAGS = @LDFLAGS@ @GLIB_LIBS@ @GTOP_LIBS@ @GSL_LIBS@ @LIBS@
-src = ../jb_config.h ../jb_def.h ../jb_def.c ../jb_math.h ../jb_math.c
-obj = ../jb_def.o ../jb_math.o
+src = ../$(SRC)jb_config.h ../$(SRC)jb_def.h ../$(SRC)jb_def.c \
+	../$(SRC)jb_math.h ../$(SRC)jb_math.c
+obj = ../$(OBJ)jb_def.o ../$(OBJ)jb_math.o
 exe = index_sort check_sort
 
 indexdep = index_sort.c $(obj)
@@ -15,9 +19,9 @@ PGO = @PGO@
 ifeq ($(PGO), 1)
 	PGOGENERATE = -fprofile-generate
 	PGOUSE = -fprofile-use -fprofile-correction
-	pgoobj = ../jb_def.pgo ../jb_math.pgo
-	INDEXDEP = index_sortpgo index_sortpgo-index_sort.gcda
-	CHECKDEP = check_sortpgo check_sortpgo-check_sort.gcda
+	pgoobj = ../$(OBJ)jb_def.pgo ../$(OBJ)jb_math.pgo
+	INDEXDEP = index_sortpgo
+	CHECKDEP = check_sortpgo
 else
 	INDEXDEP = $(indexdep)
 	CHECKDEP = $(checkdep)

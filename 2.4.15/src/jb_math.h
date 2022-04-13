@@ -95,6 +95,8 @@
  * \brief Low precision standard fmax math function.
  * \def FMIN
  * \brief Low precision standard fmin math function.
+ * \def HYPOT
+ * \brief Low precision standard hypot math function.
  * \def LOG
  * \brief Low precision standard log math function.
  * \def LOG10
@@ -121,6 +123,8 @@
  * \brief High precision standard fmax math function.
  * \def FMINL
  * \brief High precision standard fmin math function.
+ * \def HYPOTL
+ * \brief High precision standard hypot math function.
  * \def LOGL
  * \brief High precision standard log math function.
  * \def LOG10L
@@ -166,6 +170,7 @@
 #define FLOOR floor
 #define FMAX fmax
 #define FMIN fmin
+#define HYPOT hypot
 #define LOG log
 #define LOG10 log10
 #define SQRT sqrt
@@ -187,6 +192,7 @@
 #define FLOOR floor
 #define FMAX fmax
 #define FMIN fmin
+#define HYPOT hypot
 #define LOG log
 #define LOG10 log10
 #define SQRT sqrt
@@ -208,6 +214,7 @@
 #define FLOOR floorl
 #define FMAX fmaxl
 #define FMIN fminl
+#define HYPOT hypotl
 #define LOG logl
 #define LOG10 log10l
 #define SQRT sqrtl
@@ -230,6 +237,7 @@
 #define FLOORL floor
 #define FMAXL fmax
 #define FMINL fmin
+#define HYPOTL hypot
 #define LOGL log
 #define LOG10L log10
 #define SQRTL sqrt
@@ -251,6 +259,7 @@
 #define FLOORL floor
 #define FMAXL fmax
 #define FMINL fmin
+#define HYPOTL hypot
 #define LOGL log
 #define LOG10L log10
 #define SQRTL sqrt
@@ -272,6 +281,7 @@
 #define FLOORL floorl
 #define FMAXL fmaxl
 #define FMINL fminl
+#define HYPOTL hypotl
 #define LOGL logl
 #define LOG10L log10l
 #define SQRTL sqrtl
@@ -1732,7 +1742,7 @@ jbm_v2_length (JBFLOAT x1,
                JBFLOAT y2)
 ///< y-coordinate of the 2nd point defining the segment.
 {
-  return SQRT (jbm_fsqr (x2 - x1) + jbm_fsqr (y2 - y1));
+  return HYPOT (x2 - x1, y2 - y1);
 }
 
 /**
@@ -1750,7 +1760,7 @@ jbm_v2_lengthl (JBDOUBLE x1,
                 JBDOUBLE y2)
 ///< y-coordinate of the 2nd point defining the segment.
 {
-  return SQRTL (jbm_fsqrl (x2 - x1) + jbm_fsqrl (y2 - y1));
+  return HYPOTL (x2 - x1, y2 - y1);
 }
 
 /**

@@ -1,5 +1,5 @@
-#ifndef JB__CONFIG__H
-#define JB__CONFIG__H 1
+#ifndef CONFIG__H
+#define CONFIG__H 1
 
 #undef HAVE_GTOP
 #undef HAVE_VULKAN

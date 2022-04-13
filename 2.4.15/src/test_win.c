@@ -138,7 +138,7 @@ main (int argn, char **argc)
   jbw_graphic_set_zzlabel (graphic, "zz");
   jbw_graphic_set_grid (graphic, 1);
   jbw_graphic_set_resize (graphic, 0);
-  jbw_graphic_set_logo (graphic, "test.png");
+  jbw_graphic_set_logo (graphic, "../test.png");
   graphic->xmin = 0.;
   graphic->xmax = 3.;
   graphic->ymin = 0.3;
