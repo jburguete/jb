@@ -134,7 +134,11 @@ enum JBWEditorWidgetType
   JBW_EDITOR_WIDGET_TYPE_TIME = 3
 };
 
+#if HIGH_PRECISION > 2
 typedef GtkEntry JBWFloatEntry; ///< widget to work with float number.
+#else
+typedef GtkSpinButton JBWFloatEntry;
+#endif
 
 typedef struct
 {
@@ -377,7 +381,7 @@ typedef struct
   GtkButton **button_numeric;   ///< array of row numeric GtkButton widgets.
   GtkButton **button_title;     ///< array of column title GtkButton widgets.
   GtkWidget ***matrix_entry;    ///< matrix of GtkWidget widgets.
-  GtkGrid *table;               ///< GtkGrid widget.
+  GtkGrid *grid;                ///< GtkGrid widget.
   int *type;                    ///< array of widget types.
   int ncolumns;                 ///< number of columns.
   int nrows;                    ///< number of rows.
@@ -389,7 +393,11 @@ typedef struct
       g_signal_connect_data((instance), (detailed_signal), (c_handler), \
       (data), 0, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
 
+#if HIGH_PRECISION > 2
 #define jbw_float_entry_new (JBWFloatEntry*)gtk_entry_new
+#else
+#define jbw_float_entry_new (JBWFloatEntry*)gtk_spin_button_new
+#endif
 
 extern GtkWindow *window_parent;
 extern const GLfloat jbw_black[4];
@@ -733,6 +741,16 @@ jbw_graphic_show (JBWGraphic * graphic) ///< JBWGraphic widget.
 #if GTK4
 
 void gtk_entry_set_text (GtkEntry * entry, const char *text);
+const char * gtk_entry_get_text (GtkEntry * entry);
+
+#else
+
+#define gtk_file_chooser_get_current_name gtk_file_chooser_get_filename
+#define gtk_scrolled_window_set_child(scrolled, widget) \
+  (gtk_container_add (GTK_CONTAINER(scrolled), widget))
+#define gtk_window_destroy(window) (gtk_widget_destroy (GTK_WIDGET(window)))
+#define gtk_window_set_child(window, widget) \
+  (gtk_container_add (GTK_CONTAINER(window), widget))
 
 #endif
 

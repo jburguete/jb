@@ -1,4 +1,4 @@
-JB (version 2.4.17)
+JB (version 2.4.18)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -17,15 +17,15 @@ FICHIERS
 --------
 
 * TODO: liste de tâches pour réaliser.
-* jb\*.h: fichiers de code d'en-tête.
-* jb\*.c: fichiers de code source.
+* src\*.h: fichiers de code d'en-tête.
+* src\*.c: fichiers de code source.
 * Doxyfile: fichier de configuration pour générer documentation doxygen.
 * build.sh: script de construction par défaut.
 * configure.ac: pour configurer la construction du Makefile.
 * Makefile.in: modèle pour générer le Makefile.
 * Doxyfile: pour configurer la construction de la documentation.
 * test.png: figure pour vérifier les fonctions graphiques.
-* text\*.c: fichier source de vérification.
+* test\*.c: fichier source de vérification.
 * locale/\*/LC\_MESSAGES/jb.po: fichiers de traduction.
 
 CONSTRUCTION DE LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
@@ -149,7 +149,7 @@ _____________________________________
 2. Liez la dernière version dans une répertoire jb, p.ex.:
 > $ cd RÉPERTOIRE\_DE\_VÔTRE\_PROGRAMME
 >
-> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.4.17 jb
+> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.4.18 jb
 
 3. Incluez le fichier de configuration et les outils requis dans vôtre code
   source p.ex.:
@@ -215,7 +215,7 @@ INSTRUCTIONS POUR FAIRE LE MANUEL DE REFERENCE (fichier doc/latex/refman.pdf)
 -------------------------------------------------------------------------------
 
 Exécutez dans un terminal:
-> $ cd CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.4.17
+> $ cd CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/2.4.18
 >
 > $ doxygen
 >

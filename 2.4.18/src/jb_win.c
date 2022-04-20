@@ -1943,7 +1943,7 @@ jbw_graphic_destroy (JBWGraphic * graphic)      ///< JBWGraphic widget.
 {
   if (graphic->window)
 #if HAVE_GTKGLAREA
-    gtk_widget_destroy (GTK_WIDGET (graphic->window));
+    gtk_window_destroy (graphic->window));
 #elif HAVE_FREEGLUT
     glutDestroyWindow (graphic->window);
 #elif HAVE_SDL
@@ -3629,6 +3629,34 @@ jbw_graphic_save (JBWGraphic * graphic, ///< JBWGraphic struct.
 }
 
 /**
+ * function to save the view of a JBWGraphic widget on a file.
+ */
+static void
+jbw_graphic_dialog_response (JBWGraphic * graphic,
+                             ///< JBWGraphic struct.
+                             int id,    ///< response identifier.
+                             GtkFileChooserDialog * dlg)
+                             ///< GtkFileChooserDialog struct.
+{
+  GMainContext *context;
+  char *buffer;
+  if (id == GTK_RESPONSE_ACCEPT)
+    {
+      buffer = gtk_file_chooser_get_current_name (GTK_FILE_CHOOSER (dlg));
+      if (buffer)
+        {
+          context = g_main_context_default ();
+          graphic->draw (graphic);
+          while (g_main_context_pending (context))
+            g_main_context_iteration (context, 0);
+          jbw_graphic_save (graphic, buffer);
+          g_free (buffer);
+        }
+    }
+  gtk_window_destroy (GTK_WINDOW (dlg));
+}
+
+/**
  * Function to show a dialog to save the JBWGraphic widget on a graphic file.
  */
 void
@@ -3658,8 +3686,7 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
 #endif
   GtkFileChooserDialog *dlg;
   GtkFileFilter *filter;
-  GMainContext *context = g_main_context_default ();
-  char *buffer = NULL;
+  GMainLoop *loop;
   unsigned int i, j;
   dlg =
     (GtkFileChooserDialog *)
@@ -3677,21 +3704,19 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
           gtk_file_filter_add_pattern (filter, pattern[j][i]);
       gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dlg), filter);
     }
+  g_signal_connect_swapped (dlg, "response",
+                            G_CALLBACK (jbw_graphic_dialog_response), graphic);
 #if GTK4
+  gtk_widget_show (GTK_WIDGET (dlg));
 #else
   gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dlg), 1);
+  gtk_widget_show_all (GTK_WIDGET (dlg));
 #endif
-  if (gtk_dialog_run ((GtkDialog *) dlg) == GTK_RESPONSE_OK)
-    buffer = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dlg));
-  gtk_widget_destroy ((GtkWidget *) dlg);
-  if (buffer)
-    {
-      graphic->draw (graphic);
-      while (g_main_context_pending (context))
-        g_main_context_iteration (context, 0);
-      jbw_graphic_save (graphic, buffer);
-      g_free (buffer);
-    }
+  loop = g_main_loop_new (NULL, 0);
+  g_signal_connect_swapped (dlg, "destroy", G_CALLBACK (g_main_loop_quit),
+                            loop);
+  g_main_loop_run (loop);
+  g_main_loop_unref (loop);
 }
 
 /**
@@ -4119,7 +4144,7 @@ jbw_array_editor_insert_button_end (JBWArrayEditor * editor,
     (GtkButton *) gtk_button_new_with_label (buffer);
   gtk_widget_set_sensitive (GTK_WIDGET (editor->button_numeric[row]), 0);
   k = row + row;
-  gtk_grid_attach (editor->table, GTK_WIDGET (editor->button_numeric[row]),
+  gtk_grid_attach (editor->grid, GTK_WIDGET (editor->button_numeric[row]),
                    0, k + 1, 1, 2);
 }
 
@@ -4149,10 +4174,10 @@ jbw_array_editor_insert_entry_end (JBWArrayEditor * editor,
       break;
     default:
       widget
-        = gtk_spin_button_new_with_range (-INFINITY, INFINITY, JB_EPSILONL);
+        = gtk_spin_button_new_with_range (-INFINITY, INFINITY, JBM_EPSILONL);
     }
   gtk_entry_set_text (GTK_ENTRY (widget), "0");
-  gtk_grid_attach (editor->table, widget, row + 1, position, 1, 2);
+  gtk_grid_attach (editor->grid, widget, row + 1, position, 1, 2);
   editor->matrix_entry[row][position] = widget;
 }
 
@@ -4171,7 +4196,11 @@ jbw_array_editor_insert_last (JBWArrayEditor * editor)
   if (j > 0)
     for (; i < editor->ncolumns; ++i)
       jbw_array_editor_insert_entry_end (editor, i, j - 1, k);
-  gtk_widget_show_all (GTK_WIDGET (editor->table));
+#if GTK4
+  gtk_widget_show (GTK_WIDGET (editor->grid));
+#else
+  gtk_widget_show_all (GTK_WIDGET (editor->grid));
+#endif
 }
 
 /**
@@ -4221,7 +4250,11 @@ jbw_array_editor_remove_entry_end (JBWArrayEditor * editor,
                                    int column,  ///< column number.
                                    int row)     ///< last row number.
 {
+#if GTK4
+  gtk_grid_remove (editor->grid, editor->matrix_entry[column][row]);
+#else
   gtk_widget_destroy (editor->matrix_entry[column][row]);
+#endif
   editor->matrix_entry[column] =
     (GtkWidget **) jb_realloc (editor->matrix_entry[column],
                                row * sizeof (GtkWidget *));
@@ -4238,7 +4271,11 @@ jbw_array_editor_remove_last (JBWArrayEditor * editor)
   if (editor->nrows <= 0)
     return;
   j = --editor->nrows;
+#if GTK4
+  gtk_grid_remove (editor->grid, GTK_WIDGET (editor->button_numeric[j]));
+#else
   gtk_widget_destroy (GTK_WIDGET (editor->button_numeric[j]));
+#endif
   for (i = 0; i < editor->nfull; ++i)
     jbw_array_editor_remove_entry_end (editor, i, j);
   if (--j >= 0)
@@ -4295,7 +4332,11 @@ jbw_array_editor_set_rows (JBWArrayEditor * editor,
     jbw_array_editor_remove_last (editor);
   for (; i < n; ++i)
     jbw_array_editor_insert_last (editor);
-  gtk_widget_show_all (GTK_WIDGET (editor->table));
+#if GTK4
+  gtk_widget_show (GTK_WIDGET (editor->grid));
+#else
+  gtk_widget_show_all (GTK_WIDGET (editor->grid));
+#endif
 }
 
 /**
@@ -4318,7 +4359,6 @@ jbw_array_editor_destroy (JBWArrayEditor * editor)
                                 ///< JBWArrayEditor widget.
 {
   register int i;
-  gtk_widget_destroy (GTK_WIDGET (editor->scrolled));
   for (i = editor->ncolumns; --i >= 0;)
     jb_free_null ((void **) &editor->matrix_entry[i]);
   jb_free_null ((void **) &editor->button_numeric);
@@ -4353,10 +4393,14 @@ jbw_array_editor_new (int ncolumns,     ///< number of columns.
       error_msg = _("not enough memory to open the array editor");
       goto error1;
     }
+#if GTK4
+  editor->scrolled = (GtkScrolledWindow *) gtk_scrolled_window_new ();
+#else
   editor->scrolled = (GtkScrolledWindow *) gtk_scrolled_window_new (0, 0);
+#endif
   gtk_widget_set_hexpand (GTK_WIDGET (editor->scrolled), TRUE);
   gtk_widget_set_vexpand (GTK_WIDGET (editor->scrolled), TRUE);
-  editor->table = (GtkGrid *) gtk_grid_new ();
+  editor->grid = (GtkGrid *) gtk_grid_new ();
   editor->matrix_entry =
     (GtkWidget ***) g_malloc (ncolumns * sizeof (GtkWidget **));
   editor->button_title =
@@ -4367,7 +4411,7 @@ jbw_array_editor_new (int ncolumns,     ///< number of columns.
       editor->button_title[i]
         = (GtkButton *) gtk_button_new_with_label (label[i]);
       gtk_widget_set_sensitive (GTK_WIDGET (editor->button_title[i]), 0);
-      gtk_grid_attach (editor->table,
+      gtk_grid_attach (editor->grid,
                        GTK_WIDGET (editor->button_title[i]), i + 1, 0, 1, 1);
     }
   editor->button_numeric = NULL;
@@ -4377,8 +4421,7 @@ jbw_array_editor_new (int ncolumns,     ///< number of columns.
   editor->type = (int *) g_try_malloc (ncolumns * sizeof (int));
   memcpy (editor->type, type, ncolumns * sizeof (int));
   jbw_array_editor_set_rows (editor, nrows);
-  gtk_container_add (GTK_CONTAINER (editor->scrolled),
-                     GTK_WIDGET (editor->table));
+  gtk_scrolled_window_set_child (editor->scrolled, GTK_WIDGET (editor->grid));
   gtk_scrolled_window_set_policy (editor->scrolled,
                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
   return editor;
@@ -4400,6 +4443,19 @@ gtk_entry_set_text (GtkEntry * entry,   ///< GtkEntry struct.
   GtkEntryBuffer *buffer;
   buffer = gtk_entry_get_buffer (entry);
   gtk_entry_buffer_set_text (buffer, text, -1);
+}
+
+/**
+ * function to get the text of a GtkEntry widget as in GTK3.
+ *
+ * \return text.
+ */
+const char *
+gtk_entry_get_text (GtkEntry * entry)   ///< GtkEntry struct.
+{
+  GtkEntryBuffer *buffer;
+  buffer = gtk_entry_get_buffer (entry);
+  return gtk_entry_buffer_get_text (buffer);
 }
 
 #endif

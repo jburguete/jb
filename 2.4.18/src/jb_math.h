@@ -131,11 +131,11 @@
  * \brief High precision standard log10 math function.
  * \def SQRTL
  * \brief High precision standard sqrt math function.
- * \def JB_EPSILON
+ * \def JBM_EPSILON
  * \brief Low precision epsilon number.
  * \def JB_PI
  * \brief Low precision pi number.
- * \def JB_EPSILONL
+ * \def JBM_EPSILONL
  * \brief High precision epsilon number.
  * \def JB_PIL
  * \brief High precision pi number.
@@ -178,7 +178,7 @@
 #define FWF "%.6e"
 #define FPF "%.6g"
 #define FGF "%.5g"
-#define JB_EPSILON FLT_EPSILON
+#define JBM_EPSILON FLT_EPSILON
 #define JB_PI M_PI
 #elif LOW_PRECISION == 2
 #define JBFLOAT double
@@ -200,7 +200,7 @@
 #define FWF "%.13le"
 #define FPF "%.13lg"
 #define FGF "%.5lg"
-#define JB_EPSILON DBL_EPSILON
+#define JBM_EPSILON DBL_EPSILON
 #define JB_PI M_PI
 #else
 #define JBFLOAT long double
@@ -222,7 +222,7 @@
 #define FWF "%.17Le"
 #define FPF "%.17Lg"
 #define FGF "%.5Lg"
-#define JB_EPSILON LDBL_EPSILON
+#define JBM_EPSILON LDBL_EPSILON
 #define JB_PI M_PIl
 #endif
 #if HIGH_PRECISION == 1
@@ -241,7 +241,7 @@
 #define LOGL log
 #define LOG10L log10
 #define SQRTL sqrt
-#define JB_EPSILONL FLT_EPSILON
+#define JBM_EPSILONL FLT_EPSILON
 #define JB_PIL M_PI
 #define FRL "%e"
 #define FWL "%.6e"
@@ -263,7 +263,7 @@
 #define LOGL log
 #define LOG10L log10
 #define SQRTL sqrt
-#define JB_EPSILONL DBL_EPSILON
+#define JBM_EPSILONL DBL_EPSILON
 #define JB_PIL M_PI
 #define FRL "%le"
 #define FWL "%.13le"
@@ -285,7 +285,7 @@
 #define LOGL logl
 #define LOG10L log10l
 #define SQRTL sqrtl
-#define JB_EPSILONL LDBL_EPSILON
+#define JBM_EPSILONL LDBL_EPSILON
 #define JB_PIL M_PIl
 #define FRL "%Le"
 #define FWL "%.17Le"
@@ -298,10 +298,10 @@
 #define JBM_G 9.80665           ///< gravitational constant.
 #define JBM_INDEX_SORT_FLASH_CLASS 4
 ///< number of elements of a class in the jbm_index_sort_flash() function.
-#define JBM_INDEX_SORT_FLASH_MIN 500
+#define JBM_INDEX_SORT_FLASH_MIN 40
 ///< minimum number of elements to select the jbm_index_sort_flash()
 ///< function as default sort method.
-#define JBM_INDEX_SORT_MERGE_MIN 16
+#define JBM_INDEX_SORT_MERGE_MIN 70
 ///< minimum number of elements to select the jbm_index_sort_merge()
 ///< function as default sort method.
 #define JBM_MAX(a, b) (((a) > (b))? (a): (b))
@@ -395,7 +395,7 @@ void jbm_index_sort_flashl (JBDOUBLE * x, unsigned int *ni, int n);
 static inline int
 jbm_small (JBFLOAT x)           ///< JBFLOAT number.
 {
-  if (FABS (x) < JB_EPSILON)
+  if (FABS (x) < JBM_EPSILON)
     return 1;
   return 0;
 }
@@ -408,7 +408,7 @@ jbm_small (JBFLOAT x)           ///< JBFLOAT number.
 static inline int
 jbm_smalll (JBDOUBLE x)         ///< JBDOUBLE number.
 {
-  if (FABSL (x) < JB_EPSILONL)
+  if (FABSL (x) < JBM_EPSILONL)
     return 1;
   return 0;
 }

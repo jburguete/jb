@@ -1,4 +1,4 @@
-JB (2.4.17 version)
+JB (2.4.18 version)
 ==================
 
 :uk:[english](README.md) :es:[español](README.es.md)
@@ -17,15 +17,15 @@ FILES
 -----
 
 * TODO: list of tasks to do.
-* jb\*.h: header code files.
-* jb\*.c: source code files.
+* src\*.h: header code files.
+* src\*.c: source code files.
 * Doxyfile: configuration file to generate doxygen documentation.
 * build.sh: default build script.
 * configure.ac: to configure the Makefile building.
 * Makefile.in: template to generate the Makefile.
 * Doxyfile: to configure the documentation building.
 * test.png: figure to check graphical functions.
-* text\*.c: test source files.
+* test\*.c: test source files.
 * locale/\*/LC\_MESSAGES/jb.po: translation files.
 
 BUILDING THIS LIBRARY ON OTHER PROGRAMS
@@ -138,7 +138,7 @@ ____________________________
 2. Link the latest version on a jb directory i.e.:
 > $ cd YOUR\_PROGRAM\_PATH
 >
-> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/2.4.17 jb
+> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/2.4.18 jb
 
 3. Include the config and the used utility headers on your source code i.e.:
 > \#include "jb/jb\_config.h"
@@ -202,7 +202,7 @@ INSTRUCTIONS TO MAKE THE REFERENCE MANUAL (doc/latex/refman.pdf file)
 ---------------------------------------------------------------------
 
 Execute on a terminal:
-> $ cd PATH\_TO\_JB\_LIBRARY/2.4.17
+> $ cd PATH\_TO\_JB\_LIBRARY/2.4.18
 >
 > $ doxygen
 >

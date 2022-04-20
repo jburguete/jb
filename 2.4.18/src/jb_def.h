@@ -81,7 +81,7 @@
  * \brief Macro to define the directory to search the locale language files.
  */
 #ifdef G_OS_WIN32
-#define JB_LOCALE "..\\share\\locale"
+#define JB_LOCALE "../share/locale"
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
 #if JB_DEBUG_FILE
@@ -89,7 +89,7 @@
 extern FILE *stderr;
 #endif
 #else
-#define JB_LOCALE "./locale"
+#define JB_LOCALE "../locale"
 #endif
 
 #define JB_PROTECT(a, b, c) ((a < b)? 1: (a > c)? 1: 0)

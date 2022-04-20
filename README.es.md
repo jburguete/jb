@@ -1,4 +1,4 @@
-JB (versión 2.4.17)
+JB (versión 2.4.18)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -17,15 +17,15 @@ FICHEROS
 --------
 
 * TODO: lista de tareas a realizar.
-* jb\*.h: ficheros de código de cabecera.
-* jb\*.c: ficheros de código fuente.
+* src\*.h: ficheros de código de cabecera.
+* src\*.c: ficheros de código fuente.
 * Doxyfile: fichero de configuración para generar documentación doxygen.
 * build.sh: script de construcción por defecto.
 * configure.ac: para configurar la construcción del Makefile.
 * Makefile.in: plantilla para generar del Makefile.
 * Doxyfile: para configurar la construcción de la documentación.
 * test.png: figura para probar funciones gráficas.
-* text\*.c: ficheros fuente de prueba.
+* test\*.c: ficheros fuente de prueba.
 * locale/\*/LC\_MESSAGES/jb.po: ficheros de traducción.
 
 CONSTRUYENDO LA BIBLIOTECA EN OTROS PROGRAMAS
@@ -142,7 +142,7 @@ _____________________________________
 2. Enlácese la última versión en una carpeta jb p.ej.:
 > $ cd CARPETA\_DE\_SU\_PROGRAMA
 >
-> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.4.17 jb
+> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.4.18 jb
 
 3. Incluya el fichero de configuración y las utilidades requeridas en su código
    fuente p.ej.:
@@ -208,7 +208,7 @@ INSTRUCCIONES PARA HACER EL MANUAL DE REFERENCIA (fichero doc/latex/refman.pdf)
 -------------------------------------------------------------------------------
 
 Ejecute en un terminal:
-> $ cd RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.4.17
+> $ cd RUTA\_DE\_LA\_BIBLIOTECA\_JB/2.4.18
 >
 > $ doxygen
 >

@@ -46,7 +46,7 @@ jbm_index_sort_flash (JBFLOAT * x,      ///< array of JBFLOAT numbers.
   register int i, j, m;
   if (n <= JBM_INDEX_SORT_FLASH_MIN)
     {
-      jbm_index_sort_merge (x, ni, n);
+      jbm_index_sort_insertion (x, ni, n);
       return;
     }
   m = n / JBM_INDEX_SORT_FLASH_CLASS + 1;
@@ -64,7 +64,7 @@ jbm_index_sort_flash (JBFLOAT * x,      ///< array of JBFLOAT numbers.
       else if (xi < xmin)
         xmin = xi;
     }
-  if (xmax == xmin)
+  if ((xmax - xmin) < JBM_EPSILON)
     goto sorted;
   jbm_changeu (ni, ni + j);
   i = m;
@@ -91,7 +91,7 @@ jbm_index_sort_flash (JBFLOAT * x,      ///< array of JBFLOAT numbers.
       j = l1[i] - 1;
       nk = ni + l2[i];
       if (j < JBM_INDEX_SORT_FLASH_MIN)
-        jbm_index_sort_merge (x, nk, j);
+        jbm_index_sort_insertion (x, nk, j);
       else
         jbm_index_sort_flash (x, nk, j);
     }
@@ -114,7 +114,7 @@ jbm_index_sort_flashl (JBDOUBLE * x,    ///< array of JBDOUBLE numbers.
   register int i, j, m;
   if (n <= JBM_INDEX_SORT_FLASH_MIN)
     {
-      jbm_index_sort_mergel (x, ni, n);
+      jbm_index_sort_insertionl (x, ni, n);
       return;
     }
   m = n / JBM_INDEX_SORT_FLASH_CLASS + 1;
@@ -132,7 +132,7 @@ jbm_index_sort_flashl (JBDOUBLE * x,    ///< array of JBDOUBLE numbers.
       else if (xi < xmin)
         xmin = xi;
     }
-  if (xmax == xmin)
+  if ((xmax - xmin) < JBM_EPSILONL)
     goto sorted;
   jbm_changeu (ni, ni + j);
   i = m;
@@ -159,7 +159,7 @@ jbm_index_sort_flashl (JBDOUBLE * x,    ///< array of JBDOUBLE numbers.
       j = l1[i] - 1;
       nk = ni + l2[i];
       if (j < JBM_INDEX_SORT_FLASH_MIN)
-        jbm_index_sort_mergel (x, nk, j);
+        jbm_index_sort_insertionl (x, nk, j);
       else
         jbm_index_sort_flashl (x, nk, j);
     }

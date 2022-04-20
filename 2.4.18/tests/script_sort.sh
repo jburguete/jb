@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-n=1000000
-m=1000
+n=10000000
+m=500
 d=10
 declare -a file=("interchange" "insertion" "merge" "flash")
-for i in `seq 4 4`
+for i in `seq 1 4`
 do
 	s=${file[$i-1]}
 	j=$d

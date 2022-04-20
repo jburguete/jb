@@ -187,8 +187,12 @@ main (int argn, char **argc)
   gtk_grid_attach (grid, GTK_WIDGET (button_open2), 1, 0, 1, 1);
   gtk_grid_attach (grid, GTK_WIDGET (button_close), 2, 0, 1, 1);
 
+#if GTK4
+  window = (GtkWindow *) gtk_window_new ();
+#else
   window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_container_add (GTK_CONTAINER (window), GTK_WIDGET (grid));
+#endif
+  gtk_window_set_child (window, GTK_WIDGET (grid));
 #if HAVE_GTKGLAREA
   jbw_main_loop_pointer = g_main_loop_new (NULL, 0);
   g_signal_connect_swapped (graphic->window, "delete-event",
@@ -216,19 +220,21 @@ main (int argn, char **argc)
   g_signal_connect_swapped (window, "delete-event",
                             (GCallback) jbw_glfw_window_close, graphic);
 #endif
-  g_signal_connect (window, "destroy", (GCallback) gtk_widget_destroyed,
-                    &window);
   g_signal_connect_swapped (button_open1, "clicked", (GCallback) cb_open1,
                             graphic);
   g_signal_connect_swapped (button_open2, "clicked", (GCallback) cb_open2,
                             graphic);
+#if GTK4
+  gtk_widget_show (GTK_WIDGET (window));
+#else
   gtk_widget_show_all (GTK_WIDGET (window));
+#endif
 
   jbw_main_loop ();
 
   jbw_graphic_destroy (graphic);
   if (window)
-    gtk_widget_destroy (GTK_WIDGET (window));
+    gtk_window_destroy (window);
 
   return 0;
 }
