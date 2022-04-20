@@ -1058,7 +1058,7 @@ jbm_farray_maxmin (JBFLOAT * fa,        ///< array of JBFLOAT numbers.
 static inline void
 jbm_farray_change (JBFLOAT * fa,        ///< 1st array of JBFLOAT numbers.
                    JBFLOAT * fb,        ///< 2nd array of JBFLOAT numbers.
-                   int n)     ///< the highest element number of the arrays.
+                   int n)       ///< the highest element number of the arrays.
 {
   JBFLOAT *fc;
   int n1;
@@ -1392,7 +1392,7 @@ jbm_darray_maxmin (JBDOUBLE * fa,       ///< array of JBDOUBLE numbers.
 static inline void
 jbm_darray_change (JBDOUBLE * fa,       ///< 1st array of JBDOUBLE numbers.
                    JBDOUBLE * fb,       ///< 2nd array of JBDOUBLE numbers.
-                   int n)     ///< the highest element number of the arrays.
+                   int n)       ///< the highest element number of the arrays.
 {
   JBDOUBLE *fc;
   int n1;

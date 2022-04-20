@@ -189,9 +189,10 @@ unsigned int jbw_main_exit;
  * \return 1 on success, 0 on error.
  */
 int
-jbw_init (int *argn,
+jbw_init (int *argn __attribute__((unused)),
           ///< pointer to the number of command line arguments.
-          char ***argc)         ///< pointer to the command line arguments.
+          char ***argc __attribute__((unused)))
+          ///< pointer to the command line arguments.
 {
   jb_init ();
 #if HAVE_FREEGLUT
@@ -211,7 +212,11 @@ jbw_init (int *argn,
     }
 #endif
   gtk_disable_setlocale ();
+#if GTK4
+  gtk_init ();
+#else
   gtk_init (argn, argc);
+#endif
   return 1;
 }
 
@@ -294,11 +299,24 @@ jbw_show_message (const char *title,    ///< message title.
                   GtkMessageType type)  ///< message type.
 {
   GtkMessageDialog *dlg;
+  GMainLoop *loop;
   dlg = (GtkMessageDialog *) gtk_message_dialog_new
     (window_parent, GTK_DIALOG_MODAL, type, GTK_BUTTONS_OK, "%s", message);
   gtk_window_set_title (GTK_WINDOW (dlg), title);
-  gtk_dialog_run (GTK_DIALOG (dlg));
-  gtk_widget_destroy (GTK_WIDGET (dlg));
+#if GTK4
+  gtk_widget_show (GTK_WIDGET (dlg));
+  g_signal_connect (GTK_WINDOW (dlg), "response",
+                    G_CALLBACK (gtk_window_destroy), NULL);
+#else
+  gtk_widget_show_all (GTK_WIDGET (dlg));
+  g_signal_connect (GTK_WIDGET (dlg), "response",
+                    G_CALLBACK (gtk_widget_destroy), NULL);
+#endif
+  loop = g_main_loop_new (NULL, 0);
+  g_signal_connect_swapped (dlg, "destroy", G_CALLBACK (g_main_loop_quit),
+                            loop);
+  g_main_loop_run (loop);
+  g_main_loop_unref (loop);
 }
 
 /**
@@ -379,43 +397,14 @@ jbw_combo_box_new_with_strings (char **strings, ///< array of strings.
 }
 
 /**
- * Function to set active a GtkRadioButton of an array.
- */
-void
-jbw_array_radio_buttons_set_active (GtkRadioButton ** array,
-///< array of GtkRadioButton structs.
-                                    int n,
-///< number of the GtkRadioButton struct to set active.
-                                    int is_active)
-///< 1 on active, 0 on deactive.
-{
-  gtk_toggle_button_set_active ((GtkToggleButton *) array[n], is_active);
-}
-
-/**
- * Function to get the active GtkRadioButton of an array.
- *
- * \return element number of the active GtkRadioButton struct.
- */
-int
-jbw_array_radio_buttons_get_active (GtkRadioButton ** array)
-///< array of GtkRadioButton structs.
-{
-  int i = 0;
-  while (!gtk_toggle_button_get_active ((GtkToggleButton *) array[i]))
-    ++i;
-  return i;
-}
-
-/**
  * Function to set a JBWFloatEntry struct with a formated floating point value.
  */
 void
 jbw_float_entry_set_value_with_format (JBWFloatEntry * entry,
-///< JBWFloatEntry struct.
+                                       ///< JBWFloatEntry struct.
                                        char *format,    ///< c-format string.
                                        JBDOUBLE value)
-///< floating point value.
+                                       ///< floating point value.
 {
   char buffer[64];
   snprintf (buffer, 64, format, value);
@@ -3688,7 +3677,10 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
           gtk_file_filter_add_pattern (filter, pattern[j][i]);
       gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dlg), filter);
     }
+#if GTK4
+#else
   gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dlg), 1);
+#endif
   if (gtk_dialog_run ((GtkDialog *) dlg) == GTK_RESPONSE_OK)
     buffer = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dlg));
   gtk_widget_destroy ((GtkWidget *) dlg);
@@ -4395,5 +4387,21 @@ error1:
   jbw_show_error (error_msg);
   return NULL;
 }
+
+#if GTK4
+
+/**
+ * function to set a text on a GtkEntry struct as in GTK3.
+ */
+void
+gtk_entry_set_text (GtkEntry * entry,   ///< GtkEntry struct.
+                    const char *text)   ///< text.
+{
+  GtkEntryBuffer *buffer;
+  buffer = gtk_entry_get_buffer (entry);
+  gtk_entry_buffer_set_text (buffer, text, -1);
+}
+
+#endif
 
 #endif

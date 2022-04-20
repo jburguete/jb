@@ -134,7 +134,7 @@ enum JBWEditorWidgetType
   JBW_EDITOR_WIDGET_TYPE_TIME = 3
 };
 
-typedef GtkEntry JBWFloatEntry;    ///< widget to work with float number.
+typedef GtkEntry JBWFloatEntry; ///< widget to work with float number.
 
 typedef struct
 {
@@ -445,10 +445,6 @@ void _jbw_combo_box_set_strings (GtkComboBoxText * combo, char **strings,
                                  int n);
 GtkComboBoxText *jbw_combo_box_new_with_strings (char **strings, int n);
 
-void jbw_array_radio_buttons_set_active (GtkRadioButton ** array, int n,
-                                         int is_active);
-int jbw_array_radio_buttons_get_active (GtkRadioButton ** array);
-
 void jbw_float_entry_set_value_with_format (JBWFloatEntry * entry,
                                             char *format, JBDOUBLE value);
 #if HIGH_PRECISION > 2
@@ -732,6 +728,12 @@ jbw_graphic_show (JBWGraphic * graphic) ///< JBWGraphic widget.
     : GTK_WIDGET (graphic->widget);
   gtk_widget_show_all (w);
 }
+#endif
+
+#if GTK4
+
+void gtk_entry_set_text (GtkEntry * entry, const char *text);
+
 #endif
 
 #endif
