@@ -1782,7 +1782,7 @@ jbm_v3_length (JBFLOAT x1,
                JBFLOAT z2)
 ///< z-coordinate of the 2nd point defining the segment.
 {
-  return SQRT (jbm_fsqr (x2 - x1) + jbm_fsqr (y2 - y1) + jbm_fsqr (z2 - z1));
+  return HYPOT (HYPOT (x2 - x1, y2 - y1), z2 - z1);
 }
 
 /**
@@ -1804,8 +1804,7 @@ jbm_v3_lengthl (JBDOUBLE x1,
                 JBDOUBLE z2)
 ///< z-coordinate of the 2nd point defining the segment.
 {
-  return
-    SQRTL (jbm_fsqrl (x2 - x1) + jbm_fsqrl (y2 - y1) + jbm_fsqrl (z2 - z1));
+  return HYPOTL (HYPOTL (x2 - x1, y2 - y1), z2 - z1);
 }
 
 /**
