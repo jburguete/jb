@@ -94,60 +94,59 @@ const char *jbw_required_validation_layers[JBW_VK_N_VALIDATION_LAYERS] =
 
 GtkWindow *window_parent;       ///< pointer to the parent GtkWindow struct.
 
+///> black color intensities array.
 const GLfloat jbw_black[4] = { 0.f, 0.f, 0.f, 1.f };
 
-///< black color intensities array.
+///> dark red color intensities array.
 const GLfloat jbw_darkred[4] = { 0.5f, 0.f, 0.f, 1.f };
 
-///< dark red color intensities array.
+///> dark green color intensities array.
 const GLfloat jbw_darkgreen[4] = { 0.f, 0.5f, 0.f, 1.f };
 
-///< dark green color intensities array.
+///> dark blue color intensities array.
 const GLfloat jbw_darkblue[4] = { 0.f, 0.f, 0.5f, 1.f };
 
-///< dark blue color intensities array.
+///> red color intensities array.
 const GLfloat jbw_red[4] = { 1.f, 0.f, 0.f, 1.f };
 
-///< red color intensities array.
+///> brown color intensities array.
 const GLfloat jbw_brown[4] = { 0.5f, 0.5f, 0.f, 1.f };
 
-///< brown color intensities array.
+///> green color intensities array.
 const GLfloat jbw_green[4] = { 0.f, 1.f, 0.f, 1.f };
 
-///< green color intensities array.
+///> green-blue color intensities array.
 const GLfloat jbw_greenblue[4] = { 0.f, 1.f, 0.f, 1.f };
 
-///< green-blue color intensities array.
+///> blue color intensities array.
 const GLfloat jbw_blue[4] = { 0.f, 0.f, 1.f, 1.f };
 
-///< blue color intensities array.
+///> violet color intensities array.
 const GLfloat jbw_violet[4] = { 0.5f, 0.f, 0.5f, 1.f };
 
-///< violet color intensities array.
+///> yellow color intensities array.
 const GLfloat jbw_yellow[4] = { 1.f, 1.f, 0.f, 1.f };
 
-///< yellow color intensities array.
+///> pink color intensities array.
 const GLfloat jbw_pink[4] = { 1.f, 0.f, 1.f, 1.f };
 
-///< pink color intensities array.
+///> light blue color intensities array.
 const GLfloat jbw_lightblue[4] = { 0.f, 1.f, 1.f, 1.f };
 
-///< light blue color intensities array.
+///> very light red
 const GLfloat jbw_starred[4] = { 1.f, 0.85f, 0.85f, 1.f };
 
-///< very light red
+///> very light green
 const GLfloat jbw_stargreen[4] = { 0.85f, 1.f, 0.85f, 1.f };
 
-///< very light green
+///> very light blue
 const GLfloat jbw_starblue[4] = { 0.85f, 0.85f, 1.f, 1.f };
 
-///< very light blue
+///<>very light gray
 const GLfloat jbw_stargray[4] = { 0.9f, 0.9f, 0.9f, 1.f };
 
-///< very light gray
+///> white color intensities array.
 const GLfloat jbw_white[4] = { 1.f, 1.f, 1.f, 1.f };
-
-///< white color intensities array.
 
 const GLfloat jbw_identity[16] = {
   1.f, 0.f, 0.f, 0.f,
@@ -1943,7 +1942,7 @@ jbw_graphic_destroy (JBWGraphic * graphic)      ///< JBWGraphic widget.
 {
   if (graphic->window)
 #if HAVE_GTKGLAREA
-    gtk_window_destroy (graphic->window));
+    gtk_window_destroy (graphic->window);
 #elif HAVE_FREEGLUT
     glutDestroyWindow (graphic->window);
 #elif HAVE_SDL
@@ -2506,7 +2505,6 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
   graphic->init = 0;
   jbw_graphic_set_draw (graphic, draw);
 
-
   // Setting up the new window
 #if HAVE_GTKGLAREA
   graphic->widget = (GtkGLArea *) gtk_gl_area_new ();
@@ -2727,7 +2725,7 @@ jbw_graphic_draw_resize (JBWGraphic * graphic,  ///< JBWGraphic widget.
                          JBFLOAT * y2,  ///< 2nd y-coordinates array.
                          JBFLOAT * z1,  ///< 1st z-coordinates array.
                          JBFLOAT * z2,  ///< 2nd z-coordinates array.
-                         int n) ///< number of array points.
+                         int n) ///< number of array elements.
 {
   JBFLOAT k1, k2, kmin, kmax;
   jbm_farray_maxmin (x, n, &kmax, &kmin);
@@ -2770,7 +2768,7 @@ jbw_graphic_draw_resizel (JBWGraphic * graphic, ///< JBWGraphic widget.
                           JBDOUBLE * y2,        ///< 2nd y-coordinates array.
                           JBDOUBLE * z1,        ///< 1st z-coordinates array.
                           JBDOUBLE * z2,        ///< 2nd z-coordinates array.
-                          int n)        ///< number of array points.
+                          int n)        ///< number of array elements.
 {
   JBDOUBLE k1, k2, kmin, kmax;
   jbm_darray_maxmin (x, n, &kmax, &kmin);
@@ -2908,7 +2906,7 @@ jbw_graphic_draw_rectangles_color (JBWGraphic * graphic,
                                    ///< JBWGraphic widget.
                                    GLfloat * vertex,    ///< vertex array.
                                    GLushort * index,    ///< index array.
-                                   unsigned int n)      ///< rectanbles number.
+                                   unsigned int n)      ///< rectangles number.
 {
   GLuint vao, ebo;
   glGenBuffers (1, &vao);
@@ -2937,10 +2935,11 @@ jbw_graphic_draw_rectangles_color (JBWGraphic * graphic,
  * Function to draw a tabuled function on a JBWGraphic widget (JBFLOAT).
  */
 void
-jbw_graphic_draw_farray (JBWGraphic * graphic,
-                         JBFLOAT * x,
-                         JBFLOAT * y,
-                         unsigned int n, const GLfloat * color, GLenum type)
+jbw_graphic_draw_farray (JBWGraphic * graphic,  ///< JBWGraphic struct.
+                         JBFLOAT * x,   ///< x-coordinates array.
+                         JBFLOAT * y,   ///< y-coordinates array.
+                         unsigned int n,        ///< number of array elements.
+                         const GLfloat * color, GLenum type)
 {
   GLfloat *vertex;
   GLuint v;
@@ -2970,10 +2969,11 @@ jbw_graphic_draw_farray (JBWGraphic * graphic,
  * Function to draw a tabuled function on a JBWGraphic widget (JBDOUBLE).
  */
 void
-jbw_graphic_draw_darray (JBWGraphic * graphic,
-                         JBDOUBLE * x,
-                         JBDOUBLE * y,
-                         unsigned int n, const GLfloat * color, GLenum type)
+jbw_graphic_draw_darray (JBWGraphic * graphic,  ///< JBWGraphic struct.
+                         JBDOUBLE * x,  ///< x-coordinates array.
+                         JBDOUBLE * y,  ///< y-coordinates array.
+                         unsigned int n,        ///< number of array elements.
+                         const GLfloat * color, GLenum type)
 {
   GLdouble *vertex;
   GLuint v;
@@ -3003,11 +3003,12 @@ jbw_graphic_draw_darray (JBWGraphic * graphic,
  * Function to draw a tabuled function on a JBWGraphic widget (JBFLOAT).
  */
 void
-jbw_graphic_draw_varray (JBWGraphic * graphic,
-                         void *x,
-                         void *y,
-                         unsigned int size,
-                         unsigned int n, const GLfloat * color, GLenum type)
+jbw_graphic_draw_varray (JBWGraphic * graphic,  ///< JBWGraphic struct.
+                         void *x,       ///< x-coordinates array.
+                         void *y,       ///< y-coordinates array.
+                         unsigned int size,     ///< struct size.
+                         unsigned int n,        ///< number of array elements.
+                         const GLfloat * color, GLenum type)
 {
   GLfloat *vertex;
   GLuint v;
@@ -3037,11 +3038,12 @@ jbw_graphic_draw_varray (JBWGraphic * graphic,
  * Function to draw a tabuled function on a JBWGraphic widget (JBFLOAT).
  */
 void
-jbw_graphic_draw_varrayl (JBWGraphic * graphic,
-                          void *x,
-                          void *y,
-                          unsigned int size,
-                          unsigned int n, const GLfloat * color, GLenum type)
+jbw_graphic_draw_varrayl (JBWGraphic * graphic, ///< JBWGraphic struct.
+                          void *x,      ///< x-coordinates array.
+                          void *y,      ///< y-coordinates array.
+                          unsigned int size,    ///< struct size.
+                          unsigned int n,       ///< number of array elements.
+                          const GLfloat * color, GLenum type)
 {
   GLdouble *vertex;
   GLuint v;

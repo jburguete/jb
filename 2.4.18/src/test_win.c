@@ -1,5 +1,7 @@
 #include "jb_win.h"
 
+#define WITH_GTK 1
+
 #if HAVE_FREEGLUT
 
 JBWGraphic *graphic;
@@ -112,9 +114,16 @@ main (int argn, char **argc)
 #if HAVE_SDL
   SDL_Event exit_event[1];
 #endif
+#if WITH_GTK
+#if GTK4
+  const char *close = "close-request";
+#else
+  const char *close = "delete-event";
+#endif
   GtkWindow *window;
   GtkGrid *grid;
   GtkButton *button_open1, *button_open2, *button_close;
+#endif
   const char *title;
   const char *version;
 
@@ -179,6 +188,7 @@ main (int argn, char **argc)
   if (!graphic->init)
     return 2;
 
+#if WITH_GTK
   button_open1 = (GtkButton *) gtk_button_new_with_label ("Draw 1");
   button_open2 = (GtkButton *) gtk_button_new_with_label ("Draw 2");
   button_close = (GtkButton *) gtk_button_new_with_label ("Close");
@@ -195,29 +205,27 @@ main (int argn, char **argc)
   gtk_window_set_child (window, GTK_WIDGET (grid));
 #if HAVE_GTKGLAREA
   jbw_main_loop_pointer = g_main_loop_new (NULL, 0);
-  g_signal_connect_swapped (graphic->window, "delete-event",
+  g_signal_connect_swapped (graphic->window, close,
                             (GCallback) g_main_loop_quit,
                             jbw_main_loop_pointer);
   g_signal_connect_swapped (button_close, "clicked",
                             (GCallback) g_main_loop_quit,
                             jbw_main_loop_pointer);
-  g_signal_connect_swapped (window, "delete-event",
-                            (GCallback) g_main_loop_quit,
+  g_signal_connect_swapped (window, close, (GCallback) g_main_loop_quit,
                             jbw_main_loop_pointer);
 #elif HAVE_FREEGLUT
   g_signal_connect (button_close, "clicked", (GCallback) glutLeaveMainLoop,
                     NULL);
-  g_signal_connect (window, "delete-event", (GCallback) glutLeaveMainLoop,
-                    NULL);
+  g_signal_connect (window, close, (GCallback) glutLeaveMainLoop, NULL);
 #elif HAVE_SDL
   g_signal_connect_swapped (button_close, "clicked",
                             (GCallback) SDL_PushEvent, exit_event);
-  g_signal_connect_swapped (window, "delete-event", (GCallback) SDL_PushEvent,
+  g_signal_connect_swapped (window, close, (GCallback) SDL_PushEvent,
                             exit_event);
 #elif HAVE_GLFW
   g_signal_connect_swapped (button_close, "clicked",
                             (GCallback) jbw_glfw_window_close, graphic);
-  g_signal_connect_swapped (window, "delete-event",
+  g_signal_connect_swapped (window, close,
                             (GCallback) jbw_glfw_window_close, graphic);
 #endif
   g_signal_connect_swapped (button_open1, "clicked", (GCallback) cb_open1,
@@ -229,12 +237,15 @@ main (int argn, char **argc)
 #else
   gtk_widget_show_all (GTK_WIDGET (window));
 #endif
+#endif
 
   jbw_main_loop ();
 
   jbw_graphic_destroy (graphic);
+#if WITH_GTK
   if (window)
     gtk_window_destroy (window);
+#endif
 
   return 0;
 }
