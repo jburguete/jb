@@ -692,7 +692,7 @@ jbw_image_init (JBWImage * image,       ///< JBWImage widget.
   };
   const char *error_msg;
   GLint error_code;
-  GLuint vs, fs;
+  GLuint fs, vs;
 
   // setting up matrices and vertices
   image->id_texture = image->vbo = image->ibo = image->vbo_texture = 0;
@@ -700,17 +700,6 @@ jbw_image_init (JBWImage * image,       ///< JBWImage widget.
   memcpy (image->vertices, vertices, 8 * sizeof (GLfloat));
   memcpy (image->square_texture, square_texture, 8 * sizeof (GLfloat));
   memcpy (image->elements, elements, 6 * sizeof (GLushort));
-
-  // compiling vertex shader
-  vs = glCreateShader (GL_VERTEX_SHADER);
-  glShaderSource (vs, 2, vs_texture_sources, NULL);
-  glCompileShader (vs);
-  glGetShaderiv (vs, GL_COMPILE_STATUS, &error_code);
-  if (!error_code)
-    {
-      error_msg = _("unable to compile the texture vertex shader");
-      goto end;
-    }
 
   // compiling texture fragment shader
   fs = glCreateShader (GL_FRAGMENT_SHADER);
@@ -724,11 +713,24 @@ jbw_image_init (JBWImage * image,       ///< JBWImage widget.
       goto end;
     }
 
+  // compiling vertex shader
+  vs = glCreateShader (GL_VERTEX_SHADER);
+  glShaderSource (vs, 2, vs_texture_sources, NULL);
+  glCompileShader (vs);
+  glGetShaderiv (vs, GL_COMPILE_STATUS, &error_code);
+  if (!error_code)
+    {
+      error_msg = _("unable to compile the texture vertex shader");
+      goto end;
+    }
+
   // linking texture program
   image->program_texture = glCreateProgram ();
-  glAttachShader (image->program_texture, vs);
   glAttachShader (image->program_texture, fs);
+  glAttachShader (image->program_texture, vs);
   glLinkProgram (image->program_texture);
+  glDetachShader (image->program_texture, vs);
+  glDetachShader (image->program_texture, fs);
   glDeleteShader (fs);
   glDeleteShader (vs);
   glGetProgramiv (image->program_texture, GL_LINK_STATUS, &error_code);
@@ -2081,9 +2083,11 @@ init:
 
   // Linking the 2D program
   graphic->program_2D = glCreateProgram ();
-  glAttachShader (graphic->program_2D, vs);
   glAttachShader (graphic->program_2D, fs);
+  glAttachShader (graphic->program_2D, vs);
   glLinkProgram (graphic->program_2D);
+  glDetachShader (graphic->program_2D, vs);
+  glDetachShader (graphic->program_2D, fs);
   glDeleteShader (vs);
   glGetProgramiv (graphic->program_2D, GL_LINK_STATUS, &error_code);
   if (!error_code)
@@ -2108,9 +2112,11 @@ init:
 
   // Linking the 3D program
   graphic->program_3D = glCreateProgram ();
-  glAttachShader (graphic->program_3D, vs);
   glAttachShader (graphic->program_3D, fs);
+  glAttachShader (graphic->program_3D, vs);
   glLinkProgram (graphic->program_3D);
+  glDetachShader (graphic->program_3D, vs);
+  glDetachShader (graphic->program_3D, fs);
   glDeleteShader (vs);
   glGetProgramiv (graphic->program_3D, GL_LINK_STATUS, &error_code);
   if (!error_code)
@@ -2135,9 +2141,11 @@ init:
 
   // Linking the 2D with color program
   graphic->program_2Dc = glCreateProgram ();
-  glAttachShader (graphic->program_2Dc, vs);
   glAttachShader (graphic->program_2Dc, fs);
+  glAttachShader (graphic->program_2Dc, vs);
   glLinkProgram (graphic->program_2Dc);
+  glDetachShader (graphic->program_2Dc, vs);
+  glDetachShader (graphic->program_2Dc, fs);
   glDeleteShader (vs);
   glGetProgramiv (graphic->program_2Dc, GL_LINK_STATUS, &error_code);
   if (!error_code)
@@ -2162,9 +2170,11 @@ init:
 
   // Linking the 3D program
   graphic->program_3Dc = glCreateProgram ();
-  glAttachShader (graphic->program_3Dc, vs);
   glAttachShader (graphic->program_3Dc, fs);
+  glAttachShader (graphic->program_3Dc, vs);
   glLinkProgram (graphic->program_3Dc);
+  glDetachShader (graphic->program_3Dc, vs);
+  glDetachShader (graphic->program_3Dc, fs);
   glDeleteShader (vs);
   glDeleteShader (fs);
   glGetProgramiv (graphic->program_3D, GL_LINK_STATUS, &error_code);
@@ -2172,17 +2182,6 @@ init:
     {
       graphic->program_3Dc = 0;
       error_msg = _("unable to link the 3D with color program");
-      goto end;
-    }
-
-  // Compiling the text vertex shader
-  vs = glCreateShader (GL_VERTEX_SHADER);
-  glShaderSource (vs, 2, vs_text_sources, NULL);
-  glCompileShader (vs);
-  glGetShaderiv (vs, GL_COMPILE_STATUS, &error_code);
-  if (!error_code)
-    {
-      error_msg = _("unable to compile the text vertex shader");
       goto end;
     }
 
@@ -2198,11 +2197,24 @@ init:
       goto end;
     }
 
+  // Compiling the text vertex shader
+  vs = glCreateShader (GL_VERTEX_SHADER);
+  glShaderSource (vs, 2, vs_text_sources, NULL);
+  glCompileShader (vs);
+  glGetShaderiv (vs, GL_COMPILE_STATUS, &error_code);
+  if (!error_code)
+    {
+      error_msg = _("unable to compile the text vertex shader");
+      goto end;
+    }
+
   // Linking the text program
   graphic->program_text = glCreateProgram ();
-  glAttachShader (graphic->program_text, vs);
   glAttachShader (graphic->program_text, fs);
+  glAttachShader (graphic->program_text, vs);
   glLinkProgram (graphic->program_text);
+  glDetachShader (graphic->program_text, vs);
+  glDetachShader (graphic->program_text, fs);
   glDeleteShader (vs);
   glDeleteShader (fs);
   glGetProgramiv (graphic->program_text, GL_LINK_STATUS, &error_code);
