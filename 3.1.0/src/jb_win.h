@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2021, Javier Burguete Tolosa.
+ * Copyright 2005-2022, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_win.h
  * \brief Header file with useful display functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2021, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2022, Javier Burguete Tolosa.
  */
 #ifndef JB_WIN__H
 #define JB_WIN__H 1
@@ -308,6 +308,7 @@ struct _JBWGraphic
   int window;                   ///< FreeGLUT window number.
 #elif HAVE_SDL
   SDL_Window *window;           ///< SDL window.
+  SDL_GLContext *sdl_context;   ///< SDL context.
 #elif HAVE_GLFW
   GLFWwindow *window;           ///< GLFW window.
 #endif
@@ -400,6 +401,9 @@ typedef struct
 #endif
 
 extern GtkWindow *window_parent;
+extern GdkGLContext *jbw_gdk_gl_context;
+extern JBWGraphic *jbw_graphic_pointer;
+
 extern const GLfloat jbw_black[4];
 extern const GLfloat jbw_darkred[4];
 extern const GLfloat jbw_darkgreen[4];
@@ -422,24 +426,23 @@ extern const GLfloat jbw_white[4];
 extern const GLfloat jbw_identity[16];
 
 #if HAVE_GTKGLAREA
-extern int (*jbw_main_idle) ();
-extern GMainLoop *jbw_main_loop_pointer;
+extern int (*jbw_graphic_loop_idle) ();
+extern GMainLoop *jbw_graphic_loop_pointer;
 #elif HAVE_FREEGLUT
-extern void (*jbw_main_idle) ();
-extern void (*jbw_main_resize) (int width, int height);
-extern void (*jbw_main_render) ();
+extern void (*jbw_graphic_loop_idle) ();
+extern void (*jbw_graphic_loop_resize) (int width, int height);
+extern void (*jbw_graphic_loop_render) ();
 #elif HAVE_SDL
-extern int (*jbw_main_idle) ();
-extern void (*jbw_main_resize) (int width, int height);
-extern void (*jbw_main_render) ();
+extern int (*jbw_graphic_loop_idle) ();
+extern void (*jbw_graphic_loop_resize) (int width, int height);
+extern void (*jbw_graphic_loop_render) ();
 #elif HAVE_GLFW
-extern int (*jbw_main_idle) ();
-extern void (*jbw_main_render) ();
-extern unsigned int jbw_main_exit;
+extern int (*jbw_graphic_loop_idle) ();
+extern void (*jbw_graphic_loop_render) ();
+extern unsigned int jbw_graphic_loop_exit;
 #endif
 
 int jbw_init (int *argn, char ***argc);
-void jbw_main_loop ();
 
 void jbw_show_message (const char *title, const char *message,
                        GtkMessageType type);
@@ -475,63 +478,55 @@ void jbw_draw_orthogonal_matrix (GLint uniform, GLfloat x, GLfloat y,
 void jbw_draw_orthogonal_matrixl (GLint uniform, GLdouble x, GLdouble y,
                                   GLdouble w, GLdouble h);
 
-JBWImage *jbw_image_new (char *name);
+JBWImage *jbw_image_new (const char *name);
 
-void jbw_graphic_delete (JBWGraphic * graphic);
-void jbw_graphic_destroy (JBWGraphic * graphic);
-void jbw_graphic_init (JBWGraphic * graphic);
-void jbw_graphic_resize (JBWGraphic * graphic, int width, int height);
-void jbw_graphic_render (JBWGraphic * graphic);
-void jbw_graphic_set_title (JBWGraphic *, const char *title);
-void jbw_graphic_set_logo (JBWGraphic *, char *name);
+void jbw_graphic_destroy ();
+void jbw_graphic_init ();
+void jbw_graphic_resize (int width, int height);
+void jbw_graphic_render ();
+void jbw_graphic_loop ();
+void jbw_graphic_set_title (const char *title);
+void jbw_graphic_set_logo (const char *name);
 JBWGraphic *jbw_graphic_new (unsigned int nx, unsigned int ny,
                              unsigned int nz,
                              void (*draw) (JBWGraphic * graphic),
                              const char *title);
-void jbw_graphic_get_display_size (JBWGraphic * graphic);
-void jbw_graphic_draw_text (JBWGraphic * graphic, const char *string,
+void jbw_graphic_get_display_size ();
+void jbw_graphic_draw_text (const char *string,
                             GLfloat x, GLfloat y, const GLfloat * color);
-void jbw_graphic_map_resize (JBWGraphic *);
-void jbw_graphic_draw_resize (JBWGraphic * graphic, JBFLOAT * x, JBFLOAT * y1,
-                              JBFLOAT * y2, JBFLOAT * z1, JBFLOAT * z2, int n);
-void jbw_graphic_draw_resizel (JBWGraphic * graphic, JBDOUBLE * x,
-                               JBDOUBLE * y1, JBDOUBLE * y2, JBDOUBLE * z1,
-                               JBDOUBLE * z2, int n);
-void jbw_graphic_draw_resizev (JBWGraphic * graphic, void *x, void *y1,
-                               void *y2, void *z1, void *z2,
+void jbw_graphic_map_resize ();
+void jbw_graphic_draw_resize (JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2,
+                              JBFLOAT * z1, JBFLOAT * z2, int n);
+void jbw_graphic_draw_resizel (JBDOUBLE * x, JBDOUBLE * y1, JBDOUBLE * y2,
+                               JBDOUBLE * z1, JBDOUBLE * z2, int n);
+void jbw_graphic_draw_resizev (void *x, void *y1, void *y2, void *z1, void *z2,
                                unsigned int size, int n);
-void jbw_graphic_draw_resizevl (JBWGraphic * graphic, void *x, void *y1,
-                                void *y2, void *z1, void *z2,
+void jbw_graphic_draw_resizevl (void *x, void *y1, void *y2, void *z1, void *z2,
                                 unsigned int size, int n);
-void jbw_graphic_draw_rectangles_color (JBWGraphic * graphic,
-                                        GLfloat * vertex, GLushort * index,
+void jbw_graphic_draw_rectangles_color (GLfloat * vertex, GLushort * index,
                                         unsigned int n);
-void jbw_graphic_draw_farray (JBWGraphic * graphic, JBFLOAT * x, JBFLOAT * y,
+void jbw_graphic_draw_farray (JBFLOAT * x, JBFLOAT * y,
                               unsigned int n, const GLfloat * color,
                               GLenum type);
-void jbw_graphic_draw_darray (JBWGraphic * graphic, JBDOUBLE * x,
-                              JBDOUBLE * y, unsigned int n,
+void jbw_graphic_draw_darray (JBDOUBLE * x, JBDOUBLE * y, unsigned int n,
                               const GLfloat * color, GLenum type);
-void jbw_graphic_draw_rectangle (JBWGraphic * graphic, JBFLOAT x1, JBFLOAT y1,
-                                 JBFLOAT x2, JBFLOAT y2, const GLfloat * color);
-void jbw_graphic_draw_rectanglel (JBWGraphic * graphic, JBDOUBLE x1,
-                                  JBDOUBLE y1, JBDOUBLE x2, JBDOUBLE y2,
+void jbw_graphic_draw_rectangle (JBFLOAT x1, JBFLOAT y1, JBFLOAT x2, JBFLOAT y2,
+                                 const GLfloat * color);
+void jbw_graphic_draw_rectanglel (JBDOUBLE x1, JBDOUBLE y1,
+                                  JBDOUBLE x2, JBDOUBLE y2,
                                   const GLfloat * color);
-void jbw_graphic_draw_labels (JBWGraphic * graphic);
-void jbw_graphic_draw_logo (JBWGraphic * graphic);
-void jbw_graphic_draw_lines (JBWGraphic * graphic, JBFLOAT * x, JBFLOAT * y1,
-                             JBFLOAT * y2, JBFLOAT * z1, JBFLOAT * z2, int n);
-void jbw_graphic_draw_linesl (JBWGraphic * graphic, JBDOUBLE * x,
-                              JBDOUBLE * y1, JBDOUBLE * y2, JBDOUBLE * z1,
-                              JBDOUBLE * z2, int n);
-void jbw_graphic_draw_linesv (JBWGraphic * graphic, void *x, void *y1,
-                              void *y2, void *z1, void *z2, unsigned int size,
-                              int n);
-void jbw_graphic_draw_linesvl (JBWGraphic * graphic, void *x, void *y1,
-                               void *y2, void *z1, void *z2,
+void jbw_graphic_draw_labels ();
+void jbw_graphic_draw_logo ();
+void jbw_graphic_draw_lines (JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2,
+                             JBFLOAT * z1, JBFLOAT * z2, int n);
+void jbw_graphic_draw_linesl (JBDOUBLE * x, JBDOUBLE * y1, JBDOUBLE * y2,
+                              JBDOUBLE * z1, JBDOUBLE * z2, int n);
+void jbw_graphic_draw_linesv (void *x, void *y1, void *y2, void *z1, void *z2,
+                              unsigned int size, int n);
+void jbw_graphic_draw_linesvl (void *x, void *y1, void *y2, void *z1, void *z2,
                                unsigned int size, int n);
-void jbw_graphic_save (JBWGraphic * graphic, char *file_name);
-void jbw_graphic_dialog_save (JBWGraphic * graphic);
+void jbw_graphic_save (char *file_name);
+void jbw_graphic_dialog_save ();
 
 void jbw_array_editor_check_column (JBWArrayEditor * editor, int column,
                                     int type);
@@ -709,10 +704,10 @@ jbw_graphic_set_data (JBWGraphic * graphic,     ///< JBWGraphic widget.
  * Function to quit a main loop in a JBWGraphic widget.
  */
 static inline void
-jbw_main_loop_quit ()
+jbw_graphic_loop_quit ()
 {
 #if HAVE_GTKGLAREA
-  g_main_loop_quit (jbw_main_loop_pointer);
+  g_main_loop_quit (jbw_graphic_loop_pointer);
 #elif HAVE_FREEGLUT
   glutLeaveMainLoop ();
 #elif HAVE_SDL
@@ -720,7 +715,7 @@ jbw_main_loop_quit ()
   event->type = SDL_QUIT;
   SDL_PushEvent (event);
 #elif HAVE_GLFW
-  jbw_main_exit = 1;
+  jbw_graphic_loop_exit = 1;
 #endif
 }
 
@@ -731,14 +726,15 @@ jbw_main_loop_quit ()
 static inline void
 jbw_graphic_show (JBWGraphic * graphic) ///< JBWGraphic widget.
 {
-  GtkWidget *w;
-  w = graphic->window ? GTK_WIDGET (graphic->window)
-    : GTK_WIDGET (graphic->widget);
-  gtk_widget_show_all (w);
+#if GTK_MAJOR_VERSION > 3
+  gtk_widget_show (GTK_WIDGET (graphic->window));
+#else
+  gtk_widget_show_all (GTK_WIDGET (graphic->window));
+#endif
 }
 #endif
 
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
 
 void gtk_entry_set_text (GtkEntry * entry, const char *text);
 const char * gtk_entry_get_text (GtkEntry * entry);

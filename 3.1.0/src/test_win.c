@@ -10,21 +10,23 @@ static void
 jbw_freeglut_idle ()
 {
   GMainContext *context = g_main_context_default ();
+  gdk_gl_context_make_current (jbw_gdk_gl_context);
   while (g_main_context_pending (context))
     g_main_context_iteration (context, 0);
+  glutSetWindow (graphic->window);
 }
 
 static void
 jbw_freeglut_draw_resize (int width, int height)
 {
-  jbw_graphic_resize (graphic, width, height);
-  jbw_graphic_render (graphic);
+  jbw_graphic_resize (width, height);
+  jbw_graphic_render ();
 }
 
 static void
 jbw_freeglut_draw_render ()
 {
-  jbw_graphic_render (graphic);
+  jbw_graphic_render ();
 }
 
 #elif HAVE_SDL
@@ -34,14 +36,14 @@ JBWGraphic *graphic;
 static void
 jbw_sdl_draw_resize (int width, int height)
 {
-  jbw_graphic_resize (graphic, width, height);
-  jbw_graphic_render (graphic);
+  jbw_graphic_resize (width, height);
+  jbw_graphic_render ();
 }
 
 static void
 jbw_sdl_draw_render ()
 {
-  jbw_graphic_render (graphic);
+  jbw_graphic_render ();
 }
 
 #elif HAVE_GLFW
@@ -49,22 +51,16 @@ jbw_sdl_draw_render ()
 JBWGraphic *graphic;
 
 static void
-jbw_glfw_draw_render ()
-{
-  jbw_graphic_render (graphic);
-}
-
-static void
 jbw_glfw_window_close (JBWGraphic * graphic)
 {
-  jbw_main_loop_quit ();
+  jbw_graphic_loop_quit ();
   glfwSetWindowShouldClose (graphic->window, 1);
 }
 
 #endif
 
 void
-draw1 (JBWGraphic * graphic)
+draw1 (JBWGraphic * graphic __attribute__((unused)))
 {
   const JBFLOAT x[3] = { 0., 1., 3. };
   const JBFLOAT y[3] = { 0., 1., 3. };
@@ -72,9 +68,9 @@ draw1 (JBWGraphic * graphic)
   const JBFLOAT z[3] = { 3., 1., 0. };
   const JBFLOAT zz[3] = { 2., 0.5, 0. };
   jbw_draw_clear (1.f, 1.f, 1.f, 0.f);
-  jbw_graphic_draw_lines (graphic, (JBFLOAT *) x, (JBFLOAT *) y,
+  jbw_graphic_draw_lines ((JBFLOAT *) x, (JBFLOAT *) y,
                           (JBFLOAT *) yy, (JBFLOAT *) z, (JBFLOAT *) zz, 2);
-  jbw_graphic_draw_logo (graphic);
+  jbw_graphic_draw_logo ();
 }
 
 void
@@ -87,22 +83,22 @@ draw2 (JBWGraphic * graphic)
   x1 = (-1.f * graphic->char_width * strlen (str1)) / graphic->width;
   x2 = (-1.f * graphic->char_width * strlen (str2)) / graphic->width;
   y = (-1.f * graphic->char_height) / graphic->height;
-  jbw_graphic_draw_text (graphic, str1, x1, -y, jbw_yellow);
-  jbw_graphic_draw_text (graphic, str2, x2, y, jbw_pink);
+  jbw_graphic_draw_text (str1, x1, -y, jbw_yellow);
+  jbw_graphic_draw_text (str2, x2, y, jbw_pink);
 }
 
 void
 cb_open1 (JBWGraphic * graphic)
 {
   jbw_graphic_set_draw (graphic, draw1);
-  jbw_graphic_render (graphic);
+  jbw_graphic_render ();
 }
 
 void
 cb_open2 (JBWGraphic * graphic)
 {
   jbw_graphic_set_draw (graphic, draw2);
-  jbw_graphic_render (graphic);
+  jbw_graphic_render ();
 }
 
 int
@@ -115,7 +111,7 @@ main (int argn, char **argc)
   SDL_Event exit_event[1];
 #endif
 #if WITH_GTK
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
   const char *close = "close-request";
 #else
   const char *close = "delete-event";
@@ -147,7 +143,7 @@ main (int argn, char **argc)
   jbw_graphic_set_zzlabel (graphic, "zz");
   jbw_graphic_set_grid (graphic, 1);
   jbw_graphic_set_resize (graphic, 0);
-  jbw_graphic_set_logo (graphic, "../test.png");
+  jbw_graphic_set_logo ("../test.png");
   graphic->xmin = 0.;
   graphic->xmax = 3.;
   graphic->ymin = 0.3;
@@ -157,18 +153,18 @@ main (int argn, char **argc)
 #if HAVE_GTKGLAREA
   jbw_graphic_show (graphic);
 #elif HAVE_FREEGLUT
-  jbw_graphic_init (graphic);
-  jbw_main_idle = jbw_freeglut_idle;
-  jbw_main_resize = jbw_freeglut_draw_resize;
-  jbw_main_render = jbw_freeglut_draw_render;
+  jbw_graphic_init ();
+  jbw_graphic_loop_idle = jbw_freeglut_idle;
+  jbw_graphic_loop_resize = jbw_freeglut_draw_resize;
+  jbw_graphic_loop_render = jbw_freeglut_draw_render;
 #elif HAVE_SDL
   exit_event->type = SDL_QUIT;
-  jbw_graphic_init (graphic);
-  jbw_main_resize = jbw_sdl_draw_resize;
-  jbw_main_render = jbw_sdl_draw_render;
+  jbw_graphic_init ();
+  jbw_graphic_loop_resize = jbw_sdl_draw_resize;
+  jbw_graphic_loop_render = jbw_sdl_draw_render;
 #elif HAVE_GLFW
-  jbw_graphic_init (graphic);
-  jbw_main_render = jbw_glfw_draw_render;
+  jbw_graphic_init ();
+  jbw_graphic_loop_render = jbw_graphic_render;
 #endif
   if (glewIsSupported ("GL_VERSION_4_0"))
     version = "OpenGL supported version 4.0";
@@ -197,22 +193,22 @@ main (int argn, char **argc)
   gtk_grid_attach (grid, GTK_WIDGET (button_open2), 1, 0, 1, 1);
   gtk_grid_attach (grid, GTK_WIDGET (button_close), 2, 0, 1, 1);
 
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
   window = (GtkWindow *) gtk_window_new ();
 #else
   window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
 #endif
   gtk_window_set_child (window, GTK_WIDGET (grid));
 #if HAVE_GTKGLAREA
-  jbw_main_loop_pointer = g_main_loop_new (NULL, 0);
+  jbw_graphic_loop_pointer = g_main_loop_new (NULL, 0);
   g_signal_connect_swapped (graphic->window, close,
                             (GCallback) g_main_loop_quit,
-                            jbw_main_loop_pointer);
+                            jbw_graphic_loop_pointer);
   g_signal_connect_swapped (button_close, "clicked",
                             (GCallback) g_main_loop_quit,
-                            jbw_main_loop_pointer);
+                            jbw_graphic_loop_pointer);
   g_signal_connect_swapped (window, close, (GCallback) g_main_loop_quit,
-                            jbw_main_loop_pointer);
+                            jbw_graphic_loop_pointer);
 #elif HAVE_FREEGLUT
   g_signal_connect (button_close, "clicked", (GCallback) glutLeaveMainLoop,
                     NULL);
@@ -232,16 +228,17 @@ main (int argn, char **argc)
                             graphic);
   g_signal_connect_swapped (button_open2, "clicked", (GCallback) cb_open2,
                             graphic);
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
   gtk_widget_show (GTK_WIDGET (window));
 #else
   gtk_widget_show_all (GTK_WIDGET (window));
 #endif
 #endif
+  jbw_gdk_gl_context = gdk_gl_context_get_current ();
 
-  jbw_main_loop ();
+  jbw_graphic_loop ();
 
-  jbw_graphic_destroy (graphic);
+  jbw_graphic_destroy ();
 #if WITH_GTK
   if (window)
     gtk_window_destroy (window);

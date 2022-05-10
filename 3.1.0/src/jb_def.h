@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2021, Javier Burguete Tolosa.
+ * Copyright 2005-2022, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_def.h
  * \brief Header file to define the basic macros and functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2021.
+ * \copyright Copyright 2005-2022.
  */
 #ifndef JB_DEF__H
 #define JB_DEF__H 1
@@ -57,10 +57,6 @@
 ///< Macro to use on terminal programs.
 #define JBW_GTK 2
 ///< Macro to use the GTK+ library on visual programs.
-#define JBW_GRAPHIC_OUTPUT_GDKPIXBUF 1
-///< Macro to use GdkPixbuf to save the JBWGraphic widget on a file.
-#define JBW_GRAPHIC_OUTPUT_PNG 2
-///< Macro to use libpng to save the JBWGraphic widget on a file.
 
 #include "jb_config.h"
 
@@ -70,10 +66,6 @@
 // Detecting configuration errors
 #if (JBW < JBW_NO || JBW > JBW_GTK)
 #error "Unknown JB windows"
-#endif
-#if (JBW_GRAPHIC_OUTPUT < JBW_GRAPHIC_OUTPUT_PIXBUF \
-     || JBW_GRAPHIC_OUTPUT > JBW_GRAPHIC_OUTPUT_PNG)
-#error "Unknown JB graphic output"
 #endif
 
 /**

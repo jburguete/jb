@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2021, Javier Burguete Tolosa.
+ * Copyright 2005-2022, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_win.c
  * \brief Source file with useful display functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2021, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2022, Javier Burguete Tolosa.
  */
 #include "jb_win.h"
 
@@ -75,6 +75,11 @@ exit_on_error:
 }
 
 #if JBW == JBW_GTK
+
+GdkGLContext *jbw_gdk_gl_context;
+///< GdkGLContext OpenGL context used in GTK widgets.
+JBWGraphic *jbw_graphic_pointer;
+///< pointer to the JBWGraphic current widget.
 
 #if HAVE_VULKAN
 
@@ -142,7 +147,7 @@ const GLfloat jbw_stargreen[4] = { 0.85f, 1.f, 0.85f, 1.f };
 ///> very light blue
 const GLfloat jbw_starblue[4] = { 0.85f, 0.85f, 1.f, 1.f };
 
-///<>very light gray
+///> very light gray
 const GLfloat jbw_stargray[4] = { 0.9f, 0.9f, 0.9f, 1.f };
 
 ///> white color intensities array.
@@ -156,29 +161,29 @@ const GLfloat jbw_identity[16] = {
 };                              ///< identity matrix.
 
 #if HAVE_GTKGLAREA
-int (*jbw_main_idle) () = NULL;
-GMainLoop *jbw_main_loop_pointer = NULL;
+int (*jbw_graphic_loop_idle) () = NULL;
+GMainLoop *jbw_graphic_loop_pointer = NULL;
 ///< pointer to the idle function on a main loop.
 #elif HAVE_FREEGLUT
-void (*jbw_main_idle) () = NULL;
+void (*jbw_graphic_loop_idle) () = NULL;
 ///< pointer to the idle function on a main loop.
-void (*jbw_main_resize) (int width, int height) = NULL;
+void (*jbw_graphic_loop_resize) (int width, int height) = NULL;
 ///< pointer to the resize function on a main loop.
-void (*jbw_main_render) () = NULL;
+void (*jbw_graphic_loop_render) () = NULL;
 ///< pointer to the render function on a main loop.
 #elif HAVE_SDL
-int (*jbw_main_idle) () = NULL;
+int (*jbw_graphic_loop_idle) () = NULL;
 ///< pointer to the idle function on a main loop.
-void (*jbw_main_resize) (int width, int height) = NULL;
+void (*jbw_graphic_loop_resize) (int width, int height) = NULL;
 ///< pointer to the resize function on a main loop.
-void (*jbw_main_render) () = NULL;
+void (*jbw_graphic_loop_render) () = NULL;
 ///< pointer to the render function on a main loop.
 #elif HAVE_GLFW
-int (*jbw_main_idle) () = NULL;
+int (*jbw_graphic_loop_idle) () = NULL;
 ///< pointer to the idle function on a main loop.
-void (*jbw_main_render) () = NULL;
+void (*jbw_graphic_loop_render) () = NULL;
 ///< pointer to the render function on a main loop.
-unsigned int jbw_main_exit;
+unsigned int jbw_graphic_loop_exit;
 ///< 1 on exit main loop, 0 on continue.
 #endif
 
@@ -211,82 +216,12 @@ jbw_init (int *argn __attribute__((unused)),
     }
 #endif
   gtk_disable_setlocale ();
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
   gtk_init ();
 #else
   gtk_init (argn, argc);
 #endif
   return 1;
-}
-
-/**
- * Function to do a main loop.
- */
-void
-jbw_main_loop ()
-{
-#if HAVE_GTKGLAREA
-
-  if (jbw_main_idle)
-    g_idle_add ((GSourceFunc) jbw_main_idle, NULL);
-  g_main_loop_run (jbw_main_loop_pointer);
-  g_main_loop_unref (jbw_main_loop_pointer);
-
-#elif HAVE_FREEGLUT
-
-  // Passing the GTK+ signals to the FreeGLUT main loop
-  glutIdleFunc (jbw_main_idle);
-  // Setting our draw resize function as the FreeGLUT reshape function
-  glutReshapeFunc (jbw_main_resize);
-  // Setting our draw function as the FreeGLUT display function
-  glutDisplayFunc (jbw_main_render);
-  // FreeGLUT main loop
-  glutMainLoop ();
-
-#elif HAVE_SDL
-
-  SDL_Event event[1];
-  GMainContext *context = g_main_context_default ();
-  jbw_main_render ();
-  while (1)
-    {
-      while (g_main_context_pending (context))
-        g_main_context_iteration (context, 0);
-      while (SDL_PollEvent (event))
-        {
-          if (event->type == SDL_QUIT)
-            return;
-          if (event->type == SDL_WINDOWEVENT)
-            {
-              if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-                {
-                  if (jbw_main_resize)
-                    jbw_main_resize (event->window.data1, event->window.data2);
-                }
-              else if (jbw_main_render)
-                jbw_main_render ();
-            }
-        }
-      if (jbw_main_idle && !jbw_main_idle ())
-        jbw_main_idle = NULL;
-    }
-
-#elif HAVE_GLFW
-
-  GMainContext *context = g_main_context_default ();
-  jbw_main_render ();
-  jbw_main_exit = 0;
-  while (!jbw_main_exit)
-    {
-      while (g_main_context_pending (context))
-        g_main_context_iteration (context, 0);
-      glfwPollEvents ();
-      if (jbw_main_idle && !jbw_main_idle ())
-        jbw_main_idle = NULL;
-      jbw_main_render ();
-    }
-
-#endif
 }
 
 /**
@@ -302,7 +237,7 @@ jbw_show_message (const char *title,    ///< message title.
   dlg = (GtkMessageDialog *) gtk_message_dialog_new
     (window_parent, GTK_DIALOG_MODAL, type, GTK_BUTTONS_OK, "%s", message);
   gtk_window_set_title (GTK_WINDOW (dlg), title);
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
   gtk_widget_show (GTK_WIDGET (dlg));
   g_signal_connect (GTK_WINDOW (dlg), "response",
                     G_CALLBACK (gtk_window_destroy), NULL);
@@ -815,7 +750,7 @@ end:
  * Function to create a new JBWImage widget from a PNG file.
  */
 JBWImage *
-jbw_image_new (char *name)      ///< PNG file name.
+jbw_image_new (const char *name) ///< PNG file name.
 {
   JBWImage *image = NULL;
   png_struct *png;
@@ -1904,10 +1839,10 @@ exit_on_error:
 #endif
 
 /**
- * Function to free the memory used by a JBWGraphic widget.
+ * Function to free the memory used by the current JBWGraphic widget.
  */
-void
-jbw_graphic_delete (JBWGraphic * graphic)       ///< JBWGraphic widget.
+static void
+jbw_graphic_delete (JBWGraphic * graphic)       ///< current JBWGraphic widget.
 {
   if (graphic->vbo_text)
     glDeleteBuffers (1, &graphic->vbo_text);
@@ -1934,14 +1869,16 @@ jbw_graphic_delete (JBWGraphic * graphic)       ///< JBWGraphic widget.
   if (graphic->logo)
     jbw_image_delete (graphic->logo);
   g_free (graphic);
+  jbw_graphic_pointer = NULL;
 }
 
 /**
- * Function to close and free the memory used by a JBWGraphic widget.
+ * Function to close and free the memory used by the current JBWGraphic widget.
  */
 void
-jbw_graphic_destroy (JBWGraphic * graphic)      ///< JBWGraphic widget.
+jbw_graphic_destroy ()
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   if (graphic->window)
 #if HAVE_GTKGLAREA
     gtk_window_destroy (graphic->window);
@@ -1952,14 +1889,13 @@ jbw_graphic_destroy (JBWGraphic * graphic)      ///< JBWGraphic widget.
 #elif HAVE_GLFW
     glfwDestroyWindow (graphic->window);
 #endif
-  jbw_graphic_delete (graphic);
 }
 
 /**
- * Function to init the OpenGL functions on a JBWGraphic widget.
+ * Function to init the OpenGL functions on the current JBWGraphic widget.
  */
 void
-jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
+jbw_graphic_init ()
 {
   const char *gl_version_120 =
     "#version 120\n" "#define in attribute\n" "#define out varying\n";
@@ -2016,16 +1952,15 @@ jbw_graphic_init (JBWGraphic * graphic) ///< JBWGraphic widget.
   const char *vs_3Dc_sources[2];
   const char *fs_text_sources[2];
   const char *vs_text_sources[2];
+  JBWGraphic *graphic;
   const char *gl_version;
   const char *error_msg;
   GLint error_code;
   GLuint fs, vs;
   GLenum glew_status;
 
-  // Selecting current OpenGL area
-#if HAVE_GTKGLAREA
-  gtk_gl_area_make_current (graphic->widget);
-#endif
+  // Current JBWGraphic widget
+  graphic = jbw_graphic_pointer;
 
   // Initing GLEW library
   glew_status = glewInit ();
@@ -2379,10 +2314,6 @@ init:
                                 ((1 + graphic->nxmax) * JBW_GRAPHIC_N_CHARS +
                                  1) * graphic->char_width,
                                 (5 + graphic->nymax) * graphic->char_height);
-#if HAVE_GTKGLAREA
-  g_signal_connect (graphic->window, "destroy",
-                    (GCallback) gtk_widget_destroyed, &graphic->window);
-#endif
 
   // ending on success
   graphic->init = 1;
@@ -2401,13 +2332,13 @@ end2:
 }
 
 /**
- * Function to resize a JBWGraphic widget.
+ * Function to resize the current JBWGraphic widget.
  */
 void
-jbw_graphic_resize (JBWGraphic * graphic,       ///< JBWGraphic widget.
-                    int width,  ///< new screen width.
+jbw_graphic_resize (int width,  ///< new screen width.
                     int height) ///< new screen height.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   width = JBM_MAX (width, graphic->minimum_width);
   height = JBM_MAX (height, graphic->minimum_height);
   graphic->width = width;
@@ -2419,11 +2350,12 @@ jbw_graphic_resize (JBWGraphic * graphic,       ///< JBWGraphic widget.
 }
 
 /**
- * Function to render a JBWGraphic widget.
+ * Function to render the current JBWGraphic widget.
  */
 void
-jbw_graphic_render (JBWGraphic * graphic)       ///< JBWGraphic widget.
+jbw_graphic_render ()
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   if (graphic->draw)
     graphic->draw (graphic);
 #if HAVE_GTKGLAREA
@@ -2437,13 +2369,123 @@ jbw_graphic_render (JBWGraphic * graphic)       ///< JBWGraphic widget.
 #endif
 }
 
+#if HAVE_GTKGLAREA
+
+static void
+jbw_graphic_init_gtk (GtkGLArea * widget)
+{
+  gtk_gl_area_make_current (widget);
+  jbw_graphic_init ();
+}
+
+static void
+jbw_graphic_resize_gtk (GtkGLArea * widget,
+                        int width, int height)
+{
+  jbw_graphic_resize (width, height);
+  gtk_widget_queue_draw (GTK_WIDGET (widget));
+}
+
+#elif HAVE_GLFW
+
+static void
+jbw_graphic_resize_glfw (GLFWwindow * window __attribute__((unused)),
+                         int width, int height)
+{
+  jbw_graphic_resize (width, height);
+}
+
+static void
+jbw_graphic_render_glfw (GLFWwindow * window __attribute__((unused)))
+{
+  jbw_graphic_render ();
+}
+
+#endif
+
 /**
- * Function to set the title label of a JBWGraphic widget.
+ * Function to do a main loop on the current JBWGraphic widget.
  */
 void
-jbw_graphic_set_title (JBWGraphic * graphic,    ///< JBWGraphic widget.
-                       const char *title)       ///< title label.
+jbw_graphic_loop ()
 {
+#if HAVE_GTKGLAREA
+
+  if (jbw_graphic_loop_idle)
+    g_idle_add ((GSourceFunc) jbw_graphic_loop_idle, NULL);
+  g_main_loop_run (jbw_graphic_loop_pointer);
+  g_main_loop_unref (jbw_graphic_loop_pointer);
+
+#elif HAVE_FREEGLUT
+
+  // Passing the GTK+ signals to the FreeGLUT main loop
+  glutIdleFunc (jbw_graphic_loop_idle);
+  // Setting our draw resize function as the FreeGLUT reshape function
+  glutReshapeFunc (jbw_graphic_loop_resize);
+  // Setting our draw function as the FreeGLUT display function
+  glutDisplayFunc (jbw_graphic_loop_render);
+  // FreeGLUT main loop
+  glutMainLoop ();
+
+#elif HAVE_SDL
+
+  SDL_Event event[1];
+  GMainContext *context = g_main_context_default ();
+  jbw_graphic_loop_render ();
+  while (1)
+    {
+      gdk_gl_context_make_current (jbw_gdk_gl_context);
+      while (g_main_context_pending (context))
+        g_main_context_iteration (context, 0);
+      SDL_GL_MakeCurrent (jbw_graphic_pointer->window,
+                          jbw_graphic_pointer->sdl_context);
+      while (SDL_PollEvent (event))
+        {
+          switch (event->type)
+            {
+            case SDL_QUIT:
+              return;
+            case SDL_WINDOWEVENT:
+              if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                {
+                  if (jbw_graphic_loop_resize)
+                    jbw_graphic_loop_resize (event->window.data1,
+                                             event->window.data2);
+                }
+              else if (jbw_graphic_loop_render)
+                jbw_graphic_loop_render ();
+            }
+        }
+      if (jbw_graphic_loop_idle && !jbw_graphic_loop_idle ())
+        jbw_graphic_loop_idle = NULL;
+    }
+
+#elif HAVE_GLFW
+
+  GMainContext *context = g_main_context_default ();
+  jbw_graphic_loop_render ();
+  jbw_graphic_loop_exit = 0;
+  while (!jbw_graphic_loop_exit)
+    {
+      gdk_gl_context_make_current (jbw_gdk_gl_context);
+      while (g_main_context_pending (context))
+        g_main_context_iteration (context, 0);
+      glfwMakeContextCurrent (jbw_graphic_pointer->window);
+      glfwPollEvents ();
+      if (jbw_graphic_loop_idle && !jbw_graphic_loop_idle ())
+        jbw_graphic_loop_idle = NULL;
+    }
+
+#endif
+}
+
+/**
+ * Function to set the title label of the current JBWGraphic widget.
+ */
+void
+jbw_graphic_set_title (const char *title)       ///< title label.
+{
+  JBWGraphic *graphic = jbw_graphic_pointer;
   graphic->str_title = title;
 #if HAVE_GTKGLAREA
   gtk_window_set_title (graphic->window, title);
@@ -2457,12 +2499,12 @@ jbw_graphic_set_title (JBWGraphic * graphic,    ///< JBWGraphic widget.
 }
 
 /**
- * Function to set the logo on a JBWGraphic widget.
+ * Function to set the logo on the current JBWGraphic widget.
  */
 void
-jbw_graphic_set_logo (JBWGraphic * graphic,     ///< JBWGraphic widget.
-                      char *name)       ///< logo PNG file name.
+jbw_graphic_set_logo (const char *name)       ///< logo PNG file name.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   if (graphic->logo)
     jbw_image_delete (graphic->logo);
   graphic->logo = jbw_image_new (name);
@@ -2525,16 +2567,22 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
       error_msg = _("unable to open the graphic area widget");
       goto error2;
     }
-  g_signal_connect_swapped (graphic->widget, "realize",
-                            (GCallback) jbw_graphic_init, graphic);
-  g_signal_connect_swapped (graphic->widget, "resize",
-                            (GCallback) jbw_graphic_resize, graphic);
-  g_signal_connect_swapped (graphic->widget, "render",
-                            (GCallback) jbw_graphic_render, graphic);
+  g_signal_connect (graphic->widget, "realize",
+                    (GCallback) jbw_graphic_init_gtk, NULL);
+  g_signal_connect (graphic->widget, "resize",
+                    (GCallback) jbw_graphic_resize_gtk, NULL);
+  g_signal_connect (graphic->widget, "render",
+                    (GCallback) jbw_graphic_render, NULL);
+#if GTK_MAJOR_VERSION > 3
+  graphic->window = (GtkWindow *) gtk_window_new ();
+#else
   graphic->window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_container_add (GTK_CONTAINER (graphic->window),
-                     GTK_WIDGET (graphic->widget));
+#endif
+  gtk_window_set_child (graphic->window, GTK_WIDGET (graphic->widget));
   gtk_window_set_title (graphic->window, title);
+  g_signal_connect_swapped (graphic->window, "destroy",
+                            (GCallback) jbw_graphic_delete, graphic);
+#endif
 #elif HAVE_FREEGLUT
   glutInitWindowSize (JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT);
   graphic->window = glutCreateWindow (title);
@@ -2550,7 +2598,8 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
       goto error2;
     }
   SDL_GL_SetAttribute (SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-  if (!SDL_GL_CreateContext (graphic->window))
+  graphic->sdl_context = SDL_GL_CreateContext (graphic->window);
+  if (!graphic->sdl_context)
     {
       error_msg = SDL_GetError ();
       goto error2;
@@ -2565,9 +2614,12 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
       goto error2;
     }
   glfwMakeContextCurrent (graphic->window);
+  glfwSetFramebufferSizeCallback (graphic->window, jbw_graphic_resize_glfw);
+  glfwSetWindowRefreshCallback (graphic->window, jbw_graphic_render_glfw);
 #endif
 
   // Return the widget pointer
+  jbw_graphic_pointer = graphic;
   return graphic;
 
   // Exit and show an error message on error
@@ -2581,11 +2633,12 @@ error1:
 }
 
 /**
- * Function to get the graphical size of a JBWGraphic widget.
+ * Function to get the graphical size of the current JBWGraphic widget.
  */
 void
-jbw_graphic_get_display_size (JBWGraphic * graphic)
+jbw_graphic_get_display_size ()
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
 #if HAVE_GTKGLAREA
   graphic->width
     = gtk_widget_get_allocated_width (GTK_WIDGET (graphic->widget));
@@ -2602,21 +2655,24 @@ jbw_graphic_get_display_size (JBWGraphic * graphic)
 }
 
 /**
- * Function to draw a string in a JBWGraphic widget.
+ * Function to draw a string in the current JBWGraphic widget.
  */
 void
-jbw_graphic_draw_text (JBWGraphic * graphic,    ///< JBWGraphic widget.
-                       const char *string,      ///< string.
+jbw_graphic_draw_text (const char *string,      ///< string.
                        GLfloat x,       ///< x initial position.
                        GLfloat y,       ///< y initial position.
                        const GLfloat * color)   ///< color intensities array.
 {
   GLfloat box[16];
+  JBWGraphic *graphic;
   FT_Face *face;
   GLfloat x2, y2, w, h, sx, sy;
   GLuint id;
   FT_UInt glyph;
   gunichar c;
+
+  // current JBWGraphic widget
+  graphic = jbw_graphic_pointer;
 
   // enabling OpenGL properties
   glEnable (GL_BLEND);
@@ -2694,11 +2750,13 @@ jbw_graphic_draw_text (JBWGraphic * graphic,    ///< JBWGraphic widget.
 }
 
 /**
- * Function to resize the graphic limits if map on a JBWGraphic widget.
+ * Function to resize the graphic limits if map on the current JBWGraphic 
+ * widget.
  */
 void
-jbw_graphic_map_resize (JBWGraphic * graphic)
+jbw_graphic_map_resize ()
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   register JBDOUBLE vw, vh, cw, ch;
   vw = graphic->x2 - graphic->x1;
   vh = graphic->y2 - graphic->y1;
@@ -2727,18 +2785,18 @@ jbw_graphic_map_resize (JBWGraphic * graphic)
 }
 
 /**
- * Function to get the limit coordinates on a JBWGraphic widget from 4 tabular
- * functions (JBFLOAT).
+ * Function to get the limit coordinates on the current JBWGraphic widget from 4
+ * tabular functions (JBFLOAT).
  */
 void
-jbw_graphic_draw_resize (JBWGraphic * graphic,  ///< JBWGraphic widget.
-                         JBFLOAT * x,   ///< x-coordinates array.
+jbw_graphic_draw_resize (JBFLOAT * x,   ///< x-coordinates array.
                          JBFLOAT * y1,  ///< 1st y-coordinates array.
                          JBFLOAT * y2,  ///< 2nd y-coordinates array.
                          JBFLOAT * z1,  ///< 1st z-coordinates array.
                          JBFLOAT * z2,  ///< 2nd z-coordinates array.
                          int n) ///< number of array elements.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   JBFLOAT k1, k2, kmin, kmax;
   jbm_farray_maxmin (x, n, &kmax, &kmin);
   graphic->xmax = (JBDOUBLE) kmax;
@@ -2770,18 +2828,18 @@ jbw_graphic_draw_resize (JBWGraphic * graphic,  ///< JBWGraphic widget.
 }
 
 /**
- * Function to get the limit coordinates on a JBWGraphic widget from 4 tabular
- * functions (JBDOUBLE).
+ * Function to get the limit coordinates on the current JBWGraphic widget from 4
+ * tabular functions (JBDOUBLE).
  */
 void
-jbw_graphic_draw_resizel (JBWGraphic * graphic, ///< JBWGraphic widget.
-                          JBDOUBLE * x, ///< x-coordinates array.
+jbw_graphic_draw_resizel (JBDOUBLE * x, ///< x-coordinates array.
                           JBDOUBLE * y1,        ///< 1st y-coordinates array.
                           JBDOUBLE * y2,        ///< 2nd y-coordinates array.
                           JBDOUBLE * z1,        ///< 1st z-coordinates array.
                           JBDOUBLE * z2,        ///< 2nd z-coordinates array.
                           int n)        ///< number of array elements.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   JBDOUBLE k1, k2, kmin, kmax;
   jbm_darray_maxmin (x, n, &kmax, &kmin);
   graphic->xmax = kmax;
@@ -2813,12 +2871,11 @@ jbw_graphic_draw_resizel (JBWGraphic * graphic, ///< JBWGraphic widget.
 }
 
 /**
- * Function to get the limit coordinates on a JBWGraphic widget from 4 tabular
- * functions defined by a struct array (JBFLOAT).
+ * Function to get the limit coordinates on the current JBWGraphic widget from 4
+ * tabular functions defined by a struct array (JBFLOAT).
  */
 void
-jbw_graphic_draw_resizev (JBWGraphic * graphic, ///< JBWGraphic widget.
-                          void *x,
+jbw_graphic_draw_resizev (void *x,
                           ///< pointer to the first x-coordinate element.
                           void *y1,
                           ///< pointer to the first 1st y-coordinate element.
@@ -2831,6 +2888,7 @@ jbw_graphic_draw_resizev (JBWGraphic * graphic, ///< JBWGraphic widget.
                           unsigned int size,    ///< struct size.
                           int n)        ///< last arrays element number.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   JBFLOAT k1, k2, kmin, kmax;
   jbm_varray_maxmin (x, size, n, &kmax, &kmin);
   graphic->xmax = (JBDOUBLE) kmax;
@@ -2862,12 +2920,11 @@ jbw_graphic_draw_resizev (JBWGraphic * graphic, ///< JBWGraphic widget.
 }
 
 /**
- * Function to get the limit coordinates on a JBWGraphic widget from 4 tabular
- * functions defined by a struct array (JBDOUBLE).
+ * Function to get the limit coordinates on the current JBWGraphic widget from 4
+ * tabular functions defined by a struct array (JBDOUBLE).
  */
 void
-jbw_graphic_draw_resizevl (JBWGraphic * graphic,        ///< JBWGraphic widget.
-                           void *x,
+jbw_graphic_draw_resizevl (void *x,
                            ///< pointer to the first x-coordinate element.
                            void *y1,
                            ///< pointer to the first 1st y-coordinate element.
@@ -2880,6 +2937,7 @@ jbw_graphic_draw_resizevl (JBWGraphic * graphic,        ///< JBWGraphic widget.
                            unsigned int size,   ///< struct size.
                            int n)       ///< last arrays element number.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   JBDOUBLE k1, k2, kmin, kmax;
   jbm_varray_maxminl (x, size, n, &kmax, &kmin);
   graphic->xmax = kmax;
@@ -2911,15 +2969,14 @@ jbw_graphic_draw_resizevl (JBWGraphic * graphic,        ///< JBWGraphic widget.
 }
 
 /**
- * Function to draw rectangles with color in a JBWGraphic widget.
+ * Function to draw rectangles with color in the current JBWGraphic widget.
  */
 void
-jbw_graphic_draw_rectangles_color (JBWGraphic * graphic,
-                                   ///< JBWGraphic widget.
-                                   GLfloat * vertex,    ///< vertex array.
+jbw_graphic_draw_rectangles_color (GLfloat * vertex,    ///< vertex array.
                                    GLushort * index,    ///< index array.
                                    unsigned int n)      ///< rectangles number.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   GLuint vao, ebo;
   glGenBuffers (1, &vao);
   glBindBuffer (GL_ARRAY_BUFFER, vao);
@@ -2944,18 +3001,21 @@ jbw_graphic_draw_rectangles_color (JBWGraphic * graphic,
 
 
 /**
- * Function to draw a tabuled function on a JBWGraphic widget (JBFLOAT).
+ * Function to draw a tabuled function on the current JBWGraphic widget
+ * (JBFLOAT).
  */
 void
-jbw_graphic_draw_farray (JBWGraphic * graphic,  ///< JBWGraphic struct.
-                         JBFLOAT * x,   ///< x-coordinates array.
+jbw_graphic_draw_farray (JBFLOAT * x,   ///< x-coordinates array.
                          JBFLOAT * y,   ///< y-coordinates array.
                          unsigned int n,        ///< number of array elements.
-                         const GLfloat * color, GLenum type)
+                         const GLfloat * color, ///< array of RGB colors.
+                         GLenum type)   ///< draw type.
 {
+  JBWGraphic *graphic;
   GLfloat *vertex;
   GLuint v;
   unsigned int i;
+  graphic = jbw_graphic_pointer;
   glUniform3fv (graphic->uniform_2D_color, 1, color);
   glGenBuffers (1, &v);
   glBindBuffer (GL_ARRAY_BUFFER, v);
@@ -2978,18 +3038,21 @@ jbw_graphic_draw_farray (JBWGraphic * graphic,  ///< JBWGraphic struct.
 }
 
 /**
- * Function to draw a tabuled function on a JBWGraphic widget (JBDOUBLE).
+ * Function to draw a tabuled function on the current JBWGraphic widget
+ * (JBDOUBLE).
  */
 void
-jbw_graphic_draw_darray (JBWGraphic * graphic,  ///< JBWGraphic struct.
-                         JBDOUBLE * x,  ///< x-coordinates array.
+jbw_graphic_draw_darray (JBDOUBLE * x,  ///< x-coordinates array.
                          JBDOUBLE * y,  ///< y-coordinates array.
                          unsigned int n,        ///< number of array elements.
-                         const GLfloat * color, GLenum type)
+                         const GLfloat * color,
+                         GLenum type)
 {
+  JBWGraphic *graphic;
   GLdouble *vertex;
   GLuint v;
   unsigned int i;
+  graphic = jbw_graphic_pointer;
   glUniform3fv (graphic->uniform_2D_color, 1, color);
   glGenBuffers (1, &v);
   glBindBuffer (GL_ARRAY_BUFFER, v);
@@ -3012,16 +3075,18 @@ jbw_graphic_draw_darray (JBWGraphic * graphic,  ///< JBWGraphic struct.
 }
 
 /**
- * Function to draw a tabuled function on a JBWGraphic widget (JBFLOAT).
+ * Function to draw a tabuled function on the current JBWGraphic widget 
+ * (JBFLOAT).
  */
 void
-jbw_graphic_draw_varray (JBWGraphic * graphic,  ///< JBWGraphic struct.
-                         void *x,       ///< x-coordinates array.
+jbw_graphic_draw_varray (void *x,       ///< x-coordinates array.
                          void *y,       ///< y-coordinates array.
                          unsigned int size,     ///< struct size.
                          unsigned int n,        ///< number of array elements.
-                         const GLfloat * color, GLenum type)
+                         const GLfloat * color, ///< array of RGB colors.
+                         GLenum type)   ///< draw type.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   GLfloat *vertex;
   GLuint v;
   unsigned int i;
@@ -3047,19 +3112,22 @@ jbw_graphic_draw_varray (JBWGraphic * graphic,  ///< JBWGraphic struct.
 }
 
 /**
- * Function to draw a tabuled function on a JBWGraphic widget (JBFLOAT).
+ * Function to draw a tabuled function on the current JBWGraphic widget (JBFLOAT).
  */
 void
-jbw_graphic_draw_varrayl (JBWGraphic * graphic, ///< JBWGraphic struct.
-                          void *x,      ///< x-coordinates array.
+jbw_graphic_draw_varrayl (void *x,      ///< x-coordinates array.
                           void *y,      ///< y-coordinates array.
                           unsigned int size,    ///< struct size.
                           unsigned int n,       ///< number of array elements.
-                          const GLfloat * color, GLenum type)
+                          const GLfloat * color,
+                          ///< array of RGB colors.
+                          GLenum type)   ///< draw type.
 {
+  JBWGraphic *graphic;
   GLdouble *vertex;
   GLuint v;
   unsigned int i;
+  graphic = jbw_graphic_pointer;
   glUniform3fv (graphic->uniform_2D_color, 1, color);
   glGenBuffers (1, &v);
   glBindBuffer (GL_ARRAY_BUFFER, v);
@@ -3082,11 +3150,10 @@ jbw_graphic_draw_varrayl (JBWGraphic * graphic, ///< JBWGraphic struct.
 }
 
 /**
- * Function to draw a rectangle on a JBWGraphic widget (JBFLOAT).
+ * Function to draw a rectangle on the current JBWGraphic widget (JBFLOAT).
  */
 void
-jbw_graphic_draw_rectangle (JBWGraphic * graphic,       ///< JBWGraphic widget.
-                            JBFLOAT x1, ///< 1st corner x-coordinate.
+jbw_graphic_draw_rectangle (JBFLOAT x1, ///< 1st corner x-coordinate.
                             JBFLOAT y1, ///< 1st corner y-coordinate.
                             JBFLOAT x2, ///< 2nd corner x-coordinate.
                             JBFLOAT y2, ///< 2nd corner y-coordinate.
@@ -3095,15 +3162,14 @@ jbw_graphic_draw_rectangle (JBWGraphic * graphic,       ///< JBWGraphic widget.
 {
   JBFLOAT x[4] = { x1, x2, x2, x1 };
   JBFLOAT y[4] = { y1, y1, y2, y2 };
-  jbw_graphic_draw_farray (graphic, x, y, 3, color, GL_LINE_LOOP);
+  jbw_graphic_draw_farray (x, y, 3, color, GL_LINE_LOOP);
 }
 
 /**
- * Function to draw a rectangle on a JBWGraphic widget (JBDOUBLE).
+ * Function to draw a rectangle on the current JBWGraphic widget (JBDOUBLE).
  */
 void
-jbw_graphic_draw_rectanglel (JBWGraphic * graphic,      ///< JBWGraphic widget.
-                             JBDOUBLE x1,       ///< 1st corner x-coordinate.
+jbw_graphic_draw_rectanglel (JBDOUBLE x1,       ///< 1st corner x-coordinate.
                              JBDOUBLE y1,       ///< 1st corner y-coordinate.
                              JBDOUBLE x2,       ///< 2nd corner x-coordinate.
                              JBDOUBLE y2,       ///< 2nd corner y-coordinate.
@@ -3112,27 +3178,29 @@ jbw_graphic_draw_rectanglel (JBWGraphic * graphic,      ///< JBWGraphic widget.
 {
   JBDOUBLE x[4] = { x1, x2, x2, x1 };
   JBDOUBLE y[4] = { y1, y1, y2, y2 };
-  jbw_graphic_draw_darray (graphic, x, y, 3, color, GL_LINE_LOOP);
+  jbw_graphic_draw_darray (x, y, 3, color, GL_LINE_LOOP);
 }
 
 /**
- * Function to set the viewport and to draw labels, tics and grid on a
+ * Function to set the viewport and to draw labels, tics and grid on the current
  * JBWGraphic widget.
  */
 void
-jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
+jbw_graphic_draw_labels ()
 {
   JBDOUBLE xtic[JBW_GRAPHIC_N_TICS];
   JBDOUBLE ytic[JBW_GRAPHIC_N_TICS];
   JBDOUBLE ztic[JBW_GRAPHIC_N_TICS];
   JBFLOAT x[2 * JBW_GRAPHIC_N_TICS];
   JBFLOAT y[2 * JBW_GRAPHIC_N_TICS];
+  char buffer[512];
+  JBWGraphic *graphic;
   const GLfloat *color_x, *color_y, *color_z;
   JBFLOAT kx, ky, kz;
   GLfloat k, x1, x2, y1, y2, sx, sy, sa, sb;
-  char buffer[512];
   int i;
-  jbw_graphic_get_display_size (graphic);
+  graphic = jbw_graphic_pointer;
+  jbw_graphic_get_display_size ();
   jbw_draw_clear (1.f, 1.f, 1.f, 0.f);
   glViewport (0, 0, graphic->width, graphic->height);
   sx = (2.f * graphic->char_width) / graphic->width;
@@ -3147,7 +3215,7 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
     {
       k -= sy;
       graphic->y2 -= graphic->char_height;
-      jbw_graphic_draw_text (graphic, graphic->str_title,
+      jbw_graphic_draw_text (graphic->str_title,
                              -0.5f * sx * strlen (graphic->str_title), sb + k,
                              jbw_black);
     }
@@ -3158,9 +3226,9 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
       k -= sy;
       graphic->y2 -= graphic->char_height;
       if (graphic->str_y)
-        jbw_graphic_draw_text (graphic, graphic->str_y, -1.f, sb + k, jbw_blue);
+        jbw_graphic_draw_text (graphic->str_y, -1.f, sb + k, jbw_blue);
       if (graphic->str_z)
-        jbw_graphic_draw_text (graphic, graphic->str_z,
+        jbw_graphic_draw_text (graphic->str_z,
                                1.f - sx * strlen (graphic->str_z), sb + k,
                                jbw_red);
     }
@@ -3169,10 +3237,10 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
       k -= sy;
       graphic->y2 -= graphic->char_height;
       if (graphic->str_yy)
-        jbw_graphic_draw_text (graphic, graphic->str_yy, -1.f, sb + k,
+        jbw_graphic_draw_text (graphic->str_yy, -1.f, sb + k,
                                jbw_green);
       if (graphic->str_zz)
-        jbw_graphic_draw_text (graphic, graphic->str_zz,
+        jbw_graphic_draw_text (graphic->str_zz,
                                1.f - sx * strlen (graphic->str_zz), sb + k,
                                jbw_brown);
     }
@@ -3185,7 +3253,7 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
   else
     graphic->x2 -= ceil (0.5f * JBW_GRAPHIC_N_CHARS * graphic->char_width);
   if (graphic->map)
-    jbw_graphic_map_resize (graphic);
+    jbw_graphic_map_resize ();
   x1 = (2.f * graphic->x1) / graphic->width - 1.f;
   x2 = (2.f * graphic->x2) / graphic->width - 1.f;
   y1 = (2.f * graphic->y1) / graphic->height - 1.f;
@@ -3195,7 +3263,7 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
       jbw_draw_rangel (&graphic->xmin, &graphic->xmax);
       jbw_draw_ticsl (graphic->xmin, graphic->xmax,
                       graphic->nxmax, &graphic->nx, graphic->xtic);
-      jbw_graphic_draw_text (graphic, graphic->str_x,
+      jbw_graphic_draw_text (graphic->str_x,
                              ((float) graphic->x1 + graphic->x2)
                              / graphic->width - 1.f
                              - 0.5f * sx * strlen (graphic->str_x),
@@ -3207,7 +3275,7 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
             jbm_extrapolatel (graphic->xtic[i], graphic->xmin, graphic->xmax,
                               (JBDOUBLE) x1, (JBDOUBLE) x2);
           k = (GLfloat) xtic[i];
-          jbw_graphic_draw_text (graphic, buffer,
+          jbw_graphic_draw_text (buffer,
                                  k - 0.5f * sx * strlen (buffer),
                                  sb - 1.f + sy, jbw_black);
         }
@@ -3226,7 +3294,7 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
             jbm_extrapolatel (graphic->ytic[i], graphic->ymin, graphic->ymax,
                               (JBDOUBLE) y1, (JBDOUBLE) y2);
           k = (GLfloat) ytic[i];
-          jbw_graphic_draw_text (graphic, buffer,
+          jbw_graphic_draw_text (buffer,
                                  x1 - sx * strlen (buffer) - sa,
                                  sb + k - 0.5f * sy, jbw_blue);
         }
@@ -3245,7 +3313,7 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
             jbm_extrapolatel (graphic->ztic[i], graphic->zmin, graphic->zmax,
                               (JBDOUBLE) y1, (JBDOUBLE) y2);
           k = (GLfloat) ztic[i];
-          jbw_graphic_draw_text (graphic, buffer, x2 + sa, sb + k - 0.5f * sy,
+          jbw_graphic_draw_text (buffer, x2 + sa, sb + k - 0.5f * sy,
                                  jbw_red);
         }
     }
@@ -3278,7 +3346,7 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
           y[2 * i] = y1;
           y[2 * i + 1] = kx;
         }
-      jbw_graphic_draw_farray (graphic, x, y, 2 * i - 1, color_x, GL_LINES);
+      jbw_graphic_draw_farray (x, y, 2 * i - 1, color_x, GL_LINES);
     }
   if (graphic->nz)
     {
@@ -3288,7 +3356,7 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
           x[2 * i] = kz;
           x[2 * i + 1] = x2;
         }
-      jbw_graphic_draw_farray (graphic, x, y, 2 * i - 1, color_z, GL_LINES);
+      jbw_graphic_draw_farray (x, y, 2 * i - 1, color_z, GL_LINES);
     }
   if (graphic->ny)
     {
@@ -3298,46 +3366,47 @@ jbw_graphic_draw_labels (JBWGraphic * graphic)  ///< JBWGraphic widget.
           x[2 * i] = x1;
           x[2 * i + 1] = ky;
         }
-      jbw_graphic_draw_farray (graphic, x, y, 2 * i - 1, color_y, GL_LINES);
+      jbw_graphic_draw_farray (x, y, 2 * i - 1, color_y, GL_LINES);
     }
-  jbw_graphic_draw_rectangle (graphic, (JBFLOAT) x1, (JBFLOAT) y1,
+  jbw_graphic_draw_rectangle ((JBFLOAT) x1, (JBFLOAT) y1,
                               (JBFLOAT) x2, (JBFLOAT) y2, jbw_black);
   glViewport (graphic->x1, graphic->y1,
               graphic->x2 - graphic->x1, graphic->y2 - graphic->y1);
 }
 
 /**
- * Function to render the logo in a JBWGraphic widget.
+ * Function to render the logo in the current JBWGraphic widget.
  */
 void
-jbw_graphic_draw_logo (JBWGraphic * graphic)    ///< JBWGraphic widget.
+jbw_graphic_draw_logo ()
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   JBWImage *logo = graphic->logo;
   if (logo)
     jbw_image_draw (logo, 0, 0, graphic->width, graphic->height);
 }
 
 /**
- * Function to draw lines defined by float arrays in a JBWGraphic widget
- * (JBFLOAT).
+ * Function to draw lines defined by float arrays in the current JBWGraphic
+ * widget (JBFLOAT).
  */
 void
-jbw_graphic_draw_lines (JBWGraphic * graphic,   ///< JBWGraphic widget.
-                        JBFLOAT * x,    ///< x-coordinates array.
+jbw_graphic_draw_lines (JBFLOAT * x,    ///< x-coordinates array.
                         JBFLOAT * y1,   ///< 1st y-coordinates array.
                         JBFLOAT * y2,   ///< 2nd y-coordinates array.
                         JBFLOAT * z1,   ///< 1st z-coordinates array.
                         JBFLOAT * z2,   ///< 2nd z-coordinates array.
                         int n)  ///< last arrays element number.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   if (!x)
     {
-      jbw_graphic_draw_labels (graphic);
+      jbw_graphic_draw_labels ();
       return;
     }
   if (graphic->resize)
-    jbw_graphic_draw_resize (graphic, x, y1, y2, z1, z2, n);
-  jbw_graphic_draw_labels (graphic);
+    jbw_graphic_draw_resize (x, y1, y2, z1, z2, n);
+  jbw_graphic_draw_labels ();
   if (y1 || y2)
     {
       jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
@@ -3346,9 +3415,9 @@ jbw_graphic_draw_lines (JBWGraphic * graphic,   ///< JBWGraphic widget.
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->ymax - graphic->ymin);
       if (y1)
-        jbw_graphic_draw_farray (graphic, x, y1, n, jbw_blue, GL_LINE_STRIP);
+        jbw_graphic_draw_farray (x, y1, n, jbw_blue, GL_LINE_STRIP);
       if (y2)
-        jbw_graphic_draw_farray (graphic, x, y2, n, jbw_brown, GL_LINE_STRIP);
+        jbw_graphic_draw_farray (x, y2, n, jbw_brown, GL_LINE_STRIP);
     }
   if (z1 || z2)
     {
@@ -3358,33 +3427,33 @@ jbw_graphic_draw_lines (JBWGraphic * graphic,   ///< JBWGraphic widget.
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->zmax - graphic->zmin);
       if (z1)
-        jbw_graphic_draw_farray (graphic, x, z1, n, jbw_red, GL_LINE_STRIP);
+        jbw_graphic_draw_farray (x, z1, n, jbw_red, GL_LINE_STRIP);
       if (z2)
-        jbw_graphic_draw_farray (graphic, x, z2, n, jbw_green, GL_LINE_STRIP);
+        jbw_graphic_draw_farray (x, z2, n, jbw_green, GL_LINE_STRIP);
     }
 }
 
 /**
- * Function to draw lines defined by float arrays in a JBWGraphic widget
- * (JBDOUBLE).
+ * Function to draw lines defined by float arrays in the current JBWGraphic 
+ * widget (JBDOUBLE).
  */
 void
-jbw_graphic_draw_linesl (JBWGraphic * graphic,  ///< JBWGraphic widget.
-                         JBDOUBLE * x,  ///< x-coordinates array.
+jbw_graphic_draw_linesl (JBDOUBLE * x,  ///< x-coordinates array.
                          JBDOUBLE * y1, ///< 1st y-coordinates array.
                          JBDOUBLE * y2, ///< 2nd y-coordinates array.
                          JBDOUBLE * z1, ///< 1st z-coordinates array.
                          JBDOUBLE * z2, ///< 2nd z-coordinates array.
                          int n) ///< last arrays element number.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   if (!x)
     {
-      jbw_graphic_draw_labels (graphic);
+      jbw_graphic_draw_labels ();
       return;
     }
   if (graphic->resize)
-    jbw_graphic_draw_resizel (graphic, x, y1, y2, z1, z2, n);
-  jbw_graphic_draw_labels (graphic);
+    jbw_graphic_draw_resizel (x, y1, y2, z1, z2, n);
+  jbw_graphic_draw_labels ();
   if (y1 || y2)
     {
       jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
@@ -3393,9 +3462,9 @@ jbw_graphic_draw_linesl (JBWGraphic * graphic,  ///< JBWGraphic widget.
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->ymax - graphic->ymin);
       if (y1)
-        jbw_graphic_draw_darray (graphic, x, y1, n, jbw_blue, GL_LINE_STRIP);
+        jbw_graphic_draw_darray (x, y1, n, jbw_blue, GL_LINE_STRIP);
       if (y2)
-        jbw_graphic_draw_darray (graphic, x, y2, n, jbw_brown, GL_LINE_STRIP);
+        jbw_graphic_draw_darray (x, y2, n, jbw_brown, GL_LINE_STRIP);
     }
   if (z1 || z2)
     {
@@ -3405,19 +3474,18 @@ jbw_graphic_draw_linesl (JBWGraphic * graphic,  ///< JBWGraphic widget.
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->ymax - graphic->ymin);
       if (z1)
-        jbw_graphic_draw_darray (graphic, x, z1, n, jbw_red, GL_LINE_STRIP);
+        jbw_graphic_draw_darray (x, z1, n, jbw_red, GL_LINE_STRIP);
       if (z2)
-        jbw_graphic_draw_darray (graphic, x, z2, n, jbw_green, GL_LINE_STRIP);
+        jbw_graphic_draw_darray (x, z2, n, jbw_green, GL_LINE_STRIP);
     }
 }
 
 /**
- * Function to draw lines defined by struct arrays in a JBWGraphic widget
- * (JBFLOAT).
+ * Function to draw lines defined by struct arrays in the current JBWGraphic
+ * widget (JBFLOAT).
  */
 void
-jbw_graphic_draw_linesv (JBWGraphic * graphic,  ///< JBWGraphic widget.
-                         void *x,
+jbw_graphic_draw_linesv (void *x,
                          ///< pointer to the first x-coordinate element.
                          void *y1,
                          ///< pointer to the first 1st y-coordinate element.
@@ -3430,14 +3498,15 @@ jbw_graphic_draw_linesv (JBWGraphic * graphic,  ///< JBWGraphic widget.
                          unsigned int size,     ///< struct size.
                          int n) ///< last arrays element number.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   if (!x)
     {
-      jbw_graphic_draw_labels (graphic);
+      jbw_graphic_draw_labels ();
       return;
     }
   if (graphic->resize)
-    jbw_graphic_draw_resizev (graphic, x, y1, y2, z1, z2, size, n);
-  jbw_graphic_draw_labels (graphic);
+    jbw_graphic_draw_resizev (x, y1, y2, z1, z2, size, n);
+  jbw_graphic_draw_labels ();
   if (y1 || y2)
     {
       jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
@@ -3446,10 +3515,10 @@ jbw_graphic_draw_linesv (JBWGraphic * graphic,  ///< JBWGraphic widget.
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->ymax - graphic->ymin);
       if (y1)
-        jbw_graphic_draw_varray (graphic, x, y1, size, n, jbw_blue,
+        jbw_graphic_draw_varray (x, y1, size, n, jbw_blue,
                                  GL_LINE_STRIP);
       if (y2)
-        jbw_graphic_draw_varray (graphic, x, y2, size, n, jbw_brown,
+        jbw_graphic_draw_varray (x, y2, size, n, jbw_brown,
                                  GL_LINE_STRIP);
     }
   if (z1 || z2)
@@ -3460,21 +3529,20 @@ jbw_graphic_draw_linesv (JBWGraphic * graphic,  ///< JBWGraphic widget.
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->zmax - graphic->zmin);
       if (z1)
-        jbw_graphic_draw_varray (graphic, x, z1, size, n, jbw_red,
+        jbw_graphic_draw_varray (x, z1, size, n, jbw_red,
                                  GL_LINE_STRIP);
       if (z2)
-        jbw_graphic_draw_varray (graphic, x, z2, size, n, jbw_green,
+        jbw_graphic_draw_varray (x, z2, size, n, jbw_green,
                                  GL_LINE_STRIP);
     }
 }
 
 /**
- * Function to draw lines defined by struct arrays in a JBWGraphic widget
- * (JBDOUBLE).
+ * Function to draw lines defined by struct arrays in the current JBWGraphic 
+ * widget (JBDOUBLE).
  */
 void
-jbw_graphic_draw_linesvl (JBWGraphic * graphic, ///< JBWGraphic widget.
-                          void *x,
+jbw_graphic_draw_linesvl (void *x,
                           ///< pointer to the first x-coordinate element.
                           void *y1,
                           ///< pointer to the first 1st y-coordinate element.
@@ -3487,14 +3555,15 @@ jbw_graphic_draw_linesvl (JBWGraphic * graphic, ///< JBWGraphic widget.
                           unsigned int size,    ///< struct size.
                           int n)        ///< last arrays element number.
 {
+  JBWGraphic *graphic = jbw_graphic_pointer;
   if (!x)
     {
-      jbw_graphic_draw_labels (graphic);
+      jbw_graphic_draw_labels ();
       return;
     }
   if (graphic->resize)
-    jbw_graphic_draw_resizevl (graphic, x, y1, y2, z1, z2, size, n);
-  jbw_graphic_draw_labels (graphic);
+    jbw_graphic_draw_resizevl (x, y1, y2, z1, z2, size, n);
+  jbw_graphic_draw_labels ();
   if (y1 || y2)
     {
       jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
@@ -3503,10 +3572,10 @@ jbw_graphic_draw_linesvl (JBWGraphic * graphic, ///< JBWGraphic widget.
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->ymax - graphic->ymin);
       if (y1)
-        jbw_graphic_draw_varrayl (graphic, x, y1, size, n, jbw_blue,
+        jbw_graphic_draw_varrayl (x, y1, size, n, jbw_blue,
                                   GL_LINE_STRIP);
       if (y2)
-        jbw_graphic_draw_varrayl (graphic, x, y2, size, n, jbw_brown,
+        jbw_graphic_draw_varrayl (x, y2, size, n, jbw_brown,
                                   GL_LINE_STRIP);
     }
   if (z1 || z2)
@@ -3517,61 +3586,28 @@ jbw_graphic_draw_linesvl (JBWGraphic * graphic, ///< JBWGraphic widget.
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->zmax - graphic->zmin);
       if (z1)
-        jbw_graphic_draw_varrayl (graphic, x, z1, size, n, jbw_red,
+        jbw_graphic_draw_varrayl (x, z1, size, n, jbw_red,
                                   GL_LINE_STRIP);
       if (z2)
-        jbw_graphic_draw_varrayl (graphic, x, z2, size, n, jbw_green,
+        jbw_graphic_draw_varrayl (x, z2, size, n, jbw_green,
                                   GL_LINE_STRIP);
     }
 }
 
 /**
- * Function to save the JBWGraphic widget on a file.
+ * Function to save the current JBWGraphic widget on a file.
  */
 void
-jbw_graphic_save (JBWGraphic * graphic, ///< JBWGraphic struct.
-                  char *file_name)      ///< file name.
+jbw_graphic_save (char *file_name)      ///< file name.
 {
-  // function gdk_pixbuf_get_from_window is not working
-#if JBW_GRAPHIC_OUTPUT == JBW_GRAPHIC_OUTPUT_GDKPIXBUF
-  GdkWindow *window;
-  GdkPixbuf *pixbuf;
-  GError *error;
-  const char *t;
-  char *ext;
-  jbw_graphic_get_display_size (graphic);
-  gtk_window_present (graphic->window);
-  window = gtk_widget_get_window (GTK_WIDGET (graphic->widget));
-  pixbuf = gdk_pixbuf_get_from_window (window, 0, 0, graphic->width,
-                                       graphic->height);
-  if (!pixbuf)
-    {
-      jbw_show_error2 ("JBWGraphic", _("unable to get the GdkPixbuf widget"));
-      return;
-    }
-  ext = strrchr (file_name, '.');
-  t = "png";
-  if (ext && ext != file_name)
-    {
-      if (!strcasecmp (ext, "jpg") || !strcasecmp (ext, "jpeg"))
-        t = "jpeg";
-      else if (!strcasecmp (ext, "xpm"))
-        t = "xpm";
-      else if (!strcasecmp (ext, "tif") || !strcasecmp (ext, "tiff"))
-        t = "tiff";
-      else if (!strcasecmp (ext, "bmp"))
-        t = "bmp";
-      else if (!strcasecmp (ext, "ico"))
-        t = "ico";
-    }
-  gdk_pixbuf_save (pixbuf, file_name, t, &error, NULL);
-#else
+  JBWGraphic *graphic;
   png_struct *png;
   png_info *info;
   png_byte **row_pointers;
   GLubyte *pixels;
   FILE *file;
   unsigned int row_bytes, pointers_bytes, pixels_bytes, i, x2, y2;
+  graphic = jbw_graphic_pointer;
   jbw_graphic_get_display_size (graphic);
   x2 = graphic->width;
   y2 = graphic->height;
@@ -3639,19 +3675,17 @@ jbw_graphic_save (JBWGraphic * graphic, ///< JBWGraphic struct.
   png_write_end (png, NULL);
   fclose (file);
   png_destroy_write_struct (&png, &info);
-#endif
 }
 
 /**
- * function to save the view of a JBWGraphic widget on a file.
+ * function to save the view of the current JBWGraphic widget on a file.
  */
 static void
-jbw_graphic_dialog_response (JBWGraphic * graphic,
-                             ///< JBWGraphic struct.
-                             int id,    ///< response identifier.
-                             GtkFileChooserDialog * dlg)
+jbw_graphic_dialog_response (GtkFileChooserDialog * dlg,
                              ///< GtkFileChooserDialog struct.
+                             int id)    ///< response identifier.
 {
+  JBWGraphic *graphic;
   GMainContext *context;
   char *buffer;
   if (id == GTK_RESPONSE_ACCEPT)
@@ -3659,11 +3693,12 @@ jbw_graphic_dialog_response (JBWGraphic * graphic,
       buffer = gtk_file_chooser_get_current_name (GTK_FILE_CHOOSER (dlg));
       if (buffer)
         {
+          graphic = jbw_graphic_pointer;
           context = g_main_context_default ();
           graphic->draw (graphic);
           while (g_main_context_pending (context))
             g_main_context_iteration (context, 0);
-          jbw_graphic_save (graphic, buffer);
+          jbw_graphic_save (buffer);
           g_free (buffer);
         }
     }
@@ -3674,7 +3709,7 @@ jbw_graphic_dialog_response (JBWGraphic * graphic,
  * Function to show a dialog to save the JBWGraphic widget on a graphic file.
  */
 void
-jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
+jbw_graphic_dialog_save ()
 {
 #if JBW_GRAPHIC_OUTPUT == JBW_GRAPHIC_OUTPUT_GDKPIXBUF
   const char *filter_name[JBW_GRAPHIC_N_TYPES] = {
@@ -3718,9 +3753,9 @@ jbw_graphic_dialog_save (JBWGraphic * graphic)  ///< JBWGraphic struct.
           gtk_file_filter_add_pattern (filter, pattern[j][i]);
       gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dlg), filter);
     }
-  g_signal_connect_swapped (dlg, "response",
-                            G_CALLBACK (jbw_graphic_dialog_response), graphic);
-#if GTK4
+  g_signal_connect (dlg, "response", G_CALLBACK (jbw_graphic_dialog_response), 
+                    NULL);
+#if GTK_MAJOR_VERSION > 3
   gtk_widget_show (GTK_WIDGET (dlg));
 #else
   gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dlg), 1);
@@ -4210,7 +4245,7 @@ jbw_array_editor_insert_last (JBWArrayEditor * editor)
   if (j > 0)
     for (; i < editor->ncolumns; ++i)
       jbw_array_editor_insert_entry_end (editor, i, j - 1, k);
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
   gtk_widget_show (GTK_WIDGET (editor->grid));
 #else
   gtk_widget_show_all (GTK_WIDGET (editor->grid));
@@ -4264,7 +4299,7 @@ jbw_array_editor_remove_entry_end (JBWArrayEditor * editor,
                                    int column,  ///< column number.
                                    int row)     ///< last row number.
 {
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
   gtk_grid_remove (editor->grid, editor->matrix_entry[column][row]);
 #else
   gtk_widget_destroy (editor->matrix_entry[column][row]);
@@ -4285,7 +4320,7 @@ jbw_array_editor_remove_last (JBWArrayEditor * editor)
   if (editor->nrows <= 0)
     return;
   j = --editor->nrows;
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
   gtk_grid_remove (editor->grid, GTK_WIDGET (editor->button_numeric[j]));
 #else
   gtk_widget_destroy (GTK_WIDGET (editor->button_numeric[j]));
@@ -4346,7 +4381,7 @@ jbw_array_editor_set_rows (JBWArrayEditor * editor,
     jbw_array_editor_remove_last (editor);
   for (; i < n; ++i)
     jbw_array_editor_insert_last (editor);
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
   gtk_widget_show (GTK_WIDGET (editor->grid));
 #else
   gtk_widget_show_all (GTK_WIDGET (editor->grid));
@@ -4407,7 +4442,7 @@ jbw_array_editor_new (int ncolumns,     ///< number of columns.
       error_msg = _("not enough memory to open the array editor");
       goto error1;
     }
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
   editor->scrolled = (GtkScrolledWindow *) gtk_scrolled_window_new ();
 #else
   editor->scrolled = (GtkScrolledWindow *) gtk_scrolled_window_new (0, 0);
@@ -4445,7 +4480,7 @@ error1:
   return NULL;
 }
 
-#if GTK4
+#if GTK_MAJOR_VERSION > 3
 
 /**
  * function to set a text on a GtkEntry struct as in GTK3.

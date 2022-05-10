@@ -134,7 +134,7 @@ $(jb_win_bin_pgo): $(windep)
 	$(CC) $(CFLAGS) $(PGOGENERATE) -c -fPIC -DJBW=1 $(jb_win_c) \
 		-o $(jb_win_bin_pgo)
 $(jb_win_pgo): $(windep)
-	$(CC) $(CFLAGS) $(PGOGENERATE) -c -fPIC @JBW@ @GTK4@ $(jb_win_c) \
+	$(CC) $(CFLAGS) $(PGOGENERATE) -c -fPIC @JBW@ $(jb_win_c) \
 		-o $(jb_win_pgo)
 
 # PGO dynamic libraries
@@ -164,7 +164,7 @@ $(test_xml_pgo): $(test_xml_c) $(libjbpgo) $(libjbmpgo) $(libjbxmlpgo)
 		$(EXEFLAGSPGO) -ljb -ljbm -ljbxml
 	cd $(BINPGO); ./test_xml
 $(test_win_pgo): $(test_win_c) $(libjbpgo) $(libjbmpgo) $(libjbwpgo)
-	$(CC) $(CFLAGS) $(PGOGENERATE) @JBW@ @GTK4@ $(test_win_c) -o $(test_win_pgo) \
+	$(CC) $(CFLAGS) $(PGOGENERATE) @JBW@ $(test_win_c) -o $(test_win_pgo) \
 		$(EXEFLAGSPGO) -ljb -ljbm -ljbw
 	cd $(BINPGO); ./test_win
 
@@ -178,7 +178,7 @@ $(jb_xml_o): $(XMLDEP)
 $(jb_win_bin_o): $(WINDEP)
 	$(CC) $(CFLAGS) $(PGOUSE) -c -fPIC -DJBW=1 $(jb_win_c) -o $(jb_win_bin_o)
 $(jb_win_o): $(WINDEP)
-	$(CC) $(CFLAGS) $(PGOUSE) -c -fPIC @JBW@ @GTK4@ $(jb_win_c) -o $(jb_win_o)
+	$(CC) $(CFLAGS) $(PGOUSE) -c -fPIC @JBW@ $(jb_win_c) -o $(jb_win_o)
 
 # Dynamic libraries
 $(libjb): $(jb_def_o)
@@ -200,8 +200,8 @@ $(test_xml): $(test_xml_c) $(libjb) $(libjbm) $(libjbbin)
 	$(CC) $(CFLAGS) $(PGOUSE) -DJBW=1 $(test_xml_c) -o $(test_xml) $(EXEFLAGS) \
 		-ljb -ljbm -ljbxml
 $(test_win): $(test_win_c) $(libjb) $(libjbm) $(libjbw)
-	$(CC) $(CFLAGS) $(PGOUSE) @JBW@ @GTK4@ $(test_win_c) -o $(test_win) \
-		$(EXEFLAGS) -ljb -ljbm -ljbw
+	$(CC) $(CFLAGS) $(PGOUSE) @JBW@ $(test_win_c) -o $(test_win) $(EXEFLAGS) \
+		-ljb -ljbm -ljbw
 
 # Shaders
 shaders/2D.spv: shaders/2D.vert Makefile

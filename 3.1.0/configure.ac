@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([jb],[2.4.19],[https://github.com/jburguete/jb])
+AC_INIT([jb],[3.1.0],[https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -139,11 +139,9 @@ else
 	fi
 fi
 if test $gtk4 = 1; then
-	AC_SUBST(GTK4, "-DGTK4=1")
 	AC_SUBST(JBW, [-DJBW=2])
 	gtk=1
 else
-	AC_SUBST(GTK4, "-DGTK4=0")
 	if test $gtk3 = 1; then
 		PKG_CHECK_MODULES([GTK], [gtk+-3.0],
 			[AC_MSG_NOTICE([With GTK])],
