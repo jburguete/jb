@@ -2582,7 +2582,6 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
   gtk_window_set_title (graphic->window, title);
   g_signal_connect_swapped (graphic->window, "destroy",
                             (GCallback) jbw_graphic_delete, graphic);
-#endif
 #elif HAVE_FREEGLUT
   glutInitWindowSize (JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT);
   graphic->window = glutCreateWindow (title);
