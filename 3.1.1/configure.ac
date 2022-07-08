@@ -42,6 +42,9 @@ elif test `uname -s` = "DragonFly"; then
 	AC_MSG_NOTICE([DragonFly BSD])
 	LDFLAGS="$LDFLAGS -L/usr/local/lib"
 	CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+elif test `uname -s` = "SunOS"; then
+	AC_MSG_NOTICE([SunOS])
+	AC_SUBST(gnu, [/usr/gnu/bin/])
 fi
 
 # Checks for programs
