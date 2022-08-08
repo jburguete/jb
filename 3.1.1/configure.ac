@@ -219,9 +219,14 @@ AC_CHECK_FUNC([get_nprocs], AC_DEFINE([HAVE_GET_NPROCS], [1]))
 # Check for font
 if test $gtk = 1; then
 	AC_MSG_NOTICE([Searching font...])
-	font=`find /usr -type f -iname freemono.otf`
+  if test $win = 1; then
+    dir="/"
+  else
+    dir="/usr"
+  fi
+	font=`find $dir -type f -iname freemono.otf`
 	if test "x$font" = "x"; then
-		font=`find /usr -type f -iname freemono.ttf`
+		font=`find $dir -type f -iname freemono.ttf`
 		if test "x$font" = "x"; then
 			AC_MSG_ERROR([FreeMono font not found])
 		fi
