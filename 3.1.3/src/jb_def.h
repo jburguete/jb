@@ -97,10 +97,10 @@ extern FILE *stderr;
  * Function to interchange two pointers.
  */
 static inline void
-JBChange (void **a,             ///< a pointer to interchange.
-          void **b)             ///< a pointer to interchange.
+JBChange (void **__restrict a,  ///< a pointer to interchange.
+          void **__restrict b)  ///< a pointer to interchange.
 {
-  void *c;
+  void *__restrict c;
   JB_CHANGE (*a, *b, c);
 }
 
