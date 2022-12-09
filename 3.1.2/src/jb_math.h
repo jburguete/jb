@@ -582,7 +582,7 @@ static inline void
 jbm_change (int *a,             ///< 1st int number pointer. 
             int *b)             ///< 1st int number pointer. 
 {
-  register int c;
+  int c;
   JB_CHANGE (*a, *b, c);
 }
 
@@ -593,7 +593,7 @@ static inline void
 jbm_changel (long int *a,       ///< 1st long int number pointer. 
              long int *b)       ///< 1st long int number pointer. 
 {
-  register long int c;
+  long int c;
   JB_CHANGE (*a, *b, c);
 }
 
@@ -604,7 +604,7 @@ static inline void
 jbm_changell (long long int *a, ///< 1st long long int number pointer. 
               long long int *b) ///< 1st long long int number pointer. 
 {
-  register long long int c;
+  long long int c;
   JB_CHANGE (*a, *b, c);
 }
 
@@ -615,7 +615,7 @@ static inline void
 jbm_changeu (unsigned int *a,   ///< 1st unsigned int number pointer. 
              unsigned int *b)   ///< 1st unsigned int number pointer. 
 {
-  register unsigned int c;
+  unsigned int c;
   JB_CHANGE (*a, *b, c);
 }
 
@@ -623,10 +623,12 @@ jbm_changeu (unsigned int *a,   ///< 1st unsigned int number pointer.
  * Function to interchange 2 long unsigned int numbers.
  */
 static inline void
-jbm_changeul (long unsigned int *a,     ///< 1st long unsigned int number pointer. 
-              long unsigned int *b)     ///< 1st long unsigned int number pointer. 
+jbm_changeul (long unsigned int *a,
+              ///< 1st long unsigned int number pointer.
+              long unsigned int *b)
+              ///< 1st long unsigned int number pointer.
 {
-  register long unsigned int c;
+  long unsigned int c;
   JB_CHANGE (*a, *b, c);
 }
 
@@ -639,7 +641,7 @@ jbm_changeull (long long unsigned int *a,
                long long unsigned int *b)
                ///< 1st long long unsigned int number pointer. 
 {
-  register long long unsigned int c;
+  long long unsigned int c;
   JB_CHANGE (*a, *b, c);
 }
 
@@ -650,7 +652,7 @@ static inline void
 jbm_fchange (JBFLOAT * a,       ///< 1st JBFLOAT number pointer.
              JBFLOAT * b)       ///< 2nd JBFLOAT number pointer.
 {
-  register JBFLOAT c;
+  JBFLOAT c;
   JB_CHANGE (*a, *b, c);
 }
 
@@ -661,7 +663,7 @@ static inline void
 jbm_fchangel (JBDOUBLE * a,     ///< 1st JBDOUBLE number pointer.
               JBDOUBLE * b)     ///< 2nd JBDOUBLE number pointer.
 {
-  register JBDOUBLE c;
+  JBDOUBLE c;
   JB_CHANGE (*a, *b, c);
 }
 
@@ -818,7 +820,7 @@ jbm_interpolate (JBFLOAT x,     ///< x-coordinate of the interpolated point.
                  JBFLOAT y1,    ///< y-coordinate of the 1st point.
                  JBFLOAT y2)    ///< y-coordinate of the 2nd point.
 {
-  register JBFLOAT k;
+  JBFLOAT k;
   if (x <= x1)
     k = y1;
   else if (x >= x2)
@@ -841,7 +843,7 @@ jbm_interpolatel (JBDOUBLE x,   ///< x-coordinate of the interpolated point.
                   JBDOUBLE y1,  ///< y-coordinate of the 1st point.
                   JBDOUBLE y2)  ///< y-coordinate of the 2nd point.
 {
-  register JBDOUBLE k;
+  JBDOUBLE k;
   if (x <= x1)
     k = y1;
   else if (x >= x2)
@@ -888,8 +890,8 @@ jbm_integral (JBFLOAT (*f) (JBFLOAT),
     0.7415311855993944398638648L, 0.9491079123427585245261897L
   };
 #endif
-  register JBFLOAT k, k2, x, dx;
-  register int i;
+  JBFLOAT k, k2, x, dx;
+  int i;
   dx = 0.5L * (x2 - x1);
   x = 0.5L * (x1 + x2);
   k = a[0] * dx * f (x);
@@ -938,8 +940,8 @@ jbm_integrall (JBDOUBLE (*f) (JBDOUBLE),
     0.7415311855993944398638648L, 0.9491079123427585245261897L
   };
 #endif
-  register JBDOUBLE k, k2, x, dx;
-  register int i;
+  JBDOUBLE k, k2, x, dx;
+  int i;
   dx = 0.5L * (x2 - x1);
   x = 0.5L * (x1 + x2);
   k = a[0] * dx * f (x);
@@ -962,7 +964,7 @@ jbm_farray_search (JBFLOAT x,   ///< number to search.
                    JBFLOAT * fa,        ///< array of JBFLOAT numbers.
                    int n)       ///< number of the highest array element.
 {
-  register int i, j;
+  int i, j;
   for (i = 0; n - i > 1;)
     {
       j = (i + n) >> 1;
@@ -985,7 +987,7 @@ jbm_farray_search_extended (JBFLOAT x,  ///< number to search.
                             int n)
                             ///< number of the highest array element.
 {
-  register int i;
+  int i;
   if (x < fa[0])
     i = -1;
   else if (x >= fa[n])
@@ -1004,8 +1006,8 @@ static inline JBFLOAT
 jbm_farray_max (JBFLOAT * fa,   ///< array of JBFLOAT numbers.
                 int n)          ///< number of the ending array element.
 {
-  register JBFLOAT k;
-  register int i;
+  JBFLOAT k;
+  int i;
   k = fa[0];
   for (i = 0; ++i <= n;)
     k = FMAX (k, fa[i]);
@@ -1021,8 +1023,8 @@ static inline JBFLOAT
 jbm_farray_min (JBFLOAT * fa,   ///< array of JBFLOAT numbers.
                 int n)          ///< number of the ending array element.
 {
-  register JBFLOAT k;
-  register int i;
+  JBFLOAT k;
+  int i;
   k = fa[0];
   for (i = 0; ++i <= n;)
     k = FMIN (k, fa[i]);
@@ -1039,8 +1041,8 @@ jbm_farray_maxmin (JBFLOAT * fa,        ///< array of JBFLOAT numbers.
                    JBFLOAT * max,       ///< the highest value.
                    JBFLOAT * min)       ///< the lowest value.
 {
-  register JBFLOAT kmax, kmin;
-  register int i;
+  JBFLOAT kmax, kmin;
+  int i;
   kmax = kmin = fa[0];
   for (i = 0; ++i <= n;)
     {
@@ -1084,8 +1086,8 @@ jbm_farray_interpolate (JBFLOAT x,      ///< x-coordinate of the point.
 ///< array of y-coordinates of the tabular function.
                         int n)  ///< the highest element number of the arrays.
 {
-  register JBFLOAT k;
-  register int i;
+  JBFLOAT k;
+  int i;
   i = jbm_farray_search (x, fa, n);
   if (i == n)
     k = fb[i];
@@ -1113,8 +1115,8 @@ _jbm_farray_merge (JBFLOAT * fa,
                    int *nc)
 ///< pointer to the highest element number of the resulting array.
 {
-  register JBFLOAT *x;
-  register int i, j, k;
+  JBFLOAT *x;
+  int i, j, k;
   x = (JBFLOAT *) g_try_malloc ((na + nb + 2) * sizeof (JBFLOAT));
   if (!x)
     return 0;
@@ -1150,9 +1152,9 @@ jbm_farray_integral (JBFLOAT * x,
                      JBFLOAT x2)
                      ///< right limit of the integration interval.
 {
-  register JBFLOAT *yy, *xx;
-  register JBFLOAT I, y1;
-  register int i;
+  JBFLOAT *yy, *xx;
+  JBFLOAT I, y1;
+  int i;
   if (n == 0)
     {
       I = y[0] * (x2 - x1);
@@ -1238,7 +1240,7 @@ jbm_farray_mean_square_error (JBFLOAT * xa,
 ///< function.
 {
   JBFLOAT k = 0.;
-  register int i, j;
+  int i, j;
   for (i = 0; i <= na && xa[i] < xr[0]; ++i)
     k += jbm_fsqr (fa[i] - fr[0]);
   for (j = 0; i <= na; ++i)
@@ -1296,7 +1298,7 @@ jbm_darray_search (JBDOUBLE x,  ///< number to search.
                    JBDOUBLE * fa,       ///< array of JBDOUBLE numbers.
                    int n)       ///< number of the highest array element.
 {
-  register int i, j;
+  int i, j;
   for (i = 0; n - i > 1;)
     {
       j = (i + n) >> 1;
@@ -1319,7 +1321,7 @@ jbm_darray_search_extended (JBDOUBLE x, ///< number to search.
                             int n)
                             ///< number of the highest array element.
 {
-  register int i;
+  int i;
   if (x < fa[0])
     i = -1;
   else if (x >= fa[n])
@@ -1338,8 +1340,8 @@ static inline JBDOUBLE
 jbm_darray_max (JBDOUBLE * fa,  ///< array of JBDOUBLE numbers.
                 int n)          ///< number of the ending array element.
 {
-  register JBDOUBLE k;
-  register int i;
+  JBDOUBLE k;
+  int i;
   k = fa[0];
   for (i = 0; ++i <= n;)
     k = FMAXL (k, fa[i]);
@@ -1355,8 +1357,8 @@ static inline JBDOUBLE
 jbm_darray_min (JBDOUBLE * fa,  ///< array of JBDOUBLE numbers.
                 int n)          ///< number of the ending array element.
 {
-  register JBDOUBLE k;
-  register int i;
+  JBDOUBLE k;
+  int i;
   k = fa[0];
   for (i = 0; ++i <= n;)
     k = FMINL (k, fa[i]);
@@ -1373,8 +1375,8 @@ jbm_darray_maxmin (JBDOUBLE * fa,       ///< array of JBDOUBLE numbers.
                    JBDOUBLE * max,      ///< the highest value.
                    JBDOUBLE * min)      ///< the lowest value.
 {
-  register JBDOUBLE kmax, kmin;
-  register int i;
+  JBDOUBLE kmax, kmin;
+  int i;
   kmax = kmin = fa[0];
   for (i = 0; ++i <= n;)
     {
@@ -1418,8 +1420,8 @@ jbm_darray_interpolate (JBDOUBLE x,     ///< x-coordinate of the point.
 ///< array of y-coordinates of the tabular function.
                         int n)  ///< the highest element number of the arrays.
 {
-  register JBDOUBLE k;
-  register int i;
+  JBDOUBLE k;
+  int i;
   i = jbm_darray_search (x, fx, n);
   if (i == n)
     k = fy[i];
@@ -1447,8 +1449,8 @@ _jbm_darray_merge (JBDOUBLE * fa,
                    int *nc)
 ///< pointer to the highest element number of the resulting array.
 {
-  register JBDOUBLE *x;
-  register int i, j, k;
+  JBDOUBLE *x;
+  int i, j, k;
   x = (JBDOUBLE *) g_try_malloc ((na + nb + 2) * sizeof (JBDOUBLE));
   if (!x)
     return 0;
@@ -1484,9 +1486,9 @@ jbm_darray_integral (JBDOUBLE * x,
                      JBDOUBLE x2)
                      ///< right limit of the integration interval.
 {
-  register JBDOUBLE *yy, *xx;
-  register JBDOUBLE I, y1;
-  register int i;
+  JBDOUBLE *yy, *xx;
+  JBDOUBLE I, y1;
+  int i;
   if (n == 0)
     {
       I = y[0] * (x2 - x1);
@@ -1572,7 +1574,7 @@ jbm_darray_mean_square_error (JBDOUBLE * xa,
 ///< function.
 {
   JBDOUBLE k = 0.L;
-  register int i, j;
+  int i, j;
   for (i = 0; i <= na && xa[i] < xr[0]; ++i)
     k += jbm_fsqrl (fa[i] - fr[0]);
   for (j = 0; i <= na; ++i)
@@ -1635,8 +1637,8 @@ jbm_darray_farray_interpolate (JBDOUBLE x,      ///< x-coordinate of the point.
                                int n)
 ///< the highest element number of the arrays.
 {
-  register JBFLOAT k;
-  register int i;
+  JBFLOAT k;
+  int i;
   i = jbm_darray_search (x, fx, n);
   if (i == n)
     k = fy[i];
@@ -1665,10 +1667,10 @@ jbm_darray_farray_integral (JBDOUBLE * x,
                             JBDOUBLE x2)
                             ///< right limit of the integration interval.
 {
-  register JBDOUBLE *xx;
-  register JBFLOAT *yy;
-  register JBFLOAT I, y1;
-  register int i;
+  JBDOUBLE *xx;
+  JBFLOAT *yy;
+  JBFLOAT I, y1;
+  int i;
   if (n == 0)
     {
       I = y[0] * (x2 - x1);
@@ -1824,7 +1826,7 @@ jbm_solve_quadratic_reduced (JBFLOAT a,
                              JBFLOAT x2)
                              ///< right limit of the solution interval.
 {
-  register JBFLOAT k;
+  JBFLOAT k;
   a /= 2.;
   b = SQRT (a * a - b);
   k = b - a;
@@ -1850,7 +1852,7 @@ jbm_solve_quadratic_reducedl (JBDOUBLE a,
                               JBDOUBLE x2)
                               ///< right limit of the solution interval.
 {
-  register JBDOUBLE k;
+  JBDOUBLE k;
   a /= 2.L;
   b = SQRTL (a * a - b);
   k = b - a;
@@ -2069,8 +2071,8 @@ jbm_index_sort_insertion (JBFLOAT * x,  ///< array of JBFLOAT numbers.
                           int n)
                           ///< the highest element number of the arrays.
 {
-  register JBFLOAT xi;
-  register int i, j, ii;
+  JBFLOAT xi;
+  int i, j, ii;
   for (i = 0; ++i <= n;)
     {
       ii = ni[i];
@@ -2091,8 +2093,8 @@ jbm_index_sort_insertionl (JBDOUBLE * x,        ///< array of JBDOUBLE numbers.
                            int n)
                            ///< the highest element number of the arrays.
 {
-  register JBDOUBLE xi;
-  register int i, j, ii;
+  JBDOUBLE xi;
+  int i, j, ii;
   for (i = 0; ++i <= n;)
     {
       ii = ni[i];
@@ -2113,8 +2115,8 @@ jbm_index_sort_interchange (JBFLOAT * x,        ///< array of JBFLOAT numbers.
                             int n)
                             ///< the highest element number of the arrays.
 {
-  register JBFLOAT xi, xj;
-  register int i, j;
+  JBFLOAT xi, xj;
+  int i, j;
   for (i = n + 1; --i > 0;)
     {
       xi = x[ni[i]];
@@ -2140,8 +2142,8 @@ jbm_index_sort_interchangel (JBDOUBLE * x,      ///< array of JBDOUBLE numbers.
                              int n)
                              ///< the highest element number of the arrays.
 {
-  register JBDOUBLE xi, xj;
-  register int i, j;
+  JBDOUBLE xi, xj;
+  int i, j;
   for (i = n + 1; --i > 0;)
     {
       xi = x[ni[i]];
@@ -2306,7 +2308,7 @@ jbm_index_sort (JBFLOAT * x,    ///< array of JBFLOAT numbers.
                 unsigned int *ni,       ///< array of indexes.
                 int n)          ///< the highest element number of the arrays.
 {
-  register int i;
+  int i;
   for (i = n + 1; --i >= 0;)
     ni[i] = i;
   if (n < JBM_INDEX_SORT_FLASH_MIN)
@@ -2324,7 +2326,7 @@ jbm_index_sortl (JBDOUBLE * x,  ///< array of JBDOUBLE numbers.
                  unsigned int *ni,      ///< array of indexes.
                  int n)         ///< the highest element number of the arrays.
 {
-  register int i;
+  int i;
   for (i = n + 1; --i >= 0;)
     ni[i] = i;
   if (n < JBM_INDEX_SORT_FLASH_MIN)
@@ -2350,8 +2352,8 @@ jbm_index_sort_extended (JBFLOAT * x,   ///< array of JBFLOAT numbers to sort.
 ///< the highest element number of the array to sort.
 {
   unsigned int nk[n + 1], nj[n + 1];
-  register JBFLOAT k1, k2;
-  register int i, j = 0;
+  JBFLOAT k1, k2;
+  int i, j = 0;
   *ni = (int *) g_try_malloc ((n + 1) * sizeof (int));
   *xr = (JBFLOAT *) g_try_malloc ((n + 1) * sizeof (JBFLOAT));
   if (!*xr)
@@ -2395,8 +2397,8 @@ jbm_index_sort_extendedl (JBDOUBLE * x, ///< array of JBDOUBLE numbers to sort.
 ///< the highest element number of the array to sort.
 {
   unsigned int nk[n + 1], nj[n + 1];
-  register JBDOUBLE k1, k2;
-  register int i, j = 0;
+  JBDOUBLE k1, k2;
+  int i, j = 0;
   *ni = (int *) g_try_malloc ((n + 1) * sizeof (int));
   *xr = (JBDOUBLE *) g_try_malloc ((n + 1) * sizeof (JBDOUBLE));
   if (!*xr)
@@ -2441,7 +2443,7 @@ jbm_matrix_solve (JBFLOAT * x,  ///< matrix storing the linear equations system.
 {
   JBFLOAT *f, *g;
   JBFLOAT k1, k2;
-  register int i, j, k;
+  int i, j, k;
   // Setting n to the number of row elements
   ++n;
   // Scaling every equation to reduce rounding effects.
@@ -2512,7 +2514,7 @@ jbm_matrix_solvel (JBDOUBLE * x,
 {
   JBDOUBLE *f, *g;
   JBDOUBLE k1, k2;
-  register int i, j, k;
+  int i, j, k;
   // Setting n to the number of row elements
   ++n;
   // Scaling every equation to reduce rounding effects.
@@ -2581,8 +2583,8 @@ jbm_matrix_solve_tridiagonal (JBFLOAT * C,      ///< left diagonal array.
                               JBFLOAT * H,      ///< final column array.
                               int n)    ///< number of matrix rows.
 {
-  register JBFLOAT k;
-  register int i;
+  JBFLOAT k;
+  int i;
   for (i = 0; i < n; ++i)
     {
       k = C[i] / D[i];
@@ -2611,8 +2613,8 @@ jbm_matrix_solve_tridiagonall (JBDOUBLE * C,    ///< left diagonal array.
                                JBDOUBLE * H,    ///< final column array.
                                int n)   ///< number of matrix rows.
 {
-  register JBDOUBLE k;
-  register int i;
+  JBDOUBLE k;
+  int i;
   for (i = 0; i < n; ++i)
     {
       k = C[i] / D[i];
@@ -2642,8 +2644,8 @@ jbm_matrix_solve_tridiagonal_zero (JBFLOAT * C, ///< left diagonal array.
                                    JBFLOAT * H, ///< final column array.
                                    int n)       ///< number of matrix rows.
 {
-  register JBFLOAT k;
-  register int i;
+  JBFLOAT k;
+  int i;
   for (i = 0; i < n; ++i)
     if (!jbm_small (D[i]))
       {
@@ -2683,8 +2685,8 @@ jbm_matrix_solve_tridiagonal_zerol (JBDOUBLE * C,
                                     JBDOUBLE * H,       ///< final column array.
                                     int n)      ///< number of matrix rows.
 {
-  register JBDOUBLE k;
-  register int i;
+  JBDOUBLE k;
+  int i;
   for (i = 0; i < n; ++i)
     if (!jbm_smalll (D[i]))
       {
@@ -2725,8 +2727,8 @@ jbm_matrix_solve_pentadiagonal (JBFLOAT * B,    ///< double-left diagonal array.
                                 JBFLOAT * H,    ///< final column array.
                                 int n)  ///< number of matrix rows.
 {
-  register JBFLOAT k;
-  register int i;
+  JBFLOAT k;
+  int i;
   for (i = 0; i < n - 1; ++i)
     {
       k = C[i] / D[i];
@@ -2769,8 +2771,8 @@ jbm_matrix_solve_pentadiagonall (JBDOUBLE * B,  ///< double-left diagonal array.
                                  JBDOUBLE * H,  ///< final column array.
                                  int n) ///< number of matrix rows.
 {
-  register JBDOUBLE k;
-  register int i;
+  JBDOUBLE k;
+  int i;
   for (i = 0; i < n - 1; ++i)
     {
       k = C[i] / D[i];
@@ -2817,8 +2819,8 @@ jbm_matrix_solve_pentadiagonal_zero (JBFLOAT * B,
                                      JBFLOAT * H,       ///< final column array.
                                      int n)     ///< number of matrix rows.
 {
-  register JBFLOAT k;
-  register int i;
+  JBFLOAT k;
+  int i;
   for (i = 0; i < n - 1; ++i)
     if (!jbm_small (D[i]))
       {
@@ -2878,8 +2880,8 @@ jbm_matrix_solve_pentadiagonal_zerol (JBDOUBLE * B,
                                       JBDOUBLE * H,     ///< final column array.
                                       int n)    ///< number of matrix rows.
 {
-  register JBDOUBLE k;
-  register int i;
+  JBDOUBLE k;
+  int i;
   for (i = 0; i < n - 1; ++i)
     if (!jbm_smalll (D[i]))
       {
@@ -2927,9 +2929,9 @@ jbm_regression_polynomial (JBFLOAT * x, ///< array of point x-coordinates.
                            int m)       ///< order of the polynomial regression.
 {
   JBFLOAT xx[m + m + 1], yx[m + 1], B[(m + 1) * (m + 2)];
-  register JBFLOAT *k;
-  register JBFLOAT zx, zy;
-  register int i, j;
+  JBFLOAT *k;
+  JBFLOAT zx, zy;
+  int i, j;
   *A = (JBFLOAT *) g_malloc ((m + 1) * sizeof (JBFLOAT));
   for (j = m + m; --j > m;)
     xx[j] = 0.;
@@ -2977,9 +2979,9 @@ jbm_regression_polynomiall (JBDOUBLE * x,
                             int m)      ///< order of the polynomial regression.
 {
   JBDOUBLE xx[m + m + 1], yx[m + 1], B[(m + 1) * (m + 2)];
-  register JBDOUBLE *k;
-  register JBDOUBLE zx, zy;
-  register int i, j;
+  JBDOUBLE *k;
+  JBDOUBLE zx, zy;
+  int i, j;
   *A = (JBDOUBLE *) g_malloc ((m + 1) * sizeof (JBDOUBLE));
   for (j = m + m; --j > m;)
     xx[j] = 0.L;
@@ -3024,8 +3026,8 @@ jbm_regression_linear (JBFLOAT * x,     ///< array of point x-coordinates.
                        JBFLOAT * b)
 ///< pointer to the 1st order regression coefficient.
 {
-  register JBFLOAT syx, sy, sxx, sx;
-  register int i;
+  JBFLOAT syx, sy, sxx, sx;
+  int i;
   syx = sy = sxx = sx = 0.;
   for (i = 0; i <= n; ++i)
     {
@@ -3051,8 +3053,8 @@ jbm_regression_linearl (JBDOUBLE * x,   ///< array of point x-coordinates.
                         JBDOUBLE * b)
 ///< pointer to the 1st order regression coefficient.
 {
-  register JBDOUBLE syx, sy, sxx, sx;
-  register int i;
+  JBDOUBLE syx, sy, sxx, sx;
+  int i;
   syx = sy = sxx = sx = 0.L;
   for (i = 0; i <= n; ++i)
     {
@@ -3080,7 +3082,7 @@ jbm_regression_exponential (JBFLOAT * x,
                             JBFLOAT * b)
 ///< pointer to the exponent regression coefficient.
 {
-  register int i;
+  int i;
   for (i = n; i-- >= 0;)
     x[i] = LOG (x[i]), y[i] = LOG (y[i]);
   jbm_regression_linear (x, y, n, a, b);
@@ -3102,7 +3104,7 @@ jbm_regression_exponentiall (JBDOUBLE * x,
                              JBDOUBLE * b)
 ///< pointer to the exponent regression coefficient.
 {
-  register int i;
+  int i;
   for (i = n; i-- >= 0;)
     x[i] = LOGL (x[i]), y[i] = LOGL (y[i]);
   jbm_regression_linearl (x, y, n, a, b);
@@ -3124,7 +3126,7 @@ jbm_regression_multilinear (JBFLOAT ** x,
 {
   JBFLOAT c[(m + 1) * (m + 2)];
   JBFLOAT *d, *xj, *xk;
-  register int i, j, k;
+  int i, j, k;
   ++m;
   for (j = m; --j > 0;)
     {
@@ -3177,7 +3179,7 @@ jbm_regression_multilinearl (JBDOUBLE ** x,
 {
   JBDOUBLE c[(m + 1) * (m + 2)];
   JBDOUBLE *d, *xj, *xk;
-  register int i, j, k;
+  int i, j, k;
   ++m;
   for (j = m; --j > 0;)
     {
@@ -3230,7 +3232,7 @@ jbm_regression_multiexponential (JBFLOAT ** x,
                                  int m) ///< number of variables.
 {
   JBFLOAT *c;
-  register int i, j;
+  int i, j;
   for (j = m + 1; --j >= 0;)
     for (i = n + 1, c = x[j]; --i >= 0; ++c)
       *c = LOG (*c);
@@ -3253,7 +3255,7 @@ jbm_regression_multiexponentiall (JBDOUBLE ** x,
                                   int m)        ///< number of variables.
 {
   JBDOUBLE *c;
-  register int i, j;
+  int i, j;
   for (j = m + 1; --j >= 0;)
     for (i = n + 1, c = x[j]; --i >= 0; ++c)
       *c = LOGL (*c);
@@ -3277,8 +3279,8 @@ jbm_spline_cubic (JBFLOAT * x,  ///< array of point x-coordinates.
 ///< pointer to the array of 3rd order spline coefficients.
 {
   JBFLOAT *B, *C, *D, *E, *F, *H;
-  register JBFLOAT dx;
-  register int i, j, m;
+  JBFLOAT dx;
+  int i, j, m;
   --n;
   m = 3 * n;
   B = (JBFLOAT *) g_malloc (6 * (m - 1) * sizeof (JBFLOAT));
@@ -3352,8 +3354,8 @@ jbm_spline_cubicl (JBDOUBLE * x,        ///< array of point x-coordinates.
 ///< pointer to the array of 3rd order spline coefficients.
 {
   JBDOUBLE *B, *C, *D, *E, *F, *H;
-  register JBDOUBLE dx;
-  register int i, j, m;
+  JBDOUBLE dx;
+  int i, j, m;
   --n;
   m = 3 * n;
   B = (JBDOUBLE *) g_malloc (6 * (m - 1) * sizeof (JBDOUBLE));
@@ -3519,7 +3521,7 @@ jbm_flux_limiter_superbee (JBFLOAT d1,
                            JBFLOAT d2)
                            ///< 2nd flux limiter function parameter.
 {
-  register JBFLOAT r;
+  JBFLOAT r;
   if (d1 * d2 <= 0.)
     return 0.;
   r = d1 / d2;
@@ -3540,7 +3542,7 @@ jbm_flux_limiter_superbeel (JBDOUBLE d1,
                             JBDOUBLE d2)
                             ///< 2nd flux limiter function parameter.
 {
-  register JBDOUBLE r;
+  JBDOUBLE r;
   if (d1 * d2 <= 0.L)
     return 0.L;
   r = d1 / d2;
@@ -3597,7 +3599,7 @@ jbm_flux_limiter_VanLeer (JBFLOAT d1,
                           JBFLOAT d2)
                           ///< 2nd flux limiter function parameter.
 {
-  register JBFLOAT r, k;
+  JBFLOAT r, k;
   if (d1 * d2 <= 0.)
     return 0.;
   r = d1 / d2;
@@ -3619,7 +3621,7 @@ jbm_flux_limiter_VanLeerl (JBDOUBLE d1,
                            JBDOUBLE d2)
                            ///< 2nd flux limiter function parameter.
 {
-  register JBDOUBLE r, k;
+  JBDOUBLE r, k;
   if (d1 * d2 <= 0.L)
     return 0.L;
   r = d1 / d2;
@@ -3640,7 +3642,7 @@ jbm_flux_limiter_VanAlbada (JBFLOAT d1,
                             JBFLOAT d2)
                             ///< 2nd flux limiter function parameter.
 {
-  register JBFLOAT r, k;
+  JBFLOAT r, k;
   if (d1 * d2 <= 0.)
     return 0.;
   r = d1 / d2;
@@ -3661,7 +3663,7 @@ jbm_flux_limiter_VanAlbadal (JBDOUBLE d1,
                              JBDOUBLE d2)
                              ///< 2nd flux limiter function parameter.
 {
-  register JBDOUBLE r, k;
+  JBDOUBLE r, k;
   if (d1 * d2 <= 0.L)
     return 0.L;
   r = d1 / d2;
@@ -3755,7 +3757,7 @@ jbm_flux_limiter_monotonized_central (JBFLOAT d1,
                                       JBFLOAT d2)
                                       ///< 2nd flux limiter function parameter.
 {
-  register JBFLOAT k;
+  JBFLOAT k;
   if (d1 * d2 <= 0.)
     return 0.;
   k = d1 / d2;
@@ -3780,7 +3782,7 @@ jbm_flux_limiter_monotonized_centrall (JBDOUBLE d1,
                                        JBDOUBLE d2)
                                        ///< 2nd flux limiter function parameter.
 {
-  register JBDOUBLE k;
+  JBDOUBLE k;
   if (d1 * d2 <= 0.L)
     return 0.L;
   k = d1 / d2;
@@ -3916,8 +3918,8 @@ jbm_transversal_section_regions_sort (int i,    ///< level index.
 {
   JBFLOAT x[nj];
   unsigned int nx[nj], na[nj];
-  register int j, k;
-  register JBDOUBLE t;
+  int j, k;
+  JBDOUBLE t;
   t = 0.5 * (zz[i] + zz[i + 1]);
   for (j = nj; --j >= 0;)
     {
@@ -3960,7 +3962,7 @@ jbm_transversal_section_regions (JBFLOAT * l,
 {
   int *nk;
   int nmax;
-  register int i = 0, j, k;
+  int i = 0, j, k;
   nmax = i = jbm_index_sort_extended (z, zz, ni, n);
   if (!i)
     goto exit1;
@@ -4005,7 +4007,7 @@ jbm_varray_search (JBFLOAT x,   ///< number to search.
                    int size,    ///< size in bytes of the structs.
                    int n)       ///< number of structs.
 {
-  register int i, j;
+  int i, j;
   for (i = 0; n - i > 1;)
     {
       j = (i + n) >> 1;
@@ -4031,7 +4033,7 @@ jbm_varray_searchl (JBDOUBLE x, ///< number to search.
                     int size,   ///< size in bytes of the structs.
                     int n)      ///< number of structs.
 {
-  register int i, j;
+  int i, j;
   for (i = 0; n - i > 1;)
     {
       j = (i + n) >> 1;
@@ -4057,7 +4059,7 @@ jbm_varray_search_extended (JBFLOAT x,  ///< number to search.
                             int size,   ///< size in bytes of the structs.
                             int n)      ///< number of structs.
 {
-  register int i;
+  int i;
   if (x < *(JBFLOAT *) v)
     i = -1;
   else if (x >= *(JBFLOAT *) ((char *) v + n * size))
@@ -4081,7 +4083,7 @@ jbm_varray_search_extendedl (JBDOUBLE x,        ///< number to search.
                              int size,  ///< size in bytes of the structs.
                              int n)     ///< number of structs.
 {
-  register int i;
+  int i;
   if (x < *(JBDOUBLE *) v)
     i = -1;
   else if (x >= *(JBDOUBLE *) ((char *) v + n * size))
@@ -4103,8 +4105,8 @@ jbm_varray_max (void *v,
                 int size,       ///< size in bytes of the structs.
                 int n)          ///< number of structs.
 {
-  register int i;
-  register JBFLOAT k;
+  int i;
+  JBFLOAT k;
   k = *(JBFLOAT *) v;
   for (i = 0; ++i <= n;)
     k = FMAX (k, *(JBFLOAT *) (v = (char *) v + size));
@@ -4123,8 +4125,8 @@ jbm_varray_maxl (void *v,
                  int size,      ///< size in bytes of the structs.
                  int n)         ///< number of structs.
 {
-  register int i;
-  register JBDOUBLE k;
+  int i;
+  JBDOUBLE k;
   k = *(JBDOUBLE *) v;
   for (i = 0; ++i <= n;)
     k = FMAXL (k, *(JBDOUBLE *) (v = (char *) v + size));
@@ -4143,8 +4145,8 @@ jbm_varray_min (void *v,
                 int size,       ///< size in bytes of the structs.
                 int n)          ///< number of structs.
 {
-  register int i;
-  register JBFLOAT k;
+  int i;
+  JBFLOAT k;
   k = *(JBFLOAT *) v;
   for (i = 0; ++i <= n;)
     k = FMIN (k, *(JBFLOAT *) (v = (char *) v + size));
@@ -4163,8 +4165,8 @@ jbm_varray_minl (void *v,
                  int size,      ///< size in bytes of the structs.
                  int n)         ///< number of structs.
 {
-  register int i;
-  register JBDOUBLE k;
+  int i;
+  JBDOUBLE k;
   k = *(JBDOUBLE *) v;
   for (i = 0; ++i <= n;)
     k = FMINL (k, *(JBDOUBLE *) (v = (char *) v + size));
@@ -4184,8 +4186,8 @@ jbm_varray_maxmin (void *v,
                    JBFLOAT * max,       ///< pointer to the highest value.
                    JBFLOAT * min)       ///< pointer to the lowest value.
 {
-  register int i;
-  register JBFLOAT kmax, kmin;
+  int i;
+  JBFLOAT kmax, kmin;
   kmax = kmin = *(JBFLOAT *) v;
   for (i = 0; ++i <= n;)
     {
@@ -4211,8 +4213,8 @@ jbm_varray_maxminl (void *v,
                     JBDOUBLE * max,     ///< pointer to the highest value.
                     JBDOUBLE * min)     ///< pointer to the lowest value.
 {
-  register int i;
-  register JBDOUBLE kmax, kmin;
+  int i;
+  JBDOUBLE kmax, kmin;
   kmax = kmin = *(JBDOUBLE *) v;
   for (i = 0; ++i <= n;)
     {
@@ -4248,7 +4250,7 @@ jbm_varray_mean_square_error (void *xa,
 ///< the highest point number tabulating the 2nd function.
 {
   JBFLOAT k = 0., k2;
-  register int i, j;
+  int i, j;
   for (i = 0; i <= na && *(JBFLOAT *) xa < *(JBFLOAT *) xr;
        ++i, xa = (char *) xa + sizea, fa = (char *) fa + sizea)
     k += jbm_fsqr (*(JBFLOAT *) fa - *(JBFLOAT *) fr);
@@ -4300,7 +4302,7 @@ jbm_varray_mean_square_errorl (void *xa,
 ///< the highest point number tabulating the 2nd function.
 {
   JBDOUBLE k = 0., k2;
-  register int i, j;
+  int i, j;
   for (i = 0; i <= na && *(JBDOUBLE *) xa < *(JBDOUBLE *) xr;
        ++i, xa = (char *) xa + sizea, fa = (char *) fa + sizea)
     k += jbm_fsqr (*(JBDOUBLE *) fa - *(JBDOUBLE *) fr);
@@ -4408,8 +4410,8 @@ jbm_varray_solve_tridiagonal (void *C,
                               int size, ///< struct size.
                               int n)    ///< the latest struct array element.
 {
-  register JBFLOAT *CC, *DD, *EE, *HH;
-  register JBDOUBLE k;
+  JBFLOAT *CC, *DD, *EE, *HH;
+  JBDOUBLE k;
   int i;
   DD = (JBFLOAT *) D;
   HH = (JBFLOAT *) H;
@@ -4467,8 +4469,8 @@ jbm_varray_solve_tridiagonall (void *C,
                                int size,        ///< struct size.
                                int n)   ///< the latest struct array element.
 {
-  register JBDOUBLE *CC, *DD, *EE, *HH;
-  register JBDOUBLE k;
+  JBDOUBLE *CC, *DD, *EE, *HH;
+  JBDOUBLE k;
   int i;
   DD = (JBDOUBLE *) D;
   HH = (JBDOUBLE *) H;
@@ -4528,8 +4530,8 @@ jbm_varray_solve_tridiagonal_zero (void *C,
                                    int n)
                                    ///< the latest struct array element.
 {
-  register JBFLOAT *CC, *DD, *EE, *HH;
-  register JBDOUBLE k;
+  JBFLOAT *CC, *DD, *EE, *HH;
+  JBDOUBLE k;
   int i;
   DD = (JBFLOAT *) D;
   HH = (JBFLOAT *) H;
@@ -4600,8 +4602,8 @@ jbm_varray_solve_tridiagonal_zerol (void *C,
                                     int n)
                                     ///< the latest struct array element.
 {
-  register JBDOUBLE *CC, *DD, *EE, *HH;
-  register JBDOUBLE k;
+  JBDOUBLE *CC, *DD, *EE, *HH;
+  JBDOUBLE k;
   int i;
   DD = (JBDOUBLE *) D;
   HH = (JBDOUBLE *) H;

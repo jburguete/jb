@@ -79,7 +79,7 @@ void *
 jb_realloc (void *p,            ///< a pointer.
             const int n)        ///< size of the reallocated pointer.
 {
-  register void *q;
+  void *q;
   q = g_try_realloc (p, n);
   if (!q)
     g_free (p);

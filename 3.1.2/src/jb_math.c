@@ -42,8 +42,8 @@ jbm_index_sort_flash (JBFLOAT * x,      ///< array of JBFLOAT numbers.
                       int n)    ///< the highest element number of the arrays.
 {
   unsigned int *nj, *nk, *l1, *l2;
-  register JBFLOAT xi, xmin, xmax;
-  register int i, j, m;
+  JBFLOAT xi, xmin, xmax;
+  int i, j, m;
   if (n <= JBM_INDEX_SORT_FLASH_MIN)
     {
       jbm_index_sort_insertion (x, ni, n);
@@ -110,8 +110,8 @@ jbm_index_sort_flashl (JBDOUBLE * x,    ///< array of JBDOUBLE numbers.
                        int n)   ///< the highest element number of the arrays.
 {
   unsigned int *nj, *nk, *l1, *l2;
-  register JBDOUBLE xi, xmin, xmax;
-  register int i, j, m;
+  JBDOUBLE xi, xmin, xmax;
+  int i, j, m;
   if (n <= JBM_INDEX_SORT_FLASH_MIN)
     {
       jbm_index_sort_insertionl (x, ni, n);

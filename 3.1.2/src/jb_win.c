@@ -394,7 +394,7 @@ void
 jbw_draw_range (JBFLOAT * xmin, ///< minimum graphical value.
                 JBFLOAT * xmax) ///< maximum graphical value.
 {
-  register JBFLOAT m;
+  JBFLOAT m;
   m = FMAX (FABS (*xmax), FABS (*xmin));
   if (jbm_small (m))
     {
@@ -415,7 +415,7 @@ void
 jbw_draw_rangel (JBDOUBLE * xmin,       ///< minimum graphical value.
                  JBDOUBLE * xmax)       ///< maximum graphical value.
 {
-  register JBDOUBLE m;
+  JBDOUBLE m;
   m = FMAXL (FABSL (*xmax), FABSL (*xmin));
   if (jbm_smalll (m))
     {
@@ -2756,7 +2756,7 @@ void
 jbw_graphic_map_resize ()
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
-  register JBDOUBLE vw, vh, cw, ch;
+  JBDOUBLE vw, vh, cw, ch;
   vw = graphic->x2 - graphic->x1;
   vh = graphic->y2 - graphic->y1;
   cw = graphic->xmax - graphic->xmin;
@@ -4406,7 +4406,7 @@ void
 jbw_array_editor_destroy (JBWArrayEditor * editor)
                                 ///< JBWArrayEditor widget.
 {
-  register int i;
+  int i;
   for (i = editor->ncolumns; --i >= 0;)
     jb_free_null ((void **) &editor->matrix_entry[i]);
   jb_free_null ((void **) &editor->button_numeric);

@@ -100,7 +100,7 @@ static inline void
 JBChange (void **a,             ///< a pointer to interchange.
           void **b)             ///< a pointer to interchange.
 {
-  register void *c;
+  void *c;
   JB_CHANGE (*a, *b, c);
 }
 
