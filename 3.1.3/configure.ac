@@ -49,7 +49,7 @@ elif test `uname -s` = "SunOS"; then
 fi
 
 # Checks for programs
-AC_PROG_CC([gcc-11 gcc11 gcc-10 gcc10 gcc9 egcc gcc clang])
+AC_PROG_CC([gcc-12 gcc12 gcc-11 gcc11 gcc-10 gcc10 egcc gcc clang])
 AC_MSG_NOTICE([Compiler: $CC])
 $CC -v
 AC_PROG_MAKE_SET
