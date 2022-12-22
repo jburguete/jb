@@ -99,7 +99,7 @@ This software has been built and tested in the following operative systems:
 * Debian 11 (Linux)
 * Devuan Linux 4
 * Dragonfly BSD 6.2.2
-* Fedora Linux 35
+* Fedora Linux 37
 * FreeBSD 13.0
 * Gentoo Linux
 * Linux Mint 4
