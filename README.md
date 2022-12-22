@@ -100,7 +100,7 @@ This software has been built and tested in the following operative systems:
 * Devuan Linux 4
 * Dragonfly BSD 6.2.2
 * Fedora Linux 37
-* FreeBSD 13.0
+* FreeBSD 13.1
 * Gentoo Linux
 * Linux Mint 4
 * MacOS Catalina + Homebrew
