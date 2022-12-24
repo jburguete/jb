@@ -10,6 +10,7 @@ AC_MSG_NOTICE([Host: $host])
 win=0
 win32=0
 native=1
+haiku=0
 if test $host = "x86_64-w64-mingw32"; then
 	AC_MSG_NOTICE([Microsoft Windows 64 bits + MinGW])
 	win=1
@@ -46,6 +47,9 @@ elif test `uname -s` = "DragonFly"; then
 elif test `uname -s` = "SunOS"; then
 	AC_MSG_NOTICE([SunOS])
 	AC_SUBST(gnu, [/usr/gnu/bin/])
+elif test `uname -s` = "Haiku"; then
+	AC_MSG_NOTICE([Haiku])
+	haiku=1
 fi
 
 # Checks for programs
@@ -165,7 +169,12 @@ if test $gtk = 1; then
 		AC_MSG_ERROR([OpenGL not found]))
 	PKG_CHECK_MODULES([PNG], [libpng])
 	PKG_CHECK_MODULES([FREETYPE], [freetype2])
-	PKG_CHECK_MODULES([GLEW], [glew])
+	if test $haiku = 1; then
+		AC_MSG_NOTICE([Haiku])
+		AC_SUBST(GLEW_LIBS, "-lGLEW -lGLU")
+	else
+		PKG_CHECK_MODULES([GLEW], [glew])
+	fi
 	AC_ARG_WITH([vulkan],
 		AS_HELP_STRING([--with-vulkan],
 			[Build graphic window with Vulkan support]))
@@ -220,7 +229,7 @@ AC_CHECK_FUNC([get_nprocs], AC_DEFINE([HAVE_GET_NPROCS], [1]))
 # Check for font
 if test $gtk = 1; then
 	AC_MSG_NOTICE([Searching font...])
-  if test $win = 1; then
+  if test $win = 1 || test $haiku = 1; then
     dir="/"
   else
     dir="/usr"
@@ -229,7 +238,10 @@ if test $gtk = 1; then
 	if test "x$font" = "x"; then
 		font=`find $dir -type f -iname freemono.ttf`
 		if test "x$font" = "x"; then
-			AC_MSG_ERROR([FreeMono font not found])
+			font=`find $dir -type f -iname NotoSansMono-Regular.ttf`
+			if test "x$font" = "x"; then
+				AC_MSG_ERROR([FreeMono font not found])
+			fi
 		fi
 	fi
 	AC_MSG_NOTICE([Font: $font])
