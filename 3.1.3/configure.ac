@@ -276,5 +276,5 @@ fi
 
 # Final output
 AC_CONFIG_HEADERS([src/config.h])
-AC_CONFIG_FILES([Makefile tests/Makefile])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

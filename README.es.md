@@ -112,7 +112,7 @@ operativos:
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
 * NetBSD 9.3
-* OpenBSD 7.0
+* OpenBSD 7.2
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.3
 * Ubuntu Linux 21.04

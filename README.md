@@ -107,7 +107,7 @@ This software has been built and tested in the following operative systems:
 * Manjaro Linux
 * Microsoft Windows 10
 * NetBSD 9.3
-* OpenBSD 7.0
+* OpenBSD 7.2
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.3
 * Ubuntu Linux 21.04
