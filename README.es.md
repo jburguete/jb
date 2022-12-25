@@ -111,7 +111,7 @@ operativos:
 * MacOS Catalina + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
-* NetBSD 9.2
+* NetBSD 9.3
 * OpenBSD 7.0
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.3
