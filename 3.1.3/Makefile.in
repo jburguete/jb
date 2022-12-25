@@ -10,13 +10,13 @@ OBJ = obj/
 CC = @CC@ @ARCH@ @LTO@
 CFLAGS = @CFLAGS@ @XML_CFLAGS@ @GTHREAD_CFLAGS@ @GLIB_CFLAGS@ @GTOP_CFLAGS@ \
 	@PNG_CFLAGS@ @FREETYPE_CFLAGS@ @GTK_CFLAGS@ @GLEW_CFLAGS@ \
-	@VULKAN_CFLAGS@ @SDL_CFLAGS@ @GLFW_CFLAGS@ @FONT@ @PRECISION@ @GRAPHIC@ \
-	-O3 -pedantic -Wall -Wextra
-LDFLAGS = @LDFLAGS@ @LIBS@ @SDL_LIBS@ @GLFW_LIBS@ @VULKAN_LIBS@ @GLEW_LIBS@ \
-	@GTK_LIBS@ @FREETYPE_LIBS@ @PNG_LIBS@ @GTOP_LIBS@ @GLIB_LIBS@ @GTHREAD_LIBS@ \
-	@XML_LIBS@
-EXEFLAGSPGO = $(LDFLAGS) -L$(BINPGO) -Wl,-rpath=.
-EXEFLAGS = $(LDFLAGS) -L$(BIN) -Wl,-rpath=.
+	@VULKAN_CFLAGS@ @GLUT_CFLAGS@ @SDL_CFLAGS@ @GLFW_CFLAGS@ @FONT@ \
+	@PRECISION@ @GRAPHIC@ -O3 -pedantic -Wall -Wextra
+LDFLAGS = @LDFLAGS@ @LIBS@ @SDL_LIBS@ @GLFW_LIBS@ @GLUT_LIBS@ @VULKAN_LIBS@ \
+	@GLEW_LIBS@ @GTK_LIBS@ @FREETYPE_LIBS@ @PNG_LIBS@ @GTOP_LIBS@ \
+	@GLIB_LIBS@ @GTHREAD_LIBS@ @XML_LIBS@
+EXEFLAGSPGO = $(LDFLAGS) -L$(BINPGO) -Wl,@RPATH@.
+EXEFLAGS = $(LDFLAGS) -L$(BIN) -Wl,@RPATH@.
 
 config_h = $(SRC)config.h
 jb_config_h = $(SRC)jb_config.h
@@ -81,10 +81,18 @@ defdep = $(jb_def_c) $(dep)
 mathdep = $(jb_math_c) $(jb_math_h) $(dep)
 xmldep = $(jb_xml_c) $(jb_xml_h) $(jb_math_h) $(dep)
 windep = $(jb_win_c) $(jb_win_h) $(jb_math_h) $(dep)
-PGO = @PGO@
-ifeq ($(PGO), 1)
+ifeq (@PGO@, 1)
+ifeq (@CC@, clang)
+	PGOGENERATE = -fprofile-instr-generate
+	PGOUSE = -fprofile-instr-use=$(BINPGO)jb.profraw
+	mathprefix = LLVM_PROFILE_FILE="math.profdata"
+	xmlprefix = LLVM_PROFILE_FILE="xml.profdata"
+	winprefix = LLVM_PROFILE_FILE="win.profdata"
+	llvm_merge = llvm-profdata *.profdata -output jb.profraw
+else
 	PGOGENERATE = -fprofile-generate
 	PGOUSE = -fprofile-use -fprofile-correction
+endif
 	pgoobj = $(jb_def_pgo) $(jb_math_pgo) $(jb_xml_pgo) $(jb_win_bin_pgo) \
 		$(jb_win_pgo)
 	testspgo = $(test_math_pgo) $(test_xml_pgo) $(test_win_pgo)
@@ -157,16 +165,16 @@ $(libjbwpgo): $(jb_win_pgo) $(libjbpgo) $(libjbmpgo)
 $(test_math_pgo): $(test_math_c) $(libjbpgo) $(libjbmpgo)
 	$(CC) $(CFLAGS) $(PGOGENERATE) -DJBW=1 $(test_math_c) -o $(test_math_pgo) \
 		$(EXEFLAGSPGO) -ljb -ljbm
-	cd $(BINPGO); ./test_math
+	cd $(BINPGO); $(mathprefix) ./test_math
 	cd tests; @MAKE@ index_sortpgo check_sortpgo
 $(test_xml_pgo): $(test_xml_c) $(libjbpgo) $(libjbmpgo) $(libjbxmlpgo)
 	$(CC) $(CFLAGS) $(PGOGENERATE) -DJBW=1 $(test_xml_c) -o $(test_xml_pgo) \
 		$(EXEFLAGSPGO) -ljb -ljbm -ljbxml
-	cd $(BINPGO); ./test_xml
+	cd $(BINPGO); $(xmlprefix) ./test_xml
 $(test_win_pgo): $(test_win_c) $(libjbpgo) $(libjbmpgo) $(libjbwpgo)
 	$(CC) $(CFLAGS) $(PGOGENERATE) @JBW@ $(test_win_c) -o $(test_win_pgo) \
 		$(EXEFLAGSPGO) -ljb -ljbm -ljbw
-	cd $(BINPGO); ./test_win
+	cd $(BINPGO); $(winprefix) ./test_win; $(llvm_merge)
 
 # Objects
 $(jb_def_o): $(DEFDEP)

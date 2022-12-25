@@ -27,7 +27,12 @@ elif test $host = "i686-pc-cygwin"; then
 	win32=1
 elif test `uname -s` = "Darwin"; then
 	AC_MSG_NOTICE([MacOS])
-	LDFLAGS="$LDFLAGS -L/System/Library/Frameworks -framework GLUT -framework OpenGL"
+	AC_MSG_NOTICE([Remember:])
+	AC_MSG_NOTICE("echo 'export PATH=''/usr/local/opt/llvm@13/bin:$PATH''' >> ./zshrc")
+	LDFLAGS="$LDFLAGS -L/usr/local/opt/llvm@13/lib -L/System/Library/Frameworks -framework GLUT -framework OpenGL"
+	CPPFLAGS="$CPPFLAGS -I/usr/local/opt/llvm@13/include"
+	AC_SUBST(mac, 1)
+	mac=1
 elif test `uname -s` = "FreeBSD"; then
 	AC_MSG_NOTICE([FreeBSD])
 	LDFLAGS="$LDFLAGS -L/usr/local/lib"
@@ -50,6 +55,11 @@ elif test `uname -s` = "SunOS"; then
 elif test `uname -s` = "Haiku"; then
 	AC_MSG_NOTICE([Haiku])
 	haiku=1
+fi
+if test $mac = 0; then
+	AC_SUBST(RPATH, [-rpath=])
+else
+	AC_SUBST(RPATH, [-rpath,])
 fi
 
 # Checks for programs
@@ -200,7 +210,7 @@ if test $gtk = 1; then
 		AS_HELP_STRING([--with-sdl], [Build graphic window with SDL]))
 	if test "x$with_freeglut" = "xyes"; then
 		AC_SUBST(GRAPHIC, "-DHAVE_FREEGLUT=1")
-		AC_SEARCH_LIBS([glutLeaveMainLoop], [freeglut glut], glut="yes", glut="no")
+		PKG_CHECK_MODULES([GLUT], [glut])
 	else
 		if test "x$with_glfw" = "xyes"; then
 			AC_SUBST(GRAPHIC, "-DHAVE_GLFW=1")
