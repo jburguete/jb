@@ -2,6 +2,7 @@
 
 # Directories
 SRC = src/
+TESTS = tests/
 BINPGO = binpgo/
 BIN = bin/
 OBJ = obj/
@@ -15,6 +16,8 @@ CFLAGS = @CFLAGS@ @XML_CFLAGS@ @GTHREAD_CFLAGS@ @GLIB_CFLAGS@ @GTOP_CFLAGS@ \
 LDFLAGS = @LDFLAGS@ @LIBS@ @SDL_LIBS@ @GLFW_LIBS@ @GLUT_LIBS@ @VULKAN_LIBS@ \
 	@GLEW_LIBS@ @GTK_LIBS@ @FREETYPE_LIBS@ @PNG_LIBS@ @GTOP_LIBS@ \
 	@GLIB_LIBS@ @GTHREAD_LIBS@ @XML_LIBS@
+TESTS_CFLAGS = @GSL_CFLAGS@ $(CFLAGS) -I$(SRC) -DJBW=1
+TESTS_LDFLAGS = $(LDFLAGS) @GSL_LIBS@
 EXEFLAGSPGO = $(LDFLAGS) -L$(BINPGO) -Wl,@RPATH@.
 EXEFLAGS = $(LDFLAGS) -L$(BIN) -Wl,@RPATH@.
 
@@ -40,6 +43,8 @@ jb_win_pgo = $(OBJ)jb_win.pgo
 test_math_c = $(SRC)test_math.c
 test_xml_c = $(SRC)test_xml.c
 test_win_c = $(SRC)test_win.c
+index_sort_c = $(TESTS)index_sort.c
+check_sort_c = $(TESTS)check_sort.c
 
 jb_config_o = $(OBJ)jb_config.o
 jb_def_o = $(OBJ)jb_def.o
@@ -51,10 +56,14 @@ jb_win_o = $(OBJ)jb_win.o
 test_math_pgo = $(BINPGO)test_math@EXE@
 test_xml_pgo = $(BINPGO)test_xml@EXE@
 test_win_pgo = $(BINPGO)test_win@EXE@
+index_sort_pgo = $(BINPGO)index_sort@EXE@
+check_sort_pgo = $(BINPGO)check_sort@EXE@
 
 test_math = $(BIN)test_math@EXE@
 test_xml = $(BIN)test_xml@EXE@
 test_win = $(BIN)test_win@EXE@
+index_sort = $(BIN)index_sort@EXE@
+check_sort = $(BIN)check_sort@EXE@
 
 libjbpgo = $(BINPGO)libjb@SO@
 libjbmpgo = $(BINPGO)libjbm@SO@
@@ -74,13 +83,16 @@ objpgo = $(jb_config_pgo) $(jb_def_pgo) $(jb_math_pgo) $(jb_xml_pgo) \
 	$(jb_win_bin_pgo) $(jb_win_pgo)
 obj = $(jb_config_o) $(jb_def_o) $(jb_math_o) $(jb_xml_o) $(jb_win_bin_o) \
 	$(jb_win_o)
-tests = $(test_math) $(test_xml) $(test_win)
+tests = $(test_math) $(test_xml) $(test_win) $(index_sort) $(check_sort)
 exe = $(libjb) $(libjbm) $(libjbxml) $(libjbbin) $(libjbw) $(tests)
 dep = $(jb_def_h) $(jb_config_h) $(config_h) Makefile
 defdep = $(jb_def_c) $(dep)
 mathdep = $(jb_math_c) $(jb_math_h) $(dep)
 xmldep = $(jb_xml_c) $(jb_xml_h) $(jb_math_h) $(dep)
 windep = $(jb_win_c) $(jb_win_h) $(jb_math_h) $(dep)
+index_sort_dep = $(index_sort_c) $(jb_math_h) $(dep)
+check_sort_dep = $(check_sort_c) $(jb_math_h) $(dep)
+
 ifeq (@PGO@, 1)
 ifeq (@CC@, clang)
 	PGOGENERATE = -fprofile-instr-generate
@@ -88,23 +100,30 @@ ifeq (@CC@, clang)
 	mathprefix = LLVM_PROFILE_FILE="math.profdata"
 	xmlprefix = LLVM_PROFILE_FILE="xml.profdata"
 	winprefix = LLVM_PROFILE_FILE="win.profdata"
-	llvm_merge = llvm-profdata *.profdata -output jb.profraw
+	index_sortprefix = LLVM_PROFILE_FILE="index_sort.profdata"
+	check_sortprefix = LLVM_PROFILE_FILE="check_sort.profdata"
+	llvm_merge = llvm-profdata merge *.profdata -output jb.profraw
 else
 	PGOGENERATE = -fprofile-generate
 	PGOUSE = -fprofile-use -fprofile-correction
 endif
 	pgoobj = $(jb_def_pgo) $(jb_math_pgo) $(jb_xml_pgo) $(jb_win_bin_pgo) \
 		$(jb_win_pgo)
-	testspgo = $(test_math_pgo) $(test_xml_pgo) $(test_win_pgo)
-	DEFDEP = $(testspgo) $(OBJ)jb_def.gcda
-	MATHDEP = $(testspgo) $(OBJ)jb_math.gcda
-	XMLDEP = $(testspgo) $(OBJ)jb_xml.gcda
-	WINDEP = $(testspgo) $(OBJ)jb_win.gcda
+	testspgo = $(test_math_pgo) $(test_xml_pgo) $(test_win_pgo) \
+		$(index_sort_pgo) $(check_sort_pgo)
+	DEFDEP = $(testspgo)
+	MATHDEP = $(testspgo)
+	XMLDEP = $(testspgo)
+	WINDEP = $(testspgo)
+	INDEX_SORTDEP = $(testspgo)
+	CHECK_SORTDEP = $(testspgo)
 else
 	DEFDEP = $(defdep)
 	MATHDEP = $(mathdep)
 	XMLDEP = $(xmldep)
 	WINDEP = $(windep)
+	INDEX_SORTDEP = $(index_sort_dep)
+	CHECK_SORTDEP = $(check_sort_dep)
 endif
 VULKAN = @VULKAN@
 ifeq ($(VULKAN), 1)
@@ -175,6 +194,20 @@ $(test_win_pgo): $(test_win_c) $(libjbpgo) $(libjbmpgo) $(libjbwpgo)
 	$(CC) $(CFLAGS) $(PGOGENERATE) @JBW@ $(test_win_c) -o $(test_win_pgo) \
 		$(EXEFLAGSPGO) -ljb -ljbm -ljbw
 	cd $(BINPGO); $(winprefix) ./test_win; $(llvm_merge)
+$(index_sort_pgo): $(index_sortdep)
+	$(CC) $(TESTS_CFLAGS) $(PGOGENERATE) $(index_sort_c) \
+		-o $(index_sort_pgo) $(TESTS_LDFLAGS) $(EXEFLAGSPGO) -ljbm -ljb
+	cd $(BINPGO); ./index_sort 10000 1000 0 1
+	cd $(BINPGO); ./index_sort 10000 1000 0 2
+	cd $(BINPGO); ./index_sort 10000 1000 0 3
+	cd $(BINPGO); ./index_sort 10000 1000 0 4
+$(check_sort_pgo): $(check_sortdep)
+	$(CC) $(TESTS_CFLAGS) $(PGOGENERATE) $(check_sort_c) \
+		-o $(check_sort_pgo) $(TESTS_LDFLAGS) $(EXEFLAGSPGO) -ljbm -ljb
+	cd $(BINPGO); ./check_sort 1000 1
+	cd $(BINPGO); ./check_sort 1000 2
+	cd $(BINPGO); ./check_sort 1000 3
+	cd $(BINPGO); ./check_sort 1000 4
 
 # Objects
 $(jb_def_o): $(DEFDEP)
@@ -210,6 +243,12 @@ $(test_xml): $(test_xml_c) $(libjb) $(libjbm) $(libjbbin)
 $(test_win): $(test_win_c) $(libjb) $(libjbm) $(libjbw)
 	$(CC) $(CFLAGS) $(PGOUSE) @JBW@ $(test_win_c) -o $(test_win) $(EXEFLAGS) \
 		-ljb -ljbm -ljbw
+$(index_sort): $(INDEX_SORTDEP)
+	$(CC) $(TESTS_CFLAGS) $(PGOUSE) $(index_sort_c) -o $(index_sort) \
+		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm -ljb
+$(check_sort): $(CHECK_SORTDEP)
+	$(CC) $(TESTS_CFLAGS) $(PGOUSE) $(check_sort_c) -o $(check_sort) \
+		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm -ljb
 
 # Shaders
 shaders/2D.spv: shaders/2D.vert Makefile
@@ -259,10 +298,8 @@ doc/latex/refman.pdf: $(src) Doxyfile Makefile
 # Final version
 strip:
 	@MAKE@
-	cd tests; @MAKE@ strip
 	strip $(exe) $(tests)
 
 # Clean
 clean:
-	cd tests; @MAKE@ clean
 	rm -rf doc $(OBJ) $(BIN) $(BINPGO)
