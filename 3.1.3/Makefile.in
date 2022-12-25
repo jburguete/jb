@@ -185,7 +185,6 @@ $(test_math_pgo): $(test_math_c) $(libjbpgo) $(libjbmpgo)
 	$(CC) $(CFLAGS) $(PGOGENERATE) -DJBW=1 $(test_math_c) -o $(test_math_pgo) \
 		$(EXEFLAGSPGO) -ljb -ljbm
 	cd $(BINPGO); $(mathprefix) ./test_math
-	cd tests; @MAKE@ index_sortpgo check_sortpgo
 $(test_xml_pgo): $(test_xml_c) $(libjbpgo) $(libjbmpgo) $(libjbxmlpgo)
 	$(CC) $(CFLAGS) $(PGOGENERATE) -DJBW=1 $(test_xml_c) -o $(test_xml_pgo) \
 		$(EXEFLAGSPGO) -ljb -ljbm -ljbxml
