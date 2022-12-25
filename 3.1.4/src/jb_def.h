@@ -107,8 +107,8 @@ JBChange (void **__restrict a,  ///< a pointer to interchange.
 #define jb_change(a, b) (JBChange((void**)&a, (void**)&b))
 ///< Macro to interchange two pointers.
 
-void jb_init ();
-void jb_function_null ();
+void jb_init (void);
+void jb_function_null (void);
 void jb_free_null (void **);
 void *jb_realloc (void *, const int);
 char *jb_strdup (char *);
@@ -116,6 +116,6 @@ long int jb_flength (FILE * file);
 void jb_slist_free (GSList ** list);
 int jb_bin_read (FILE * file, char *buffer);
 void jb_bin_write (FILE * file, char *buffer);
-int jb_get_ncores ();
+int jb_get_ncores (void);
 
 #endif

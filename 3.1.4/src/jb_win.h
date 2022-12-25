@@ -426,19 +426,19 @@ extern const GLfloat jbw_white[4];
 extern const GLfloat jbw_identity[16];
 
 #if HAVE_GTKGLAREA
-extern int (*jbw_graphic_loop_idle) ();
+extern int (*jbw_graphic_loop_idle) (void);
 extern GMainLoop *jbw_graphic_loop_pointer;
 #elif HAVE_FREEGLUT
-extern void (*jbw_graphic_loop_idle) ();
+extern void (*jbw_graphic_loop_idle) (void);
 extern void (*jbw_graphic_loop_resize) (int width, int height);
-extern void (*jbw_graphic_loop_render) ();
+extern void (*jbw_graphic_loop_render) (void);
 #elif HAVE_SDL
-extern int (*jbw_graphic_loop_idle) ();
+extern int (*jbw_graphic_loop_idle) (void);
 extern void (*jbw_graphic_loop_resize) (int width, int height);
-extern void (*jbw_graphic_loop_render) ();
+extern void (*jbw_graphic_loop_render) (void);
 #elif HAVE_GLFW
-extern int (*jbw_graphic_loop_idle) ();
-extern void (*jbw_graphic_loop_render) ();
+extern int (*jbw_graphic_loop_idle) (void);
+extern void (*jbw_graphic_loop_render) (void);
 extern unsigned int jbw_graphic_loop_exit;
 #endif
 
@@ -480,21 +480,21 @@ void jbw_draw_orthogonal_matrixl (GLint uniform, GLdouble x, GLdouble y,
 
 JBWImage *jbw_image_new (const char *name);
 
-void jbw_graphic_destroy ();
-void jbw_graphic_init ();
+void jbw_graphic_destroy (void);
+void jbw_graphic_init (void);
 void jbw_graphic_resize (int width, int height);
-void jbw_graphic_render ();
-void jbw_graphic_loop ();
+void jbw_graphic_render (void);
+void jbw_graphic_loop (void);
 void jbw_graphic_set_title (const char *title);
 void jbw_graphic_set_logo (const char *name);
 JBWGraphic *jbw_graphic_new (unsigned int nx, unsigned int ny,
                              unsigned int nz,
                              void (*draw) (JBWGraphic * graphic),
                              const char *title);
-void jbw_graphic_get_display_size ();
+void jbw_graphic_get_display_size (void);
 void jbw_graphic_draw_text (const char *string,
                             GLfloat x, GLfloat y, const GLfloat * color);
-void jbw_graphic_map_resize ();
+void jbw_graphic_map_resize (void);
 void jbw_graphic_draw_resize (JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2,
                               JBFLOAT * z1, JBFLOAT * z2, int n);
 void jbw_graphic_draw_resizel (JBDOUBLE * x, JBDOUBLE * y1, JBDOUBLE * y2,
@@ -515,8 +515,8 @@ void jbw_graphic_draw_rectangle (JBFLOAT x1, JBFLOAT y1, JBFLOAT x2, JBFLOAT y2,
 void jbw_graphic_draw_rectanglel (JBDOUBLE x1, JBDOUBLE y1,
                                   JBDOUBLE x2, JBDOUBLE y2,
                                   const GLfloat * color);
-void jbw_graphic_draw_labels ();
-void jbw_graphic_draw_logo ();
+void jbw_graphic_draw_labels (void);
+void jbw_graphic_draw_logo (void);
 void jbw_graphic_draw_lines (JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2,
                              JBFLOAT * z1, JBFLOAT * z2, int n);
 void jbw_graphic_draw_linesl (JBDOUBLE * x, JBDOUBLE * y1, JBDOUBLE * y2,
@@ -526,7 +526,7 @@ void jbw_graphic_draw_linesv (void *x, void *y1, void *y2, void *z1, void *z2,
 void jbw_graphic_draw_linesvl (void *x, void *y1, void *y2, void *z1, void *z2,
                                unsigned int size, int n);
 void jbw_graphic_save (char *file_name);
-void jbw_graphic_dialog_save ();
+void jbw_graphic_dialog_save (void);
 
 void jbw_array_editor_check_column (JBWArrayEditor * editor, int column,
                                     int type);
@@ -704,7 +704,7 @@ jbw_graphic_set_data (JBWGraphic * graphic,     ///< JBWGraphic widget.
  * Function to quit a main loop in a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_loop_quit ()
+jbw_graphic_loop_quit (void)
 {
 #if HAVE_GTKGLAREA
   g_main_loop_quit (jbw_graphic_loop_pointer);

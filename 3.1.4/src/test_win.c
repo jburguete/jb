@@ -7,10 +7,11 @@
 JBWGraphic *graphic;
 
 static void
-jbw_freeglut_idle ()
+jbw_freeglut_idle (void)
 {
   GMainContext *context = g_main_context_default ();
-  gdk_gl_context_make_current (jbw_gdk_gl_context);
+  if (jbw_gdk_gl_context)
+    gdk_gl_context_make_current (jbw_gdk_gl_context);
   while (g_main_context_pending (context))
     g_main_context_iteration (context, 0);
   glutSetWindow (graphic->window);
@@ -24,7 +25,7 @@ jbw_freeglut_draw_resize (int width, int height)
 }
 
 static void
-jbw_freeglut_draw_render ()
+jbw_freeglut_draw_render (void)
 {
   jbw_graphic_render ();
 }
@@ -41,7 +42,7 @@ jbw_sdl_draw_resize (int width, int height)
 }
 
 static void
-jbw_sdl_draw_render ()
+jbw_sdl_draw_render (void)
 {
   jbw_graphic_render ();
 }

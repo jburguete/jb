@@ -161,27 +161,27 @@ const GLfloat jbw_identity[16] = {
 };                              ///< identity matrix.
 
 #if HAVE_GTKGLAREA
-int (*jbw_graphic_loop_idle) () = NULL;
+int (*jbw_graphic_loop_idle) (void) = NULL;
 GMainLoop *jbw_graphic_loop_pointer = NULL;
 ///< pointer to the idle function on a main loop.
 #elif HAVE_FREEGLUT
-void (*jbw_graphic_loop_idle) () = NULL;
+void (*jbw_graphic_loop_idle) (void) = NULL;
 ///< pointer to the idle function on a main loop.
 void (*jbw_graphic_loop_resize) (int width, int height) = NULL;
 ///< pointer to the resize function on a main loop.
-void (*jbw_graphic_loop_render) () = NULL;
+void (*jbw_graphic_loop_render) (void) = NULL;
 ///< pointer to the render function on a main loop.
 #elif HAVE_SDL
-int (*jbw_graphic_loop_idle) () = NULL;
+int (*jbw_graphic_loop_idle) (void) = NULL;
 ///< pointer to the idle function on a main loop.
 void (*jbw_graphic_loop_resize) (int width, int height) = NULL;
 ///< pointer to the resize function on a main loop.
-void (*jbw_graphic_loop_render) () = NULL;
+void (*jbw_graphic_loop_render) (void) = NULL;
 ///< pointer to the render function on a main loop.
 #elif HAVE_GLFW
-int (*jbw_graphic_loop_idle) () = NULL;
+int (*jbw_graphic_loop_idle) (void) = NULL;
 ///< pointer to the idle function on a main loop.
-void (*jbw_graphic_loop_render) () = NULL;
+void (*jbw_graphic_loop_render) (void) = NULL;
 ///< pointer to the render function on a main loop.
 unsigned int jbw_graphic_loop_exit;
 ///< 1 on exit main loop, 0 on continue.
@@ -643,7 +643,7 @@ jbw_image_init (JBWImage * image,       ///< JBWImage widget.
   glGetShaderiv (fs, GL_COMPILE_STATUS, &error_code);
   if (!error_code)
     {
-      glDeleteShader (vs);
+      glDeleteShader (fs);
       error_msg = _("unable to compile the texture fragment shader");
       goto end;
     }
@@ -655,6 +655,8 @@ jbw_image_init (JBWImage * image,       ///< JBWImage widget.
   glGetShaderiv (vs, GL_COMPILE_STATUS, &error_code);
   if (!error_code)
     {
+      glDeleteShader (fs);
+      glDeleteShader (vs);
       error_msg = _("unable to compile the texture vertex shader");
       goto end;
     }
@@ -888,7 +890,7 @@ jbw_image_draw (JBWImage * image,       ///< JBWImage struct.
  * \return 1 on available all validation layers, 0 otherwise.
  */
 static int
-jbw_validation_layer_check_support ()
+jbw_validation_layer_check_support (void)
 {
   VkLayerProperties *available_layers;
   int err;
@@ -1876,7 +1878,7 @@ jbw_graphic_delete (JBWGraphic * graphic)       ///< current JBWGraphic widget.
  * Function to close and free the memory used by the current JBWGraphic widget.
  */
 void
-jbw_graphic_destroy ()
+jbw_graphic_destroy (void)
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
   if (graphic->window)
@@ -1895,7 +1897,7 @@ jbw_graphic_destroy ()
  * Function to init the OpenGL functions on the current JBWGraphic widget.
  */
 void
-jbw_graphic_init ()
+jbw_graphic_init (void)
 {
   const char *gl_version_120 =
     "#version 120\n" "#define in attribute\n" "#define out varying\n";
@@ -1967,7 +1969,7 @@ jbw_graphic_init ()
   if (glew_status != GLEW_OK)
     {
       error_msg = (const char *) glewGetErrorString (glew_status);
-      goto end;
+      goto end2;
     }
   if (glewIsSupported ("GL_VERSION_3_0"))
     gl_version = gl_version_130;
@@ -2353,7 +2355,7 @@ jbw_graphic_resize (int width,  ///< new screen width.
  * Function to render the current JBWGraphic widget.
  */
 void
-jbw_graphic_render ()
+jbw_graphic_render (void)
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
   if (graphic->draw)
@@ -2407,7 +2409,7 @@ jbw_graphic_render_glfw (GLFWwindow * window __attribute__((unused)))
  * Function to do a main loop on the current JBWGraphic widget.
  */
 void
-jbw_graphic_loop ()
+jbw_graphic_loop (void)
 {
 #if HAVE_GTKGLAREA
 
@@ -2434,7 +2436,8 @@ jbw_graphic_loop ()
   jbw_graphic_loop_render ();
   while (1)
     {
-      gdk_gl_context_make_current (jbw_gdk_gl_context);
+      if (jbw_gdk_gl_context)
+        gdk_gl_context_make_current (jbw_gdk_gl_context);
       while (g_main_context_pending (context))
         g_main_context_iteration (context, 0);
       SDL_GL_MakeCurrent (jbw_graphic_pointer->window,
@@ -2467,7 +2470,8 @@ jbw_graphic_loop ()
   jbw_graphic_loop_exit = 0;
   while (!jbw_graphic_loop_exit)
     {
-      gdk_gl_context_make_current (jbw_gdk_gl_context);
+      if (jbw_gdk_gl_context)
+        gdk_gl_context_make_current (jbw_gdk_gl_context);
       while (g_main_context_pending (context))
         g_main_context_iteration (context, 0);
       glfwMakeContextCurrent (jbw_graphic_pointer->window);
@@ -2625,7 +2629,7 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
 #if !HAVE_FREEGLUT
 error2:
 #endif
-  jbw_graphic_destroy (graphic);
+  jbw_graphic_destroy ();
 error1:
   jbw_show_error (error_msg);
   return NULL;
@@ -2635,7 +2639,7 @@ error1:
  * Function to get the graphical size of the current JBWGraphic widget.
  */
 void
-jbw_graphic_get_display_size ()
+jbw_graphic_get_display_size (void)
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
 #if HAVE_GTKGLAREA
@@ -2753,7 +2757,7 @@ jbw_graphic_draw_text (const char *string,      ///< string.
  * widget.
  */
 void
-jbw_graphic_map_resize ()
+jbw_graphic_map_resize (void)
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
   JBDOUBLE vw, vh, cw, ch;
@@ -3185,7 +3189,7 @@ jbw_graphic_draw_rectanglel (JBDOUBLE x1,       ///< 1st corner x-coordinate.
  * JBWGraphic widget.
  */
 void
-jbw_graphic_draw_labels ()
+jbw_graphic_draw_labels (void)
 {
   JBDOUBLE xtic[JBW_GRAPHIC_N_TICS];
   JBDOUBLE ytic[JBW_GRAPHIC_N_TICS];
@@ -3377,7 +3381,7 @@ jbw_graphic_draw_labels ()
  * Function to render the logo in the current JBWGraphic widget.
  */
 void
-jbw_graphic_draw_logo ()
+jbw_graphic_draw_logo (void)
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
   JBWImage *logo = graphic->logo;
@@ -3607,7 +3611,7 @@ jbw_graphic_save (char *file_name)      ///< file name.
   FILE *file;
   unsigned int row_bytes, pointers_bytes, pixels_bytes, i, x2, y2;
   graphic = jbw_graphic_pointer;
-  jbw_graphic_get_display_size (graphic);
+  jbw_graphic_get_display_size ();
   x2 = graphic->width;
   y2 = graphic->height;
   png = png_create_write_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -3708,7 +3712,7 @@ jbw_graphic_dialog_response (GtkFileChooserDialog * dlg,
  * Function to show a dialog to save the JBWGraphic widget on a graphic file.
  */
 void
-jbw_graphic_dialog_save ()
+jbw_graphic_dialog_save (void)
 {
 #if JBW_GRAPHIC_OUTPUT == JBW_GRAPHIC_OUTPUT_GDKPIXBUF
   const char *filter_name[JBW_GRAPHIC_N_TYPES] = {

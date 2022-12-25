@@ -102,7 +102,7 @@ ifeq (@CC@, clang)
 	winprefix = LLVM_PROFILE_FILE="win.profdata"
 	index_sortprefix = LLVM_PROFILE_FILE="index_sort.profdata"
 	check_sortprefix = LLVM_PROFILE_FILE="check_sort.profdata"
-	llvm_merge = llvm-profdata merge *.profdata -output jb.profraw
+	llvm_merge = @LLVM_PROFDATA@ merge *.profdata -output jb.profraw
 else
 	PGOGENERATE = -fprofile-generate
 	PGOUSE = -fprofile-use -fprofile-correction

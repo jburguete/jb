@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([jb],[3.1.3],[https://github.com/jburguete/jb])
+AC_INIT([jb],[3.1.4],[https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -79,6 +79,13 @@ if test "`command -v gmake`"; then
 	AC_SUBST(MAKE, [gmake])
 else
 	AC_SUBST(MAKE, [make])
+fi
+if test $CC = "clang"; then
+	AC_CHECK_PROGS([LLVM_PROFDATA], [llvm-profdata llvm-profdata-15], 0)
+	if test $LLVM_PROFDATA = 0; then
+	      	AC_MSG_ERROR([No llvm-profdata])
+	fi
+	AC_MSG_NOTICE([llvm-profdata: $LLVM_PROFDATA])
 fi
 
 # Checking -march=native compiler flag

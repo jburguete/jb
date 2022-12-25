@@ -9,7 +9,7 @@
 #define XML_T (const xmlChar *) "t"
 
 int
-main ()
+main (void)
 {
   xmlDoc *doc;
   xmlNode *node;

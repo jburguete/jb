@@ -36,7 +36,7 @@
  * Function to init locales in the JB library.
  */
 void
-jb_init ()
+jb_init (void)
 {
   char *buffer, *buffer2;
   setlocale (LC_ALL, "");
@@ -65,7 +65,7 @@ jb_free_null (void **p)         ///< pointer to free.
  * An empty function useful to pass as pointer to functions.
  */
 void
-jb_function_null ()
+jb_function_null (void)
 {
 }
 
@@ -165,7 +165,7 @@ jb_bin_write (FILE * file,      ///< file.
  * \return number of cores.
  */
 int
-jb_get_ncores ()
+jb_get_ncores (void)
 {
 #if HAVE_GTOP
   int ncores;

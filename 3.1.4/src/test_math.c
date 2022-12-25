@@ -18,7 +18,7 @@ typedef struct
 } Check;
 
 int
-main ()
+main (void)
 {
   int i;
   Check check[4];
@@ -63,7 +63,8 @@ JBFLOAT D[] = { -2., -1., 3., 1. };
 JBFLOAT E[] = { -3., 1., 2. };
 JBFLOAT H[] = { -20., 13., 14., 52., 48. };
 
-main ()
+int
+main (void)
 {
   int i;
   FILE *file;
@@ -105,7 +106,8 @@ JBFLOAT z[25] =
   6., 5., 4., 5., 6., 7.
 };
 
-main ()
+int
+main (void)
 {
   JBFLOAT *zz;
   int *ni, *nj, *nij, nmax, nmin;
@@ -124,7 +126,8 @@ JBFLOAT ya[7] = { 3., 2., -1., 4., 7., 3., 1. };
 JBFLOAT xr[3] = { 1.5, 3.2, 4.8 };
 JBFLOAT yr[3] = { 2., 3., 1. };
 
-main ()
+int
+main (void)
 {
   printf ("MSE = " FWL "\n",
           jbm_farray_mean_square_error (xa, ya, na, xr, yr, nr));
@@ -149,7 +152,8 @@ int na = 6, nr = 2;
 P2 va[7] = { 0., 3., 1., 2., 2., -1., 3., 4., 4., 7., 5., 3., 6., 1. };
 P3 vr[3] = { 1.5, 2., 0., 3.2, 3., 0., 4.8, 1., 0 };
 
-main ()
+int
+main (void)
 {
   printf ("MSE = " FWL "\n",
           jbm_varray_mean_square_error
@@ -162,7 +166,8 @@ main ()
 
 #ifdef FILE_MEAN_SQUARE_ERROR
 
-main ()
+int
+main (void)
 {
   printf
     ("MSE = " FWL "\n",
