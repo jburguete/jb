@@ -109,7 +109,7 @@ This software has been built and tested in the following operative systems:
 * NetBSD 9.3
 * OpenBSD 7.2
 * OpenInidiana Hipster
-* OpenSUSE Linux 15.3
+* OpenSUSE Linux 15.4
 * Ubuntu Linux 21.04
 
 On Microsoft Windows systems you have to install
@@ -118,15 +118,15 @@ libraries and utilities. You can follow detailed instructions in
 [install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf)
 tutorial.
 
-On NetBSD 9.2, to use the last GCC version, you have to do first on the
+On NetBSD 9.3, to use the last GCC version, you have to do first on the
 building terminal:
-> $ export PATH="/usr/pkg/gcc9/bin:$PATH"
+> $ export PATH="/usr/pkg/gcc12/bin:$PATH"
 
 To do permanent this change the following line can be added to the ".profile"
 file in the user root directory:
-> PATH="/usr/pkg/gcc9/bin:$PATH"
+> PATH="/usr/pkg/gcc12/bin:$PATH"
 
-On OpenBSD 7.0 you have to do first on the building terminal:
+On OpenBSD 7.2 you have to do first on the building terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 COMMON BUILDING INSTRUCTIONS
@@ -197,15 +197,3 @@ ____________________
 > $ gcc -DJBW=2 -DJBM\_PRECISION=2 YOUR\_SOURCE\_CODE.c
 > -o YOUR\_EXECUTABLE\_FILE -L. -Wl,-rpath=. -ljb
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
-
-INSTRUCTIONS TO MAKE THE REFERENCE MANUAL (doc/latex/refman.pdf file)
----------------------------------------------------------------------
-
-Execute on a terminal:
-> $ cd PATH\_TO\_JB\_LIBRARY/3.1.3
->
-> $ doxygen
->
-> $ cd doc/latex
->
-> $ make

@@ -120,7 +120,7 @@ d'exploitation:
 * NetBSD 9.3
 * OpenBSD 7.2
 * OpenInidiana Hipster
-* OpenSUSE Linux 15.3
+* OpenSUSE Linux 15.4
 * Ubuntu Linux 21.04
 
 Avec systèmes Microsoft Windows on doit installer
@@ -129,15 +129,15 @@ les outils requis. On peut suivre les instructions détaillées dans le
 didacticiel
 [install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf).
 
-Avec NetBSD 9.2, pour utiliser le derniére version du compilateur GCC, il faut
+Avec NetBSD 9.3, pour utiliser le derniére version du compilateur GCC, il faut
 faire avant dans le terminal:
-> $ export PATH="/usr/pkg/gcc9/bin:$PATH"
+> $ export PATH="/usr/pkg/gcc12/bin:$PATH"
 
 Pour faire le changement permanent on peut ajouter à la dernière ligne di
 fichier ".profile" dans le répertoire racine du utilisateur:
-> PATH="/usr/pkg/gcc9/bin:$PATH"
+> PATH="/usr/pkg/gcc12/bin:$PATH"
 
-Avec OpenBSD 7.0 on doit faire avant dans le terminal:
+Avec OpenBSD 7.2 on doit faire avant dans le terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 INSTRUCTIONS DE CONSTRUCTION COMMUNES
@@ -210,15 +210,3 @@ _______________________
 > $ gcc -DJBW=2 -DJBM\_PRECISION=2 VÔTRE\_CODE\_SOURCE.c
 > -o VÔTRE\_FICHIER\_EXECUTABLE -L. -Wl,-rpath=. -ljb
 > \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
-
-INSTRUCTIONS POUR FAIRE LE MANUEL DE REFERENCE (fichier doc/latex/refman.pdf)
--------------------------------------------------------------------------------
-
-Exécutez dans un terminal:
-> $ cd CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/3.1.3
->
-> $ doxygen
->
-> $ cd doc/latex
->
-> $ make
