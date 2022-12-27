@@ -11,6 +11,7 @@ win=0
 win32=0
 native=1
 haiku=0
+mac=0
 if test $host = "x86_64-w64-mingw32"; then
 	AC_MSG_NOTICE([Microsoft Windows 64 bits + MinGW])
 	win=1
@@ -31,7 +32,6 @@ elif test `uname -s` = "Darwin"; then
 	AC_MSG_NOTICE("echo 'export PATH=''/usr/local/opt/llvm@13/bin:$PATH''' >> ./zshrc")
 	LDFLAGS="$LDFLAGS -L/usr/local/opt/llvm@13/lib -L/System/Library/Frameworks -framework GLUT -framework OpenGL"
 	CPPFLAGS="$CPPFLAGS -I/usr/local/opt/llvm@13/include"
-	AC_SUBST(mac, 1)
 	mac=1
 elif test `uname -s` = "FreeBSD"; then
 	AC_MSG_NOTICE([FreeBSD])

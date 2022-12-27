@@ -199,6 +199,7 @@ main (int argn, char **argc)
 #else
   window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
 #endif
+  gtk_window_set_title (window, "test_win");
   gtk_window_set_child (window, GTK_WIDGET (grid));
 #if HAVE_GTKGLAREA
   jbw_graphic_loop_pointer = g_main_loop_new (NULL, 0);

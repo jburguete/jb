@@ -1,7 +1,6 @@
 /*
 BUGS:
-  * No JBWGraphics (SDL and GLFW) rendering on GTK4 
-  * JBWGraphics fails on GTK4 (FreeGLUT)
+  * No JBWGraphics (SDL and GtkGLArea) rendering on GTK4 
 
 DEBUGS:
 

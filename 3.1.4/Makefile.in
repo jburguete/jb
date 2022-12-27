@@ -32,9 +32,9 @@ jb_def_c = $(SRC)jb_def.c
 jb_math_c = $(SRC)jb_math.c
 jb_xml_c = $(SRC)jb_xml.c
 jb_win_c = $(SRC)jb_win.c
-test_math_c = $(SRC)test_math.c
-test_xml_c = $(SRC)test_xml.c
-test_win_c = $(SRC)test_win.c
+test_math_c = $(TESTS)test_math.c
+test_xml_c = $(TESTS)test_xml.c
+test_win_c = $(TESTS)test_win.c
 index_sort_c = $(TESTS)index_sort.c
 check_sort_c = $(TESTS)check_sort.c
 
@@ -44,7 +44,6 @@ jb_math_pgo = $(OBJ)jb_math.pgo
 jb_xml_pgo = $(OBJ)jb_xml.pgo
 jb_win_bin_pgo = $(OBJ)jb_win_bin.pgo
 jb_win_pgo = $(OBJ)jb_win.pgo
-
 test_math_pgo = $(OBJ)test_math.pgo
 test_xml_pgo = $(OBJ)test_xml.pgo
 test_win_pgo = $(OBJ)test_win.pgo
@@ -69,6 +68,11 @@ jb_math_o = $(OBJ)jb_math.o
 jb_xml_o = $(OBJ)jb_xml.o
 jb_win_bin_o = $(OBJ)jb_win_bin.o
 jb_win_o = $(OBJ)jb_win.o
+test_math_o = $(OBJ)test_math.o
+test_xml_o = $(OBJ)test_xml.o
+test_win_o = $(OBJ)test_win.o
+index_sort_o = $(OBJ)index_sort.o
+check_sort_o = $(OBJ)check_sort.o
 
 libjb = $(BIN)libjb@SO@
 libjbm = $(BIN)libjbm@SO@
@@ -179,11 +183,14 @@ $(jb_win_pgo): $(windep)
 	$(CC) $(CFLAGS) $(PGOGENERATE) -c -fPIC @JBW@ $(jb_win_c) \
 		-o $(jb_win_pgo)
 $(test_math_pgo): $(test_math_dep)
-	$(CC) $(CFLAGS) $(PGOGENERATE) -c -DJBW=1 $(test_math_c) -o $(test_math_pgo)
+	$(CC) $(CFLAGS) $(PGOGENERATE) -I$(SRC) -c -DJBW=1 $(test_math_c) \
+		-o $(test_math_pgo)
 $(test_xml_pgo): $(test_xml_dep)
-	$(CC) $(CFLAGS) $(PGOGENERATE) -c -DJBW=1 $(test_xml_c) -o $(test_xml_pgo)
+	$(CC) $(CFLAGS) $(PGOGENERATE) -I$(SRC) -c -DJBW=1 $(test_xml_c) \
+		-o $(test_xml_pgo)
 $(test_win_pgo): $(test_win_dep)
-	$(CC) $(CFLAGS) $(PGOGENERATE) -c @JBW@ $(test_win_c) -o $(test_win_pgo)
+	$(CC) $(CFLAGS) $(PGOGENERATE) -I$(SRC) -c @JBW@ $(test_win_c) \
+		-o $(test_win_pgo)
 $(index_sort_pgo): $(index_sort_dep)
 	$(CC) $(TESTS_CFLAGS) $(PGOGENERATE) $(index_sort_c) \
 		-o $(index_sort_pgo)
@@ -217,7 +224,7 @@ $(test_xml_binpgo): $(test_xml_pgo) $(libjbxmlpgo)
 		$(EXEFLAGSPGO) -ljb -ljbm -ljbxml
 	cd $(BINPGO); $(xmlprefix) ./test_xml
 $(test_win_binpgo): $(test_win_pgo) $(libjbwpgo)
-	$(CC) $(CFLAGS) $(PGOGENERATE) @JBW@ $(test_win_c) -o $(test_win_binpgo) \
+	$(CC) $(CFLAGS) $(PGOGENERATE) @JBW@ $(test_win_pgo) -o $(test_win_binpgo) \
 		$(EXEFLAGSPGO) -ljb -ljbm -ljbw
 	cd $(BINPGO); $(winprefix) ./test_win; $(llvm_merge)
 $(index_sort_binpgo): $(index_sort_pgo) $(libjbmpgo)
@@ -247,11 +254,11 @@ $(jb_win_bin_o): $(WINDEP)
 $(jb_win_o): $(WINDEP)
 	$(CC) $(CFLAGS) $(PGOUSE) -c -fPIC @JBW@ $(jb_win_c) -o $(jb_win_o)
 $(test_math_o): $(TEST_MATH_DEP)
-	$(CC) $(CFLAGS) $(PGOUSE) -c -DJBW=1 $(test_math_c) -o $(test_math_o)
+	$(CC) $(CFLAGS) $(PGOUSE) -I$(SRC) -c -DJBW=1 $(test_math_c) -o $(test_math_o)
 $(test_xml_o): $(TEST_XML_DEP)
-	$(CC) $(CFLAGS) $(PGOUSE) -c -DJBW=1 $(test_xml_c) -o $(test_xml_o)
+	$(CC) $(CFLAGS) $(PGOUSE) -I$(SRC) -c -DJBW=1 $(test_xml_c) -o $(test_xml_o)
 $(test_win_o): $(TEST_WIN_DEP)
-	$(CC) $(CFLAGS) $(PGOUSE) -c @JBW@ $(test_win_c) -o $(test_win_o)
+	$(CC) $(CFLAGS) $(PGOUSE) -I$(SRC) -c @JBW@ $(test_win_c) -o $(test_win_o)
 $(index_sort_o): $(INDEX_SORT_DEP)
 	$(CC) $(TESTS_CFLAGS) $(PGOUSE) $(index_sort_c) -o $(index_sort_o)
 $(check_sort_o): $(CHECK_SORT_DEP)
@@ -270,19 +277,19 @@ $(libjbw): $(jb_win_o) $(libjb) $(libjbm)
 	$(CC) $(PGOUSE) -shared $(jb_win_o) $(EXEFLAGS) -o $(libjbw) -ljb -ljbm
 
 # Tests
-$(test_math): $(test_math_o) $(libjbm)
-	$(CC) $(PGOUSE) $(test_math_o) -o $(test_math) $(EXEFLAGS) -ljb -ljbm
-$(test_xml): $(test_xml_o) $(libjbbin)
-	$(CC) $(PGOUSE) $(test_xml_o) -o $(test_xml) $(EXEFLAGS) \
+$(test_math_bin): $(test_math_o) $(libjbm)
+	$(CC) $(PGOUSE) $(test_math_o) -o $(test_math_bin) $(EXEFLAGS) -ljb -ljbm
+$(test_xml_bin): $(test_xml_o) $(libjbbin)
+	$(CC) $(PGOUSE) $(test_xml_o) -o $(test_xml_bin) $(EXEFLAGS) \
 		-ljb -ljbm -ljbxml
-$(test_win): $(test_win_o) $(libjbw)
-	$(CC) $(PGOUSE) @JBW@ $(test_win_o) -o $(test_win) $(EXEFLAGS) \
+$(test_win_bin): $(test_win_o) $(libjbw)
+	$(CC) $(PGOUSE) @JBW@ $(test_win_o) -o $(test_win_bin) $(EXEFLAGS) \
 		-ljb -ljbm -ljbw
-$(index_sort): $(index_sort_o) $(libjbm)
-	$(CC) $(PGOUSE) $(index_sort_o) -o $(index_sort) \
+$(index_sort_bin): $(index_sort_o) $(libjbm)
+	$(CC) $(PGOUSE) $(index_sort_o) -o $(index_sort_bin) \
 		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm -ljb
-$(check_sort): $(check_sort_o) $(libjbm)
-	$(CC) $(PGOUSE) $(check_sort_o) -o $(check_sort) \
+$(check_sort_bin): $(check_sort_o) $(libjbm)
+	$(CC) $(PGOUSE) $(check_sort_o) -o $(check_sort_bin) \
 		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm -ljb
 
 # Shaders
