@@ -311,7 +311,7 @@ exit1:
 }
 
 /**
- * Function to set in the content of a XML node a file.
+ * Function to set in a file the content of a XML node.
  */
 void
 jb_xml_node_set_content_file (xmlNode * node,   ///< XML node struct.
