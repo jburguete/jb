@@ -13,8 +13,8 @@ main (void)
 {
   xmlDoc *doc;
   xmlNode *node;
-//  FILE *file;
-//  char *buffer;
+  FILE *file;
+  char *buffer;
   JBDOUBLE x;
   int i, e1, e2, e3;
   xmlKeepBlanksDefault (0);
@@ -24,7 +24,6 @@ main (void)
   jb_xml_node_set_float_with_default (node, XML_X, 1., 0.);
   jb_xml_node_set_int_with_default (node, XML_I, 1, 0);
   jb_xml_node_set_time_with_default (node, XML_T, 1., 0.);
-/*
   file = fopen ("../test_data", "r");
   if (!file || fscanf (file, "%d", &i) != 1 || i)
     {
@@ -32,11 +31,10 @@ main (void)
       return 1;
     }
   jb_xml_node_set_content_file (node, file);
-*/
-  fclose (file);
   xmlSaveFormatFile (TEST_FILE, doc, 1);
+  fclose (file);
   xmlFreeDoc (doc);
-  doc = xmlParseDoc (XML_FILE);
+  doc = xmlParseEntity (TEST_FILE);
   node = xmlDocGetRootElement (doc);
   x = jb_xml_node_get_float_with_default (node, XML_X, &e1, 0.);
   printf ("x " FWL " 1\n", x);
@@ -49,16 +47,15 @@ main (void)
       printf ("Bad xml property e1=%d e2=%d e3=%d\n", e1, e2, e3);
       return 2;
     }
-/*
-	file = jb_xml_node_get_content_file (node, &buffer);
-	if (!file || fscanf (file, "%d", &i) != 1 || i || !buffer)
-	  {
-			printf ("Bad xml content\n");
-			return 3;
+  file = jb_xml_node_get_content_file (node, &buffer);
+  if (!file || (e1 = fscanf (file, "%d", &i)) != 1 || i || !buffer)
+    {
+      printf ("Bad xml content file=%lu e1=%d i=%d buffer=%s\n",
+              (size_t) file, e1, i, buffer);
+      return 3;
     }
-	printf ("content %d %s\n", i, buffer);
-	fclose (file);
-*/
+  printf ("content %d %s\n", i, buffer);
+  fclose (file);
   xmlFree (doc);
   return 0;
 }

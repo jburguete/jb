@@ -11,9 +11,8 @@ FEATURES:
 	- 3D figures
 	- Legend in JBWGraphics
 	- Enable Vulkan
-	* Enable PGO building with CLang/LLVM
 	* Disconnect GTK and JBWGraphics
-  * Update link instructions in README files
+	* Update link instructions in README files
 
 STYLE:
 

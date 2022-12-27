@@ -1,4 +1,5 @@
-/* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
+/* JB - A library with useful mathematical, XML, JSON, GTK+ and OpenGL
+ * functions.
  *
  * Copyright 2005-2022, Javier Burguete Tolosa.
  *
