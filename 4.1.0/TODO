@@ -12,7 +12,8 @@ FEATURES:
 	- Legend in JBWGraphics
 	- Enable Vulkan
 	* Enable PGO building with CLang/LLVM
-  * Disconnect GTK and JBWGraphics
+	* Disconnect GTK and JBWGraphics
+	* Add JSON tools
 
 STYLE:
 
