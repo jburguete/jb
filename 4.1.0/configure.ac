@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([jb],[3.1.5],[https://github.com/jburguete/jb])
+AC_INIT([jb],[4.1.0],[https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -88,13 +88,14 @@ if test $CC = "clang"; then
 	AC_MSG_NOTICE([llvm-profdata: $LLVM_PROFDATA])
 fi
 
+# Checks for compiler flags
+compiler=$CC
+
 # Checking -march=native compiler flag
-AC_ARG_WITH([native],
-	AS_HELP_STRING([--with-native],
+AC_ARG_WITH([native], AS_HELP_STRING([--with-native],
 		[Build using -march=native compiler flag]))
 if test "x$with_native" = "xyes"; then
 	if test "x$native" = "x1"; then
-		compiler=$CC
 		CC="$CC -march=native"
 		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [arch=1], [arch=0])
 		CC=$compiler
@@ -109,7 +110,6 @@ if test "x$with_native" = "xyes"; then
 fi
 
 # Checking -flto compiler flag
-compiler=$CC
 CC="$CC -flto"
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [lto=1], [lto=0])
 CC=$compiler
@@ -124,18 +124,23 @@ fi
 # Checking PGO optimiztion
 AC_ARG_WITH([pgo],
 	AS_HELP_STRING([--with-pgo], [Build using PGO]))
+pgo=0
 if test "x$with_pgo" = "xyes"; then
 	CC="$CC -fprofile-generate"
-	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [pgo=1], [pgo=0])
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [pgo=1])
 	CC=$compiler
-	if test "x$pgo" = "x0"; then
-		AC_MSG_NOTICE("checking for PGO... no")
-		AC_SUBST(PGO, "0")
-	else
-		AC_MSG_NOTICE("checking for PGO... yes")
-		AC_SUBST(PGO, "1")
+	if test $pgo = 0; then
+		CC="$CC -fprofile-instr-generate"
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [pgo=1])
+		CC=$compiler
 	fi
 fi
+if test $pgo = 0; then
+		AC_MSG_NOTICE("checking for PGO... no")
+else
+		AC_MSG_NOTICE("checking for PGO... yes")
+fi
+AC_SUBST(PGO, [$pgo])
 
 # Checks for libraries
 AC_SEARCH_LIBS([fmaxl], [m])
@@ -271,14 +276,19 @@ AC_ARG_WITH([precision],
 		[Build with precision degree (1-5), default=2]))
 if test "x$with_precision" = "x1"; then
 	AC_SUBST(PRECISION, "-DJBM_PRECISION=1")
+	AC_SUBST(SUFFIX, [-1])
 elif test "x$with_precision" = "x3"; then
 	AC_SUBST(PRECISION, "-DJBM_PRECISION=3")
+	AC_SUBST(SUFFIX, [-3])
 elif test "x$with_precision" = "x4"; then
 	AC_SUBST(PRECISION, "-DJBM_PRECISION=4")
+	AC_SUBST(SUFFIX, [-4])
 elif test "x$with_precision" = "x5"; then
 	AC_SUBST(PRECISION, "-DJBM_PRECISION=5")
+	AC_SUBST(SUFFIX, [-5])
 else
 	AC_SUBST(PRECISION, "-DJBM_PRECISION=2")
+	AC_SUBST(SUFFIX, [-2])
 fi
 
 # Final output

@@ -1,4 +1,4 @@
-JB (version 3.1.5)
+JB (version 4.1.0)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -149,7 +149,7 @@ _____________________________________
 2. Liez la dernière version dans une répertoire jb, p.ex.:
 > $ cd RÉPERTOIRE\_DE\_VÔTRE\_PROGRAMME
 >
-> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/3.1.5 jb
+> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/4.1.0 jb
 
 3. Incluez le fichier de configuration et les outils requis dans vôtre code
   source p.ex.:

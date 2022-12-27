@@ -38,53 +38,53 @@ test_win_c = $(TESTS)test_win.c
 index_sort_c = $(TESTS)index_sort.c
 check_sort_c = $(TESTS)check_sort.c
 
-jb_config_pgo = $(OBJ)jb_config.pgo
-jb_def_pgo = $(OBJ)jb_def.pgo
-jb_math_pgo = $(OBJ)jb_math.pgo
-jb_xml_pgo = $(OBJ)jb_xml.pgo
-jb_win_bin_pgo = $(OBJ)jb_win_bin.pgo
-jb_win_pgo = $(OBJ)jb_win.pgo
-test_math_pgo = $(OBJ)test_math.pgo
-test_xml_pgo = $(OBJ)test_xml.pgo
-test_win_pgo = $(OBJ)test_win.pgo
-index_sort_pgo = $(OBJ)index_sort.pgo
-check_sort_pgo = $(OBJ)check_sort.pgo
+jb_config_pgo = $(OBJ)jb_config@SUFFIX@.pgo
+jb_def_pgo = $(OBJ)jb_def@SUFFIX@.pgo
+jb_math_pgo = $(OBJ)jb_math@SUFFIX@.pgo
+jb_xml_pgo = $(OBJ)jb_xml@SUFFIX@.pgo
+jb_win_bin_pgo = $(OBJ)jb_win_bin@SUFFIX@.pgo
+jb_win_pgo = $(OBJ)jb_win@SUFFIX@.pgo
+test_math_pgo = $(OBJ)test_math@SUFFIX@.pgo
+test_xml_pgo = $(OBJ)test_xml@SUFFIX@.pgo
+test_win_pgo = $(OBJ)test_win@SUFFIX@.pgo
+index_sort_pgo = $(OBJ)index_sort@SUFFIX@.pgo
+check_sort_pgo = $(OBJ)check_sort@SUFFIX@.pgo
 
-libjbpgo = $(BINPGO)libjb@SO@
-libjbmpgo = $(BINPGO)libjbm@SO@
-libjbxmlpgo = $(BINPGO)libjbxml@SO@
-libjbbinpgo = $(BINPGO)libjbbin@SO@
-libjbwpgo = $(BINPGO)libjbw@SO@
+libjbpgo = $(BINPGO)libjb@SUFFIX@@SO@
+libjbmpgo = $(BINPGO)libjbm@SUFFIX@@SO@
+libjbxmlpgo = $(BINPGO)libjbxml@SUFFIX@@SO@
+libjbbinpgo = $(BINPGO)libjbbin@SUFFIX@@SO@
+libjbwpgo = $(BINPGO)libjbw@SUFFIX@@SO@
 
-test_math_binpgo = $(BINPGO)test_math@EXE@
-test_xml_binpgo = $(BINPGO)test_xml@EXE@
-test_win_binpgo = $(BINPGO)test_win@EXE@
-index_sort_binpgo = $(BINPGO)index_sort@EXE@
-check_sort_binpgo = $(BINPGO)check_sort@EXE@
+test_math_binpgo = $(BINPGO)test_math@SUFFIX@@EXE@
+test_xml_binpgo = $(BINPGO)test_xml@SUFFIX@@EXE@
+test_win_binpgo = $(BINPGO)test_win@SUFFIX@@EXE@
+index_sort_binpgo = $(BINPGO)index_sort@SUFFIX@@EXE@
+check_sort_binpgo = $(BINPGO)check_sort@SUFFIX@@EXE@
 
-jb_config_o = $(OBJ)jb_config.o
-jb_def_o = $(OBJ)jb_def.o
-jb_math_o = $(OBJ)jb_math.o
-jb_xml_o = $(OBJ)jb_xml.o
-jb_win_bin_o = $(OBJ)jb_win_bin.o
-jb_win_o = $(OBJ)jb_win.o
-test_math_o = $(OBJ)test_math.o
-test_xml_o = $(OBJ)test_xml.o
-test_win_o = $(OBJ)test_win.o
-index_sort_o = $(OBJ)index_sort.o
-check_sort_o = $(OBJ)check_sort.o
+jb_config_o = $(OBJ)jb_config@SUFFIX@.o
+jb_def_o = $(OBJ)jb_def@SUFFIX@.o
+jb_math_o = $(OBJ)jb_math@SUFFIX@.o
+jb_xml_o = $(OBJ)jb_xml@SUFFIX@.o
+jb_win_bin_o = $(OBJ)jb_win_bin@SUFFIX@.o
+jb_win_o = $(OBJ)jb_win@SUFFIX@.o
+test_math_o = $(OBJ)test_math@SUFFIX@.o
+test_xml_o = $(OBJ)test_xml@SUFFIX@.o
+test_win_o = $(OBJ)test_win@SUFFIX@.o
+index_sort_o = $(OBJ)index_sort@SUFFIX@.o
+check_sort_o = $(OBJ)check_sort@SUFFIX@.o
 
-libjb = $(BIN)libjb@SO@
-libjbm = $(BIN)libjbm@SO@
-libjbxml = $(BIN)libjbxml@SO@
-libjbbin = $(BIN)libjbbin@SO@
-libjbw = $(BIN)libjbw@SO@
+libjb = $(BIN)libjb@SUFFIX@@SO@
+libjbm = $(BIN)libjbm@SUFFIX@@SO@
+libjbxml = $(BIN)libjbxml@SUFFIX@@SO@
+libjbbin = $(BIN)libjbbin@SUFFIX@@SO@
+libjbw = $(BIN)libjbw@SUFFIX@@SO@
 
-test_math_bin = $(BIN)test_math@EXE@
-test_xml_bin = $(BIN)test_xml@EXE@
-test_win_bin = $(BIN)test_win@EXE@
-index_sort_bin = $(BIN)index_sort@EXE@
-check_sort_bin = $(BIN)check_sort@EXE@
+test_math_bin = $(BIN)test_math@SUFFIX@@EXE@
+test_xml_bin = $(BIN)test_xml@SUFFIX@@EXE@
+test_win_bin = $(BIN)test_win@SUFFIX@@EXE@
+index_sort_bin = $(BIN)index_sort@SUFFIX@@EXE@
+check_sort_bin = $(BIN)check_sort@SUFFIX@@EXE@
 
 src = $(config_h) $(jb_config_h) $(jb_def_h) $(jb_math_h) $(jb_xml_h) \
 	$(jb_win_h) $(jb_def_c) $(jb_math_c) $(jb_xml_c) $(jb_win_c)
@@ -110,12 +110,13 @@ ifeq (@PGO@, 1)
 ifeq (@CC@, clang)
 	PGOGENERATE = -fprofile-instr-generate
 	PGOUSE = -fprofile-instr-use=$(BINPGO)jb.profraw
-	mathprefix = LLVM_PROFILE_FILE="math.profdata"
-	xmlprefix = LLVM_PROFILE_FILE="xml.profdata"
-	winprefix = LLVM_PROFILE_FILE="win.profdata"
-	index_sortprefix = LLVM_PROFILE_FILE="index_sort.profdata"
-	check_sortprefix = LLVM_PROFILE_FILE="check_sort.profdata"
-	llvm_merge = @LLVM_PROFDATA@ merge *.profdata -output jb.profraw
+	mathprefix = LLVM_PROFILE_FILE="math@SUFFIX@.profdata"
+	xmlprefix = LLVM_PROFILE_FILE="xml@SUFFIX@.profdata"
+	winprefix = LLVM_PROFILE_FILE="win@SUFFIX@.profdata"
+	index_sortprefix = LLVM_PROFILE_FILE="index_sort@SUFFIX@.profdata"
+	check_sortprefix = LLVM_PROFILE_FILE="check_sort@SUFFIX@.profdata"
+	llvm_merge = @LLVM_PROFDATA@ merge *@SUFFIX@.profdata \
+		-output jb@SUFFIX@.profraw
 else
 	PGOGENERATE = -fprofile-generate
 	PGOUSE = -fprofile-use -fprofile-correction
@@ -203,44 +204,44 @@ $(libjbpgo): $(jb_def_pgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_def_pgo) $(LDFLAGS) -o $(libjbpgo)
 $(libjbmpgo): $(jb_math_pgo) $(libjbpgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_math_pgo) $(EXEFLAGSPGO) -o $(libjbmpgo) \
-		-ljb
+		-ljb@SUFFIX@
 $(libjbxmlpgo): $(jb_xml_pgo) $(libjbpgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_xml_pgo) $(EXEFLAGSPGO) -o $(libjbxmlpgo) \
-		-ljb -ljbm
+		-ljbm@SUFFIX@ -ljb@SUFFIX@
 $(libjbbinpgo): $(jb_win_bin_pgo) $(libjbpgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_win_bin_pgo) $(EXEFLAGSPGO) \
-		-o $(libjbbinpgo) -ljb -ljbm
+		-o $(libjbbinpgo) -ljbm@SUFFIX@ -ljb@SUFFIX@
 $(libjbwpgo): $(jb_win_pgo) $(libjbpgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_win_pgo) $(EXEFLAGSPGO) -o $(libjbwpgo) \
-		-ljb -ljbm
+		-ljbm@SUFFIX@ -ljb@SUFFIX@
 
 # PGO tests
 $(test_math_binpgo): $(test_math_pgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) $(test_math_pgo) -o $(test_math_binpgo) \
-		$(EXEFLAGSPGO) -ljb -ljbm
-	cd $(BINPGO); $(mathprefix) ./test_math
+		$(EXEFLAGSPGO) -ljbm@SUFFIX@ -ljb@SUFFIX@
+	cd $(BINPGO); $(mathprefix) ./test_math@SUFFIX@
 $(test_xml_binpgo): $(test_xml_pgo) $(libjbxmlpgo)
 	$(CC) $(PGOGENERATE) $(test_xml_pgo) -o $(test_xml_binpgo) \
-		$(EXEFLAGSPGO) -ljb -ljbm -ljbxml
-	cd $(BINPGO); $(xmlprefix) ./test_xml
+		$(EXEFLAGSPGO) -ljbxml@SUFFIX@ -ljbm@SUFFIX@ -ljb@SUFFIX@
+	cd $(BINPGO); $(xmlprefix) ./test_xml@SUFFIX@
 $(test_win_binpgo): $(test_win_pgo) $(libjbwpgo)
 	$(CC) $(CFLAGS) $(PGOGENERATE) @JBW@ $(test_win_pgo) -o $(test_win_binpgo) \
-		$(EXEFLAGSPGO) -ljb -ljbm -ljbw
-	cd $(BINPGO); $(winprefix) ./test_win; $(llvm_merge)
+		$(EXEFLAGSPGO) -ljbw@SUFFIX@ -ljbm@SUFFIX@ -ljb@SUFFIX@
+	cd $(BINPGO); $(winprefix) ./test_win@SUFFIX@; $(llvm_merge)
 $(index_sort_binpgo): $(index_sort_pgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) $(index_sort_pgo) -o $(index_sort_binpgo) \
-		$(TESTS_LDFLAGS) $(EXEFLAGSPGO) -ljbm -ljb
-	cd $(BINPGO); ./index_sort 10000 1000 0 1
-	cd $(BINPGO); ./index_sort 10000 1000 0 2
-	cd $(BINPGO); ./index_sort 10000 1000 0 3
-	cd $(BINPGO); ./index_sort 10000 1000 0 4
+		$(TESTS_LDFLAGS) $(EXEFLAGSPGO) -ljbm@SUFFIX@ -ljb@SUFFIX@
+	cd $(BINPGO); ./index_sort@SUFFIX@ 10000 1000 0 1
+	cd $(BINPGO); ./index_sort@SUFFIX@ 10000 1000 0 2
+	cd $(BINPGO); ./index_sort@SUFFIX@ 10000 1000 0 3
+	cd $(BINPGO); ./index_sort@SUFFIX@ 10000 1000 0 4
 $(check_sort_binpgo): $(check_sort_pgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) $(check_sort_pgo) -o $(check_sort_binpgo) \
-		$(TESTS_LDFLAGS) $(EXEFLAGSPGO) -ljbm -ljb
-	cd $(BINPGO); ./check_sort 1000 1
-	cd $(BINPGO); ./check_sort 1000 2
-	cd $(BINPGO); ./check_sort 1000 3
-	cd $(BINPGO); ./check_sort 1000 4
+		$(TESTS_LDFLAGS) $(EXEFLAGSPGO) -ljbm@SUFFIX@ -ljb@SUFFIX@
+	cd $(BINPGO); ./check_sort@SUFFIX@ 1000 1
+	cd $(BINPGO); ./check_sort@SUFFIX@ 1000 2
+	cd $(BINPGO); ./check_sort@SUFFIX@ 1000 3
+	cd $(BINPGO); ./check_sort@SUFFIX@ 1000 4
 
 # Objects
 $(jb_def_o): $(DEFDEP)
@@ -268,29 +269,33 @@ $(check_sort_o): $(CHECK_SORT_DEP)
 $(libjb): $(jb_def_o)
 	$(CC) $(PGOUSE) -shared $(jb_def_o) $(LDFLAGS) -o $(libjb)
 $(libjbm): $(jb_math_o) $(libjb)
-	$(CC) $(PGOUSE) -shared $(jb_math_o) $(EXEFLAGS) -o $(libjbm) -ljb
+	$(CC) $(PGOUSE) -shared $(jb_math_o) $(EXEFLAGS) -o $(libjbm) -ljb@SUFFIX@
 $(libjbxml): $(jb_xml_o) $(libjb) $(libjbm)
-	$(CC) $(PGOUSE) -shared $(jb_xml_o) $(EXEFLAGS) -o $(libjbxml) -ljb -ljbm
+	$(CC) $(PGOUSE) -shared $(jb_xml_o) $(EXEFLAGS) -o $(libjbxml) \
+		-ljb@SUFFIX@ -ljbm@SUFFIX@
 $(libjbbin): $(jb_win_bin_o) $(libjb) $(libjbm)
-	$(CC) $(PGOUSE) -shared $(jb_win_bin_o) $(EXEFLAGS) -o $(libjbbin) -ljb -ljbm
+	$(CC) $(PGOUSE) -shared $(jb_win_bin_o) $(EXEFLAGS) -o $(libjbbin) \
+		-ljb@SUFFIX@ -ljbm@SUFFIX@
 $(libjbw): $(jb_win_o) $(libjb) $(libjbm)
-	$(CC) $(PGOUSE) -shared $(jb_win_o) $(EXEFLAGS) -o $(libjbw) -ljb -ljbm
+	$(CC) $(PGOUSE) -shared $(jb_win_o) $(EXEFLAGS) -o $(libjbw) \
+		-ljb@SUFFIX@ -ljbm@SUFFIX@
 
 # Tests
 $(test_math_bin): $(test_math_o) $(libjbm)
-	$(CC) $(PGOUSE) $(test_math_o) -o $(test_math_bin) $(EXEFLAGS) -ljb -ljbm
+	$(CC) $(PGOUSE) $(test_math_o) -o $(test_math_bin) $(EXEFLAGS) \
+		-ljbm@SUFFIX@ -ljb@SUFFIX@
 $(test_xml_bin): $(test_xml_o) $(libjbbin)
 	$(CC) $(PGOUSE) $(test_xml_o) -o $(test_xml_bin) $(EXEFLAGS) \
-		-ljb -ljbm -ljbxml
+		-ljbxml@SUFFIX@ -ljbm@SUFFIX@ -ljb@SUFFIX@
 $(test_win_bin): $(test_win_o) $(libjbw)
 	$(CC) $(PGOUSE) @JBW@ $(test_win_o) -o $(test_win_bin) $(EXEFLAGS) \
-		-ljb -ljbm -ljbw
+		-ljbw@SUFFIX@ -ljbm@SUFFIX@ -ljb@SUFFIX@
 $(index_sort_bin): $(index_sort_o) $(libjbm)
 	$(CC) $(PGOUSE) $(index_sort_o) -o $(index_sort_bin) \
-		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm -ljb
+		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm@SUFFIX@ -ljb@SUFFIX@
 $(check_sort_bin): $(check_sort_o) $(libjbm)
 	$(CC) $(PGOUSE) $(check_sort_o) -o $(check_sort_bin) \
-		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm -ljb
+		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm@SUFFIX@ -ljb@SUFFIX@
 
 # Shaders
 shaders/2D.spv: shaders/2D.vert Makefile
