@@ -13,7 +13,7 @@ FEATURES:
 	- Enable Vulkan
 	* Enable PGO building with CLang/LLVM
 	* Disconnect GTK and JBWGraphics
-	* Add JSON tools
+  * Update link instructions in README files
 
 STYLE:
 
