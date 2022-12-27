@@ -217,7 +217,7 @@ jb_xml_node_get_time (xmlNode * node,   ///< XML node struct.
   if (!buffer)
     return 0.;
   t = jbm_get_time (buffer, error);
-  if (*error != 6)
+  if (*error != 1)
     *error = 0;
   xmlFree (buffer);
   return t;

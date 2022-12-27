@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: jb 4.1.0\n"
+"Project-Id-Version: jb 4.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-25 20:04+0100\n"
+"POT-Creation-Date: 2022-12-27 15:31+0100\n"
 "PO-Revision-Date: 2020-05-05 02:59+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -305,83 +305,83 @@ msgstr "memoria insuficiente para abrir la fuente"
 msgid "could not open font"
 msgstr "no se pudo abrir la fuente"
 
-#: src/jb_win.c:2535
+#: src/jb_win.c:2534
 msgid "bad tics number"
 msgstr "número de marcas incorrecto"
 
-#: src/jb_win.c:2543
+#: src/jb_win.c:2542
 msgid "not enough memory to open the graphic area"
 msgstr "memoria insuficiente para abrir el área gráfica"
 
-#: src/jb_win.c:2571
+#: src/jb_win.c:2570
 msgid "unable to open the graphic area widget"
 msgstr "no se pudo abrir el widget de área gráfica"
 
-#: src/jb_win.c:2615
+#: src/jb_win.c:2614
 msgid "unable to open the window"
 msgstr "no se pudo abrir la ventana"
 
-#: src/jb_win.c:3719 src/jb_win.c:3734
+#: src/jb_win.c:3707 src/jb_win.c:3722
 msgid "PNG file"
 msgstr "Fichero PNG"
 
-#: src/jb_win.c:3720
+#: src/jb_win.c:3708
 msgid "JPEG file"
 msgstr "Fichero JPEG"
 
-#: src/jb_win.c:3721
+#: src/jb_win.c:3709
 msgid "XPM file"
 msgstr "Fichero XPM"
 
-#: src/jb_win.c:3722
+#: src/jb_win.c:3710
 msgid "TIFF file"
 msgstr "Fichero TIFF"
 
-#: src/jb_win.c:3723
+#: src/jb_win.c:3711
 msgid "BMP file"
 msgstr "Fichero BMP"
 
-#: src/jb_win.c:3724
+#: src/jb_win.c:3712
 msgid "GIF file"
 msgstr "Fichero GIF"
 
-#: src/jb_win.c:3725
+#: src/jb_win.c:3713
 msgid "ICO file"
 msgstr "Fichero ICO"
 
-#: src/jb_win.c:3745
+#: src/jb_win.c:3733
 msgid "Save graph"
 msgstr "Guardar gráfica"
 
-#: src/jb_win.c:3748
+#: src/jb_win.c:3736
 msgid "_OK"
 msgstr "_Aceptar"
 
-#: src/jb_win.c:3749
+#: src/jb_win.c:3737
 msgid "_Cancel"
 msgstr "_Cancelar"
 
-#: src/jb_win.c:3789
+#: src/jb_win.c:3777
 msgid "no a text editor type"
 msgstr "no es un tipo de editor de texto"
 
-#: src/jb_win.c:3792
+#: src/jb_win.c:3780
 msgid "no an integer numbers editor type"
 msgstr "no es un tipo de editor de números enteros"
 
-#: src/jb_win.c:3795
+#: src/jb_win.c:3783
 msgid "no a float numbers editor type"
 msgstr "no es un tipo de editor de números reales"
 
-#: src/jb_win.c:3798
+#: src/jb_win.c:3786
 msgid "no a date editor type"
 msgstr "no es un tipo de editor de fechas"
 
-#: src/jb_win.c:4439
+#: src/jb_win.c:4427
 msgid "bad array editor widget type"
 msgstr "tipo incorrecto de widget de editor de matrices"
 
-#: src/jb_win.c:4445
+#: src/jb_win.c:4433
 msgid "not enough memory to open the array editor"
 msgstr "memoria insuficiente para abrir el editor de matrices"
 

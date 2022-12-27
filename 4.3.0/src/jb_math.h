@@ -653,8 +653,8 @@ jbm_changeull (long long unsigned int *__restrict a,
  * Function to interchange 2 JBFLOAT numbers.
  */
 static inline void
-jbm_fchange (JBFLOAT *__restrict a,     ///< 1st JBFLOAT number pointer.
-             JBFLOAT *__restrict b)     ///< 2nd JBFLOAT number pointer.
+jbm_fchange (JBFLOAT * __restrict a,    ///< 1st JBFLOAT number pointer.
+             JBFLOAT * __restrict b)    ///< 2nd JBFLOAT number pointer.
 {
   JBFLOAT c;
   JB_CHANGE (*a, *b, c);
@@ -664,8 +664,8 @@ jbm_fchange (JBFLOAT *__restrict a,     ///< 1st JBFLOAT number pointer.
  * Function to interchange 2 JBDOUBLE numbers.
  */
 static inline void
-jbm_fchangel (JBDOUBLE *__restrict a,   ///< 1st JBDOUBLE number pointer.
-              JBDOUBLE *__restrict b)   ///< 2nd JBDOUBLE number pointer.
+jbm_fchangel (JBDOUBLE * __restrict a,  ///< 1st JBDOUBLE number pointer.
+              JBDOUBLE * __restrict b)  ///< 2nd JBDOUBLE number pointer.
 {
   JBDOUBLE c;
   JB_CHANGE (*a, *b, c);
@@ -1062,9 +1062,9 @@ jbm_farray_maxmin (JBFLOAT * fa,        ///< array of JBFLOAT numbers.
  * Function to interchange 2 arrays of JBFLOAT numbers.
  */
 static inline void
-jbm_farray_change (JBFLOAT *__restrict fa,
+jbm_farray_change (JBFLOAT * __restrict fa,
                    ///< 1st array of JBFLOAT numbers.
-                   JBFLOAT *__restrict fb,
+                   JBFLOAT * __restrict fb,
                    ///< 2nd array of JBFLOAT numbers.
                    int n)       ///< the highest element number of the arrays.
 {
@@ -1108,11 +1108,11 @@ jbm_farray_interpolate (JBFLOAT x,      ///< x-coordinate of the point.
  * \return resulting array.
  */
 static inline JBFLOAT *
-_jbm_farray_merge (JBFLOAT *__restrict fa,
+_jbm_farray_merge (JBFLOAT * __restrict fa,
                    ///< 1st increasingly sorted array of JBFLOAT numbers.
                    int na,
                    ///< the highest element number of the 1st array.
-                   JBFLOAT *__restrict fb,
+                   JBFLOAT * __restrict fb,
                    ///< 2nd increasingly sorted array of JBFLOAT numbers.
                    int nb,
                    ///< the highest element number of the 2nd array.
@@ -1146,10 +1146,10 @@ _jbm_farray_merge (JBFLOAT *__restrict fa,
  * \return integral value.
  */
 static inline JBFLOAT
-jbm_farray_integral (JBFLOAT *__restrict x,
+jbm_farray_integral (JBFLOAT * __restrict x,
 ///< incresingly sorted array of JBFLOAT numbers defining the x-coordinates of
 ///< the tabular function.
-                     JBFLOAT *__restrict y,
+                     JBFLOAT * __restrict y,
 ///< array of JBFLOAT numbers defining the y-coordinates of the tabular
 ///< function.
                      int n,     ///< the highest element number of the arrays.
@@ -1226,19 +1226,19 @@ exit1:
  * \return mean square error.
  */
 static inline JBFLOAT
-jbm_farray_mean_square_error (JBFLOAT *__restrict xa,
+jbm_farray_mean_square_error (JBFLOAT * __restrict xa,
 ///< incresingly sorted array of JBFLOAT numbers defining the x-coordinates
 ///< of the 1st tabular function.
-                              JBFLOAT *__restrict fa,
+                              JBFLOAT * __restrict fa,
 ///< array of JBFLOAT numbers defining the y-coordinates of the 1st tabular
 ///< function.
                               int na,
 ///< the highest element number of the arrays defining the 1st tabular
 ///< function.
-                              JBFLOAT *__restrict xr,
+                              JBFLOAT * __restrict xr,
 ///< incresingly sorted array of JBFLOAT numbers defining the x-coordinates
 ///< of the 2nd tabular function.
-                              JBFLOAT *__restrict fr,
+                              JBFLOAT * __restrict fr,
 ///< array of JBFLOAT numbers defining the y-coordinates of the 2nd tabular
 ///< function.
                               int nr)
@@ -1271,19 +1271,19 @@ jbm_farray_mean_square_error (JBFLOAT *__restrict xa,
  * \return root mean square error.
  */
 static inline JBFLOAT
-jbm_farray_root_mean_square_error (JBFLOAT *__restrict xa,
+jbm_farray_root_mean_square_error (JBFLOAT * __restrict xa,
 ///< incresingly sorted array of JBFLOAT numbers defining the x-coordinates
 ///< of the 1st tabular function.
-                                   JBFLOAT *__restrict fa,
+                                   JBFLOAT * __restrict fa,
 ///< array of JBFLOAT numbers defining the y-coordinates of the 1st tabular
 ///< function.
                                    int na,
 ///< the highest element number of the arrays defining the 1st tabular
 ///< function.
-                                   JBFLOAT *__restrict xr,
+                                   JBFLOAT * __restrict xr,
 ///< incresingly sorted array of JBFLOAT numbers defining the x-coordinates
 ///< of the 2nd tabular function.
-                                   JBFLOAT *__restrict fr,
+                                   JBFLOAT * __restrict fr,
 ///< array of JBFLOAT numbers defining the y-coordinates of the 2nd tabular
 ///< function.
                                    int nr)
@@ -1398,9 +1398,9 @@ jbm_darray_maxmin (JBDOUBLE * fa,       ///< array of JBDOUBLE numbers.
  * Function to interchange 2 arrays of JBDOUBLE numbers.
  */
 static inline void
-jbm_darray_change (JBDOUBLE *__restrict fa,
+jbm_darray_change (JBDOUBLE * __restrict fa,
                    ///< 1st array of JBDOUBLE numbers.
-                   JBDOUBLE *__restrict fb,
+                   JBDOUBLE * __restrict fb,
                    ///< 2nd array of JBDOUBLE numbers.
                    int n)       ///< the highest element number of the arrays.
 {
@@ -1422,9 +1422,9 @@ jbm_darray_change (JBDOUBLE *__restrict fa,
  */
 static inline JBDOUBLE
 jbm_darray_interpolate (JBDOUBLE x,     ///< x-coordinate of the point.
-                        JBDOUBLE *__restrict fx,
+                        JBDOUBLE * __restrict fx,
 ///< increasingly sorted array of x-coordinates of the tabular function.
-                        JBDOUBLE *__restrict fy,
+                        JBDOUBLE * __restrict fy,
 ///< array of y-coordinates of the tabular function.
                         int n)  ///< the highest element number of the arrays.
 {
@@ -1444,11 +1444,11 @@ jbm_darray_interpolate (JBDOUBLE x,     ///< x-coordinate of the point.
  * \return resulting array.
  */
 static inline JBDOUBLE *
-_jbm_darray_merge (JBDOUBLE *__restrict fa,
+_jbm_darray_merge (JBDOUBLE * __restrict fa,
                    ///< 1st increasingly sorted array of JBDOUBLE numbers.
                    int na,
                    ///< the highest element number of the 1st array.
-                   JBDOUBLE *__restrict fb,
+                   JBDOUBLE * __restrict fb,
                    ///< 2nd increasingly sorted array of JBDOUBLE numbers.
                    int nb,
                    ///< the highest element number of the 2nd array.
@@ -1482,10 +1482,10 @@ _jbm_darray_merge (JBDOUBLE *__restrict fa,
  * \return integral value.
  */
 static inline JBDOUBLE
-jbm_darray_integral (JBDOUBLE *__restrict x,
+jbm_darray_integral (JBDOUBLE * __restrict x,
 ///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates of
 ///< the tabular function.
-                     JBDOUBLE *__restrict y,
+                     JBDOUBLE * __restrict y,
 ///< array of JBDOUBLE numbers defining the y-coordinates of the tabular
 ///< function.
                      int n,     ///< the highest element number of the arrays.
@@ -1562,19 +1562,19 @@ exit1:
  * \return mean square error.
  */
 static inline JBDOUBLE
-jbm_darray_mean_square_error (JBDOUBLE *__restrict xa,
+jbm_darray_mean_square_error (JBDOUBLE * __restrict xa,
 ///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates
 ///< of the 1st tabular function.
-                              JBDOUBLE *__restrict fa,
+                              JBDOUBLE * __restrict fa,
 ///< array of JBDOUBLE numbers defining the y-coordinates of the 1st tabular
 ///< function.
                               int na,
 ///< the highest element number of the arrays defining the 1st tabular
 ///< function.
-                              JBDOUBLE *__restrict xr,
+                              JBDOUBLE * __restrict xr,
 ///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates
 ///< of the 2nd tabular function.
-                              JBDOUBLE *__restrict fr,
+                              JBDOUBLE * __restrict fr,
 ///< array of JBDOUBLE numbers defining the y-coordinates of the 2nd tabular
 ///< function.
                               int nr)
@@ -1607,19 +1607,19 @@ jbm_darray_mean_square_error (JBDOUBLE *__restrict xa,
  * \return root mean square error.
  */
 static inline JBDOUBLE
-jbm_darray_root_mean_square_error (JBDOUBLE *__restrict xa,
+jbm_darray_root_mean_square_error (JBDOUBLE * __restrict xa,
 ///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates
 ///< of the 1st tabular function.
-                                   JBDOUBLE *__restrict fa,
+                                   JBDOUBLE * __restrict fa,
 ///< array of JBDOUBLE numbers defining the y-coordinates of the 1st tabular
 ///< function.
                                    int na,
 ///< the highest element number of the arrays defining the 1st tabular
 ///< function.
-                                   JBDOUBLE *__restrict xr,
+                                   JBDOUBLE * __restrict xr,
 ///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates
 ///< of the 2nd tabular function.
-                                   JBDOUBLE *__restrict fr,
+                                   JBDOUBLE * __restrict fr,
 ///< array of JBDOUBLE numbers defining the y-coordinates of the 2nd tabular
 ///< function.
                                    int nr)
@@ -1638,9 +1638,9 @@ jbm_darray_root_mean_square_error (JBDOUBLE *__restrict xa,
  */
 static inline JBFLOAT
 jbm_darray_farray_interpolate (JBDOUBLE x,      ///< x-coordinate of the point.
-                               JBDOUBLE *__restrict fx,
+                               JBDOUBLE * __restrict fx,
 ///< increasingly sorted array of x-coordinates of the tabular function.
-                               JBFLOAT *__restrict fy,
+                               JBFLOAT * __restrict fy,
 ///< array of y-coordinates of the tabular function.
                                int n)
 ///< the highest element number of the arrays.
@@ -1662,10 +1662,10 @@ jbm_darray_farray_interpolate (JBDOUBLE x,      ///< x-coordinate of the point.
  * \return integral value.
  */
 static inline JBFLOAT
-jbm_darray_farray_integral (JBDOUBLE *__restrict x,
+jbm_darray_farray_integral (JBDOUBLE * __restrict x,
 ///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates of 
 ///< the tabular function.
-                            JBFLOAT *__restrict y,
+                            JBFLOAT * __restrict y,
 ///< array of JBFLOAT numbers defining the y-coordinates of the tabular
 ///< function.
                             int n,
@@ -2074,7 +2074,7 @@ jbm_solve_cubicl (JBDOUBLE a,
  * JBFLOAT numbers by the insertion method.
  */
 static inline void
-jbm_index_sort_insertion (JBFLOAT *__restrict x,
+jbm_index_sort_insertion (JBFLOAT * __restrict x,
                           ///< array of JBFLOAT numbers.
                           unsigned int *__restrict ni,  ///< array of indexes.
                           int n)
@@ -2097,7 +2097,7 @@ jbm_index_sort_insertion (JBFLOAT *__restrict x,
  * JBDOUBLE numbers by the insertion method.
  */
 static inline void
-jbm_index_sort_insertionl (JBDOUBLE *__restrict x,
+jbm_index_sort_insertionl (JBDOUBLE * __restrict x,
                            ///< array of JBDOUBLE numbers.
                            unsigned int *__restrict ni, ///< array of indexes.
                            int n)
@@ -2120,7 +2120,7 @@ jbm_index_sort_insertionl (JBDOUBLE *__restrict x,
  * JBFLOAT numbers by the interchange method.
  */
 static inline void
-jbm_index_sort_interchange (JBFLOAT *__restrict x,
+jbm_index_sort_interchange (JBFLOAT * __restrict x,
                             ///< array of JBFLOAT numbers.
                             unsigned int *__restrict ni,
                             ///< array of indexes.
@@ -2149,7 +2149,7 @@ jbm_index_sort_interchange (JBFLOAT *__restrict x,
  * JBDOUBLE numbers by the interchange method.
  */
 static inline void
-jbm_index_sort_interchangel (JBDOUBLE *__restrict x,
+jbm_index_sort_interchangel (JBDOUBLE * __restrict x,
                              ///< array of JBDOUBLE numbers.
                              unsigned int *__restrict ni,
                              ///< array of indexes.
@@ -2178,7 +2178,7 @@ jbm_index_sort_interchangel (JBDOUBLE *__restrict x,
  * JBFLOAT numbers by the merge method.
  */
 static inline void
-jbm_index_sort_merge (JBFLOAT *__restrict x,    ///< array of JBFLOAT numbers.
+jbm_index_sort_merge (JBFLOAT * __restrict x,   ///< array of JBFLOAT numbers.
                       unsigned int *__restrict ni,      ///< array of indexes.
                       int n)    ///< the highest element number of the arrays.
 {
@@ -2248,7 +2248,7 @@ jbm_index_sort_merge (JBFLOAT *__restrict x,    ///< array of JBFLOAT numbers.
  * JBDOUBLE numbers by the merge method.
  */
 static inline void
-jbm_index_sort_mergel (JBDOUBLE *__restrict x,  ///< array of JBDOUBLE numbers.
+jbm_index_sort_mergel (JBDOUBLE * __restrict x, ///< array of JBDOUBLE numbers.
                        unsigned int *__restrict ni,     ///< array of indexes.
                        int n)   ///< the highest element number of the arrays.
 {
@@ -2318,7 +2318,7 @@ jbm_index_sort_mergel (JBDOUBLE *__restrict x,  ///< array of JBDOUBLE numbers.
  * JBFLOAT numbers by the optimal method.
  */
 static inline void
-jbm_index_sort (JBFLOAT *__restrict x,  ///< array of JBFLOAT numbers.
+jbm_index_sort (JBFLOAT * __restrict x, ///< array of JBFLOAT numbers.
                 unsigned int *__restrict ni,    ///< array of indexes.
                 int n)          ///< the highest element number of the arrays.
 {
@@ -2336,7 +2336,7 @@ jbm_index_sort (JBFLOAT *__restrict x,  ///< array of JBFLOAT numbers.
  * JBDOUBLE numbers by the optimal method.
  */
 static inline void
-jbm_index_sortl (JBDOUBLE *__restrict x,        ///< array of JBDOUBLE numbers.
+jbm_index_sortl (JBDOUBLE * __restrict x,       ///< array of JBDOUBLE numbers.
                  unsigned int *__restrict ni,   ///< array of indexes.
                  int n)         ///< the highest element number of the arrays.
 {
@@ -2356,9 +2356,9 @@ jbm_index_sortl (JBDOUBLE *__restrict x,        ///< array of JBDOUBLE numbers.
  * \return the highest element number of the sorted array.
  */
 static inline int
-jbm_index_sort_extended (JBFLOAT *__restrict x,
+jbm_index_sort_extended (JBFLOAT * __restrict x,
                          ///< array of JBFLOAT numbers to sort.
-                         JBFLOAT **__restrict xr,
+                         JBFLOAT ** __restrict xr,
 ///< pointer to the array of sorted JBFLOAT numbers elliminating duplicated
 ///< numbers. It has to be freed with g_free.
                          int **__restrict ni,
@@ -2402,9 +2402,9 @@ index_exit:
  * \return the highest element number of the sorted array.
  */
 static inline int
-jbm_index_sort_extendedl (JBDOUBLE *__restrict x,
+jbm_index_sort_extendedl (JBDOUBLE * __restrict x,
                           ///< array of JBDOUBLE numbers to sort.
-                          JBDOUBLE **__restrict xr,
+                          JBDOUBLE ** __restrict xr,
 ///< pointer to the array of sorted JBDOUBLE numbers elliminating duplicated
 ///< numbers. It has to be freed with g_free.
                           int **__restrict ni,
@@ -2593,13 +2593,13 @@ jbm_matrix_solvel (JBDOUBLE * x,
  * Results are stored in the H array. It modifies D and H arrays (JBFLOAT).
  */
 static inline void
-jbm_matrix_solve_tridiagonal (JBFLOAT *__restrict C,
+jbm_matrix_solve_tridiagonal (JBFLOAT * __restrict C,
                               ///< left diagonal array.
-                              JBFLOAT *__restrict D,
+                              JBFLOAT * __restrict D,
                               ///< central diagonal array.
-                              JBFLOAT *__restrict E,
+                              JBFLOAT * __restrict E,
                               ///< right diagonal array.
-                              JBFLOAT *__restrict H,    ///< final column array.
+                              JBFLOAT * __restrict H,   ///< final column array.
                               int n)    ///< number of matrix rows.
 {
   JBFLOAT k;
@@ -2626,13 +2626,13 @@ jbm_matrix_solve_tridiagonal (JBFLOAT *__restrict C,
  * Results are stored in the H array. It modifies D and H arrays (JBDOUBLE).
  */
 static inline void
-jbm_matrix_solve_tridiagonall (JBDOUBLE *__restrict C,
+jbm_matrix_solve_tridiagonall (JBDOUBLE * __restrict C,
                                ///< left diagonal array.
-                               JBDOUBLE *__restrict D,
+                               JBDOUBLE * __restrict D,
                                ///< central diagonal array.
-                               JBDOUBLE *__restrict E,
+                               JBDOUBLE * __restrict E,
                                ///< right diagonal array.
-                               JBDOUBLE *__restrict H,  ///< final column array.
+                               JBDOUBLE * __restrict H, ///< final column array.
                                int n)   ///< number of matrix rows.
 {
   JBDOUBLE k;
@@ -2660,13 +2660,13 @@ jbm_matrix_solve_tridiagonall (JBDOUBLE *__restrict C,
  * H arrays (JBFLOAT).
  */
 static inline void
-jbm_matrix_solve_tridiagonal_zero (JBFLOAT *__restrict C,
+jbm_matrix_solve_tridiagonal_zero (JBFLOAT * __restrict C,
                                    ///< left diagonal array.
-                                   JBFLOAT *__restrict D,
+                                   JBFLOAT * __restrict D,
                                    ///< central diagonal array.
-                                   JBFLOAT *__restrict E,
+                                   JBFLOAT * __restrict E,
                                    ///< right diagonal array.
-                                   JBFLOAT *__restrict H,
+                                   JBFLOAT * __restrict H,
                                    ///< final column array.
                                    int n)       ///< number of matrix rows.
 {
@@ -2702,13 +2702,13 @@ jbm_matrix_solve_tridiagonal_zero (JBFLOAT *__restrict C,
  * H arrays (JBDOUBLE).
  */
 static inline void
-jbm_matrix_solve_tridiagonal_zerol (JBDOUBLE *__restrict C,
+jbm_matrix_solve_tridiagonal_zerol (JBDOUBLE * __restrict C,
                                     ///< left diagonal array.
-                                    JBDOUBLE *__restrict D,
+                                    JBDOUBLE * __restrict D,
                                     ///< central diagonal array.
-                                    JBDOUBLE *__restrict E,
+                                    JBDOUBLE * __restrict E,
                                     ///< right diagonal array.
-                                    JBDOUBLE *__restrict H,
+                                    JBDOUBLE * __restrict H,
                                     ///< final column array.
                                     int n)      ///< number of matrix rows.
 {
@@ -2745,17 +2745,17 @@ jbm_matrix_solve_tridiagonal_zerol (JBDOUBLE *__restrict C,
  * (JBFLOAT).
  */
 static inline void
-jbm_matrix_solve_pentadiagonal (JBFLOAT *__restrict B,
+jbm_matrix_solve_pentadiagonal (JBFLOAT * __restrict B,
                                 ///< double-left diagonal array.
-                                JBFLOAT *__restrict C,
+                                JBFLOAT * __restrict C,
                                 ///< left diagonal array.
-                                JBFLOAT *__restrict D,
+                                JBFLOAT * __restrict D,
                                 ///< central diagonal array.
-                                JBFLOAT *__restrict E,
+                                JBFLOAT * __restrict E,
                                 ///< right diagonal array.
-                                JBFLOAT *__restrict F,
+                                JBFLOAT * __restrict F,
                                 ///< double-right diagonal array.
-                                JBFLOAT *__restrict H,  ///< final column array.
+                                JBFLOAT * __restrict H, ///< final column array.
                                 int n)  ///< number of matrix rows.
 {
   JBFLOAT k;
@@ -2793,17 +2793,17 @@ jbm_matrix_solve_pentadiagonal (JBFLOAT *__restrict B,
  * (JBDOUBLE).
  */
 static inline void
-jbm_matrix_solve_pentadiagonall (JBDOUBLE *__restrict B,
+jbm_matrix_solve_pentadiagonall (JBDOUBLE * __restrict B,
                                  ///< double-left diagonal array.
-                                 JBDOUBLE *__restrict C,
+                                 JBDOUBLE * __restrict C,
                                  ///< left diagonal array.
-                                 JBDOUBLE *__restrict D,
+                                 JBDOUBLE * __restrict D,
                                  ///< central diagonal array.
-                                 JBDOUBLE *__restrict E,
+                                 JBDOUBLE * __restrict E,
                                  ///< right diagonal array.
-                                 JBDOUBLE *__restrict F,
+                                 JBDOUBLE * __restrict F,
                                  ///< double-right diagonal array.
-                                 JBDOUBLE *__restrict H,
+                                 JBDOUBLE * __restrict H,
                                  ///< final column array.
                                  int n) ///< number of matrix rows.
 {
@@ -2842,17 +2842,17 @@ jbm_matrix_solve_pentadiagonall (JBDOUBLE *__restrict B,
  * E and H arrays (JBFLOAT).
  */
 static inline void
-jbm_matrix_solve_pentadiagonal_zero (JBFLOAT *__restrict B,
+jbm_matrix_solve_pentadiagonal_zero (JBFLOAT * __restrict B,
                                      ///< double-left diagonal array.
-                                     JBFLOAT *__restrict C,
+                                     JBFLOAT * __restrict C,
                                      ///< left diagonal array.
-                                     JBFLOAT *__restrict D,
+                                     JBFLOAT * __restrict D,
                                      ///< central diagonal array.
-                                     JBFLOAT *__restrict E,
+                                     JBFLOAT * __restrict E,
                                      ///< right diagonal array.
-                                     JBFLOAT *__restrict F,
+                                     JBFLOAT * __restrict F,
                                      ///< double-right diagonal array.
-                                     JBFLOAT *__restrict H,
+                                     JBFLOAT * __restrict H,
                                      ///< final column array.
                                      int n)     ///< number of matrix rows.
 {
@@ -2904,17 +2904,17 @@ jbm_matrix_solve_pentadiagonal_zero (JBFLOAT *__restrict B,
  * E and H arrays (JBDOUBLE).
  */
 static inline void
-jbm_matrix_solve_pentadiagonal_zerol (JBDOUBLE *__restrict B,
+jbm_matrix_solve_pentadiagonal_zerol (JBDOUBLE * __restrict B,
                                       ///< double-left diagonal array.
-                                      JBDOUBLE *__restrict C,
+                                      JBDOUBLE * __restrict C,
                                       ///< left diagonal array.
-                                      JBDOUBLE *__restrict D,
+                                      JBDOUBLE * __restrict D,
                                       ///< central diagonal array.
-                                      JBDOUBLE *__restrict E,
+                                      JBDOUBLE * __restrict E,
                                       ///< right diagonal array.
-                                      JBDOUBLE *__restrict F,
+                                      JBDOUBLE * __restrict F,
                                       ///< double-right diagonal array.
-                                      JBDOUBLE *__restrict H,
+                                      JBDOUBLE * __restrict H,
                                       ///< final column array.
                                       int n)    ///< number of matrix rows.
 {
@@ -2958,9 +2958,9 @@ jbm_matrix_solve_pentadiagonal_zerol (JBDOUBLE *__restrict B,
  * by minimum squares: \f$y=A_0+A_1\,x+A_2\,x^2+\cdots\f$ (JBFLOAT).
  */
 static inline void
-jbm_regression_polynomial (JBFLOAT *__restrict x,
+jbm_regression_polynomial (JBFLOAT * __restrict x,
                            ///< array of point x-coordinates.
-                           JBFLOAT *__restrict y,
+                           JBFLOAT * __restrict y,
                            ///< array of point y-coordinates.
                            int n,       ///< points number.
                            JBFLOAT ** A,
@@ -3008,9 +3008,9 @@ jbm_regression_polynomial (JBFLOAT *__restrict x,
  * by minimum squares: \f$y=A_0+A_1\,x+A_2\,x^2+\cdots\f$ (JBDOUBLE).
  */
 static inline void
-jbm_regression_polynomiall (JBDOUBLE *__restrict x,
+jbm_regression_polynomiall (JBDOUBLE * __restrict x,
                             ///< array of point x-coordinates.
-                            JBDOUBLE *__restrict y,
+                            JBDOUBLE * __restrict y,
                             ///< array of point y-coordinates.
                             int n,      ///< points number.
                             JBDOUBLE ** A,
@@ -3058,9 +3058,9 @@ jbm_regression_polynomiall (JBDOUBLE *__restrict x,
  * minimum squares: \f$y=a+b\,x\f$ (JBFLOAT).
  */
 static inline void
-jbm_regression_linear (JBFLOAT *__restrict x,
+jbm_regression_linear (JBFLOAT * __restrict x,
                        ///< array of point x-coordinates.
-                       JBFLOAT *__restrict y,
+                       JBFLOAT * __restrict y,
                        ///< array of point y-coordinates.
                        int n,   ///< points number.
                        JBFLOAT * a,
@@ -3087,9 +3087,9 @@ jbm_regression_linear (JBFLOAT *__restrict x,
  * minimum squares: \f$y=a+b\,x\f$ (JBDOUBLE).
  */
 static inline void
-jbm_regression_linearl (JBDOUBLE *__restrict x,
+jbm_regression_linearl (JBDOUBLE * __restrict x,
                         ///< array of point x-coordinates.
-                        JBDOUBLE *__restrict y,
+                        JBDOUBLE * __restrict y,
                         ///< array of point y-coordinates.
                         int n,  ///< points number.
                         JBDOUBLE * a,
@@ -3116,9 +3116,9 @@ jbm_regression_linearl (JBDOUBLE *__restrict x,
  * by minimum squares: \f$y=a\,x^b\f$ (JBFLOAT).
  */
 static inline void
-jbm_regression_exponential (JBFLOAT *__restrict x,
+jbm_regression_exponential (JBFLOAT * __restrict x,
 ///< array of point x-coordinates. It is modified by the function.
-                            JBFLOAT *__restrict y,
+                            JBFLOAT * __restrict y,
 ///< array of point y-coordinates. It is modified by the function.
                             int n,      ///< points number.
                             JBFLOAT * a,
@@ -3138,9 +3138,9 @@ jbm_regression_exponential (JBFLOAT *__restrict x,
  * by minimum squares: \f$y=a\,x^b\f$ (JBDOUBLE).
  */
 static inline void
-jbm_regression_exponentiall (JBDOUBLE *__restrict x,
+jbm_regression_exponentiall (JBDOUBLE * __restrict x,
 ///< array of point x-coordinates. It is modified by the function.
-                             JBDOUBLE *__restrict y,
+                             JBDOUBLE * __restrict y,
 ///< array of point y-coordinates. It is modified by the function.
                              int n,     ///< points number.
                              JBDOUBLE * a,
@@ -3160,11 +3160,11 @@ jbm_regression_exponentiall (JBDOUBLE *__restrict x,
  * by minimum squares: \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$ (JBFLOAT).
  */
 static inline void
-jbm_regression_multilinear (JBFLOAT **__restrict x,
+jbm_regression_multilinear (JBFLOAT ** __restrict x,
 ///< array of point coordinates in format:
 ///< \f$\left(x_1,\cdots,x_n,y_1,\cdots,y_n,\cdots,f_1,\cdots,f_n\right)\f$.
                             int n,      ///< points number.
-                            JBFLOAT *__restrict a,
+                            JBFLOAT * __restrict a,
                             ///< array of regression coefficients.
                             int m)      ///< number of variables.
 {
@@ -3213,11 +3213,11 @@ jbm_regression_multilinear (JBFLOAT **__restrict x,
  * by minimum squares: \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$ (JBDOUBLE).
  */
 static inline void
-jbm_regression_multilinearl (JBDOUBLE **__restrict x,
+jbm_regression_multilinearl (JBDOUBLE ** __restrict x,
 ///< array of point coordinates in format:
 ///< \f$\left(x_1,\cdots,x_n,y_1,\cdots,y_n,\cdots,f_1,\cdots,f_n\right)\f$.
                              int n,     ///< points number.
-                             JBDOUBLE *__restrict a,
+                             JBDOUBLE * __restrict a,
 ///< array of regression coefficients.
                              int m)     ///< number of variables.
 {
@@ -3266,12 +3266,12 @@ jbm_regression_multilinearl (JBDOUBLE **__restrict x,
  * adjusted by minimum squares: \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$ (JBFLOAT).
  */
 static inline void
-jbm_regression_multiexponential (JBFLOAT **__restrict x,
+jbm_regression_multiexponential (JBFLOAT ** __restrict x,
 ///< array of point coordinates in format:
 ///< \f$\left(x_1,\cdots,x_n,y_1,\cdots,y_n,\cdots,f_1,\cdots,f_n\right)\f$. It
 ///< is modified by the function.
                                  int n, ///< points number.
-                                 JBFLOAT *__restrict a,
+                                 JBFLOAT * __restrict a,
 ///< array of regression coefficients.
                                  int m) ///< number of variables.
 {
@@ -3289,12 +3289,12 @@ jbm_regression_multiexponential (JBFLOAT **__restrict x,
  * adjusted by minimum squares: \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$ (JBDOUBLE).
  */
 static inline void
-jbm_regression_multiexponentiall (JBDOUBLE **__restrict x,
+jbm_regression_multiexponentiall (JBDOUBLE ** __restrict x,
 ///< array of point coordinates in format:
 ///< \f$\left(x_1,\cdots,x_n,y_1,\cdots,y_n,\cdots,f_1,\cdots,f_n\right)\f$. It
 ///< is modified by the function.
                                   int n,        ///< points number.
-                                  JBDOUBLE *__restrict a,
+                                  JBDOUBLE * __restrict a,
 ///< array of regression coefficients.
                                   int m)        ///< number of variables.
 {
@@ -3311,17 +3311,17 @@ jbm_regression_multiexponentiall (JBDOUBLE **__restrict x,
  * Function to calculate a cubic spline on tabular data (JBFLOAT).
  */
 static inline void
-jbm_spline_cubic (JBFLOAT *__restrict x,
+jbm_spline_cubic (JBFLOAT * __restrict x,
                   ///< array of point x-coordinates.
-                  JBFLOAT *__restrict y,
+                  JBFLOAT * __restrict y,
                   ///< array of point y-coordinates.
                   int n,        ///< number of points.
-                  JBFLOAT **__restrict b,
+                  JBFLOAT ** __restrict b,
 ///< pointer to the array of 1st order spline coefficients. It is generated by
 ///< g_malloc.
-                  JBFLOAT **__restrict c,
+                  JBFLOAT ** __restrict c,
 ///< pointer to the array of 2nd order spline coefficients.
-                  JBFLOAT **__restrict d)
+                  JBFLOAT ** __restrict d)
 ///< pointer to the array of 3rd order spline coefficients.
 {
   JBFLOAT *B, *C, *D, *E, *F, *H;
@@ -3388,17 +3388,17 @@ jbm_spline_cubic (JBFLOAT *__restrict x,
  * Function to calculate a cubic spline on tabular data (JBDOUBLE).
  */
 static inline void
-jbm_spline_cubicl (JBDOUBLE *__restrict x,
+jbm_spline_cubicl (JBDOUBLE * __restrict x,
                    ///< array of point x-coordinates.
                    JBDOUBLE * y,
                    ///< array of point y-coordinates.
                    int n,       ///< number of points.
-                   JBDOUBLE **__restrict b,
+                   JBDOUBLE ** __restrict b,
 ///< pointer to the array of 1st order spline coefficients. It is generated by
 ///< g_malloc.
-                   JBDOUBLE **__restrict c,
+                   JBDOUBLE ** __restrict c,
 ///< pointer to the array of 2nd order spline coefficients.
-                   JBDOUBLE **__restrict d)
+                   JBDOUBLE ** __restrict d)
 ///< pointer to the array of 3rd order spline coefficients.
 {
   JBDOUBLE *B, *C, *D, *E, *F, *H;
@@ -3958,11 +3958,11 @@ jbm_transversal_section_regions_sort (int i,    ///< level index.
                                       int nj,   ///< number of points.
                                       int *__restrict nk,
                                       ///< array of region indices.
-                                      JBFLOAT *__restrict l,
+                                      JBFLOAT * __restrict l,
                                       ///< array of longitudinal coordinates.
-                                      JBFLOAT *__restrict z,
+                                      JBFLOAT * __restrict z,
                                       ///< array of vertical coordinates.
-                                      JBFLOAT *__restrict zz)
+                                      JBFLOAT * __restrict zz)
                                       ///< array of levels.
 {
   JBFLOAT x[nj];
@@ -3986,15 +3986,15 @@ jbm_transversal_section_regions_sort (int i,    ///< level index.
  * \return index of the highest riverside point.
  */
 static inline int
-jbm_transversal_section_regions (JBFLOAT *__restrict l,
+jbm_transversal_section_regions (JBFLOAT * __restrict l,
 ///< array of JBFLOAT numbers with the transversal coordinates of the points
 ///< defining the cross section.
-                                 JBFLOAT *__restrict z,
+                                 JBFLOAT * __restrict z,
 ///< array of JBFLOAT numbers with the vertical coordinates of the points 
 ///< defining the cross section.
                                  int n,
 ///< the highest cross section point number.
-                                 JBFLOAT **__restrict zz,
+                                 JBFLOAT ** __restrict zz,
 ///< pointer to the array of JBFLOAT numbers, generated by g_malloc, of the 
 ///< cross section z-coordinates sorted from the lowest to the highest.
                                  int **__restrict ni,
@@ -4970,6 +4970,7 @@ jbm_get_time (const char *string,       ///< date in string format.
                    &sys_date->tm_mon,
                    &sys_date->tm_mday,
                    &sys_date->tm_hour, &sys_date->tm_min, &sys_sec);
+printf ("error=%d\n", *error);
   if (*error < 0)
     *error = 0;
   if (*error == 6)

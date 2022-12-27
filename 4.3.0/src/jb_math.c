@@ -37,7 +37,7 @@
  * JBFLOAT numbers by the flash method.
  */
 void
-jbm_index_sort_flash (JBFLOAT *__restrict x,    ///< array of JBFLOAT numbers.
+jbm_index_sort_flash (JBFLOAT * __restrict x,   ///< array of JBFLOAT numbers.
                       unsigned int *__restrict ni,      ///< array of indexes.
                       int n)    ///< the highest element number of the arrays.
 {
@@ -105,7 +105,7 @@ sorted:
  * JBDOUBLE numbers by the flash method.
  */
 void
-jbm_index_sort_flashl (JBDOUBLE *__restrict x,  ///< array of JBDOUBLE numbers.
+jbm_index_sort_flashl (JBDOUBLE * __restrict x, ///< array of JBDOUBLE numbers.
                        unsigned int *__restrict ni,     ///< array of indexes.
                        int n)   ///< the highest element number of the arrays.
 {

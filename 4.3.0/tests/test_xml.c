@@ -13,8 +13,8 @@ main (void)
 {
   xmlDoc *doc;
   xmlNode *node;
-  FILE *file;
-//      char *buffer;
+//  FILE *file;
+//  char *buffer;
   JBDOUBLE x;
   int i, e1, e2, e3;
   xmlKeepBlanksDefault (0);
@@ -24,13 +24,15 @@ main (void)
   jb_xml_node_set_float_with_default (node, XML_X, 1., 0.);
   jb_xml_node_set_int_with_default (node, XML_I, 1, 0);
   jb_xml_node_set_time_with_default (node, XML_T, 1., 0.);
+/*
   file = fopen ("../test_data", "r");
   if (!file || fscanf (file, "%d", &i) != 1 || i)
     {
       printf ("Bad test_data file\n");
       return 1;
     }
-//      jb_xml_node_set_content_file (node, file);
+  jb_xml_node_set_content_file (node, file);
+*/
   fclose (file);
   xmlSaveFormatFile (TEST_FILE, doc, 1);
   xmlFreeDoc (doc);
@@ -41,12 +43,12 @@ main (void)
   i = jb_xml_node_get_int_with_default (node, XML_I, &e2, 0);
   printf ("i %d 1\n", i);
   x = jb_xml_node_get_time_with_default (node, XML_T, &e3, 0.);
+  printf ("t " FWL " 1\n", x);
   if (!e1 || !e2 || !e3)
     {
-      printf ("Bad xml property\n");
+      printf ("Bad xml property e1=%d e2=%d e3=%d\n", e1, e2, e3);
       return 2;
     }
-  printf ("t " FWL " 1\n", x);
 /*
 	file = jb_xml_node_get_content_file (node, &buffer);
 	if (!file || fscanf (file, "%d", &i) != 1 || i || !buffer)

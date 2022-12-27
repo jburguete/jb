@@ -737,7 +737,7 @@ jbw_graphic_show (JBWGraphic * graphic) ///< JBWGraphic widget.
 #if GTK_MAJOR_VERSION > 3
 
 void gtk_entry_set_text (GtkEntry * entry, const char *text);
-const char * gtk_entry_get_text (GtkEntry * entry);
+const char *gtk_entry_get_text (GtkEntry * entry);
 
 #else
 

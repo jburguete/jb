@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([jb],[4.1.0],[https://github.com/jburguete/jb])
+AC_INIT([jb],[4.3.0],[https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -148,6 +148,7 @@ AC_SEARCH_LIBS([textdomain], [intl])
 PKG_CHECK_MODULES([XML], [libxml-2.0])
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 PKG_CHECK_MODULES([GTHREAD], [gthread-2.0])
+PKG_CHECK_MODULES([JSON], [json-glib-1.0])
 PKG_CHECK_MODULES([GTOP], [libgtop-2.0], AC_DEFINE([HAVE_GTOP], [1]),
 	AC_MSG_NOTICE([No gtop]))
 PKG_CHECK_MODULES([GSL], [gsl])

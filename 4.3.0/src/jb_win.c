@@ -196,7 +196,7 @@ int
 jbw_init (int *argn __attribute__((unused)),
           ///< pointer to the number of command line arguments.
           char ***argc __attribute__((unused)))
-          ///< pointer to the command line arguments.
+  ///< pointer to the command line arguments.
 {
   jb_init ();
 #if HAVE_FREEGLUT
@@ -752,7 +752,7 @@ end:
  * Function to create a new JBWImage widget from a PNG file.
  */
 JBWImage *
-jbw_image_new (const char *name) ///< PNG file name.
+jbw_image_new (const char *name)        ///< PNG file name.
 {
   JBWImage *image = NULL;
   png_struct *png;
@@ -2381,8 +2381,7 @@ jbw_graphic_init_gtk (GtkGLArea * widget)
 }
 
 static void
-jbw_graphic_resize_gtk (GtkGLArea * widget,
-                        int width, int height)
+jbw_graphic_resize_gtk (GtkGLArea * widget, int width, int height)
 {
   jbw_graphic_resize (width, height);
   gtk_widget_queue_draw (GTK_WIDGET (widget));
@@ -2506,7 +2505,7 @@ jbw_graphic_set_title (const char *title)       ///< title label.
  * Function to set the logo on the current JBWGraphic widget.
  */
 void
-jbw_graphic_set_logo (const char *name)       ///< logo PNG file name.
+jbw_graphic_set_logo (const char *name) ///< logo PNG file name.
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
   if (graphic->logo)
@@ -3048,8 +3047,7 @@ void
 jbw_graphic_draw_darray (JBDOUBLE * x,  ///< x-coordinates array.
                          JBDOUBLE * y,  ///< y-coordinates array.
                          unsigned int n,        ///< number of array elements.
-                         const GLfloat * color,
-                         GLenum type)
+                         const GLfloat * color, GLenum type)
 {
   JBWGraphic *graphic;
   GLdouble *vertex;
@@ -3124,7 +3122,7 @@ jbw_graphic_draw_varrayl (void *x,      ///< x-coordinates array.
                           unsigned int n,       ///< number of array elements.
                           const GLfloat * color,
                           ///< array of RGB colors.
-                          GLenum type)   ///< draw type.
+                          GLenum type)  ///< draw type.
 {
   JBWGraphic *graphic;
   GLdouble *vertex;
@@ -3240,8 +3238,7 @@ jbw_graphic_draw_labels (void)
       k -= sy;
       graphic->y2 -= graphic->char_height;
       if (graphic->str_yy)
-        jbw_graphic_draw_text (graphic->str_yy, -1.f, sb + k,
-                               jbw_green);
+        jbw_graphic_draw_text (graphic->str_yy, -1.f, sb + k, jbw_green);
       if (graphic->str_zz)
         jbw_graphic_draw_text (graphic->str_zz,
                                1.f - sx * strlen (graphic->str_zz), sb + k,
@@ -3316,8 +3313,7 @@ jbw_graphic_draw_labels (void)
             jbm_extrapolatel (graphic->ztic[i], graphic->zmin, graphic->zmax,
                               (JBDOUBLE) y1, (JBDOUBLE) y2);
           k = (GLfloat) ztic[i];
-          jbw_graphic_draw_text (buffer, x2 + sa, sb + k - 0.5f * sy,
-                                 jbw_red);
+          jbw_graphic_draw_text (buffer, x2 + sa, sb + k - 0.5f * sy, jbw_red);
         }
     }
   else
@@ -3518,11 +3514,9 @@ jbw_graphic_draw_linesv (void *x,
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->ymax - graphic->ymin);
       if (y1)
-        jbw_graphic_draw_varray (x, y1, size, n, jbw_blue,
-                                 GL_LINE_STRIP);
+        jbw_graphic_draw_varray (x, y1, size, n, jbw_blue, GL_LINE_STRIP);
       if (y2)
-        jbw_graphic_draw_varray (x, y2, size, n, jbw_brown,
-                                 GL_LINE_STRIP);
+        jbw_graphic_draw_varray (x, y2, size, n, jbw_brown, GL_LINE_STRIP);
     }
   if (z1 || z2)
     {
@@ -3532,11 +3526,9 @@ jbw_graphic_draw_linesv (void *x,
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->zmax - graphic->zmin);
       if (z1)
-        jbw_graphic_draw_varray (x, z1, size, n, jbw_red,
-                                 GL_LINE_STRIP);
+        jbw_graphic_draw_varray (x, z1, size, n, jbw_red, GL_LINE_STRIP);
       if (z2)
-        jbw_graphic_draw_varray (x, z2, size, n, jbw_green,
-                                 GL_LINE_STRIP);
+        jbw_graphic_draw_varray (x, z2, size, n, jbw_green, GL_LINE_STRIP);
     }
 }
 
@@ -3575,11 +3567,9 @@ jbw_graphic_draw_linesvl (void *x,
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->ymax - graphic->ymin);
       if (y1)
-        jbw_graphic_draw_varrayl (x, y1, size, n, jbw_blue,
-                                  GL_LINE_STRIP);
+        jbw_graphic_draw_varrayl (x, y1, size, n, jbw_blue, GL_LINE_STRIP);
       if (y2)
-        jbw_graphic_draw_varrayl (x, y2, size, n, jbw_brown,
-                                  GL_LINE_STRIP);
+        jbw_graphic_draw_varrayl (x, y2, size, n, jbw_brown, GL_LINE_STRIP);
     }
   if (z1 || z2)
     {
@@ -3589,11 +3579,9 @@ jbw_graphic_draw_linesvl (void *x,
                                    (GLdouble) graphic->xmax - graphic->xmin,
                                    (GLdouble) graphic->zmax - graphic->zmin);
       if (z1)
-        jbw_graphic_draw_varrayl (x, z1, size, n, jbw_red,
-                                  GL_LINE_STRIP);
+        jbw_graphic_draw_varrayl (x, z1, size, n, jbw_red, GL_LINE_STRIP);
       if (z2)
-        jbw_graphic_draw_varrayl (x, z2, size, n, jbw_green,
-                                  GL_LINE_STRIP);
+        jbw_graphic_draw_varrayl (x, z2, size, n, jbw_green, GL_LINE_STRIP);
     }
 }
 
@@ -3756,7 +3744,7 @@ jbw_graphic_dialog_save (void)
           gtk_file_filter_add_pattern (filter, pattern[j][i]);
       gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dlg), filter);
     }
-  g_signal_connect (dlg, "response", G_CALLBACK (jbw_graphic_dialog_response), 
+  g_signal_connect (dlg, "response", G_CALLBACK (jbw_graphic_dialog_response),
                     NULL);
 #if GTK_MAJOR_VERSION > 3
   gtk_widget_show (GTK_WIDGET (dlg));
