@@ -1,6 +1,6 @@
 /*
 BUGS:
-  * No JBWGraphics (SDL and GtkGLArea) rendering on GTK4 
+	* No JBWGraphics (SDL and GtkGLArea) rendering on GTK4 
 
 DEBUGS:
 
