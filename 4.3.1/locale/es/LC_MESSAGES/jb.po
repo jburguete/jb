@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jb 4.3.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-27 15:31+0100\n"
+"POT-Creation-Date: 2022-12-29 20:20+0100\n"
 "PO-Revision-Date: 2020-05-05 02:59+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/jb_win.h:51 src/jb_win.c:262
+#: src/jb_win.h:52 src/jb_win.c:262
 msgid "Error!"
 msgstr "¡Error!"
 
-#: src/jb_win.h:57 src/jb_win.c:296
+#: src/jb_win.h:58 src/jb_win.c:296
 msgid "Warning!"
 msgstr "¡Ojo!"
 

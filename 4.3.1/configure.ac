@@ -157,32 +157,26 @@ PKG_CHECK_MODULES([GSL], [gsl])
 AC_ARG_WITH([gtk],
 	AS_HELP_STRING([--with-gtk],
 		[Build using a version of GTK (3 (--with-gtk=3) or 4 (--with-gtk=4))]))
+gtk4=0
+gtk3=0
+gtk=0
 if test "x$with_gtk" = "x4"; then
 	PKG_CHECK_MODULES([GTK], [gtk4], [gtk4=1], [gtk4=0])
 	gtk3=1
-else
-	if test "x$with_gtk" = "x3"; then
-		gtk4=0
-		gtk3=1
-	else
-		gtk4=0
-		gtk3=0
-	fi
+elif test "x$with_gtk" = "x3"; then
+	gtk3=1
 fi
 if test $gtk4 = 1; then
 	AC_SUBST(JBW, [-DJBW=2])
 	gtk=1
+elif test $gtk3 = 1; then
+	PKG_CHECK_MODULES([GTK], [gtk+-3.0],
+		[AC_MSG_NOTICE([With GTK])],
+		[AC_MSG_NOTICE([Without GTK])])
+	AC_SUBST(JBW, [-DJBW=2])
+	gtk=1
 else
-	if test $gtk3 = 1; then
-		PKG_CHECK_MODULES([GTK], [gtk+-3.0],
-			[AC_MSG_NOTICE([With GTK])],
-			[AC_MSG_NOTICE([Without GTK])])
-		AC_SUBST(JBW, [-DJBW=2])
-		gtk=1
-	else
-		AC_SUBST(JBW, [-DJBW=1])
-		gtk=0
-	fi
+	AC_SUBST(JBW, [-DJBW=1])
 fi
 
 # Checks for graphic interface
@@ -224,18 +218,14 @@ if test $gtk = 1; then
 	if test "x$with_freeglut" = "xyes"; then
 		AC_SUBST(GRAPHIC, "-DHAVE_FREEGLUT=1")
 		PKG_CHECK_MODULES([GLUT], [glut])
+	elif test "x$with_glfw" = "xyes"; then
+		AC_SUBST(GRAPHIC, "-DHAVE_GLFW=1")
+		PKG_CHECK_MODULES([GLFW], [glfw3])
+	elif test "x$with_sdl" = "xyes"; then
+		AC_SUBST(GRAPHIC, "-DHAVE_SDL=1")
+		PKG_CHECK_MODULES([SDL], [sdl2])
 	else
-		if test "x$with_glfw" = "xyes"; then
-			AC_SUBST(GRAPHIC, "-DHAVE_GLFW=1")
-			PKG_CHECK_MODULES([GLFW], [glfw3])
-		else
-			if test "x$with_sdl" = "xyes"; then
-				AC_SUBST(GRAPHIC, "-DHAVE_SDL=1")
-				PKG_CHECK_MODULES([SDL], [sdl2])
-			else
-				AC_SUBST(GRAPHIC, "-DHAVE_GTKGLAREA=1")
-			fi
-		fi
+		AC_SUBST(GRAPHIC, "-DHAVE_GTKGLAREA=1")
 	fi
 fi
 
@@ -252,11 +242,11 @@ AC_CHECK_FUNC([get_nprocs], AC_DEFINE([HAVE_GET_NPROCS], [1]))
 # Check for font
 if test $gtk = 1; then
 	AC_MSG_NOTICE([Searching font...])
-  if test $win = 1 || test $haiku = 1; then
-    dir="/"
-  else
-    dir="/usr"
-  fi
+	if test $win = 1 || test $haiku = 1; then
+		dir="/"
+	else
+		dir="/usr"
+	fi
 	font=`find $dir -type f -iname freemono.otf`
 	if test "x$font" = "x"; then
 		font=`find $dir -type f -iname freemono.ttf`
