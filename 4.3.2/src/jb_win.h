@@ -742,7 +742,15 @@ const char *gtk_entry_get_text (GtkEntry * entry);
 
 #else
 
+#define gtk_box_append(box, child) (gtk_box_pack_start(box, child, 0, 0, 0))
+#define gtk_check_button_get_active(button) \
+  (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button)))
+#define gtk_check_button_set_active(button, active) \
+  (gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), active))
 #define gtk_file_chooser_get_current_name gtk_file_chooser_get_filename
+#define gtk_file_chooser_set_current_name gtk_file_chooser_set_filename
+#define gtk_frame_set_child(frame, child) \
+  (gtk_container_add(GTK_CONTAINER(frame), child))
 #define gtk_scrolled_window_set_child(scrolled, widget) \
   (gtk_container_add (GTK_CONTAINER(scrolled), widget))
 #define gtk_window_destroy(window) (gtk_widget_destroy (GTK_WIDGET(window)))
