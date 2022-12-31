@@ -123,7 +123,7 @@ check_sort_dep = $(check_sort_c) $(jb_math_h) $(dep)
 ifeq (@PGO@, 1)
 ifeq (@CC@, clang)
 	PGOGENERATE = -fprofile-instr-generate
-	PGOUSE = -fprofile-instr-use=$(BINPGO)jb.profraw
+	PGOUSE = -fprofile-instr-use=$(BINPGO)jb@SUFFIX@.profraw
 	mathprefix = LLVM_PROFILE_FILE="math@SUFFIX@.profdata"
 	xmlprefix = LLVM_PROFILE_FILE="xml@SUFFIX@.profdata"
 	jsonprefix = LLVM_PROFILE_FILE="json@SUFFIX@.profdata"
