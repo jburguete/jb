@@ -40,12 +40,12 @@
 
 JBDOUBLE jb_json_object_get_float (JsonObject *, const char *, int *);
 JBDOUBLE jb_json_object_get_float_with_default
-  (JsonObject *, const char *, int *, JBDOUBLE);
+    (JsonObject *, const char *, int *, JBDOUBLE);
 void jb_json_object_set_float_with_format
-  (JsonObject *, const char *, char *, JBDOUBLE);
+    (JsonObject *, const char *, char *, JBDOUBLE);
 void jb_json_object_set_float (JsonObject *, const char *, JBDOUBLE);
 void jb_json_object_set_float_with_default
-  (JsonObject *, const char *, JBDOUBLE, JBDOUBLE);
+    (JsonObject *, const char *, JBDOUBLE, JBDOUBLE);
 long int jb_json_object_get_int (JsonObject *, const char *, int *);
 long int jb_json_object_get_int_with_default (JsonObject *, const char *,
                                               int *, long int);
@@ -54,9 +54,9 @@ void jb_json_object_set_int_with_default (JsonObject *, const char *,
                                           long int, long int);
 JBDOUBLE jb_json_object_get_time (JsonObject *, const char *, int *);
 JBDOUBLE jb_json_object_get_time_with_default
-  (JsonObject *, const char *, int *, JBDOUBLE);
+    (JsonObject *, const char *, int *, JBDOUBLE);
 void jb_json_object_set_time (JsonObject *, const char *, JBDOUBLE);
 void jb_json_object_set_time_with_default
-  (JsonObject *, const char *, JBDOUBLE, JBDOUBLE);
+    (JsonObject *, const char *, JBDOUBLE, JBDOUBLE);
 
 #endif

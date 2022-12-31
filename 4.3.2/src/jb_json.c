@@ -26,7 +26,7 @@
  */
 
 /**
- * \file jb_JSON.c
+ * \file jb_json.c
  * \brief Source file with useful JSON functions.
  * \author Javier Burguete Tolosa.
  * \copyright Copyright 2005-2022, Javier Burguete Tolosa.

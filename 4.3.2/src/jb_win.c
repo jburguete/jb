@@ -86,12 +86,12 @@ JBWGraphic *jbw_graphic_pointer;
 #define DEBUG_VULKAN 1          ///< macro to debug Vulkan functions.
 
 const char *jbw_required_device_extensions[JBW_VK_N_DEVICE_EXTENSIONS]
-  = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+    = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 ///< required Vulkan device extensions.
 
 #if DEBUG_VULKAN
 const char *jbw_required_validation_layers[JBW_VK_N_VALIDATION_LAYERS] =
-  { "VK_LAYER_KHRONOS_validation" };
+    { "VK_LAYER_KHRONOS_validation" };
 ///< required validation layers.
 #endif
 
@@ -196,7 +196,7 @@ int
 jbw_init (int *argn __attribute__((unused)),
           ///< pointer to the number of command line arguments.
           char ***argc __attribute__((unused)))
-  ///< pointer to the command line arguments.
+    ///< pointer to the command line arguments.
 {
   jb_init ();
 #if HAVE_FREEGLUT
@@ -235,7 +235,7 @@ jbw_show_message (const char *title,    ///< message title.
   GtkMessageDialog *dlg;
   GMainLoop *loop;
   dlg = (GtkMessageDialog *) gtk_message_dialog_new
-    (window_parent, GTK_DIALOG_MODAL, type, GTK_BUTTONS_OK, "%s", message);
+      (window_parent, GTK_DIALOG_MODAL, type, GTK_BUTTONS_OK, "%s", message);
   gtk_window_set_title (GTK_WINDOW (dlg), title);
 #if GTK_MAJOR_VERSION > 3
   gtk_widget_show (GTK_WIDGET (dlg));
@@ -510,7 +510,7 @@ jbw_draw_orthogonal_matrix (GLint uniform_matrix,
 {
   GLfloat matrix[16];
   matrix[1] = matrix[2] = matrix[3] = matrix[4] = matrix[6] = matrix[7]
-    = matrix[8] = matrix[9] = matrix[10] = matrix[11] = matrix[14] = 0.f;
+      = matrix[8] = matrix[9] = matrix[10] = matrix[11] = matrix[14] = 0.f;
   matrix[15] = 1.f;
   matrix[0] = 2.f / w;
   matrix[12] = -1.f - matrix[0] * x;
@@ -536,7 +536,7 @@ jbw_draw_orthogonal_matrixl (GLint uniform_matrix,
   GLdouble matrix[16];
 #endif
   matrix[1] = matrix[2] = matrix[3] = matrix[4] = matrix[6] = matrix[7]
-    = matrix[8] = matrix[9] = matrix[10] = matrix[11] = matrix[14] = 0.;
+      = matrix[8] = matrix[9] = matrix[10] = matrix[11] = matrix[14] = 0.;
   matrix[15] = 1.;
   matrix[0] = 2. / w;
   matrix[12] = -1. - matrix[0] * x;
@@ -585,18 +585,18 @@ jbw_image_init (JBWImage * image,       ///< JBWImage widget.
                 const char *gl_version) ///< OpenGL GLSL version string.
 {
   const char *vs_texture_source =
-    "in vec2 position;"
-    "in vec2 texture_position;"
-    "uniform mat4 matrix;"
-    "out vec2 t_position;"
-    "void main()"
-    "{"
-    "gl_Position=matrix*vec4 (position,0.f,1.f);"
-    "t_position=texture_position;" "}";
+      "in vec2 position;"
+      "in vec2 texture_position;"
+      "uniform mat4 matrix;"
+      "out vec2 t_position;"
+      "void main()"
+      "{"
+      "gl_Position=matrix*vec4 (position,0.f,1.f);"
+      "t_position=texture_position;" "}";
   const char *fs_texture_source =
-    "uniform sampler2D texture_image;"
-    "out vec2 t_position;"
-    "void main()" "{" "gl_FragColor=texture2D(texture_image,t_position);" "}";
+      "uniform sampler2D texture_image;"
+      "out vec2 t_position;"
+      "void main()" "{" "gl_FragColor=texture2D(texture_image,t_position);" "}";
   const char *vertex_name = "position";
   const char *texture_name = "texture_image";
   const char *texture_position_name = "texture_position";
@@ -694,28 +694,28 @@ jbw_image_init (JBWImage * image,       ///< JBWImage widget.
 
   // setting up the shader attributes
   image->attribute_texture
-    = glGetAttribLocation (image->program_texture, vertex_name);
+      = glGetAttribLocation (image->program_texture, vertex_name);
   if (image->attribute_texture == -1)
     {
       error_msg = _("could not bind texture attribute");
       goto end;
     }
   image->attribute_texture_position
-    = glGetAttribLocation (image->program_texture, texture_position_name);
+      = glGetAttribLocation (image->program_texture, texture_position_name);
   if (image->attribute_texture_position == -1)
     {
       error_msg = _("could not bind texture position attribute");
       goto end;
     }
   image->uniform_texture
-    = glGetUniformLocation (image->program_texture, texture_name);
+      = glGetUniformLocation (image->program_texture, texture_name);
   if (image->uniform_texture == -1)
     {
       error_msg = _("could not bind texture uniform");
       goto end;
     }
   image->uniform_matrix
-    = glGetUniformLocation (image->program_texture, matrix_name);
+      = glGetUniformLocation (image->program_texture, matrix_name);
   if (image->uniform_matrix == -1)
     {
       error_msg = _("could not bind matrix uniform");
@@ -898,7 +898,7 @@ jbw_validation_layer_check_support (void)
   unsigned int layer_found;
   vkEnumerateInstanceLayerProperties (&n, NULL);
   available_layers
-    = (VkLayerProperties *) malloc (n * sizeof (VkLayerProperties));
+      = (VkLayerProperties *) malloc (n * sizeof (VkLayerProperties));
   vkEnumerateInstanceLayerProperties (&n, available_layers);
   for (i = 0; i < n; ++i)
     printf ("Vulkan validation layer %s\n", available_layers[i].layerName);
@@ -954,7 +954,8 @@ jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
     }
 #if DEBUG_VULKAN
   extensions
-    = (VkExtensionProperties *) malloc (count * sizeof (VkExtensionProperties));
+      =
+      (VkExtensionProperties *) malloc (count * sizeof (VkExtensionProperties));
   vkEnumerateInstanceExtensionProperties (NULL, &count, extensions);
   for (i = 0; i < count; ++i)
     fprintf (stderr, "Vulkan available instance extension: %s\n",
@@ -1001,7 +1002,7 @@ jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
       create_info.ppEnabledLayerNames = jbw_required_validation_layers;
       ++count;
       window_extensions
-        = realloc (window_extensions, count * sizeof (const char *));
+          = realloc (window_extensions, count * sizeof (const char *));
       window_extensions[count - 1] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
     }
   else
@@ -1147,7 +1148,7 @@ jbw_vk_check_extensions (JBWVK * vk)    ///< JBWVK struct.
   vkEnumerateDeviceExtensionProperties (vk->physical_device, NULL, &count,
                                         NULL);
   available_extensions = (VkExtensionProperties *)
-    malloc (count * sizeof (VkExtensionProperties));
+      malloc (count * sizeof (VkExtensionProperties));
   vkEnumerateDeviceExtensionProperties (vk->physical_device, NULL, &count,
                                         available_extensions);
 #if DEBUG_VULKAN
@@ -1200,7 +1201,7 @@ jbw_vk_create_logical_device (JBWVK * vk)       ///< JBWVK struct.
            (unsigned int) count);
 #endif
   queue_families = (VkQueueFamilyProperties *)
-    malloc (count * sizeof (VkQueueFamilyProperties));
+      malloc (count * sizeof (VkQueueFamilyProperties));
   vkGetPhysicalDeviceQueueFamilyProperties (vk->physical_device, &count,
                                             queue_families);
   for (i = 0; i < count; ++i)
@@ -1282,7 +1283,7 @@ jbw_vk_create_swap_chain (JBWVK * vk)   ///< JBWVK struct.
   if (count)
     {
       details.formats = (VkSurfaceFormatKHR *)
-        malloc (count * sizeof (VkSurfaceFormatKHR));
+          malloc (count * sizeof (VkSurfaceFormatKHR));
       vkGetPhysicalDeviceSurfaceFormatsKHR (vk->physical_device, vk->surface,
                                             &count, details.formats);
     }
@@ -1300,7 +1301,7 @@ jbw_vk_create_swap_chain (JBWVK * vk)   ///< JBWVK struct.
   if (count)
     {
       details.present_modes = (VkPresentModeKHR *)
-        malloc (count * sizeof (VkPresentModeKHR));
+          malloc (count * sizeof (VkPresentModeKHR));
       vkGetPhysicalDeviceSurfacePresentModesKHR (vk->physical_device,
                                                  vk->surface,
                                                  &count, details.present_modes);
@@ -1411,7 +1412,7 @@ jbw_vk_create_image_view (JBWVK * vk,   ///< JBWVK struct.
       != VK_SUCCESS)
     {
       vk->error_message
-        = _("unable to create the Vulkan swap chain image view");
+          = _("unable to create the Vulkan swap chain image view");
       return JBW_VK_ERROR_FAILED_TO_CREATE_VULKAN_IMAGE_VIEW;
     }
   return 0;
@@ -1429,7 +1430,7 @@ jbw_vk_create_image_views (JBWVK * vk)  ///< JBWVK struct.
   int j;
   // Image views
   vk->swap_chain_image_views
-    = (VkImageView *) malloc (vk->n_image_views * sizeof (VkImageView));
+      = (VkImageView *) malloc (vk->n_image_views * sizeof (VkImageView));
   vk->created_image_views = 1;
   for (i = 0; i < vk->n_image_views; ++i)
     {
@@ -1495,10 +1496,10 @@ jbw_vk_find_depth_format (JBWVK * vk)   ///< JBWVK struct.
     VK_FORMAT_D24_UNORM_S8_UINT
   };
   return jbw_vk_find_supported_format
-    (vk,
-     formats,
-     3,
-     VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+      (vk,
+       formats,
+       3,
+       VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 }
 
 /**
@@ -1535,13 +1536,13 @@ jbw_vk_create_render_pass (JBWVK * vk)  ///< JBWVK struct.
   depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
   depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
   depth_attachment.finalLayout
-    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+      = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
   // Subpasses and attachment references
   color_attachment_ref.attachment = 0;
   color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
   depth_attachment_ref.attachment = 1;
   depth_attachment_ref.layout
-    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+      = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
   subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
   subpass.colorAttachmentCount = 1;
   subpass.pColorAttachments = &color_attachment_ref;
@@ -1594,7 +1595,7 @@ jbw_vk_create_descriptor_set_layout (JBWVK * vk)
   sampler_layout_binding.binding = 1;
   sampler_layout_binding.descriptorCount = 1;
   sampler_layout_binding.descriptorType
-    = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+      = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
   sampler_layout_binding.pImmutableSamplers = NULL;
   sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
   bindings[0] = ubo_layout_binding;
@@ -1606,7 +1607,7 @@ jbw_vk_create_descriptor_set_layout (JBWVK * vk)
                                    &vk->descriptor_set_layout) != VK_SUCCESS)
     {
       vk->error_message
-        = _("failed to create the Vulkan descriptor set layout");
+          = _("failed to create the Vulkan descriptor set layout");
       return JBW_VK_ERROR_CODE_FAILED_TO_CREATE_VULKAN_DESCRIPTOR_SET_LAYOUT;
     }
   vk->created_descriptor_set_layout = 1;
@@ -1661,10 +1662,10 @@ jbw_vk_create_shader_modules (JBWVK * vk)       ///< JBWVK struct.
   int i;
   // Initing shader handles
   vk->vert_2D_shader_module = vk->vert_2Dc_shader_module
-    = vk->vert_3D_shader_module = vk->vert_3Dc_shader_module
-    = vk->frag_color_shader_module = vk->vert_text_shader_module
-    = vk->frag_text_shader_module = vk->vert_image_shader_module
-    = vk->frag_image_shader_module = VK_NULL_HANDLE;
+      = vk->vert_3D_shader_module = vk->vert_3Dc_shader_module
+      = vk->frag_color_shader_module = vk->vert_text_shader_module
+      = vk->frag_text_shader_module = vk->vert_image_shader_module
+      = vk->frag_image_shader_module = VK_NULL_HANDLE;
   // Creating shader modules
   vk->created_shader_modules = 1;
   i = jbw_vk_create_shader_module (vk, "shaders/2D.spv",
@@ -1786,9 +1787,9 @@ jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
   int i;
   // Initing creation flags
   vk->created_instance = vk->created_surface = vk->created_device
-    = vk->created_swap_chain = vk->created_image_views
-    = vk->created_render_pass = vk->created_descriptor_set_layout
-    = vk->created_shader_modules = 0;
+      = vk->created_swap_chain = vk->created_image_views
+      = vk->created_render_pass = vk->created_descriptor_set_layout
+      = vk->created_shader_modules = 0;
   // Creating a Vulkan instance
   i = jbw_vk_create_instance (vk);
   if (i)
@@ -1900,49 +1901,50 @@ void
 jbw_graphic_init (void)
 {
   const char *gl_version_120 =
-    "#version 120\n" "#define in attribute\n" "#define out varying\n";
+      "#version 120\n" "#define in attribute\n" "#define out varying\n";
   const char *gl_version_130 = "#version 130\n";
   const char *fs_source =
-    "out vec3 fcolor;" "void main()" "{" "gl_FragColor=vec4(fcolor,1.f);" "}";
+      "out vec3 fcolor;" "void main()" "{" "gl_FragColor=vec4(fcolor,1.f);" "}";
   const char *vs_2D_source =
-    "in vec2 position;"
-    "uniform vec3 color;"
-    "uniform mat4 matrix;"
-    "out vec3 fcolor;"
-    "void main()"
-    "{" "gl_Position=matrix*vec4(position,0.f,1.f);" "fcolor=color;" "}";
+      "in vec2 position;"
+      "uniform vec3 color;"
+      "uniform mat4 matrix;"
+      "out vec3 fcolor;"
+      "void main()"
+      "{" "gl_Position=matrix*vec4(position,0.f,1.f);" "fcolor=color;" "}";
   const char *vs_3D_source =
-    "in vec3 position;"
-    "uniform vec3 color;"
-    "uniform mat4 matrix;"
-    "out vec3 fcolor;"
-    "void main()"
-    "{" "gl_Position=matrix*vec4(position,1.f);" "fcolor=color;" "}";
+      "in vec3 position;"
+      "uniform vec3 color;"
+      "uniform mat4 matrix;"
+      "out vec3 fcolor;"
+      "void main()"
+      "{" "gl_Position=matrix*vec4(position,1.f);" "fcolor=color;" "}";
   const char *vs_2Dc_source =
-    "in vec2 position;"
-    "in vec3 color;"
-    "uniform mat4 matrix;"
-    "out vec3 fcolor;"
-    "void main()"
-    "{" "gl_Position=matrix*vec4(position,0.f,1.f);" "fcolor=color;" "}";
+      "in vec2 position;"
+      "in vec3 color;"
+      "uniform mat4 matrix;"
+      "out vec3 fcolor;"
+      "void main()"
+      "{" "gl_Position=matrix*vec4(position,0.f,1.f);" "fcolor=color;" "}";
   const char *vs_3Dc_source =
-    "in vec3 position;"
-    "in vec3 color;"
-    "uniform mat4 matrix;"
-    "out vec3 fcolor;"
-    "void main()"
-    "{" "gl_Position=matrix*vec4(position,1.f);" "fcolor=color;" "}";
+      "in vec3 position;"
+      "in vec3 color;"
+      "uniform mat4 matrix;"
+      "out vec3 fcolor;"
+      "void main()"
+      "{" "gl_Position=matrix*vec4(position,1.f);" "fcolor=color;" "}";
   const char *vs_text_source =
-    "in vec4 position;"
-    "out vec2 textcoord;"
-    "void main()"
-    "{" "gl_Position=vec4(position.xy,0.f,1.f);" "textcoord=position.zw;" "}";
+      "in vec4 position;"
+      "out vec2 textcoord;"
+      "void main()"
+      "{" "gl_Position=vec4(position.xy,0.f,1.f);" "textcoord=position.zw;" "}";
   const char *fs_text_source =
-    "uniform sampler2D text;"
-    "uniform vec4 color;"
-    "out vec2 textcoord;"
-    "void main()"
-    "{" "gl_FragColor=vec4(1.f,1.f,1.f,texture2D(text,textcoord).a)*color;" "}";
+      "uniform sampler2D text;"
+      "uniform vec4 color;"
+      "out vec2 textcoord;"
+      "void main()"
+      "{" "gl_FragColor=vec4(1.f,1.f,1.f,texture2D(text,textcoord).a)*color;"
+      "}";
   const char *position_name = "position";
   const char *color_name = "color";
   const char *matrix_name = "matrix";
@@ -1984,9 +1986,10 @@ jbw_graphic_init (void)
   // Initing variables
 init:
   graphic->vbo_text = graphic->program_2D = graphic->program_3D
-    = graphic->program_2Dc = graphic->program_3Dc = graphic->program_text = 0;
+      = graphic->program_2Dc = graphic->program_3Dc = graphic->program_text = 0;
   fs_sources[0] = vs_2D_sources[0] = vs_3D_sources[0] = vs_2Dc_sources[0]
-    = vs_3Dc_sources[0] = fs_text_sources[0] = vs_text_sources[0] = gl_version;
+      = vs_3Dc_sources[0] = fs_text_sources[0] = vs_text_sources[0] =
+      gl_version;
   fs_sources[1] = fs_source;
   vs_2D_sources[1] = vs_2D_source;
   vs_3D_sources[1] = vs_3D_source;
@@ -2164,21 +2167,21 @@ init:
 
   // Setting up 2D attributes
   graphic->in_2D_position
-    = glGetAttribLocation (graphic->program_2D, position_name);
+      = glGetAttribLocation (graphic->program_2D, position_name);
   if (graphic->in_2D_position == -1)
     {
       error_msg = _("could not bind 2D position attribute");
       goto end;
     }
   graphic->uniform_2D_color
-    = glGetUniformLocation (graphic->program_2D, color_name);
+      = glGetUniformLocation (graphic->program_2D, color_name);
   if (graphic->uniform_2D_color == -1)
     {
       error_msg = _("could not bind 2D color");
       goto end;
     }
   graphic->uniform_2D_matrix
-    = glGetUniformLocation (graphic->program_2D, matrix_name);
+      = glGetUniformLocation (graphic->program_2D, matrix_name);
   if (graphic->uniform_2D_matrix == -1)
     {
       error_msg = _("could not bind 2D matrix");
@@ -2187,21 +2190,21 @@ init:
 
   // Setting up 3D attributes
   graphic->in_3D_position
-    = glGetAttribLocation (graphic->program_3D, position_name);
+      = glGetAttribLocation (graphic->program_3D, position_name);
   if (graphic->in_3D_position == -1)
     {
       error_msg = _("could not bind 3D position attribute");
       goto end;
     }
   graphic->uniform_3D_color
-    = glGetUniformLocation (graphic->program_3D, color_name);
+      = glGetUniformLocation (graphic->program_3D, color_name);
   if (graphic->uniform_3D_color == -1)
     {
       error_msg = _("could not bind 3D color");
       goto end;
     }
   graphic->uniform_3D_matrix
-    = glGetUniformLocation (graphic->program_3D, matrix_name);
+      = glGetUniformLocation (graphic->program_3D, matrix_name);
   if (graphic->uniform_3D_matrix == -1)
     {
       error_msg = _("could not bind 3D matrix");
@@ -2210,21 +2213,21 @@ init:
 
   // Setting up 2D with color attributes
   graphic->in_2Dc_position
-    = glGetAttribLocation (graphic->program_2Dc, position_name);
+      = glGetAttribLocation (graphic->program_2Dc, position_name);
   if (graphic->in_2Dc_position == -1)
     {
       error_msg = _("could not bind 2D with color position attribute");
       goto end;
     }
   graphic->in_2Dc_color
-    = glGetAttribLocation (graphic->program_2Dc, color_name);
+      = glGetAttribLocation (graphic->program_2Dc, color_name);
   if (graphic->in_2Dc_color == -1)
     {
       error_msg = _("could not bind 2D with color color");
       goto end;
     }
   graphic->uniform_2Dc_matrix
-    = glGetUniformLocation (graphic->program_2Dc, matrix_name);
+      = glGetUniformLocation (graphic->program_2Dc, matrix_name);
   if (graphic->uniform_2Dc_matrix == -1)
     {
       error_msg = _("could not bind 2D with color matrix");
@@ -2233,21 +2236,21 @@ init:
 
   // Setting up 3D with color attributes
   graphic->in_3Dc_position
-    = glGetAttribLocation (graphic->program_3Dc, position_name);
+      = glGetAttribLocation (graphic->program_3Dc, position_name);
   if (graphic->in_3Dc_position == -1)
     {
       error_msg = _("could not bind 3D with color position attribute");
       goto end;
     }
   graphic->in_3Dc_color
-    = glGetAttribLocation (graphic->program_3Dc, color_name);
+      = glGetAttribLocation (graphic->program_3Dc, color_name);
   if (graphic->in_3Dc_color == -1)
     {
       error_msg = _("could not bind 3D with color color");
       goto end;
     }
   graphic->uniform_3Dc_matrix
-    = glGetUniformLocation (graphic->program_3Dc, matrix_name);
+      = glGetUniformLocation (graphic->program_3Dc, matrix_name);
   if (graphic->uniform_3Dc_matrix == -1)
     {
       error_msg = _("could not bind 3D with color matrix");
@@ -2260,21 +2263,21 @@ init:
 
   // Setting up text attributes
   graphic->in_text_position
-    = glGetAttribLocation (graphic->program_text, position_name);
+      = glGetAttribLocation (graphic->program_text, position_name);
   if (graphic->in_text_position == -1)
     {
       error_msg = _("could not bind text position attribute");
       goto end;
     }
   graphic->uniform_text
-    = glGetUniformLocation (graphic->program_text, text_name);
+      = glGetUniformLocation (graphic->program_text, text_name);
   if (graphic->uniform_text == -1)
     {
       error_msg = _("could not bind text uniform");
       goto end;
     }
   graphic->uniform_text_color
-    = glGetUniformLocation (graphic->program_text, color_name);
+      = glGetUniformLocation (graphic->program_text, color_name);
   if (graphic->uniform_text_color == -1)
     {
       error_msg = _("could not bind text color uniform");
@@ -2549,7 +2552,7 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
   graphic->resize = graphic->grid = 1;
   graphic->map = 0;
   graphic->str_x = graphic->str_y = graphic->str_yy = graphic->str_z
-    = graphic->str_zz = NULL;
+      = graphic->str_zz = NULL;
   graphic->str_title = title;
   graphic->logo = NULL;
   graphic->nxmax = nx;
@@ -2590,10 +2593,10 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
   graphic->window = glutCreateWindow (title);
 #elif HAVE_SDL
   graphic->window
-    = SDL_CreateWindow (title,
-                        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                        JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT,
-                        SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+      = SDL_CreateWindow (title,
+                          SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                          JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT,
+                          SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
   if (!graphic->window)
     {
       error_msg = SDL_GetError ();
@@ -2608,7 +2611,8 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
     }
 #elif HAVE_GLFW
   graphic->window
-    = glfwCreateWindow (JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT, title, NULL, NULL);
+      =
+      glfwCreateWindow (JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT, title, NULL, NULL);
   if (!graphic->window)
     {
       error_msg = _("unable to open the window");
@@ -2643,9 +2647,9 @@ jbw_graphic_get_display_size (void)
   JBWGraphic *graphic = jbw_graphic_pointer;
 #if HAVE_GTKGLAREA
   graphic->width
-    = gtk_widget_get_allocated_width (GTK_WIDGET (graphic->widget));
+      = gtk_widget_get_allocated_width (GTK_WIDGET (graphic->widget));
   graphic->height
-    = gtk_widget_get_allocated_height (GTK_WIDGET (graphic->widget));
+      = gtk_widget_get_allocated_height (GTK_WIDGET (graphic->widget));
 #elif HAVE_FREEGLUT
   graphic->width = glutGet (GLUT_WINDOW_WIDTH);
   graphic->height = glutGet (GLUT_WINDOW_HEIGHT);
@@ -3010,7 +3014,7 @@ void
 jbw_graphic_draw_farray (JBFLOAT * x,   ///< x-coordinates array.
                          JBFLOAT * y,   ///< y-coordinates array.
                          unsigned int n,        ///< number of array elements.
-                         const GLfloat * color, ///< array of RGB colors.
+                         const GLfloat * color, ///< RGB color.
                          GLenum type)   ///< draw type.
 {
   JBWGraphic *graphic;
@@ -3047,7 +3051,8 @@ void
 jbw_graphic_draw_darray (JBDOUBLE * x,  ///< x-coordinates array.
                          JBDOUBLE * y,  ///< y-coordinates array.
                          unsigned int n,        ///< number of array elements.
-                         const GLfloat * color, GLenum type)
+                         const GLfloat * color, ///< RGB color.
+                         GLenum type)   ///< draw type.
 {
   JBWGraphic *graphic;
   GLdouble *vertex;
@@ -3084,7 +3089,7 @@ jbw_graphic_draw_varray (void *x,       ///< x-coordinates array.
                          void *y,       ///< y-coordinates array.
                          unsigned int size,     ///< struct size.
                          unsigned int n,        ///< number of array elements.
-                         const GLfloat * color, ///< array of RGB colors.
+                         const GLfloat * color, ///< RGB color.
                          GLenum type)   ///< draw type.
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
@@ -3120,8 +3125,7 @@ jbw_graphic_draw_varrayl (void *x,      ///< x-coordinates array.
                           void *y,      ///< y-coordinates array.
                           unsigned int size,    ///< struct size.
                           unsigned int n,       ///< number of array elements.
-                          const GLfloat * color,
-                          ///< array of RGB colors.
+                          const GLfloat * color,        ///< RGB color.
                           GLenum type)  ///< draw type.
 {
   JBWGraphic *graphic;
@@ -3158,8 +3162,7 @@ jbw_graphic_draw_rectangle (JBFLOAT x1, ///< 1st corner x-coordinate.
                             JBFLOAT y1, ///< 1st corner y-coordinate.
                             JBFLOAT x2, ///< 2nd corner x-coordinate.
                             JBFLOAT y2, ///< 2nd corner y-coordinate.
-                            const GLfloat * color)
-                            ///< intensity color array.
+                            const GLfloat * color)      ///< RGB color.
 {
   JBFLOAT x[4] = { x1, x2, x2, x1 };
   JBFLOAT y[4] = { y1, y1, y2, y2 };
@@ -3174,8 +3177,7 @@ jbw_graphic_draw_rectanglel (JBDOUBLE x1,       ///< 1st corner x-coordinate.
                              JBDOUBLE y1,       ///< 1st corner y-coordinate.
                              JBDOUBLE x2,       ///< 2nd corner x-coordinate.
                              JBDOUBLE y2,       ///< 2nd corner y-coordinate.
-                             const GLfloat * color)
-                             ///< intensity color array.
+                             const GLfloat * color)     ///< RGB color.
 {
   JBDOUBLE x[4] = { x1, x2, x2, x1 };
   JBDOUBLE y[4] = { y1, y1, y2, y2 };
@@ -3272,8 +3274,8 @@ jbw_graphic_draw_labels (void)
         {
           sprintf (buffer, FGL, graphic->xtic[i]);
           xtic[i] =
-            jbm_extrapolatel (graphic->xtic[i], graphic->xmin, graphic->xmax,
-                              (JBDOUBLE) x1, (JBDOUBLE) x2);
+              jbm_extrapolatel (graphic->xtic[i], graphic->xmin, graphic->xmax,
+                                (JBDOUBLE) x1, (JBDOUBLE) x2);
           k = (GLfloat) xtic[i];
           jbw_graphic_draw_text (buffer,
                                  k - 0.5f * sx * strlen (buffer),
@@ -3291,8 +3293,8 @@ jbw_graphic_draw_labels (void)
         {
           sprintf (buffer, FGL, graphic->ytic[i]);
           ytic[i] =
-            jbm_extrapolatel (graphic->ytic[i], graphic->ymin, graphic->ymax,
-                              (JBDOUBLE) y1, (JBDOUBLE) y2);
+              jbm_extrapolatel (graphic->ytic[i], graphic->ymin, graphic->ymax,
+                                (JBDOUBLE) y1, (JBDOUBLE) y2);
           k = (GLfloat) ytic[i];
           jbw_graphic_draw_text (buffer,
                                  x1 - sx * strlen (buffer) - sa,
@@ -3310,8 +3312,8 @@ jbw_graphic_draw_labels (void)
         {
           sprintf (buffer, FGL, graphic->ztic[i]);
           ztic[i] =
-            jbm_extrapolatel (graphic->ztic[i], graphic->zmin, graphic->zmax,
-                              (JBDOUBLE) y1, (JBDOUBLE) y2);
+              jbm_extrapolatel (graphic->ztic[i], graphic->zmin, graphic->zmax,
+                                (JBDOUBLE) y1, (JBDOUBLE) y2);
           k = (GLfloat) ztic[i];
           jbw_graphic_draw_text (buffer, x2 + sa, sb + k - 0.5f * sy, jbw_red);
         }
@@ -3729,12 +3731,12 @@ jbw_graphic_dialog_save (void)
   GMainLoop *loop;
   unsigned int i, j;
   dlg =
-    (GtkFileChooserDialog *)
-    gtk_file_chooser_dialog_new (_("Save graph"),
-                                 window_parent,
-                                 GTK_FILE_CHOOSER_ACTION_SAVE,
-                                 _("_OK"), GTK_RESPONSE_OK,
-                                 _("_Cancel"), GTK_RESPONSE_CANCEL, NULL);
+      (GtkFileChooserDialog *)
+      gtk_file_chooser_dialog_new (_("Save graph"),
+                                   window_parent,
+                                   GTK_FILE_CHOOSER_ACTION_SAVE,
+                                   _("_OK"), GTK_RESPONSE_OK,
+                                   _("_Cancel"), GTK_RESPONSE_CANCEL, NULL);
   for (i = 0; i < JBW_GRAPHIC_N_TYPES; ++i)
     {
       filter = gtk_file_filter_new ();
@@ -4178,10 +4180,10 @@ jbw_array_editor_insert_button_end (JBWArrayEditor * editor,
   k = row + 1;
   sprintf (buffer, "%d", k);
   editor->button_numeric =
-    (GtkButton **) jb_realloc (editor->button_numeric,
-                               k * sizeof (GtkButton *));
+      (GtkButton **) jb_realloc (editor->button_numeric,
+                                 k * sizeof (GtkButton *));
   editor->button_numeric[row] =
-    (GtkButton *) gtk_button_new_with_label (buffer);
+      (GtkButton *) gtk_button_new_with_label (buffer);
   gtk_widget_set_sensitive (GTK_WIDGET (editor->button_numeric[row]), 0);
   k = row + row;
   gtk_grid_attach (editor->grid, GTK_WIDGET (editor->button_numeric[row]),
@@ -4201,7 +4203,8 @@ jbw_array_editor_insert_entry_end (JBWArrayEditor * editor,
 {
   GtkWidget *widget;
   editor->matrix_entry[row] = (GtkWidget **)
-    jb_realloc (editor->matrix_entry[column], (row + 1) * sizeof (GtkWidget *));
+      jb_realloc (editor->matrix_entry[column],
+                  (row + 1) * sizeof (GtkWidget *));
   switch (editor->type[column])
     {
     case JBW_EDITOR_WIDGET_TYPE_TEXT:
@@ -4214,7 +4217,7 @@ jbw_array_editor_insert_entry_end (JBWArrayEditor * editor,
       break;
     default:
       widget
-        = gtk_spin_button_new_with_range (-INFINITY, INFINITY, JBM_EPSILONL);
+          = gtk_spin_button_new_with_range (-INFINITY, INFINITY, JBM_EPSILONL);
     }
   gtk_entry_set_text (GTK_ENTRY (widget), "0");
   gtk_grid_attach (editor->grid, widget, row + 1, position, 1, 2);
@@ -4296,8 +4299,8 @@ jbw_array_editor_remove_entry_end (JBWArrayEditor * editor,
   gtk_widget_destroy (editor->matrix_entry[column][row]);
 #endif
   editor->matrix_entry[column] =
-    (GtkWidget **) jb_realloc (editor->matrix_entry[column],
-                               row * sizeof (GtkWidget *));
+      (GtkWidget **) jb_realloc (editor->matrix_entry[column],
+                                 row * sizeof (GtkWidget *));
 }
 
 /**
@@ -4442,14 +4445,14 @@ jbw_array_editor_new (int ncolumns,     ///< number of columns.
   gtk_widget_set_vexpand (GTK_WIDGET (editor->scrolled), TRUE);
   editor->grid = (GtkGrid *) gtk_grid_new ();
   editor->matrix_entry =
-    (GtkWidget ***) g_malloc (ncolumns * sizeof (GtkWidget **));
+      (GtkWidget ***) g_malloc (ncolumns * sizeof (GtkWidget **));
   editor->button_title =
-    (GtkButton **) g_malloc (ncolumns * sizeof (GtkButton *));
+      (GtkButton **) g_malloc (ncolumns * sizeof (GtkButton *));
   for (i = 0; i < ncolumns; ++i)
     {
       editor->matrix_entry[i] = NULL;
       editor->button_title[i]
-        = (GtkButton *) gtk_button_new_with_label (label[i]);
+          = (GtkButton *) gtk_button_new_with_label (label[i]);
       gtk_widget_set_sensitive (GTK_WIDGET (editor->button_title[i]), 0);
       gtk_grid_attach (editor->grid,
                        GTK_WIDGET (editor->button_title[i]), i + 1, 0, 1, 1);

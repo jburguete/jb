@@ -127,12 +127,13 @@ jbw_show_error3 (const char *message1,  ///< 1st error message.
 #define JBW_WINDOW_HEIGHT 100
 ///< macro to define the default JBWGraphics window height.
 
+///> enum to define the data types of a JBWArrayEditor column.
 enum JBWEditorWidgetType
 {
-  JBW_EDITOR_WIDGET_TYPE_TEXT = 0,
-  JBW_EDITOR_WIDGET_TYPE_INT = 1,
-  JBW_EDITOR_WIDGET_TYPE_FLOAT = 2,
-  JBW_EDITOR_WIDGET_TYPE_TIME = 3
+  JBW_EDITOR_WIDGET_TYPE_TEXT = 0,      ///< text data.
+  JBW_EDITOR_WIDGET_TYPE_INT = 1,       ///< integer number data.
+  JBW_EDITOR_WIDGET_TYPE_FLOAT = 2,     ///< floating point number data.
+  JBW_EDITOR_WIDGET_TYPE_TIME = 3       ///< time data.
 };
 
 #if HIGH_PRECISION > 2
@@ -336,7 +337,7 @@ struct _JBWGraphic
   ///< 1 if automatic range has to be set to extremal variable values.
   int grid;                     ///< 1 on grid drawing.
   int map;
-  /// 1 if coordenates system has to be proportional to screen.
+  ///< 1 if coordenates system has to be proportional to screen.
   int nx;                       ///< current number of x-axis labels.
   int ny;                       ///< current number of y-axis labels.
   int nz;                       ///< current number of z-axis labels.
@@ -453,8 +454,7 @@ void jbw_show_error3 (const char *message1, const char *message2,
                       const char *message3);
 void jbw_show_warning (const char *message);
 
-void _jbw_combo_box_set_strings (GtkComboBoxText * combo, char **strings,
-                                 int n);
+void jbw_combo_box_set_strings (GtkComboBoxText * combo, char **strings, int n);
 GtkComboBoxText *jbw_combo_box_new_with_strings (char **strings, int n);
 
 void jbw_float_entry_set_value_with_format (JBWFloatEntry * entry,

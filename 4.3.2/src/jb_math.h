@@ -1197,7 +1197,7 @@ jbm_farray_integral (JBFLOAT * __restrict x,
   if (x2 < xx[1])
     {
       I += 0.5 * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1]))
-        * (x2 - x1);
+          * (x2 - x1);
       goto exit1;
     }
   I += 0.5 * (y1 + yy[1]) * (xx[1] - x1);
@@ -1215,7 +1215,7 @@ jbm_farray_integral (JBFLOAT * __restrict x,
     I += yy[2] * (x2 - xx[1]);
   else if (x2 < xx[2])
     I += 0.5 * (yy[1] + jbm_extrapolate (x2, xx[1], xx[2], yy[1], yy[2]))
-      * (x2 - xx[1]);
+        * (x2 - xx[1]);
 exit1:
   return I;
 }
@@ -1533,7 +1533,7 @@ jbm_darray_integral (JBDOUBLE * __restrict x,
   if (x2 < xx[1])
     {
       I += 0.5L * (y1 + jbm_extrapolatel (x2, xx[0], xx[1], yy[0], yy[1]))
-        * (x2 - x1);
+          * (x2 - x1);
       goto exit1;
     }
   I += 0.5L * (y1 + yy[1]) * (xx[1] - x1);
@@ -1551,7 +1551,7 @@ jbm_darray_integral (JBDOUBLE * __restrict x,
     I += yy[2] * (x2 - xx[1]);
   else if (x2 < xx[2])
     I += 0.5L * (yy[1] + jbm_extrapolatel (x2, xx[1], xx[2], yy[1], yy[2]))
-      * (x2 - xx[1]);
+        * (x2 - xx[1]);
 exit1:
   return I;
 }
@@ -1715,7 +1715,7 @@ jbm_darray_farray_integral (JBDOUBLE * __restrict x,
   if (x2 < xx[1])
     {
       I += 0.5 * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1]))
-        * (x2 - x1);
+          * (x2 - x1);
       goto exit1;
     }
   I += 0.5 * (y1 + yy[1]) * (xx[1] - x1);
@@ -1733,7 +1733,7 @@ jbm_darray_farray_integral (JBDOUBLE * __restrict x,
     I += yy[2] * (x2 - xx[1]);
   else if (x2 < xx[2])
     I += 0.5 * (yy[1] + jbm_extrapolate (x2, xx[1], xx[2], yy[1], yy[2]))
-      * (x2 - xx[1]);
+        * (x2 - xx[1]);
 exit1:
   return I;
 }
@@ -3352,7 +3352,7 @@ jbm_spline_cubic (JBFLOAT * __restrict x,
       j = 3 * i + 1;
       dx = x[i + 1] - x[i];
       B[j - 2] = D[j + 2] = F[j] = F[j + 1] = F[j + 2] = H[j + 1] = H[j + 2]
-        = 0.;
+          = 0.;
       B[j - 1] = B[j] = 1.;
       E[j + 1] = E[j + 2] = -1.;
       C[j - 1] = dx;
@@ -3429,7 +3429,7 @@ jbm_spline_cubicl (JBDOUBLE * __restrict x,
       j = 3 * i + 1;
       dx = x[i + 1] - x[i];
       B[j - 2] = D[j + 2] = F[j] = F[j + 1] = F[j + 2] = H[j + 1] = H[j + 2]
-        = 0.L;
+          = 0.L;
       B[j - 1] = B[j] = 1.L;
       E[j + 1] = E[j + 2] = -1.L;
       C[j - 1] = dx;
@@ -3517,7 +3517,7 @@ static inline JBDOUBLE
 jbm_flux_limiter_nulll (JBDOUBLE d1 __attribute__((unused)),
                         ///< 1st flux limiter function parameter.
                         JBDOUBLE d2 __attribute__((unused)))
-  ///< 2nd flux limiter function parameter.
+    ///< 2nd flux limiter function parameter.
 {
   return 1.L;
 }
@@ -3920,7 +3920,7 @@ static inline JBFLOAT (*jbm_flux_limiter_select (int type)) (JBFLOAT, JBFLOAT)
  * \return pointer to the flux limiter function.
  */
 static inline JBDOUBLE
-  (*jbm_flux_limiter_selectl (int type)) (JBDOUBLE, JBDOUBLE)
+    (*jbm_flux_limiter_selectl (int type)) (JBDOUBLE, JBDOUBLE)
 ///< type of flux limiter function.
 {
   switch (type)
@@ -4410,7 +4410,7 @@ jbm_varray_root_mean_square_error (void *__restrict xa,
 ///< the highest point number tabulating the 2nd function.
 {
   return SQRT
-    (jbm_varray_mean_square_error (xa, fa, na, sizea, xr, fr, nr, sizer));
+      (jbm_varray_mean_square_error (xa, fa, na, sizea, xr, fr, nr, sizer));
 }
 
 /**
@@ -4438,7 +4438,7 @@ jbm_varray_root_mean_square_errorl (void *__restrict xa,
 ///< the highest point number tabulating the 2nd function.
 {
   return SQRTL
-    (jbm_varray_mean_square_errorl (xa, fa, na, sizea, xr, fr, nr, sizer));
+      (jbm_varray_mean_square_errorl (xa, fa, na, sizea, xr, fr, nr, sizer));
 }
 
 /**
@@ -4902,7 +4902,7 @@ jbm_file_root_mean_square_error (char *namea,
 ///< columns number of file tabulating the 2nd function.
 {
   return SQRT
-    (jbm_file_mean_square_error (namea, ixa, ifa, na, namer, ixr, ifr, nr));
+      (jbm_file_mean_square_error (namea, ixa, ifa, na, namer, ixr, ifr, nr));
 }
 
 /**
@@ -4930,7 +4930,7 @@ jbm_file_root_mean_square_errorl (char *namea,
 ///< columns number of file tabulating the 2nd function.
 {
   return SQRTL
-    (jbm_file_mean_square_errorl (namea, ixa, ifa, na, namer, ixr, ifr, nr));
+      (jbm_file_mean_square_errorl (namea, ixa, ifa, na, namer, ixr, ifr, nr));
 }
 
 /**
@@ -4971,7 +4971,7 @@ jbm_get_time (const char *string,       ///< date in string format.
                    &sys_date->tm_mon,
                    &sys_date->tm_mday,
                    &sys_date->tm_hour, &sys_date->tm_min, &sys_sec);
-printf ("error=%d\n", *error);
+  printf ("error=%d\n", *error);
   if (*error < 0)
     *error = 0;
   if (*error == 6)
@@ -5025,7 +5025,7 @@ jbm_set_time (JBDOUBLE time)    ///< date coded in a JBDOUBLE number format.
                 sys_date->tm_mday,
                 sys_date->tm_hour, sys_date->tm_min, time + sys_date->tm_sec);
       buffer =
-        (char *) jb_realloc (buffer, (1 + strlen (buffer)) * sizeof (char));
+          (char *) jb_realloc (buffer, (1 + strlen (buffer)) * sizeof (char));
     }
   return buffer;
 }
