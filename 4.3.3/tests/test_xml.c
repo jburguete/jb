@@ -1,7 +1,6 @@
 #include "jb_xml.h"
 
-#define TEST_FILE "../test_data.xml"
-#define XML_FILE (const xmlChar *) TEST_FILE
+#define XML_FILE (const xmlChar *) "test.xml"
 #define XML_TEST (const xmlChar *) "test"
 #define XML_VERSION (const xmlChar *) "1.0"
 #define XML_X (const xmlChar *) "x"
@@ -24,17 +23,17 @@ main (void)
   jb_xml_node_set_float_with_default (node, XML_X, 1., 0.);
   jb_xml_node_set_int_with_default (node, XML_I, 1, 0);
   jb_xml_node_set_time_with_default (node, XML_T, 1., 0.);
-  file = fopen ("../test_data", "r");
+  file = fopen (TEST_FILE, "r");
   if (!file || fscanf (file, "%d", &i) != 1 || i)
     {
       printf ("Bad test_data file\n");
       return 1;
     }
   jb_xml_node_set_content_file (node, file);
-  xmlSaveFormatFile (TEST_FILE, doc, 1);
+  xmlSaveFormatFile (XML_FILE, doc, 1);
   fclose (file);
   xmlFreeDoc (doc);
-  doc = xmlParseEntity (TEST_FILE);
+  doc = xmlParseEntity (XML_FILE);
   node = xmlDocGetRootElement (doc);
   x = jb_xml_node_get_float_with_default (node, XML_X, &e1, 0.);
   printf ("x " FWL " 1\n", x);

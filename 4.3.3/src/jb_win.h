@@ -487,7 +487,7 @@ void jbw_graphic_resize (int width, int height);
 void jbw_graphic_render (void);
 void jbw_graphic_loop (void);
 void jbw_graphic_set_title (const char *title);
-void jbw_graphic_set_logo (const char *name);
+int jbw_graphic_set_logo (const char *name);
 JBWGraphic *jbw_graphic_new (unsigned int nx, unsigned int ny,
                              unsigned int nz,
                              void (*draw) (JBWGraphic * graphic),

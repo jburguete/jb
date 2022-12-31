@@ -1,7 +1,6 @@
 #include "jb_json.h"
 
-#define TEST_FILE "../test_data.json"
-#define JSON_FILE (const char *) TEST_FILE
+#define JSON_FILE (const char *) "test.json"
 #define JSON_TEST (const char *) "test"
 #define JSON_X (const char *) "x"
 #define JSON_I (const char *) "i"
@@ -25,10 +24,10 @@ main (void)
   jb_json_object_set_float_with_default (object, JSON_X, 1., 0.);
   jb_json_object_set_int_with_default (object, JSON_I, 1, 0);
   jb_json_object_set_time_with_default (object, JSON_T, 1., 0.);
-  json_generator_to_file (generator, TEST_FILE, NULL);
+  json_generator_to_file (generator, JSON_FILE, NULL);
   g_object_unref (generator);
   parser = json_parser_new ();
-  json_parser_load_from_file (parser, TEST_FILE, NULL);
+  json_parser_load_from_file (parser, JSON_FILE, NULL);
   node = json_parser_get_root (parser);
   object = json_node_get_object (node);
   x = jb_json_object_get_float_with_default (object, JSON_X, &e1, 0.);

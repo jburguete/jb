@@ -144,7 +144,8 @@ main (int argn, char **argc)
   jbw_graphic_set_zzlabel (graphic, "zz");
   jbw_graphic_set_grid (graphic, 1);
   jbw_graphic_set_resize (graphic, 0);
-  jbw_graphic_set_logo ("../test.png");
+  if (!jbw_graphic_set_logo (LOGO_FILE))
+    return 2;
   graphic->xmin = 0.;
   graphic->xmax = 3.;
   graphic->ymin = 0.3;
@@ -183,7 +184,7 @@ main (int argn, char **argc)
   printf ("OpenGL version %s\n", glGetString (GL_VERSION));
   printf ("GLSL version %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
   if (!graphic->init)
-    return 2;
+    return 3;
 
 #if WITH_GTK
   button_open1 = (GtkButton *) gtk_button_new_with_label ("Draw 1");

@@ -1,5 +1,5 @@
 AC_PREREQ([2.69])
-AC_INIT([jb],[4.3.2],[https://github.com/jburguete/jb])
+AC_INIT([jb],[4.3.3],[https://github.com/jburguete/jb])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
@@ -58,8 +58,16 @@ elif test `uname -s` = "Haiku"; then
 fi
 if test $mac = 0; then
 	AC_SUBST(RPATH, [-rpath=])
+	AC_SUBST(BIN, [bin/])
+	AC_SUBST(BINPGO, [binpgo/])
+	AC_SUBST(TEST_DATA_FILE, [../test_data])
+	AC_SUBST(LOGO_FILE, [../test.png])
 else
 	AC_SUBST(RPATH, [-rpath,])
+	AC_SUBST(BIN, [./])
+	AC_SUBST(BINPGO, [./])
+	AC_SUBST(TEST_DATA_FILE, [./test_data])
+	AC_SUBST(LOGO_FILE, [./test.png])
 fi
 
 # Checks for programs

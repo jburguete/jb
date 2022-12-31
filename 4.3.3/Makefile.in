@@ -3,8 +3,8 @@
 # Directories
 SRC = src/
 TESTS = tests/
-BINPGO = binpgo/
-BIN = bin/
+BINPGO = @BINPGO@
+BIN = @BIN@
 OBJ = obj/
 
 # Variables
@@ -55,19 +55,19 @@ test_win_pgo = $(OBJ)test_win@SUFFIX@.pgo
 index_sort_pgo = $(OBJ)index_sort@SUFFIX@.pgo
 check_sort_pgo = $(OBJ)check_sort@SUFFIX@.pgo
 
-libjbpgo = $(BINPGO)libjb@SUFFIX@@SO@
-libjbmpgo = $(BINPGO)libjbm@SUFFIX@@SO@
-libjbxmlpgo = $(BINPGO)libjbxml@SUFFIX@@SO@
-libjbjsonpgo = $(BINPGO)libjbjson@SUFFIX@@SO@
-libjbbinpgo = $(BINPGO)libjbbin@SUFFIX@@SO@
-libjbwpgo = $(BINPGO)libjbw@SUFFIX@@SO@
+libjbpgo = $(BINPGO)libjbpgo@SUFFIX@@SO@
+libjbmpgo = $(BINPGO)libjbmpgo@SUFFIX@@SO@
+libjbxmlpgo = $(BINPGO)libjbxmlpgo@SUFFIX@@SO@
+libjbjsonpgo = $(BINPGO)libjbjsonpgo@SUFFIX@@SO@
+libjbbinpgo = $(BINPGO)libjbbinpgo@SUFFIX@@SO@
+libjbwpgo = $(BINPGO)libjbwpgo@SUFFIX@@SO@
 
-test_math_binpgo = $(BINPGO)test_math@SUFFIX@@EXE@
-test_xml_binpgo = $(BINPGO)test_xml@SUFFIX@@EXE@
-test_json_binpgo = $(BINPGO)test_json@SUFFIX@@EXE@
-test_win_binpgo = $(BINPGO)test_win@SUFFIX@@EXE@
-index_sort_binpgo = $(BINPGO)index_sort@SUFFIX@@EXE@
-check_sort_binpgo = $(BINPGO)check_sort@SUFFIX@@EXE@
+test_math_binpgo = $(BINPGO)test_mathpgo@SUFFIX@@EXE@
+test_xml_binpgo = $(BINPGO)test_xmlpgo@SUFFIX@@EXE@
+test_json_binpgo = $(BINPGO)test_jsonpgo@SUFFIX@@EXE@
+test_win_binpgo = $(BINPGO)test_winpgo@SUFFIX@@EXE@
+index_sort_binpgo = $(BINPGO)index_sortpgo@SUFFIX@@EXE@
+check_sort_binpgo = $(BINPGO)check_sortpgo@SUFFIX@@EXE@
 
 jb_config_o = $(OBJ)jb_config@SUFFIX@.o
 jb_def_o = $(OBJ)jb_def@SUFFIX@.o
@@ -206,14 +206,14 @@ $(test_math_pgo): $(test_math_dep)
 	$(CC) $(CFLAGS) $(PGOGENERATE) -I$(SRC) -c -DJBW=1 $(test_math_c) \
 		-o $(test_math_pgo)
 $(test_xml_pgo): $(test_xml_dep)
-	$(CC) $(CFLAGS) $(PGOGENERATE) -I$(SRC) -c -DJBW=1 $(test_xml_c) \
-		-o $(test_xml_pgo)
+	$(CC) $(CFLAGS) $(PGOGENERATE) -I$(SRC) -c -DJBW=1 \
+		-DTEST_FILE=\"@TEST_DATA_FILE@\" $(test_xml_c) -o $(test_xml_pgo)
 $(test_json_pgo): $(test_json_dep)
 	$(CC) $(CFLAGS) $(PGOGENERATE) -I$(SRC) -c -DJBW=1 $(test_json_c) \
 		-o $(test_json_pgo)
 $(test_win_pgo): $(test_win_dep)
-	$(CC) $(CFLAGS) $(PGOGENERATE) -I$(SRC) -c @JBW@ $(test_win_c) \
-		-o $(test_win_pgo)
+	$(CC) $(CFLAGS) $(PGOGENERATE) -I$(SRC) -c @JBW@ -DLOGO_FILE=\"@LOGO_FILE@\" \
+		$(test_win_c) -o $(test_win_pgo)
 $(index_sort_pgo): $(index_sort_dep)
 	$(CC) $(TESTS_CFLAGS) $(PGOGENERATE) $(index_sort_c) \
 		-o $(index_sort_pgo)
@@ -226,51 +226,52 @@ $(libjbpgo): $(jb_def_pgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_def_pgo) $(LDFLAGS) -o $(libjbpgo)
 $(libjbmpgo): $(jb_math_pgo) $(libjbpgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_math_pgo) $(EXEFLAGSPGO) -o $(libjbmpgo) \
-		-ljb@SUFFIX@
+		-ljbpgo@SUFFIX@
 $(libjbxmlpgo): $(jb_xml_pgo) $(libjbpgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_xml_pgo) $(EXEFLAGSPGO) -o $(libjbxmlpgo) \
-		-ljbm@SUFFIX@ -ljb@SUFFIX@
+		-ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
 $(libjbjsonpgo): $(jb_json_pgo) $(libjbpgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_json_pgo) $(EXEFLAGSPGO) \
-		-o $(libjbjsonpgo) -ljbm@SUFFIX@ -ljb@SUFFIX@
+		-o $(libjbjsonpgo) -ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
 $(libjbbinpgo): $(jb_win_bin_pgo) $(libjbpgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_win_bin_pgo) $(EXEFLAGSPGO) \
-		-o $(libjbbinpgo) -ljbm@SUFFIX@ -ljb@SUFFIX@
+		-o $(libjbbinpgo) -ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
 $(libjbwpgo): $(jb_win_pgo) $(libjbpgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) -shared $(jb_win_pgo) $(EXEFLAGSPGO) -o $(libjbwpgo) \
-		-ljbm@SUFFIX@ -ljb@SUFFIX@
+		-ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
 
 # PGO tests
 $(test_math_binpgo): $(test_math_pgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) $(test_math_pgo) -o $(test_math_binpgo) \
-		$(EXEFLAGSPGO) -ljbm@SUFFIX@ -ljb@SUFFIX@
-	cd $(BINPGO); $(mathprefix) ./test_math@SUFFIX@
+		$(EXEFLAGSPGO) -ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
+	cd $(BINPGO); $(mathprefix) ./test_mathpgo@SUFFIX@
 $(test_xml_binpgo): $(test_xml_pgo) $(libjbxmlpgo)
-	$(CC) $(PGOGENERATE) $(test_xml_pgo) -o $(test_xml_binpgo) \
-		$(EXEFLAGSPGO) -ljbxml@SUFFIX@ -ljbm@SUFFIX@ -ljb@SUFFIX@
-	cd $(BINPGO); $(xmlprefix) ./test_xml@SUFFIX@
+	$(CC) $(PGOGENERATE) $(test_xml_pgo) \
+		-o $(test_xml_binpgo) $(EXEFLAGSPGO) \
+		-ljbxmlpgo@SUFFIX@ -ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
+	cd $(BINPGO); $(xmlprefix) ./test_xmlpgo@SUFFIX@
 $(test_json_binpgo): $(test_json_pgo) $(libjbjsonpgo)
 	$(CC) $(PGOGENERATE) $(test_json_pgo) -o $(test_json_binpgo) \
-		$(EXEFLAGSPGO) -ljbjson@SUFFIX@ -ljbm@SUFFIX@ -ljb@SUFFIX@
-	cd $(BINPGO); $(jsonprefix) ./test_json@SUFFIX@
+		$(EXEFLAGSPGO) -ljbjsonpgo@SUFFIX@ -ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
+	cd $(BINPGO); $(jsonprefix) ./test_jsonpgo@SUFFIX@
 $(test_win_binpgo): $(test_win_pgo) $(libjbwpgo)
 	$(CC) $(CFLAGS) $(PGOGENERATE) @JBW@ $(test_win_pgo) -o $(test_win_binpgo) \
-		$(EXEFLAGSPGO) -ljbw@SUFFIX@ -ljbm@SUFFIX@ -ljb@SUFFIX@
-	cd $(BINPGO); $(winprefix) ./test_win@SUFFIX@; $(llvm_merge)
+		$(EXEFLAGSPGO) -ljbwpgo@SUFFIX@ -ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
+	cd $(BINPGO); $(winprefix) ./test_winpgo@SUFFIX@; $(llvm_merge)
 $(index_sort_binpgo): $(index_sort_pgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) $(index_sort_pgo) -o $(index_sort_binpgo) \
-		$(TESTS_LDFLAGS) $(EXEFLAGSPGO) -ljbm@SUFFIX@ -ljb@SUFFIX@
-	cd $(BINPGO); ./index_sort@SUFFIX@ 10000 1000 0 1
-	cd $(BINPGO); ./index_sort@SUFFIX@ 10000 1000 0 2
-	cd $(BINPGO); ./index_sort@SUFFIX@ 10000 1000 0 3
-	cd $(BINPGO); ./index_sort@SUFFIX@ 10000 1000 0 4
+		$(TESTS_LDFLAGS) $(EXEFLAGSPGO) -ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
+	cd $(BINPGO); ./index_sortpgo@SUFFIX@ 10000 1000 0 1
+	cd $(BINPGO); ./index_sortpgo@SUFFIX@ 10000 1000 0 2
+	cd $(BINPGO); ./index_sortpgo@SUFFIX@ 10000 1000 0 3
+	cd $(BINPGO); ./index_sortpgo@SUFFIX@ 10000 1000 0 4
 $(check_sort_binpgo): $(check_sort_pgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) $(check_sort_pgo) -o $(check_sort_binpgo) \
-		$(TESTS_LDFLAGS) $(EXEFLAGSPGO) -ljbm@SUFFIX@ -ljb@SUFFIX@
-	cd $(BINPGO); ./check_sort@SUFFIX@ 1000 1
-	cd $(BINPGO); ./check_sort@SUFFIX@ 1000 2
-	cd $(BINPGO); ./check_sort@SUFFIX@ 1000 3
-	cd $(BINPGO); ./check_sort@SUFFIX@ 1000 4
+		$(TESTS_LDFLAGS) $(EXEFLAGSPGO) -ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
+	cd $(BINPGO); ./check_sortpgo@SUFFIX@ 1000 1
+	cd $(BINPGO); ./check_sortpgo@SUFFIX@ 1000 2
+	cd $(BINPGO); ./check_sortpgo@SUFFIX@ 1000 3
+	cd $(BINPGO); ./check_sortpgo@SUFFIX@ 1000 4
 
 # Objects
 $(jb_def_o): $(DEFDEP)
@@ -288,11 +289,13 @@ $(jb_win_o): $(WINDEP)
 $(test_math_o): $(TEST_MATH_DEP)
 	$(CC) $(CFLAGS) $(PGOUSE) -I$(SRC) -c -DJBW=1 $(test_math_c) -o $(test_math_o)
 $(test_xml_o): $(TEST_XML_DEP)
-	$(CC) $(CFLAGS) $(PGOUSE) -I$(SRC) -c -DJBW=1 $(test_xml_c) -o $(test_xml_o)
+	$(CC) $(CFLAGS) $(PGOUSE) -I$(SRC) -c -DJBW=1 \
+		-DTEST_FILE=\"@TEST_DATA_FILE@\" $(test_xml_c) -o $(test_xml_o)
 $(test_json_o): $(TEST_XML_DEP)
 	$(CC) $(CFLAGS) $(PGOUSE) -I$(SRC) -c -DJBW=1 $(test_json_c) -o $(test_json_o)
 $(test_win_o): $(TEST_WIN_DEP)
-	$(CC) $(CFLAGS) $(PGOUSE) -I$(SRC) -c @JBW@ $(test_win_c) -o $(test_win_o)
+	$(CC) $(CFLAGS) $(PGOUSE) -I$(SRC) -c @JBW@ -DLOGO_FILE=\"@LOGO_FILE@\" \
+		$(test_win_c) -o $(test_win_o)
 $(index_sort_o): $(INDEX_SORT_DEP)
 	$(CC) $(TESTS_CFLAGS) $(PGOUSE) $(index_sort_c) -o $(index_sort_o)
 $(check_sort_o): $(CHECK_SORT_DEP)

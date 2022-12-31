@@ -2506,14 +2506,19 @@ jbw_graphic_set_title (const char *title)       ///< title label.
 
 /**
  * Function to set the logo on the current JBWGraphic widget.
+ *
+ * \return 1 on success opening the logo, 0 on error.
  */
-void
+int
 jbw_graphic_set_logo (const char *name) ///< logo PNG file name.
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
   if (graphic->logo)
     jbw_image_delete (graphic->logo);
   graphic->logo = jbw_image_new (name);
+  if (graphic->logo)
+    return 1;
+  return 0;
 }
 
 /**
