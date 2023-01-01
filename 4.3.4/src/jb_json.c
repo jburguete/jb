@@ -233,12 +233,12 @@ jb_json_object_get_uint (JsonObject * object,
  */
 unsigned long int
 jb_json_object_get_uint_with_default (JsonObject * object,
-                                     ///< JSON object struct.
-                                     const char *prop,
+                                      ///< JSON object struct.
+                                      const char *prop,
 ///< JSON object property having the number.
-                                     int *error,
-                                     ///< error code (1 on success, 0 on error).
-                                     unsigned long int def)
+                                      int *error,
+                                      ///< error code (1 on success, 0 on error).
+                                      unsigned long int def)
                                      ///< default value.
 {
   if (!json_object_get_member (object, prop))

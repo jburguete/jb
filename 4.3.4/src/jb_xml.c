@@ -267,7 +267,7 @@ jb_xml_node_set_uint (xmlNode * node,   ///< XML node struct.
 void
 jb_xml_node_set_uint_with_default (xmlNode * node,      ///< XML node struct.
                                    const xmlChar * prop,
-				   ///< XML node property.
+                                   ///< XML node property.
                                    unsigned long int x,
 ///< unsigned integer number value in unsigned long int format.
                                    unsigned long int def)
