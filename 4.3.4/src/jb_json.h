@@ -1,7 +1,7 @@
 /* JB - A library with useful mathematical, XML, JSON, GTK+ and OpenGL
  * functions.
  *
- * Copyright 2005-2022, Javier Burguete Tolosa.
+ * Copyright 2005-2023, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,7 @@
  * \file jb_json.h
  * \brief Header file with useful JSON functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2022, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2023, Javier Burguete Tolosa.
  */
 #ifndef JB_JSON__H
 #define JB_JSON__H 1
@@ -52,6 +52,15 @@ long int jb_json_object_get_int_with_default (JsonObject *, const char *,
 void jb_json_object_set_int (JsonObject *, const char *, long int);
 void jb_json_object_set_int_with_default (JsonObject *, const char *,
                                           long int, long int);
+unsigned long int jb_json_object_get_uint (JsonObject *, const char *, int *);
+unsigned long int jb_json_object_get_uint_with_default (JsonObject *,
+                                                        const char *,
+                                                        int *,
+						       	unsigned long int);
+void jb_json_object_set_uint (JsonObject *, const char *, unsigned long int);
+void jb_json_object_set_uint_with_default (JsonObject *, const char *,
+                                           unsigned long int,
+					   unsigned long int);
 JBDOUBLE jb_json_object_get_time (JsonObject *, const char *, int *);
 JBDOUBLE jb_json_object_get_time_with_default
     (JsonObject *, const char *, int *, JBDOUBLE);

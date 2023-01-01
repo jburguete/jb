@@ -1,7 +1,7 @@
 /* JB - A library with useful mathematical, XML, JSON, GTK+ and OpenGL
  * functions.
  *
- * Copyright 2005-2022, Javier Burguete Tolosa.
+ * Copyright 2005-2023, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,7 @@
  * \file jb_def.h
  * \brief Header file to define the basic macros and functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2022.
+ * \copyright Copyright 2005-2023.
  */
 #ifndef JB_DEF__H
 #define JB_DEF__H 1

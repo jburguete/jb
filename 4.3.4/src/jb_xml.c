@@ -1,6 +1,6 @@
 /* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
  *
- * Copyright 2005-2022, Javier Burguete Tolosa.
+ * Copyright 2005-2023, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * \file jb_xml.c
  * \brief Source file with useful XML functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2022, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2023, Javier Burguete Tolosa.
  */
 #include "jb_xml.h"
 
@@ -196,6 +196,85 @@ jb_xml_node_set_int_with_default (xmlNode * node,       ///< XML node struct.
 {
   if (x != def)
     jb_xml_node_set_int (node, prop, x);
+}
+
+/**
+ * Function to get an unsigned integer number, in unsigned long int format, from
+ * a property of a XML node.
+ *
+ * \return unsigned integer number value in unsigned long int format.
+ */
+unsigned long int
+jb_xml_node_get_uint (xmlNode * node,   ///< XML node struct.
+                      const xmlChar * prop,
+                      ///< XML node property having the number.
+                      int *error)
+                      ///< error code (1 on success, 0 on error).
+{
+  char *buffer;
+  unsigned long int x = 0;
+  *error = 0;
+  buffer = (char *) xmlGetProp (node, prop);
+  if (buffer)
+    {
+      *error = sscanf (buffer, "%ld", &x);
+      xmlFree (buffer);
+    }
+  return x;
+}
+
+/**
+ * Function to get an unsigned integer number, in unsigned long int format, from
+ * a property of a XML node or a default value if the node has not the property.
+ *
+ * \return unsigned integer number value in unsigned long int format.
+ */
+unsigned long int
+jb_xml_node_get_uint_with_default (xmlNode * node,      ///< XML node struct.
+                                   const xmlChar * prop,
+                                   ///< XML node property having the number.
+                                   int *error,
+                                   ///< error code (1 on success, 0 on error).
+                                   unsigned long int def)
+                                   ///< default value.
+{
+  if (!xmlHasProp (node, prop))
+    {
+      *error = 1;
+      return def;
+    }
+  return jb_xml_node_get_uint (node, prop, error);
+}
+
+/**
+ * Function to set an unsigned integer number in a property of a XML node.
+ */
+void
+jb_xml_node_set_uint (xmlNode * node,   ///< XML node struct.
+                      const xmlChar * prop,     ///< XML node property.
+                      unsigned long int x)
+///< unsigned integer number value in unsigned long int format.
+{
+  char buffer[JB_BUFFER_SIZE];
+  snprintf (buffer, JB_BUFFER_SIZE, "%ld", x);
+  xmlSetProp (node, prop, (xmlChar *) buffer);
+}
+
+/**
+ * Function to set an unsigned integer number in a property of a XML node or
+ * none if the number is equal to a default value.
+ */
+void
+jb_xml_node_set_uint_with_default (xmlNode * node,      ///< XML node struct.
+                                   const xmlChar * prop,
+				   ///< XML node property.
+                                   unsigned long int x,
+///< unsigned integer number value in unsigned long int format.
+                                   unsigned long int def)
+                                   ///< default value.
+{
+  if (x != def)
+    jb_xml_node_set_uint (node, prop, x);
 }
 
 /**

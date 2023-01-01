@@ -1,7 +1,7 @@
 /* JB - A library with useful mathematical, XML, JSON, GTK+ and OpenGL
  * functions.
  *
- * Copyright 2005-2022, Javier Burguete Tolosa.
+ * Copyright 2005-2023, Javier Burguete Tolosa.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -29,7 +29,7 @@
  * \file jb_xml.h
  * \brief Header file with useful XML functions.
  * \author Javier Burguete Tolosa.
- * \copyright Copyright 2005-2022, Javier Burguete Tolosa.
+ * \copyright Copyright 2005-2023, Javier Burguete Tolosa.
  */
 #ifndef JB_XML__H
 #define JB_XML__H 1
@@ -51,6 +51,13 @@ long int jb_xml_node_get_int_with_default (xmlNode *, const xmlChar *, int *,
 void jb_xml_node_set_int (xmlNode *, const xmlChar *, long int);
 void jb_xml_node_set_int_with_default (xmlNode *, const xmlChar *, long int,
                                        long int);
+unsigned long int jb_xml_node_get_uint (xmlNode *, const xmlChar *, int *);
+unsigned long int jb_xml_node_get_uint_with_default (xmlNode *, const xmlChar *,
+                                                     int *,
+                                                     unsigned long int);
+void jb_xml_node_set_uint (xmlNode *, const xmlChar *, unsigned long int);
+void jb_xml_node_set_uint_with_default (xmlNode *, const xmlChar *,
+                                        unsigned long int, unsigned long int);
 JBDOUBLE jb_xml_node_get_time (xmlNode *, const xmlChar *, int *);
 JBDOUBLE jb_xml_node_get_time_with_default
     (xmlNode *, const xmlChar *, int *, JBDOUBLE);
