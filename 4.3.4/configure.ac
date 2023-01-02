@@ -225,7 +225,8 @@ if test $gtk = 1; then
 		AS_HELP_STRING([--with-sdl], [Build graphic window with SDL]))
 	if test "x$with_freeglut" = "xyes"; then
 		AC_SUBST(GRAPHIC, "-DHAVE_FREEGLUT=1")
-		PKG_CHECK_MODULES([GLUT], [glut])
+		PKG_CHECK_MODULES([GLUT], [glut], ,
+			[PKG_CHECK_MODULES([GLUT], [freeglut])])
 	elif test "x$with_glfw" = "xyes"; then
 		AC_SUBST(GRAPHIC, "-DHAVE_GLFW=1")
 		PKG_CHECK_MODULES([GLFW], [glfw3])
