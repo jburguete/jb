@@ -1,6 +1,6 @@
+# Header
 AC_PREREQ([2.69])
 AC_INIT([jb],[4.3.5],[https://github.com/jburguete/jb])
-AC_CONFIG_HEADERS([config.h])
 
 # Checks for operative systems
 AC_CANONICAL_TARGET
@@ -77,16 +77,17 @@ $CC -v
 AC_PROG_MAKE_SET
 AC_LANG([C])
 PKG_PROG_PKG_CONFIG
-if test $win = 1; then
-	AC_SUBST(SO, [.dll])
-	AC_SUBST(EXE, [.exe])
-else
-	AC_SUBST(SO, [.so])
-fi
 if test "`command -v gmake`"; then
 	AC_SUBST(MAKE, [gmake])
 else
 	AC_SUBST(MAKE, [make])
+fi
+if test $win = 1; then
+	AC_SUBST(SO, [.dll])
+	AC_SUBST(EXE, [.exe])
+	native=0
+else
+	AC_SUBST(SO, [.so])
 fi
 if test $CC = "clang"; then
 	AC_CHECK_PROGS([LLVM_PROFDATA], [llvm-profdata llvm-profdata-15], 0)
@@ -100,10 +101,10 @@ fi
 compiler=$CC
 
 # Checking -march=native compiler flag
-AC_ARG_WITH([native], AS_HELP_STRING([--with-native],
+if test $native = 1; then
+	AC_ARG_WITH([native], AS_HELP_STRING([--with-native],
 		[Build using -march=native compiler flag]))
-if test "x$with_native" = "xyes"; then
-	if test "x$native" = "x1"; then
+	if test "x$with_native" = "xyes"; then
 		CC="$CC -march=native"
 		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [arch=1], [arch=0])
 		CC=$compiler
@@ -130,8 +131,7 @@ else
 fi
 
 # Checking PGO optimiztion
-AC_ARG_WITH([pgo],
-	AS_HELP_STRING([--with-pgo], [Build using PGO]))
+AC_ARG_WITH([pgo], AS_HELP_STRING([--with-pgo], [Build using PGO]))
 pgo=0
 if test "x$with_pgo" = "xyes"; then
 	CC="$CC -fprofile-generate"
@@ -158,7 +158,7 @@ PKG_CHECK_MODULES([GLIB], [glib-2.0])
 PKG_CHECK_MODULES([GTHREAD], [gthread-2.0])
 PKG_CHECK_MODULES([JSON], [json-glib-1.0])
 PKG_CHECK_MODULES([GTOP], [libgtop-2.0], AC_DEFINE([HAVE_GTOP], [1]),
-	AC_MSG_NOTICE([No gtop]))
+	AC_MSG_NOTICE([No libgtop]))
 PKG_CHECK_MODULES([GSL], [gsl])
 
 # Checks for GTK+ interface
@@ -292,6 +292,7 @@ else
 fi
 
 # Final output
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
