@@ -221,6 +221,7 @@ jbw_init (int *argn __attribute__((unused)),
 #else
   gtk_init (argn, argc);
 #endif
+  jbw_graphic_pointer = NULL;
   return 1;
 }
 
@@ -1843,7 +1844,7 @@ exit_on_error:
 /**
  * Function to free the memory used by the current JBWGraphic widget.
  */
-static void
+static inline void
 jbw_graphic_delete (JBWGraphic * graphic)       ///< current JBWGraphic widget.
 {
   if (graphic->vbo_text)
@@ -1870,8 +1871,6 @@ jbw_graphic_delete (JBWGraphic * graphic)       ///< current JBWGraphic widget.
     glDeleteProgram (graphic->program_2D);
   if (graphic->logo)
     jbw_image_delete (graphic->logo);
-  g_free (graphic);
-  jbw_graphic_pointer = NULL;
 }
 
 /**
@@ -1881,16 +1880,21 @@ void
 jbw_graphic_destroy (void)
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
-  if (graphic->window)
+  if (graphic && graphic->window)
+    {
+      jbw_graphic_delete (graphic);
 #if HAVE_GTKGLAREA
-    gtk_window_destroy (graphic->window);
+      gtk_window_destroy (graphic->window);
 #elif HAVE_FREEGLUT
-    glutDestroyWindow (graphic->window);
+      glutDestroyWindow (graphic->window);
 #elif HAVE_SDL
-    SDL_DestroyWindow (graphic->window);
+      SDL_DestroyWindow (graphic->window);
 #elif HAVE_GLFW
-    glfwDestroyWindow (graphic->window);
+      glfwDestroyWindow (graphic->window);
 #endif
+    }
+  g_free (graphic);
+  jbw_graphic_pointer = NULL;
 }
 
 /**
@@ -2439,27 +2443,30 @@ jbw_graphic_loop (void)
         gdk_gl_context_make_current (jbw_gdk_gl_context);
       while (g_main_context_pending (context))
         g_main_context_iteration (context, 0);
-      SDL_GL_MakeCurrent (jbw_graphic_pointer->window,
-                          jbw_graphic_pointer->sdl_context);
-      while (SDL_PollEvent (event))
+      if (jbw_graphic_pointer)
         {
-          switch (event->type)
+          SDL_GL_MakeCurrent (jbw_graphic_pointer->window,
+                              jbw_graphic_pointer->sdl_context);
+          while (SDL_PollEvent (event))
             {
-            case SDL_QUIT:
-              return;
-            case SDL_WINDOWEVENT:
-              if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+              switch (event->type)
                 {
-                  if (jbw_graphic_loop_resize)
-                    jbw_graphic_loop_resize (event->window.data1,
-                                             event->window.data2);
+                case SDL_QUIT:
+                  return;
+                case SDL_WINDOWEVENT:
+                  if (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                    {
+                      if (jbw_graphic_loop_resize)
+                        jbw_graphic_loop_resize (event->window.data1,
+                                                 event->window.data2);
+                    }
+                  else if (jbw_graphic_loop_render)
+                    jbw_graphic_loop_render ();
                 }
-              else if (jbw_graphic_loop_render)
-                jbw_graphic_loop_render ();
             }
-        }
-      if (jbw_graphic_loop_idle && !jbw_graphic_loop_idle ())
-        jbw_graphic_loop_idle = NULL;
+          if (jbw_graphic_loop_idle && !jbw_graphic_loop_idle ())
+            jbw_graphic_loop_idle = NULL;
+	}
     }
 
 #elif HAVE_GLFW
@@ -2473,10 +2480,13 @@ jbw_graphic_loop (void)
         gdk_gl_context_make_current (jbw_gdk_gl_context);
       while (g_main_context_pending (context))
         g_main_context_iteration (context, 0);
-      glfwMakeContextCurrent (jbw_graphic_pointer->window);
-      glfwPollEvents ();
-      if (jbw_graphic_loop_idle && !jbw_graphic_loop_idle ())
-        jbw_graphic_loop_idle = NULL;
+      if (jbw_graphic_pointer)
+        {
+          glfwMakeContextCurrent (jbw_graphic_pointer->window);
+          glfwPollEvents ();
+          if (jbw_graphic_loop_idle && !jbw_graphic_loop_idle ())
+            jbw_graphic_loop_idle = NULL;
+	}
     }
 
 #endif
@@ -2589,7 +2599,7 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
   gtk_window_set_child (graphic->window, GTK_WIDGET (graphic->widget));
   gtk_window_set_title (graphic->window, title);
   g_signal_connect_swapped (graphic->window, "destroy",
-                            (GCallback) jbw_graphic_delete, graphic);
+                            (GCallback) jbw_graphic_destroy, graphic);
 #elif HAVE_FREEGLUT
   glutInitWindowSize (JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT);
   graphic->window = glutCreateWindow (title);

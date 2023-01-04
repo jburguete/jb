@@ -3571,7 +3571,7 @@ jbm_flux_limiter_superbee (JBFLOAT d1,
                            ///< 2nd flux limiter function parameter.
 {
   JBFLOAT r;
-  if (d1 * d2 <= 0.)
+  if (d1 * d2 <= JBM_EPSILON)
     return 0.;
   r = d1 / d2;
   return FMAX (FMIN (r + r, 1.), FMIN (r, 2.));
@@ -3592,7 +3592,7 @@ jbm_flux_limiter_superbeel (JBDOUBLE d1,
                             ///< 2nd flux limiter function parameter.
 {
   JBDOUBLE r;
-  if (d1 * d2 <= 0.L)
+  if (d1 * d2 <= JBM_EPSILONL)
     return 0.L;
   r = d1 / d2;
   return FMAXL (FMINL (r + r, 1.L), FMINL (r, 2.L));
@@ -3611,7 +3611,7 @@ jbm_flux_limiter_minmod (JBFLOAT d1,
                          JBFLOAT d2)
                          ///< 2nd flux limiter function parameter.
 {
-  if (d1 * d2 <= 0.)
+  if (d1 * d2 <= JBM_EPSILON)
     return 0.;
   return FMIN (d1 / d2, 1.);
 }
@@ -3629,7 +3629,7 @@ jbm_flux_limiter_minmodl (JBDOUBLE d1,
                           JBDOUBLE d2)
                           ///< 2nd flux limiter function parameter.
 {
-  if (d1 * d2 <= 0.L)
+  if (d1 * d2 <= JBM_EPSILONL)
     return 0.L;
   return FMINL (d1 / d2, 1.L);
 }
@@ -3649,7 +3649,7 @@ jbm_flux_limiter_VanLeer (JBFLOAT d1,
                           ///< 2nd flux limiter function parameter.
 {
   JBFLOAT r, k;
-  if (d1 * d2 <= 0.)
+  if (d1 * d2 <= JBM_EPSILON)
     return 0.;
   r = d1 / d2;
   k = FABS (r);
@@ -3671,7 +3671,7 @@ jbm_flux_limiter_VanLeerl (JBDOUBLE d1,
                            ///< 2nd flux limiter function parameter.
 {
   JBDOUBLE r, k;
-  if (d1 * d2 <= 0.L)
+  if (d1 * d2 <= JBM_EPSILONL)
     return 0.L;
   r = d1 / d2;
   k = FABSL (r);
@@ -3692,7 +3692,7 @@ jbm_flux_limiter_VanAlbada (JBFLOAT d1,
                             ///< 2nd flux limiter function parameter.
 {
   JBFLOAT r, k;
-  if (d1 * d2 <= 0.)
+  if (d1 * d2 <= JBM_EPSILON)
     return 0.;
   r = d1 / d2;
   k = r * r;
@@ -3713,7 +3713,7 @@ jbm_flux_limiter_VanAlbadal (JBDOUBLE d1,
                              ///< 2nd flux limiter function parameter.
 {
   JBDOUBLE r, k;
-  if (d1 * d2 <= 0.L)
+  if (d1 * d2 <= JBM_EPSILONL)
     return 0.L;
   r = d1 / d2;
   k = r * r;
@@ -3733,7 +3733,7 @@ jbm_flux_limiter_minsuper (JBFLOAT d1,
                            JBFLOAT d2)
                            ///< 2nd flux limiter function parameter.
 {
-  if (d1 * d2 <= 0.)
+  if (d1 * d2 <= JBM_EPSILON)
     return 0.;
   return FMIN (d1 / d2, 2.);
 }
@@ -3751,7 +3751,7 @@ jbm_flux_limiter_minsuperl (JBDOUBLE d1,
                             JBDOUBLE d2)
                             ///< 2nd flux limiter function parameter.
 {
-  if (d1 * d2 <= 0.L)
+  if (d1 * d2 <= JBM_EPSILONL)
     return 0.L;
   return FMINL (d1 / d2, 2.L);
 }
@@ -3769,7 +3769,7 @@ jbm_flux_limiter_supermin (JBFLOAT d1,
                            JBFLOAT d2)
                            ///< 2nd flux limiter function parameter.
 {
-  if (d1 * d2 <= 0.)
+  if (d1 * d2 <= JBM_EPSILON)
     return 0.;
   return FMIN (jbm_fdbl (d1 / d2), 1.);
 }
@@ -3787,7 +3787,7 @@ jbm_flux_limiter_superminl (JBDOUBLE d1,
                             JBDOUBLE d2)
                             ///< 2nd flux limiter function parameter.
 {
-  if (d1 * d2 <= 0.L)
+  if (d1 * d2 <= JBM_EPSILONL)
     return 0.L;
   return FMINL (jbm_fdbll (d1 / d2), 1.L);
 }
@@ -3807,7 +3807,7 @@ jbm_flux_limiter_monotonized_central (JBFLOAT d1,
                                       ///< 2nd flux limiter function parameter.
 {
   JBFLOAT k;
-  if (d1 * d2 <= 0.)
+  if (d1 * d2 <= JBM_EPSILON)
     return 0.;
   k = d1 / d2;
   if (k >= 3.)
@@ -3832,7 +3832,7 @@ jbm_flux_limiter_monotonized_centrall (JBDOUBLE d1,
                                        ///< 2nd flux limiter function parameter.
 {
   JBDOUBLE k;
-  if (d1 * d2 <= 0.L)
+  if (d1 * d2 <= JBM_EPSILONL)
     return 0.L;
   k = d1 / d2;
   if (k >= 3.L)
