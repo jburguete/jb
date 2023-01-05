@@ -10,8 +10,8 @@ AC_MSG_NOTICE([Host: $host])
 win=0
 win32=0
 native=1
-haiku=0
 mac=0
+haiku=0
 if test $host = "x86_64-w64-mingw32"; then
 	AC_MSG_NOTICE([Microsoft Windows 64 bits + MinGW])
 	win=1
@@ -160,7 +160,7 @@ PKG_CHECK_MODULES([GTOP], [libgtop-2.0], AC_DEFINE([HAVE_GTOP], [1]),
 	AC_MSG_NOTICE([No libgtop]))
 PKG_CHECK_MODULES([GSL], [gsl])
 
-# Checks for GTK+ interface
+# Checks for GTK interface
 AC_ARG_WITH([gtk], AS_HELP_STRING([--with-gtk],
 	[Build using a version of GTK (3 (--with-gtk=3) or 4 (--with-gtk=4))]))
 gtk4=0
@@ -241,6 +241,10 @@ AC_CHECK_HEADERS([stdlib.h string.h unistd.h],,
 	AC_MSG_ERROR([Missing standard headers]))
 AC_CHECK_HEADER([sys/sysinfo.h], AC_DEFINE([HAVE_SYSINFO], [1]))
 
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_INLINE
+AC_TYPE_SIZE_T
+
 # Checks for library functions
 AC_CHECK_FUNC([exp10], AC_DEFINE([HAVE_EXP10], [1]))
 AC_CHECK_FUNC([fmemopen], AC_DEFINE([HAVE_FMEMOPEN], [1]))
@@ -249,7 +253,13 @@ AC_CHECK_FUNC([get_nprocs], AC_DEFINE([HAVE_GET_NPROCS], [1]))
 # Check for font
 if test $gtk = 1; then
 	AC_MSG_NOTICE([Searching font...])
-	if test $win = 1 || test $haiku = 1; then
+	if test $win = 1; then
+		if test $win32 = 1; then
+			dir="/mingw32"
+		else
+			dir="/mingw64"
+		fi
+	elif test $haiku = 1; then
 		dir="/"
 	else
 		dir="/usr"
@@ -269,9 +279,8 @@ if test $gtk = 1; then
 fi
 
 # Set precision
-AC_ARG_WITH([precision],
-	AS_HELP_STRING([--with-precision],
-		[Build with precision degree (1-5), default=2]))
+AC_ARG_WITH([precision], AS_HELP_STRING([--with-precision],
+	[Build with precision degree (1-5), default=2]))
 if test "x$with_precision" = "x1"; then
 	AC_SUBST(PRECISION, "-DJBM_PRECISION=1")
 	AC_SUBST(SUFFIX, [-1])
