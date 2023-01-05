@@ -217,7 +217,7 @@ jb_xml_node_get_uint (xmlNode * node,   ///< XML node struct.
   buffer = (char *) xmlGetProp (node, prop);
   if (buffer)
     {
-      *error = sscanf (buffer, "%ld", &x);
+      *error = sscanf (buffer, "%lu", &x);
       xmlFree (buffer);
     }
   return x;
@@ -256,7 +256,7 @@ jb_xml_node_set_uint (xmlNode * node,   ///< XML node struct.
 ///< unsigned integer number value in unsigned long int format.
 {
   char buffer[JB_BUFFER_SIZE];
-  snprintf (buffer, JB_BUFFER_SIZE, "%ld", x);
+  snprintf (buffer, JB_BUFFER_SIZE, "%lu", x);
   xmlSetProp (node, prop, (xmlChar *) buffer);
 }
 
@@ -399,6 +399,7 @@ jb_xml_node_set_content_file (xmlNode * node,   ///< XML node struct.
 {
   long int l;
   char *buffer;
+  fseek (file, 0, SEEK_END);
   l = ftell (file);
   buffer = (char *) g_malloc (l + 1);
   fseek (file, 0, SEEK_SET);
