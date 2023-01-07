@@ -30,14 +30,12 @@ msgid "unable to open the file"
 msgstr "no se pudo abrir el fichero"
 
 #: src/jb_win.c:59
-#, fuzzy
 msgid "not enough memory to open the file"
-msgstr "memoria insuficiente para abrir la imagen"
+msgstr "memoria insuficiente para abrir el fichero"
 
 #: src/jb_win.c:65
-#, fuzzy
 msgid "unable to read the file"
-msgstr "no se pudo abrir el fichero"
+msgstr "no se pudo leerr el fichero"
 
 #: src/jb_win.c:208
 msgid "unable to init SDL"
@@ -96,86 +94,72 @@ msgid "no VK_KHR_surface Vulkan extension"
 msgstr ""
 
 #: src/jb_win.c:1010
-#, fuzzy
 msgid "no available Vulkan validation layers"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "capas de validación de Vulkan no disponibles"
 
 #: src/jb_win.c:1019
-#, fuzzy
 msgid "failed to create Vulkan instance"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "no se pudo crear la instancia de Vulkan"
 
 #: src/jb_win.c:1046
-#, fuzzy
 msgid "unable to create a Vulkan surface"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "no se pudo crear la superficie de Vulkan"
 
 #: src/jb_win.c:1071
-#, fuzzy
 msgid "failed to find a GPU with Vulkan support"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "no se pudo encontrar una GPU con soporte para Vulkan"
 
 #: src/jb_win.c:1083
-#, fuzzy
 msgid "bad Vulkan physical devices"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "dispositivos físicos de Vulkan incorrectos"
 
 #: src/jb_win.c:1126
-#, fuzzy
 msgid "no suitable Vulkan physical devices"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "dispositivos físicos de Vulkan no adecuados"
 
 #: src/jb_win.c:1169
 msgid "no available Vulkan extension"
-msgstr ""
+msgstr "extensión de Vulkan no disponible"
 
 #: src/jb_win.c:1213
-#, fuzzy
 msgid "no suitable Vulkan physical device queue family"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "familia de colas del dispositivo físico de Vulkan no adecuada"
 
 #: src/jb_win.c:1228
 msgid "Vulkan device does not support surfaces"
-msgstr ""
+msgstr "dispositivo de Vulkan no soporta superficies"
 
 #: src/jb_win.c:1256
-#, fuzzy
 msgid "unable to create the Vulkan logical device"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "no se pudo crear el dispositivo lógico de Vulkan"
 
 #: src/jb_win.c:1370
-#, fuzzy
 msgid "unable to create the Vulkan swap chain"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "no se pudo crear la cadena de intercambio de Vulkan"
 
 #: src/jb_win.c:1415
-#, fuzzy
 msgid "unable to create the Vulkan swap chain image view"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "no se pudo crear la vista de imagen de la cadena de intercambio de Vulkan"
 
 #: src/jb_win.c:1481
 msgid "failed to find supported format"
-msgstr ""
+msgstr "no se pudo encontrar un formato soportado"
 
 #: src/jb_win.c:1570
-#, fuzzy
 msgid "failed to create the Vulkan render pass"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "no se pudo crear el paso de renderización de Vulkan"
 
 #: src/jb_win.c:1610
-#, fuzzy
 msgid "failed to create the Vulkan descriptor set layout"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "no se pudo crear la capa del conjunto descriptor de Vulkan"
 
 #: src/jb_win.c:1636
-#, fuzzy
 msgid "failed to open the shader file"
-msgstr "no se pudo abrir el fichero"
+msgstr "no se pudo abrir el fichero de shader"
 
 #: src/jb_win.c:1646
-#, fuzzy
 msgid "failed to create the Vulkan shader module"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "no se pudo crear el módulo de shader de Vulkan"
 
 #: src/jb_win.c:1984
 msgid "OpenGL 2.1 is not supported"

@@ -30,14 +30,12 @@ msgid "unable to open the file"
 msgstr "on ne peut pas ouvrir le fichier"
 
 #: src/jb_win.c:59
-#, fuzzy
 msgid "not enough memory to open the file"
-msgstr "mémoire insuffisante pour ouvrir l'image"
+msgstr "mémoire insuffisante pour ouvrir le fichier"
 
 #: src/jb_win.c:65
-#, fuzzy
 msgid "unable to read the file"
-msgstr "on ne peut pas ouvrir le fichier"
+msgstr "on ne peut pas lire le fichier"
 
 #: src/jb_win.c:208
 msgid "unable to init SDL"
