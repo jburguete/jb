@@ -89,7 +89,7 @@ jb_json_object_set_float_with_format (JsonObject * object,
                                       JBDOUBLE x)
 ///< floating number value in JBDOUBLE format.
 {
-  const char buffer[JB_BUFFER_SIZE];
+  char buffer[JB_BUFFER_SIZE];
   snprintf (buffer, JB_BUFFER_SIZE, format, x);
   json_object_set_string_member (object, prop, (const gchar *) buffer);
 }
@@ -179,7 +179,7 @@ jb_json_object_set_int (JsonObject * object,    ///< JSON object struct.
                         long int x)
                         ///< integer number value in long int format.
 {
-  const char buffer[JB_BUFFER_SIZE];
+  char buffer[JB_BUFFER_SIZE];
   snprintf (buffer, JB_BUFFER_SIZE, "%ld", x);
   json_object_set_string_member (object, prop, (const gchar *) buffer);
 }
@@ -220,7 +220,7 @@ jb_json_object_get_uint (JsonObject * object,
   *error = 0;
   buffer = (const char *) json_object_get_string_member (object, prop);
   if (buffer)
-    *error = sscanf (buffer, "%ld", &x);
+    *error = sscanf (buffer, "%lu", &x);
   return x;
 }
 
@@ -258,8 +258,8 @@ jb_json_object_set_uint (JsonObject * object,   ///< JSON object struct.
                          unsigned long int x)
 ///< unsigned integer number value in unsigned long int format.
 {
-  const char buffer[JB_BUFFER_SIZE];
-  snprintf (buffer, JB_BUFFER_SIZE, "%ld", x);
+  char buffer[JB_BUFFER_SIZE];
+  snprintf (buffer, JB_BUFFER_SIZE, "%lu", x);
   json_object_set_string_member (object, prop, (const gchar *) buffer);
 }
 

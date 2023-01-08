@@ -1,6 +1,6 @@
 #include "jb_xml.h"
 
-#define XML_FILE (const xmlChar *) "test.xml"
+#define XML_FILE (const char *) "test.xml"
 #define XML_TEST (const xmlChar *) "test"
 #define XML_VERSION (const xmlChar *) "1.0"
 #define XML_X (const xmlChar *) "x"
