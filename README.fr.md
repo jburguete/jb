@@ -88,10 +88,10 @@ _______________________
 On peut installer tous les bibliothèques et les outils requis en utilisant les
 instructions en [install-unix](https://github.com/jburguete/install-unix).
 
-Ce programme a été construit et prouvé avec les suivants systèmes
+Ce programme a été construit et verifié avec les suivants systèmes
 d'exploitation:
 * Arch Linux
-* Debian 11 (Linux)
+* Debian Linux 11
 * Devuan Linux 4
 * Dragonfly BSD 6.4
 * Fedora Linux 37
@@ -117,7 +117,7 @@ Avec NetBSD 9.3, pour utiliser le derniére version du compilateur GCC, il faut
 faire avant dans le terminal:
 > $ export PATH="/usr/pkg/gcc12/bin:$PATH"
 
-Pour faire le changement permanent on peut ajouter à la dernière ligne di
+Pour faire le changement permanent on peut ajouter à la dernière ligne du
 fichier ".profile" dans le répertoire racine du utilisateur:
 > PATH="/usr/pkg/gcc12/bin:$PATH"
 

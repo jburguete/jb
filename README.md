@@ -85,13 +85,13 @@ You can install all required utilities and libraries using the instructions of
 
 This software has been built and tested in the following operative systems:
 * Arch Linux
-* Debian 11 (Linux)
+* Debian Linux 11
 * Devuan Linux 4
 * Dragonfly BSD 6.4
 * Fedora Linux 37
 * FreeBSD 13.1
 * Gentoo Linux
-* Linux Mint 4
+* Linux Mint DE 5
 * MacOS Catalina + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10
