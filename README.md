@@ -98,7 +98,7 @@ This software has been built and tested in the following operative systems:
 * Arch Linux
 * Debian 11 (Linux)
 * Devuan Linux 4
-* Dragonfly BSD 6.2.2
+* Dragonfly BSD 6.4
 * Fedora Linux 37
 * FreeBSD 13.1
 * Gentoo Linux
@@ -141,13 +141,13 @@ ____________________________
 > $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/5.1.1 jb
 
 3. Include the config and the used utility headers on your source code i.e.:
-> \#include "jb/jb\_config.h"
+> \#include "jb/src/jb\_config.h"
 >
-> \#include "jb/jb\_math.h"
+> \#include "jb/src/jb\_math.h"
 >
-> \#include "jb/jb\_win.h"
+> \#include "jb/src/jb\_win.h"
 >
-> \#include "jb/jb\_xml.h"
+> \#include "jb/src/jb\_xml.h"
 
 BUILDING STATICALLY
 ___________________

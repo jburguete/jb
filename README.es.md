@@ -103,7 +103,7 @@ operativos:
 * Arch Linux
 * Debian 11 (Linux)
 * Devuan Linux 4
-* Dragonfly BSD 6.2.2
+* Dragonfly BSD 6.4
 * Fedora Linux 37
 * FreeBSD 13.1
 * Gentoo Linux
@@ -146,13 +146,13 @@ _____________________________________
 
 3. Incluya el fichero de configuración y las utilidades requeridas en su código
    fuente p.ej.:
-> \#include "jb/jb\_config.h"
+> \#include "jb/src/jb\_config.h"
 >
-> \#include "jb/jb\_math.h"
+> \#include "jb/src/jb\_math.h"
 >
-> \#include "jb/jb\_win.h"
+> \#include "jb/src/jb\_win.h"
 >
-> \#include "jb/jb\_xml.h"
+> \#include "jb/src/jb\_xml.h"
 
 CONSTRUCCIÓN ESTÁTICA
 _____________________
