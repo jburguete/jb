@@ -1,6 +1,6 @@
 # Header
 AC_PREREQ([2.69])
-AC_INIT([jb],[4.3.7],[https://github.com/jburguete/jb])
+AC_INIT([jb],[5.1.1],[https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_TARGET
@@ -208,6 +208,10 @@ if test $gtk = 1; then
 			AC_MSG_NOTICE([No vulkan])
 			AC_SUBST(VULKAN, "0"))
 	fi
+	AC_SUBST(EXEBIN,
+		"\$(exebin) \$(exe) \$(testsbin) \$(tests) \$(shaders)")
+else
+	AC_SUBST(EXEBIN, "\$(exebin) \$(testsbin)")
 fi
 
 # Checks for GtkGLArea, FreeGLUT, GLFW or SDL to draw the graphic window

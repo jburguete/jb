@@ -74,7 +74,27 @@ exit_on_error:
   return NULL;
 }
 
-#if JBW == JBW_GTK
+#if JBW == JBW_NO
+
+static void
+jbw_show_message (const char *title, const char *message)
+{
+  printf ("%s: %s\n", title, message);
+}
+
+void
+jbw_show_error (const char *message)
+{
+  jbw_show_message (_("Error!"), message);
+}
+
+void
+jbw_show_warning (const char *message)
+{
+  jbw_show_message (_("Warning!"), message);
+}
+
+#elif JBW == JBW_GTK
 
 GdkGLContext *jbw_gdk_gl_context;
 ///< GdkGLContext OpenGL context used in GTK widgets.
@@ -261,31 +281,6 @@ void
 jbw_show_error (const char *message)    ///< error message.
 {
   jbw_show_message (_("Error!"), message, GTK_MESSAGE_ERROR);
-}
-
-/**
- * Function to display two error messages.
- */
-void
-jbw_show_error2 (const char *message1,  ///< 1st error message.
-                 const char *message2)  ///< 2nd error message.
-{
-  char buffer[1024];
-  snprintf (buffer, 1024, "%s:\n%s", message1, message2);
-  jbw_show_error (buffer);
-}
-
-/**
- * Function to display three error messages.
- */
-void
-jbw_show_error3 (const char *message1,  ///< 1st error message.
-                 const char *message2,  ///< 2nd error message.
-                 const char *message3)  ///< 3rd error message.
-{
-  char buffer[1024];
-  snprintf (buffer, 1024, "%s: %s\n%s", message1, message2, message3);
-  jbw_show_error (buffer);
 }
 
 /**
@@ -4512,5 +4507,30 @@ gtk_entry_get_text (GtkEntry * entry)   ///< GtkEntry struct.
 }
 
 #endif
+
+/**
+ * Function to display two error messages.
+ */
+void
+jbw_show_error2 (const char *message1,  ///< 1st error message.
+                 const char *message2)  ///< 2nd error message.
+{
+  char buffer[1024];
+  snprintf (buffer, 1024, "%s:\n%s", message1, message2);
+  jbw_show_error (buffer);
+}
+
+/**
+ * Function to display three error messages.
+ */
+void
+jbw_show_error3 (const char *message1,  ///< 1st error message.
+                 const char *message2,  ///< 2nd error message.
+                 const char *message3)  ///< 3rd error message.
+{
+  char buffer[1024];
+  snprintf (buffer, 1024, "%s: %s\n%s", message1, message2, message3);
+  jbw_show_error (buffer);
+}
 
 #endif

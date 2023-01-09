@@ -37,53 +37,13 @@
 #include "jb_math.h"
 
 char *jbw_read_file (const char *name, long int *size);
+void jbw_show_error (const char *message);
+void jbw_show_error2 (const char *message1, const char *message2);
+void jbw_show_error3 (const char *message1, const char *message2,
+                      const char *message3);
+void jbw_show_warning (const char *message);
 
-#if JBW == JBW_NO
-
-static inline void
-jbw_show_message (const char *title, const char *message)
-{
-  printf ("%s: %s\n", title, message);
-}
-
-static inline void
-jbw_show_error (const char *message)
-{
-  jbw_show_message (_("Error!"), message);
-}
-
-static inline void
-jbw_show_warning (const char *message)
-{
-  jbw_show_message (_("Warning!"), message);
-}
-
-/**
- * Function to display two error messages.
- */
-static inline void
-jbw_show_error2 (const char *message1,  ///< 1st error message.
-                 const char *message2)  ///< 2nd error message.
-{
-  char buffer[1024];
-  snprintf (buffer, 1024, "%s:\n%s", message1, message2);
-  jbw_show_error (buffer);
-}
-
-/**
- * Function to display three error messages.
- */
-static inline void
-jbw_show_error3 (const char *message1,  ///< 1st error message.
-                 const char *message2,  ///< 2nd error message.
-                 const char *message3)  ///< 3rd error message.
-{
-  char buffer[1024];
-  snprintf (buffer, 1024, "%s: %s\n%s", message1, message2, message3);
-  jbw_show_error (buffer);
-}
-
-#elif JBW == JBW_GTK
+#if JBW == JBW_GTK
 
 #include <png.h>
 #include <ft2build.h>
@@ -448,11 +408,6 @@ int jbw_init (int *argn, char ***argc);
 
 void jbw_show_message (const char *title, const char *message,
                        GtkMessageType type);
-void jbw_show_error (const char *message);
-void jbw_show_error2 (const char *message1, const char *message2);
-void jbw_show_error3 (const char *message1, const char *message2,
-                      const char *message3);
-void jbw_show_warning (const char *message);
 
 void jbw_combo_box_set_strings (GtkComboBoxText * combo, char **strings, int n);
 GtkComboBoxText *jbw_combo_box_new_with_strings (char **strings, int n);
