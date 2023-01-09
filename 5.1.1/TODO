@@ -12,7 +12,6 @@ FEATURES:
 	- Legend in JBWGraphics
 	- Enable Vulkan
 	* Disconnect GTK and JBWGraphics
-	* Update link instructions in README files
 
 STYLE:
 	* Remove doxygen errors

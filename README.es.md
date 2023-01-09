@@ -158,7 +158,7 @@ ENLAZANDO LA BIBLIOTECA EN OTROS PROGRAMAS
    libjb\*.so en sistemas UNIX, ficheros libjb\*.dll en sistemas Microsoft
    Windows)
 
-4. Enlace la bibliotecas compartidas en su ejecutable p.ej.: 
+4. Enlace las bibliotecas compartidas en su ejecutable p.ej.: 
 > $ gcc -DJBW=2 -DJBM\_PRECISION=2 SU\_CÓDIGO\_FUENTE.c
 > -o SU\_FICHERO\_EJECUTABLE -L. -Wl,-rpath=. -ljbwin-2 -ljbxml-2 -ljbm-2
 > -ljb-2 \`pkg-config --cflags --libs glib-2.0 libxml-2.0 gtk+-3.0 glew\`

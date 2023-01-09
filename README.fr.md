@@ -146,7 +146,7 @@ LIEN LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
 >
 > $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/5.1.1 jb
 
-2. Incluez le fichier de configuration et les outils requis dans vôtre code
+2. Incluez le fichier de configuration et les outils requis dans votre code
    source, p.ex.:
 > \#include "jb/src/jb\_config.h"
 >
@@ -160,7 +160,7 @@ LIEN LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
 (fichiers libjb\*.so pour sistèmes UNIX, fichiers libjb\*.dll pour sistèmes
 Microsoft Windows).
 
-4. Liez les bibliothèques utilisées dans vôtre exécutable, p.ex.:
+4. Liez les bibliothèques utilisées dans votre exécutable, p.ex.:
 > $ gcc -DJBW=2 -DJBM\_PRECISION=2 VÔTRE\_CODE\_SOURCE.c
 > -o VÔTRE\_FICHIER\_EXÉCUTABLE -L. -Wl,-rpath=. -ljbwin-2 -ljbxml-2 -ljbm-2
 > -ljb-2 \`pkg-config --cflags --libs glib-2.0 libxml-2.0 gtk+-3.0 glew\`
