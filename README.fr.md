@@ -5,7 +5,7 @@ JB (version 5.1.1)
 :fr:[français](README.fr.md)
 
 Une bibliothèque avec fonctions utiles de mathématiques, graphiques, widgets et
-entrée/sortie XML.
+entrée/sortie XML et JSON.
 
 AUTEURS
 -------
@@ -21,15 +21,17 @@ FICHIERS
 * src\*.c: fichiers de code source.
 * Doxyfile: fichier de configuration pour générer documentation doxygen.
 * build.sh: script de construction par défaut.
+* build\_without\_gui.sh: script de construction pour applications de terminal.
 * configure.ac: pour configurer la construction du Makefile.
 * Makefile.in: modèle pour générer le Makefile.
 * Doxyfile: pour configurer la construction de la documentation.
 * test.png: figure pour vérifier les fonctions graphiques.
+* test\_data: fichier de données pour la vérification.
 * test\*.c: fichier source de vérification.
 * locale/\*/LC\_MESSAGES/jb.po: fichiers de traduction.
 
-CONSTRUCTION DE LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
-------------------------------------------------------
+CONSTRUCTION DE LA BIBLIOTHÈQUE
+-------------------------------
 
 BIBLIOTHÈQUES ET OUTILS REQUIS
 ______________________________
@@ -58,6 +60,10 @@ Optionnel pour détecter les characteristiques du processeur:
 Obligatoire si les outils jb\_xml sont inclus:
 * [libxml](http://xmlsoft.org) pour travailler avec fichiers XML.
 
+Obligatoire si les outils jb\_json sont inclus:
+* [json-glib](https://gitlab.gnome.org/GNOME/json-glib) pour travailler avec
+  fichiers JSON.
+
 Obligatoire si les outils jb\_win sont inclus et on compile en utilisant
 l'option -DJBW=2.
 * [png](http://libpng.sourceforge.net) pour travailler avec fichiers PNG.
@@ -75,28 +81,6 @@ Optionnel pour construire la documentation:
 * [doxygen](http://www.stack.nl/~dimitri/doxygen) format de commentaires
   standard pour générer la documentation.
 * [latex](https://www.latex-project.org/) pour construire les manuels PDF.
-
-OPTIONS DE COMPILATION
-______________________
-
-Pour compiler la bibliothèque JB on doit définir l'option JBW. Il y a 2
-possibilités:
-* -DJBW=1: pour interfaces de terminal.
-* -DJBW=2: pour interfaces graphiques.
-
-On doit aussi définir l'option de niveau de précision:
-* -DJBM\_PRECISION=1: tous les variables mathématiques sont définies comme
-  float.
-* -DJBM\_PRECISION=2: les variables mathématiques sont définies comme float ou
-  double.
-* -DJBM\_PRECISION=3: tous les variables mathématiques sont définies comme
-  double.
-* -DJBM\_PRECISION=4: les variables mathématiques sont définies comme double ou
-  long double.
-* -DJBM\_PRECISION=5: tous les variables mathématiques sont définies comme
-  long double.
-
-Les bibliothèques construites par défaut utilisent le niveau de précision 2.
 
 SISTÈMES D'EXPLOITATION
 _______________________
@@ -140,19 +124,30 @@ fichier ".profile" dans le répertoire racine du utilisateur:
 Avec OpenBSD 7.2 on doit faire avant dans le terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
-INSTRUCTIONS DE CONSTRUCTION COMMUNES
-_____________________________________
+INSTRUCTIONS DE CONSTRUCTION
+____________________________
 
 1. Téléchargez la dernière version de la bibliothèque:
 > $ git clone https://github.com/jburguete/jb
 
-2. Liez la dernière version dans une répertoire jb, p.ex.:
+2. Pour applications de terminal compilez les codes source avec:
+> $ cd 5.1.1
+> $ ./build\_wihtout_\gui.sh
+
+2. Pour applications graphiques compilez les codes source avec:
+> $ cd 5.1.1
+> $ ./build.sh
+
+LIEN LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
+-------------------------------------------
+
+1. Liez la dernière version dans une répertoire jb, p.ex.:
 > $ cd RÉPERTOIRE\_DE\_VÔTRE\_PROGRAMME
 >
 > $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/5.1.1 jb
 
-3. Incluez le fichier de configuration et les outils requis dans vôtre code
-  source p.ex.:
+2. Incluez le fichier de configuration et les outils requis dans vôtre code
+   source, p.ex.:
 > \#include "jb/src/jb\_config.h"
 >
 > \#include "jb/src/jb\_math.h"
@@ -161,52 +156,11 @@ _____________________________________
 >
 > \#include "jb/src/jb\_xml.h"
 
-CONSTRUCTION STATIQUE
-_____________________
+3. Copiez les bibliothèques utilisées dans la répertoire de votre exécutable
+(fichiers libjb\*.so pour sistèmes UNIX, fichiers libjb\*.dll pour sistèmes
+Microsoft Windows).
 
-4. Compilez les codes source des outils utilisés p.ex.:
-> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
->
-> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_math.c -o jb\_math.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
->
-> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_win.c -o jb\_win.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
->
-> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_xml.c -o jb\_xml.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
-
-5. Liez les fichiers objet des outils utilisés dans vôtre executable p.ex.:
-> $ gcc -DJBW=2 -DJBM\_PRECISION=2 VÔTRE\_CODE\_SOURCE.c jb\_def.o jb\_math.o
-> jb\_win.o jb\_xml.o -o VÔTRE\_FICHIER\_EXECUTABLE
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
-
-Notez que vôtre code peut aussi avoir besoin de bibliotèques additionnelles au
-command "pkg-config".
-
-Notez aussi qu'on peut utiliser un autre niveau de précision (JBM\_PRECISION).
-
-CONSTRUCTION DYNAMIQUE
-_______________________
-
-4. Compilez les codes source des outils utilisés p.ex. avec chemins absolus
-  p.ex.:
-> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
->
-> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_math.c -o jb\_math.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
->
-> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_win.c -o jb\_win.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
-
-5. Construisez la bibliothèqe partagée:
-> $ gcc -shared -DJBW=2 -DJBM\_PRECISION=2 jb\_def.o jb\_win.o jb\_math.o
-> -o libjb.so
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
-
-6. Liez la bibliothèque partagée dans vôtre executable p.ex.:
+4. Liez les bibliothèques utilisées dans vôtre exécutable, p.ex.:
 > $ gcc -DJBW=2 -DJBM\_PRECISION=2 VÔTRE\_CODE\_SOURCE.c
-> -o VÔTRE\_FICHIER\_EXECUTABLE -L. -Wl,-rpath=. -ljb
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
+> -o VÔTRE\_FICHIER\_EXÉCUTABLE -L. -Wl,-rpath=. -ljbwin-2 -ljbxml-2 -ljbm-2
+> -ljb-2 \`pkg-config --cflags --libs glib-2.0 libxml-2.0 gtk+-3.0 glew\`

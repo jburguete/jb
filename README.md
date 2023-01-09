@@ -5,7 +5,7 @@ JB (5.1.1 version)
 :fr:[français](README.fr.md)
 
 A library with some useful functions of mathematics, graphics, widgets and XML
-input/output.
+and JSON input/output.
 
 AUTHORS
 -------
@@ -21,15 +21,17 @@ FILES
 * src\*.c: source code files.
 * Doxyfile: configuration file to generate doxygen documentation.
 * build.sh: default build script.
+* build\_without\_gui.sh: build script for terminal applications.
 * configure.ac: to configure the Makefile building.
 * Makefile.in: template to generate the Makefile.
 * Doxyfile: to configure the documentation building.
 * test.png: figure to check graphical functions.
+* test\_data: data file for tests.
 * test\*.c: test source files.
 * locale/\*/LC\_MESSAGES/jb.po: translation files.
 
-BUILDING THIS LIBRARY ON OTHER PROGRAMS
----------------------------------------
+BUILDING THIS LIBRARY
+---------------------
 
 REQUIRED LIBRARIES AND UTILITIES
 ________________________________
@@ -56,6 +58,9 @@ Optional to get the processor properties:
 Required if including jb\_xml utilites:
 * [libxml](http://xmlsoft.org) to deal with XML files.
 
+Required if including jb\_json utilites:
+* [json-glib](https://gitlab.gnome.org/GNOME/json-glib) to deal with JSON files.
+
 Needed if including jb\_win utilities and compiling with -DJBW=2 flag.
 * [png](http://libpng.sourceforge.net) to work with PNG files.
 * [gtk3](http://www.gtk.org) to work with interactive windows.
@@ -71,22 +76,6 @@ Optional to build documentation:
 * [doxygen](http://www.stack.nl/~dimitri/doxygen) standard comments format to
   generate documentation.
 * [latex](https://www.latex-project.org/) to build the PDF manuals.
-
-COMPILING FLAGS
-_______________
-
-To compile with JB library you has to define the JBW flag. They are 2 options:
-* -DJBW=1: for terminal applications.
-* -DJBW=2: for graphical applications.
-
-It is also needed to set the precision level flag:
-* -DJBM\_PRECISION=1: all math variables are defined as float.
-* -DJBM\_PRECISION=2: math variables are defined as float or double.
-* -DJBM\_PRECISION=3: all math variables are defined as double.
-* -DJBM\_PRECISION=4: math variables are defined as double or long double.
-* -DJBM\_PRECISION=5: all math variables are defined as long double.
-
-In default building shared libraries are using the precision level 2.
 
 OPERATIVE SYSTEMS
 _________________
@@ -129,18 +118,29 @@ file in the user root directory:
 On OpenBSD 7.2 you have to do first on the building terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
-COMMON BUILDING INSTRUCTIONS
-____________________________
+BUILDING INSTRUCTIONS
+_____________________
 
 1. Load the last library version:
 > $ git clone https://github.com/jburguete/jb
 
-2. Link the latest version on a jb directory i.e.:
+2. If only terminal applications are required compile the source codes with:
+> $ cd 5.1.1
+> $ ./build\_wihtout_\gui.sh
+
+2. Or, if graphic interfaces are required, compile the source codes with:
+> $ cd 5.1.1
+> $ ./build.sh
+
+LINKING THIS LIBRARY ON OTHER PROGRAMS
+--------------------------------------
+
+1. Link the latest version on a jb directory, i.e.:
 > $ cd YOUR\_PROGRAM\_PATH
 >
 > $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/5.1.1 jb
 
-3. Include the config and the used utility headers on your source code i.e.:
+2. Include the config and the used utility headers on your source code i.e.:
 > \#include "jb/src/jb\_config.h"
 >
 > \#include "jb/src/jb\_math.h"
@@ -149,51 +149,10 @@ ____________________________
 >
 > \#include "jb/src/jb\_xml.h"
 
-BUILDING STATICALLY
-___________________
+3. Copy the used libraries in your executable directory (libjb\*.so files on
+   UNIX systems or libjb\*.dll files on Microsoft Windows systems).
 
-4. Build the used utility source codes i.e.:
-> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
->
-> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_math.c -o jb\_math.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
->
-> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_win.c -o jb\_win.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
->
-> $ gcc -c -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_xml.c -o jb\_xml.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
-
-5. Link the used utility object file to your executable i.e.:
-> $ gcc -DJBW=2 -DJBM\_PRECISION=2 YOUR\_SOURCE\_CODE.c jb\_def.o jb\_math.o
-> jb\_win.o jb\_xml.o -o YOUR\_EXECUTABLE\_FILE
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
-
-Note that your code could also need additional libraries to "pkg-config"
-command.
-
-Note also that you can set another precision level (JBM\_PRECISION).
-
-BUILDING DINAMICALLY
-____________________
-
-4. Build the used utility source codes with absolute paths i.e.:
-> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_def.c -o jb\_def.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
->
-> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_math.c -o jb\_math.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
->
-> $ gcc -c -fPIC -DJBW=2 -DJBM\_PRECISION=2 jb/jb\_win.c -o jb\_win.o
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
-
-5. Build the shared library:
-> $ gcc -shared -DJBW=2 -DJBM\_PRECISION=2 jb\_def.o jb\_win.o jb\_math.o
-> -o libjb.so
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
-
-6. Link the shared library to your executable i.e.:
+4. Link the shared libraries in your executable, i.e.: 
 > $ gcc -DJBW=2 -DJBM\_PRECISION=2 YOUR\_SOURCE\_CODE.c
-> -o YOUR\_EXECUTABLE\_FILE -L. -Wl,-rpath=. -ljb
-> \`pkg-config --cflags glib-2.0 libxml-2.0 gtk+-3.0 glew\`
+> -o YOUR\_EXECUTABLE\_FILE -L. -Wl,-rpath=. -ljbwin-2 -ljbxml-2 -ljbm-2
+> -ljb-2 \`pkg-config --cflags --libs glib-2.0 libxml-2.0 gtk+-3.0 glew\`
