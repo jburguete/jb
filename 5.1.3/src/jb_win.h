@@ -96,7 +96,7 @@ enum JBWEditorWidgetType
   JBW_EDITOR_WIDGET_TYPE_TIME = 3       ///< time data.
 };
 
-#if HIGH_PRECISION > 2
+#if JBM_HIGH_PRECISION > 2
 typedef GtkEntry JBWFloatEntry; ///< widget to work with float number.
 #else
 typedef GtkSpinButton JBWFloatEntry;
@@ -356,7 +356,7 @@ typedef struct
       g_signal_connect_data((instance), (detailed_signal), (c_handler), \
       (data), 0, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
 
-#if HIGH_PRECISION > 2
+#if JBM_HIGH_PRECISION > 2
 #define jbw_float_entry_new (JBWFloatEntry*)gtk_entry_new
 #else
 #define jbw_float_entry_new (JBWFloatEntry*)gtk_spin_button_new
@@ -414,7 +414,7 @@ GtkComboBoxText *jbw_combo_box_new_with_strings (char **strings, int n);
 
 void jbw_float_entry_set_value_with_format (JBWFloatEntry * entry,
                                             char *format, JBDOUBLE value);
-#if HIGH_PRECISION > 2
+#if JBM_HIGH_PRECISION > 2
 void jbw_float_entry_set_value (JBWFloatEntry * entry, JBDOUBLE value);
 JBDOUBLE jbw_float_entry_get_value (JBWFloatEntry * entry);
 #else

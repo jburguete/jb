@@ -341,7 +341,7 @@ jbw_float_entry_set_value_with_format (JBWFloatEntry * entry,
   gtk_entry_set_text (GTK_ENTRY (entry), buffer);
 }
 
-#if HIGH_PRECISION > 2
+#if JBM_HIGH_PRECISION > 2
 
 /**
  * Function to set a JBWFloatEntry struct with a floating point value.
