@@ -697,6 +697,8 @@ const char *gtk_entry_get_text (GtkEntry * entry);
 
 #else
 
+#define GtkPicture GtkImage
+
 #define gtk_box_append(box, child) (gtk_box_pack_start(box, child, 0, 0, 0))
 #define gtk_check_button_get_active(button) \
   (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button)))
@@ -706,6 +708,9 @@ const char *gtk_entry_get_text (GtkEntry * entry);
 #define gtk_file_chooser_set_current_name gtk_file_chooser_set_filename
 #define gtk_frame_set_child(frame, child) \
   (gtk_container_add(GTK_CONTAINER(frame), child))
+#define gtk_grid_remove(grid, child) (gtk_widget_destroy(child))
+#define gtk_picture_new_for_filename gtk_image_new_from_file
+#define gtk_picture_new_for_pixbuf gtk_image_new_from_pixbuf
 #define gtk_scrolled_window_set_child(scrolled, widget) \
   (gtk_container_add (GTK_CONTAINER(scrolled), widget))
 #define gtk_window_destroy(window) (gtk_widget_destroy (GTK_WIDGET(window)))

@@ -216,7 +216,7 @@ int
 jbw_init (int *argn __attribute__((unused)),
           ///< pointer to the number of command line arguments.
           char ***argc __attribute__((unused)))
-          ///< pointer to the command line arguments.
+  ///< pointer to the command line arguments.
 {
   jb_init ();
 #if HAVE_FREEGLUT
@@ -2461,7 +2461,7 @@ jbw_graphic_loop (void)
             }
           if (jbw_graphic_loop_idle && !jbw_graphic_loop_idle ())
             jbw_graphic_loop_idle = NULL;
-	}
+        }
     }
 
 #elif HAVE_GLFW
@@ -2481,7 +2481,7 @@ jbw_graphic_loop (void)
           glfwPollEvents ();
           if (jbw_graphic_loop_idle && !jbw_graphic_loop_idle ())
             jbw_graphic_loop_idle = NULL;
-	}
+        }
     }
 
 #endif
@@ -3686,10 +3686,13 @@ jbw_graphic_dialog_response (GtkFileChooserDialog * dlg,
 {
   JBWGraphic *graphic;
   GMainContext *context;
+  GFile *file;
   char *buffer;
-  if (id == GTK_RESPONSE_ACCEPT)
+  if (id == GTK_RESPONSE_OK)
     {
-      buffer = gtk_file_chooser_get_current_name (GTK_FILE_CHOOSER (dlg));
+      file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dlg));
+      buffer = g_file_get_path (file);
+      g_object_unref (file);
       if (buffer)
         {
           graphic = jbw_graphic_pointer;
