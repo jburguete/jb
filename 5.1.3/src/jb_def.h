@@ -119,4 +119,101 @@ int jb_bin_read (FILE * file, char *buffer);
 void jb_bin_write (FILE * file, char *buffer);
 int jb_get_ncores (void);
 
+/**
+ * Function to code a date in struct tm format to a double number.
+ */
+static inline void
+jbm_make_time (struct tm *sys_date,     ///< date in struct tm format.
+               double *sys_sec,
+               ///< pointer to the date in double format.
+               int *error)      ///< 1 on success, 0 on error.
+{
+  time_t sys_t;
+  sys_date->tm_year -= 1900;
+  --sys_date->tm_mon;
+  sys_date->tm_sec = 0;
+  sys_date->tm_isdst = 0;
+  sys_t = mktime (sys_date);
+  if (sys_t == -1)
+    *error = 0;
+  else
+    *error = 1;
+  *sys_sec += (double) sys_t;
+}
+
+/**
+ * Function to code a date in string format to a double number.
+ *
+ * \return date in double format.
+ */
+static inline double
+jbm_get_time (const char *string,       ///< date in string format.
+              int *error)       ///< 1 on success, 0 on error.
+{
+  struct tm sys_date[1];
+  double sys_sec;
+  *error = sscanf (string, "%d%d%d%d%d%lf",
+                   &sys_date->tm_year,
+                   &sys_date->tm_mon,
+                   &sys_date->tm_mday,
+                   &sys_date->tm_hour, &sys_date->tm_min, &sys_sec);
+  printf ("error=%d\n", *error);
+  if (*error < 0)
+    *error = 0;
+  if (*error == 6)
+    jbm_make_time (sys_date, &sys_sec, error);
+  return sys_sec;
+}
+
+/**
+ * Function to read a date of a file in string format to a double number.
+ *
+ * \return date in double format.
+ */
+static inline double
+jbm_get_time_file (FILE * file, ///< file.
+                   int *error)  ///< 1 on success, 0 on error.
+{
+  struct tm sys_date[1];
+  double sys_sec;
+  *error = fscanf (file, "%d%d%d%d%d%lf",
+                   &sys_date->tm_year,
+                   &sys_date->tm_mon,
+                   &sys_date->tm_mday,
+                   &sys_date->tm_hour, &sys_date->tm_min, &sys_sec);
+  if (*error < 0)
+    *error = 0;
+  if (*error == 6)
+    jbm_make_time (sys_date, &sys_sec, error);
+  return sys_sec;
+}
+
+/**
+ * Function to write in a string a date coded in a double number format.
+ *
+ * \return string on success, 0 on error
+ */
+static inline char *
+jbm_set_time (double time)      ///< date coded in a double number format.
+{
+  struct tm *sys_date;
+  char *buffer;
+  time_t sys_t;
+  buffer = (char *) g_try_malloc (JB_BUFFER_SIZE * sizeof (char));
+  if (buffer)
+    {
+      sys_t = (time_t) time;
+      time -= (double) sys_t;
+      sys_date = localtime (&sys_t);
+      snprintf (buffer, JB_BUFFER_SIZE, "%d %d %d %d %d %lg",
+                sys_date->tm_year + 1900,
+                sys_date->tm_mon + 1,
+                sys_date->tm_mday,
+                sys_date->tm_hour, sys_date->tm_min, time + sys_date->tm_sec);
+      buffer =
+        (char *) jb_realloc (buffer, (1 + strlen (buffer)) * sizeof (char));
+    }
+  return buffer;
+}
+
 #endif

@@ -33,6 +33,8 @@
  */
 #include "jb_math.h"
 
+#if JBM_HIGH_PRECISION != JBM_LOW_PRECISION || JBM_HIGH_PRECISION < 3
+
 /**
  * Function to sort from the highest to the lowest the indexes of an array of
  * JBFLOAT numbers by the flash method.
@@ -101,6 +103,11 @@ sorted:
   g_free (nj);
 }
 
+#endif
+
+
+#if JBM_HIGH_PRECISION != JBM_LOW_PRECISION || JBM_HIGH_PRECISION > 2
+
 /**
  * Function to sort from the highest to the lowest the indexes of an array of
  * JBDOUBLE numbers by the flash method.
@@ -168,3 +175,5 @@ jbm_index_sort_flashl (JBDOUBLE * __restrict x, ///< array of JBDOUBLE numbers.
 sorted:
   g_free (nj);
 }
+
+#endif
