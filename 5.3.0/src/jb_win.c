@@ -246,6 +246,17 @@ jbw_init (int *argn __attribute__((unused)),
 }
 
 /**
+ * Function to process events on long computation.
+ */
+void
+jbw_process_pending ()
+{
+  GMainContext *context = g_main_context_default ();
+  while (g_main_context_pending (context))
+    g_main_context_iteration (context, 0);
+}
+
+/**
  * Function to display a message.
  */
 void
@@ -369,6 +380,29 @@ jbw_float_entry_get_value (JBWFloatEntry * entry)
 }
 
 #endif
+
+/**
+ * Function to get the active widget.
+ *
+ * \return index of the active widget.
+ */
+unsigned int
+jbw_buttons_array_get_active (
+#if GTK_MAJOR_VERSION > 3
+                             GtkCheckButton * array[],
+                             ///< array of GtkCheckButtons.
+#else
+                             GtkRadioButton * array[],
+                             ///< array of GtkRadioButtons.
+#endif
+                             unsigned int n)    ///< number of widgets.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    if (gtk_check_button_get_active (array[i]))
+      break;
+  return i;
+}
 
 /**
  * Function to set the screen background.
