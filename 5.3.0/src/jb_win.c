@@ -389,13 +389,13 @@ jbw_float_entry_get_value (JBWFloatEntry * entry)
 unsigned int
 jbw_array_buttons_get_active (
 #if GTK_MAJOR_VERSION > 3
-                             GtkCheckButton * array[],
-                             ///< array of GtkCheckButtons.
+                               GtkCheckButton * array[],
+                               ///< array of GtkCheckButtons.
 #else
-                             GtkRadioButton * array[],
-                             ///< array of GtkRadioButtons.
+                               GtkRadioButton * array[],
+                               ///< array of GtkRadioButtons.
 #endif
-                             unsigned int n)    ///< number of widgets.
+                               unsigned int n)  ///< number of widgets.
 {
   unsigned int i;
   for (i = 0; i < n; ++i)
