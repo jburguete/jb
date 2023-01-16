@@ -387,7 +387,7 @@ jbw_float_entry_get_value (JBWFloatEntry * entry)
  * \return index of the active widget.
  */
 unsigned int
-jbw_buttons_array_get_active (
+jbw_array_buttons_get_active (
 #if GTK_MAJOR_VERSION > 3
                              GtkCheckButton * array[],
                              ///< array of GtkCheckButtons.
