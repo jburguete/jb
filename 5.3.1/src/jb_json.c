@@ -95,7 +95,7 @@ jb_json_object_set_float_with_format (JsonObject * object,
 }
 
 /**
- * Function to set a floating number with default format (see FWL macro) in a
+ * Function to set a floating number with default format (see FPL macro) in a
  * property of a JSON object.
  */
 void
@@ -104,11 +104,11 @@ jb_json_object_set_float (JsonObject * object,  ///< JSON object struct.
                           JBDOUBLE x)
 ///< floating number value in JBDOUBLE format.
 {
-  jb_json_object_set_float_with_format (object, prop, FWL, x);
+  jb_json_object_set_float_with_format (object, prop, FPL, x);
 }
 
 /**
- * Function to set a floating number with default format (see FWL macro) in a
+ * Function to set a floating number with default format (see FPL macro) in a
  * property of a JSON object or none if the number is equal to a default value.
  */
 void

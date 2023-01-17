@@ -94,7 +94,7 @@ jb_xml_node_set_float_with_format (xmlNode * node,      ///< XML node struct.
 }
 
 /**
- * Function to set a floating number with default format (see FWL macro) in a
+ * Function to set a floating number with default format (see FPL macro) in a
  * property of a XML node.
  */
 void
@@ -103,17 +103,17 @@ jb_xml_node_set_float (xmlNode * node,  ///< XML node struct.
                        JBDOUBLE x)
 ///< floating number value in JBDOUBLE format.
 {
-  jb_xml_node_set_float_with_format (node, prop, FWL, x);
+  jb_xml_node_set_float_with_format (node, prop, FPL, x);
 }
 
 /**
- * Function to set a floating number with default format (see FWL macro) in a
+ * Function to set a floating number with default format (see FPL macro) in a
  * property of a XML node or none if the number is equal to a default value.
  */
 void
 jb_xml_node_set_float_with_default (xmlNode * node,     ///< XML node struct.
                                     const xmlChar * prop,
-///< XML node property.
+                                    ///< XML node property.
                                     JBDOUBLE x,
 ///< floating number value in JBDOUBLE format.
                                     JBDOUBLE def)       ///< default value.

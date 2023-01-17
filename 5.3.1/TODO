@@ -12,7 +12,6 @@ FEATURES:
 	- Legend in JBWGraphics
 	- Enable Vulkan
 	* Disconnect GTK and JBWGraphics
-	* Check HIGH_PRECISION==LOW_PRECISION to simplify libjbm
 
 STYLE:
 	* Remove doxygen errors
