@@ -405,6 +405,7 @@ extern unsigned int jbw_graphic_loop_exit;
 #endif
 
 int jbw_init (int *argn, char ***argc);
+void jbw_process_pending ();
 
 void jbw_show_message (const char *title, const char *message,
                        GtkMessageType type);
@@ -695,6 +696,9 @@ jbw_graphic_show (JBWGraphic * graphic) ///< JBWGraphic widget.
 void gtk_entry_set_text (GtkEntry * entry, const char *text);
 const char *gtk_entry_get_text (GtkEntry * entry);
 
+unsigned int jbw_array_buttons_get_active (GtkCheckButton * array[],
+                                           unsigned int n);
+
 #else
 
 #define GtkPicture GtkImage
@@ -716,6 +720,10 @@ const char *gtk_entry_get_text (GtkEntry * entry);
 #define gtk_window_destroy(window) (gtk_widget_destroy (GTK_WIDGET(window)))
 #define gtk_window_set_child(window, widget) \
   (gtk_container_add (GTK_CONTAINER(window), widget))
+
+#define G_APPLICATION_DEFAULT_FLAGS G_APPLICATION_FLAGS_NONE
+unsigned int jbw_array_buttons_get_active (GtkRadioButton * array[],
+                                           unsigned int n);
 
 #endif
 
