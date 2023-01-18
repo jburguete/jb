@@ -46,17 +46,19 @@ jbm_index_sort_flash (JBFLOAT * __restrict x,   ///< array of JBFLOAT numbers.
 {
   unsigned int *nj, *nk, *l1, *l2;
   JBFLOAT xi, xmin, xmax;
-  int i, j, m;
+  int i, j, m, m1, n1;
   if (n <= JBM_INDEX_SORT_FLASH_MIN)
     {
       jbm_index_sort_insertion (x, ni, n);
       return;
     }
   m = n / JBM_INDEX_SORT_FLASH_CLASS + 1;
-  nj = (unsigned int *) g_malloc ((n + m + 2) * 2 * sizeof (int));
-  nk = nj + n + 1;
-  l1 = nk + n + 1;
-  l2 = l1 + m + 1;
+  m1 = m + 1;
+  n1 = n + 1;
+  nj = (unsigned int *) g_malloc ((n1 + m1) * 2 * sizeof (unsigned int));
+  nk = nj + n1;
+  l1 = nk + n1;
+  l2 = l1 + m1;
   j = i = n;
   xmax = xmin = x[ni[i]];
   while (--i >= 0)
@@ -74,18 +76,19 @@ jbm_index_sort_flash (JBFLOAT * __restrict x,   ///< array of JBFLOAT numbers.
   l1[i] = 1;
   while (--i >= 0)
     l1[i] = 0;
-  for (i = n + 1; --i > 0;)
+  for (i = n1; --i > 0;)
     {
-      j = FLOOR (m * (x[ni[i]] - xmin) / (xmax - xmin));
+      j = jbm_max (0, jbm_min (m,
+                               FLOOR (m1 * (x[ni[i]] - xmin) / (xmax - xmin))));
       nj[i] = j;
       ++l1[j];
     }
   nj[0] = m;
   for (i = m, l2[i] = l1[i]; --i >= 0;)
     l2[i] = l2[i + 1] + l1[i];
-  for (i = n + 1; --i > 0;)
+  for (i = n1; --i > 0;)
     nk[--l2[nj[i]]] = ni[i];
-  for (i = n + 1; --i > 0;)
+  for (i = n1; --i > 0;)
     ni[i] = nk[i];
   --l2[m];
   i = m;
@@ -119,17 +122,19 @@ jbm_index_sort_flashl (JBDOUBLE * __restrict x, ///< array of JBDOUBLE numbers.
 {
   unsigned int *nj, *nk, *l1, *l2;
   JBDOUBLE xi, xmin, xmax;
-  int i, j, m;
+  int i, j, m, m1, n1;
   if (n <= JBM_INDEX_SORT_FLASH_MIN)
     {
       jbm_index_sort_insertionl (x, ni, n);
       return;
     }
   m = n / JBM_INDEX_SORT_FLASH_CLASS + 1;
-  nj = (unsigned int *) g_malloc ((n + m + 2) * 2 * sizeof (unsigned int));
-  nk = nj + n + 1;
-  l1 = nk + n + 1;
-  l2 = l1 + m + 1;
+  m1 = m + 1;
+  n1 = n + 1;
+  nj = (unsigned int *) g_malloc ((n1 + m1) * 2 * sizeof (unsigned int));
+  nk = nj + n1;
+  l1 = nk + n1;
+  l2 = l1 + m1;
   j = i = n;
   xmax = xmin = x[ni[i]];
   while (--i >= 0)
@@ -147,18 +152,20 @@ jbm_index_sort_flashl (JBDOUBLE * __restrict x, ///< array of JBDOUBLE numbers.
   l1[i] = 1;
   while (--i >= 0)
     l1[i] = 0;
-  for (i = n + 1; --i > 0;)
+  for (i = n1; --i > 0;)
     {
-      j = FLOORL (m * (x[ni[i]] - xmin) / (xmax - xmin));
+      j = jbm_max (0,
+                   jbm_min (m,
+                            FLOORL (m1 * (x[ni[i]] - xmin) / (xmax - xmin))));
       nj[i] = j;
       ++l1[j];
     }
   nj[0] = m;
   for (i = m, l2[i] = l1[i]; --i >= 0;)
     l2[i] = l2[i + 1] + l1[i];
-  for (i = n + 1; --i > 0;)
+  for (i = n1; --i > 0;)
     nk[--l2[nj[i]]] = ni[i];
-  for (i = n + 1; --i > 0;)
+  for (i = n1; --i > 0;)
     ni[i] = nk[i];
   --l2[m];
   i = m;
