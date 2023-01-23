@@ -1885,7 +1885,7 @@ jbw_graphic_delete (JBWGraphic * graphic)       ///< current JBWGraphic widget.
     }
   if (graphic->ft)
     {
-      FT_Done_Library (*graphic->ft);
+      FT_Done_FreeType (*graphic->ft);
       g_free (graphic->ft);
     }
   if (graphic->program_text)

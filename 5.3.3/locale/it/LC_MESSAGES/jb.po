@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: jb 5.3.2\n"
+"Project-Id-Version: jb 5.3.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-16 14:59+0100\n"
 "PO-Revision-Date: 2020-06-14 20:07+0200\n"
