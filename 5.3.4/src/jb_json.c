@@ -45,12 +45,18 @@ jb_json_object_get_float (JsonObject * object,  ///< JSON object struct.
                           int *error)
                           ///< error code (1 on success, 0 on error).
 {
+  JsonNode *node;
   const char *buffer;
   JBDOUBLE x = 0.L;
   *error = 0;
-  buffer = (const char *) json_object_get_string_member (object, prop);
-  if (buffer)
-    *error = sscanf (buffer, FRL, &x);
+  node = json_object_get_member (object, prop);
+  if (json_node_get_node_type (node) == JSON_NODE_VALUE
+      && json_node_get_value_type (node) == G_TYPE_STRING)
+    {
+      buffer = (const char *) json_node_get_string (node);
+      if (buffer)
+        *error = sscanf (buffer, FRL, &x);
+    }
   return x;
 }
 
@@ -138,12 +144,18 @@ jb_json_object_get_int (JsonObject * object,
                         int *error)
                         ///< error code (1 on success, 0 on error).
 {
+  JsonNode *node;
   const char *buffer;
   long int x = 0;
   *error = 0;
-  buffer = (const char *) json_object_get_string_member (object, prop);
-  if (buffer)
-    *error = sscanf (buffer, "%ld", &x);
+  node = json_object_get_member (object, prop);
+  if (json_node_get_node_type (node) == JSON_NODE_VALUE
+      && json_node_get_value_type (node) == G_TYPE_STRING)
+    {
+      buffer = (const char *) json_node_get_string (node);
+      if (buffer)
+        *error = sscanf (buffer, "%ld", &x);
+    }
   return x;
 }
 
@@ -215,12 +227,18 @@ jb_json_object_get_uint (JsonObject * object,
                          int *error)
                          ///< error code (1 on success, 0 on error).
 {
+  JsonNode *node;
   const char *buffer;
   unsigned long int x = 0;
   *error = 0;
-  buffer = (const char *) json_object_get_string_member (object, prop);
-  if (buffer)
-    *error = sscanf (buffer, "%lu", &x);
+  node = json_object_get_member (object, prop);
+  if (json_node_get_node_type (node) == JSON_NODE_VALUE
+      && json_node_get_value_type (node) == G_TYPE_STRING)
+    {
+      buffer = (const char *) json_node_get_string (node);
+      if (buffer)
+        *error = sscanf (buffer, "%lu", &x);
+    }
   return x;
 }
 
@@ -293,15 +311,21 @@ jb_json_object_get_time (JsonObject * object,   ///< JSON object struct.
                          int *error)
                          ///< error code (1 on success, 0 on error).
 {
+  JsonNode *node;
   const char *buffer;
   JBDOUBLE t;
   *error = 0;
-  buffer = (const char *) json_object_get_string_member (object, prop);
-  if (!buffer)
-    return 0.;
-  t = jbm_get_time (buffer, error);
-  if (*error != 1)
-    *error = 0;
+  node = json_object_get_member (object, prop);
+  if (json_node_get_node_type (node) == JSON_NODE_VALUE
+      && json_node_get_value_type (node) == G_TYPE_STRING)
+    {
+      buffer = (const char *) json_node_get_string (node);
+      if (!buffer)
+        return 0.;
+      t = jbm_get_time (buffer, error);
+      if (*error != 1)
+        *error = 0;
+    }
   return t;
 }
 
