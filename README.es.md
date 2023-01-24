@@ -53,8 +53,8 @@ Obligatorio:
   códigos y lenguajes internacionales.
 
 Opcional para detectar las características del procesador:
-* [libgtop](https://github.com/GNOME/libgtop) para obtener las características
-  de la máquina
+* [libgtop](https://github.com/GNOME/libgtop) para obtener el número de
+  procesadores.
 
 Obligatorio si se incluyen las utilidades jb\_xml:
 * [libxml](http://xmlsoft.org) para trabajar con ficheros XML.
@@ -66,7 +66,7 @@ Obligatorio si se incluyen las utilidades jb\_json:
 Obligatorio si se incluyen las utilidades jb\_win y se compila usando el flag
 -DJBW=2.
 * [png](http://libpng.sourceforge.net) para trabajar con ficheros PNG.
-* [gtk3](http://www.gtk.org) para trabajar con ventanas interactivas.
+* [gtk](http://www.gtk.org) para trabajar con ventanas interactivas.
 * [glew](http://glew.sourceforge.net) funciones OpenGL de alto nivel.
 
 Bibliotecas opcionales que pueden usarse como alternativa al widget GtkGLArea de

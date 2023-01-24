@@ -63,7 +63,7 @@ Required if including jb\_json utilites:
 
 Needed if including jb\_win utilities and compiling with -DJBW=2 flag.
 * [png](http://libpng.sourceforge.net) to work with PNG files.
-* [gtk3](http://www.gtk.org) to work with interactive windows.
+* [gtk](http://www.gtk.org) to work with interactive windows.
 * [glew](http://glew.sourceforge.net) high level OpenGL functions.
 
 The following optional libraries can be used as alternative to the GtkGLArea

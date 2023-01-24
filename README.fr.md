@@ -67,7 +67,7 @@ Obligatoire si les outils jb\_json sont inclus:
 Obligatoire si les outils jb\_win sont inclus et on compile en utilisant
 l'option -DJBW=2.
 * [png](http://libpng.sourceforge.net) pour travailler avec fichiers PNG.
-* [gtk3](http://www.gtk.org) pour travailler avec fenêtres interactives.
+* [gtk](http://www.gtk.org) pour travailler avec fenêtres interactives.
 * [glew](http://glew.sourceforge.net) functions OpenGL de haut niveau.
 
 On peut utiliser les bibliothèques graphiques suivantes comme alternative au
