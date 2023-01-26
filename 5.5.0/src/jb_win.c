@@ -32,6 +32,9 @@
  */
 #include "jb_win.h"
 
+void (*jbw_show_error) (const char *message) = NULL;
+void (*jbw_show_warning) (const char *message) = NULL;
+
 /**
  * Function to read a binary file on a buffer.
  *
@@ -83,13 +86,13 @@ jbw_show_message (const char *title, const char *message)
 }
 
 void
-jbw_show_error (const char *message)
+jbw_show_error_terminal (const char *message)
 {
   jbw_show_message (_("Error!"), message);
 }
 
 void
-jbw_show_warning (const char *message)
+jbw_show_warning_terminal (const char *message)
 {
   jbw_show_message (_("Warning!"), message);
 }
@@ -260,9 +263,9 @@ jbw_process_pending ()
  * Function to display a message.
  */
 void
-jbw_show_message (const char *title,    ///< message title.
-                  const char *message,  ///< message.
-                  GtkMessageType type)  ///< message type.
+jbw_show_message_gtk (const char *title,        ///< message title.
+                      const char *message,      ///< message.
+                      GtkMessageType type)      ///< message type.
 {
   GtkMessageDialog *dlg;
   GMainLoop *loop;
@@ -289,18 +292,18 @@ jbw_show_message (const char *title,    ///< message title.
  * Function to display an error message.
  */
 void
-jbw_show_error (const char *message)    ///< error message.
+jbw_show_error_gtk (const char *message)        ///< error message.
 {
-  jbw_show_message (_("Error!"), message, GTK_MESSAGE_ERROR);
+  jbw_show_message_gtk (_("Error!"), message, GTK_MESSAGE_ERROR);
 }
 
 /**
  * Function to display a warning message.
  */
 void
-jbw_show_warning (const char *message)  ///< warning message.
+jbw_show_warning_gtk (const char *message)      ///< warning message.
 {
-  jbw_show_message (_("Warning!"), message, GTK_MESSAGE_WARNING);
+  jbw_show_message_gtk (_("Warning!"), message, GTK_MESSAGE_WARNING);
 }
 
 /**

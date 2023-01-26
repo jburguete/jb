@@ -108,6 +108,8 @@ JBChange (void **__restrict a,  ///< a pointer to interchange.
 #define jb_change(a, b) (JBChange((void**)&a, (void**)&b))
 ///< Macro to interchange two pointers.
 
+void jb_set_locales (const char *program_name, const char *locale_dir,
+                     const char *locale_all, const char *locale_numeric);
 void jb_init (void);
 void jb_function_null (void);
 void jb_free_null (void **);

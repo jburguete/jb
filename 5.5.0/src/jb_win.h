@@ -36,14 +36,20 @@
 
 #include "jb_math.h"
 
+extern void (*jbw_show_error) (const char *message);
+extern void (*jbw_show_warning) (const char *message);
+
 char *jbw_read_file (const char *name, long int *size);
-void jbw_show_error (const char *message);
 void jbw_show_error2 (const char *message1, const char *message2);
 void jbw_show_error3 (const char *message1, const char *message2,
                       const char *message3);
-void jbw_show_warning (const char *message);
 
-#if JBW == JBW_GTK
+#if JBW == JBW_NO
+
+void jbw_show_error_terminal (const char *message);
+void jbw_show_warning_terminal (const char *message);
+
+#elif JBW == JBW_GTK
 
 #include <png.h>
 #include <ft2build.h>
@@ -67,7 +73,6 @@ void jbw_show_warning (const char *message);
 #endif
 #include <GLFW/glfw3.h>
 #endif
-
 /**
  * \def JBW_GRAPHIC_N_TYPES
  * \brief number of graphical file formats.
@@ -81,12 +86,10 @@ void jbw_show_warning (const char *message);
 #define JBW_GRAPHIC_N_TYPES 1
 #define JBW_GRAPHIC_N_PATTERNS 2
 #endif
-
 #define JBW_WINDOW_WIDTH 100
 ///< macro to define the default JBWGraphics window width.
 #define JBW_WINDOW_HEIGHT 100
 ///< macro to define the default JBWGraphics window height.
-
 ///> enum to define the data types of a JBWArrayEditor column.
 enum JBWEditorWidgetType
 {
@@ -175,7 +178,8 @@ enum
  */
 typedef struct
 {
-  VkSurfaceCapabilitiesKHR capabilities;        ///< Vulkan surface capabilities.
+  VkSurfaceCapabilitiesKHR capabilities;
+  ///< Vulkan surface capabilities.
   VkSurfaceFormatKHR *formats;  ///< Vulkan surface formats array.
   VkPresentModeKHR *present_modes;      ///< Vulkan present modes.
 } JBWVKSwapChainSupportDetails;
@@ -194,7 +198,8 @@ typedef struct
   ///< graphics window struct pointer.
   VkInstance instance;          ///< Vulkan instance.
   VkSurfaceKHR surface;         ///< Vulkan surface.
-  VkPhysicalDevice physical_device;     ///< Vulkan graphics card handle.
+  VkPhysicalDevice physical_device;
+  ///< Vulkan graphics card handle.
   VkDevice device;              ///< Vulkan logical device.
   VkQueue graphics_queue;       ///< Vulkan graphics queue.
   VkQueue present_queue;        ///< Vulkan present queue.
@@ -207,10 +212,12 @@ typedef struct
   VkRenderPass render_pass;     ///< Vulkan render pass.
   VkDescriptorSetLayout descriptor_set_layout;
   ///< Vulkan descriptor set layout.
-  VkShaderModule vert_2D_shader_module; ///< 2D vertex Vulkan shader module.
+  VkShaderModule vert_2D_shader_module;
+  ///< 2D vertex Vulkan shader module.
   VkShaderModule vert_2Dc_shader_module;
   ///< 2D with color vertex Vulkan shader module.
-  VkShaderModule vert_3D_shader_module; ///< 3D vertex Vulkan shader module.
+  VkShaderModule vert_3D_shader_module;
+  ///< 3D vertex Vulkan shader module.
   VkShaderModule vert_3Dc_shader_module;
   ///< 3D with color vertex Vulkan shader module.
   VkShaderModule frag_color_shader_module;
@@ -259,7 +266,8 @@ struct _JBWGraphic
   JBDOUBLE xtic[JBW_GRAPHIC_N_TICS];    ///< x-axis tics.
   JBDOUBLE ytic[JBW_GRAPHIC_N_TICS];    ///< y-axis tics.
   JBDOUBLE ztic[JBW_GRAPHIC_N_TICS];    ///< z-axis tics.
-  void (*draw) (JBWGraphic * graphic);  ///< pointer to the draw function.
+  void (*draw) (JBWGraphic * graphic);
+  ///< pointer to the draw function.
   int (*calculate) (JBWGraphic * graphic);
   ///< pointer to a calculate function.
   JBWImage *logo;               ///< logo.
@@ -341,8 +349,10 @@ struct _JBWGraphic
 typedef struct
 {
   GtkScrolledWindow *scrolled;  ///< GtkScrolledWindow widget.
-  GtkButton **button_numeric;   ///< array of row numeric GtkButton widgets.
-  GtkButton **button_title;     ///< array of column title GtkButton widgets.
+  GtkButton **button_numeric;
+  ///< array of row numeric GtkButton widgets.
+  GtkButton **button_title;
+  ///< array of column title GtkButton widgets.
   GtkWidget ***matrix_entry;    ///< matrix of GtkWidget widgets.
   GtkGrid *grid;                ///< GtkGrid widget.
   int *type;                    ///< array of widget types.
@@ -407,9 +417,10 @@ extern unsigned int jbw_graphic_loop_exit;
 int jbw_init (int *argn, char ***argc);
 void jbw_process_pending ();
 
-void jbw_show_message (const char *title, const char *message,
-                       GtkMessageType type);
-
+void jbw_show_message_gtk (const char *title, const char *message,
+                           GtkMessageType type);
+void jbw_show_error_gtk (const char *message);
+void jbw_show_warning_gtk (const char *message);
 void jbw_combo_box_set_strings (GtkComboBoxText * combo, char **strings, int n);
 GtkComboBoxText *jbw_combo_box_new_with_strings (char **strings, int n);
 
@@ -456,32 +467,30 @@ void jbw_graphic_draw_resize (JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2,
                               JBFLOAT * z1, JBFLOAT * z2, int n);
 void jbw_graphic_draw_resizel (JBDOUBLE * x, JBDOUBLE * y1, JBDOUBLE * y2,
                                JBDOUBLE * z1, JBDOUBLE * z2, int n);
-void jbw_graphic_draw_resizev (void *x, void *y1, void *y2, void *z1, void *z2,
-                               unsigned int size, int n);
-void jbw_graphic_draw_resizevl (void *x, void *y1, void *y2, void *z1, void *z2,
-                                unsigned int size, int n);
+void jbw_graphic_draw_resizev (void *x, void *y1, void *y2, void *z1,
+                               void *z2, unsigned int size, int n);
+void jbw_graphic_draw_resizevl (void *x, void *y1, void *y2, void *z1,
+                                void *z2, unsigned int size, int n);
 void jbw_graphic_draw_rectangles_color (GLfloat * vertex, GLushort * index,
                                         unsigned int n);
-void jbw_graphic_draw_farray (JBFLOAT * x, JBFLOAT * y,
-                              unsigned int n, const GLfloat * color,
-                              GLenum type);
+void jbw_graphic_draw_farray (JBFLOAT * x, JBFLOAT * y, unsigned int n,
+                              const GLfloat * color, GLenum type);
 void jbw_graphic_draw_darray (JBDOUBLE * x, JBDOUBLE * y, unsigned int n,
                               const GLfloat * color, GLenum type);
-void jbw_graphic_draw_rectangle (JBFLOAT x1, JBFLOAT y1, JBFLOAT x2, JBFLOAT y2,
-                                 const GLfloat * color);
-void jbw_graphic_draw_rectanglel (JBDOUBLE x1, JBDOUBLE y1,
-                                  JBDOUBLE x2, JBDOUBLE y2,
-                                  const GLfloat * color);
+void jbw_graphic_draw_rectangle (JBFLOAT x1, JBFLOAT y1, JBFLOAT x2,
+                                 JBFLOAT y2, const GLfloat * color);
+void jbw_graphic_draw_rectanglel (JBDOUBLE x1, JBDOUBLE y1, JBDOUBLE x2,
+                                  JBDOUBLE y2, const GLfloat * color);
 void jbw_graphic_draw_labels (void);
 void jbw_graphic_draw_logo (void);
 void jbw_graphic_draw_lines (JBFLOAT * x, JBFLOAT * y1, JBFLOAT * y2,
                              JBFLOAT * z1, JBFLOAT * z2, int n);
 void jbw_graphic_draw_linesl (JBDOUBLE * x, JBDOUBLE * y1, JBDOUBLE * y2,
                               JBDOUBLE * z1, JBDOUBLE * z2, int n);
-void jbw_graphic_draw_linesv (void *x, void *y1, void *y2, void *z1, void *z2,
-                              unsigned int size, int n);
-void jbw_graphic_draw_linesvl (void *x, void *y1, void *y2, void *z1, void *z2,
-                               unsigned int size, int n);
+void jbw_graphic_draw_linesv (void *x, void *y1, void *y2, void *z1,
+                              void *z2, unsigned int size, int n);
+void jbw_graphic_draw_linesvl (void *x, void *y1, void *y2, void *z1,
+                               void *z2, unsigned int size, int n);
 void jbw_graphic_save (char *file_name);
 void jbw_graphic_dialog_save (void);
 
@@ -493,16 +502,16 @@ char *jbw_array_editor_get_element (JBWArrayEditor * editor, int row,
                                     int column);
 void jbw_array_editor_set_element_int (JBWArrayEditor * editor, int row,
                                        int column, long int x);
-long int jbw_array_editor_get_element_int (JBWArrayEditor * editor, int row,
-                                           int column);
+long int jbw_array_editor_get_element_int (JBWArrayEditor * editor,
+                                           int row, int column);
 void jbw_array_editor_set_element_float (JBWArrayEditor * editor, int row,
                                          int column, JBDOUBLE x);
-JBDOUBLE jbw_array_editor_get_element_float (JBWArrayEditor * editor, int row,
-                                             int column);
+JBDOUBLE jbw_array_editor_get_element_float (JBWArrayEditor * editor,
+                                             int row, int column);
 void jbw_array_editor_set_element_time (JBWArrayEditor * editor, int row,
                                         int column, JBDOUBLE t);
-JBDOUBLE jbw_array_editor_get_element_time (JBWArrayEditor * editor, int row,
-                                            int column);
+JBDOUBLE jbw_array_editor_get_element_time (JBWArrayEditor * editor,
+                                            int row, int column);
 void jbw_array_editor_set_column (JBWArrayEditor * editor, int column,
                                   char **c);
 void jbw_array_editor_get_column (JBWArrayEditor * editor, int column,
@@ -511,14 +520,14 @@ void jbw_array_editor_set_column_int (JBWArrayEditor * editor, int column,
                                       long int *x);
 void jbw_array_editor_get_column_int (JBWArrayEditor * editor, int column,
                                       long int *x);
-void jbw_array_editor_set_column_float (JBWArrayEditor * editor, int column,
-                                        JBFLOAT * x);
-void jbw_array_editor_set_column_floatl (JBWArrayEditor * editor, int column,
-                                         JBDOUBLE * x);
-void jbw_array_editor_get_column_float (JBWArrayEditor * editor, int column,
-                                        JBFLOAT * x);
-void jbw_array_editor_get_column_floatl (JBWArrayEditor * editor, int column,
-                                         JBDOUBLE * x);
+void jbw_array_editor_set_column_float (JBWArrayEditor * editor,
+                                        int column, JBFLOAT * x);
+void jbw_array_editor_set_column_floatl (JBWArrayEditor * editor,
+                                         int column, JBDOUBLE * x);
+void jbw_array_editor_get_column_float (JBWArrayEditor * editor,
+                                        int column, JBFLOAT * x);
+void jbw_array_editor_get_column_floatl (JBWArrayEditor * editor,
+                                         int column, JBDOUBLE * x);
 void jbw_array_editor_set_column_time (JBWArrayEditor * editor, int column,
                                        JBDOUBLE * t);
 void jbw_array_editor_get_column_time (JBWArrayEditor * editor, int column,

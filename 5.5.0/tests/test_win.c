@@ -180,7 +180,7 @@ main (int argn, char **argc)
     version = "OpenGL supported version 1.3";
   else
     version = "OpenGL unsupported";
-  jbw_show_message ("Info", version, GTK_MESSAGE_INFO);
+  jbw_show_message_gtk ("Info", version, GTK_MESSAGE_INFO);
   printf ("OpenGL version %s\n", glGetString (GL_VERSION));
   printf ("GLSL version %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
   if (!graphic->init)

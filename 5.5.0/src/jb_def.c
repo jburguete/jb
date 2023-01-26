@@ -34,21 +34,33 @@
 #include "jb_def.h"
 
 /**
+ * Function to set locales.
+ */
+void
+jb_set_locales (const char *program_name,       ///< program name.
+                const char *locale_dir, ///< locale directory.
+                const char *locale_all, ///< all locales set.
+                const char *locale_numeric)     ///< numeric locale set.
+{
+  char *buffer, *buffer2;
+  setlocale (LC_ALL, locale_all);
+  setlocale (LC_NUMERIC, locale_numeric);
+  buffer2 = g_get_current_dir ();
+  buffer = g_build_filename (buffer2, locale_dir, NULL);
+  g_free (buffer2);
+  bindtextdomain (program_name, buffer);
+  g_free (buffer);
+  bind_textdomain_codeset (program_name, "UTF-8");
+  textdomain (program_name);
+}
+
+/**
  * Function to init locales in the JB library.
  */
 void
 jb_init (void)
 {
-  char *buffer, *buffer2;
-  setlocale (LC_ALL, "");
-  setlocale (LC_NUMERIC, "C");
-  buffer2 = g_get_current_dir ();
-  buffer = g_build_filename (buffer2, JB_LOCALE, NULL);
-  g_free (buffer2);
-  bindtextdomain ("jb", buffer);
-  g_free (buffer);
-  bind_textdomain_codeset ("jb", "UTF-8");
-  textdomain ("jb");
+  jb_set_locales ("jb", JB_LOCALE, "", "C");
 }
 
 /**
