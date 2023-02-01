@@ -43,14 +43,24 @@ jb_set_locales (const char *program_name,       ///< program name.
                 const char *locale_numeric)     ///< numeric locale set.
 {
   char *buffer, *buffer2;
+
+  // Setting locale
   setlocale (LC_ALL, locale_all);
+
+  // Setting numerical locale
   setlocale (LC_NUMERIC, locale_numeric);
+
+  // Setting the program name and locale directory to find locale files
   buffer2 = g_get_current_dir ();
   buffer = g_build_filename (buffer2, locale_dir, NULL);
   g_free (buffer2);
   bindtextdomain (program_name, buffer);
   g_free (buffer);
+
+  // Setting the format of the codeset files (UTF-8)
   bind_textdomain_codeset (program_name, "UTF-8");
+
+  // Loading the locale strings
   textdomain (program_name);
 }
 
