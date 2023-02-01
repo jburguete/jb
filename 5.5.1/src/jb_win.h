@@ -49,6 +49,13 @@ void jbw_show_error3 (const char *message1, const char *message2,
 void jbw_show_error_terminal (const char *message);
 void jbw_show_warning_terminal (const char *message);
 
+static inline void
+jbw_show_init (void)
+{
+  jbw_show_error = jbw_show_error_terminal;
+  jbw_show_warning = jbw_show_warning_terminal;
+}
+
 #elif JBW == JBW_GTK
 
 #include <png.h>
@@ -544,6 +551,17 @@ void jbw_array_editor_set_title (JBWArrayEditor * editor, int column,
 void jbw_array_editor_destroy (JBWArrayEditor * editor);
 JBWArrayEditor *jbw_array_editor_new (int ncolumns, int nfull, int nrows,
                                       const int *types, const char **label);
+
+/**
+ * Function to init the show error and warning functions.
+ */
+static inline void
+jbw_show_init (void)
+{
+  jbw_show_error = jbw_show_error_gtk;
+  jbw_show_warning = jbw_show_warning_gtk;
+}
+
 /**
  * Function to set the resize property of a JBWGraphic widget.
  */
@@ -730,7 +748,10 @@ unsigned int jbw_array_buttons_get_active (GtkCheckButton * array[],
 #define gtk_window_set_child(window, widget) \
   (gtk_container_add (GTK_CONTAINER(window), widget))
 
+#if GLIB_MAJOR_VERSION <= 2 && GLIB_MINOR_VERSION < 74
 #define G_APPLICATION_DEFAULT_FLAGS G_APPLICATION_FLAGS_NONE
+#endif
+
 unsigned int jbw_array_buttons_get_active (GtkRadioButton * array[],
                                            unsigned int n);
 
