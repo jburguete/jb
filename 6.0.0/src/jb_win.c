@@ -216,10 +216,10 @@ unsigned int jbw_graphic_loop_exit;
  * \return 1 on success, 0 on error.
  */
 int
-jbw_init (int *argn __attribute__((unused)),
-          ///< pointer to the number of command line arguments.
-          char ***argc __attribute__((unused)))
-  ///< pointer to the command line arguments.
+jbw_init_gtk (int *argn __attribute__((unused)),
+              ///< pointer to the number of command line arguments.
+              char ***argc __attribute__((unused)))
+              ///< pointer to the command line arguments.
 {
   jb_init ();
 #if HAVE_FREEGLUT

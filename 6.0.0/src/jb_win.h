@@ -49,11 +49,15 @@ void jbw_show_error3 (const char *message1, const char *message2,
 void jbw_show_error_terminal (const char *message);
 void jbw_show_warning_terminal (const char *message);
 
-static inline void
-jbw_show_init (void)
+static inline int
+jbw_init (int *argn __attribute__((unused)),
+          ///< pointer to the number of command line arguments.
+          char ***argc __attribute__((unused)))
+          ///< pointer to the command line arguments.
 {
   jbw_show_error = jbw_show_error_terminal;
   jbw_show_warning = jbw_show_warning_terminal;
+  return 0;
 }
 
 #elif JBW == JBW_GTK
@@ -421,7 +425,7 @@ extern void (*jbw_graphic_loop_render) (void);
 extern unsigned int jbw_graphic_loop_exit;
 #endif
 
-int jbw_init (int *argn, char ***argc);
+int jbw_init_gtk (int *argn, char ***argc);
 void jbw_process_pending ();
 
 void jbw_show_message_gtk (const char *title, const char *message,
@@ -555,11 +559,15 @@ JBWArrayEditor *jbw_array_editor_new (int ncolumns, int nfull, int nrows,
 /**
  * Function to init the show error and warning functions.
  */
-static inline void
-jbw_show_init (void)
+static inline int
+jbw_init (int *argn __attribute__((unused)),
+          ///< pointer to the number of command line arguments.
+          char ***argc __attribute__((unused)))
+          ///< pointer to the command line arguments.
 {
   jbw_show_error = jbw_show_error_gtk;
   jbw_show_warning = jbw_show_warning_gtk;
+  return jbw_init_gtk (argn, argc);
 }
 
 /**
