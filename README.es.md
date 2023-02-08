@@ -1,4 +1,4 @@
-JB (versión 6.0.0)
+JB (versión 6.0.1)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -96,7 +96,7 @@ operativos:
 * FreeBSD 13.1
 * Gentoo Linux
 * Linux Mint DE 5
-* MacOS Catalina + Homebrew
+* MacOS Big Sur + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
 * NetBSD 9.3
@@ -129,11 +129,11 @@ _____________________________
 
 2. Si sólo se requiere para aplicaciones de terminal compile los códigos fuente
    con el script:
-> $ cd 6.0.0
+> $ cd 6.0.1
 > $ ./build\_wihtout_\gui.sh
 
 2. O si se quiere interfaz gráfica compile los códigos fuente con el script:
-> $ cd 6.0.0
+> $ cd 6.0.1
 > $ ./build.sh
 
 ENLAZANDO LA BIBLIOTECA EN OTROS PROGRAMAS
@@ -142,7 +142,7 @@ ENLAZANDO LA BIBLIOTECA EN OTROS PROGRAMAS
 1. Enlácese la última versión en una carpeta jb p.ej.:
 > $ cd CARPETA\_DE\_SU\_PROGRAMA
 >
-> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/6.0.0 jb
+> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/6.0.1 jb
 
 2. Incluya el fichero de configuración y las utilidades requeridas en su código
    fuente p.ej.:

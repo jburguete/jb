@@ -33,7 +33,9 @@
 #include "jb_win.h"
 
 void (*jbw_show_error) (const char *message) = NULL;
+///< Pointer to the function to show error messages.
 void (*jbw_show_warning) (const char *message) = NULL;
+///< Pointer to the function to show warning messages.
 
 /**
  * Function to read a binary file on a buffer.

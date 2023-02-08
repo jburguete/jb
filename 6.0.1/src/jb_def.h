@@ -63,6 +63,7 @@
 
 // Simplifying gettext
 #define _(str) gettext(str)
+///< Macro to simplify gettext usage
 
 // Detecting configuration errors
 #if (JBW < JBW_NO || JBW > JBW_GTK)
@@ -98,10 +99,10 @@ extern FILE *stderr;
  * Function to interchange two pointers.
  */
 static inline void
-JBChange (void **__restrict a,  ///< a pointer to interchange.
-          void **__restrict b)  ///< a pointer to interchange.
+JBChange (void **restrict a,  ///< a pointer to interchange.
+          void **restrict b)  ///< a pointer to interchange.
 {
-  void *__restrict c;
+  void *restrict c;
   JB_CHANGE (*a, *b, c);
 }
 

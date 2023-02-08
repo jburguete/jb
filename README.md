@@ -1,4 +1,4 @@
-JB (6.0.0 version)
+JB (6.0.1 version)
 ==================
 
 :uk:[english](README.md) :es:[español](README.es.md)
@@ -92,7 +92,7 @@ This software has been built and tested in the following operative systems:
 * FreeBSD 13.1
 * Gentoo Linux
 * Linux Mint DE 5
-* MacOS Catalina + Homebrew
+* MacOS Big Sur + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10
 * NetBSD 9.3
@@ -125,11 +125,11 @@ _____________________
 > $ git clone https://github.com/jburguete/jb
 
 2. If only terminal applications are required compile the source codes with:
-> $ cd 6.0.0
+> $ cd 6.0.1
 > $ ./build\_wihtout_\gui.sh
 
 2. Or, if graphic interfaces are required, compile the source codes with:
-> $ cd 6.0.0
+> $ cd 6.0.1
 > $ ./build.sh
 
 LINKING THIS LIBRARY ON OTHER PROGRAMS
@@ -138,7 +138,7 @@ LINKING THIS LIBRARY ON OTHER PROGRAMS
 1. Link the latest version on a jb directory, i.e.:
 > $ cd YOUR\_PROGRAM\_PATH
 >
-> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/6.0.0 jb
+> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/6.0.1 jb
 
 2. Include the config and the used utility headers on your source code i.e.:
 > \#include "jb/src/jb\_config.h"

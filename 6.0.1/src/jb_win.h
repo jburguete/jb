@@ -101,6 +101,7 @@ jbw_init (int *argn __attribute__((unused)),
 ///< macro to define the default JBWGraphics window width.
 #define JBW_WINDOW_HEIGHT 100
 ///< macro to define the default JBWGraphics window height.
+
 ///> enum to define the data types of a JBWArrayEditor column.
 enum JBWEditorWidgetType
 {
@@ -111,10 +112,11 @@ enum JBWEditorWidgetType
 };
 
 #if JBM_HIGH_PRECISION > 2
-typedef GtkEntry JBWFloatEntry; ///< widget to work with float number.
+typedef GtkEntry JBWFloatEntry;
 #else
 typedef GtkSpinButton JBWFloatEntry;
 #endif
+///< widget to work with float number.
 
 typedef struct
 {
@@ -376,11 +378,13 @@ typedef struct
   data) \
       g_signal_connect_data((instance), (detailed_signal), (c_handler), \
       (data), 0, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
+///< macro to do after and swapped GSignal connections.
 
 #if JBM_HIGH_PRECISION > 2
 #define jbw_float_entry_new (JBWFloatEntry*)gtk_entry_new
 #else
 #define jbw_float_entry_new (JBWFloatEntry*)gtk_spin_button_new
+///< macro to unify float point numbers entry widgets.
 #endif
 
 extern GtkWindow *window_parent;
@@ -442,7 +446,9 @@ void jbw_float_entry_set_value (JBWFloatEntry * entry, JBDOUBLE value);
 JBDOUBLE jbw_float_entry_get_value (JBWFloatEntry * entry);
 #else
 #define jbw_float_entry_set_value gtk_spin_button_set_value
+///< macro to unify the set value function of float point numbers entry widgets.
 #define jbw_float_entry_get_value gtk_spin_button_get_value
+///< macro to unify the get value function of float point numbers entry widgets.
 #endif
 
 void jbw_draw_clear (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
