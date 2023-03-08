@@ -263,7 +263,7 @@ if test $gtk = 1; then
 		if test $win32 = 1; then
 			dir="/mingw32"
 		else
-			dir="/mingw64"
+			dir="/ucrt64"
 		fi
 	elif test $haiku = 1; then
 		dir="/"
