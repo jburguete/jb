@@ -32,53 +32,6 @@
  */
 #include "jb_win.h"
 
-void (*jbw_show_error) (const char *message) = NULL;
-///< Pointer to the function to show error messages.
-void (*jbw_show_warning) (const char *message) = NULL;
-///< Pointer to the function to show warning messages.
-
-/**
- * Function to read a binary file on a buffer.
- *
- * \return buffer pointer (it has to be freed with free()) on success, NULL
- * pointer on error.
- */
-char *
-jbw_read_file (const char *name,        ///< file name string.
-               long int *size)  ///< file size.
-{
-  FILE *file;
-  char *buffer;
-  const char *error_msg;
-  file = fopen (name, "rb");
-  if (!file)
-    {
-      error_msg = _("unable to open the file");
-      goto exit_on_error;
-    }
-  fseek (file, 0l, SEEK_END);
-  *size = ftell (file);
-  buffer = (char *) malloc (*size);
-  if (!buffer)
-    {
-      error_msg = _("not enough memory to open the file");
-      goto exit_on_error;
-    }
-  rewind (file);
-  if (!fread (buffer, *size, 1, file))
-    {
-      error_msg = _("unable to read the file");
-      free (buffer);
-      goto exit_on_error;
-    }
-  fclose (file);
-  return buffer;
-
-exit_on_error:
-  jbw_show_error (error_msg);
-  return NULL;
-}
-
 #if JBW == JBW_NO
 
 static void
@@ -590,7 +543,7 @@ jbw_draw_orthogonal_matrixl (GLint uniform_matrix,
 static void
 jbw_image_error (const char *msg)
 {
-  jbw_show_error2 ("JBWImage", msg);
+  jb_show_error2 ("JBWImage", msg);
 }
 
 /**
@@ -778,7 +731,7 @@ jbw_image_init (JBWImage * image,       ///< JBWImage widget.
 end:
   if (error_msg)
     {
-      jbw_show_error2 ("JBWImage", error_msg);
+      jb_show_error2 ("JBWImage", error_msg);
       exit (0);
     }
 }
@@ -2367,7 +2320,7 @@ end:
       goto init;
     }
 end2:
-  jbw_show_error2 ("JBWGraphic", error_msg);
+  jb_show_error2 ("JBWGraphic", error_msg);
   return;
 }
 
@@ -2679,7 +2632,7 @@ error2:
 #endif
   jbw_graphic_destroy ();
 error1:
-  jbw_show_error (error_msg);
+  jb_show_error (error_msg);
   return NULL;
 }
 
@@ -3835,7 +3788,7 @@ jbw_array_editor_check_column (JBWArrayEditor * editor,
         default:
           error_msg = _("no a date editor type");
         }
-      jbw_show_error (error_msg);
+      jb_show_error (error_msg);
       exit (0);
     }
 }
@@ -4517,7 +4470,7 @@ jbw_array_editor_new (int ncolumns,     ///< number of columns.
   return editor;
 
 error1:
-  jbw_show_error (error_msg);
+  jb_show_error (error_msg);
   return NULL;
 }
 
@@ -4549,30 +4502,5 @@ gtk_entry_get_text (GtkEntry * entry)   ///< GtkEntry struct.
 }
 
 #endif
-
-/**
- * Function to display two error messages.
- */
-void
-jbw_show_error2 (const char *message1,  ///< 1st error message.
-                 const char *message2)  ///< 2nd error message.
-{
-  char buffer[1024];
-  snprintf (buffer, 1024, "%s:\n%s", message1, message2);
-  jbw_show_error (buffer);
-}
-
-/**
- * Function to display three error messages.
- */
-void
-jbw_show_error3 (const char *message1,  ///< 1st error message.
-                 const char *message2,  ///< 2nd error message.
-                 const char *message3)  ///< 3rd error message.
-{
-  char buffer[1024];
-  snprintf (buffer, 1024, "%s: %s\n%s", message1, message2, message3);
-  jbw_show_error (buffer);
-}
 
 #endif

@@ -109,6 +109,9 @@ JBChange (void **restrict a,  ///< a pointer to interchange.
 #define jb_change(a, b) (JBChange((void**)&a, (void**)&b))
 ///< Macro to interchange two pointers.
 
+extern void (*jb_show_error) (const char *message);
+extern void (*jb_show_warning) (const char *message);
+
 void jb_set_locales (const char *program_name, const char *locale_dir,
                      const char *locale_all, const char *locale_numeric);
 void jb_init (void);
@@ -121,6 +124,11 @@ void jb_slist_free (GSList ** list);
 int jb_bin_read (FILE * file, char *buffer);
 void jb_bin_write (FILE * file, char *buffer);
 int jb_get_ncores (void);
+char *jb_read_file (const char *name, long int *size);
+void jb_show_error2 (const char *message1, const char *message2);
+void jb_show_error3 (const char *message1, const char *message2,
+                     const char *message3);
+
 
 /**
  * Function to code a date in struct tm format to a double number.

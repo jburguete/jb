@@ -33,6 +33,11 @@
  */
 #include "jb_def.h"
 
+void (*jb_show_error) (const char *message) = NULL;
+///< Pointer to the function to show error messages.
+void (*jb_show_warning) (const char *message) = NULL;
+///< Pointer to the function to show warning messages.
+
 /**
  * Function to set locales.
  */
@@ -231,4 +236,71 @@ jb_get_ncores (void)
      }
 
    */
+}
+
+/**
+ * Function to display two error messages.
+ */
+void
+jb_show_error2 (const char *message1,   ///< 1st error message.
+                const char *message2)   ///< 2nd error message.
+{
+  char buffer[1024];
+  snprintf (buffer, 1024, "%s:\n%s", message1, message2);
+  jb_show_error (buffer);
+}
+
+/**
+ * Function to display three error messages.
+ */
+void
+jb_show_error3 (const char *message1,   ///< 1st error message.
+                const char *message2,   ///< 2nd error message.
+                const char *message3)   ///< 3rd error message.
+{
+  char buffer[1024];
+  snprintf (buffer, 1024, "%s: %s\n%s", message1, message2, message3);
+  jb_show_error (buffer);
+}
+
+/**
+ * Function to read a binary file on a buffer.
+ *
+ * \return buffer pointer (it has to be freed with free()) on success, NULL
+ * pointer on error.
+ */
+char *
+jb_read_file (const char *name,        ///< file name string.
+               long int *size)  ///< file size.
+{
+  FILE *file;
+  char *buffer;
+  const char *error_msg;
+  file = fopen (name, "rb");
+  if (!file)
+    {
+      error_msg = _("unable to open the file");
+      goto exit_on_error;
+    }
+  fseek (file, 0l, SEEK_END);
+  *size = ftell (file);
+  buffer = (char *) malloc (*size);
+  if (!buffer)
+    {
+      error_msg = _("not enough memory to open the file");
+      goto exit_on_error;
+    }
+  rewind (file);
+  if (!fread (buffer, *size, 1, file))
+    {
+      error_msg = _("unable to read the file");
+      free (buffer);
+      goto exit_on_error;
+    }
+  fclose (file);
+  return buffer;
+
+exit_on_error:
+  jb_show_error (error_msg);
+  return NULL;
 }

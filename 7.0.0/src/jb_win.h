@@ -36,14 +36,6 @@
 
 #include "jb_math.h"
 
-extern void (*jbw_show_error) (const char *message);
-extern void (*jbw_show_warning) (const char *message);
-
-char *jbw_read_file (const char *name, long int *size);
-void jbw_show_error2 (const char *message1, const char *message2);
-void jbw_show_error3 (const char *message1, const char *message2,
-                      const char *message3);
-
 #if JBW == JBW_NO
 
 void jbw_show_error_terminal (const char *message);
@@ -55,8 +47,8 @@ jbw_init (int *argn __attribute__((unused)),
           char ***argc __attribute__((unused)))
           ///< pointer to the command line arguments.
 {
-  jbw_show_error = jbw_show_error_terminal;
-  jbw_show_warning = jbw_show_warning_terminal;
+  jb_show_error = jbw_show_error_terminal;
+  jb_show_warning = jbw_show_warning_terminal;
   return 0;
 }
 
@@ -571,8 +563,8 @@ jbw_init (int *argn __attribute__((unused)),
           char ***argc __attribute__((unused)))
           ///< pointer to the command line arguments.
 {
-  jbw_show_error = jbw_show_error_gtk;
-  jbw_show_warning = jbw_show_warning_gtk;
+  jb_show_error = jbw_show_error_gtk;
+  jb_show_warning = jbw_show_warning_gtk;
   return jbw_init_gtk (argn, argc);
 }
 
