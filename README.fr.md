@@ -93,16 +93,16 @@ d'exploitation:
 * Arch Linux
 * Debian Linux 11
 * Devuan Linux 4
-* Dragonfly BSD 6.4
-* Fedora Linux 37
-* FreeBSD 13.1
+* Dragonfly BSD 6.4.0
+* Fedora Linux 38
+* FreeBSD 13.2
 * Gentoo Linux
 * Linux Mint DE 5
 * MacOS Big Sur + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
 * NetBSD 9.3
-* OpenBSD 7.2
+* OpenBSD 7.3
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.4
 * Ubuntu Linux 22.10
@@ -121,7 +121,7 @@ Pour faire le changement permanent on peut ajouter à la dernière ligne du
 fichier ".profile" dans le répertoire racine du utilisateur:
 > PATH="/usr/pkg/gcc12/bin:$PATH"
 
-Avec OpenBSD 7.2 on doit faire avant dans le terminal:
+Avec OpenBSD 7.3 on doit faire avant dans le terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 INSTRUCTIONS DE CONSTRUCTION
