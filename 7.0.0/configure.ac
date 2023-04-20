@@ -62,12 +62,14 @@ if test $mac = 0; then
 	AC_SUBST(BINPGO, [binpgo/])
 	AC_SUBST(TEST_DATA_FILE, [../test_data])
 	AC_SUBST(LOGO_FILE, [../test.png])
+	AC_SUBST(STRIP, [strip])
 else
 	AC_SUBST(RPATH, [-rpath,])
 	AC_SUBST(BIN, [./])
 	AC_SUBST(BINPGO, [./])
 	AC_SUBST(TEST_DATA_FILE, [./test_data])
 	AC_SUBST(LOGO_FILE, [./test.png])
+	AC_SUBST(STRIP, ["strip -x"])
 fi
 
 # Checks for programs
@@ -210,10 +212,10 @@ if test $gtk = 1; then
 	fi
 	AC_SUBST(EXEBIN,
 		"\$(exebin) \$(exe) \$(testsbin) \$(tests) \$(shaders)")
-	AC_SUBST(STRIP, "\$(exebin) \$(exe) \$(testsbin) \$(tests)")
+	AC_SUBST(STRIP_FILES, "\$(exebin) \$(exe) \$(testsbin) \$(tests)")
 else
 	AC_SUBST(EXEBIN, "\$(exebin) \$(testsbin)")
-	AC_SUBST(STRIP, "\$(exebin) \$(testsbin)")
+	AC_SUBST(STRIP_FILES, "\$(exebin) \$(testsbin)")
 fi
 
 # Checks for GtkGLArea, FreeGLUT, GLFW or SDL to draw the graphic window
