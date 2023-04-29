@@ -228,7 +228,7 @@ jbw_show_message_gtk (const char *title,        ///< message title.
     (window_parent, GTK_DIALOG_MODAL, type, GTK_BUTTONS_OK, "%s", message);
   gtk_window_set_title (GTK_WINDOW (dlg), title);
 #if GTK_MAJOR_VERSION > 3
-  gtk_widget_show (GTK_WIDGET (dlg));
+  gtk_window_present (GTK_WINDOW (dlg));
   g_signal_connect (GTK_WINDOW (dlg), "response",
                     G_CALLBACK (gtk_window_destroy), NULL);
 #else
@@ -3750,7 +3750,7 @@ jbw_graphic_dialog_save (void)
   g_signal_connect (dlg, "response", G_CALLBACK (jbw_graphic_dialog_response),
                     NULL);
 #if GTK_MAJOR_VERSION > 3
-  gtk_widget_show (GTK_WIDGET (dlg));
+  gtk_window_present (GTK_WINDOW (dlg));
 #else
   gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dlg), 1);
   gtk_widget_show_all (GTK_WIDGET (dlg));

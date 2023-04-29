@@ -717,7 +717,7 @@ static inline void
 jbw_graphic_show (JBWGraphic * graphic) ///< JBWGraphic widget.
 {
 #if GTK_MAJOR_VERSION > 3
-  gtk_widget_show (GTK_WIDGET (graphic->window));
+  gtk_window_present (graphic->window);
 #else
   gtk_widget_show_all (GTK_WIDGET (graphic->window));
 #endif
