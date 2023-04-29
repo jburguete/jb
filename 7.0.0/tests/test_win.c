@@ -232,7 +232,7 @@ main (int argn, char **argc)
   g_signal_connect_swapped (button_open2, "clicked", (GCallback) cb_open2,
                             graphic);
 #if GTK_MAJOR_VERSION > 3
-  gtk_widget_show (GTK_WIDGET (window));
+  gtk_window_present (window);
 #else
   gtk_widget_show_all (GTK_WIDGET (window));
 #endif
