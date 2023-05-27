@@ -103,8 +103,8 @@ src = $(config_h) $(jb_config_h) $(jb_def_h) $(jb_math_h) $(jb_xml_h) \
 testsbin = $(test_math_bin) $(test_xml_bin) $(test_json_bin) $(index_sort_bin) \
 	$(check_sort_bin)
 tests = $(test_win_bin)
-exebin = $(libjb) $(libjbm) $(libjbxml) $(libjbjson) $(libjbbin) $(testsbin)
-exe = $(libjbwin) $(tests)
+exebin = $(libjb) $(libjbm) $(libjbxml) $(libjbjson) $(libjbbin)
+exe = $(libjbwin)
 dep = $(jb_def_h) $(jb_config_h) $(config_h) Makefile
 defdep = $(jb_def_c) $(dep)
 mathdep = $(jb_math_c) $(jb_math_h) $(dep)
