@@ -1,4 +1,4 @@
-/* JB - A library with useful mathematical, XML, GTK+ and OpenGL functions.
+/* JB - A library with useful mathematical, XML, GTK and OpenGL functions.
  *
  * Copyright 2005-2023, Javier Burguete Tolosa.
  *
@@ -2410,7 +2410,7 @@ jbw_graphic_loop (void)
 
 #elif HAVE_FREEGLUT
 
-  // Passing the GTK+ signals to the FreeGLUT main loop
+  // Passing the GTK signals to the FreeGLUT main loop
   glutIdleFunc (jbw_graphic_loop_idle);
   // Setting our draw resize function as the FreeGLUT reshape function
   glutReshapeFunc (jbw_graphic_loop_resize);

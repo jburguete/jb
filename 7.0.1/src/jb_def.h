@@ -1,4 +1,4 @@
-/* JB - A library with useful mathematical, XML, JSON, GTK+ and OpenGL
+/* JB - A library with useful mathematical, XML, JSON, GTK and OpenGL
  * functions.
  *
  * Copyright 2005-2023, Javier Burguete Tolosa.
@@ -57,7 +57,7 @@
 #define JBW_NO 1
 ///< Macro to use on terminal programs.
 #define JBW_GTK 2
-///< Macro to use the GTK+ library on visual programs.
+///< Macro to use the GTK library on visual programs.
 
 #include "jb_config.h"
 
