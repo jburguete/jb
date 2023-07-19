@@ -85,7 +85,7 @@ You can install all required utilities and libraries using the instructions of
 
 This software has been built and tested in the following operative systems:
 * Arch Linux
-* Debian Linux 11
+* Debian Linux 12
 * Devuan Linux 4
 * Dragonfly BSD 6.4.0
 * Fedora Linux 38

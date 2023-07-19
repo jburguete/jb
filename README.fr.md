@@ -91,7 +91,7 @@ instructions en [install-unix](https://github.com/jburguete/install-unix).
 Ce programme a été construit et verifié avec les suivants systèmes
 d'exploitation:
 * Arch Linux
-* Debian Linux 11
+* Debian Linux 12
 * Devuan Linux 4
 * Dragonfly BSD 6.4.0
 * Fedora Linux 38
