@@ -91,7 +91,7 @@ instructions en [install-unix](https://github.com/jburguete/install-unix).
 Ce programme a été construit et verifié avec les suivants systèmes
 d'exploitation:
 * Arch Linux
-* Debian Linux 12
+* Debian 12 (Linux)
 * Devuan Linux 4
 * Dragonfly BSD 6.4.0
 * Fedora Linux 38
@@ -105,7 +105,7 @@ d'exploitation:
 * OpenBSD 7.3
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.5
-* Ubuntu Linux 22.10
+* Ubuntu Linux 23.04
 
 Avec systèmes Microsoft Windows on doit installer
 [MSYS2](http://sourceforge.net/projects/msys2) et en plus les bibliothèques et
