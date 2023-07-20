@@ -102,7 +102,7 @@ operativos:
 * NetBSD 9.3
 * OpenBSD 7.3
 * OpenInidiana Hipster
-* OpenSUSE Linux 15.4
+* OpenSUSE Linux 15.5
 * Ubuntu Linux 22.10
 
 En sistemas Microsoft Windows hay que instalar

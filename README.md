@@ -98,7 +98,7 @@ This software has been built and tested in the following operative systems:
 * NetBSD 9.3
 * OpenBSD 7.3
 * OpenInidiana Hipster
-* OpenSUSE Linux 15.4
+* OpenSUSE Linux 15.5
 * Ubuntu Linux 22.10
 
 On Microsoft Windows systems you have to install
