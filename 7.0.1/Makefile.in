@@ -397,7 +397,8 @@ doc/latex/refman.pdf: $(src) Doxyfile Makefile
 # Final version
 strip:
 	@MAKE@
-	@STRIP@ @STRIP_FILES@
+	@STRIP@ @LIB_FILES@
+	strip @EXE_FILES@
 
 # Clean
 clean:

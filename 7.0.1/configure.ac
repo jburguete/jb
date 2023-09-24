@@ -212,10 +212,12 @@ if test $gtk = 1; then
 	fi
 	AC_SUBST(EXEBIN,
 		"\$(exebin) \$(exe) \$(testsbin) \$(tests) \$(shaders)")
-	AC_SUBST(STRIP_FILES, "\$(exebin) \$(exe) \$(testsbin) \$(tests)")
+	AC_SUBST(LIB_FILES, "\$(exebin) \$(exe)")
+	AC_SUBST(EXE_FILES, "\$(testsbin) \$(tests)")
 else
 	AC_SUBST(EXEBIN, "\$(exebin) \$(testsbin)")
-	AC_SUBST(STRIP_FILES, "\$(exebin) \$(testsbin)")
+	AC_SUBST(LIB_FILES, "\$(exebin)")
+	AC_SUBST(EXE_FILES, "\$(testsbin)")
 fi
 
 # Checks for GtkGLArea, FreeGLUT, GLFW or SDL to draw the graphic window
