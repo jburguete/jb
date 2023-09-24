@@ -29,9 +29,9 @@ elif test $host = "i686-pc-cygwin"; then
 elif test `uname -s` = "Darwin"; then
 	AC_MSG_NOTICE([MacOS])
 	AC_MSG_NOTICE([Remember:])
-	AC_MSG_NOTICE("echo 'export PATH=''/usr/local/opt/llvm@13/bin:$PATH''' >> ./zshrc")
-	LDFLAGS="$LDFLAGS -L/usr/local/opt/llvm@13/lib -L/System/Library/Frameworks -framework GLUT -framework OpenGL"
-	CPPFLAGS="$CPPFLAGS -I/usr/local/opt/llvm@13/include"
+	AC_MSG_NOTICE("echo 'export PATH=''/usr/local/opt/llvm/bin:$PATH''' >> ./zshrc")
+	LDFLAGS="$LDFLAGS -L/usr/local/opt/llvm/lib -L/System/Library/Frameworks -framework GLUT -framework OpenGL"
+	CPPFLAGS="$CPPFLAGS -I/usr/local/opt/llvm/include"
 	mac=1
 elif test `uname -s` = "FreeBSD"; then
 	AC_MSG_NOTICE([FreeBSD])
