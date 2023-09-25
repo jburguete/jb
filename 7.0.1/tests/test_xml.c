@@ -33,7 +33,7 @@ main (void)
   xmlSaveFormatFile (XML_FILE, doc, 1);
   fclose (file);
   xmlFreeDoc (doc);
-  doc = xmlParseEntity (XML_FILE);
+  doc = xmlParseFile (XML_FILE);
   node = xmlDocGetRootElement (doc);
   x = jb_xml_node_get_float_with_default (node, XML_X, &e1, 0.);
   printf ("x " FWL " 1\n", x);
