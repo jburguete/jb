@@ -3762,6 +3762,7 @@ jbw_graphic_dialog_save (void)
   g_main_loop_unref (loop);
 }
 
+#if GTK_MAJOR_VERSION < 4
 /**
  * Function to check the type of a column on a JBWArrayEditor widget.
  */
@@ -4473,6 +4474,7 @@ error1:
   jb_show_error (error_msg);
   return NULL;
 }
+#endif
 
 #if GTK_MAJOR_VERSION > 3
 

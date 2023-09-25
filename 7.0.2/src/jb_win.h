@@ -355,6 +355,7 @@ struct _JBWGraphic
   GLuint program_text;          ///< text program.
 };
 
+#if GTK_MAJOR_VERSION < 4
 /**
  * \struct JBWArrayEditor
  * \brief widget to edit matrix data.
@@ -373,6 +374,7 @@ typedef struct
   int nrows;                    ///< number of rows.
   int nfull;                    ///< number of full columns.
 } JBWArrayEditor;               ///< widget to edit matrices.
+#endif
 
 #define jbw_signal_connect_swapped_after(instance, detailed_signal, c_handler, \
   data) \
@@ -511,6 +513,7 @@ void jbw_graphic_draw_linesvl (void *x, void *y1, void *y2, void *z1,
 void jbw_graphic_save (char *file_name);
 void jbw_graphic_dialog_save (void);
 
+#if GTK_MAJOR_VERSION < 4
 void jbw_array_editor_check_column (JBWArrayEditor * editor, int column,
                                     int type);
 void jbw_array_editor_set_element (JBWArrayEditor * editor, int row,
@@ -561,6 +564,7 @@ void jbw_array_editor_set_title (JBWArrayEditor * editor, int column,
 void jbw_array_editor_destroy (JBWArrayEditor * editor);
 JBWArrayEditor *jbw_array_editor_new (int ncolumns, int nfull, int nrows,
                                       const int *types, const char **label);
+#endif
 
 /**
  * Function to init the show error and warning functions.
