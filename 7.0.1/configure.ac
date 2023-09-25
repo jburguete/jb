@@ -9,7 +9,6 @@ AC_MSG_NOTICE([Build: $build])
 AC_MSG_NOTICE([Host: $host])
 win=0
 win32=0
-native=1
 mac=0
 haiku=0
 if test $host = "x86_64-w64-mingw32"; then
@@ -44,7 +43,6 @@ elif test `uname -s` = "OpenBSD"; then
 	AC_MSG_NOTICE([OpenBSD])
 	LDFLAGS="$LDFLAGS -L/usr/X11R6/lib"
 	CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
-	native=0
 elif test `uname -s` = "DragonFly"; then
 	AC_MSG_NOTICE([DragonFly BSD])
 	LDFLAGS="$LDFLAGS -L/usr/local/lib"
@@ -88,12 +86,11 @@ fi
 if test $win = 1; then
 	AC_SUBST(SO, [.dll])
 	AC_SUBST(EXE, [.exe])
-	native=0
 else
 	AC_SUBST(SO, [.so])
 fi
 if test $CC = "clang"; then
-	AC_CHECK_PROGS([LLVM_PROFDATA], [llvm-profdata llvm-profdata-15], 0)
+	AC_CHECK_PROGS([LLVM_PROFDATA], [llvm-profdata], 0)
 	if test $LLVM_PROFDATA = 0; then
 	      	AC_MSG_ERROR([No llvm-profdata])
 	fi
@@ -104,19 +101,17 @@ fi
 compiler=$CC
 
 # Checking -march=native compiler flag
-if test $native = 1; then
-	AC_ARG_WITH([native], AS_HELP_STRING([--with-native],
-		[Build using -march=native compiler flag]))
-	if test "x$with_native" = "xyes"; then
-		CC="$CC -march=native"
-		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [arch=1], [arch=0])
-		CC=$compiler
-		if test $arch = 0; then
-			AC_MSG_NOTICE([checking for -march=native... no])
-		else
-			AC_MSG_NOTICE([checking for -march=native... yes])
-			AC_SUBST(ARCH, "-march=native")
-		fi
+AC_ARG_WITH([native], AS_HELP_STRING([--with-native],
+	[Build using -march=native compiler flag]))
+if test "x$with_native" = "xyes"; then
+	CC="$CC -march=native"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [arch=1], [arch=0])
+	CC=$compiler
+	if test $arch = 0; then
+		AC_MSG_NOTICE([checking for -march=native... no])
+	else
+		AC_MSG_NOTICE([checking for -march=native... yes])
+		AC_SUBST(ARCH, "-march=native")
 	fi
 fi
 
@@ -226,7 +221,8 @@ if test $gtk = 1; then
 		AS_HELP_STRING([--with-gtkglarea],
 			[Build graphic window with GtkGLArea]))
 	AC_ARG_WITH([freeglut],
-		AS_HELP_STRING([--with-freeglut], [Build graphic window with FreeGLUT]))
+		AS_HELP_STRING([--with-freeglut],
+			[Build graphic window with FreeGLUT]))
 	AC_ARG_WITH([glfw],
 		AS_HELP_STRING([--with-glfw], [Build graphic window with GLFW]))
 	AC_ARG_WITH([sdl],

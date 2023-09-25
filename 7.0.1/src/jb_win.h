@@ -110,6 +110,10 @@ typedef GtkSpinButton JBWFloatEntry;
 #endif
 ///< widget to work with float number.
 
+/**
+ * \struct JBWImage
+ * \brief struct to define an image for the JBWGraphic widget.
+ */
 typedef struct
 {
   GLfloat matrix[16];           ///< projection matrix.
@@ -351,6 +355,10 @@ struct _JBWGraphic
   GLuint program_text;          ///< text program.
 };
 
+/**
+ * \struct JBWArrayEditor
+ * \brief widget to edit matrix data.
+ */
 typedef struct
 {
   GtkScrolledWindow *scrolled;  ///< GtkScrolledWindow widget.
@@ -374,9 +382,9 @@ typedef struct
 
 #if JBM_HIGH_PRECISION > 2
 #define jbw_float_entry_new (JBWFloatEntry*)gtk_entry_new
+///< macro to unify float point numbers entry widgets.
 #else
 #define jbw_float_entry_new (JBWFloatEntry*)gtk_spin_button_new
-///< macro to unify float point numbers entry widgets.
 #endif
 
 extern GtkWindow *window_parent;
