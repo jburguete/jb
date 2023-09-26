@@ -120,53 +120,52 @@ check_sort_dep = $(check_sort_c) $(jb_math_h) $(dep)
 
 ifeq (@PGO@, 1)
 ifeq (@CC@, clang)
-	PGOGENERATE = -fprofile-instr-generate
-	PGOUSE = -fprofile-instr-use=$(BINPGO)jb@SUFFIX@.profraw
-	mathprefix = LLVM_PROFILE_FILE="math@SUFFIX@.profdata"
-	xmlprefix = LLVM_PROFILE_FILE="xml@SUFFIX@.profdata"
-	jsonprefix = LLVM_PROFILE_FILE="json@SUFFIX@.profdata"
-	winprefix = LLVM_PROFILE_FILE="win@SUFFIX@.profdata"
-	index_sortprefix = LLVM_PROFILE_FILE="index_sort@SUFFIX@.profdata"
-	check_sortprefix = LLVM_PROFILE_FILE="check_sort@SUFFIX@.profdata"
-	llvm_merge = @LLVM_PROFDATA@ merge *@SUFFIX@.profdata \
-		-output jb@SUFFIX@.profraw
+PGOGENERATE = -fprofile-instr-generate
+PGOUSE = -fprofile-instr-use=$(BINPGO)jb@SUFFIX@.profraw
+mathprefix = LLVM_PROFILE_FILE="math@SUFFIX@.profdata"
+xmlprefix = LLVM_PROFILE_FILE="xml@SUFFIX@.profdata"
+jsonprefix = LLVM_PROFILE_FILE="json@SUFFIX@.profdata"
+winprefix = LLVM_PROFILE_FILE="win@SUFFIX@.profdata"
+index_sortprefix = LLVM_PROFILE_FILE="index_sort@SUFFIX@.profdata"
+check_sortprefix = LLVM_PROFILE_FILE="check_sort@SUFFIX@.profdata"
+llvm_merge = @LLVM_PROFDATA@ merge *@SUFFIX@.profdata -output jb@SUFFIX@.profraw
 else
-	PGOGENERATE = -fprofile-generate
-	PGOUSE = -fprofile-use -fprofile-correction
+PGOGENERATE = -fprofile-generate
+PGOUSE = -fprofile-use -fprofile-correction
 endif
-	testsbinpgo = $(test_math_binpgo) $(test_xml_binpgo) \
-		$(test_json_binpgo) $(index_sort_binpgo) $(check_sort_binpgo)
-	testspgo = $(test_win_binpgo)
-	DEFDEP = $(testsbinpgo)
-	MATHDEP = $(testsbinpgo)
-	XMLDEP = $(testsbinpgo)
-	BINDEP = $(testsbinpgo)
-	WINDEP = $(testspgo)
-	TEST_MATH_DEP = $(testsbinpgo)
-	TEST_XML_DEP = $(testsbinpgo)
-	TEST_JSON_DEP = $(testsbinpgo)
-	TEST_WIN_DEP = $(testspgo)
-	INDEX_SORT_DEP = $(testsbinpgo)
-	CHECK_SORT_DEP = $(testsbinpgo)
+testsbinpgo = $(test_math_binpgo) $(test_xml_binpgo) \
+	$(test_json_binpgo) $(index_sort_binpgo) $(check_sort_binpgo)
+testspgo = $(test_win_binpgo)
+DEFDEP = $(testsbinpgo)
+MATHDEP = $(testsbinpgo)
+XMLDEP = $(testsbinpgo)
+BINDEP = $(testsbinpgo)
+WINDEP = $(testspgo)
+TEST_MATH_DEP = $(testsbinpgo)
+TEST_XML_DEP = $(testsbinpgo)
+TEST_JSON_DEP = $(testsbinpgo)
+TEST_WIN_DEP = $(testspgo)
+INDEX_SORT_DEP = $(testsbinpgo)
+CHECK_SORT_DEP = $(testsbinpgo)
 else
-	DEFDEP = $(defdep)
-	MATHDEP = $(mathdep)
-	XMLDEP = $(xmldep)
-	BINDEP = $(windep)
-	WINDEP = $(windep)
-	TEST_MATH_DEP = $(test_math_dep)
-	TEST_XML_DEP = $(test_xml_dep)
-	TEST_JSON_DEP = $(test_json_dep)
-	TEST_WIN_DEP = $(test_win_dep)
-	INDEX_SORT_DEP = $(index_sort_dep)
-	CHECK_SORT_DEP = $(check_sort_dep)
+DEFDEP = $(defdep)
+MATHDEP = $(mathdep)
+XMLDEP = $(xmldep)
+BINDEP = $(windep)
+WINDEP = $(windep)
+TEST_MATH_DEP = $(test_math_dep)
+TEST_XML_DEP = $(test_xml_dep)
+TEST_JSON_DEP = $(test_json_dep)
+TEST_WIN_DEP = $(test_win_dep)
+INDEX_SORT_DEP = $(index_sort_dep)
+CHECK_SORT_DEP = $(check_sort_dep)
 endif
 VULKAN = @VULKAN@
 ifeq ($(VULKAN), 1)
-	shaders = shaders/2D.spv shaders/2Dc.spv shaders/3D.spv \
-		shaders/3Dc.spv shaders/color.spv shaders/text-vert.spv \
-		shaders/text-frag.spv shaders/image-vert.spv \
-		shaders/image-frag.spv
+shaders = shaders/2D.spv shaders/2Dc.spv shaders/3D.spv \
+	shaders/3Dc.spv shaders/color.spv shaders/text-vert.spv \
+	shaders/text-frag.spv shaders/image-vert.spv \
+	shaders/image-frag.spv
 endif
 locale = locale/
 es = $(locale)es/LC_MESSAGES/
