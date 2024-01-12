@@ -39,17 +39,26 @@
  * \return floating number value in JBDOUBLE format.
  */
 JBDOUBLE
-jb_xml_node_get_float (xmlNode * node,  ///< XML node struct.
-                       const xmlChar * prop,    ///< XML node property.
+jb_xml_node_get_float (xmlNode *node,   ///< XML node struct.
+                       const xmlChar *prop,     ///< XML node property.
                        int *error)      ///< error code (1 on success, 0 on error).
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q;
+#endif
   char *buffer;
-  JBDOUBLE x = 0.L;
+  JBDOUBLE x = c0;
   *error = 0;
   buffer = (char *) xmlGetProp (node, prop);
   if (buffer)
     {
-      *error = sscanf (buffer, FRL, &x);
+      *error = jbm_get_double (buffer, &x);
       xmlFree (buffer);
     }
   return x;
@@ -62,8 +71,8 @@ jb_xml_node_get_float (xmlNode * node,  ///< XML node struct.
  * \return floating number value in JBDOUBLE format.
  */
 JBDOUBLE
-jb_xml_node_get_float_with_default (xmlNode * node,     ///< XML node struct.
-                                    const xmlChar * prop,
+jb_xml_node_get_float_with_default (xmlNode *node,      ///< XML node struct.
+                                    const xmlChar *prop,
 ///< XML node property.
                                     int *error,
 ///< error code (1 on success, 0 on error).
@@ -81,15 +90,15 @@ jb_xml_node_get_float_with_default (xmlNode * node,     ///< XML node struct.
  * Function to set a floating number with format in a property of a XML node.
  */
 void
-jb_xml_node_set_float_with_format (xmlNode * node,      ///< XML node struct.
-                                   const xmlChar * prop,
+jb_xml_node_set_float_with_format (xmlNode *node,       ///< XML node struct.
+                                   const xmlChar *prop,
                                    ///< XML node property.
                                    char *format,        ///< C-format string.
                                    JBDOUBLE x)
 ///< floating number value in JBDOUBLE format.
 {
   char buffer[JB_BUFFER_SIZE];
-  snprintf (buffer, JB_BUFFER_SIZE, format, x);
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, format, x);
   xmlSetProp (node, prop, (xmlChar *) buffer);
 }
 
@@ -98,8 +107,8 @@ jb_xml_node_set_float_with_format (xmlNode * node,      ///< XML node struct.
  * property of a XML node.
  */
 void
-jb_xml_node_set_float (xmlNode * node,  ///< XML node struct.
-                       const xmlChar * prop,    ///< XML node property.
+jb_xml_node_set_float (xmlNode *node,   ///< XML node struct.
+                       const xmlChar *prop,     ///< XML node property.
                        JBDOUBLE x)
 ///< floating number value in JBDOUBLE format.
 {
@@ -111,8 +120,8 @@ jb_xml_node_set_float (xmlNode * node,  ///< XML node struct.
  * property of a XML node or none if the number is equal to a default value.
  */
 void
-jb_xml_node_set_float_with_default (xmlNode * node,     ///< XML node struct.
-                                    const xmlChar * prop,
+jb_xml_node_set_float_with_default (xmlNode *node,      ///< XML node struct.
+                                    const xmlChar *prop,
                                     ///< XML node property.
                                     JBDOUBLE x,
 ///< floating number value in JBDOUBLE format.
@@ -129,8 +138,8 @@ jb_xml_node_set_float_with_default (xmlNode * node,     ///< XML node struct.
  * \return integer number value in long int format.
  */
 long int
-jb_xml_node_get_int (xmlNode * node,    ///< XML node struct.
-                     const xmlChar * prop,
+jb_xml_node_get_int (xmlNode *node,     ///< XML node struct.
+                     const xmlChar *prop,
                      ///< XML node property having the number.
                      int *error)
                      ///< error code (1 on success, 0 on error).
@@ -154,8 +163,8 @@ jb_xml_node_get_int (xmlNode * node,    ///< XML node struct.
  * \return integer number value in long int format.
  */
 long int
-jb_xml_node_get_int_with_default (xmlNode * node,       ///< XML node struct.
-                                  const xmlChar * prop,
+jb_xml_node_get_int_with_default (xmlNode *node,        ///< XML node struct.
+                                  const xmlChar *prop,
                                   ///< XML node property having the number.
                                   int *error,
                                   ///< error code (1 on success, 0 on error).
@@ -173,8 +182,8 @@ jb_xml_node_get_int_with_default (xmlNode * node,       ///< XML node struct.
  * Function to set an integer number in a property of a XML node.
  */
 void
-jb_xml_node_set_int (xmlNode * node,    ///< XML node struct.
-                     const xmlChar * prop,      ///< XML node property.
+jb_xml_node_set_int (xmlNode *node,     ///< XML node struct.
+                     const xmlChar *prop,       ///< XML node property.
                      long int x)
                      ///< integer number value in long int format.
 {
@@ -188,8 +197,8 @@ jb_xml_node_set_int (xmlNode * node,    ///< XML node struct.
  * number is equal to a default value.
  */
 void
-jb_xml_node_set_int_with_default (xmlNode * node,       ///< XML node struct.
-                                  const xmlChar * prop, ///< XML node property.
+jb_xml_node_set_int_with_default (xmlNode *node,        ///< XML node struct.
+                                  const xmlChar *prop,  ///< XML node property.
                                   long int x,
                                   ///< integer number value in long int format.
                                   long int def) ///< default value.
@@ -205,8 +214,8 @@ jb_xml_node_set_int_with_default (xmlNode * node,       ///< XML node struct.
  * \return unsigned integer number value in unsigned long int format.
  */
 unsigned long int
-jb_xml_node_get_uint (xmlNode * node,   ///< XML node struct.
-                      const xmlChar * prop,
+jb_xml_node_get_uint (xmlNode *node,    ///< XML node struct.
+                      const xmlChar *prop,
                       ///< XML node property having the number.
                       int *error)
                       ///< error code (1 on success, 0 on error).
@@ -230,8 +239,8 @@ jb_xml_node_get_uint (xmlNode * node,   ///< XML node struct.
  * \return unsigned integer number value in unsigned long int format.
  */
 unsigned long int
-jb_xml_node_get_uint_with_default (xmlNode * node,      ///< XML node struct.
-                                   const xmlChar * prop,
+jb_xml_node_get_uint_with_default (xmlNode *node,       ///< XML node struct.
+                                   const xmlChar *prop,
                                    ///< XML node property having the number.
                                    int *error,
                                    ///< error code (1 on success, 0 on error).
@@ -250,8 +259,8 @@ jb_xml_node_get_uint_with_default (xmlNode * node,      ///< XML node struct.
  * Function to set an unsigned integer number in a property of a XML node.
  */
 void
-jb_xml_node_set_uint (xmlNode * node,   ///< XML node struct.
-                      const xmlChar * prop,     ///< XML node property.
+jb_xml_node_set_uint (xmlNode *node,    ///< XML node struct.
+                      const xmlChar *prop,      ///< XML node property.
                       unsigned long int x)
 ///< unsigned integer number value in unsigned long int format.
 {
@@ -265,8 +274,8 @@ jb_xml_node_set_uint (xmlNode * node,   ///< XML node struct.
  * none if the number is equal to a default value.
  */
 void
-jb_xml_node_set_uint_with_default (xmlNode * node,      ///< XML node struct.
-                                   const xmlChar * prop,
+jb_xml_node_set_uint_with_default (xmlNode *node,       ///< XML node struct.
+                                   const xmlChar *prop,
                                    ///< XML node property.
                                    unsigned long int x,
 ///< unsigned integer number value in unsigned long int format.
@@ -284,8 +293,8 @@ jb_xml_node_set_uint_with_default (xmlNode * node,      ///< XML node struct.
  * \return date in floating point format.
  */
 JBDOUBLE
-jb_xml_node_get_time (xmlNode * node,   ///< XML node struct.
-                      const xmlChar * prop,     ///< XML node property.
+jb_xml_node_get_time (xmlNode *node,    ///< XML node struct.
+                      const xmlChar *prop,      ///< XML node property.
                       int *error)
                       ///< error code (1 on success, 0 on error).
 {
@@ -309,8 +318,8 @@ jb_xml_node_get_time (xmlNode * node,   ///< XML node struct.
  * \return date in floating point format.
  */
 JBDOUBLE
-jb_xml_node_get_time_with_default (xmlNode * node,      ///< XML node struct.
-                                   const xmlChar * prop,
+jb_xml_node_get_time_with_default (xmlNode *node,       ///< XML node struct.
+                                   const xmlChar *prop,
                                    ///< XML node property.
                                    int *error,
                                    ///< error code (1 on success, 0 on error).
@@ -329,8 +338,8 @@ jb_xml_node_get_time_with_default (xmlNode * node,      ///< XML node struct.
  * property of a XML node.
  */
 void
-jb_xml_node_set_time (xmlNode * node,   ///< XML node struct.
-                      const xmlChar * prop,     ///< XML node property.
+jb_xml_node_set_time (xmlNode *node,    ///< XML node struct.
+                      const xmlChar *prop,      ///< XML node property.
                       JBDOUBLE t)       ///< date in floating point format.
 {
   const xmlChar *buffer;
@@ -343,8 +352,8 @@ jb_xml_node_set_time (xmlNode * node,   ///< XML node struct.
  * property of a XML node or a default value if the node has not the property.
  */
 void
-jb_xml_node_set_time_with_default (xmlNode * node,      ///< XML node struct.
-                                   const xmlChar * prop,
+jb_xml_node_set_time_with_default (xmlNode *node,       ///< XML node struct.
+                                   const xmlChar *prop,
                                    ///< XML node property.
                                    JBDOUBLE t,
                                    ///< date in floating point format.
@@ -360,7 +369,7 @@ jb_xml_node_set_time_with_default (xmlNode * node,      ///< XML node struct.
  * \return file struct with the content.
  */
 FILE *
-jb_xml_node_get_content_file (xmlNode * node,   ///< XML node struct.
+jb_xml_node_get_content_file (xmlNode *node,    ///< XML node struct.
                               char **buffer)
 ///< pointer to the buffer with the content, it has to be freed with xmlFree.
 {
@@ -393,8 +402,8 @@ exit1:
  * Function to set a file in the content of a XML node.
  */
 void
-jb_xml_node_set_content_file (xmlNode * node,   ///< XML node struct.
-                              FILE * file)
+jb_xml_node_set_content_file (xmlNode *node,    ///< XML node struct.
+                              FILE *file)
                               ///< file struct with the content.
 {
   long int l;

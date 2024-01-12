@@ -45,7 +45,7 @@ static inline int
 jbw_init (int *argn __attribute__((unused)),
           ///< pointer to the number of command line arguments.
           char ***argc __attribute__((unused)))
-          ///< pointer to the command line arguments.
+  ///< pointer to the command line arguments.
 {
   jb_show_error = jbw_show_error_terminal;
   jb_show_warning = jbw_show_warning_terminal;
@@ -573,7 +573,7 @@ static inline int
 jbw_init (int *argn __attribute__((unused)),
           ///< pointer to the number of command line arguments.
           char ***argc __attribute__((unused)))
-          ///< pointer to the command line arguments.
+  ///< pointer to the command line arguments.
 {
   jb_show_error = jbw_show_error_gtk;
   jb_show_warning = jbw_show_warning_gtk;
@@ -584,7 +584,7 @@ jbw_init (int *argn __attribute__((unused)),
  * Function to set the resize property of a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_resize (JBWGraphic * graphic,   ///< JBWGraphic widget.
+jbw_graphic_set_resize (JBWGraphic *graphic,    ///< JBWGraphic widget.
                         int resize)     ///< 1 if automatic bounds resize.
 {
   graphic->resize = resize;
@@ -594,7 +594,7 @@ jbw_graphic_set_resize (JBWGraphic * graphic,   ///< JBWGraphic widget.
  * Function to set the grid property of a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_grid (JBWGraphic * graphic,     ///< JBWGraphic widget.
+jbw_graphic_set_grid (JBWGraphic *graphic,      ///< JBWGraphic widget.
                       int grid) ///< 1 if visible grid.
 {
   graphic->grid = grid;
@@ -604,7 +604,7 @@ jbw_graphic_set_grid (JBWGraphic * graphic,     ///< JBWGraphic widget.
  * Function to set the x label of a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_xlabel (JBWGraphic * graphic,   ///< JBWGraphic widget.
+jbw_graphic_set_xlabel (JBWGraphic *graphic,    ///< JBWGraphic widget.
                         const char *str_x)      ///< x label.
 {
   graphic->str_x = str_x;
@@ -614,7 +614,7 @@ jbw_graphic_set_xlabel (JBWGraphic * graphic,   ///< JBWGraphic widget.
  * Function to set the 1st y label of a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_ylabel (JBWGraphic * graphic,   ///< JBWGraphic widget.
+jbw_graphic_set_ylabel (JBWGraphic *graphic,    ///< JBWGraphic widget.
                         const char *str_y)      ///< 1st y label.
 {
   graphic->str_y = str_y;
@@ -624,7 +624,7 @@ jbw_graphic_set_ylabel (JBWGraphic * graphic,   ///< JBWGraphic widget.
  * Function to set the 2nd y label of a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_yylabel (JBWGraphic * graphic,  ///< JBWGraphic widget.
+jbw_graphic_set_yylabel (JBWGraphic *graphic,   ///< JBWGraphic widget.
                          const char *str_yy)    ///< 2nd y label.
 {
   graphic->str_yy = str_yy;
@@ -634,7 +634,7 @@ jbw_graphic_set_yylabel (JBWGraphic * graphic,  ///< JBWGraphic widget.
  * Function to set the 1st z label of a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_zlabel (JBWGraphic * graphic,   ///< JBWGraphic widget.
+jbw_graphic_set_zlabel (JBWGraphic *graphic,    ///< JBWGraphic widget.
                         const char *str_z)      ///< 1st z label.
 {
   graphic->str_z = str_z;
@@ -644,7 +644,7 @@ jbw_graphic_set_zlabel (JBWGraphic * graphic,   ///< JBWGraphic widget.
  * Function to set the 2nd z label of a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_zzlabel (JBWGraphic * graphic,  ///< JBWGraphic widget.
+jbw_graphic_set_zzlabel (JBWGraphic *graphic,   ///< JBWGraphic widget.
                          const char *str_zz)    ///< 2nd z label.
 {
   graphic->str_zz = str_zz;
@@ -654,7 +654,7 @@ jbw_graphic_set_zzlabel (JBWGraphic * graphic,  ///< JBWGraphic widget.
  * Function to set the draw function of a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_draw (JBWGraphic * graphic,     ///< JBWGraphic widget.
+jbw_graphic_set_draw (JBWGraphic *graphic,      ///< JBWGraphic widget.
                       void (*draw) (JBWGraphic *))
                       ///< draw function pointer.
 {
@@ -665,7 +665,7 @@ jbw_graphic_set_draw (JBWGraphic * graphic,     ///< JBWGraphic widget.
  * Function to set the minimum size allowed of a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_size_request (JBWGraphic * graphic,     ///< JBWGraphic widget.
+jbw_graphic_set_size_request (JBWGraphic *graphic,      ///< JBWGraphic widget.
                               int width,        ///< minimum width.
                               int height)       ///< minimum height.
 {
@@ -685,8 +685,8 @@ jbw_graphic_set_size_request (JBWGraphic * graphic,     ///< JBWGraphic widget.
  * Function to set a calculate function on a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_calculate (JBWGraphic * graphic,        ///< JBWGraphic widget.
-                           int (*calculate) (JBWGraphic * graphic))
+jbw_graphic_set_calculate (JBWGraphic *graphic, ///< JBWGraphic widget.
+                           int (*calculate) (JBWGraphic *graphic))
                                  ///< calculate function.
 {
   graphic->calculate = calculate;
@@ -696,7 +696,7 @@ jbw_graphic_set_calculate (JBWGraphic * graphic,        ///< JBWGraphic widget.
  * Function to set user data on a JBWGraphic widget.
  */
 static inline void
-jbw_graphic_set_data (JBWGraphic * graphic,     ///< JBWGraphic widget.
+jbw_graphic_set_data (JBWGraphic *graphic,      ///< JBWGraphic widget.
                       void *data)       ///< user data.
 {
   graphic->data = data;
@@ -726,7 +726,7 @@ jbw_graphic_loop_quit (void)
  */
 #if HAVE_GTKGLAREA
 static inline void
-jbw_graphic_show (JBWGraphic * graphic) ///< JBWGraphic widget.
+jbw_graphic_show (JBWGraphic *graphic)  ///< JBWGraphic widget.
 {
 #if GTK_MAJOR_VERSION > 3
   gtk_window_present (graphic->window);

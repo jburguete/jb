@@ -132,7 +132,7 @@ jb_strdup (char *buffer)        ///< string to copy.
  * \return file length.
  */
 long int
-jb_flength (FILE * file)        ///< file.
+jb_flength (FILE *file)         ///< file.
 {
   long int p, q;
   q = ftell (file);
@@ -147,7 +147,7 @@ jb_flength (FILE * file)        ///< file.
  * to NULL.
  */
 void
-jb_slist_free (GSList ** list)  ///< list.
+jb_slist_free (GSList **list)   ///< list.
 {
   if (*list)
     {
@@ -163,7 +163,7 @@ jb_slist_free (GSList ** list)  ///< list.
  * \return 0 on error, >0 on success.
  */
 int
-jb_bin_read (FILE * file,       ///< file.
+jb_bin_read (FILE *file,        ///< file.
              char *buffer)      ///< string.
 {
   uint32_t n;
@@ -178,7 +178,7 @@ jb_bin_read (FILE * file,       ///< file.
  * fixed in the first position (4 bytes) of the file.
  */
 void
-jb_bin_write (FILE * file,      ///< file.
+jb_bin_write (FILE *file,       ///< file.
               char *buffer)     ///< string.
 {
   uint32_t n;
@@ -270,8 +270,8 @@ jb_show_error3 (const char *message1,   ///< 1st error message.
  * pointer on error.
  */
 char *
-jb_read_file (const char *name,        ///< file name string.
-               long int *size)  ///< file size.
+jb_read_file (const char *name, ///< file name string.
+              long int *size)   ///< file size.
 {
   FILE *file;
   char *buffer;

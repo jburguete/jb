@@ -32,15 +32,13 @@
  */
 #include "jb_math.h"
 
-#if JBM_HIGH_PRECISION != JBM_LOW_PRECISION || JBM_HIGH_PRECISION < 3
-
 /**
  * Function to sort from the highest to the lowest the indexes of an array of
  * JBFLOAT numbers by the flash method.
  */
 void
-jbm_index_sort_flash (JBFLOAT *restrict x,   ///< array of JBFLOAT numbers.
-                      unsigned int *restrict ni,      ///< array of indexes.
+jbm_index_sort_flash (JBFLOAT *restrict x,      ///< array of JBFLOAT numbers.
+                      unsigned int *restrict ni,        ///< array of indexes.
                       int n)    ///< the highest element number of the arrays.
 {
   unsigned int *nj, *nk, *l1, *l2;
@@ -105,18 +103,15 @@ sorted:
   g_free (nj);
 }
 
-#endif
-
-
-#if JBM_HIGH_PRECISION != JBM_LOW_PRECISION || JBM_HIGH_PRECISION > 2
+#if JBM_HIGH_PRECISION != JBM_LOW_PRECISION
 
 /**
  * Function to sort from the highest to the lowest the indexes of an array of
  * JBDOUBLE numbers by the flash method.
  */
 void
-jbm_index_sort_flashl (JBDOUBLE *restrict x, ///< array of JBDOUBLE numbers.
-                       unsigned int *restrict ni,     ///< array of indexes.
+jbm_index_sort_flashl (JBDOUBLE *restrict x,    ///< array of JBDOUBLE numbers.
+                       unsigned int *restrict ni,       ///< array of indexes.
                        int n)   ///< the highest element number of the arrays.
 {
   unsigned int *nj, *nk, *l1, *l2;

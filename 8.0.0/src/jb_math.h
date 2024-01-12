@@ -36,6 +36,16 @@
 #include "jb_def.h"
 #include <math.h>
 #include <sys/param.h>
+#if JBM_PRECISION > 5
+#include <quadmath.h>
+#define exp10q(x) (expq(x * M_LN10q))
+#endif
+#ifdef __SSE4_2__
+#include <smmintrin.h>
+#endif
+#ifdef __AVX__
+#include <immintrin.h>
+#endif
 
 #ifndef M_PIl
 #define M_PIl M_PI              ///< high precision pi number.
@@ -155,6 +165,12 @@
 #elif JBM_PRECISION == 5
 #define JBM_LOW_PRECISION 3
 #define JBM_HIGH_PRECISION 3
+#elif JBM_PRECISION == 6
+#define JBM_LOW_PRECISION 3
+#define JBM_HIGH_PRECISION 4
+#elif JBM_PRECISION == 7
+#define JBM_LOW_PRECISION 4
+#define JBM_HIGH_PRECISION 4
 #else
 #error "Unknown precision"
 #endif
@@ -173,10 +189,12 @@
 #define HYPOT hypot
 #define LOG log
 #define LOG10 log10
+#define SNPRINTF snprintf
 #define SQRT sqrt
+#define STRTOF strtof
 #define FRF "%e"
 #define FWF "%.6e"
-#define FPF "%.6g"
+#define FPF "%.7g"
 #define FGF "%.5g"
 #define JBM_EPSILON FLT_EPSILON
 #define JB_PI M_PI
@@ -195,14 +213,16 @@
 #define HYPOT hypot
 #define LOG log
 #define LOG10 log10
+#define SNPRINTF snprintf
 #define SQRT sqrt
+#define STRTOF strtod
 #define FRF "%le"
-#define FWF "%.13le"
-#define FPF "%.13lg"
+#define FWF "%.15le"
+#define FPF "%.16lg"
 #define FGF "%.5lg"
 #define JBM_EPSILON DBL_EPSILON
 #define JB_PI M_PI
-#else
+#elif JBM_LOW_PRECISION == 3
 #define JBFLOAT long double
 #define ACOS acosl
 #define CBRT cbrtl
@@ -217,13 +237,39 @@
 #define HYPOT hypotl
 #define LOG logl
 #define LOG10 log10l
+#define SNPRINTF snprintf
 #define SQRT sqrtl
+#define STRTOF strtold
 #define FRF "%Le"
-#define FWF "%.17Le"
-#define FPF "%.17Lg"
+#define FWF "%.18Le"
+#define FPF "%.19Lg"
 #define FGF "%.5Lg"
 #define JBM_EPSILON LDBL_EPSILON
 #define JB_PI M_PIl
+#elif JBM_LOW_PRECISION == 4
+#define JBFLOAT __float128
+#define ACOS acosq
+#define CBRT cbrtq
+#define CEIL ceilq
+#define COS cosq
+#define EXP expq
+#define EXP10 exp10q
+#define FABS fabsq
+#define FLOOR floorq
+#define FMAX fmaxq
+#define FMIN fminq
+#define HYPOT hypotq
+#define LOG logq
+#define LOG10 log10q
+#define SNPRINTF quadmath_snprintf
+#define SQRT sqrtq
+#define STRTOF strtoflt128
+#define FRF "%Qe"
+#define FWF "%.33Qe"
+#define FPF "%.34Qg"
+#define FGF "%.5Qg"
+#define JBM_EPSILON FLT128_EPSILON
+#define JB_PI M_PIq
 #endif
 #if JBM_HIGH_PRECISION == 1
 #define JBDOUBLE float
@@ -240,12 +286,14 @@
 #define HYPOTL hypot
 #define LOGL log
 #define LOG10L log10
+#define SNPRINTFL snprintf
 #define SQRTL sqrt
+#define STRTOD strtof
 #define JBM_EPSILONL FLT_EPSILON
 #define JB_PIL M_PI
-#define FRL "%e"
+#define FRL "%f"
 #define FWL "%.6e"
-#define FPL "%.6g"
+#define FPL "%.7g"
 #define FGL "%.5g"
 #elif JBM_HIGH_PRECISION == 2
 #define JBDOUBLE double
@@ -262,14 +310,16 @@
 #define HYPOTL hypot
 #define LOGL log
 #define LOG10L log10
+#define SNPRINTFL snprintf
 #define SQRTL sqrt
+#define STRTOD strtod
 #define JBM_EPSILONL DBL_EPSILON
 #define JB_PIL M_PI
-#define FRL "%le"
-#define FWL "%.13le"
-#define FPL "%.13lg"
+#define FRL "%lf"
+#define FWL "%.15le"
+#define FPL "%.16lg"
 #define FGL "%.5lg"
-#else
+#elif JBM_HIGH_PRECISION == 3
 #define JBDOUBLE long double
 #define ACOSL acosl
 #define CBRTL cbrtl
@@ -284,13 +334,39 @@
 #define HYPOTL hypotl
 #define LOGL logl
 #define LOG10L log10l
+#define SNPRINTFL snprintf
 #define SQRTL sqrtl
+#define STRTOD strtold
 #define JBM_EPSILONL LDBL_EPSILON
 #define JB_PIL M_PIl
-#define FRL "%Le"
-#define FWL "%.17Le"
-#define FPL "%.17Lg"
+#define FRL "%Lf"
+#define FWL "%.18Le"
+#define FPL "%.19Lg"
 #define FGL "%.5Lg"
+#elif JBM_HIGH_PRECISION == 4
+#define JBDOUBLE __float128
+#define ACOSL acosq
+#define CBRTL cbrtq
+#define CEILL ceilq
+#define COSL cosq
+#define EXPL expq
+#define EXP10L exp10q
+#define FABSL fabsq
+#define FLOORL floorq
+#define FMAXL fmaxq
+#define FMINL fminq
+#define HYPOTL hypotq
+#define LOGL logq
+#define LOG10L log10q
+#define SNPRINTFL quadmath_snprintf
+#define SQRTL sqrtq
+#define STRTOD strtoflt128
+#define JBM_EPSILONL FLT128_EPSILON
+#define JB_PIL M_PIq
+#define FRL "%Qf"
+#define FWL "%.33Qe"
+#define FPL "%.34Qg"
+#define FGL "%.5Qg"
 #endif
 #define FG_LENGTH 12
 #define FWF2 FWF " "
@@ -349,8 +425,20 @@
  * b, & a,b\ne 0,\;|a|\ge|b|;
  * \end{array}\right.\f$.
  */
+#if JBM_LOW_PRECISION == 1
+#define JBM_FMODMIN(a, b) (((a) * (b) <= 0.f)? 0.f: \
+    (FABS(a) < FABS(b))? (a): (b))
+#elif JBM_LOW_PRECISION == 2
 #define JBM_FMODMIN(a, b) (((a) * (b) <= 0.)? 0.: \
     (FABS(a) < FABS(b))? (a): (b))
+#elif JBM_LOW_PRECISION == 3
+#define JBM_FMODMIN(a, b) (((a) * (b) <= 0.L)? 0.L: \
+    (FABS(a) < FABS(b))? (a): (b))
+#elif JBM_LOW_PRECISION == 4
+#define JBM_FMODMIN(a, b) (((a) * (b) <= 0.Q)? 0.Q: \
+    (FABS(a) < FABS(b))? (a): (b))
+#endif
+
 /**
  * macro calculating the number with the lower module in the [a, b] interval 
  * (JBDOUBLE arguments).
@@ -360,8 +448,20 @@
  * b, & a,b\ne 0,\;|a|\ge|b|;
  * \end{array}\right.\f$.
  */
+#if JBM_HIGH_PRECISION == 1
+#define JBM_FMODMINL(a, b) (((a) * (b) <= 0.f)? 0.f: \
+    (FABSL(a) < FABSL(b))? (a): (b))
+#elif JBM_HIGH_PRECISION == 2
+#define JBM_FMODMINL(a, b) (((a) * (b) <= 0.)? 0.: \
+    (FABSL(a) < FABSL(b))? (a): (b))
+#elif JBM_HIGH_PRECISION == 3
 #define JBM_FMODMINL(a, b) (((a) * (b) <= 0.L)? 0.L: \
     (FABSL(a) < FABSL(b))? (a): (b))
+#elif JBM_HIGH_PRECISION == 4
+#define JBM_FMODMINL(a, b) (((a) * (b) <= 0.Q)? 0.Q: \
+    (FABSL(a) < FABSL(b))? (a): (b))
+#endif
+
 #define JBM_SQR(x) ((x) * (x))  ///< macro calculating the square of a number.
 #define JBM_DBL(x) ((x) + (x))  ///< macro calculating the double of a number.
 #define JBM_EXTRAPOLATE(x, x1, x2, y1, y2) \
@@ -384,25 +484,14 @@ enum JBMFluxLimiterType
   JBM_FLUX_LIMITER_TYPE_MEAN = 10
 };
 
-#if JBM_HIGH_PRECISION == JBM_LOW_PRECISION
-
-#if JBM_HIGH_PRECISION < 3
-
 void jbm_index_sort_flash (JBFLOAT * x, unsigned int *ni, int n);
+
+#if JBM_HIGH_PRECISION == JBM_LOW_PRECISION
 
 #define jbm_index_sort_flashl jbm_index_sort_flash
 
 #else
 
-void jbm_index_sort_flashl (JBDOUBLE * x, unsigned int *ni, int n);
-
-#define jbm_index_sort_flash jbm_index_sort_flashl
-
-#endif
-
-#else
-
-void jbm_index_sort_flash (JBFLOAT * x, unsigned int *ni, int n);
 void jbm_index_sort_flashl (JBDOUBLE * x, unsigned int *ni, int n);
 
 #endif
@@ -451,14 +540,14 @@ jbm_modmin (int a,              ///< 1st int number.
 }
 
 /**
- * Function to interchange 2 int numbers.
+ * Function to calculate the double of an int number.
+ *
+ * \return int double.
  */
-static inline void
-jbm_change (int *restrict a,  ///< 1st int number pointer. 
-            int *restrict b)  ///< 1st int number pointer. 
+static inline int
+jbm_dbl (int x)                 ///< unsigned int number.
 {
-  int c;
-  JB_CHANGE (*a, *b, c);
+  return JBM_DBL (x);
 }
 
 /**
@@ -473,6 +562,41 @@ jbm_sqr (int x)                 ///< int number.
 }
 
 /**
+ * Function to interchange 2 int numbers.
+ */
+static inline void
+jbm_change (int *restrict a,    ///< 1st int number pointer. 
+            int *restrict b)    ///< 1st int number pointer. 
+{
+  int c;
+  JB_CHANGE (*a, *b, c);
+}
+
+/**
+ * Function to calculate the minimum of 2 unsigned int numbers.
+ *
+ * \return minimum unsigned int number.
+ */
+static inline unsigned int
+jbm_minu (unsigned int a,       ///< 1st unsigned int number.
+          unsigned int b)       ///< 2nd unsigned int number.
+{
+  return JBM_MIN (a, b);
+}
+
+/**
+ * Function to calculate the maximum of 2 unsigned int numbers.
+ *
+ * \return maximum unsigned int number.
+ */
+static inline unsigned int
+jbm_maxu (unsigned int a,       ///< 1st unsigned int number.
+          unsigned int b)       ///< 2nd unsigned int number.
+{
+  return JBM_MAX (a, b);
+}
+
+/**
  * Function to calculate the double of an unsigned int number.
  *
  * \return unsigned int double.
@@ -481,6 +605,17 @@ static inline unsigned int
 jbm_dblu (unsigned int x)       ///< unsigned int number.
 {
   return JBM_DBL (x);
+}
+
+/**
+ * Function to calculate the square of an unsigned int number.
+ *
+ * \return unsigned int square.
+ */
+static inline unsigned int
+jbm_sqru (unsigned int x)       ///< unsigned int number.
+{
+  return JBM_SQR (x);
 }
 
 /**
@@ -494,17 +629,6 @@ jbm_changeu (unsigned int *restrict a,
 {
   unsigned int c;
   JB_CHANGE (*a, *b, c);
-}
-
-/**
- * Function to calculate the square of an unsigned int number.
- *
- * \return unsigned int square.
- */
-static inline unsigned int
-jbm_sqru (unsigned int x)       ///< unsigned int number.
-{
-  return JBM_SQR (x);
 }
 
 /**
@@ -553,8 +677,8 @@ jbm_modminl (long int a,        ///< 1st long int number.
  * Function to interchange 2 long int numbers.
  */
 static inline void
-jbm_changel (long int *restrict a,    ///< 1st long int number pointer. 
-             long int *restrict b)    ///< 1st long int number pointer. 
+jbm_changel (long int *restrict a,      ///< 1st long int number pointer. 
+             long int *restrict b)      ///< 1st long int number pointer. 
 {
   long int c;
   JB_CHANGE (*a, *b, c);
@@ -583,38 +707,62 @@ jbm_dbll (long int x)           ///< long int number.
 }
 
 /**
- * Function to interchange 2 long unsigned int numbers.
+ * Function to calculate the maximum of 2 unsigned long int numbers.
+ *
+ * \return maximum unsigned long int number.
+ */
+static inline unsigned long int
+jbm_maxul (unsigned long int a, ///< 1st unsigned long int number.
+           unsigned long int b) ///< 2nd unsigned long int number.
+{
+  return JBM_MAX (a, b);
+}
+
+/**
+ * Function to calculate the minimum of 2 unsigned long int numbers.
+ *
+ * \return minimum unsigned long int number.
+ */
+static inline unsigned long int
+jbm_minul (unsigned long int a, ///< 1st unsigned long int number.
+           unsigned long int b) ///< 2nd unsigned long int number.
+{
+  return JBM_MIN (a, b);
+}
+
+/**
+ * Function to interchange 2 unsigned long int numbers.
  */
 static inline void
-jbm_changeul (long unsigned int *restrict a,
-              ///< 1st long unsigned int number pointer.
-              long unsigned int *restrict b)
-              ///< 1st long unsigned int number pointer.
+jbm_changeul (unsigned long int *restrict a,
+              ///< 1st unsigned long int number pointer.
+              unsigned long int *restrict b)
+              ///< 1st unsigned long int number pointer.
 {
-  long unsigned int c;
+  unsigned long int c;
   JB_CHANGE (*a, *b, c);
 }
 
 /**
- * Function to calculate the square of a long unsigned int number.
+ * Function to calculate the double of a unsigned long int number.
  *
- * \return long unsigned int square.
+ * \return unsigned long int double.
  */
-static inline long unsigned int
-jbm_sqrul (long unsigned int x) ///< long unsigned int number.
+static inline unsigned long int
+jbm_dblul (unsigned long int x) ///< unsigned long int number.
 {
-  return JBM_SQR (x);
+  return JBM_DBL (x);
 }
 
 /**
- * Function to calculate the double of a long unsigned int number.
+ * Function to calculate the square of a unsigned long int number.
  *
- * \return long unsigned int double.
+ * \return unsigned long int square.
  */
-static inline long unsigned int
-jbm_dblul (long unsigned int x) ///< long unsigned int number.
+static inline unsigned long int
+jbm_sqrul (unsigned long int x) ///< unsigned long int number.
 {
-  return JBM_DBL (x);
+  return JBM_SQR (x);
 }
 
 /**
@@ -695,36 +843,60 @@ jbm_dblll (long long int x)     ///< long long int number.
 }
 
 /**
- * Function to interchange 2 long long unsigned int numbers.
+ * Function to calculate the maximum of 2 unsigned long long int numbers.
+ *
+ * \return maximum unsigned long long int number.
+ */
+static inline unsigned long long int
+jbm_maxull (unsigned long long int a,   ///< 1st unsigned long long int number.
+            unsigned long long int b)   ///< 2nd unsigned long long int number.
+{
+  return JBM_MAX (a, b);
+}
+
+/**
+ * Function to calculate the minimum of 2 unsigned long long int numbers.
+ *
+ * \return minimum unsigned long long int number.
+ */
+static inline unsigned long long int
+jbm_minull (unsigned long long int a,   ///< 1st unsigned long long int number.
+            unsigned long long int b)   ///< 2nd unsigned long long int number.
+{
+  return JBM_MIN (a, b);
+}
+
+/**
+ * Function to interchange 2 unsigned long long int numbers.
  */
 static inline void
-jbm_changeull (long long unsigned int *restrict a,
-               ///< 1st long long unsigned int number pointer. 
-               long long unsigned int *restrict b)
-               ///< 1st long long unsigned int number pointer. 
+jbm_changeull (unsigned long long int *restrict a,
+               ///< 1st unsigned long long int number pointer. 
+               unsigned long long int *restrict b)
+               ///< 1st unsigned long long int number pointer. 
 {
-  long long unsigned int c;
+  unsigned long long int c;
   JB_CHANGE (*a, *b, c);
 }
 
 /**
- * Function to calculate the square of a long long unsigned int number.
+ * Function to calculate the square of a unsigned long long int number.
  *
- * \return long long unsigned int square.
+ * \return unsigned long long int square.
  */
-static inline long long unsigned int
-jbm_sqrull (long long unsigned int x)   ///< long long unsigned int number.
+static inline unsigned long long int
+jbm_sqrull (unsigned long long int x)   ///< unsigned long long int number.
 {
   return JBM_SQR (x);
 }
 
 /**
- * Function to calculate the double of a long long unsigned int number.
+ * Function to calculate the double of a unsigned long long int number.
  *
- * \return long long unsigned int double.
+ * \return unsigned long long int double.
  */
-static inline long long unsigned int
-jbm_dblull (long long unsigned int x)   ///< long long unsigned int number.
+static inline unsigned long long int
+jbm_dblull (unsigned long long int x)   ///< unsigned long long int number.
 {
   return JBM_DBL (x);
 }
@@ -761,14 +933,14 @@ jbm_fmodmin (JBFLOAT a,         ///< 1st JBFLOAT number.
 }
 
 /**
- * Function to interchange 2 JBFLOAT numbers.
+ * Function to calculate the double of a JBFLOAT number.
+ *
+ * \return JBFLOAT double.
  */
-static inline void
-jbm_fchange (JBFLOAT *restrict a,    ///< 1st JBFLOAT number pointer.
-             JBFLOAT *restrict b)    ///< 2nd JBFLOAT number pointer.
+static inline JBFLOAT
+jbm_fdbl (JBFLOAT x)            ///< JBFLOAT number.
 {
-  JBFLOAT c;
-  JB_CHANGE (*a, *b, c);
+  return JBM_DBL (x);
 }
 
 /**
@@ -783,14 +955,14 @@ jbm_fsqr (JBFLOAT x)            ///< JBFLOAT number.
 }
 
 /**
- * Function to calculate the double of a JBFLOAT number.
- *
- * \return JBFLOAT double.
+ * Function to interchange 2 JBFLOAT numbers.
  */
-static inline JBFLOAT
-jbm_fdbl (JBFLOAT x)            ///< JBFLOAT number.
+static inline void
+jbm_fchange (JBFLOAT *restrict a,       ///< 1st JBFLOAT number pointer.
+             JBFLOAT *restrict b)       ///< 2nd JBFLOAT number pointer.
 {
-  return JBM_DBL (x);
+  JBFLOAT c;
+  JB_CHANGE (*a, *b, c);
 }
 
 /**
@@ -821,14 +993,11 @@ jbm_interpolate (JBFLOAT x,     ///< x-coordinate of the interpolated point.
                  JBFLOAT y1,    ///< y-coordinate of the 1st point.
                  JBFLOAT y2)    ///< y-coordinate of the 2nd point.
 {
-  JBFLOAT k;
   if (x <= x1)
-    k = y1;
-  else if (x >= x2)
-    k = y2;
-  else
-    k = jbm_extrapolate (x, x1, x2, y1, y2);
-  return k;
+    return y1;
+  if (x >= x2)
+    return y2;
+  return jbm_extrapolate (x, x1, x2, y1, y2);
 }
 
 /**
@@ -872,6 +1041,138 @@ jbm_v3_length (JBFLOAT x1,
 }
 
 /**
+ * Function to calculate a 1st order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_1 (JBFLOAT x,    ///< variable.
+                  JBFLOAT *p)   ///< array of coefficients.
+{
+  return p[0] + x * p[1];
+}
+
+/**
+ * Function to calculate a 2nd order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_2 (JBFLOAT x,    ///< variable.
+                  JBFLOAT *p)   ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_1 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 3rd order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_3 (JBFLOAT x,    ///< variable.
+                  JBFLOAT *p)   ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_2 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 4th order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_4 (JBFLOAT x,    ///< variable.
+                  JBFLOAT *p)   ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_3 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 5th order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_5 (JBFLOAT x,    ///< variable.
+                  JBFLOAT *p)   ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_4 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 6th order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_6 (JBFLOAT x,    ///< variable.
+                  JBFLOAT *p)   ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_5 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 7th order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_7 (JBFLOAT x,    ///< variable.
+                  JBFLOAT *p)   ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_6 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 8th order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_8 (JBFLOAT x,    ///< variable.
+                  JBFLOAT *p)   ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_7 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 9th order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_9 (JBFLOAT x,    ///< variable.
+                  JBFLOAT *p)   ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_8 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 10th order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_10 (JBFLOAT x,   ///< variable.
+                   JBFLOAT *p)  ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_9 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 11th order polynomial (JBFLOAT).
+ *
+ * \return polynomial value.
+ */
+static inline JBFLOAT
+jbm_polynomial_11 (JBFLOAT x,   ///< variable.
+                   JBFLOAT *p)  ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_10 (x, p + 1);
+}
+
+/**
  * Function to calculate the solution of a reduced quadratic equation in
  * an interval \f$\left[x_1,x_2\right]\f$ in the form \f$x^2+a\,x+b=0\f$
  * (JBFLOAT).
@@ -889,11 +1190,19 @@ jbm_solve_quadratic_reduced (JBFLOAT a,
                              ///< right limit of the solution interval.
 {
   JBFLOAT k;
-  a /= 2.;
+#if JBM_LOW_PRECISION == 1
+  a *= -0.5f;
+#elif JBM_LOW_PRECISION == 2
+  a *= -0.5;
+#elif JBM_LOW_PRECISION == 3
+  a *= -0.5L;
+#elif JBM_LOW_PRECISION == 4
+  a *= -0.5Q;
+#endif
   b = SQRT (a * a - b);
-  k = b - a;
+  k = a + b;
   if (k < x1 || k > x2)
-    k = -b - a;
+    k = a - b;
   return k;
 }
 
@@ -940,23 +1249,32 @@ jbm_solve_cubic_reduced (JBFLOAT a,
                          JBFLOAT x2)
                          ///< right limit of the solution interval.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c2 = 2.f, c3 = 3.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c2 = 2., c3 = 3.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c2 = 2.L, c3 = 3.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c2 = 2.Q, c3 = 3.Q;
+#endif
   JBFLOAT k0, k1, k2;
-  a /= 3.;
+  a /= c3;
   k0 = a * a;
-  k1 = b / 3. - k0;
-  k0 = (b * a - c) / 2. - a * k0;
+  k1 = b / c3 - k0;
+  k0 = (b * a - c) / c2 - a * k0;
   k2 = k1 * k1 * k1 + k0 * k0;
-  if (k2 < 0.)
+  if (k2 < c0)
     {
       k1 = SQRT (-k1);
-      k0 = ACOS (k0 / (k1 * k1 * k1)) / 3.;
-      k1 *= 2.;
+      k0 = ACOS (k0 / (k1 * k1 * k1)) / c3;
+      k1 *= c2;
       k2 = k1 * COS (k0) - a;
       if (k2 < x1 || k2 > x2)
         {
-          k2 = k1 * COS (k0 + 2. * JB_PI / 3.) - a;
+          k2 = k1 * COS (k0 + c2 * JB_PI / c3) - a;
           if (k2 < x1 || k2 > x2)
-            k2 = k1 * COS (k0 - 2. * JB_PI / 3.) - a;
+            k2 = k1 * COS (k0 - c2 * JB_PI / c3) - a;
         }
     }
   else
@@ -1009,7 +1327,16 @@ jbm_flux_limiter_total (JBFLOAT d1 __attribute__((unused)),
                         JBFLOAT d2 __attribute__((unused)))
 ///< 2nd flux limiter function parameter.
 {
-  return 0.;
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q;
+#endif
+  return c0;
 }
 
 /**
@@ -1024,7 +1351,16 @@ jbm_flux_limiter_null (JBFLOAT d1 __attribute__((unused)),
                        JBFLOAT d2 __attribute__((unused)))
 ///< 2nd flux limiter function parameter.
 {
-  return 1.;
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c1 = 1.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c1 = 1.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c1 = 1.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c1 = 1.Q;
+#endif
+  return c1;
 }
 
 /**
@@ -1039,8 +1375,17 @@ jbm_flux_limiter_centred (JBFLOAT d1,
                           JBFLOAT d2)
                           ///< 2nd flux limiter function parameter.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q;
+#endif
   if (jbm_small (d2))
-    return 0.;
+    return c0;
   return d1 / d2;
 }
 
@@ -1058,11 +1403,20 @@ jbm_flux_limiter_superbee (JBFLOAT d1,
                            JBFLOAT d2)
                            ///< 2nd flux limiter function parameter.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c1 = 1.f, c2 = 2.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c1 = 1., c2 = 2.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c1 = 1.L, c2 = 2.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c1 = 1.Q, c2 = 2.Q;
+#endif
   JBFLOAT r;
   if (d1 * d2 <= JBM_EPSILON)
-    return 0.;
+    return c0;
   r = d1 / d2;
-  return FMAX (FMIN (r + r, 1.), FMIN (r, 2.));
+  return FMAX (FMIN (r + r, c1), FMIN (r, c2));
 }
 
 /**
@@ -1078,9 +1432,18 @@ jbm_flux_limiter_minmod (JBFLOAT d1,
                          JBFLOAT d2)
                          ///< 2nd flux limiter function parameter.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c1 = 1.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c1 = 1.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c1 = 1.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
+#endif
   if (d1 * d2 <= JBM_EPSILON)
-    return 0.;
-  return FMIN (d1 / d2, 1.);
+    return c0;
+  return FMIN (d1 / d2, c1);
 }
 
 /**
@@ -1097,12 +1460,21 @@ jbm_flux_limiter_VanLeer (JBFLOAT d1,
                           JBFLOAT d2)
                           ///< 2nd flux limiter function parameter.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c1 = 1.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c1 = 1.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c1 = 1.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
+#endif
   JBFLOAT r, k;
   if (d1 * d2 <= JBM_EPSILON)
-    return 0.;
+    return c0;
   r = d1 / d2;
   k = FABS (r);
-  return (r + k) / (1. + k);
+  return (r + k) / (c1 + k);
 }
 
 /**
@@ -1118,12 +1490,21 @@ jbm_flux_limiter_VanAlbada (JBFLOAT d1,
                             JBFLOAT d2)
                             ///< 2nd flux limiter function parameter.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c1 = 1.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c1 = 1.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c1 = 1.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
+#endif
   JBFLOAT r, k;
   if (d1 * d2 <= JBM_EPSILON)
-    return 0.;
+    return c0;
   r = d1 / d2;
   k = r * r;
-  return (r + k) / (1. + k);
+  return (r + k) / (c1 + k);
 }
 
 /**
@@ -1139,9 +1520,18 @@ jbm_flux_limiter_minsuper (JBFLOAT d1,
                            JBFLOAT d2)
                            ///< 2nd flux limiter function parameter.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c2 = 2.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c2 = 2.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c2 = 2.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c2 = 2.Q;
+#endif
   if (d1 * d2 <= JBM_EPSILON)
-    return 0.;
-  return FMIN (d1 / d2, 2.);
+    return c0;
+  return FMIN (d1 / d2, c2);
 }
 
 /**
@@ -1157,16 +1547,25 @@ jbm_flux_limiter_supermin (JBFLOAT d1,
                            JBFLOAT d2)
                            ///< 2nd flux limiter function parameter.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c1 = 1.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c1 = 1.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c1 = 1.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
+#endif
   if (d1 * d2 <= JBM_EPSILON)
-    return 0.;
-  return FMIN (jbm_fdbl (d1 / d2), 1.);
+    return c0;
+  return FMIN (jbm_fdbl (d1 / d2), c1);
 }
 
 /**
  * Function to calculate the monotonized central flux limiter:
- * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \f\[\psi\left(d_1,\,d_2\right)=\max\left[0,\,
  * \min\left(2,\,\frac{1+\frac{d_1}{d_2}}{2},\,\frac{2\,d_1}{d_2}\right)
- * \right]\f$ (JBFLOAT).
+ * \right]\f\] (JBFLOAT).
  *
  * \return flux limiter function value.
  */
@@ -1176,15 +1575,24 @@ jbm_flux_limiter_monotonized_central (JBFLOAT d1,
                                       JBFLOAT d2)
                                       ///< 2nd flux limiter function parameter.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c1 = 1.f, c2 = 2.f, c3 = 3.f, c05 = 0.5f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c1 = 1., c2 = 2., c3 = 3., c05 = 0.5;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c1 = 1.L, c2 = 2.L, c3 = 3.L, c05 = 0.5L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c1 = 1.Q, c2 = 2.Q, c3 = 3.Q, c05 = 0.5Q;
+#endif
   JBFLOAT k;
   if (d1 * d2 <= JBM_EPSILON)
-    return 0.;
+    return c0;
   k = d1 / d2;
-  if (k >= 3.)
-    return 2.;
-  if (k <= 1. / 3.)
+  if (k >= c3)
+    return c2;
+  if (k <= c1 / c3)
     return k + k;
-  return 0.5 * (k + 1.);
+  return c05 * (k + c1);
 }
 
 /**
@@ -1200,9 +1608,18 @@ jbm_flux_limiter_mean (JBFLOAT d1,
                        JBFLOAT d2)
                        ///< 2nd flux limiter function parameter.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c1 = 1.f, c05 = 0.5f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c1 = 1., c05 = 0.5;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c1 = 1.L, c05 = 0.5L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c1 = 1.Q, c05 = 0.5Q;
+#endif
   if (jbm_small (d2))
-    return 0.;
-  return 0.5 * (d1 / d2 + 1.);
+    return c0;
+  return c05 * (d1 / d2 + c1);
 }
 
 /**
@@ -1245,6 +1662,36 @@ static inline JBFLOAT (*jbm_flux_limiter_select (int type)) (JBFLOAT, JBFLOAT)
  * Function to approximate an integral of a function with the Gauss method
  * defined in an interval (JBFLOAT).
  *
+ * The coefficients are:\n
+ * - 1 point (2nd order):\n
+ * \f$a_0=2,\quad b_0=0\f$\n
+ * - 3 points (6th order):\n
+ * \f$a_0=\frac{8}{9},\quad b_0=0,\f$\n
+ * \f$a_1=\frac{5}{9},\quad b_1=\sqrt{\frac{3}{5}},\f$\n
+ * - 5 points (10th order):\n
+ * \f$a_0=\frac{128}{225},\quad b_0=0,\f$\n
+ * \f$a_1=\frac{15\,\sqrt{70}-21}{50\,\sqrt{70}-200},\quad
+ * b_1=\sqrt{\frac{35-\sqrt{280}}{63}},\f$\n
+ * \f$a_2=\frac{15\,\sqrt{70}+21}{50\,\sqrt{70}+200},\quad
+ * b_2=\sqrt{\frac{35+\sqrt{280}}{63}},\f$\n
+ * - 7 points (14th order):\n
+ * \f\[b_0=0,\f\]
+ * \f\[b_1=\sqrt{\frac{7}{13}-\sqrt{\frac{336}{1859}}\,\cos\left[\frac{1}{3}
+ *   \,acos\left(\sqrt{\frac{539}{83349}}\right)\right]},\f\]
+ * \f\[b_2=\sqrt{\frac{7}{13}+\sqrt{\frac{336}{1859}}\,\cos\left\{\frac{1}{3}
+ *   \,acos\left[\frac{1}{3}\,\left(\pi+\sqrt{\frac{539}{83349}}\right)\right]
+ *   \right\}},\f\]
+ * \f\[b_3=\sqrt{\frac{7}{13}+\sqrt{\frac{336}{1859}}\,\cos\left\{\frac{1}{3}
+ *   \,acos\left[\frac{1}{3}\,\left(\pi-\sqrt{\frac{539}{83349}}\right)\right]
+ *   \right\}},\f\]
+ * \f\[a_3=\frac{1}{b_3^2}\,\frac{\frac{1}{7}-y_1\,\frac{1}{5}
+ *   -y_2\,\left(\frac{1}{5}-y_1\,\frac{1}{3}\right)}
+ *   {\left(y_3-y_2\right)\,\left(y_3-y_1\right)},\f\]
+ * \f\[a_2=\frac{1}{b_2^2}\,\frac{\frac{1}{5}-y_1\,\frac{1}{3}
+ *   -b_3\,\left(y_3-y_1\right)}{y_2-y_1},\f\]
+ * \f\[a_1=\frac{1}{b_1^2}\,\left(\frac{1}{3}-b_2-b_3\right),\f\]
+ * \f\[a_0=0\f\]
+ *
  * \return integral value.
  */
 static inline JBFLOAT
@@ -1253,41 +1700,141 @@ jbm_integral (JBFLOAT (*f) (JBFLOAT),
               JBFLOAT x1,       ///< left limit of the interval.
               JBFLOAT x2)       ///< right limit of the interval.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c05 = 0.5f;
 #if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] = { 2.L }, b[1];
+  const JBFLOAT a[1] = { 2.f };
 #elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] = { 8. / 9.L, 5. / 9.L }, b[2] = {
-    0., 0.7745966692414833770358531L
-  };
+  const JBFLOAT a[2] = { 8.f / 9.f, 5.f / 9.f }, b[2] = { 0.f, 7.7459667e-1f };
 #elif JBM_INTEGRAL_GAUSS_N == 3
   const JBFLOAT a[3] = {
-    0.5688888888888888888888889L,
-    0.4786286704993664680412915L,
-    0.2369268850561890875142640L
+    128.f / 225.f,
+    4.7862867e-1f,
+    2.3692689e-1f
   }, b[3] = {
-    0.L, 0.5384693101056830910363144L, 0.9061798459386639927976269L
+    0.f,
+    5.3846931e-1f,
+    9.0617985e-1f
   };
 #elif JBM_INTEGRAL_GAUSS_N == 4
   const JBFLOAT a[4] = {
-    0.4179591836734693877551020L,
-    0.3818300505051189449503698L,
-    0.2797053914892766679014678L,
-    0.1294849661688696932706114L
+    4.1795918e-1f,
+    3.8183005e-1f,
+    2.7970539e-1f,
+    1.2948497e-1f
   }, b[4] = {
-    0.L, 0.4058451513773971669066064L,
-    0.7415311855993944398638648L, 0.9491079123427585245261897L
+    0.f,
+    4.0584515e-1f,
+    7.4153119e-1f,
+    9.4910791e-1f
   };
 #endif
-  JBFLOAT k, k2, x, dx;
-  int i;
-  dx = 0.5L * (x2 - x1);
-  x = 0.5L * (x1 + x2);
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c05 = 0.5;
+#if JBM_INTEGRAL_GAUSS_N == 1
+  const JBFLOAT a[1] = { 2. };
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  const JBFLOAT a[2] = { 8. / 9., 5. / 9. },
+    b[2] = { 0., 7.745966692414834e-1 };
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  const JBFLOAT a[3] = {
+    128. / 225.,
+    4.786286704993665e-1,
+    2.369268850561891e-1
+  }, b[3] = {
+    0.,
+    5.384693101056831e-1,
+    9.061798459386640e-1
+  };
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  const JBFLOAT a[4] = {
+    4.179591836734694e-1,
+    3.818300505051189e-1,
+    2.797053914892767e-1,
+    1.294849661688697e-1
+  }, b[4] = {
+    0.,
+    4.058451513773972e-1,
+    7.415311855993944e-1,
+    9.491079123427585e-1
+  };
+#endif
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c05 = 0.5L;
+#if JBM_INTEGRAL_GAUSS_N == 1
+  const JBFLOAT a[1] = { 2.L };
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  const JBFLOAT a[2] = { 8.L / 9.L, 5.L / 9.L },
+    b[2] = { 0.L, 7.7459666924148340428e-1L };
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  const JBFLOAT a[3] = {
+    128.L / 225.L,
+    4.7862867049936646804e-1L,
+    2.3692688505618908751e-1L
+  }, b[3] = {
+    0.L,
+    5.3846931010568309104e-1L,
+    9.0617984593866399280e-1L
+  };
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  const JBFLOAT a[4] = {
+    4.1795918367346938776e-1L,
+    3.8183005050511894495e-1L,
+    2.7970539148927666790e-1L,
+    1.2948496616886969327e-1L
+  }, b[4] = {
+    0.L,
+    4.0584515137739716691e-1L,
+    7.4153118559939443986e-1L,
+    9.4910791234275852453e-1L
+  };
+#endif
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c05 = 0.5Q;
+#if JBM_INTEGRAL_GAUSS_N == 1
+  const JBFLOAT a[1] = { 2.Q };
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  const JBFLOAT a[2] = { 8.Q / 9.Q, 5.Q / 9.Q },
+    b[2] = { 0.Q, 7.7459666924148340427791481488384306e-1Q };
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  const JBFLOAT a[3] = {
+    128.Q / 225.Q,
+    4.7862867049936646804129151483563819e-1Q,
+    2.3692688505618908751426404071991736e-1Q
+  }, b[3] = {
+    0.Q,
+    5.3846931010568309103631442070020880e-1Q,
+    9.0617984593866399279762687829939297e-1Q
+  };
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  const JBFLOAT a[4] = {
+    4.1795918367346938775510204081632653e-1Q,
+    3.8183005050511894495036977548897513e-1Q,
+    2.7970539148927666790146777142377958e-1Q,
+    1.2948496616886969327061143267908202e-1Q
+  }, b[4] = {
+    0.Q,
+    4.0584515137739716690660641207696146e-1Q,
+    7.4153118559939443986386477328078841e-1Q,
+    9.4910791234275852452618968404785126e-1Q
+  };
+#endif
+#endif
+  JBFLOAT k, x, dx;
+#if JBM_INTEGRAL_GAUSS_N > 1
+  JBFLOAT k2;
+  unsigned int i;
+#endif
+  dx = c05 * (x2 - x1);
+  x = c05 * (x1 + x2);
   k = a[0] * dx * f (x);
+#if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
       k2 = b[i] * dx;
       k += a[i] * dx * (f (x - k2) + f (x + k2));
     }
+#endif
   return k;
 }
 
@@ -1297,12 +1844,13 @@ jbm_integral (JBFLOAT (*f) (JBFLOAT),
  *
  * \return interval number.
  */
-static inline int
+static inline unsigned int
 jbm_farray_search (JBFLOAT x,   ///< number to search.
-                   JBFLOAT * fa,        ///< array of JBFLOAT numbers.
-                   int n)       ///< number of the highest array element.
+                   JBFLOAT *fa, ///< array of JBFLOAT numbers.
+                   unsigned int n)
+                   ///< number of the highest array element.
 {
-  int i, j;
+  unsigned int i, j;
   for (i = 0; n - i > 1;)
     {
       j = (i + n) >> 1;
@@ -1321,17 +1869,17 @@ jbm_farray_search (JBFLOAT x,   ///< number to search.
  */
 static inline int
 jbm_farray_search_extended (JBFLOAT x,  ///< number to search.
-                            JBFLOAT * fa,       ///< array of JBFLOAT numbers.
-                            int n)
+                            JBFLOAT *fa,        ///< array of JBFLOAT numbers.
+                            unsigned int n)
                             ///< number of the highest array element.
 {
   int i;
   if (x < fa[0])
     i = -1;
   else if (x >= fa[n])
-    i = n;
+    i = (int) n;
   else
-    i = jbm_farray_search (x, fa, n);
+    i = (int) jbm_farray_search (x, fa, n);
   return i;
 }
 
@@ -1341,11 +1889,11 @@ jbm_farray_search_extended (JBFLOAT x,  ///< number to search.
  * \return the highest value.
  */
 static inline JBFLOAT
-jbm_farray_max (JBFLOAT * fa,   ///< array of JBFLOAT numbers.
-                int n)          ///< number of the ending array element.
+jbm_farray_max (JBFLOAT *fa,    ///< array of JBFLOAT numbers.
+                unsigned int n) ///< number of the ending array element.
 {
   JBFLOAT k;
-  int i;
+  unsigned int i;
   k = fa[0];
   for (i = 0; ++i <= n;)
     k = FMAX (k, fa[i]);
@@ -1358,11 +1906,11 @@ jbm_farray_max (JBFLOAT * fa,   ///< array of JBFLOAT numbers.
  * \return the lowest value.
  */
 static inline JBFLOAT
-jbm_farray_min (JBFLOAT * fa,   ///< array of JBFLOAT numbers.
-                int n)          ///< number of the ending array element.
+jbm_farray_min (JBFLOAT *fa,    ///< array of JBFLOAT numbers.
+                unsigned int n) ///< number of the ending array element.
 {
   JBFLOAT k;
-  int i;
+  unsigned int i;
   k = fa[0];
   for (i = 0; ++i <= n;)
     k = FMIN (k, fa[i]);
@@ -1374,13 +1922,13 @@ jbm_farray_min (JBFLOAT * fa,   ///< array of JBFLOAT numbers.
  * numbers.
  */
 static inline void
-jbm_farray_maxmin (JBFLOAT * fa,        ///< array of JBFLOAT numbers.
-                   int n,       ///< number of the ending array element.
-                   JBFLOAT * max,       ///< the highest value.
-                   JBFLOAT * min)       ///< the lowest value.
+jbm_farray_maxmin (JBFLOAT *fa, ///< array of JBFLOAT numbers.
+                   unsigned int n,      ///< number of the ending array element.
+                   JBFLOAT *max,        ///< the highest value.
+                   JBFLOAT *min)        ///< the lowest value.
 {
   JBFLOAT kmax, kmin;
-  int i;
+  unsigned int i;
   kmax = kmin = fa[0];
   for (i = 0; ++i <= n;)
     {
@@ -1400,15 +1948,16 @@ jbm_farray_change (JBFLOAT *restrict fa,
                    ///< 1st array of JBFLOAT numbers.
                    JBFLOAT *restrict fb,
                    ///< 2nd array of JBFLOAT numbers.
-                   int n)       ///< the highest element number of the arrays.
+                   unsigned int n)
+                   ///< the highest element number of the arrays.
 {
-  JBFLOAT *fc;
-  int n1;
-  n1 = n + 1;
-  fc = (JBFLOAT *) malloc (n1 * sizeof (JBFLOAT));
-  memcpy (fc, fa, n1);
-  memcpy (fa, fb, n1);
-  memcpy (fb, fc, n1);
+  JBFLOAT *restrict fc;
+  size_t s;
+  s = (n + 1) * sizeof (JBFLOAT);
+  fc = (JBFLOAT *) malloc (s);
+  memcpy (fc, fa, s);
+  memcpy (fa, fb, s);
+  memcpy (fb, fc, s);
   free (fc);
 }
 
@@ -1420,14 +1969,15 @@ jbm_farray_change (JBFLOAT *restrict fa,
  */
 static inline JBFLOAT
 jbm_farray_interpolate (JBFLOAT x,      ///< x-coordinate of the point.
-                        JBFLOAT * fa,
+                        JBFLOAT *fa,
 ///< increasingly sorted array of x-coordinates of the tabular function.
-                        JBFLOAT * fb,
+                        JBFLOAT *fb,
 ///< array of y-coordinates of the tabular function.
-                        int n)  ///< the highest element number of the arrays.
+                        unsigned int n)
+///< the highest element number of the arrays.
 {
   JBFLOAT k;
-  int i;
+  unsigned int i;
   i = jbm_farray_search (x, fa, n);
   if (i == n)
     k = fb[i];
@@ -1444,25 +1994,29 @@ jbm_farray_interpolate (JBFLOAT x,      ///< x-coordinate of the point.
 static inline JBFLOAT *
 jbm_farray_merge (JBFLOAT *restrict fa,
                   ///< 1st increasingly sorted array of JBFLOAT numbers.
-                  int na,
+                  unsigned int na,
                   ///< the highest element number of the 1st array.
                   JBFLOAT *restrict fb,
                   ///< 2nd increasingly sorted array of JBFLOAT numbers.
-                  int nb,
+                  unsigned int nb,
                   ///< the highest element number of the 2nd array.
-                  JBFLOAT ** fc,
+                  JBFLOAT **fc,
 ///< pointer to the resulting increasingly sorted array of JBFLOAT numbers.
-                  int *nc)
-///< pointer to the highest element number of the resulting array.
+                  unsigned int *nc)
+                  ///< the highest element number of the resulting array.
 {
   JBFLOAT *restrict x;
-  int i, j, k;
+  unsigned int i, j, k;
   x = (JBFLOAT *) g_try_malloc ((na + nb + 2) * sizeof (JBFLOAT));
   if (!x)
-    return 0;
+    return NULL;
   for (i = j = k = 0; i <= na || j <= nb; ++k)
     {
-      if (fa[i] > fb[j])
+      if (i > na)
+        x[k] = fb[j++];
+      else if (j > nb)
+        x[k] = fa[i++];
+      else if (fa[i] > fb[j])
         x[k] = fb[j++];
       else if (fa[i] < fb[j])
         x[k] = fa[i++];
@@ -1486,12 +2040,22 @@ jbm_farray_integral (JBFLOAT *restrict x,
                      JBFLOAT *restrict y,
 ///< array of JBFLOAT numbers defining the y-coordinates of the tabular
 ///< function.
-                     int n,     ///< the highest element number of the arrays.
+                     unsigned int n,
+                     ///< the highest element number of the arrays.
                      JBFLOAT x1,
                      ///< left limit of the integration interval.
                      JBFLOAT x2)
                      ///< right limit of the integration interval.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c05 = 0.5f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c05 = 0.5;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c05 = 0.5L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c05 = 0.5Q;
+#endif
   JBFLOAT *yy, *xx;
   JBFLOAT I, y1;
   int i;
@@ -1522,18 +2086,18 @@ jbm_farray_integral (JBFLOAT *restrict x,
     }
   else
     {
-      I = 0.;
+      I = c0;
       xx = x + i;
       yy = y + i;
       y1 = jbm_extrapolate (x1, xx[0], xx[1], yy[0], yy[1]);
     }
   if (x2 < xx[1])
     {
-      I += 0.5 * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1]))
+      I += c05 * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1]))
         * (x2 - x1);
       goto exit1;
     }
-  I += 0.5 * (y1 + yy[1]) * (xx[1] - x1);
+  I += c05 * (y1 + yy[1]) * (xx[1] - x1);
   if (++i == n)
     {
       I += yy[1] * (x2 - xx[1]);
@@ -1542,12 +2106,12 @@ jbm_farray_integral (JBFLOAT *restrict x,
   while (++i < n && x2 > xx[2])
     {
       ++xx, ++yy;
-      I += 0.5 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
+      I += c05 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
     }
   if (i == n)
     I += yy[2] * (x2 - xx[1]);
   else if (x2 < xx[2])
-    I += 0.5 * (yy[1] + jbm_extrapolate (x2, xx[1], xx[2], yy[1], yy[2]))
+    I += c05 * (yy[1] + jbm_extrapolate (x2, xx[1], xx[2], yy[1], yy[2]))
       * (x2 - xx[1]);
 exit1:
   return I;
@@ -1566,7 +2130,7 @@ jbm_farray_mean_square_error (JBFLOAT *restrict xa,
                               JBFLOAT *restrict fa,
 ///< array of JBFLOAT numbers defining the y-coordinates of the 1st tabular
 ///< function.
-                              int na,
+                              unsigned int na,
 ///< the highest element number of the arrays defining the 1st tabular
 ///< function.
                               JBFLOAT *restrict xr,
@@ -1575,12 +2139,20 @@ jbm_farray_mean_square_error (JBFLOAT *restrict xa,
                               JBFLOAT *restrict fr,
 ///< array of JBFLOAT numbers defining the y-coordinates of the 2nd tabular
 ///< function.
-                              int nr)
+                              unsigned int nr)
 ///< the highest element number of the arrays defining the 2nd tabular
 ///< function.
 {
+#if JBM_LOW_PRECISION == 1
+  JBFLOAT k = 0.f;
+#elif JBM_LOW_PRECISION == 2
   JBFLOAT k = 0.;
-  int i, j;
+#elif JBM_LOW_PRECISION == 3
+  JBFLOAT k = 0.L;
+#elif JBM_LOW_PRECISION == 4
+  JBFLOAT k = 0.Q;
+#endif
+  unsigned int i, j;
   for (i = 0; i <= na && xa[i] < xr[0]; ++i)
     k += jbm_fsqr (fa[i] - fr[0]);
   for (j = 0; i <= na; ++i)
@@ -1634,7 +2206,7 @@ jbm_farray_root_mean_square_error (JBFLOAT *restrict xa,
 static inline void
 jbm_index_sort_insertion (JBFLOAT *restrict x,
                           ///< array of JBFLOAT numbers.
-                          unsigned int *restrict ni,  ///< array of indexes.
+                          unsigned int *restrict ni,    ///< array of indexes.
                           int n)
                           ///< the highest element number of the arrays.
 {
@@ -1684,8 +2256,8 @@ jbm_index_sort_interchange (JBFLOAT *restrict x,
  * JBFLOAT numbers by the merge method.
  */
 static inline void
-jbm_index_sort_merge (JBFLOAT *restrict x,   ///< array of JBFLOAT numbers.
-                      unsigned int *restrict ni,      ///< array of indexes.
+jbm_index_sort_merge (JBFLOAT *restrict x,      ///< array of JBFLOAT numbers.
+                      unsigned int *restrict ni,        ///< array of indexes.
                       int n)    ///< the highest element number of the arrays.
 {
   unsigned int nn[n + 1];
@@ -1754,8 +2326,8 @@ jbm_index_sort_merge (JBFLOAT *restrict x,   ///< array of JBFLOAT numbers.
  * JBFLOAT numbers by the optimal method.
  */
 static inline void
-jbm_index_sort (JBFLOAT *restrict x, ///< array of JBFLOAT numbers.
-                unsigned int *restrict ni,    ///< array of indexes.
+jbm_index_sort (JBFLOAT *restrict x,    ///< array of JBFLOAT numbers.
+                unsigned int *restrict ni,      ///< array of indexes.
                 int n)          ///< the highest element number of the arrays.
 {
   int i;
@@ -1826,7 +2398,7 @@ index_exit:
  * It modifies the x matrix (JBFLOAT).
  */
 static inline void
-jbm_matrix_solve (JBFLOAT * x,  ///< matrix storing the linear equations system.
+jbm_matrix_solve (JBFLOAT *x,   ///< matrix storing the linear equations system.
                   int n)        ///< number of matrix rows.
 {
   JBFLOAT *f, *g;
@@ -1861,7 +2433,7 @@ jbm_matrix_solve (JBFLOAT * x,  ///< matrix storing the linear equations system.
       if (k != i)
         {
           g = f + (i - k) * n;
-          jbm_farray_change (g + j, f + j, i + 1);
+          jbm_farray_change (g, f, i + 1);
         }
       // Eliminating column
       for (j = i, g = f + n; --j >= 0; g += n)
@@ -1889,7 +2461,7 @@ jbm_matrix_solve (JBFLOAT * x,  ///< matrix storing the linear equations system.
  * D_0 & E_0    &         &         & H_0\\
  * C_0 & D_1    & E_1     &         & H_1\\
  *     & \ddots & \ddots  & \ddots  & \vdots\\
- *     &        & C_{n-2} & D_{n-1} & H_{n-1}
+ *     &        & C_{n-1} & D_{n}   & H_{n}
  * \end{array}\right)\f$.
  * Results are stored in the H array. It modifies D and H arrays (JBFLOAT).
  */
@@ -1900,11 +2472,11 @@ jbm_matrix_solve_tridiagonal (JBFLOAT *restrict C,
                               ///< central diagonal array.
                               JBFLOAT *restrict E,
                               ///< right diagonal array.
-                              JBFLOAT *restrict H,   ///< final column array.
-                              int n)    ///< number of matrix rows.
+                              JBFLOAT *restrict H,      ///< final column array.
+                              unsigned int n)   ///< last matrix row.
 {
   JBFLOAT k;
-  int i;
+  unsigned int i;
   for (i = 0; i < n; ++i)
     {
       k = C[i] / D[i];
@@ -1922,7 +2494,7 @@ jbm_matrix_solve_tridiagonal (JBFLOAT *restrict C,
  * D_0 & E_0    &         &         & H_0\\
  * C_0 & D_1    & E_1     &         & H_1\\
  *     & \ddots & \ddots  & \ddots  & \vdots\\
- *     &        & C_{n-2} & D_{n-1} & H_{n-1}
+ *     &        & C_{n-1} & D_{n}   & H_{n}
  * \end{array}\right)\f$.
  * avoiding zero divisions. Results are stored in the H array. It modifies D and
  * H arrays (JBFLOAT).
@@ -1936,10 +2508,20 @@ jbm_matrix_solve_tridiagonal_zero (JBFLOAT *restrict C,
                                    ///< right diagonal array.
                                    JBFLOAT *restrict H,
                                    ///< final column array.
-                                   int n)       ///< number of matrix rows.
+                                   unsigned int n)
+                                   ///< last matrix row.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q;
+#endif
   JBFLOAT k;
-  int i;
+  unsigned int i;
   for (i = 0; i < n; ++i)
     if (!jbm_small (D[i]))
       {
@@ -1948,12 +2530,12 @@ jbm_matrix_solve_tridiagonal_zero (JBFLOAT *restrict C,
         H[i + 1] -= k * H[i];
       }
   if (jbm_small (D[i]))
-    H[i] = 0.;
+    H[i] = c0;
   else
     H[i] /= D[i];
   while (i--)
     if (jbm_small (D[i]))
-      H[i] = 0.;
+      H[i] = c0;
     else
       H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
 }
@@ -1965,7 +2547,7 @@ jbm_matrix_solve_tridiagonal_zero (JBFLOAT *restrict C,
  * C_0 & D_1    & E_1     & F_1     &         &         & H_1\\
  * B_0 & C_1    & D_2     & E_2     & F_2     &         & H_2\\
  *     & \ddots & \ddots  & \ddots  & \ddots  & \ddots  & \vdots\\
- *     &        &         & B_{n-3} & C_{n-2} & D_{n-1} & H_{n-1}
+ *     &        &         & B_{n-2} & C_{n-1} & D_{n}   & H_{n}
  * \end{array}\right)\f$.
  * Results are stored in the H array. It modifies C, D, E and H arrays 
  * (JBFLOAT).
@@ -1981,11 +2563,11 @@ jbm_matrix_solve_pentadiagonal (JBFLOAT *restrict B,
                                 ///< right diagonal array.
                                 JBFLOAT *restrict F,
                                 ///< double-right diagonal array.
-                                JBFLOAT *restrict H, ///< final column array.
-                                int n)  ///< number of matrix rows.
+                                JBFLOAT *restrict H,    ///< final column array.
+                                unsigned int n)  ///< last matrix row.
 {
   JBFLOAT k;
-  int i;
+  unsigned int i;
   for (i = 0; i < n - 1; ++i)
     {
       k = C[i] / D[i];
@@ -2013,7 +2595,7 @@ jbm_matrix_solve_pentadiagonal (JBFLOAT *restrict B,
  * C_0 & D_1    & E_1     & F_1     &         &         & H_1\\
  * B_0 & C_1    & D_2     & E_2     & F_2     &         & H_2\\
  *     & \ddots & \ddots  & \ddots  & \ddots  & \ddots  & \vdots\\
- *     &        &         & B_{n-3} & C_{n-2} & D_{n-1} & H_{n-1}
+ *     &        &         & B_{n-2} & C_{n-1} & D_{n}   & H_{n}
  * \end{array}\right)\f$.
  * avoiding zero divisions. Results are stored in the H array. It modifies C, D,
  * E and H arrays (JBFLOAT).
@@ -2031,10 +2613,19 @@ jbm_matrix_solve_pentadiagonal_zero (JBFLOAT *restrict B,
                                      ///< double-right diagonal array.
                                      JBFLOAT *restrict H,
                                      ///< final column array.
-                                     int n)     ///< number of matrix rows.
+                                     unsigned int n)    ///< last matrix row.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q;
+#endif
   JBFLOAT k;
-  int i;
+  unsigned int i;
   for (i = 0; i < n - 1; ++i)
     if (!jbm_small (D[i]))
       {
@@ -2054,22 +2645,60 @@ jbm_matrix_solve_pentadiagonal_zero (JBFLOAT *restrict B,
       H[i + 1] -= k * H[i];
     }
   if (jbm_small (D[i + 1]))
-    H[i + 1] = 0.;
+    H[i + 1] = c0;
   else
     H[i + 1] /= D[i + 1];
   if (jbm_small (D[i]))
-    H[i] = 0.;
+    H[i] = c0;
   else
     H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
   while (i--)
     if (jbm_small (D[i]))
-      H[i] = 0.;
+      H[i] = c0;
     else
       H[i] = (H[i] - E[i] * H[i + 1] - F[i] * H[i + 2]) / D[i];
 }
 
 /**
- * Function to calculate the coefficientes of a polynomial regression adjusted
+ * Function to calculate the coefficients of a linear regression adjusted by 
+ * minimum squares: \f$y=a+b\,x\f$ (JBFLOAT).
+ */
+static inline void
+jbm_regression_linear (JBFLOAT *restrict x,
+                       ///< array of point x-coordinates.
+                       JBFLOAT *restrict y,
+                       ///< array of point y-coordinates.
+                       unsigned int n,  ///< points number.
+                       JBFLOAT *a,
+                       ///< pointer to the 0th order regression coefficient.
+                       JBFLOAT *b)
+                       ///< pointer to the 1st order regression coefficient.
+{
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q;
+#endif
+  JBFLOAT syx, sy, sxx, sx;
+  unsigned int i;
+  syx = sy = sxx = sx = c0;
+  for (i = 0; i <= n; ++i)
+    {
+      sy += y[i];
+      syx += x[i] * y[i];
+      sxx += x[i] * x[i];
+      sx += x[i];
+    }
+  *b = (n * syx - sy * sx) / (n * sxx - sx * sx);
+  *a = (sy - *b * sx) / n;
+}
+
+/**
+ * Function to calculate the coefficients of a polynomial regression adjusted
  * by minimum squares: \f$y=A_0+A_1\,x+A_2\,x^2+\cdots\f$ (JBFLOAT).
  */
 static inline void
@@ -2078,22 +2707,31 @@ jbm_regression_polynomial (JBFLOAT *restrict x,
                            JBFLOAT *restrict y,
                            ///< array of point y-coordinates.
                            int n,       ///< points number.
-                           JBFLOAT ** A,
+                           JBFLOAT **A,
 ///< pointer to the array of regression coefficients generated by the function
 ///< calling to g_malloc.
                            int m)       ///< order of the polynomial regression.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c1 = 1.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c1 = 1.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c1 = 1.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
+#endif
   JBFLOAT xx[m + m + 1], yx[m + 1], B[(m + 1) * (m + 2)];
   JBFLOAT *k;
   JBFLOAT zx, zy;
   int i, j;
   for (j = m + m; --j > m;)
-    xx[j] = 0.;
+    xx[j] = c0;
   for (; j >= 0; --j)
-    xx[j] = yx[j] = 0.;
+    xx[j] = yx[j] = c0;
   for (i = n; --i >= 0;)
     {
-      for (j = 0, zx = 1., zy = y[i]; j <= m; ++j)
+      for (j = 0, zx = c1, zy = y[i]; j <= m; ++j)
         {
           yx[j] += zy;
           xx[j] += zx;
@@ -2119,36 +2757,7 @@ jbm_regression_polynomial (JBFLOAT *restrict x,
 }
 
 /**
- * Function to calculate the coefficientes of a linear regression adjusted by 
- * minimum squares: \f$y=a+b\,x\f$ (JBFLOAT).
- */
-static inline void
-jbm_regression_linear (JBFLOAT *restrict x,
-                       ///< array of point x-coordinates.
-                       JBFLOAT *restrict y,
-                       ///< array of point y-coordinates.
-                       int n,   ///< points number.
-                       JBFLOAT * a,
-                       ///< pointer to the 0th order regression coefficient.
-                       JBFLOAT * b)
-                       ///< pointer to the 1st order regression coefficient.
-{
-  JBFLOAT syx, sy, sxx, sx;
-  int i;
-  syx = sy = sxx = sx = 0.;
-  for (i = 0; i <= n; ++i)
-    {
-      sy += y[i];
-      syx += x[i] * y[i];
-      sxx += x[i] * x[i];
-      sy += x[i];
-    }
-  *b = (n * syx - sy * sx) / (n * sxx - sx * sx);
-  *a = (sy - *b * sx) / n;
-}
-
-/**
- * Function to calculate the coefficientes of an exponential regression adjusted
+ * Function to calculate the coefficients of an exponential regression adjusted
  * by minimum squares: \f$y=a\,x^b\f$ (JBFLOAT).
  */
 static inline void
@@ -2157,9 +2766,9 @@ jbm_regression_exponential (JBFLOAT *restrict x,
                             JBFLOAT *restrict y,
 ///< array of point y-coordinates. It is modified by the function.
                             int n,      ///< points number.
-                            JBFLOAT * a,
+                            JBFLOAT *a,
 ///< pointer to the constant parameter regression coefficient.
-                            JBFLOAT * b)
+                            JBFLOAT *b)
 ///< pointer to the exponent regression coefficient.
 {
   int i;
@@ -2170,7 +2779,7 @@ jbm_regression_exponential (JBFLOAT *restrict x,
 }
 
 /**
- * Function to calculate the coefficientes of a multilinear regression adjusted 
+ * Function to calculate the coefficients of a multilinear regression adjusted 
  * by minimum squares: \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$ (JBFLOAT).
  */
 static inline void
@@ -2182,6 +2791,15 @@ jbm_regression_multilinear (JBFLOAT **restrict x,
                             ///< array of regression coefficients.
                             int m)      ///< number of variables.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q;
+#endif
   JBFLOAT c[(m + 1) * (m + 2)];
   JBFLOAT *d, *xj, *xk;
   int i, j, k;
@@ -2193,25 +2811,25 @@ jbm_regression_multilinear (JBFLOAT **restrict x,
           d = c + (m + 1) * j + k;
           xj = x[j];
           xk = x[k];
-          for (*d = 0., i = n + 1; --i >= 0;)
+          for (*d = c0, i = n + 1; --i >= 0;)
             *d += *(xj++) ** (xk++);
         }
       d = c + (m + 1) * j + m;
       xj = x[j];
       xk = x[0];
-      for (*d = 0., i = n + 1; --i >= 0;)
+      for (*d = c0, i = n + 1; --i >= 0;)
         *d += *(xj++) ** (xk++);
     }
   for (k = m; --k > 0;)
     {
       d = c + k;
       xk = x[k];
-      for (*d = 0., i = n + 1; --i >= 0;)
+      for (*d = c0, i = n + 1; --i >= 0;)
         *d += *(xk++);
     }
   d = c + m;
   xk = x[0];
-  for (*d = 0., i = n + 1; --i >= 0;)
+  for (*d = c0, i = n + 1; --i >= 0;)
     *d += *(xk++);
   c[0] = n + 1;
   for (j = m; --j > 0;)
@@ -2223,7 +2841,7 @@ jbm_regression_multilinear (JBFLOAT **restrict x,
 }
 
 /**
- * Function to calculate the coefficientes of a multiexponential regression 
+ * Function to calculate the coefficients of a multiexponential regression 
  * adjusted by minimum squares: \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$ (JBFLOAT).
  */
 static inline void
@@ -2262,6 +2880,15 @@ jbm_spline_cubic (JBFLOAT *restrict x,
                   JBFLOAT **restrict d)
 ///< pointer to the array of 3rd order spline coefficients.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c1 = 1.f, c3 = 3.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c1 = 1., c3 = 3.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c1 = 1.L, c3 = 3.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c1 = 1.Q, c3 = 3.Q;
+#endif
   JBFLOAT *B, *C, *D, *E, *F, *H;
   JBFLOAT dx;
   int i, j, m;
@@ -2274,14 +2901,14 @@ jbm_spline_cubic (JBFLOAT *restrict x,
   F = E + m - 1;
   H = F + m - 2;
   dx = x[1] - x[0];
-  B[0] = B[1] = D[3] = E[2] = E[3] = F[3] = H[1] = H[2] = H[3] = 0.;
-  C[0] = C[1] = C[2] = 1.;
-  F[1] = F[2] = -1.;
+  B[0] = B[1] = D[3] = E[2] = E[3] = F[3] = H[1] = H[2] = H[3] = c0;
+  C[0] = C[1] = C[2] = c1;
+  F[1] = F[2] = -c1;
   D[0] = dx;
   D[1] = D[0] + dx;
   D[2] = D[1] + dx;
   E[0] = D[0] * dx;
-  E[1] = 3 * E[0];
+  E[1] = c3 * E[0];
   F[0] = E[0] * dx;
   H[0] = y[1] - y[0];
   for (i = n - 1; --i > 0;)
@@ -2289,21 +2916,21 @@ jbm_spline_cubic (JBFLOAT *restrict x,
       j = 3 * i + 1;
       dx = x[i + 1] - x[i];
       B[j - 2] = D[j + 2] = F[j] = F[j + 1] = F[j + 2] = H[j + 1] = H[j + 2]
-        = 0.;
-      B[j - 1] = B[j] = 1.;
-      E[j + 1] = E[j + 2] = -1.;
+        = c0;
+      B[j - 1] = B[j] = c1;
+      E[j + 1] = E[j + 2] = -c1;
       C[j - 1] = dx;
       C[j] = C[j - 1] + dx;
       C[j + 1] = C[j] + dx;
       D[j] = C[j - 1] * dx;
-      D[j + 1] = 3 * D[j];
+      D[j + 1] = c3 * D[j];
       E[j] = D[j] * dx;
       H[j] = y[i + 1] - y[i];
     }
   j = 3 * n - 2;
   dx = x[n] - x[n - 1];
-  B[j - 2] = B[j - 1] = C[j] = H[j + 1] = 0.;
-  D[j + 1] = 1.;
+  B[j - 2] = B[j - 1] = C[j] = H[j + 1] = c0;
+  D[j + 1] = c1;
   C[j - 1] = dx;
   D[j] = dx * dx;
   E[j] = D[j] * dx;
@@ -2337,11 +2964,20 @@ jbm_transversal_section_regions_sort (int i,    ///< level index.
                                       JBFLOAT *restrict zz)
                                       ///< array of levels.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c05 = 0.5f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c05 = 0.5;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c05 = 0.5L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c05 = 0.5Q;
+#endif
   JBFLOAT x[nj];
   unsigned int nx[nj], na[nj];
+  JBFLOAT t;
   int j, k;
-  JBDOUBLE t;
-  t = 0.5 * (zz[i] + zz[i + 1]);
+  t = c05 * (zz[i] + zz[i + 1]);
   for (j = nj; --j >= 0;)
     {
       na[j] = k = nk[j];
@@ -2514,8 +3150,8 @@ jbm_varray_maxmin (void *v,
 ///< structs.
                    int size,    ///< size in bytes of the structs.
                    int n,       ///< number of structs.
-                   JBFLOAT * max,       ///< pointer to the highest value.
-                   JBFLOAT * min)       ///< pointer to the lowest value.
+                   JBFLOAT *max,        ///< pointer to the highest value.
+                   JBFLOAT *min)        ///< pointer to the lowest value.
 {
   int i;
   JBFLOAT kmax, kmin;
@@ -2555,8 +3191,18 @@ jbm_varray_mean_square_error (void *restrict xa,
                               int nr)
 ///< the highest point number tabulating the 2nd function.
 {
-  JBFLOAT k = 0., k2;
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q;
+#endif
+  JBFLOAT k, k2;
   int i, j;
+  k = c0;
   for (i = 0; i <= na && *(JBFLOAT *) xa < *(JBFLOAT *) xr;
        ++i, xa = (char *) xa + sizea, fa = (char *) fa + sizea)
     k += jbm_fsqr (*(JBFLOAT *) fa - *(JBFLOAT *) fr);
@@ -2637,12 +3283,13 @@ jbm_varray_solve_tridiagonal (void *restrict C,
                               void *restrict H,
 ///< field address of first element of the struct array containing the final
 ///< equation system values.
-                              int size, ///< struct size.
-                              int n)    ///< the latest struct array element.
+                              unsigned int size,        ///< struct size.
+                              unsigned int n)
+                              ///< the latest struct array element.
 {
   JBFLOAT *CC, *DD, *EE, *HH;
-  JBDOUBLE k;
-  int i;
+  JBFLOAT k;
+  unsigned int i;
   DD = (JBFLOAT *) D;
   HH = (JBFLOAT *) H;
   for (i = 0; ++i <= n; C = (char *) C + size, E = (char *) E + size)
@@ -2697,13 +3344,22 @@ jbm_varray_solve_tridiagonal_zero (void *restrict C,
                                    void *restrict H,
 ///< field address of first element of the struct array containing the final
 ///< equation system values.
-                                   int size,    ///< struct size.
-                                   int n)
+                                   unsigned int size,   ///< struct size.
+                                   unsigned int n)
                                    ///< the latest struct array element.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q;
+#endif
   JBFLOAT *CC, *DD, *EE, *HH;
-  JBDOUBLE k;
-  int i;
+  JBFLOAT k;
+  unsigned int i;
   DD = (JBFLOAT *) D;
   HH = (JBFLOAT *) H;
   for (i = 0; ++i <= n; C = (char *) C + size, E = (char *) E + size)
@@ -2711,7 +3367,12 @@ jbm_varray_solve_tridiagonal_zero (void *restrict C,
       CC = (JBFLOAT *) C;
       EE = (JBFLOAT *) E;
       if (jbm_small (*DD))
-        D = (char *) D + size, H = (char *) H + size;
+        {
+          D = (char *) D + size;
+          H = (char *) H + size;
+          DD = (JBFLOAT *) D;
+          HH = (JBFLOAT *) H;
+        }
       else
         {
           k = *CC / *DD;
@@ -2725,7 +3386,7 @@ jbm_varray_solve_tridiagonal_zero (void *restrict C,
         }
     }
   if (jbm_small (*DD))
-    *HH = 0.;
+    *HH = c0;
   else
     *HH /= *DD;
   while (--i > 0)
@@ -2738,15 +3399,55 @@ jbm_varray_solve_tridiagonal_zero (void *restrict C,
       H = (char *) H - size;
       HH = (JBFLOAT *) H;
       if (jbm_small (*DD))
-        *HH = 0.;
+        *HH = c0;
       else
         *HH = (*HH - k) / *DD;
     }
 }
 
 /**
+ * Function to get a JBFLOAT number on a string.
+ *
+ * \return 1 on success, 0 on error.
+ */
+static inline int
+jbm_get_float (char *str,       ///< string.
+               JBFLOAT *x)      ///< pointer to the JBFLOAT number.
+{
+#if JBM_LOW_PRECISION < 4
+  return sscanf (str, FRF, x);
+#else
+  char buffer[JB_BUFFER_SIZE];
+  int i;
+  i = sscanf (str, "%512s", buffer);
+  *x = STRTOF (buffer, NULL);
+  return i;
+#endif
+}
+
+/**
+ * Function to read a JBFLOAT number on a file.
+ *
+ * \return 1 on success, 0 on error.
+ */
+static inline int
+jbm_read_float (FILE *file,     ///< file.
+                JBFLOAT *x)     ///< pointer to the JBFLOAT number.
+{
+#if JBM_LOW_PRECISION < 4
+  return fscanf (file, FRF, x);
+#else
+  char buffer[JB_BUFFER_SIZE];
+  int i;
+  i = fscanf (file, "%512s", buffer);
+  *x = STRTOF (buffer, NULL);
+  return i;
+#endif
+}
+
+/**
  * Function to calculate the mean square error between 2 functions tabulated in
- * 2 columns data of a file (JBFLOAT).
+ * 2 columns data of 2 files (JBFLOAT).
  *
  * \return mean square error value.
  */
@@ -2768,12 +3469,21 @@ jbm_file_mean_square_error (char *namea,
                             int nr)
 ///< columns number of file tabulating the 2nd function.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q;
+#endif
   JBFLOAT aa[na], ar[nr];
   FILE *filea, *filer;
   JBFLOAT k, xa, fa, xr1, fr1, xr2, fr2;
   int i, j, endr;
   endr = i = 0;
-  k = 0.;
+  k = c0;
   filea = fopen (namea, "r");
   if (!filea)
     goto exit_mse;
@@ -2781,19 +3491,19 @@ jbm_file_mean_square_error (char *namea,
   if (!filer)
     goto exit_mse;
   for (j = 0; j < nr; ++j)
-    if (fscanf (filer, FRF, ar + j) != 1)
+    if (jbm_read_float (filer, ar + j) != 1)
       goto exit_mse;
   xr1 = ar[ixr - 1];
   fr1 = ar[ifr - 1];
   for (j = 0; j < nr; ++j)
-    if (fscanf (filer, FRF, ar + j) != 1)
+    if (jbm_read_float (filer, ar + j) != 1)
       endr = 1;
   xr2 = ar[ixr - 1];
   fr2 = ar[ifr - 1];
   for (i = 0; !endr; ++i)
     {
-      for (j = 0; j < na; ++j)
-        if (fscanf (filea, FRF, aa + j) != 1)
+      for (j = 0; j < nr; ++j)
+        if (jbm_read_float (filer, ar + j) != 1)
           goto exit_mse;
       xa = aa[ixa - 1];
       fa = aa[ifa - 1];
@@ -2802,7 +3512,7 @@ jbm_file_mean_square_error (char *namea,
           xr1 = xr2;
           fr1 = fr2;
           for (j = 0; j < nr; ++j)
-            if (fscanf (filer, FRF, ar + j) != 1)
+            if (jbm_read_float (filer, ar + j) != 1)
               {
                 endr = 1;
                 goto end_filer;
@@ -2819,7 +3529,7 @@ jbm_file_mean_square_error (char *namea,
   for (; 1; ++i)
     {
       for (j = 0; j < na; ++j)
-        if (fscanf (filea, FRF, aa + j) != 1)
+        if (jbm_read_float (filea, aa + j) != 1)
           goto exit_mse;
       xa = aa[ixa - 1];
       fa = aa[ifa - 1];
@@ -2827,13 +3537,13 @@ jbm_file_mean_square_error (char *namea,
     }
 exit_mse:
   if (i == 0)
-    return 0.;
+    return c0;
   return k / i;
 }
 
 /**
  * Function to calculate the root mean square error between 2 functions
- * tabulated in 2 columns data of a file (JBFLOAT).
+ * tabulated in 2 columns data of 2 files (JBFLOAT).
  *
  * \return root mean square error value.
  */
@@ -2894,8 +3604,8 @@ jbm_fmodminl (JBDOUBLE a,       ///< 1st JBDOUBLE number.
  * Function to interchange 2 JBDOUBLE numbers.
  */
 static inline void
-jbm_fchangel (JBDOUBLE *restrict a,  ///< 1st JBDOUBLE number pointer.
-              JBDOUBLE *restrict b)  ///< 2nd JBDOUBLE number pointer.
+jbm_fchangel (JBDOUBLE *restrict a,     ///< 1st JBDOUBLE number pointer.
+              JBDOUBLE *restrict b)     ///< 2nd JBDOUBLE number pointer.
 {
   JBDOUBLE c;
   JB_CHANGE (*a, *b, c);
@@ -2951,14 +3661,11 @@ jbm_interpolatel (JBDOUBLE x,   ///< x-coordinate of the interpolated point.
                   JBDOUBLE y1,  ///< y-coordinate of the 1st point.
                   JBDOUBLE y2)  ///< y-coordinate of the 2nd point.
 {
-  JBDOUBLE k;
   if (x <= x1)
-    k = y1;
-  else if (x >= x2)
-    k = y2;
-  else
-    k = jbm_extrapolatel (x, x1, x2, y1, y2);
-  return k;
+    return y1;
+  if (x >= x2)
+    return y2;
+  return jbm_extrapolatel (x, x1, x2, y1, y2);
 }
 
 /**
@@ -3002,6 +3709,138 @@ jbm_v3_lengthl (JBDOUBLE x1,
 }
 
 /**
+ * Function to calculate a 1st order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_1l (JBDOUBLE x,  ///< variable.
+                   JBDOUBLE *p) ///< array of coefficients.
+{
+  return p[0] + x * p[1];
+}
+
+/**
+ * Function to calculate a 2nd order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_2l (JBDOUBLE x,  ///< variable.
+                   JBDOUBLE *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_1l (x, p + 1);
+}
+
+/**
+ * Function to calculate a 3rd order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_3l (JBDOUBLE x,  ///< variable.
+                   JBDOUBLE *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_2l (x, p + 1);
+}
+
+/**
+ * Function to calculate a 4th order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_4l (JBDOUBLE x,  ///< variable.
+                   JBDOUBLE *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_3l (x, p + 1);
+}
+
+/**
+ * Function to calculate a 5th order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_5l (JBDOUBLE x,  ///< variable.
+                   JBDOUBLE *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_4l (x, p + 1);
+}
+
+/**
+ * Function to calculate a 6th order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_6l (JBDOUBLE x,  ///< variable.
+                   JBDOUBLE *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_5l (x, p + 1);
+}
+
+/**
+ * Function to calculate a 7th order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_7l (JBDOUBLE x,  ///< variable.
+                   JBDOUBLE *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_6l (x, p + 1);
+}
+
+/**
+ * Function to calculate a 8th order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_8l (JBDOUBLE x,  ///< variable.
+                   JBDOUBLE *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_7l (x, p + 1);
+}
+
+/**
+ * Function to calculate a 9th order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_9l (JBDOUBLE x,  ///< variable.
+                   JBDOUBLE *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_8l (x, p + 1);
+}
+
+/**
+ * Function to calculate a 10th order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_10l (JBDOUBLE x, ///< variable.
+                    JBDOUBLE *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_9l (x, p + 1);
+}
+
+/**
+ * Function to calculate a 11th order polynomial (JBDOUBLE).
+ *
+ * \return polynomial value.
+ */
+static inline JBDOUBLE
+jbm_polynomial_11l (JBDOUBLE x, ///< variable.
+                    JBDOUBLE *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_polynomial_10l (x, p + 1);
+}
+
+/**
  * Function to calculate the solution of a reduced quadratic equation in
  * an interval \f$\left[x_1,x_2\right]\f$ in the form \f$x^2+a\,x+b=0\f$
  * (JBDOUBLE).
@@ -3019,7 +3858,15 @@ jbm_solve_quadratic_reducedl (JBDOUBLE a,
                               ///< right limit of the solution interval.
 {
   JBDOUBLE k;
-  a /= 2.L;
+#if JBM_HIGH_PRECISION == 1
+  a *= -0.5f;
+#elif JBM_HIGH_PRECISION == 2
+  a *= -0.5;
+#elif JBM_HIGH_PRECISION == 3
+  a *= -0.5L;
+#elif JBM_HIGH_PRECISION == 4
+  a *= -0.5Q;
+#endif
   b = SQRTL (a * a - b);
   k = b - a;
   if (k < x1 || k > x2)
@@ -3070,23 +3917,32 @@ jbm_solve_cubic_reducedl (JBDOUBLE a,
                           JBDOUBLE x2)
                           ///< right limit of the solution interval.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c2 = 2.f, c3 = 3.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c2 = 2., c3 = 3.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c2 = 2.L, c3 = 3.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c2 = 2.Q, c3 = 3.Q;
+#endif
   JBDOUBLE k0, k1, k2;
-  a /= 3.L;
+  a /= c3;
   k0 = a * a;
-  k1 = b / 3.L - k0;
-  k0 = (b * a - c) / 2.L - a * k0;
+  k1 = b / c3 - k0;
+  k0 = (b * a - c) / c2 - a * k0;
   k2 = k1 * k1 * k1 + k0 * k0;
-  if (k2 < 0.L)
+  if (k2 < c0)
     {
       k1 = SQRTL (-k1);
       k0 = ACOSL (k0 / (k1 * k1 * k1)) / 3.L;
-      k1 *= 2.L;
+      k1 *= c2;
       k2 = k1 * COSL (k0) - a;
       if (k2 < x1 || k2 > x2)
         {
-          k2 = k1 * COSL (k0 + 2.L * M_PIl / 3.L) - a;
+          k2 = k1 * COSL (k0 + c2 * M_PIl / c3) - a;
           if (k2 < x1 || k2 > x2)
-            k2 = k1 * COSL (k0 - 2.L * M_PIl / 3.L) - a;
+            k2 = k1 * COSL (k0 - c2 * M_PIl / c3) - a;
         }
     }
   else
@@ -3139,7 +3995,16 @@ jbm_flux_limiter_totall (JBDOUBLE d1 __attribute__((unused)),
                          JBDOUBLE d2 __attribute__((unused)))
 ///< 2nd flux limiter function parameter.
 {
-  return 0.L;
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q;
+#endif
+  return c0;
 }
 
 /**
@@ -3154,7 +4019,16 @@ jbm_flux_limiter_nulll (JBDOUBLE d1 __attribute__((unused)),
                         JBDOUBLE d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
-  return 1.L;
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c1 = 1.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c1 = 1.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c1 = 1.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c1 = 1.Q;
+#endif
+  return c1;
 }
 
 /**
@@ -3169,8 +4043,17 @@ jbm_flux_limiter_centredl (JBDOUBLE d1,
                            JBDOUBLE d2)
                            ///< 2nd flux limiter function parameter.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q;
+#endif
   if (jbm_smalll (d2))
-    return 0.L;
+    return c0;
   return d1 / d2;
 }
 
@@ -3188,11 +4071,20 @@ jbm_flux_limiter_superbeel (JBDOUBLE d1,
                             JBDOUBLE d2)
                             ///< 2nd flux limiter function parameter.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c1 = 1.f, c2 = 2.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c1 = 1., c2 = 2.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c1 = 1.L, c2 = 2.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c1 = 1.Q, c2 = 2.Q;
+#endif
   JBDOUBLE r;
   if (d1 * d2 <= JBM_EPSILONL)
-    return 0.L;
+    return c0;
   r = d1 / d2;
-  return FMAXL (FMINL (r + r, 1.L), FMINL (r, 2.L));
+  return FMAXL (FMINL (r + r, c1), FMINL (r, c2));
 }
 
 /**
@@ -3208,9 +4100,18 @@ jbm_flux_limiter_minmodl (JBDOUBLE d1,
                           JBDOUBLE d2)
                           ///< 2nd flux limiter function parameter.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c1 = 1.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c1 = 1.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c1 = 1.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c1 = 1.Q;
+#endif
   if (d1 * d2 <= JBM_EPSILONL)
-    return 0.L;
-  return FMINL (d1 / d2, 1.L);
+    return c0;
+  return FMINL (d1 / d2, c1);
 }
 
 /**
@@ -3227,12 +4128,21 @@ jbm_flux_limiter_VanLeerl (JBDOUBLE d1,
                            JBDOUBLE d2)
                            ///< 2nd flux limiter function parameter.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c1 = 1.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c1 = 1.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c1 = 1.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c1 = 1.Q;
+#endif
   JBDOUBLE r, k;
   if (d1 * d2 <= JBM_EPSILONL)
-    return 0.L;
+    return c0;
   r = d1 / d2;
   k = FABSL (r);
-  return (r + k) / (1.L + k);
+  return (r + k) / (c1 + k);
 }
 
 /**
@@ -3248,12 +4158,21 @@ jbm_flux_limiter_VanAlbadal (JBDOUBLE d1,
                              JBDOUBLE d2)
                              ///< 2nd flux limiter function parameter.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c1 = 1.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c1 = 1.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c1 = 1.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c1 = 1.Q;
+#endif
   JBDOUBLE r, k;
   if (d1 * d2 <= JBM_EPSILONL)
-    return 0.L;
+    return c0;
   r = d1 / d2;
   k = r * r;
-  return (r + k) / (1.L + k);
+  return (r + k) / (c1 + k);
 }
 
 /**
@@ -3269,9 +4188,18 @@ jbm_flux_limiter_minsuperl (JBDOUBLE d1,
                             JBDOUBLE d2)
                             ///< 2nd flux limiter function parameter.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c2 = 2.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c2 = 2.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c2 = 2.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c2 = 2.Q;
+#endif
   if (d1 * d2 <= JBM_EPSILONL)
-    return 0.L;
-  return FMINL (d1 / d2, 2.L);
+    return c0;
+  return FMINL (d1 / d2, c2);
 }
 
 /**
@@ -3287,9 +4215,18 @@ jbm_flux_limiter_superminl (JBDOUBLE d1,
                             JBDOUBLE d2)
                             ///< 2nd flux limiter function parameter.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c1 = 1.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c1 = 1.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c1 = 1.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c1 = 1.Q;
+#endif
   if (d1 * d2 <= JBM_EPSILONL)
-    return 0.L;
-  return FMINL (jbm_fdbll (d1 / d2), 1.L);
+    return c0;
+  return FMINL (jbm_fdbll (d1 / d2), c1);
 }
 
 /**
@@ -3306,15 +4243,24 @@ jbm_flux_limiter_monotonized_centrall (JBDOUBLE d1,
                                        JBDOUBLE d2)
                                        ///< 2nd flux limiter function parameter.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c1 = 1.f, c2 = 2.f, c3 = 3.f, c05 = 0.5f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c1 = 1., c2 = 2., c3 = 3., c05 = 0.5;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c1 = 1.L, c2 = 2.L, c3 = 3.L, c05 = 0.5L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c1 = 1.Q, c2 = 2.Q, c3 = 3.Q, c05 = 0.5Q;
+#endif
   JBDOUBLE k;
   if (d1 * d2 <= JBM_EPSILONL)
-    return 0.L;
+    return c0;
   k = d1 / d2;
-  if (k >= 3.L)
-    return 2.L;
-  if (k <= 1.L / 3.L)
+  if (k >= c3)
+    return c2;
+  if (k <= c1 / c3)
     return k + k;
-  return 0.5L * (k + 1.L);
+  return c05 * (k + c1);
 }
 
 /**
@@ -3330,51 +4276,53 @@ jbm_flux_limiter_meanl (JBDOUBLE d1,
                         JBDOUBLE d2)
                         ///< 2nd flux limiter function parameter.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c1 = 1.f, c05 = 0.5f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c1 = 1., c05 = 0.5;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c1 = 1.L, c05 = 0.5L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c1 = 1.Q, c05 = 0.5Q;
+#endif
   if (jbm_smalll (d2))
-    return 0.L;
-  return 0.5L * (d1 / d2 + 1.L);
-}
-
-/**
- * Function to select a flux limiter function (JBDOUBLE).
- *
- * \return pointer to the flux limiter function.
- */
-static inline JBDOUBLE
-  (*jbm_flux_limiter_selectl (int type)) (JBDOUBLE, JBDOUBLE)
-///< type of flux limiter function.
-{
-  switch (type)
-    {
-    case JBM_FLUX_LIMITER_TYPE_TOTAL:
-      return jbm_flux_limiter_totall;
-    case JBM_FLUX_LIMITER_TYPE_NULL:
-      return jbm_flux_limiter_nulll;
-    case JBM_FLUX_LIMITER_TYPE_CENTRED:
-      return jbm_flux_limiter_centredl;
-    case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_minmodl;
-    case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
-      return jbm_flux_limiter_superbeel;
-    case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
-      return jbm_flux_limiter_VanLeerl;
-    case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
-      return jbm_flux_limiter_VanAlbadal;
-    case JBM_FLUX_LIMITER_TYPE_MINSUPER:
-      return jbm_flux_limiter_minsuperl;
-    case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
-      return jbm_flux_limiter_superminl;
-    case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
-      return jbm_flux_limiter_monotonized_centrall;
-    case JBM_FLUX_LIMITER_TYPE_MEAN:
-      return jbm_flux_limiter_meanl;
-    }
-  return NULL;
+    return c0;
+  return c05 * (d1 / d2 + c1);
 }
 
 /**
  * Function to approximate an integral of a function with the Gauss method
  * defined in an interval (JBDOUBLE).
+ *
+ * The coefficients are:\n
+ * - 1 point (2nd order):\n
+ * \f$a_0=2,\quad b_0=0\f$\n
+ * - 3 points (6th order):\n
+ * \f$a_0=\frac{8}{9},\quad b_0=0,\f$\n
+ * \f$a_1=\frac{5}{9},\quad b_1=\sqrt{\frac{3}{5}},\f$\n
+ * - 5 points (10th order):\n
+ * \f$a_0=\frac{128}{225},\quad b_0=0,\f$\n
+ * \f$a_1=\frac{15\,\sqrt{70}-21}{50\,\sqrt{70}-200},\quad
+ * b_1=\sqrt{\frac{35-\sqrt{280}}{63}},\f$\n
+ * \f$a_2=\frac{15\,\sqrt{70}+21}{50\,\sqrt{70}+200},\quad
+ * b_2=\sqrt{\frac{35+\sqrt{280}}{63}},\f$\n
+ * - 7 points (14th order):\n
+ * \f\[b_0=0,\f\]
+ * \f\[b_1=\sqrt{\frac{7}{13}-\sqrt{\frac{336}{1859}}\,\cos\left[\frac{1}{3}
+ *   \,acos\left(\sqrt{\frac{539}{83349}}\right)\right]},\f\]
+ * \f\[b_2=\sqrt{\frac{7}{13}+\sqrt{\frac{336}{1859}}\,\cos\left\{\frac{1}{3}
+ *   \,acos\left[\frac{1}{3}\,\left(\pi+\sqrt{\frac{539}{83349}}\right)\right]
+ *   \right\}},\f\]
+ * \f\[b_3=\sqrt{\frac{7}{13}+\sqrt{\frac{336}{1859}}\,\cos\left\{\frac{1}{3}
+ *   \,acos\left[\frac{1}{3}\,\left(\pi-\sqrt{\frac{539}{83349}}\right)\right]
+ *   \right\}},\f\]
+ * \f\[a_3=\frac{1}{b_3^2}\,\frac{\frac{1}{7}-y_1\,\frac{1}{5}
+ *   -y_2\,\left(\frac{1}{5}-y_1\,\frac{1}{3}\right)}
+ *   {\left(y_3-y_2\right)\,\left(y_3-y_1\right)},\f\]
+ * \f\[a_2=\frac{1}{b_2^2}\,\frac{\frac{1}{5}-y_1\,\frac{1}{3}
+ *   -b_3\,\left(y_3-y_1\right)}{y_2-y_1},\f\]
+ * \f\[a_1=\frac{1}{b_1^2}\,\left(\frac{1}{3}-b_2-b_3\right),\f\]
+ * \f\[a_0=0\f\]
  *
  * \return integral value.
  */
@@ -3384,41 +4332,141 @@ jbm_integrall (JBDOUBLE (*f) (JBDOUBLE),
                JBDOUBLE x1,     ///< left limit of the interval.
                JBDOUBLE x2)     ///< right limit of the interval.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c05 = 0.5f;
 #if JBM_INTEGRAL_GAUSS_N == 1
-  const JBDOUBLE a[1] = { 2.L }, b[1];
+  const JBDOUBLE a[1] = { 2.f };
 #elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBDOUBLE a[2] = { 8. / 9.L, 5. / 9.L }, b[2] = {
-    0., 0.7745966692414833770358531L
-  };
+  const JBDOUBLE a[2] = { 8.f / 9.f, 5.f / 9.f }, b[2] = { 0.f, 7.7459667e-1f };
 #elif JBM_INTEGRAL_GAUSS_N == 3
   const JBDOUBLE a[3] = {
-    0.5688888888888888888888889L,
-    0.4786286704993664680412915L,
-    0.2369268850561890875142640L
+    128.f / 225.f,
+    4.7862867e-1f,
+    2.3692689e-1f
   }, b[3] = {
-    0.L, 0.5384693101056830910363144L, 0.9061798459386639927976269L
+    0.f,
+    5.3846931e-1f,
+    9.0617985e-1f
   };
 #elif JBM_INTEGRAL_GAUSS_N == 4
   const JBDOUBLE a[4] = {
-    0.4179591836734693877551020L,
-    0.3818300505051189449503698L,
-    0.2797053914892766679014678L,
-    0.1294849661688696932706114L
+    4.1795918e-1f,
+    3.8183005e-1f,
+    2.7970539e-1f,
+    1.2948497e-1f
   }, b[4] = {
-    0.L, 0.4058451513773971669066064L,
-    0.7415311855993944398638648L, 0.9491079123427585245261897L
+    0.f,
+    4.0584515e-1f,
+    7.4153119e-1f,
+    9.4910791e-1f
   };
 #endif
-  JBDOUBLE k, k2, x, dx;
-  int i;
-  dx = 0.5L * (x2 - x1);
-  x = 0.5L * (x1 + x2);
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c05 = 0.5;
+#if JBM_INTEGRAL_GAUSS_N == 1
+  const JBDOUBLE a[1] = { 2. };
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  const JBDOUBLE a[2] = { 8. / 9., 5. / 9. },
+    b[2] = { 0., 7.745966692414834e-1 };
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  const JBDOUBLE a[3] = {
+    128. / 225.,
+    4.786286704993665e-1,
+    2.369268850561891e-1
+  }, b[3] = {
+    0.,
+    5.384693101056831e-1,
+    9.061798459386640e-1
+  };
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  const JBDOUBLE a[4] = {
+    4.179591836734694e-1,
+    3.818300505051189e-1,
+    2.797053914892767e-1,
+    1.294849661688697e-1
+  }, b[4] = {
+    0.,
+    4.058451513773972e-1,
+    7.415311855993944e-1,
+    9.491079123427585e-1
+  };
+#endif
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c05 = 0.5L;
+#if JBM_INTEGRAL_GAUSS_N == 1
+  const JBDOUBLE a[1] = { 2.L };
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  const JBDOUBLE a[2] = { 8.L / 9.L, 5.L / 9.L },
+    b[2] = { 0.L, 7.7459666924148340428e-1L };
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  const JBDOUBLE a[3] = {
+    128.L / 225.L,
+    4.7862867049936646804e-1L,
+    2.3692688505618908751e-1L
+  }, b[3] = {
+    0.L,
+    5.3846931010568309104e-1L,
+    9.0617984593866399280e-1L
+  };
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  const JBDOUBLE a[4] = {
+    4.1795918367346938776e-1L,
+    3.8183005050511894495e-1L,
+    2.7970539148927666790e-1L,
+    1.2948496616886969327e-1L
+  }, b[4] = {
+    0.L,
+    4.0584515137739716691e-1L,
+    7.4153118559939443986e-1L,
+    9.4910791234275852453e-1L
+  };
+#endif
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c05 = 0.5Q;
+#if JBM_INTEGRAL_GAUSS_N == 1
+  const JBDOUBLE a[1] = { 2.Q };
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  const JBDOUBLE a[2] = { 8.Q / 9.Q, 5.Q / 9.Q },
+    b[2] = { 0.Q, 7.7459666924148340427791481488384306e-1Q };
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  const JBDOUBLE a[3] = {
+    128.Q / 225.Q,
+    4.7862867049936646804129151483563819e-1Q,
+    2.3692688505618908751426404071991736e-1Q
+  }, b[3] = {
+    0.Q,
+    5.3846931010568309103631442070020880e-1Q,
+    9.0617984593866399279762687829939297e-1Q
+  };
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  const JBDOUBLE a[4] = {
+    4.1795918367346938775510204081632653e-1Q,
+    3.8183005050511894495036977548897513e-1Q,
+    2.7970539148927666790146777142377958e-1Q,
+    1.2948496616886969327061143267908202e-1Q
+  }, b[4] = {
+    0.Q,
+    4.0584515137739716690660641207696146e-1Q,
+    7.4153118559939443986386477328078841e-1Q,
+    9.4910791234275852452618968404785126e-1Q
+  };
+#endif
+#endif
+  JBDOUBLE k, x, dx;
+#if JBM_INTEGRAL_GAUSS_N > 1
+  JBDOUBLE k2;
+  unsigned int i;
+#endif
+  dx = c05 * (x2 - x1);
+  x = c05 * (x1 + x2);
   k = a[0] * dx * f (x);
+#if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
       k2 = b[i] * dx;
       k += a[i] * dx * (f (x - k2) + f (x + k2));
     }
+#endif
   return k;
 }
 
@@ -3428,12 +4476,13 @@ jbm_integrall (JBDOUBLE (*f) (JBDOUBLE),
  *
  * \return interval number.
  */
-static inline int
+static inline unsigned int
 jbm_darray_search (JBDOUBLE x,  ///< number to search.
-                   JBDOUBLE * fa,       ///< array of JBDOUBLE numbers.
-                   int n)       ///< number of the highest array element.
+                   JBDOUBLE *fa,        ///< array of JBDOUBLE numbers.
+                   unsigned int n)
+                   ///< number of the highest array element.
 {
-  int i, j;
+  unsigned int i, j;
   for (i = 0; n - i > 1;)
     {
       j = (i + n) >> 1;
@@ -3452,17 +4501,17 @@ jbm_darray_search (JBDOUBLE x,  ///< number to search.
  */
 static inline int
 jbm_darray_search_extended (JBDOUBLE x, ///< number to search.
-                            JBDOUBLE * fa,      ///< array of JBDOUBLE numbers.
-                            int n)
+                            JBDOUBLE *fa,       ///< array of JBDOUBLE numbers.
+                            unsigned int n)
                             ///< number of the highest array element.
 {
   int i;
   if (x < fa[0])
     i = -1;
   else if (x >= fa[n])
-    i = n;
+    i = (int) n;
   else
-    i = jbm_darray_search (x, fa, n);
+    i = (int) jbm_darray_search (x, fa, n);
   return i;
 }
 
@@ -3472,14 +4521,14 @@ jbm_darray_search_extended (JBDOUBLE x, ///< number to search.
  * \return the highest value.
  */
 static inline JBDOUBLE
-jbm_darray_max (JBDOUBLE * fa,  ///< array of JBDOUBLE numbers.
-                int n)          ///< number of the ending array element.
+jbm_darray_max (JBDOUBLE *fa,   ///< array of JBDOUBLE numbers.
+                unsigned int n) ///< number of the ending array element.
 {
   JBDOUBLE k;
-  int i;
+  unsigned int i;
   k = fa[0];
   for (i = 0; ++i <= n;)
-    k = FMAXL (k, fa[i]);
+    k = FMAX (k, fa[i]);
   return k;
 }
 
@@ -3489,14 +4538,14 @@ jbm_darray_max (JBDOUBLE * fa,  ///< array of JBDOUBLE numbers.
  * \return the lowest value.
  */
 static inline JBDOUBLE
-jbm_darray_min (JBDOUBLE * fa,  ///< array of JBDOUBLE numbers.
-                int n)          ///< number of the ending array element.
+jbm_darray_min (JBDOUBLE *fa,    ///< array of JBDOUBLE numbers.
+                unsigned int n)  ///< number of the ending array element.
 {
   JBDOUBLE k;
-  int i;
+  unsigned int i;
   k = fa[0];
   for (i = 0; ++i <= n;)
-    k = FMINL (k, fa[i]);
+    k = FMIN (k, fa[i]);
   return k;
 }
 
@@ -3505,13 +4554,13 @@ jbm_darray_min (JBDOUBLE * fa,  ///< array of JBDOUBLE numbers.
  * numbers.
  */
 static inline void
-jbm_darray_maxmin (JBDOUBLE * fa,       ///< array of JBDOUBLE numbers.
-                   int n,       ///< number of the ending array element.
-                   JBDOUBLE * max,      ///< the highest value.
-                   JBDOUBLE * min)      ///< the lowest value.
+jbm_darray_maxmin (JBDOUBLE *fa, ///< array of JBDOUBLE numbers.
+                   unsigned int n,      ///< number of the ending array element.
+                   JBDOUBLE *max,       ///< the highest value.
+                   JBDOUBLE *min)       ///< the lowest value.
 {
   JBDOUBLE kmax, kmin;
-  int i;
+  unsigned int i;
   kmax = kmin = fa[0];
   for (i = 0; ++i <= n;)
     {
@@ -3531,15 +4580,16 @@ jbm_darray_change (JBDOUBLE *restrict fa,
                    ///< 1st array of JBDOUBLE numbers.
                    JBDOUBLE *restrict fb,
                    ///< 2nd array of JBDOUBLE numbers.
-                   int n)       ///< the highest element number of the arrays.
+                   unsigned int n)
+                   ///< the highest element number of the arrays.
 {
-  JBDOUBLE *fc;
-  int n1;
-  n1 = n + 1;
-  fc = (JBDOUBLE *) malloc (n1 * sizeof (JBDOUBLE));
-  memcpy (fc, fa, n1);
-  memcpy (fa, fb, n1);
-  memcpy (fb, fc, n1);
+  JBDOUBLE *restrict fc;
+  size_t s;
+  s = (n + 1) * sizeof (JBDOUBLE);
+  fc = (JBDOUBLE *) malloc (s);
+  memcpy (fc, fa, s);
+  memcpy (fa, fb, s);
+  memcpy (fb, fc, s);
   free (fc);
 }
 
@@ -3551,45 +4601,20 @@ jbm_darray_change (JBDOUBLE *restrict fa,
  */
 static inline JBDOUBLE
 jbm_darray_interpolate (JBDOUBLE x,     ///< x-coordinate of the point.
-                        JBDOUBLE *restrict fx,
+                        JBDOUBLE *fa,
 ///< increasingly sorted array of x-coordinates of the tabular function.
-                        JBDOUBLE *restrict fy,
+                        JBDOUBLE *fb,
 ///< array of y-coordinates of the tabular function.
-                        int n)  ///< the highest element number of the arrays.
-{
-  JBDOUBLE k;
-  int i;
-  i = jbm_darray_search (x, fx, n);
-  if (i == n)
-    k = fy[i];
-  else
-    k = jbm_interpolatel (x, fx[i], fx[i + 1], fy[i], fy[i + 1]);
-  return k;
-}
-
-/**
- * Function to calculate the y-coordinate of a 2D point interpolated between a
- * tabular function defined by 2 arrays of JBDOUBLE (x coordinates) and
- * JBFLOAT (y coordinates) numbers.
- *
- * \return y-coordinate of the interpolated point.
- */
-static inline JBFLOAT
-jbm_darray_farray_interpolate (JBDOUBLE x,      ///< x-coordinate of the point.
-                               JBDOUBLE *restrict fx,
-///< increasingly sorted array of x-coordinates of the tabular function.
-                               JBFLOAT *restrict fy,
-///< array of y-coordinates of the tabular function.
-                               int n)
+                        unsigned int n)
 ///< the highest element number of the arrays.
 {
-  JBFLOAT k;
-  int i;
-  i = jbm_darray_search (x, fx, n);
+  JBDOUBLE k;
+  unsigned int i;
+  i = jbm_darray_search (x, fa, n);
   if (i == n)
-    k = fy[i];
+    k = fb[i];
   else
-    k = jbm_interpolate (x, fx[i], fx[i + 1], fy[i], fy[i + 1]);
+    k = jbm_interpolatel (x, fa[i], fa[i + 1], fb[i], fb[i + 1]);
   return k;
 }
 
@@ -3601,25 +4626,29 @@ jbm_darray_farray_interpolate (JBDOUBLE x,      ///< x-coordinate of the point.
 static inline JBDOUBLE *
 jbm_darray_merge (JBDOUBLE *restrict fa,
                   ///< 1st increasingly sorted array of JBDOUBLE numbers.
-                  int na,
+                  unsigned int na,
                   ///< the highest element number of the 1st array.
                   JBDOUBLE *restrict fb,
                   ///< 2nd increasingly sorted array of JBDOUBLE numbers.
-                  int nb,
+                  unsigned int nb,
                   ///< the highest element number of the 2nd array.
-                  JBDOUBLE ** fc,
+                  JBDOUBLE **fc,
 ///< pointer to the resulting increasingly sorted array of JBDOUBLE numbers.
-                  int *nc)
-///< pointer to the highest element number of the resulting array.
+                  unsigned int *nc)
+                  ///< the highest element number of the resulting array.
 {
   JBDOUBLE *restrict x;
-  int i, j, k;
+  unsigned int i, j, k;
   x = (JBDOUBLE *) g_try_malloc ((na + nb + 2) * sizeof (JBDOUBLE));
   if (!x)
-    return 0;
+    return NULL;
   for (i = j = k = 0; i <= na || j <= nb; ++k)
     {
-      if (fa[i] > fb[j])
+      if (i > na)
+        x[k] = fb[j++];
+      else if (j > nb)
+        x[k] = fa[i++];
+      else if (fa[i] > fb[j])
         x[k] = fb[j++];
       else if (fa[i] < fb[j])
         x[k] = fa[i++];
@@ -3643,12 +4672,22 @@ jbm_darray_integral (JBDOUBLE *restrict x,
                      JBDOUBLE *restrict y,
 ///< array of JBDOUBLE numbers defining the y-coordinates of the tabular
 ///< function.
-                     int n,     ///< the highest element number of the arrays.
+                     unsigned int n,
+                     ///< the highest element number of the arrays.
                      JBDOUBLE x1,
                      ///< left limit of the integration interval.
                      JBDOUBLE x2)
                      ///< right limit of the integration interval.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c05 = 0.5f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c05 = 0.5;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c05 = 0.5L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c05 = 0.5Q;
+#endif
   JBDOUBLE *yy, *xx;
   JBDOUBLE I, y1;
   int i;
@@ -3679,18 +4718,18 @@ jbm_darray_integral (JBDOUBLE *restrict x,
     }
   else
     {
-      I = 0.L;
+      I = c0;
       xx = x + i;
       yy = y + i;
       y1 = jbm_extrapolatel (x1, xx[0], xx[1], yy[0], yy[1]);
     }
   if (x2 < xx[1])
     {
-      I += 0.5L * (y1 + jbm_extrapolatel (x2, xx[0], xx[1], yy[0], yy[1]))
+      I += c05 * (y1 + jbm_extrapolatel (x2, xx[0], xx[1], yy[0], yy[1]))
         * (x2 - x1);
       goto exit1;
     }
-  I += 0.5L * (y1 + yy[1]) * (xx[1] - x1);
+  I += c05 * (y1 + yy[1]) * (xx[1] - x1);
   if (++i == n)
     {
       I += yy[1] * (x2 - xx[1]);
@@ -3699,97 +4738,55 @@ jbm_darray_integral (JBDOUBLE *restrict x,
   while (++i < n && x2 > xx[2])
     {
       ++xx, ++yy;
-      I += 0.5L * (yy[0] + yy[1]) * (xx[1] - xx[0]);
+      I += c05 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
     }
   if (i == n)
     I += yy[2] * (x2 - xx[1]);
   else if (x2 < xx[2])
-    I += 0.5L * (yy[1] + jbm_extrapolatel (x2, xx[1], xx[2], yy[1], yy[2]))
+    I += c05 * (yy[1] + jbm_extrapolatel (x2, xx[1], xx[2], yy[1], yy[2]))
       * (x2 - xx[1]);
 exit1:
   return I;
 }
 
 /**
- * Function to integrate a tabular function (JBDOUBLE in, x JBFLOAT in y) in an
- * interval.
+ * Function to get a JBFLOAT number on a string.
  *
- * \return integral value.
+ * \return 1 on success, 0 on error.
  */
-static inline JBFLOAT
-jbm_darray_farray_integral (JBDOUBLE *restrict x,
-///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates of 
-///< the tabular function.
-                            JBFLOAT *restrict y,
-///< array of JBFLOAT numbers defining the y-coordinates of the tabular
-///< function.
-                            int n,
-                            ///< the highest element number of the arrays.
-                            JBDOUBLE x1,
-                            ///< left limit of the integration interval.
-                            JBDOUBLE x2)
-                            ///< right limit of the integration interval.
+static inline int
+jbm_get_double (char *str,      ///< string.
+                JBDOUBLE *x)    ///< pointer to the JBDOUBLE number.
 {
-  JBDOUBLE *xx;
-  JBFLOAT *yy;
-  JBFLOAT I, y1;
+#if JBM_HIGH_PRECISION < 4
+  return sscanf (str, FRL, x);
+#else
+  char buffer[JB_BUFFER_SIZE];
   int i;
-  if (n == 0)
-    {
-      I = y[0] * (x2 - x1);
-      goto exit1;
-    }
-  i = jbm_darray_search_extended (x1, x, n);
-  if (i < 0)
-    {
-      if (x2 <= x[0])
-        {
-          I = y[0] * (x2 - x1);
-          goto exit1;
-        }
-      I = y[0] * (x[0] - x1);
-      i = 0;
-      x1 = x[0];
-      y1 = y[0];
-      xx = x;
-      yy = y;
-    }
-  else if (i == n)
-    {
-      I = y[i] * (x2 - x1);
-      goto exit1;
-    }
-  else
-    {
-      I = 0.;
-      xx = x + i;
-      yy = y + i;
-      y1 = jbm_extrapolate (x1, xx[0], xx[1], yy[0], yy[1]);
-    }
-  if (x2 < xx[1])
-    {
-      I += 0.5 * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1]))
-        * (x2 - x1);
-      goto exit1;
-    }
-  I += 0.5 * (y1 + yy[1]) * (xx[1] - x1);
-  if (++i == n)
-    {
-      I += yy[1] * (x2 - xx[1]);
-      goto exit1;
-    }
-  while (++i < n && x2 > xx[2])
-    {
-      ++xx, ++yy;
-      I += 0.5 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
-    }
-  if (i == n)
-    I += yy[2] * (x2 - xx[1]);
-  else if (x2 < xx[2])
-    I += 0.5 * (yy[1] + jbm_extrapolate (x2, xx[1], xx[2], yy[1], yy[2]))
-      * (x2 - xx[1]);
-exit1:
-  return I;
+  i = sscanf (str, "%512s", buffer);
+  *x = STRTOD (str, NULL);
+  return i;
+#endif
+}
+
+/**
+ * Function to read a JBFLOAT number on a file.
+ *
+ * \return 1 on success, 0 on error.
+ */
+static inline int
+jbm_read_double (FILE *file,    ///< file.
+                 JBDOUBLE *x)   ///< pointer to the JBDOUBLE number.
+{
+#if JBM_HIGH_PRECISION < 4
+  return fscanf (file, FRL, x);
+#else
+  char buffer[JB_BUFFER_SIZE];
+  int i;
+  i = fscanf (file, "%512s", buffer);
+  *x = STRTOD (buffer, NULL);
+  return i;
+#endif
 }
 
 /**
@@ -3805,7 +4802,7 @@ jbm_darray_mean_square_error (JBDOUBLE *restrict xa,
                               JBDOUBLE *restrict fa,
 ///< array of JBDOUBLE numbers defining the y-coordinates of the 1st tabular
 ///< function.
-                              int na,
+                              unsigned int na,
 ///< the highest element number of the arrays defining the 1st tabular
 ///< function.
                               JBDOUBLE *restrict xr,
@@ -3814,12 +4811,20 @@ jbm_darray_mean_square_error (JBDOUBLE *restrict xa,
                               JBDOUBLE *restrict fr,
 ///< array of JBDOUBLE numbers defining the y-coordinates of the 2nd tabular
 ///< function.
-                              int nr)
+                              unsigned int nr)
 ///< the highest element number of the arrays defining the 2nd tabular
 ///< function.
 {
+#if JBM_HIGH_PRECISION == 1
+  JBDOUBLE k = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  JBDOUBLE k = 0.;
+#elif JBM_HIGH_PRECISION == 3
   JBDOUBLE k = 0.L;
-  int i, j;
+#elif JBM_HIGH_PRECISION == 4
+  JBDOUBLE k = 0.Q;
+#endif
+  unsigned int i, j;
   for (i = 0; i <= na && xa[i] < xr[0]; ++i)
     k += jbm_fsqrl (fa[i] - fr[0]);
   for (j = 0; i <= na; ++i)
@@ -3873,7 +4878,7 @@ jbm_darray_root_mean_square_error (JBDOUBLE *restrict xa,
 static inline void
 jbm_index_sort_insertionl (JBDOUBLE *restrict x,
                            ///< array of JBDOUBLE numbers.
-                           unsigned int *restrict ni, ///< array of indexes.
+                           unsigned int *restrict ni,   ///< array of indexes.
                            int n)
                            ///< the highest element number of the arrays.
 {
@@ -3923,8 +4928,8 @@ jbm_index_sort_interchangel (JBDOUBLE *restrict x,
  * JBDOUBLE numbers by the merge method.
  */
 static inline void
-jbm_index_sort_mergel (JBDOUBLE *restrict x, ///< array of JBDOUBLE numbers.
-                       unsigned int *restrict ni,     ///< array of indexes.
+jbm_index_sort_mergel (JBDOUBLE *restrict x,    ///< array of JBDOUBLE numbers.
+                       unsigned int *restrict ni,       ///< array of indexes.
                        int n)   ///< the highest element number of the arrays.
 {
   unsigned int nn[n + 1];
@@ -3993,8 +4998,8 @@ jbm_index_sort_mergel (JBDOUBLE *restrict x, ///< array of JBDOUBLE numbers.
  * JBDOUBLE numbers by the optimal method.
  */
 static inline void
-jbm_index_sortl (JBDOUBLE *restrict x,       ///< array of JBDOUBLE numbers.
-                 unsigned int *restrict ni,   ///< array of indexes.
+jbm_index_sortl (JBDOUBLE *restrict x,  ///< array of JBDOUBLE numbers.
+                 unsigned int *restrict ni,     ///< array of indexes.
                  int n)         ///< the highest element number of the arrays.
 {
   int i;
@@ -4065,7 +5070,7 @@ index_exit:
  * It modifies the x matrix (JBDOUBLE).
  */
 static inline void
-jbm_matrix_solvel (JBDOUBLE * x,
+jbm_matrix_solvel (JBDOUBLE *x,
 ///< matrix storing the linear equations system.
                    int n)       ///< number of matrix rows.
 {
@@ -4101,7 +5106,7 @@ jbm_matrix_solvel (JBDOUBLE * x,
       if (k != i)
         {
           g = f + (i - k) * n;
-          jbm_darray_change (g + j, f + j, i + 1);
+          jbm_darray_change (g, f, i + 1);
         }
       // Eliminating column
       for (j = i, g = f + n; --j >= 0; g += n)
@@ -4140,7 +5145,7 @@ jbm_matrix_solve_tridiagonall (JBDOUBLE *restrict C,
                                ///< central diagonal array.
                                JBDOUBLE *restrict E,
                                ///< right diagonal array.
-                               JBDOUBLE *restrict H, ///< final column array.
+                               JBDOUBLE *restrict H,    ///< final column array.
                                int n)   ///< number of matrix rows.
 {
   JBDOUBLE k;
@@ -4178,6 +5183,15 @@ jbm_matrix_solve_tridiagonal_zerol (JBDOUBLE *restrict C,
                                     ///< final column array.
                                     int n)      ///< number of matrix rows.
 {
+#if JBM_HIGH_PRECISION == 1
+  JBDOUBLE c0 = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  JBDOUBLE c0 = 0.;
+#elif JBM_HIGH_PRECISION == 3
+  JBDOUBLE c0 = 0.L;
+#elif JBM_HIGH_PRECISION == 4
+  JBDOUBLE c0 = 0.Q;
+#endif
   JBDOUBLE k;
   int i;
   for (i = 0; i < n; ++i)
@@ -4188,12 +5202,12 @@ jbm_matrix_solve_tridiagonal_zerol (JBDOUBLE *restrict C,
         H[i + 1] -= k * H[i];
       }
   if (jbm_smalll (D[i]))
-    H[i] = 0.L;
+    H[i] = c0;
   else
     H[i] /= D[i];
   while (i--)
     if (jbm_smalll (D[i]))
-      H[i] = 0.L;
+      H[i] = c0;
     else
       H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
 }
@@ -4274,6 +5288,15 @@ jbm_matrix_solve_pentadiagonal_zerol (JBDOUBLE *restrict B,
                                       ///< final column array.
                                       int n)    ///< number of matrix rows.
 {
+#if JBM_HIGH_PRECISION == 1
+  JBDOUBLE c0 = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  JBDOUBLE c0 = 0.;
+#elif JBM_HIGH_PRECISION == 3
+  JBDOUBLE c0 = 0.L;
+#elif JBM_HIGH_PRECISION == 4
+  JBDOUBLE c0 = 0.Q;
+#endif
   JBDOUBLE k;
   int i;
   for (i = 0; i < n - 1; ++i)
@@ -4295,22 +5318,60 @@ jbm_matrix_solve_pentadiagonal_zerol (JBDOUBLE *restrict B,
       H[i + 1] -= k * H[i];
     }
   if (jbm_smalll (D[i + 1]))
-    H[i + 1] = 0.L;
+    H[i + 1] = c0;
   else
     H[i + 1] /= D[i + 1];
   if (jbm_smalll (D[i]))
-    H[i] = 0.L;
+    H[i] = c0;
   else
     H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
   while (i--)
     if (jbm_smalll (D[i]))
-      H[i] = 0.L;
+      H[i] = c0;
     else
       H[i] = (H[i] - E[i] * H[i + 1] - F[i] * H[i + 2]) / D[i];
 }
 
 /**
- * Function to calculate the coefficientes of a polynomial regression adjusted
+ * Function to calculate the coefficients of a linear regression adjusted by 
+ * minimum squares: \f$y=a+b\,x\f$ (JBDOUBLE).
+ */
+static inline void
+jbm_regression_linearl (JBDOUBLE *restrict x,
+                        ///< array of point x-coordinates.
+                        JBDOUBLE *restrict y,
+                        ///< array of point y-coordinates.
+                        int n,  ///< points number.
+                        JBDOUBLE *a,
+                        ///< pointer to the 0th order regression coefficient.
+                        JBDOUBLE *b)
+                        ///< pointer to the 1st order regression coefficient.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q;
+#endif
+  JBDOUBLE syx, sy, sxx, sx;
+  int i;
+  syx = sy = sxx = sx = c0;
+  for (i = 0; i <= n; ++i)
+    {
+      sy += y[i];
+      syx += x[i] * y[i];
+      sxx += x[i] * x[i];
+      sx += x[i];
+    }
+  *b = (n * syx - sy * sx) / (n * sxx - sx * sx);
+  *a = (sy - *b * sx) / n;
+}
+
+/**
+ * Function to calculate the coefficients of a polynomial regression adjusted
  * by minimum squares: \f$y=A_0+A_1\,x+A_2\,x^2+\cdots\f$ (JBDOUBLE).
  */
 static inline void
@@ -4319,23 +5380,32 @@ jbm_regression_polynomiall (JBDOUBLE *restrict x,
                             JBDOUBLE *restrict y,
                             ///< array of point y-coordinates.
                             int n,      ///< points number.
-                            JBDOUBLE ** A,
+                            JBDOUBLE **A,
 ///< pointer to the array of regression coefficients generated by the function
 ///< calling to g_malloc.
                             int m)      ///< order of the polynomial regression.
 {
+#if JBM_LOW_PRECISION == 1
+  const JBFLOAT c0 = 0.f, c1 = 1.f;
+#elif JBM_LOW_PRECISION == 2
+  const JBFLOAT c0 = 0., c1 = 1.;
+#elif JBM_LOW_PRECISION == 3
+  const JBFLOAT c0 = 0.L, c1 = 1.L;
+#elif JBM_LOW_PRECISION == 4
+  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
+#endif
   JBDOUBLE xx[m + m + 1], yx[m + 1], B[(m + 1) * (m + 2)];
   JBDOUBLE *k;
   JBDOUBLE zx, zy;
   int i, j;
   *A = (JBDOUBLE *) g_malloc ((m + 1) * sizeof (JBDOUBLE));
   for (j = m + m; --j > m;)
-    xx[j] = 0.L;
+    xx[j] = c0;
   for (; j >= 0; --j)
-    xx[j] = yx[j] = 0.L;
+    xx[j] = yx[j] = c0;
   for (i = n; --i >= 0;)
     {
-      for (j = 0, zx = 1.L, zy = y[i]; j <= m; ++j)
+      for (j = 0, zx = c1, zy = y[i]; j <= m; ++j)
         {
           yx[j] += zy;
           xx[j] += zx;
@@ -4360,36 +5430,7 @@ jbm_regression_polynomiall (JBDOUBLE *restrict x,
 }
 
 /**
- * Function to calculate the coefficientes of a linear regression adjusted by 
- * minimum squares: \f$y=a+b\,x\f$ (JBDOUBLE).
- */
-static inline void
-jbm_regression_linearl (JBDOUBLE *restrict x,
-                        ///< array of point x-coordinates.
-                        JBDOUBLE *restrict y,
-                        ///< array of point y-coordinates.
-                        int n,  ///< points number.
-                        JBDOUBLE * a,
-                        ///< pointer to the 0th order regression coefficient.
-                        JBDOUBLE * b)
-                        ///< pointer to the 1st order regression coefficient.
-{
-  JBDOUBLE syx, sy, sxx, sx;
-  int i;
-  syx = sy = sxx = sx = 0.L;
-  for (i = 0; i <= n; ++i)
-    {
-      sy += y[i];
-      syx += x[i] * y[i];
-      sxx += x[i] * x[i];
-      sy += x[i];
-    }
-  *b = (n * syx - sy * sx) / (n * sxx - sx * sx);
-  *a = (sy - *b * sx) / n;
-}
-
-/**
- * Function to calculate the coefficientes of an exponential regression adjusted
+ * Function to calculate the coefficients of an exponential regression adjusted
  * by minimum squares: \f$y=a\,x^b\f$ (JBDOUBLE).
  */
 static inline void
@@ -4398,9 +5439,9 @@ jbm_regression_exponentiall (JBDOUBLE *restrict x,
                              JBDOUBLE *restrict y,
 ///< array of point y-coordinates. It is modified by the function.
                              int n,     ///< points number.
-                             JBDOUBLE * a,
+                             JBDOUBLE *a,
 ///< pointer to the constant parameter regression coefficient.
-                             JBDOUBLE * b)
+                             JBDOUBLE *b)
 ///< pointer to the exponent regression coefficient.
 {
   int i;
@@ -4411,7 +5452,7 @@ jbm_regression_exponentiall (JBDOUBLE *restrict x,
 }
 
 /**
- * Function to calculate the coefficientes of a multilinear regression adjusted 
+ * Function to calculate the coefficients of a multilinear regression adjusted 
  * by minimum squares: \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$ (JBDOUBLE).
  */
 static inline void
@@ -4423,6 +5464,15 @@ jbm_regression_multilinearl (JBDOUBLE **restrict x,
 ///< array of regression coefficients.
                              int m)     ///< number of variables.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q;
+#endif
   JBDOUBLE c[(m + 1) * (m + 2)];
   JBDOUBLE *d, *xj, *xk;
   int i, j, k;
@@ -4434,25 +5484,25 @@ jbm_regression_multilinearl (JBDOUBLE **restrict x,
           d = c + (m + 1) * j + k;
           xj = x[j];
           xk = x[k];
-          for (*d = 0., i = n + 1; --i >= 0;)
+          for (*d = c0, i = n + 1; --i >= 0;)
             *d += *(xj++) ** (xk++);
         }
       d = c + (m + 1) * j + m;
       xj = x[j];
       xk = x[0];
-      for (*d = 0., i = n + 1; --i >= 0;)
+      for (*d = c0, i = n + 1; --i >= 0;)
         *d += *(xj++) ** (xk++);
     }
   for (k = m; --k > 0;)
     {
       d = c + k;
       xk = x[k];
-      for (*d = 0., i = n + 1; --i >= 0;)
+      for (*d = c0, i = n + 1; --i >= 0;)
         *d += *(xk++);
     }
   d = c + m;
   xk = x[0];
-  for (*d = 0., i = n + 1; --i >= 0;)
+  for (*d = c0, i = n + 1; --i >= 0;)
     *d += *(xk++);
   c[0] = n + 1;
   for (j = m; --j > 0;)
@@ -4464,7 +5514,7 @@ jbm_regression_multilinearl (JBDOUBLE **restrict x,
 }
 
 /**
- * Function to calculate the coefficientes of a multiexponential regression 
+ * Function to calculate the coefficients of a multiexponential regression 
  * adjusted by minimum squares: \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$ (JBDOUBLE).
  */
 static inline void
@@ -4492,7 +5542,7 @@ jbm_regression_multiexponentiall (JBDOUBLE **restrict x,
 static inline void
 jbm_spline_cubicl (JBDOUBLE *restrict x,
                    ///< array of point x-coordinates.
-                   JBDOUBLE * y,
+                   JBDOUBLE *y,
                    ///< array of point y-coordinates.
                    int n,       ///< number of points.
                    JBDOUBLE **restrict b,
@@ -4503,6 +5553,15 @@ jbm_spline_cubicl (JBDOUBLE *restrict x,
                    JBDOUBLE **restrict d)
 ///< pointer to the array of 3rd order spline coefficients.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f, c1 = 1.f, c3 = 3.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0., c1 = 1., c3 = 3.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L, c1 = 1.L, c3 = 3.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q, c1 = 1.Q, c3 = 3.Q;
+#endif
   JBDOUBLE *B, *C, *D, *E, *F, *H;
   JBDOUBLE dx;
   int i, j, m;
@@ -4515,14 +5574,14 @@ jbm_spline_cubicl (JBDOUBLE *restrict x,
   F = E + m - 1;
   H = F + m - 2;
   dx = x[1] - x[0];
-  B[0] = B[1] = D[3] = E[2] = E[3] = F[3] = H[1] = H[2] = H[3] = 0.L;
-  C[0] = C[1] = C[2] = 1.L;
-  F[1] = F[2] = -1.L;
+  B[0] = B[1] = D[3] = E[2] = E[3] = F[3] = H[1] = H[2] = H[3] = c0;
+  C[0] = C[1] = C[2] = c1;
+  F[1] = F[2] = -c1;
   D[0] = dx;
   D[1] = D[0] + dx;
   D[2] = D[1] + dx;
   E[0] = D[0] * dx;
-  E[1] = 3 * E[0];
+  E[1] = c3 * E[0];
   F[0] = E[0] * dx;
   H[0] = y[1] - y[0];
   for (i = n - 1; --i > 0;)
@@ -4530,21 +5589,21 @@ jbm_spline_cubicl (JBDOUBLE *restrict x,
       j = 3 * i + 1;
       dx = x[i + 1] - x[i];
       B[j - 2] = D[j + 2] = F[j] = F[j + 1] = F[j + 2] = H[j + 1] = H[j + 2]
-        = 0.L;
-      B[j - 1] = B[j] = 1.L;
-      E[j + 1] = E[j + 2] = -1.L;
+        = c0;
+      B[j - 1] = B[j] = c1;
+      E[j + 1] = E[j + 2] = -c1;
       C[j - 1] = dx;
       C[j] = C[j - 1] + dx;
       C[j + 1] = C[j] + dx;
       D[j] = C[j - 1] * dx;
-      D[j + 1] = 3 * D[j];
+      D[j + 1] = c3 * D[j];
       E[j] = D[j] * dx;
       H[j] = y[i + 1] - y[i];
     }
   j = 3 * n - 2;
   dx = x[n] - x[n - 1];
-  B[j - 2] = B[j - 1] = C[j] = H[j + 1] = 0.L;
-  D[j + 1] = 1.L;
+  B[j - 2] = B[j - 1] = C[j] = H[j + 1] = c0;
+  D[j + 1] = c1;
   C[j - 1] = dx;
   D[j] = dx * dx;
   E[j] = D[j] * dx;
@@ -4663,8 +5722,8 @@ jbm_varray_maxminl (void *v,
 ///< structs.
                     int size,   ///< size in bytes of the structs.
                     int n,      ///< number of structs.
-                    JBDOUBLE * max,     ///< pointer to the highest value.
-                    JBDOUBLE * min)     ///< pointer to the lowest value.
+                    JBDOUBLE *max,      ///< pointer to the highest value.
+                    JBDOUBLE *min)      ///< pointer to the lowest value.
 {
   int i;
   JBDOUBLE kmax, kmin;
@@ -4704,8 +5763,18 @@ jbm_varray_mean_square_errorl (void *restrict xa,
                                int nr)
 ///< the highest point number tabulating the 2nd function.
 {
-  JBDOUBLE k = 0., k2;
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q;
+#endif
+  JBDOUBLE k, k2;
   int i, j;
+  k = c0;
   for (i = 0; i <= na && *(JBDOUBLE *) xa < *(JBDOUBLE *) xr;
        ++i, xa = (char *) xa + sizea, fa = (char *) fa + sizea)
     k += jbm_fsqr (*(JBDOUBLE *) fa - *(JBDOUBLE *) fr);
@@ -4850,6 +5919,15 @@ jbm_varray_solve_tridiagonal_zerol (void *restrict C,
                                     int n)
                                     ///< the latest struct array element.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q;
+#endif
   JBDOUBLE *CC, *DD, *EE, *HH;
   JBDOUBLE k;
   int i;
@@ -4874,7 +5952,7 @@ jbm_varray_solve_tridiagonal_zerol (void *restrict C,
         }
     }
   if (jbm_small (*DD))
-    *HH = 0.L;
+    *HH = c0;
   else
     *HH /= *DD;
   while (--i > 0)
@@ -4887,7 +5965,7 @@ jbm_varray_solve_tridiagonal_zerol (void *restrict C,
       H = (char *) H - size;
       HH = (JBDOUBLE *) H;
       if (jbm_smalll (*DD))
-        *HH = 0.L;
+        *HH = c0;
       else
         *HH = (*HH - k) / *DD;
     }
@@ -4917,12 +5995,21 @@ jbm_file_mean_square_errorl (char *namea,
                              int nr)
 ///< columns number of file tabulating the 2nd function.
 {
+#if JBM_HIGH_PRECISION == 1
+  const JBDOUBLE c0 = 0.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBDOUBLE c0 = 0.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBDOUBLE c0 = 0.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBDOUBLE c0 = 0.Q;
+#endif
   JBDOUBLE aa[na], ar[nr];
   FILE *filea, *filer;
   JBDOUBLE k, xa, fa, xr1, fr1, xr2, fr2;
   int i, j, endr;
   endr = i = 0;
-  k = 0.L;
+  k = c0;
   filea = fopen (namea, "r");
   if (!filea)
     goto exit_mse;
@@ -4930,19 +6017,19 @@ jbm_file_mean_square_errorl (char *namea,
   if (!filer)
     goto exit_mse;
   for (j = 0; j < nr; ++j)
-    if (fscanf (filer, FRL, ar + j) != 1)
+    if (jbm_read_double (filer, ar + j) != 1)
       goto exit_mse;
   xr1 = ar[ixr - 1];
   fr1 = ar[ifr - 1];
   for (j = 0; j < nr; ++j)
-    if (fscanf (filer, FRL, ar + j) != 1)
+    if (jbm_read_double (filer, ar + j) != 1)
       endr = 1;
   xr2 = ar[ixr - 1];
   fr2 = ar[ifr - 1];
   for (i = 0; !endr; ++i)
     {
       for (j = 0; j < na; ++j)
-        if (fscanf (filea, FRL, aa + j) != 1)
+        if (jbm_read_double (filea, aa + j) != 1)
           goto exit_mse;
       xa = aa[ixa - 1];
       fa = aa[ifa - 1];
@@ -4951,7 +6038,7 @@ jbm_file_mean_square_errorl (char *namea,
           xr1 = xr2;
           fr1 = fr2;
           for (j = 0; j < nr; ++j)
-            if (fscanf (filer, FRL, ar + j) != 1)
+            if (jbm_read_double (filer, ar + j) != 1)
               {
                 endr = 1;
                 goto end_filer;
@@ -4968,7 +6055,7 @@ jbm_file_mean_square_errorl (char *namea,
   for (; 1; ++i)
     {
       for (j = 0; j < na; ++j)
-        if (fscanf (filea, FRL, aa + j) != 1)
+        if (jbm_read_double (filea, aa + j) != 1)
           goto exit_mse;
       xa = aa[ixa - 1];
       fa = aa[ifa - 1];
@@ -4976,7 +6063,7 @@ jbm_file_mean_square_errorl (char *namea,
     }
 exit_mse:
   if (i == 0)
-    return 0.L;
+    return c0;
   return k / i;
 }
 
@@ -5007,5 +6094,1588 @@ jbm_file_root_mean_square_errorl (char *namea,
   return SQRTL
     (jbm_file_mean_square_errorl (namea, ixa, ifa, na, namer, ixr, ifr, nr));
 }
+
+#ifdef __SSE4_2__
+
+/**
+ * Function to calculate the absolute value of a __m128d vector.
+ *
+ * \return absolute value vector.
+ */
+static inline __m128d
+jbm_abs_128 (__m128d x)
+{
+  return _mm_andnot_pd (_mm_set1_pd (-0.0), x);
+}
+
+/**
+ * Function to check small __m128d vectors.
+ *
+ * \return 1 on small number, 0 otherwise.
+ */
+static inline __m128d
+jbm_small_128 (__m128d x)       ///< __m128d vector.
+{
+  return _mm_cmplt_pd (jbm_abs_128 (x), _mm_set1_pd (FLT_EPSILON));
+}
+
+/**
+ * Function to calculate the __m128d vector with the components with lower
+ * module in the [a, b] interval.
+ * \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
+ * 0, & a\cdot b\le 0;\\
+ * a, & a,b\ne 0,\;|a|<|b|;\\
+ * b, & a,b\ne 0,\;|a|\ge|b|;
+ * \end{array}\right.\f$.
+ *
+ * \return modmin __m128d vector.
+ */
+static inline __m128d
+jbm_modmin_128 (__m128d a,      ///< 1st __m128d vector.
+                __m128d b)      ///< 2nd __m128d vector.
+{
+  __m128d aa, ab, m, z;
+  z = _mm_setzero_pd ();
+  ab = _mm_mul_pd (a, b);
+  m = _mm_cmple_pd (ab, z);
+  a = _mm_blendv_pd (a, z, m);
+  aa = jbm_abs_128 (a);
+  ab = jbm_abs_128 (b);
+  m = _mm_cmpgt_pd (aa, ab);
+  return _mm_blendv_pd (a, b, m);
+}
+
+/**
+ * Function to interchange 2 __m128d numbers.
+ */
+static inline void
+jbm_change_128 (__m128d *restrict a,    ///< 1st __m128d vector pointer.
+                __m128d *restrict b)    ///< 2nd __m128d vector pointer.
+{
+  __m128d c;
+  JB_CHANGE (*a, *b, c);
+}
+
+/**
+ * Function to calculate the square of the components of a __m128d vector.
+ *
+ * \return __m128d vector square.
+ */
+static inline __m128d
+jbm_sqr_128 (__m128d x)         ///< __m128d vector.
+{
+  return _mm_mul_pd (x, x);
+}
+
+/**
+ * Function to calculate the double of a __m128d vector.
+ *
+ * \return __m128d double.
+ */
+static inline __m128d
+jbm_dbl_128 (__m128d x)         ///< __m128d vector.
+{
+  return _mm_add_pd (x, x);
+}
+
+/**
+ * Function to perform an extrapolation between 2 __m128d vectors of 2D points.
+ *
+ * \return __m128d vector of y-coordinates of the extrapolated points.
+ */
+static inline __m128d
+jbm_extrapolate_128 (__m128d x,
+                     ///< __m128d vector of x-coordinates of the extrapolated
+                     ///< points.
+                     __m128d x1,
+                     ///< __m128d vector of x-coordinates of the 1st points.
+                     __m128d x2,
+                     ///< __m128d vector of x-coordinates of the 2nd points.
+                     __m128d y1,
+                     ///< __m128d vector of y-coordinates of the 1st points.
+                     __m128d y2)
+                     ///< __m128d vector of y-coordinates of the 2nd points.
+{
+  __m128d d;
+  d = _mm_sub_pd (x, x1);
+  d = _mm_mul_pd (d, _mm_div_pd (_mm_sub_pd (y2, y1), _mm_sub_pd (x2, x1)));
+  return _mm_add_pd (y1, d);
+}
+
+/**
+ * Function to perform an interpolation between 2 __m128d vectors of 2D points.
+ *
+ * \return __m128d vector of y-coordinates of the interpolated points.
+ */
+static inline __m128d
+jbm_interpolate_128 (__m128d x,
+                     ///< __m128d vector of x-coordinates of the interpolated
+                     ///< points.
+                     __m128d x1,
+                     ///< __m128d vector of x-coordinates of the 1st points.
+                     __m128d x2,
+                     ///< __m128d vector of x-coordinates of the 2nd points.
+                     __m128d y1,
+                     ///< __m128d vector of y-coordinates of the 1st points.
+                     __m128d y2)
+                     ///< __m128d vector of y-coordinates of the 2nd points.
+{
+  __m128d k, m;
+  k = jbm_extrapolate_128 (x, x1, x2, y1, y2);
+  m = _mm_cmpgt_pd (x, x1);
+  k = _mm_blendv_pd (y1, k, m);
+  m = _mm_cmplt_pd (x, x2);
+  return _mm_blendv_pd (y2, k, m);
+}
+
+/**
+ * Function to calculate the length of a __m128d vector of 2D segments.
+ *
+ * \return __m128d vector of segment lengths.
+ */
+static inline __m128d
+jbm_v2_length_128 (__m128d x1,
+///< __m128d vector of x-coordinates of the 1st points defining the segment.
+                   __m128d y1,
+///< __m128d vector of y-coordinates of the 1st points defining the segment.
+                   __m128d x2,
+///< __m128d vector of x-coordinates of the 2nd points defining the segment.
+                   __m128d y2)
+///< __m128d vector of y-coordinates of the 2nd points defining the segment.
+{
+  __m128d dx, dy;
+  dx = _mm_sub_pd (x2, x1);
+  dy = _mm_sub_pd (y2, y1);
+  return _mm_sqrt_pd (_mm_add_pd (jbm_sqr_128 (dx), jbm_sqr_128 (dy)));
+}
+
+/**
+ * Function to calculate the length of a __m128d vector of 3D segments.
+ *
+ * \return __m128d vector of segment lengths.
+ */
+static inline __m128d
+jbm_v3_length_128 (__m128d x1,
+///< __m128d vector of x-coordinates of the 1st points defining the segments.
+                   __m128d y1,
+///< __m128d vector of y-coordinates of the 1st points defining the segments.
+                   __m128d z1,
+///< __m128d vector of z-coordinates of the 1st points defining the segments.
+                   __m128d x2,
+///< __m128d vector of x-coordinates of the 2nd points defining the segments.
+                   __m128d y2,
+///< __m128d vector of y-coordinates of the 2nd points defining the segments.
+                   __m128d z2)
+///< __m128d vector of z-coordinates of the 2nd points defining the segments.
+{
+  __m128d dx, dy, dz;
+  dx = _mm_sub_pd (x2, x1);
+  dx = jbm_sqr_128 (dx);
+  dy = _mm_sub_pd (y2, y1);
+  dy = jbm_sqr_128 (dy);
+  dz = _mm_sub_pd (z2, z1);
+  dz = jbm_sqr_128 (dz);
+  return _mm_sqrt_pd (_mm_add_pd (dx, _mm_add_pd (dy, dz)));
+}
+
+/**
+ * Function to calculate a __m128d vector of 1st order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_1_128 (__m128d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]), _mm_mul_pd (x, _mm_set1_pd (p[1])));
+}
+
+/**
+ * Function to calculate a __m128d vector of 2nd order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_2_128 (__m128d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]),
+                     _mm_mul_pd (x, jbm_polynomial_1_128 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m128d vector of 3rd order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_3_128 (__m128d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]),
+                     _mm_mul_pd (x, jbm_polynomial_2_128 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m128d vector of 4th order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_4_128 (__m128d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]),
+                     _mm_mul_pd (x, jbm_polynomial_3_128 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m128d vector of 5th order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_5_128 (__m128d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]),
+                     _mm_mul_pd (x, jbm_polynomial_4_128 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m128d vector of 6th order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_6_128 (__m128d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]),
+                     _mm_mul_pd (x, jbm_polynomial_5_128 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m128d vector of 7th order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_7_128 (__m128d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]),
+                     _mm_mul_pd (x, jbm_polynomial_6_128 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m128d vector of 8th order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_8_128 (__m128d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]),
+                     _mm_mul_pd (x, jbm_polynomial_7_128 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m128d vector of 9th order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_9_128 (__m128d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]),
+                     _mm_mul_pd (x, jbm_polynomial_8_128 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m128d vector of 10th order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_10_128 (__m128d x,       ///< variable.
+                       double *p)       ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]),
+                     _mm_mul_pd (x, jbm_polynomial_9_128 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m128d vector of 11th order polynomials.
+ *
+ * \return __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_11_128 (__m128d x,       ///< variable.
+                       double *p)       ///< array of coefficients.
+{
+  return _mm_add_pd (_mm_set1_pd (p[0]),
+                     _mm_mul_pd (x, jbm_polynomial_10_128 (x, p + 1)));
+}
+
+/**
+ * Function to calculate the solution of a __m128d vector of reduced quadratic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$x^2+a\,x+b=0\f$.
+ *
+ * \return __m128d vector of solution values.
+ */
+static inline __m128d
+jbm_solve_quadratic_reduced_128 (__m128d a,
+///< __m128d vector of 1st order coefficient of the equations.
+                                 __m128d b,
+///< __m128d vector of 0th order coefficient of the equations.
+                                 __m128d x1,
+///< __m128d vector of left limits of the solution intervals.
+                                 __m128d x2)
+///< __m128d vector of right limits of the solution intervals.
+{
+  __m128d k1, k2, m;
+  k1 = _mm_set1_pd (-0.5);
+  a = _mm_mul_pd (a, k1);
+  b = _mm_sqrt_pd (_mm_sub_pd (jbm_sqr_128 (a), b));
+  k1 = _mm_add_pd (a, b);
+  k2 = _mm_sub_pd (a, b);
+  m = _mm_cmplt_pd (k1, x1);
+  k1 = _mm_blendv_pd (k1, k2, m);
+  m = _mm_cmpgt_pd (k1, x2);
+  return _mm_blendv_pd (k1, k2, m);
+}
+
+/**
+ * Function to calculate the solution of a __m128d vector of quadratic equations
+ * in an interval \f$\left[x_1,x_2\right]\f$ in the form \f$a\,x^2+b\,x+c=0\f$.
+ *
+ * \return __m128d vector of solution values.
+ */
+static inline __m128d
+jbm_solve_quadratic_128 (__m128d a,
+///< __m128d vector of 2nd order coefficient of the equations.
+                         __m128d b,
+///< __m128d vector of 1st order coefficient of the equations.
+                         __m128d c,
+///< __m128d vector of 0th order coefficient of the equations.
+                         __m128d x1,
+///< __m128d vector of left limits of the solution intervals.
+                         __m128d x2)
+///< __m128d vector of right limits of the solution intervals.
+{
+  __m128d k1, k2, m;
+  m = jbm_small_128 (a);
+  k1 = jbm_solve_quadratic_reduced_128 (_mm_div_pd (b, a), _mm_div_pd (c, a),
+                                        x1, x2);
+  k2 = _mm_div_pd (_mm_sub_pd (_mm_setzero_pd (), c), b);
+  return _mm_blendv_pd (k1, k2, m);
+}
+
+/**
+ * Function to calculate the solution of a __m128d vector of reduced cubic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$x^3+a\,x^2+b\,x+c=0\f$.
+ *
+ * \return __m128d vector of solution values.
+ */
+/*
+static inline __m128d
+jbm_solve_cubic_reduced (__m128d a,
+                         ///< 2nd order coefficient of the equation.
+                         __m128d b,
+                         ///< 1st order coefficient of the equation.
+                         __m128d c,
+                         ///< 0th order coefficient of the equation.
+                         __m128d x1,
+                         ///< left limit of the solution interval.
+                         __m128d x2)
+                         ///< right limit of the solution interval.
+{
+  __m128d k0, k1, k2;
+  a /= 3.;
+  k0 = a * a;
+  k1 = b / 3. - k0;
+  k0 = (b * a - c) / 2. - a * k0;
+  k2 = k1 * k1 * k1 + k0 * k0;
+  if (k2 < 0.)
+    {
+      k1 = SQRT (-k1);
+      k0 = ACOS (k0 / (k1 * k1 * k1)) / 3.;
+      k1 *= 2.;
+      k2 = k1 * COS (k0) - a;
+      if (k2 < x1 || k2 > x2)
+        {
+          k2 = k1 * COS (k0 + 2. * JB_PI / 3.) - a;
+          if (k2 < x1 || k2 > x2)
+            k2 = k1 * COS (k0 - 2. * JB_PI / 3.) - a;
+        }
+    }
+  else
+    {
+      k1 = SQRT (k2);
+      k2 = k0 + k1;
+      k2 = CBRT (k2);
+      k0 -= k1;
+      k2 += CBRT (k0);
+      k2 -= a;
+    }
+  return k2;
+}
+*/
+
+/**
+ * Function to calculate the solution of a __m128d vector of cubic equations in
+ * an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$a\,x^3+b\,x^2+c\,x+d=0\f$.
+ *
+ * \return __m128d vector of solution values.
+ */
+/*
+static inline __m128d
+jbm_solve_cubic_128 (__m128d a,
+///< __m128d vector of 3rd order coefficient of the equations.
+                 __m128d b,
+///< __m128d vector of 2nd order coefficient of the equations.
+                 __m128d c,
+///< __m128d vector of 1st order coefficient of the equations.
+                 __m128d d,
+///< __m128d vector of 0th order coefficient of the equations.
+                         __m128d x1,
+///< __m128d vector of left limits of the solution intervals.
+                         __m128d x2)
+///< __m128d vector of right limits of the solution intervals.
+{
+  __m128d m;
+  m = jbm_small_128 (a);
+  return
+    _mm_blendv_pd (jbm_solve_cubic_reduced (_mm_div_pd (b, a),
+                                            _mm_div_pd (c, a),
+                                            _mm_div_pd (d, a), x1, x2),
+                   jbm_solve_quadratic_128 (b, c, d, x1, x2), m);
+}
+*/
+
+/**
+ * Function to calculate the total (1st order upwind) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=0\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_total_128 (__m128d d1 __attribute__((unused)),
+                            ///< 1st flux limiter function parameter.
+                            __m128d d2 __attribute__((unused)))
+  ///< 2nd flux limiter function parameter.
+{
+  return _mm_setzero_pd ();
+}
+
+/**
+ * Function to calculate the null (2nd order upwind) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=1\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_null_128 (__m128d d1 __attribute__((unused)),
+                           ///< 1st flux limiter function parameter.
+                           __m128d d2 __attribute__((unused)))
+  ///< 2nd flux limiter function parameter.
+{
+  return _mm_set1_pd (1.);
+}
+
+/**
+ * Function to calculate the centred (2nd order centred) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\frac{d_1}{d_2}\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_centred_128 (__m128d d1,
+                              ///< 1st flux limiter function parameter.
+                              __m128d d2)
+                              ///< 2nd flux limiter function parameter.
+{
+  __m128d m;
+  m = jbm_small_128 (d2);
+  return _mm_blendv_pd (_mm_div_pd (d1, d2), _mm_setzero_pd (), m);
+}
+
+/**
+ * Function to calculate the superbee flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{2\,d_1}{d_2}\right),\,
+ * \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_superbee_128 (__m128d d1,
+                               ///< 1st flux limiter function parameter.
+                               __m128d d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  __m128d r, m;
+  r = _mm_div_pd (d1, d2);
+  r = _mm_max_pd (_mm_min_pd (jbm_dbl_128 (r), _mm_set1_pd (1.)),
+                  _mm_min_pd (r, _mm_set1_pd (2.)));
+  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
+  return _mm_blendv_pd (_mm_setzero_pd (), r, m);
+}
+
+/**
+ * Function to calculate the minmod flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{d_1}{d_2}\right)\right]\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_minmod_128 (__m128d d1,
+                             ///< 1st flux limiter function parameter.
+                             __m128d d2)
+                             ///< 2nd flux limiter function parameter.
+{
+  __m128d r, m;
+  r = _mm_min_pd (_mm_div_pd (d1, d2), _mm_set1_pd (1.));
+  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
+  return _mm_blendv_pd (_mm_setzero_pd (), r, m);
+}
+
+/**
+ * Function to calculate the van Leer flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=
+ * \frac{\frac{d_1}{d_2}+\left|\frac{d_1}{d_2}\right|}
+ * {1+\left|\frac{d_1}{d_2}\right|}\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_VanLeer_128 (__m128d d1,
+                              ///< 1st flux limiter function parameter.
+                              __m128d d2)
+                              ///< 2nd flux limiter function parameter.
+{
+  __m128d r, k;
+  r = _mm_div_pd (d1, d2);
+  k = jbm_abs_128 (r);
+  r = _mm_div_pd (_mm_add_pd (r, k), _mm_add_pd (_mm_set1_pd (1.), k));
+  k = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
+  return _mm_blendv_pd (_mm_setzero_pd (), r, k);
+}
+
+/**
+ * Function to calculate the van Albada flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\frac{\frac{d_1}{d_2}+\frac{d_1^2}{d_2^2}}
+ * {1+\frac{d_1^2}{d_2^2}}\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_VanAlbada_128 (__m128d d1,
+                                ///< 1st flux limiter function parameter.
+                                __m128d d2)
+                                ///< 2nd flux limiter function parameter.
+{
+  __m128d r, k;
+  r = _mm_div_pd (d1, d2);
+  k = jbm_sqr_128 (r);
+  r = _mm_div_pd (_mm_add_pd (r, k), _mm_add_pd (_mm_set1_pd (1.), k));
+  k = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
+  return _mm_blendv_pd (_mm_setzero_pd (), r, k);
+}
+
+/**
+ * Function to calculate the minsuper flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_minsuper_128 (__m128d d1,
+                               ///< 1st flux limiter function parameter.
+                               __m128d d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  __m128d r, m;
+  r = _mm_min_pd (_mm_div_pd (d1, d2), _mm_set1_pd (2.));
+  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
+  return _mm_blendv_pd (_mm_setzero_pd (), r, m);
+}
+
+/**
+ * Function to calculate the supermin flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{2\,d_1}{d_2}\right)\right]\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_supermin_128 (__m128d d1,
+                               ///< 1st flux limiter function parameter.
+                               __m128d d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  __m128d r, m;
+  r = _mm_div_pd (d1, d2);
+  r = _mm_min_pd (jbm_dbl_128 (r), _mm_set1_pd (1.));
+  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
+  return _mm_blendv_pd (_mm_setzero_pd (), r, m);
+}
+
+/**
+ * Function to calculate the monotonized central flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(2,\,\frac{1+\frac{d_1}{d_2}}{2},\,\frac{2\,d_1}{d_2}\right)
+ * \right]\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_monotonized_central_128 (__m128d d1,
+///< 1st flux limiter function parameter.
+                                          __m128d d2)
+///< 2nd flux limiter function parameter.
+{
+  __m128d r, rm, m;
+  r = _mm_div_pd (d1, d2);
+  rm = _mm_mul_pd (_mm_set1_pd (0.5), _mm_add_pd (r, _mm_set1_pd (1.)));
+  m = _mm_cmplt_pd (r, _mm_set1_pd (3.));
+  rm = _mm_blendv_pd (_mm_set1_pd (2.), rm, m);
+  m = _mm_cmpgt_pd (r, _mm_set1_pd (1. / 3.));
+  rm = _mm_blendv_pd (rm, jbm_dbl_128 (r), m);
+  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
+  return _mm_blendv_pd (_mm_set1_pd (0.), rm, m);
+}
+
+/**
+ * Function to calculate the mean flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=
+ * \max\left(0,\,\frac{1+\frac{d_1}{d_2}}{2}\right)\f$ (__m128d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m128d
+jbm_flux_limiter_mean_128 (__m128d d1,
+                           ///< 1st flux limiter function parameter.
+                           __m128d d2)
+                           ///< 2nd flux limiter function parameter.
+{
+  __m128d r, m;
+  r = _mm_mul_pd (_mm_set1_pd (0.5),
+                  _mm_add_pd (_mm_set1_pd (1.), _mm_div_pd (d1, d2)));
+  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
+  return _mm_blendv_pd (_mm_set1_pd (0.), r, m);
+}
+
+/**
+ * Function to select a flux limiter function (__m128d).
+ *
+ * \return pointer to the flux limiter function.
+ */
+static inline __m128d
+  (*jbm_flux_limiter_select_128 (int type)) (__m128d, __m128d)
+///< type of flux limiter function.
+{
+  switch (type)
+    {
+    case JBM_FLUX_LIMITER_TYPE_TOTAL:
+      return jbm_flux_limiter_total_128;
+    case JBM_FLUX_LIMITER_TYPE_NULL:
+      return jbm_flux_limiter_null_128;
+    case JBM_FLUX_LIMITER_TYPE_CENTRED:
+      return jbm_flux_limiter_centred_128;
+    case JBM_FLUX_LIMITER_TYPE_MINMOD:
+      return jbm_flux_limiter_minmod_128;
+    case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
+      return jbm_flux_limiter_superbee_128;
+    case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
+      return jbm_flux_limiter_VanLeer_128;
+    case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
+      return jbm_flux_limiter_VanAlbada_128;
+    case JBM_FLUX_LIMITER_TYPE_MINSUPER:
+      return jbm_flux_limiter_minsuper_128;
+    case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
+      return jbm_flux_limiter_supermin_128;
+    case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
+      return jbm_flux_limiter_monotonized_central_128;
+    case JBM_FLUX_LIMITER_TYPE_MEAN:
+      return jbm_flux_limiter_mean_128;
+    }
+  return NULL;
+}
+
+/**
+ * Function to approximate an integral of a function with the Gauss method
+ * defined in an interval (__m128d).
+ *
+ * \return __m128d vector of integral values.
+ */
+static inline __m128d
+jbm_integral_128 (__m128d (*f) (__m128d),
+                  ///< pointer to the function to integrate.
+                  __m128d x1,   ///< left limit of the interval.
+                  __m128d x2)   ///< right limit of the interval.
+{
+#if JBM_INTEGRAL_GAUSS_N == 1
+  const JBFLOAT a[1] = { 2. };
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  const JBFLOAT a[2] = { 8. / 9., 5. / 9. },
+    b[2] = { 0., 7.745966692414834e-1 };
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  const JBFLOAT a[3] = {
+    128. / 225.,
+    4.786286704993665e-1,
+    2.369268850561891e-1
+  }, b[3] = {
+    0.,
+    5.384693101056831e-1,
+    9.061798459386640e-1
+  };
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  const JBFLOAT a[4] = {
+    4.179591836734694e-1,
+    3.818300505051189e-1,
+    2.797053914892767e-1,
+    1.294849661688697e-1
+  }, b[4] = {
+    0.,
+    4.058451513773972e-1,
+    7.415311855993944e-1,
+    9.491079123427585e-1
+  };
+#endif
+  __m128d k, x, dx, h;
+#if JBM_INTEGRAL_GAUSS_N > 1
+  __m128d k2, f1, f2;
+#endif
+  unsigned int i;
+  h = _mm_set1_pd (0.5);
+  dx = _mm_mul_pd (h, _mm_sub_pd (x2, x1));
+  x = _mm_mul_pd (h, _mm_add_pd (x2, x1));
+  k = _mm_set1_pd (a[0]);
+  k = _mm_mul_pd (k, _mm_mul_pd (dx, f (x)));
+#if JBM_INTEGRAL_GAUSS_N > 1
+  for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
+    {
+      k2 = _mm_set1_pd (b[i]);
+      k2 = _mm_mul_pd (k2, dx);
+      f1 = f (_mm_sub_pd (x, k2));
+      f2 = f (_mm_add_pd (x, k2));
+      h = _mm_set1_pd (a[i]);
+      h = _mm_mul_pd (h, dx);
+      k = _mm_add_pd (k, _mm_mul_pd (h, _mm_add_pd (f1, f2)));
+    }
+#endif
+  return k;
+}
+
+#endif
+
+#ifdef __AVX__
+
+/**
+ * Function to calculate the absolute value of a __m256d vector.
+ *
+ * \return absolute value vector.
+ */
+static inline __m256d
+jbm_abs_256 (__m256d x)
+{
+  return _mm256_andnot_pd (_mm256_set1_pd (-0.0), x);
+}
+
+/**
+ * Function to check small __m256d vectors.
+ *
+ * \return 1 on small number, 0 otherwise.
+ */
+static inline __m256d
+jbm_small_256 (__m256d x)       ///< __m256d vector.
+{
+  return _mm256_cmp_pd (jbm_abs_256 (x), _mm256_set1_pd (FLT_EPSILON),
+                        _CMP_LT_OS);
+}
+
+/**
+ * Function to calculate the __m256d vector with the components with lower
+ * module in the [a, b] interval.
+ * \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
+ * 0, & a\cdot b\le 0;\\
+ * a, & a,b\ne 0,\;|a|<|b|;\\
+ * b, & a,b\ne 0,\;|a|\ge|b|;
+ * \end{array}\right.\f$.
+ *
+ * \return modmin __m256d vector.
+ */
+static inline __m256d
+jbm_modmin_256 (__m256d a,      ///< 1st __m256d vector.
+                __m256d b)      ///< 2nd __m256d vector.
+{
+  __m256d aa, ab, m, z;
+  z = _mm256_setzero_pd ();
+  ab = _mm256_mul_pd (a, b);
+  m = _mm256_cmp_pd (ab, z, _CMP_LE_OS);
+  a = _mm256_blendv_pd (a, z, m);
+  aa = jbm_abs_256 (a);
+  ab = jbm_abs_256 (b);
+  m = _mm256_cmp_pd (aa, ab, _CMP_GT_OS);
+  return _mm256_blendv_pd (a, b, m);
+}
+
+/**
+ * Function to interchange 2 __m256d numbers.
+ */
+static inline void
+jbm_change_256 (__m256d *restrict a,    ///< 1st __m256d vector pointer.
+                __m256d *restrict b)    ///< 2nd __m256d vector pointer.
+{
+  __m256d c;
+  JB_CHANGE (*a, *b, c);
+}
+
+/**
+ * Function to calculate the square of the components of a __m256d vector.
+ *
+ * \return __m256d vector square.
+ */
+static inline __m256d
+jbm_sqr_256 (__m256d x)         ///< __m256d vector.
+{
+  return _mm256_mul_pd (x, x);
+}
+
+/**
+ * Function to calculate the double of a __m256d vector.
+ *
+ * \return __m256d double.
+ */
+static inline __m256d
+jbm_dbl_256 (__m256d x)         ///< __m256d vector.
+{
+  return _mm256_add_pd (x, x);
+}
+
+/**
+ * Function to perform an extrapolation between 2 __m256d vectors of 2D points.
+ *
+ * \return __m256d vector of y-coordinates of the extrapolated points.
+ */
+static inline __m256d
+jbm_extrapolate_256 (__m256d x,
+                     ///< __m256d vector of x-coordinates of the extrapolated
+                     ///< points.
+                     __m256d x1,
+                     ///< __m256d vector of x-coordinates of the 1st points.
+                     __m256d x2,
+                     ///< __m256d vector of x-coordinates of the 2nd points.
+                     __m256d y1,
+                     ///< __m256d vector of y-coordinates of the 1st points.
+                     __m256d y2)
+                     ///< __m256d vector of y-coordinates of the 2nd points.
+{
+  __m256d d;
+  d = _mm256_sub_pd (x, x1);
+  d =
+    _mm256_mul_pd (d,
+                   _mm256_div_pd (_mm256_sub_pd (y2, y1),
+                                  _mm256_sub_pd (x2, x1)));
+  return _mm256_add_pd (y1, d);
+}
+
+/**
+ * Function to perform an interpolation between 2 __m256d vectors of 2D points.
+ *
+ * \return __m256d vector of y-coordinates of the interpolated points.
+ */
+static inline __m256d
+jbm_interpolate_256 (__m256d x,
+                     ///< __m256d vector of x-coordinates of the interpolated
+                     ///< points.
+                     __m256d x1,
+                     ///< __m256d vector of x-coordinates of the 1st points.
+                     __m256d x2,
+                     ///< __m256d vector of x-coordinates of the 2nd points.
+                     __m256d y1,
+                     ///< __m256d vector of y-coordinates of the 1st points.
+                     __m256d y2)
+                     ///< __m256d vector of y-coordinates of the 2nd points.
+{
+  __m256d k, m;
+  k = jbm_extrapolate_256 (x, x1, x2, y1, y2);
+  m = _mm256_cmp_pd (x, x1, _CMP_GT_OS);
+  k = _mm256_blendv_pd (y1, k, m);
+  m = _mm256_cmp_pd (x, x2, _CMP_LT_OS);
+  return _mm256_blendv_pd (y2, k, m);
+}
+
+/**
+ * Function to calculate the length of a __m256d vector of 2D segments.
+ *
+ * \return __m256d vector of segment lengths.
+ */
+static inline __m256d
+jbm_v2_length_256 (__m256d x1,
+///< __m256d vector of x-coordinates of the 1st points defining the segment.
+                   __m256d y1,
+///< __m256d vector of y-coordinates of the 1st points defining the segment.
+                   __m256d x2,
+///< __m256d vector of x-coordinates of the 2nd points defining the segment.
+                   __m256d y2)
+///< __m256d vector of y-coordinates of the 2nd points defining the segment.
+{
+  __m256d dx, dy;
+  dx = _mm256_sub_pd (x2, x1);
+  dy = _mm256_sub_pd (y2, y1);
+  return _mm256_sqrt_pd (_mm256_add_pd (jbm_sqr_256 (dx), jbm_sqr_256 (dy)));
+}
+
+/**
+ * Function to calculate the length of a __m256d vector of 3D segments.
+ *
+ * \return __m256d vector of segment lengths.
+ */
+static inline __m256d
+jbm_v3_length_256 (__m256d x1,
+///< __m256d vector of x-coordinates of the 1st points defining the segments.
+                   __m256d y1,
+///< __m256d vector of y-coordinates of the 1st points defining the segments.
+                   __m256d z1,
+///< __m256d vector of z-coordinates of the 1st points defining the segments.
+                   __m256d x2,
+///< __m256d vector of x-coordinates of the 2nd points defining the segments.
+                   __m256d y2,
+///< __m256d vector of y-coordinates of the 2nd points defining the segments.
+                   __m256d z2)
+///< __m256d vector of z-coordinates of the 2nd points defining the segments.
+{
+  __m256d dx, dy, dz;
+  dx = _mm256_sub_pd (x2, x1);
+  dx = jbm_sqr_256 (dx);
+  dy = _mm256_sub_pd (y2, y1);
+  dy = jbm_sqr_256 (dy);
+  dz = _mm256_sub_pd (z2, z1);
+  dz = jbm_sqr_256 (dz);
+  return _mm256_sqrt_pd (_mm256_add_pd (dx, _mm256_add_pd (dy, dz)));
+}
+
+/**
+ * Function to calculate a __m256d vector of 1st order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_1_256 (__m256d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, _mm256_set1_pd (p[1])));
+}
+
+/**
+ * Function to calculate a __m256d vector of 2nd order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_2_256 (__m256d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, jbm_polynomial_1_256 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m256d vector of 3rd order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_3_256 (__m256d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, jbm_polynomial_2_256 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m256d vector of 4th order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_4_256 (__m256d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, jbm_polynomial_3_256 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m256d vector of 5th order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_5_256 (__m256d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, jbm_polynomial_4_256 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m256d vector of 6th order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_6_256 (__m256d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, jbm_polynomial_5_256 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m256d vector of 7th order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_7_256 (__m256d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, jbm_polynomial_6_256 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m256d vector of 8th order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_8_256 (__m256d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, jbm_polynomial_7_256 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m256d vector of 9th order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_9_256 (__m256d x,        ///< variable.
+                      double *p)        ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, jbm_polynomial_8_256 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m256d vector of 10th order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_10_256 (__m256d x,       ///< variable.
+                       double *p)       ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, jbm_polynomial_9_256 (x, p + 1)));
+}
+
+/**
+ * Function to calculate a __m256d vector of 11th order polynomials.
+ *
+ * \return __m256d vector of polynomial values.
+ */
+static inline __m256d
+jbm_polynomial_11_256 (__m256d x,       ///< variable.
+                       double *p)       ///< array of coefficients.
+{
+  return _mm256_add_pd (_mm256_set1_pd (p[0]),
+                        _mm256_mul_pd (x, jbm_polynomial_10_256 (x, p + 1)));
+}
+
+/**
+ * Function to calculate the solution of a __m256d vector of reduced quadratic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$x^2+a\,x+b=0\f$.
+ *
+ * \return __m256d vector of solution values.
+ */
+static inline __m256d
+jbm_solve_quadratic_reduced_256 (__m256d a,
+///< __m256d vector of 1st order coefficient of the equations.
+                                 __m256d b,
+///< __m256d vector of 0th order coefficient of the equations.
+                                 __m256d x1,
+///< __m256d vector of left limits of the solution intervals.
+                                 __m256d x2)
+///< __m256d vector of right limits of the solution intervals.
+{
+  __m256d k1, k2, m;
+  k1 = _mm256_set1_pd (-0.5);
+  a = _mm256_mul_pd (a, k1);
+  b = _mm256_sqrt_pd (_mm256_sub_pd (jbm_sqr_256 (a), b));
+  k1 = _mm256_add_pd (a, b);
+  k2 = _mm256_sub_pd (a, b);
+  m = _mm256_cmp_pd (k1, x1, _CMP_LT_OS);
+  k1 = _mm256_blendv_pd (k1, k2, m);
+  m = _mm256_cmp_pd (k1, x2, _CMP_GT_OS);
+  return _mm256_blendv_pd (k1, k2, m);
+}
+
+/**
+ * Function to calculate the solution of a __m256d vector of quadratic equations
+ * in an interval \f$\left[x_1,x_2\right]\f$ in the form \f$a\,x^2+b\,x+c=0\f$.
+ *
+ * \return __m256d vector of solution values.
+ */
+static inline __m256d
+jbm_solve_quadratic_256 (__m256d a,
+///< __m256d vector of 2nd order coefficient of the equations.
+                         __m256d b,
+///< __m256d vector of 1st order coefficient of the equations.
+                         __m256d c,
+///< __m256d vector of 0th order coefficient of the equations.
+                         __m256d x1,
+///< __m256d vector of left limits of the solution intervals.
+                         __m256d x2)
+///< __m256d vector of right limits of the solution intervals.
+{
+  __m256d k1, k2, m;
+  m = jbm_small_256 (a);
+  k1 = jbm_solve_quadratic_reduced_256 (_mm256_div_pd (b, a),
+                                        _mm256_div_pd (c, a), x1, x2);
+  k2 = _mm256_div_pd (_mm256_sub_pd (_mm256_setzero_pd (), c), b);
+  return _mm256_blendv_pd (k1, k2, m);
+}
+
+/**
+ * Function to calculate the solution of a __m256d vector of reduced cubic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$x^3+a\,x^2+b\,x+c=0\f$.
+ *
+ * \return __m256d vector of solution values.
+ */
+/*
+static inline __m256d
+jbm_solve_cubic_reduced (__m256d a,
+                         ///< 2nd order coefficient of the equation.
+                         __m256d b,
+                         ///< 1st order coefficient of the equation.
+                         __m256d c,
+                         ///< 0th order coefficient of the equation.
+                         __m256d x1,
+                         ///< left limit of the solution interval.
+                         __m256d x2)
+                         ///< right limit of the solution interval.
+{
+  __m256d k0, k1, k2;
+  a /= 3.;
+  k0 = a * a;
+  k1 = b / 3. - k0;
+  k0 = (b * a - c) / 2. - a * k0;
+  k2 = k1 * k1 * k1 + k0 * k0;
+  if (k2 < 0.)
+    {
+      k1 = SQRT (-k1);
+      k0 = ACOS (k0 / (k1 * k1 * k1)) / 3.;
+      k1 *= 2.;
+      k2 = k1 * COS (k0) - a;
+      if (k2 < x1 || k2 > x2)
+        {
+          k2 = k1 * COS (k0 + 2. * JB_PI / 3.) - a;
+          if (k2 < x1 || k2 > x2)
+            k2 = k1 * COS (k0 - 2. * JB_PI / 3.) - a;
+        }
+    }
+  else
+    {
+      k1 = SQRT (k2);
+      k2 = k0 + k1;
+      k2 = CBRT (k2);
+      k0 -= k1;
+      k2 += CBRT (k0);
+      k2 -= a;
+    }
+  return k2;
+}
+*/
+
+/**
+ * Function to calculate the solution of a __m256d vector of cubic equations in
+ * an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$a\,x^3+b\,x^2+c\,x+d=0\f$.
+ *
+ * \return __m256d vector of solution values.
+ */
+/*
+static inline __m256d
+jbm_solve_cubic_256 (__m256d a,
+///< __m256d vector of 3rd order coefficient of the equations.
+                 __m256d b,
+///< __m256d vector of 2nd order coefficient of the equations.
+                 __m256d c,
+///< __m256d vector of 1st order coefficient of the equations.
+                 __m256d d,
+///< __m256d vector of 0th order coefficient of the equations.
+                         __m256d x1,
+///< __m256d vector of left limits of the solution intervals.
+                         __m256d x2)
+///< __m256d vector of right limits of the solution intervals.
+{
+  __m256d m;
+  m = jbm_small_256 (a);
+  return
+    _mm256_blendv_pd (jbm_solve_cubic_reduced (_mm256_div_pd (b, a),
+                                            _mm256_div_pd (c, a),
+                                            _mm256_div_pd (d, a), x1, x2),
+                   jbm_solve_quadratic_256 (b, c, d, x1, x2), m);
+}
+*/
+
+/**
+ * Function to calculate the total (1st order upwind) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=0\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_total_256 (__m256d d1 __attribute__((unused)),
+                            ///< 1st flux limiter function parameter.
+                            __m256d d2 __attribute__((unused)))
+  ///< 2nd flux limiter function parameter.
+{
+  return _mm256_setzero_pd ();
+}
+
+/**
+ * Function to calculate the null (2nd order upwind) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=1\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_null_256 (__m256d d1 __attribute__((unused)),
+                           ///< 1st flux limiter function parameter.
+                           __m256d d2 __attribute__((unused)))
+  ///< 2nd flux limiter function parameter.
+{
+  return _mm256_set1_pd (1.);
+}
+
+/**
+ * Function to calculate the centred (2nd order centred) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\frac{d_1}{d_2}\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_centred_256 (__m256d d1,
+                              ///< 1st flux limiter function parameter.
+                              __m256d d2)
+                              ///< 2nd flux limiter function parameter.
+{
+  __m256d m;
+  m = jbm_small_256 (d2);
+  return _mm256_blendv_pd (_mm256_div_pd (d1, d2), _mm256_setzero_pd (), m);
+}
+
+/**
+ * Function to calculate the superbee flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{2\,d_1}{d_2}\right),\,
+ * \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_superbee_256 (__m256d d1,
+                               ///< 1st flux limiter function parameter.
+                               __m256d d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  __m256d r, m;
+  r = _mm256_div_pd (d1, d2);
+  r = _mm256_max_pd (_mm256_min_pd (jbm_dbl_256 (r), _mm256_set1_pd (1.)),
+                     _mm256_min_pd (r, _mm256_set1_pd (2.)));
+  m = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
+                     _CMP_GT_OS);
+  return _mm256_blendv_pd (_mm256_setzero_pd (), r, m);
+}
+
+/**
+ * Function to calculate the minmod flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{d_1}{d_2}\right)\right]\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_minmod_256 (__m256d d1,
+                             ///< 1st flux limiter function parameter.
+                             __m256d d2)
+                             ///< 2nd flux limiter function parameter.
+{
+  __m256d r, m;
+  r = _mm256_min_pd (_mm256_div_pd (d1, d2), _mm256_set1_pd (1.));
+  m = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
+                     _CMP_GT_OS);
+  return _mm256_blendv_pd (_mm256_setzero_pd (), r, m);
+}
+
+/**
+ * Function to calculate the van Leer flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=
+ * \frac{\frac{d_1}{d_2}+\left|\frac{d_1}{d_2}\right|}
+ * {1+\left|\frac{d_1}{d_2}\right|}\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_VanLeer_256 (__m256d d1,
+                              ///< 1st flux limiter function parameter.
+                              __m256d d2)
+                              ///< 2nd flux limiter function parameter.
+{
+  __m256d r, k;
+  r = _mm256_div_pd (d1, d2);
+  k = jbm_abs_256 (r);
+  r = _mm256_div_pd (_mm256_add_pd (r, k),
+                     _mm256_add_pd (_mm256_set1_pd (1.), k));
+  k = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
+                     _CMP_GT_OS);
+  return _mm256_blendv_pd (_mm256_setzero_pd (), r, k);
+}
+
+/**
+ * Function to calculate the van Albada flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\frac{\frac{d_1}{d_2}+\frac{d_1^2}{d_2^2}}
+ * {1+\frac{d_1^2}{d_2^2}}\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_VanAlbada_256 (__m256d d1,
+                                ///< 1st flux limiter function parameter.
+                                __m256d d2)
+                                ///< 2nd flux limiter function parameter.
+{
+  __m256d r, k;
+  r = _mm256_div_pd (d1, d2);
+  k = jbm_sqr_256 (r);
+  r = _mm256_div_pd (_mm256_add_pd (r, k),
+                     _mm256_add_pd (_mm256_set1_pd (1.), k));
+  k = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
+                     _CMP_GT_OS);
+  return _mm256_blendv_pd (_mm256_setzero_pd (), r, k);
+}
+
+/**
+ * Function to calculate the minsuper flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_minsuper_256 (__m256d d1,
+                               ///< 1st flux limiter function parameter.
+                               __m256d d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  __m256d r, m;
+  r = _mm256_min_pd (_mm256_div_pd (d1, d2), _mm256_set1_pd (2.));
+  m = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
+                     _CMP_GT_OS);
+  return _mm256_blendv_pd (_mm256_setzero_pd (), r, m);
+}
+
+/**
+ * Function to calculate the supermin flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{2\,d_1}{d_2}\right)\right]\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_supermin_256 (__m256d d1,
+                               ///< 1st flux limiter function parameter.
+                               __m256d d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  __m256d r, m;
+  r = _mm256_div_pd (d1, d2);
+  r = _mm256_min_pd (jbm_dbl_256 (r), _mm256_set1_pd (1.));
+  m = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
+                     _CMP_GT_OS);
+  return _mm256_blendv_pd (_mm256_setzero_pd (), r, m);
+}
+
+/**
+ * Function to calculate the monotonized central flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(2,\,\frac{1+\frac{d_1}{d_2}}{2},\,\frac{2\,d_1}{d_2}\right)
+ * \right]\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_monotonized_central_256 (__m256d d1,
+///< 1st flux limiter function parameter.
+                                          __m256d d2)
+///< 2nd flux limiter function parameter.
+{
+  __m256d r, rm, m;
+  r = _mm256_div_pd (d1, d2);
+  rm = _mm256_mul_pd (_mm256_set1_pd (0.5),
+                      _mm256_add_pd (r, _mm256_set1_pd (1.)));
+  m = _mm256_cmp_pd (r, _mm256_set1_pd (3.), _CMP_LT_OS);
+  rm = _mm256_blendv_pd (_mm256_set1_pd (2.), rm, m);
+  m = _mm256_cmp_pd (r, _mm256_set1_pd (1. / 3.), _CMP_GT_OS);
+  rm = _mm256_blendv_pd (rm, jbm_dbl_256 (r), m);
+  m = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
+                     _CMP_GT_OS);
+  return _mm256_blendv_pd (_mm256_set1_pd (0.), rm, m);
+}
+
+/**
+ * Function to calculate the mean flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=
+ * \max\left(0,\,\frac{1+\frac{d_1}{d_2}}{2}\right)\f$ (__m256d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m256d
+jbm_flux_limiter_mean_256 (__m256d d1,
+                           ///< 1st flux limiter function parameter.
+                           __m256d d2)
+                           ///< 2nd flux limiter function parameter.
+{
+  __m256d r, m;
+  r = _mm256_mul_pd (_mm256_set1_pd (0.5),
+                     _mm256_add_pd (_mm256_set1_pd (1.),
+                                    _mm256_div_pd (d1, d2)));
+  m = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
+                     _CMP_GT_OS);
+  return _mm256_blendv_pd (_mm256_set1_pd (0.), r, m);
+}
+
+/**
+ * Function to select a flux limiter function (__m256d).
+ *
+ * \return pointer to the flux limiter function.
+ */
+static inline __m256d
+  (*jbm_flux_limiter_select_256 (int type)) (__m256d, __m256d)
+///< type of flux limiter function.
+{
+  switch (type)
+    {
+    case JBM_FLUX_LIMITER_TYPE_TOTAL:
+      return jbm_flux_limiter_total_256;
+    case JBM_FLUX_LIMITER_TYPE_NULL:
+      return jbm_flux_limiter_null_256;
+    case JBM_FLUX_LIMITER_TYPE_CENTRED:
+      return jbm_flux_limiter_centred_256;
+    case JBM_FLUX_LIMITER_TYPE_MINMOD:
+      return jbm_flux_limiter_minmod_256;
+    case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
+      return jbm_flux_limiter_superbee_256;
+    case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
+      return jbm_flux_limiter_VanLeer_256;
+    case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
+      return jbm_flux_limiter_VanAlbada_256;
+    case JBM_FLUX_LIMITER_TYPE_MINSUPER:
+      return jbm_flux_limiter_minsuper_256;
+    case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
+      return jbm_flux_limiter_supermin_256;
+    case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
+      return jbm_flux_limiter_monotonized_central_256;
+    case JBM_FLUX_LIMITER_TYPE_MEAN:
+      return jbm_flux_limiter_mean_256;
+    }
+  return NULL;
+}
+
+/**
+ * Function to approximate an integral of a function with the Gauss method
+ * defined in an interval (__m256d).
+ *
+ * \return __m256d vector of integral values.
+ */
+static inline __m256d
+jbm_integral_256 (__m256d (*f) (__m256d),
+                  ///< pointer to the function to integrate.
+                  __m256d x1,   ///< left limit of the interval.
+                  __m256d x2)   ///< right limit of the interval.
+{
+#if JBM_INTEGRAL_GAUSS_N == 1
+  const JBFLOAT a[1] = { 2. };
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  const JBFLOAT a[2] = { 8. / 9., 5. / 9. },
+    b[2] = { 0., 7.745966692414834e-1 };
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  const JBFLOAT a[3] = {
+    128. / 225.,
+    4.786286704993665e-1,
+    2.369268850561891e-1
+  }, b[3] = {
+    0.,
+    5.384693101056831e-1,
+    9.061798459386640e-1
+  };
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  const JBFLOAT a[4] = {
+    4.179591836734694e-1,
+    3.818300505051189e-1,
+    2.797053914892767e-1,
+    1.294849661688697e-1
+  }, b[4] = {
+    0.,
+    4.058451513773972e-1,
+    7.415311855993944e-1,
+    9.491079123427585e-1
+  };
+#endif
+  __m256d k, x, dx, h;
+#if JBM_INTEGRAL_GAUSS_N > 1
+  __m256d k2, f1, f2;
+#endif
+  unsigned int i;
+  h = _mm256_set1_pd (0.5);
+  dx = _mm256_mul_pd (h, _mm256_sub_pd (x2, x1));
+  x = _mm256_mul_pd (h, _mm256_add_pd (x2, x1));
+  k = _mm256_set1_pd (a[0]);
+  k = _mm256_mul_pd (k, _mm256_mul_pd (dx, f (x)));
+#if JBM_INTEGRAL_GAUSS_N > 1
+  for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
+    {
+      k2 = _mm256_set1_pd (b[i]);
+      k2 = _mm256_mul_pd (k2, dx);
+      f1 = f (_mm256_sub_pd (x, k2));
+      f2 = f (_mm256_add_pd (x, k2));
+      h = _mm256_set1_pd (a[i]);
+      h = _mm256_mul_pd (h, dx);
+      k = _mm256_add_pd (k, _mm256_mul_pd (h, _mm256_add_pd (f1, f2)));
+    }
+#endif
+  return k;
+}
+
+#endif
 
 #endif

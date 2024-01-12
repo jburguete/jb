@@ -1,6 +1,6 @@
 # Header
 AC_PREREQ([2.69])
-AC_INIT([jb],[7.0.2],[https://github.com/jburguete/jb])
+AC_INIT([jb],[8.0.0],[https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_TARGET
@@ -299,6 +299,14 @@ elif test "x$with_precision" = "x4"; then
 elif test "x$with_precision" = "x5"; then
 	AC_SUBST(PRECISION, "-DJBM_PRECISION=5")
 	AC_SUBST(SUFFIX, [-5])
+elif test "x$with_precision" = "x6"; then
+	AC_SUBST(PRECISION, "-DJBM_PRECISION=6")
+	AC_SUBST(SUFFIX, [-6])
+	AC_SUBST(QUADMATH, [-lquadmath])
+elif test "x$with_precision" = "x7"; then
+	AC_SUBST(PRECISION, "-DJBM_PRECISION=7")
+	AC_SUBST(SUFFIX, [-7])
+	AC_SUBST(QUADMATH, [-lquadmath])
 else
 	AC_SUBST(PRECISION, "-DJBM_PRECISION=2")
 	AC_SUBST(SUFFIX, [-2])

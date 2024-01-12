@@ -39,7 +39,7 @@
  * \return floating number value in JBDOUBLE format.
  */
 JBDOUBLE
-jb_json_object_get_float (JsonObject * object,  ///< JSON object struct.
+jb_json_object_get_float (JsonObject *object,   ///< JSON object struct.
                           const char *prop,     ///< JSON object property.
                           int *error)
                           ///< error code (1 on success, 0 on error).
@@ -54,7 +54,7 @@ jb_json_object_get_float (JsonObject * object,  ///< JSON object struct.
     {
       buffer = (const char *) json_node_get_string (node);
       if (buffer)
-        *error = sscanf (buffer, FRL, &x);
+        *error = jbm_get_double (buffer, &x);
     }
   return x;
 }
@@ -66,7 +66,7 @@ jb_json_object_get_float (JsonObject * object,  ///< JSON object struct.
  * \return floating number value in JBDOUBLE format.
  */
 JBDOUBLE
-jb_json_object_get_float_with_default (JsonObject * object,
+jb_json_object_get_float_with_default (JsonObject *object,
                                        ///< JSON object struct.
                                        const char *prop,
                                        ///< JSON object property.
@@ -86,7 +86,7 @@ jb_json_object_get_float_with_default (JsonObject * object,
  * Function to set a floating number with format in a property of a JSON object.
  */
 void
-jb_json_object_set_float_with_format (JsonObject * object,
+jb_json_object_set_float_with_format (JsonObject *object,
                                       ///< JSON object struct.
                                       const char *prop,
                                       ///< JSON object property.
@@ -95,7 +95,7 @@ jb_json_object_set_float_with_format (JsonObject * object,
 ///< floating number value in JBDOUBLE format.
 {
   char buffer[JB_BUFFER_SIZE];
-  snprintf (buffer, JB_BUFFER_SIZE, format, x);
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, format, x);
   json_object_set_string_member (object, prop, (const gchar *) buffer);
 }
 
@@ -104,7 +104,7 @@ jb_json_object_set_float_with_format (JsonObject * object,
  * property of a JSON object.
  */
 void
-jb_json_object_set_float (JsonObject * object,  ///< JSON object struct.
+jb_json_object_set_float (JsonObject *object,   ///< JSON object struct.
                           const char *prop,     ///< JSON object property.
                           JBDOUBLE x)
 ///< floating number value in JBDOUBLE format.
@@ -117,7 +117,7 @@ jb_json_object_set_float (JsonObject * object,  ///< JSON object struct.
  * property of a JSON object or none if the number is equal to a default value.
  */
 void
-jb_json_object_set_float_with_default (JsonObject * object,
+jb_json_object_set_float_with_default (JsonObject *object,
                                        ///< JSON object struct.
                                        const char *prop,
                                        ///< JSON object property.
@@ -136,7 +136,7 @@ jb_json_object_set_float_with_default (JsonObject * object,
  * \return integer number value in long int format.
  */
 long int
-jb_json_object_get_int (JsonObject * object,
+jb_json_object_get_int (JsonObject *object,
                         ///< JSON object struct.
                         const char *prop,
                         ///< JSON object property having the number.
@@ -165,7 +165,7 @@ jb_json_object_get_int (JsonObject * object,
  * \return integer number value in long int format.
  */
 long int
-jb_json_object_get_int_with_default (JsonObject * object,
+jb_json_object_get_int_with_default (JsonObject *object,
                                      ///< JSON object struct.
                                      const char *prop,
 ///< JSON object property having the number.
@@ -185,7 +185,7 @@ jb_json_object_get_int_with_default (JsonObject * object,
  * Function to set an integer number in a property of a JSON object.
  */
 void
-jb_json_object_set_int (JsonObject * object,    ///< JSON object struct.
+jb_json_object_set_int (JsonObject *object,     ///< JSON object struct.
                         const char *prop,       ///< JSON object property.
                         long int x)
                         ///< integer number value in long int format.
@@ -200,7 +200,7 @@ jb_json_object_set_int (JsonObject * object,    ///< JSON object struct.
  * the number is equal to a default value.
  */
 void
-jb_json_object_set_int_with_default (JsonObject * object,
+jb_json_object_set_int_with_default (JsonObject *object,
                                      ///< JSON object struct.
                                      const char *prop,
                                      ///< JSON object property.
@@ -219,7 +219,7 @@ jb_json_object_set_int_with_default (JsonObject * object,
  * \return unsigned integer number value in unsigned long int format.
  */
 unsigned long int
-jb_json_object_get_uint (JsonObject * object,
+jb_json_object_get_uint (JsonObject *object,
                          ///< JSON object struct.
                          const char *prop,
                          ///< JSON object property having the number.
@@ -249,7 +249,7 @@ jb_json_object_get_uint (JsonObject * object,
  * \return unsigned integer number value in unsigned long int format.
  */
 unsigned long int
-jb_json_object_get_uint_with_default (JsonObject * object,
+jb_json_object_get_uint_with_default (JsonObject *object,
                                       ///< JSON object struct.
                                       const char *prop,
 ///< JSON object property having the number.
@@ -270,7 +270,7 @@ jb_json_object_get_uint_with_default (JsonObject * object,
  * Function to set an unsigned integer number in a property of a JSON object.
  */
 void
-jb_json_object_set_uint (JsonObject * object,   ///< JSON object struct.
+jb_json_object_set_uint (JsonObject *object,    ///< JSON object struct.
                          const char *prop,      ///< JSON object property.
                          unsigned long int x)
 ///< unsigned integer number value in unsigned long int format.
@@ -285,7 +285,7 @@ jb_json_object_set_uint (JsonObject * object,   ///< JSON object struct.
  * none if the number is equal to a default value.
  */
 void
-jb_json_object_set_uint_with_default (JsonObject * object,
+jb_json_object_set_uint_with_default (JsonObject *object,
                                       ///< JSON object struct.
                                       const char *prop,
                                       ///< JSON object property.
@@ -305,7 +305,7 @@ jb_json_object_set_uint_with_default (JsonObject * object,
  * \return date in floating point format.
  */
 JBDOUBLE
-jb_json_object_get_time (JsonObject * object,   ///< JSON object struct.
+jb_json_object_get_time (JsonObject *object,    ///< JSON object struct.
                          const char *prop,      ///< JSON object property.
                          int *error)
                          ///< error code (1 on success, 0 on error).
@@ -335,7 +335,7 @@ jb_json_object_get_time (JsonObject * object,   ///< JSON object struct.
  * \return date in floating point format.
  */
 JBDOUBLE
-jb_json_object_get_time_with_default (JsonObject * object,
+jb_json_object_get_time_with_default (JsonObject *object,
                                       ///< JSON object struct.
                                       const char *prop,
                                       ///< JSON object property.
@@ -356,7 +356,7 @@ jb_json_object_get_time_with_default (JsonObject * object,
  * property of a JSON object.
  */
 void
-jb_json_object_set_time (JsonObject * object,   ///< JSON object struct.
+jb_json_object_set_time (JsonObject *object,    ///< JSON object struct.
                          const char *prop,      ///< JSON object property.
                          JBDOUBLE t)    ///< date in floating point format.
 {
@@ -371,7 +371,7 @@ jb_json_object_set_time (JsonObject * object,   ///< JSON object struct.
  * property.
  */
 void
-jb_json_object_set_time_with_default (JsonObject * object,
+jb_json_object_set_time_with_default (JsonObject *object,
                                       ///< JSON object struct.
                                       const char *prop,
                                       ///< JSON object property.

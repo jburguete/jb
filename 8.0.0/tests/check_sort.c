@@ -129,10 +129,15 @@ print_array (JBFLOAT * x,       ///<
              int n,             ///<
              char *label)       ///<
 {
+  char buffer[JB_BUFFER_SIZE], buffer2[JB_BUFFER_SIZE];
   int i;
   printf ("%s\n", label);
   for (i = 0; i <= n; ++i)
-    printf ("%d %u " FWF " " FWF "\n", i, ni[i], x[ni[i]], x[i]);
+    {
+      SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, x[ni[i]]);
+      SNPRINTF (buffer2, JB_BUFFER_SIZE, FWF, x[i]);
+      printf ("%d %u %s %s\n", i, ni[i], buffer, buffer2);
+    }
 }
 
 void
@@ -141,10 +146,15 @@ print_arrayl (JBDOUBLE * x,     ///<
               int n,            ///<
               char *label)      ///<
 {
+  char buffer[JB_BUFFER_SIZE], buffer2[JB_BUFFER_SIZE];
   int i;
   printf ("%s\n", label);
   for (i = 0; i <= n; ++i)
-    printf ("%d %u " FWL "\n", i, ni[i], x[i]);
+    {
+      SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, x[ni[i]]);
+      SNPRINTFL (buffer2, JB_BUFFER_SIZE, FWL, x[i]);
+      printf ("%d %u %s %s\n", i, ni[i], buffer, buffer2);
+    }
 }
 
 int

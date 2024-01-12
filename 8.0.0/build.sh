@@ -7,7 +7,7 @@ if [[ $# != 6 ]]; then
 	echo "The syntax is: ./build.sh A B C D E F"
 	echo "A: 1 on native"
 	echo "B: 1 on PGO"
-	echo "C: JB precision (1-5)"
+	echo "C: JB precision (1-7)"
 	echo "D: 3 on GTK3, 4 on GTK4, 0 without GUI"
 	echo "E: 1 on FreeGLUT, 2 on GLFW, 3 on SDL, 4 on GtkGLArea"
 	echo "F: 1 on strip"
@@ -19,7 +19,8 @@ fi
 if [[ $2 = 1 ]]; then
 	a2="--with-pgo"
 fi
-if [[ $3 = 1 || $3 = 2 || $3 = 3 || $3 = 4 || $3 = 5 ]]; then
+if [[ $3 = 1 || $3 = 2 || $3 = 3 || $3 = 4 || $3 = 5 || $3 = 6 || $3 = 7 ]];
+then
 	a3="--with-precision=$3"
 else
 	echo "Unknown option"

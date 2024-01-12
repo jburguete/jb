@@ -99,8 +99,8 @@ extern FILE *stderr;
  * Function to interchange two pointers.
  */
 static inline void
-JBChange (void **restrict a,  ///< a pointer to interchange.
-          void **restrict b)  ///< a pointer to interchange.
+JBChange (void **restrict a,    ///< a pointer to interchange.
+          void **restrict b)    ///< a pointer to interchange.
 {
   void *restrict c;
   JB_CHANGE (*a, *b, c);
@@ -182,7 +182,7 @@ jbm_get_time (const char *string,       ///< date in string format.
  * \return date in double format.
  */
 static inline double
-jbm_get_time_file (FILE * file, ///< file.
+jbm_get_time_file (FILE *file,  ///< file.
                    int *error)  ///< 1 on success, 0 on error.
 {
   struct tm sys_date[1];

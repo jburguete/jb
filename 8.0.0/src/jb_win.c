@@ -174,7 +174,7 @@ int
 jbw_init_gtk (int *argn __attribute__((unused)),
               ///< pointer to the number of command line arguments.
               char ***argc __attribute__((unused)))
-              ///< pointer to the command line arguments.
+  ///< pointer to the command line arguments.
 {
   jb_init ();
 #if HAVE_FREEGLUT
@@ -265,7 +265,7 @@ jbw_show_warning_gtk (const char *message)      ///< warning message.
  * Function to set the strings of a GtkComboBoxText from an array of strings.
  */
 void
-jbw_combo_box_set_strings (GtkComboBoxText * combo,
+jbw_combo_box_set_strings (GtkComboBoxText *combo,
                            ///< GtkComboBoxText struct.
                            char **strings,      ///< array of strings.
                            int n)       ///< strings number.
@@ -299,14 +299,14 @@ jbw_combo_box_new_with_strings (char **strings, ///< array of strings.
  * Function to set a JBWFloatEntry struct with a formated floating point value.
  */
 void
-jbw_float_entry_set_value_with_format (JBWFloatEntry * entry,
+jbw_float_entry_set_value_with_format (JBWFloatEntry *entry,
                                        ///< JBWFloatEntry struct.
                                        char *format,    ///< c-format string.
                                        JBDOUBLE value)
                                        ///< floating point value.
 {
   char buffer[64];
-  snprintf (buffer, 64, format, value);
+  SNPRINTFL (buffer, 64, format, value);
   gtk_entry_set_text (GTK_ENTRY (entry), buffer);
 }
 
@@ -316,7 +316,7 @@ jbw_float_entry_set_value_with_format (JBWFloatEntry * entry,
  * Function to set a JBWFloatEntry struct with a floating point value.
  */
 void
-jbw_float_entry_set_value (JBWFloatEntry * entry,
+jbw_float_entry_set_value (JBWFloatEntry *entry,
                            ///< JBWFloatEntry struct.
                            JBDOUBLE value)      ///< floating point value.
 {
@@ -329,11 +329,11 @@ jbw_float_entry_set_value (JBWFloatEntry * entry,
  * \return floating point value.
  */
 JBDOUBLE
-jbw_float_entry_get_value (JBWFloatEntry * entry)
+jbw_float_entry_get_value (JBWFloatEntry *entry)
 ///< JBWFloatEntry struct.
 {
   JBDOUBLE value;
-  sscanf (gtk_entry_get_text ((GtkEntry *) entry), FRL, &value);
+  jbm_get_double (gtk_entry_get_text ((GtkEntry *) entry), &value);
   return value;
 }
 
@@ -347,10 +347,10 @@ jbw_float_entry_get_value (JBWFloatEntry * entry)
 unsigned int
 jbw_array_buttons_get_active (
 #if GTK_MAJOR_VERSION > 3
-                               GtkCheckButton * array[],
+                               GtkCheckButton *array[],
                                ///< array of GtkCheckButtons.
 #else
-                               GtkRadioButton * array[],
+                               GtkRadioButton *array[],
                                ///< array of GtkRadioButtons.
 #endif
                                unsigned int n)  ///< number of widgets.
@@ -379,8 +379,8 @@ jbw_draw_clear (GLfloat red,    ///< red color intensity.
  * Function to set minimum and maximum graphical values (JBFLOAT).
  */
 void
-jbw_draw_range (JBFLOAT * xmin, ///< minimum graphical value.
-                JBFLOAT * xmax) ///< maximum graphical value.
+jbw_draw_range (JBFLOAT *xmin,  ///< minimum graphical value.
+                JBFLOAT *xmax)  ///< maximum graphical value.
 {
   JBFLOAT m;
   m = FMAX (FABS (*xmax), FABS (*xmin));
@@ -400,8 +400,8 @@ jbw_draw_range (JBFLOAT * xmin, ///< minimum graphical value.
  * Function to set minimum and maximum graphical values (JBDOUBLE).
  */
 void
-jbw_draw_rangel (JBDOUBLE * xmin,       ///< minimum graphical value.
-                 JBDOUBLE * xmax)       ///< maximum graphical value.
+jbw_draw_rangel (JBDOUBLE *xmin,        ///< minimum graphical value.
+                 JBDOUBLE *xmax)        ///< maximum graphical value.
 {
   JBDOUBLE m;
   m = FMAXL (FABSL (*xmax), FABSL (*xmin));
@@ -425,7 +425,7 @@ jbw_draw_tics (JBFLOAT xmin,    ///< minimum axis value.
                JBFLOAT xmax,    ///< maximum axis value.
                int nlabels,     ///< maximum number of labels.
                int *n,          ///< number of tics.
-               JBFLOAT * tic)   ///< array of tic values.
+               JBFLOAT *tic)    ///< array of tic values.
 {
   int k1, k2;
   JBFLOAT h, s, k;
@@ -459,7 +459,7 @@ jbw_draw_ticsl (JBDOUBLE xmin,  ///< minimum axis value.
                 JBDOUBLE xmax,  ///< maximum axis value.
                 int nlabels,    ///< maximum number of labels.
                 int *n,         ///< number of tics.
-                JBDOUBLE * tic) ///< array of tic values.
+                JBDOUBLE *tic)  ///< array of tic values.
 {
   int k1, k2;
   JBDOUBLE h, s, k;
@@ -550,7 +550,7 @@ jbw_image_error (const char *msg)
  * Function to free the memory used by a JBWImage widget.
  */
 static void
-jbw_image_delete (JBWImage * image)     ///< JBWImage widget.
+jbw_image_delete (JBWImage *image)      ///< JBWImage widget.
 {
   glDeleteProgram (image->program_texture);
   if (image->vbo_texture)
@@ -569,7 +569,7 @@ jbw_image_delete (JBWImage * image)     ///< JBWImage widget.
  * Function to init the OpenGL functions on a JBWImage widget.
  */
 static void
-jbw_image_init (JBWImage * image,       ///< JBWImage widget.
+jbw_image_init (JBWImage *image,        ///< JBWImage widget.
                 const char *gl_version) ///< OpenGL GLSL version string.
 {
   const char *vs_texture_source =
@@ -824,7 +824,7 @@ error1:
  * Function to draw a JBWImage widget.
  */
 void
-jbw_image_draw (JBWImage * image,       ///< JBWImage struct.
+jbw_image_draw (JBWImage *image,        ///< JBWImage struct.
                 unsigned int x, ///< image x-coordinate. 
                 unsigned int y, ///< image y-coordinate. 
                 unsigned int width,     ///< window width.
@@ -920,7 +920,7 @@ jbw_validation_layer_check_support (void)
  * \return 0 on success, error code on error.
  */
 static int
-jbw_vk_create_instance (JBWVK * vk)     ///< JBWVK struct.
+jbw_vk_create_instance (JBWVK *vk)      ///< JBWVK struct.
 {
   VkApplicationInfo application_info = { 0 };
   VkInstanceCreateInfo create_info = { 0 };
@@ -1019,7 +1019,7 @@ exit_on_error:
  * \return 0 on success, error code on error.
  */
 static int
-jbw_vk_create_surface (JBWVK * vk)      ///< JBWVK data struct.
+jbw_vk_create_surface (JBWVK *vk)       ///< JBWVK data struct.
 {
 #if HAVE_GLFW
   if (glfwCreateWindowSurface (vk->instance, vk->window, NULL, &vk->surface)
@@ -1043,7 +1043,7 @@ jbw_vk_create_surface (JBWVK * vk)      ///< JBWVK data struct.
  * \return 0 on success, error code on error.
  */
 static int
-jbw_vk_select_physical_device (JBWVK * vk)      ///< JBWVK data struct.
+jbw_vk_select_physical_device (JBWVK *vk)       ///< JBWVK data struct.
 {
   VkPhysicalDevice device;
   VkPhysicalDeviceProperties device_properties;
@@ -1125,7 +1125,7 @@ exit_on_error:
  * \return 0 on success, error code on error.
  */
 static int
-jbw_vk_check_extensions (JBWVK * vk)    ///< JBWVK struct.
+jbw_vk_check_extensions (JBWVK *vk)     ///< JBWVK struct.
 {
   VkExtensionProperties *available_extensions;
   const char *buffer;
@@ -1168,7 +1168,7 @@ jbw_vk_check_extensions (JBWVK * vk)    ///< JBWVK struct.
  * \return ERROR_CODE_NONE on succes, error code on error.
  */
 static int
-jbw_vk_create_logical_device (JBWVK * vk)       ///< JBWVK struct.
+jbw_vk_create_logical_device (JBWVK *vk)        ///< JBWVK struct.
 {
   VkDeviceCreateInfo create_info = { 0 };
   VkBool32 present_support;
@@ -1255,7 +1255,7 @@ jbw_vk_create_logical_device (JBWVK * vk)       ///< JBWVK struct.
  * \return ERROR_CODE_NONE on succes, error code on error.
  */
 int
-jbw_vk_create_swap_chain (JBWVK * vk)   ///< JBWVK struct.
+jbw_vk_create_swap_chain (JBWVK *vk)    ///< JBWVK struct.
 {
   JBWVKSwapChainSupportDetails details = { 0 };
   VkPresentModeKHR present_mode;
@@ -1377,12 +1377,12 @@ exit_on_error:
  * \return 0 on success, error code on error.
  */
 int
-jbw_vk_create_image_view (JBWVK * vk,   ///< JBWVK struct.
+jbw_vk_create_image_view (JBWVK *vk,    ///< JBWVK struct.
                           VkImage image,        ///< Vulkan image struct.
                           VkFormat format,      ///< Vulkan image format.
                           VkImageAspectFlags aspect_flags,
                           ///< Vulkan image aspect flags.
-                          VkImageView * image_view)
+                          VkImageView *image_view)
                           ///< Vulkan image view pointer.
 {
   VkImageViewCreateInfo view_info = { 0 };
@@ -1411,7 +1411,7 @@ jbw_vk_create_image_view (JBWVK * vk,   ///< JBWVK struct.
  * \return 0 on success, error code on error.
  */
 int
-jbw_vk_create_image_views (JBWVK * vk)  ///< JBWVK struct.
+jbw_vk_create_image_views (JBWVK *vk)   ///< JBWVK struct.
 {
   uint32_t i;
   int j;
@@ -1441,8 +1441,8 @@ jbw_vk_create_image_views (JBWVK * vk)  ///< JBWVK struct.
  * \return supported Vulkan format on success, 0 on error.
  */
 static VkFormat
-jbw_vk_find_supported_format (JBWVK * vk,       ///< JBWVK struct.
-                              const VkFormat * candidates,
+jbw_vk_find_supported_format (JBWVK *vk,        ///< JBWVK struct.
+                              const VkFormat *candidates,
                               ///< Array of Vulkan format candidates.
                               unsigned int n_candidates,
                               ///< Number of Vulkan format candidates.
@@ -1475,7 +1475,7 @@ jbw_vk_find_supported_format (JBWVK * vk,       ///< JBWVK struct.
  * \return Vulkan depth format on success, 0 on error.
  */
 static VkFormat
-jbw_vk_find_depth_format (JBWVK * vk)   ///< JBWVK struct.
+jbw_vk_find_depth_format (JBWVK *vk)    ///< JBWVK struct.
 {
   const VkFormat formats[3] = {
     VK_FORMAT_D32_SFLOAT,
@@ -1495,7 +1495,7 @@ jbw_vk_find_depth_format (JBWVK * vk)   ///< JBWVK struct.
  * \return ERROR_CODE_NONE on success, error code on error.
  */
 static int
-jbw_vk_create_render_pass (JBWVK * vk)  ///< JBWVK struct.
+jbw_vk_create_render_pass (JBWVK *vk)   ///< JBWVK struct.
 {
   VkAttachmentDescription color_attachment = { 0 };
   VkAttachmentReference color_attachment_ref = { 0 };
@@ -1567,7 +1567,7 @@ jbw_vk_create_render_pass (JBWVK * vk)  ///< JBWVK struct.
  * \return 0 on success, error code on error.
  */
 static int
-jbw_vk_create_descriptor_set_layout (JBWVK * vk)
+jbw_vk_create_descriptor_set_layout (JBWVK *vk)
 ///< Graphics data struct.
 {
   VkDescriptorSetLayoutBinding ubo_layout_binding = { 0 };
@@ -1607,9 +1607,9 @@ jbw_vk_create_descriptor_set_layout (JBWVK * vk)
  * \return 0 on success, error code on error.
  */
 static int
-jbw_vk_create_shader_module (JBWVK * vk,        ///< JBWVK struct.
+jbw_vk_create_shader_module (JBWVK *vk, ///< JBWVK struct.
                              const char *name,  ///< shader file name.
-                             VkShaderModule * shader_module)
+                             VkShaderModule *shader_module)
                              ///< VkShaderModule struct.
 {
   VkShaderModuleCreateInfo create_info = { 0 };
@@ -1644,7 +1644,7 @@ exit_on_error:
  * \return 0 on success, error code on error.
  */
 static int
-jbw_vk_create_shader_modules (JBWVK * vk)       ///< JBWVK struct.
+jbw_vk_create_shader_modules (JBWVK *vk)        ///< JBWVK struct.
 {
   int i;
   // Initing shader handles
@@ -1698,7 +1698,7 @@ jbw_vk_create_shader_modules (JBWVK * vk)       ///< JBWVK struct.
  * Function to free the memory used by the Vulkan swap chain.
  */
 static void
-jbw_vk_destroy_swap_chain (JBWVK * vk)  ///< JBWVK struct.
+jbw_vk_destroy_swap_chain (JBWVK *vk)   ///< JBWVK struct.
 {
   uint32_t i;
   if (vk->created_render_pass)
@@ -1724,7 +1724,7 @@ jbw_vk_destroy_swap_chain (JBWVK * vk)  ///< JBWVK struct.
  * Function to free the memory used by a JBWVK struct.
  */
 static void
-jbw_vk_destroy (JBWVK * vk)     ///< JBWVK struct.
+jbw_vk_destroy (JBWVK *vk)      ///< JBWVK struct.
 {
   jbw_vk_destroy_swap_chain (vk);
   if (vk->created_shader_modules)
@@ -1769,7 +1769,7 @@ jbw_vk_destroy (JBWVK * vk)     ///< JBWVK struct.
  * \return 0 on success, error code on error.
  */
 static int
-jbw_vk_init (JBWVK * vk)        ///< JBWVK struct.
+jbw_vk_init (JBWVK *vk)         ///< JBWVK struct.
 {
   int i;
   // Initing creation flags
@@ -1832,7 +1832,7 @@ exit_on_error:
  * Function to free the memory used by the current JBWGraphic widget.
  */
 static inline void
-jbw_graphic_delete (JBWGraphic * graphic)       ///< current JBWGraphic widget.
+jbw_graphic_delete (JBWGraphic *graphic)        ///< current JBWGraphic widget.
 {
   if (graphic->vbo_text)
     glDeleteBuffers (1, &graphic->vbo_text);
@@ -2365,14 +2365,14 @@ jbw_graphic_render (void)
 #if HAVE_GTKGLAREA
 
 static void
-jbw_graphic_init_gtk (GtkGLArea * widget)
+jbw_graphic_init_gtk (GtkGLArea *widget)
 {
   gtk_gl_area_make_current (widget);
   jbw_graphic_init ();
 }
 
 static void
-jbw_graphic_resize_gtk (GtkGLArea * widget, int width, int height)
+jbw_graphic_resize_gtk (GtkGLArea *widget, int width, int height)
 {
   jbw_graphic_resize (width, height);
   gtk_widget_queue_draw (GTK_WIDGET (widget));
@@ -2381,14 +2381,14 @@ jbw_graphic_resize_gtk (GtkGLArea * widget, int width, int height)
 #elif HAVE_GLFW
 
 static void
-jbw_graphic_resize_glfw (GLFWwindow * window __attribute__((unused)),
+jbw_graphic_resize_glfw (GLFWwindow *window __attribute__((unused)),
                          int width, int height)
 {
   jbw_graphic_resize (width, height);
 }
 
 static void
-jbw_graphic_render_glfw (GLFWwindow * window __attribute__((unused)))
+jbw_graphic_render_glfw (GLFWwindow *window __attribute__((unused)))
 {
   jbw_graphic_render ();
 }
@@ -2522,7 +2522,7 @@ JBWGraphic *
 jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
                  unsigned int ny,       ///< maximum number of x-tics.
                  unsigned int nz,       ///< maximum number of x-tics.
-                 void (*draw) (JBWGraphic * graphic),
+                 void (*draw) (JBWGraphic *graphic),
                  ///< pointer to the render function.
                  const char *title)     ///< title.
 {
@@ -2665,7 +2665,7 @@ void
 jbw_graphic_draw_text (const char *string,      ///< string.
                        GLfloat x,       ///< x initial position.
                        GLfloat y,       ///< y initial position.
-                       const GLfloat * color)   ///< color intensities array.
+                       const GLfloat *color)    ///< color intensities array.
 {
   GLfloat box[16];
   JBWGraphic *graphic;
@@ -2793,11 +2793,11 @@ jbw_graphic_map_resize (void)
  * tabular functions (JBFLOAT).
  */
 void
-jbw_graphic_draw_resize (JBFLOAT * x,   ///< x-coordinates array.
-                         JBFLOAT * y1,  ///< 1st y-coordinates array.
-                         JBFLOAT * y2,  ///< 2nd y-coordinates array.
-                         JBFLOAT * z1,  ///< 1st z-coordinates array.
-                         JBFLOAT * z2,  ///< 2nd z-coordinates array.
+jbw_graphic_draw_resize (JBFLOAT *x,    ///< x-coordinates array.
+                         JBFLOAT *y1,   ///< 1st y-coordinates array.
+                         JBFLOAT *y2,   ///< 2nd y-coordinates array.
+                         JBFLOAT *z1,   ///< 1st z-coordinates array.
+                         JBFLOAT *z2,   ///< 2nd z-coordinates array.
                          int n) ///< number of array elements.
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
@@ -2836,11 +2836,11 @@ jbw_graphic_draw_resize (JBFLOAT * x,   ///< x-coordinates array.
  * tabular functions (JBDOUBLE).
  */
 void
-jbw_graphic_draw_resizel (JBDOUBLE * x, ///< x-coordinates array.
-                          JBDOUBLE * y1,        ///< 1st y-coordinates array.
-                          JBDOUBLE * y2,        ///< 2nd y-coordinates array.
-                          JBDOUBLE * z1,        ///< 1st z-coordinates array.
-                          JBDOUBLE * z2,        ///< 2nd z-coordinates array.
+jbw_graphic_draw_resizel (JBDOUBLE *x,  ///< x-coordinates array.
+                          JBDOUBLE *y1, ///< 1st y-coordinates array.
+                          JBDOUBLE *y2, ///< 2nd y-coordinates array.
+                          JBDOUBLE *z1, ///< 1st z-coordinates array.
+                          JBDOUBLE *z2, ///< 2nd z-coordinates array.
                           int n)        ///< number of array elements.
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
@@ -2976,8 +2976,8 @@ jbw_graphic_draw_resizevl (void *x,
  * Function to draw rectangles with color in the current JBWGraphic widget.
  */
 void
-jbw_graphic_draw_rectangles_color (GLfloat * vertex,    ///< vertex array.
-                                   GLushort * index,    ///< index array.
+jbw_graphic_draw_rectangles_color (GLfloat *vertex,     ///< vertex array.
+                                   GLushort *index,     ///< index array.
                                    unsigned int n)      ///< rectangles number.
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
@@ -3009,10 +3009,10 @@ jbw_graphic_draw_rectangles_color (GLfloat * vertex,    ///< vertex array.
  * (JBFLOAT).
  */
 void
-jbw_graphic_draw_farray (JBFLOAT * x,   ///< x-coordinates array.
-                         JBFLOAT * y,   ///< y-coordinates array.
+jbw_graphic_draw_farray (JBFLOAT *x,    ///< x-coordinates array.
+                         JBFLOAT *y,    ///< y-coordinates array.
                          unsigned int n,        ///< number of array elements.
-                         const GLfloat * color, ///< RGB color.
+                         const GLfloat *color,  ///< RGB color.
                          GLenum type)   ///< draw type.
 {
   JBWGraphic *graphic;
@@ -3046,10 +3046,10 @@ jbw_graphic_draw_farray (JBFLOAT * x,   ///< x-coordinates array.
  * (JBDOUBLE).
  */
 void
-jbw_graphic_draw_darray (JBDOUBLE * x,  ///< x-coordinates array.
-                         JBDOUBLE * y,  ///< y-coordinates array.
+jbw_graphic_draw_darray (JBDOUBLE *x,   ///< x-coordinates array.
+                         JBDOUBLE *y,   ///< y-coordinates array.
                          unsigned int n,        ///< number of array elements.
-                         const GLfloat * color, ///< RGB color.
+                         const GLfloat *color,  ///< RGB color.
                          GLenum type)   ///< draw type.
 {
   JBWGraphic *graphic;
@@ -3087,7 +3087,7 @@ jbw_graphic_draw_varray (void *x,       ///< x-coordinates array.
                          void *y,       ///< y-coordinates array.
                          unsigned int size,     ///< struct size.
                          unsigned int n,        ///< number of array elements.
-                         const GLfloat * color, ///< RGB color.
+                         const GLfloat *color,  ///< RGB color.
                          GLenum type)   ///< draw type.
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
@@ -3123,7 +3123,7 @@ jbw_graphic_draw_varrayl (void *x,      ///< x-coordinates array.
                           void *y,      ///< y-coordinates array.
                           unsigned int size,    ///< struct size.
                           unsigned int n,       ///< number of array elements.
-                          const GLfloat * color,        ///< RGB color.
+                          const GLfloat *color, ///< RGB color.
                           GLenum type)  ///< draw type.
 {
   JBWGraphic *graphic;
@@ -3160,7 +3160,7 @@ jbw_graphic_draw_rectangle (JBFLOAT x1, ///< 1st corner x-coordinate.
                             JBFLOAT y1, ///< 1st corner y-coordinate.
                             JBFLOAT x2, ///< 2nd corner x-coordinate.
                             JBFLOAT y2, ///< 2nd corner y-coordinate.
-                            const GLfloat * color)      ///< RGB color.
+                            const GLfloat *color)       ///< RGB color.
 {
   JBFLOAT x[4] = { x1, x2, x2, x1 };
   JBFLOAT y[4] = { y1, y1, y2, y2 };
@@ -3175,7 +3175,7 @@ jbw_graphic_draw_rectanglel (JBDOUBLE x1,       ///< 1st corner x-coordinate.
                              JBDOUBLE y1,       ///< 1st corner y-coordinate.
                              JBDOUBLE x2,       ///< 2nd corner x-coordinate.
                              JBDOUBLE y2,       ///< 2nd corner y-coordinate.
-                             const GLfloat * color)     ///< RGB color.
+                             const GLfloat *color)      ///< RGB color.
 {
   JBDOUBLE x[4] = { x1, x2, x2, x1 };
   JBDOUBLE y[4] = { y1, y1, y2, y2 };
@@ -3390,11 +3390,11 @@ jbw_graphic_draw_logo (void)
  * widget (JBFLOAT).
  */
 void
-jbw_graphic_draw_lines (JBFLOAT * x,    ///< x-coordinates array.
-                        JBFLOAT * y1,   ///< 1st y-coordinates array.
-                        JBFLOAT * y2,   ///< 2nd y-coordinates array.
-                        JBFLOAT * z1,   ///< 1st z-coordinates array.
-                        JBFLOAT * z2,   ///< 2nd z-coordinates array.
+jbw_graphic_draw_lines (JBFLOAT *x,     ///< x-coordinates array.
+                        JBFLOAT *y1,    ///< 1st y-coordinates array.
+                        JBFLOAT *y2,    ///< 2nd y-coordinates array.
+                        JBFLOAT *z1,    ///< 1st z-coordinates array.
+                        JBFLOAT *z2,    ///< 2nd z-coordinates array.
                         int n)  ///< last arrays element number.
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
@@ -3437,11 +3437,11 @@ jbw_graphic_draw_lines (JBFLOAT * x,    ///< x-coordinates array.
  * widget (JBDOUBLE).
  */
 void
-jbw_graphic_draw_linesl (JBDOUBLE * x,  ///< x-coordinates array.
-                         JBDOUBLE * y1, ///< 1st y-coordinates array.
-                         JBDOUBLE * y2, ///< 2nd y-coordinates array.
-                         JBDOUBLE * z1, ///< 1st z-coordinates array.
-                         JBDOUBLE * z2, ///< 2nd z-coordinates array.
+jbw_graphic_draw_linesl (JBDOUBLE *x,   ///< x-coordinates array.
+                         JBDOUBLE *y1,  ///< 1st y-coordinates array.
+                         JBDOUBLE *y2,  ///< 2nd y-coordinates array.
+                         JBDOUBLE *z1,  ///< 1st z-coordinates array.
+                         JBDOUBLE *z2,  ///< 2nd z-coordinates array.
                          int n) ///< last arrays element number.
 {
   JBWGraphic *graphic = jbw_graphic_pointer;
@@ -3672,7 +3672,7 @@ jbw_graphic_save (char *file_name)      ///< file name.
  * function to save the view of the current JBWGraphic widget on a file.
  */
 static void
-jbw_graphic_dialog_response (GtkFileChooserDialog * dlg,
+jbw_graphic_dialog_response (GtkFileChooserDialog *dlg,
                              ///< GtkFileChooserDialog struct.
                              int id)    ///< response identifier.
 {
@@ -3767,7 +3767,7 @@ jbw_graphic_dialog_save (void)
  * Function to check the type of a column on a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_check_column (JBWArrayEditor * editor,
+jbw_array_editor_check_column (JBWArrayEditor *editor,
                                ///< JBWArrayEditor widget.
                                int column,      ///< column number.
                                int type)        ///< column type.
@@ -3798,7 +3798,7 @@ jbw_array_editor_check_column (JBWArrayEditor * editor,
  * Function to set the string of an element of a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_set_element (JBWArrayEditor * editor,
+jbw_array_editor_set_element (JBWArrayEditor *editor,
                               ///< JBWArrayEditor widget.
                               int row,  ///< element row number.
                               int column,       ///< element column number.
@@ -3816,7 +3816,7 @@ jbw_array_editor_set_element (JBWArrayEditor * editor,
  * \return string. It has to be freed with g_free.
  */
 char *
-jbw_array_editor_get_element (JBWArrayEditor * editor,
+jbw_array_editor_get_element (JBWArrayEditor *editor,
                               ///< JBWArrayEditor widget.
                               int row,  ///< element row number.
                               int column)       ///< element column number.
@@ -3831,7 +3831,7 @@ jbw_array_editor_get_element (JBWArrayEditor * editor,
  * Function to set an integer number in an element of a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_set_element_int (JBWArrayEditor * editor,
+jbw_array_editor_set_element_int (JBWArrayEditor *editor,
                                   ///< JBWArrayEditor widget.
                                   int row,      ///< element row number.
                                   int column,   ///< element column number.
@@ -3849,7 +3849,7 @@ jbw_array_editor_set_element_int (JBWArrayEditor * editor,
  * \return integer number.
  */
 long int
-jbw_array_editor_get_element_int (JBWArrayEditor * editor,
+jbw_array_editor_get_element_int (JBWArrayEditor *editor,
                                   ///< JBWArrayEditor widget.
                                   int row,      ///< element row number.
                                   int column)   ///< element column number.
@@ -3864,7 +3864,7 @@ jbw_array_editor_get_element_int (JBWArrayEditor * editor,
  * Function to set a float number in an element of a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_set_element_float (JBWArrayEditor * editor,
+jbw_array_editor_set_element_float (JBWArrayEditor *editor,
                                     ///< JBWArrayEditor widget.
                                     int row,    ///< element row number.
                                     int column, ///< element column number.
@@ -3882,7 +3882,7 @@ jbw_array_editor_set_element_float (JBWArrayEditor * editor,
  * \return float number.
  */
 JBDOUBLE
-jbw_array_editor_get_element_float (JBWArrayEditor * editor,
+jbw_array_editor_get_element_float (JBWArrayEditor *editor,
                                     ///< JBWArrayEditor widget.
                                     int row,    ///< element row number.
                                     int column) ///< element column number.
@@ -3897,7 +3897,7 @@ jbw_array_editor_get_element_float (JBWArrayEditor * editor,
  * Function to set a date in an element of a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_set_element_time (JBWArrayEditor * editor,
+jbw_array_editor_set_element_time (JBWArrayEditor *editor,
                                    ///< JBWArrayEditor widget.
                                    int row,     ///< element row number.
                                    int column,  ///< element column number.
@@ -3918,7 +3918,7 @@ jbw_array_editor_set_element_time (JBWArrayEditor * editor,
  * \return date.
  */
 JBDOUBLE
-jbw_array_editor_get_element_time (JBWArrayEditor * editor,
+jbw_array_editor_get_element_time (JBWArrayEditor *editor,
                                    ///< JBWArrayEditor widget.
                                    int row,     ///< element row number.
                                    int column)  ///< element column number.
@@ -3938,7 +3938,7 @@ jbw_array_editor_get_element_time (JBWArrayEditor * editor,
  * Function to set the strings of a column in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_set_column (JBWArrayEditor * editor,
+jbw_array_editor_set_column (JBWArrayEditor *editor,
                              ///< JBWArrayEditor widget.
                              int column,        ///< column number.
                              char **c)  ///< array of strings.
@@ -3955,7 +3955,7 @@ jbw_array_editor_set_column (JBWArrayEditor * editor,
  * Function to get the strings of a column in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_get_column (JBWArrayEditor * editor,
+jbw_array_editor_get_column (JBWArrayEditor *editor,
                              ///< JBWArrayEditor widget.
                              int column,        ///< column number.
                              char **c)  ///< array of strings.
@@ -3972,7 +3972,7 @@ jbw_array_editor_get_column (JBWArrayEditor * editor,
  * Function to set the integer numbers of a column in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_set_column_int (JBWArrayEditor * editor,
+jbw_array_editor_set_column_int (JBWArrayEditor *editor,
                                  ///< JBWArrayEditor widget.
                                  int column,    ///< column number.
                                  long int *x)   ///< array of integer numbers.
@@ -3989,7 +3989,7 @@ jbw_array_editor_set_column_int (JBWArrayEditor * editor,
  * Function to get the integer numbers of a column in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_get_column_int (JBWArrayEditor * editor,
+jbw_array_editor_get_column_int (JBWArrayEditor *editor,
                                  ///< JBWArrayEditor widget.
                                  int column,    ///< column number.
                                  long int *x)   ///< array of integer numbers.
@@ -4007,10 +4007,10 @@ jbw_array_editor_get_column_int (JBWArrayEditor * editor,
  * (JBFLOAT).
  */
 void
-jbw_array_editor_set_column_float (JBWArrayEditor * editor,
+jbw_array_editor_set_column_float (JBWArrayEditor *editor,
                                    ///< JBWArrayEditor widget.
                                    int column,  ///< column number.
-                                   JBFLOAT * x) ///< array of float numbers.
+                                   JBFLOAT *x)  ///< array of float numbers.
 {
   int i, j;
   j = editor->nrows;
@@ -4025,10 +4025,10 @@ jbw_array_editor_set_column_float (JBWArrayEditor * editor,
  * (JBDOUBLE).
  */
 void
-jbw_array_editor_set_column_floatl (JBWArrayEditor * editor,
+jbw_array_editor_set_column_floatl (JBWArrayEditor *editor,
                                     ///< JBWArrayEditor widget.
                                     int column, ///< column number.
-                                    JBDOUBLE * x)
+                                    JBDOUBLE *x)
                                     ///< array of float numbers.
 {
   int i, j;
@@ -4044,10 +4044,10 @@ jbw_array_editor_set_column_floatl (JBWArrayEditor * editor,
  * (JBFLOAT).
  */
 void
-jbw_array_editor_get_column_float (JBWArrayEditor * editor,
+jbw_array_editor_get_column_float (JBWArrayEditor *editor,
                                    ///< JBWArrayEditor widget.
                                    int column,  ///< column number.
-                                   JBFLOAT * x) ///< array of float numbers.
+                                   JBFLOAT *x)  ///< array of float numbers.
 {
   int i, j;
   j = editor->nrows;
@@ -4062,10 +4062,10 @@ jbw_array_editor_get_column_float (JBWArrayEditor * editor,
  * (JBDOUBLE).
  */
 void
-jbw_array_editor_get_column_floatl (JBWArrayEditor * editor,
+jbw_array_editor_get_column_floatl (JBWArrayEditor *editor,
                                     ///< JBWArrayEditor widget.
                                     int column, ///< column number.
-                                    JBDOUBLE * x)       ///< array of float numbers.
+                                    JBDOUBLE *x)        ///< array of float numbers.
 {
   int i, j;
   j = editor->nrows;
@@ -4079,10 +4079,10 @@ jbw_array_editor_get_column_floatl (JBWArrayEditor * editor,
  * Function to set the dates of a column in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_set_column_time (JBWArrayEditor * editor,
+jbw_array_editor_set_column_time (JBWArrayEditor *editor,
                                   ///< JBWArrayEditor widget.
                                   int column,   ///< column number.
-                                  JBDOUBLE * t) ///< array of dates.
+                                  JBDOUBLE *t)  ///< array of dates.
 {
   int i, j;
   j = editor->nrows;
@@ -4096,10 +4096,10 @@ jbw_array_editor_set_column_time (JBWArrayEditor * editor,
  * Function to get the dates of a column in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_get_column_time (JBWArrayEditor * editor,
+jbw_array_editor_get_column_time (JBWArrayEditor *editor,
                                   ///< JBWArrayEditor widget.
                                   int column,   ///< column number.
-                                  JBDOUBLE * t) ///< array of dates.
+                                  JBDOUBLE *t)  ///< array of dates.
 {
   int i, j;
   j = editor->nrows;
@@ -4114,7 +4114,7 @@ jbw_array_editor_get_column_time (JBWArrayEditor * editor,
  * widget.
  */
 void
-jbw_array_editor_set_column_sensitive (JBWArrayEditor * editor,
+jbw_array_editor_set_column_sensitive (JBWArrayEditor *editor,
                                        ///< JBWArrayEditor widget.
                                        int column,      ///< column number.
                                        int sensitive)
@@ -4134,7 +4134,7 @@ jbw_array_editor_set_column_sensitive (JBWArrayEditor * editor,
  * Function to show a column in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_show_column (JBWArrayEditor * editor,
+jbw_array_editor_show_column (JBWArrayEditor *editor,
                               ///< JBWArrayEditor widget.
                               int column)       ///< column number.
 {
@@ -4153,7 +4153,7 @@ jbw_array_editor_show_column (JBWArrayEditor * editor,
  * Function to hide a column in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_hide_column (JBWArrayEditor * editor,
+jbw_array_editor_hide_column (JBWArrayEditor *editor,
                               ///< JBWArrayEditor widget.
                               int column)       ///< column number.
 {
@@ -4173,7 +4173,7 @@ jbw_array_editor_hide_column (JBWArrayEditor * editor,
  * widget.
  */
 static void
-jbw_array_editor_insert_button_end (JBWArrayEditor * editor,
+jbw_array_editor_insert_button_end (JBWArrayEditor *editor,
                                     ///< JBWArrayEditor widget.
                                     int row)    ///< last row number.
 {
@@ -4197,7 +4197,7 @@ jbw_array_editor_insert_button_end (JBWArrayEditor * editor,
  * widget.
  */
 static void
-jbw_array_editor_insert_entry_end (JBWArrayEditor * editor,
+jbw_array_editor_insert_entry_end (JBWArrayEditor *editor,
                                    ///< JBWArrayEditor widget.
                                    int column,  ///< column number.
                                    int row,     ///< last row number.
@@ -4229,7 +4229,7 @@ jbw_array_editor_insert_entry_end (JBWArrayEditor * editor,
  * Function to insert the last row of a JBWArrayEditor widget.
  */
 static void
-jbw_array_editor_insert_last (JBWArrayEditor * editor)
+jbw_array_editor_insert_last (JBWArrayEditor *editor)
 {
   int i, j, k;
   j = editor->nrows++;
@@ -4251,7 +4251,7 @@ jbw_array_editor_insert_last (JBWArrayEditor * editor)
  * Function to up the information on a column of a JBWArrayEditor widget.
  */
 static void
-jbw_array_editor_up_rows (JBWArrayEditor * editor,
+jbw_array_editor_up_rows (JBWArrayEditor *editor,
                           ///< JBWArrayEditor widget.
                           int column,   ///< column number.
                           int row,      ///< initial row to down.
@@ -4272,7 +4272,7 @@ jbw_array_editor_up_rows (JBWArrayEditor * editor,
  * Function to insert a row in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_insert_row (JBWArrayEditor * editor,
+jbw_array_editor_insert_row (JBWArrayEditor *editor,
                              ///< JBWArrayEditor widget.
                              int row)   ///< row number.
 {
@@ -4289,7 +4289,7 @@ jbw_array_editor_insert_row (JBWArrayEditor * editor,
  * widget.
  */
 static void
-jbw_array_editor_remove_entry_end (JBWArrayEditor * editor,
+jbw_array_editor_remove_entry_end (JBWArrayEditor *editor,
                                    ///< JBWArrayEditor widget.
                                    int column,  ///< column number.
                                    int row)     ///< last row number.
@@ -4308,7 +4308,7 @@ jbw_array_editor_remove_entry_end (JBWArrayEditor * editor,
  * Function to remove the last row in a JBWArrayEditor widget.
  */
 static void
-jbw_array_editor_remove_last (JBWArrayEditor * editor)
+jbw_array_editor_remove_last (JBWArrayEditor *editor)
                                     ///< JBWArrayEditor widget.
 {
   int i, j;
@@ -4331,7 +4331,7 @@ jbw_array_editor_remove_last (JBWArrayEditor * editor)
  * Function to down the information on a column of a JBWArrayEditor widget.
  */
 static void
-jbw_array_editor_down_rows (JBWArrayEditor * editor,
+jbw_array_editor_down_rows (JBWArrayEditor *editor,
                             ///< JBWArrayEditor widget.
                             int column, ///< column number.
                             int row,    ///< initial row to down.
@@ -4351,7 +4351,7 @@ jbw_array_editor_down_rows (JBWArrayEditor * editor,
  * Function to remove a row in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_remove_row (JBWArrayEditor * editor,
+jbw_array_editor_remove_row (JBWArrayEditor *editor,
                              ///< JBWArrayEditor widget.
                              int row)   ///< row number.
 {
@@ -4367,7 +4367,7 @@ jbw_array_editor_remove_row (JBWArrayEditor * editor,
  * Function to set the number of rows in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_set_rows (JBWArrayEditor * editor,
+jbw_array_editor_set_rows (JBWArrayEditor *editor,
                            ///< JBWArrayEditor widget.
                            int n)       ///< number of rows.
 {
@@ -4387,7 +4387,7 @@ jbw_array_editor_set_rows (JBWArrayEditor * editor,
  * Function to set the title of a column in a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_set_title (JBWArrayEditor * editor,
+jbw_array_editor_set_title (JBWArrayEditor *editor,
                             ///< JBWArrayEditor widget.
                             int column, ///< column number.
                             char *title)        ///< column title string.
@@ -4399,7 +4399,7 @@ jbw_array_editor_set_title (JBWArrayEditor * editor,
  * Function to close and free the memory used by a JBWArrayEditor widget.
  */
 void
-jbw_array_editor_destroy (JBWArrayEditor * editor)
+jbw_array_editor_destroy (JBWArrayEditor *editor)
                                 ///< JBWArrayEditor widget.
 {
   int i;
@@ -4482,7 +4482,7 @@ error1:
  * function to set a text on a GtkEntry struct as in GTK3.
  */
 void
-gtk_entry_set_text (GtkEntry * entry,   ///< GtkEntry struct.
+gtk_entry_set_text (GtkEntry *entry,    ///< GtkEntry struct.
                     const char *text)   ///< text.
 {
   GtkEntryBuffer *buffer;
@@ -4496,7 +4496,7 @@ gtk_entry_set_text (GtkEntry * entry,   ///< GtkEntry struct.
  * \return text.
  */
 const char *
-gtk_entry_get_text (GtkEntry * entry)   ///< GtkEntry struct.
+gtk_entry_get_text (GtkEntry *entry)    ///< GtkEntry struct.
 {
   GtkEntryBuffer *buffer;
   buffer = gtk_entry_get_buffer (entry);
