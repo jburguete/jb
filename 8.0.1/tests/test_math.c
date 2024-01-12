@@ -413,7 +413,7 @@ main (void)
   JBDOUBLE (*flux_limiterl) (JBDOUBLE, JBDOUBLE); 
   JBFLOAT (*flux_limiter) (JBFLOAT, JBFLOAT); 
   JBDOUBLE *darray3;
-  JBFLOAT *farray3;
+  JBFLOAT *farray3, *Af;
   JBDOUBLE d, d2;
   JBFLOAT f, f2;
   long long int iL, iL2;
@@ -764,6 +764,36 @@ main (void)
   SNPRINTF (buffer2, JB_BUFFER_SIZE, FWF, f2);
   printf ("regression_linear([1,2,4,...],[2048,1024,512,...],11)=(%s,%s)\n",
           buffer, buffer2);
+  jbm_regression_exponential (farray, farray2, 11, &f, &f2);
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f);
+  SNPRINTF (buffer2, JB_BUFFER_SIZE, FWF, f2);
+  printf ("regression_exponential([1,2,4,...],[2048,1024,512,...],11)"
+          "=(%s,%s)\n",buffer, buffer2);
+  for (i = 0; i < 12; ++i)
+    {
+      farray[i] = pf[i];
+      farray2[i] = jbm_fdbl (pf[i]);
+    }
+  jbm_regression_exponential (farray, farray2, 11, &f, &f2);
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f);
+  SNPRINTF (buffer2, JB_BUFFER_SIZE, FWF, f2);
+  printf ("regression_exponential([1,2,4,...],[2,4,8,...],11)=(%s,%s)\n",
+          buffer, buffer2);
+  printf ("regression_polynomial([1,2,4,...],[2,4,8,...],11,f,2)\n");
+  for (i = 0; i < 12; ++i)
+    {
+      farray[i] = pf[i];
+      farray2[i] = jbm_fdbl (pf[i]);
+    }
+  jbm_regression_polynomial (farray, farray2, 11, &Af, 2);
+  farray_print (Af, 2);
+  free (Af);
+  printf ("regression_polynomial([1,2,4,...],[2048,1024,512,...],11,f,3)\n");
+  for (i = 0; i < 12; ++i)
+    farray2[i] = pf[11 - i];
+  jbm_regression_polynomial (farray, farray2, 11, &Af, 3);
+  farray_print (Af, 3);
+  free (Af);
   jbm_varray_solve_tridiagonal (&cf[0].C, &cf[0].D, &cf[0].E, &cf[0].H,
                                 sizeof (MatrixFloat), 3);
   for (i = 0; i < 4; ++i)

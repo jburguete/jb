@@ -11,7 +11,7 @@ main (void)
 {
 #if JBM_HIGH_PRECISION == 1
   const JBDOUBLE c0 = 0.f, c1 = 1.f;
-#elif JBM_HIGH_PRECISION == 1
+#elif JBM_HIGH_PRECISION == 2
   const JBDOUBLE c0 = 0., c1 = 1.;
 #elif JBM_HIGH_PRECISION == 3
   const JBDOUBLE c0 = 0.L, c1 = 1.L;

@@ -1846,7 +1846,7 @@ jbm_integral (JBFLOAT (*f) (JBFLOAT),
  */
 static inline unsigned int
 jbm_farray_search (JBFLOAT x,   ///< number to search.
-                   JBFLOAT *fa, ///< array of JBFLOAT numbers.
+                   JBFLOAT *fa,   ///< array of JBFLOAT numbers.
                    unsigned int n)
                    ///< number of the highest array element.
 {
@@ -1869,7 +1869,7 @@ jbm_farray_search (JBFLOAT x,   ///< number to search.
  */
 static inline int
 jbm_farray_search_extended (JBFLOAT x,  ///< number to search.
-                            JBFLOAT *fa,        ///< array of JBFLOAT numbers.
+                            JBFLOAT *fa,  ///< array of JBFLOAT numbers.
                             unsigned int n)
                             ///< number of the highest array element.
 {
@@ -2079,7 +2079,7 @@ jbm_farray_integral (JBFLOAT *restrict x,
       xx = x;
       yy = y;
     }
-  else if (i == n)
+  else if (i == (int) n)
     {
       I = y[i] * (x2 - x1);
       goto exit1;
@@ -2098,17 +2098,17 @@ jbm_farray_integral (JBFLOAT *restrict x,
       goto exit1;
     }
   I += c05 * (y1 + yy[1]) * (xx[1] - x1);
-  if (++i == n)
+  if (++i == (int) n)
     {
       I += yy[1] * (x2 - xx[1]);
       goto exit1;
     }
-  while (++i < n && x2 > xx[2])
+  while (++i < (int) n && x2 > xx[2])
     {
       ++xx, ++yy;
       I += c05 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
     }
-  if (i == n)
+  if (i == (int) n)
     I += yy[2] * (x2 - xx[1]);
   else if (x2 < xx[2])
     I += c05 * (yy[1] + jbm_extrapolate (x2, xx[1], xx[2], yy[1], yy[2]))
@@ -2685,8 +2685,9 @@ jbm_regression_linear (JBFLOAT *restrict x,
 #endif
   JBFLOAT syx, sy, sxx, sx;
   unsigned int i;
+  ++n;
   syx = sy = sxx = sx = c0;
-  for (i = 0; i <= n; ++i)
+  for (i = 0; i < n; ++i)
     {
       sy += y[i];
       syx += x[i] * y[i];
@@ -2695,6 +2696,28 @@ jbm_regression_linear (JBFLOAT *restrict x,
     }
   *b = (n * syx - sy * sx) / (n * sxx - sx * sx);
   *a = (sy - *b * sx) / n;
+}
+
+/**
+ * Function to calculate the coefficients of an exponential regression adjusted
+ * by minimum squares: \f$y=a\,x^b\f$ (JBFLOAT). It modifies the x and y arrays.
+ */
+static inline void
+jbm_regression_exponential (JBFLOAT *restrict x,
+///< array of point x-coordinates. It is modified by the function.
+                            JBFLOAT *restrict y,
+///< array of point y-coordinates. It is modified by the function.
+                            unsigned int n,     ///< points number.
+                            JBFLOAT *a,
+///< pointer to the constant parameter regression coefficient.
+                            JBFLOAT *b)
+///< pointer to the exponent regression coefficient.
+{
+  unsigned int i;
+  for (i = 0; i <= n; ++i)
+    x[i] = LOG (x[i]), y[i] = LOG (y[i]);
+  jbm_regression_linear (x, y, n, a, b);
+  *a = EXP (*a);
 }
 
 /**
@@ -2725,7 +2748,7 @@ jbm_regression_polynomial (JBFLOAT *restrict x,
   JBFLOAT *k;
   JBFLOAT zx, zy;
   int i, j;
-  for (j = m + m; --j > m;)
+  for (j = m + m + 1; --j > m;)
     xx[j] = c0;
   for (; j >= 0; --j)
     xx[j] = yx[j] = c0;
@@ -2754,28 +2777,6 @@ jbm_regression_polynomial (JBFLOAT *restrict x,
   *A = (JBFLOAT *) g_malloc ((m + 1) * sizeof (JBFLOAT));
   for (i = 0, k = B; i <= m; ++i, k += m + 1)
     (*A)[i] = *k;
-}
-
-/**
- * Function to calculate the coefficients of an exponential regression adjusted
- * by minimum squares: \f$y=a\,x^b\f$ (JBFLOAT).
- */
-static inline void
-jbm_regression_exponential (JBFLOAT *restrict x,
-///< array of point x-coordinates. It is modified by the function.
-                            JBFLOAT *restrict y,
-///< array of point y-coordinates. It is modified by the function.
-                            int n,      ///< points number.
-                            JBFLOAT *a,
-///< pointer to the constant parameter regression coefficient.
-                            JBFLOAT *b)
-///< pointer to the exponent regression coefficient.
-{
-  int i;
-  for (i = n; i-- >= 0;)
-    x[i] = LOG (x[i]), y[i] = LOG (y[i]);
-  jbm_regression_linear (x, y, n, a, b);
-  *a = EXP (*a);
 }
 
 /**
@@ -4711,7 +4712,7 @@ jbm_darray_integral (JBDOUBLE *restrict x,
       xx = x;
       yy = y;
     }
-  else if (i == n)
+  else if (i == (int) n)
     {
       I = y[i] * (x2 - x1);
       goto exit1;
@@ -4730,17 +4731,17 @@ jbm_darray_integral (JBDOUBLE *restrict x,
       goto exit1;
     }
   I += c05 * (y1 + yy[1]) * (xx[1] - x1);
-  if (++i == n)
+  if (++i == (int) n)
     {
       I += yy[1] * (x2 - xx[1]);
       goto exit1;
     }
-  while (++i < n && x2 > xx[2])
+  while (++i < (int) n && x2 > xx[2])
     {
       ++xx, ++yy;
       I += c05 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
     }
-  if (i == n)
+  if (i == (int) n)
     I += yy[2] * (x2 - xx[1]);
   else if (x2 < xx[2])
     I += c05 * (yy[1] + jbm_extrapolatel (x2, xx[1], xx[2], yy[1], yy[2]))
@@ -5341,7 +5342,7 @@ jbm_regression_linearl (JBDOUBLE *restrict x,
                         ///< array of point x-coordinates.
                         JBDOUBLE *restrict y,
                         ///< array of point y-coordinates.
-                        int n,  ///< points number.
+                        unsigned int n, ///< points number.
                         JBDOUBLE *a,
                         ///< pointer to the 0th order regression coefficient.
                         JBDOUBLE *b)
@@ -5357,9 +5358,10 @@ jbm_regression_linearl (JBDOUBLE *restrict x,
   const JBDOUBLE c0 = 0.Q;
 #endif
   JBDOUBLE syx, sy, sxx, sx;
-  int i;
+  unsigned int i;
+  ++n;
   syx = sy = sxx = sx = c0;
-  for (i = 0; i <= n; ++i)
+  for (i = 0; i < n; ++i)
     {
       sy += y[i];
       syx += x[i] * y[i];
