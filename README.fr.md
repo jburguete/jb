@@ -1,4 +1,4 @@
-JB (version 8.0.1)
+JB (version 9.1.0)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -57,14 +57,14 @@ Optionnel pour détecter les characteristiques du processeur:
 * [libgtop](https://github.com/GNOME/libgtop) pour obtenir le nombre de
   processeurs.
 
-Obligatoire si les outils jb\_xml sont inclus:
+Obligatoire si les outils jb/xml sont inclus:
 * [libxml](http://xmlsoft.org) pour travailler avec fichiers XML.
 
-Obligatoire si les outils jb\_json sont inclus:
+Obligatoire si les outils jb/json sont inclus:
 * [json-glib](https://gitlab.gnome.org/GNOME/json-glib) pour travailler avec
   fichiers JSON.
 
-Obligatoire si les outils jb\_win sont inclus et on compile en utilisant
+Obligatoire si les outils jb/win sont inclus et on compile en utilisant
 l'option -DJBW=2.
 * [png](http://libpng.sourceforge.net) pour travailler avec fichiers PNG.
 * [gtk](http://www.gtk.org) pour travailler avec fenêtres interactives.
@@ -92,20 +92,20 @@ Ce programme a été construit et verifié avec les suivants systèmes
 d'exploitation:
 * Arch Linux
 * Debian 12 (Linux)
-* Devuan Linux 4
+* Devuan Linux 5
 * Dragonfly BSD 6.4.0
-* Fedora Linux 38
+* Fedora Linux 39
 * FreeBSD 13.2
 * Gentoo Linux
-* Linux Mint DE 5
+* Linux Mint DE 6
 * MacOS Ventura + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
 * NetBSD 9.3
-* OpenBSD 7.3
+* OpenBSD 7.4
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.5
-* Ubuntu Linux 23.04
+* Ubuntu Linux 23.10
 
 Avec systèmes Microsoft Windows on doit installer
 [MSYS2](http://sourceforge.net/projects/msys2) et en plus les bibliothèques et
@@ -131,11 +131,11 @@ ____________________________
 > $ git clone https://github.com/jburguete/jb
 
 2. Pour applications de terminal compilez les codes source avec:
-> $ cd 8.0.1
+> $ cd 9.1.0
 > $ ./build\_wihtout_\gui.sh
 
 2. Pour applications graphiques compilez les codes source avec:
-> $ cd 8.0.1
+> $ cd 9.1.0
 > $ ./build.sh
 
 LIEN LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
@@ -144,17 +144,15 @@ LIEN LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
 1. Liez la dernière version dans une répertoire jb, p.ex.:
 > $ cd RÉPERTOIRE\_DE\_VÔTRE\_PROGRAMME
 >
-> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/8.0.1 jb
+> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/9.1.0 jb
 
 2. Incluez le fichier de configuration et les outils requis dans votre code
    source, p.ex.:
-> \#include "jb/src/jb\_config.h"
+> \#include "jb/src/math.h"
 >
-> \#include "jb/src/jb\_math.h"
+> \#include "jb/src/win.h"
 >
-> \#include "jb/src/jb\_win.h"
->
-> \#include "jb/src/jb\_xml.h"
+> \#include "jb/src/xml.h"
 
 3. Copiez les bibliothèques utilisées dans la répertoire de votre exécutable
 (fichiers libjb\*.so pour sistèmes UNIX, fichiers libjb\*.dll pour sistèmes

@@ -1,4 +1,4 @@
-JB (versión 8.0.1)
+JB (versión 9.1.0)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -56,14 +56,14 @@ Opcional para detectar las características del procesador:
 * [libgtop](https://github.com/GNOME/libgtop) para obtener el número de
   procesadores.
 
-Obligatorio si se incluyen las utilidades jb\_xml:
+Obligatorio si se incluyen las utilidades jb/xml:
 * [libxml](http://xmlsoft.org) para trabajar con ficheros XML.
 
-Obligatorio si se incluyen las utilidades jb\_json:
+Obligatorio si se incluyen las utilidades jb/json:
 * [json-glib](https://gitlab.gnome.org/GNOME/json-glib) para trabajar con
   ficheros JSON.
 
-Obligatorio si se incluyen las utilidades jb\_win y se compila usando el flag
+Obligatorio si se incluyen las utilidades jb/win y se compila usando el flag
 -DJBW=2.
 * [png](http://libpng.sourceforge.net) para trabajar con ficheros PNG.
 * [gtk](http://www.gtk.org) para trabajar con ventanas interactivas.
@@ -90,20 +90,20 @@ Este programa ha sido construido y probado en los siguientes sistemas
 operativos:
 * Arch Linux
 * Debian 12 (Linux)
-* Devuan Linux 4
+* Devuan Linux 5
 * Dragonfly BSD 6.4.0
-* Fedora Linux 38
+* Fedora Linux 39
 * FreeBSD 13.2
 * Gentoo Linux
-* Linux Mint DE 5
+* Linux Mint DE 6
 * MacOS Ventura + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
 * NetBSD 9.3
-* OpenBSD 7.3
+* OpenBSD 7.4
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.5
-* Ubuntu Linux 23.04
+* Ubuntu Linux 23.10
 
 En sistemas Microsoft Windows hay que instalar
 [MSYS2](http://sourceforge.net/projects/msys2) además de las bibliotecas y
@@ -129,11 +129,11 @@ _____________________________
 
 2. Si sólo se requiere para aplicaciones de terminal compile los códigos fuente
    con el script:
-> $ cd 8.0.1
+> $ cd 9.1.0
 > $ ./build\_wihtout_\gui.sh
 
 2. O si se quiere interfaz gráfica compile los códigos fuente con el script:
-> $ cd 8.0.1
+> $ cd 9.1.0
 > $ ./build.sh
 
 ENLAZANDO LA BIBLIOTECA EN OTROS PROGRAMAS
@@ -142,17 +142,15 @@ ENLAZANDO LA BIBLIOTECA EN OTROS PROGRAMAS
 1. Enlácese la última versión en una carpeta jb p.ej.:
 > $ cd CARPETA\_DE\_SU\_PROGRAMA
 >
-> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/8.0.1 jb
+> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/9.1.0 jb
 
 2. Incluya el fichero de configuración y las utilidades requeridas en su código
    fuente p.ej.:
-> \#include "jb/src/jb\_config.h"
+> \#include "jb/src/math.h"
 >
-> \#include "jb/src/jb\_math.h"
+> \#include "jb/src/win.h"
 >
-> \#include "jb/src/jb\_win.h"
->
-> \#include "jb/src/jb\_xml.h"
+> \#include "jb/src/xml.h"
 
 3. Copie las bibliotecas usadas en la carpeta de su ejecutable (ficheros
    libjb\*.so en sistemas UNIX, ficheros libjb\*.dll en sistemas Microsoft

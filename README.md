@@ -1,4 +1,4 @@
-JB (8.0.1 version)
+JB (9.1.0 version)
 ==================
 
 :uk:[english](README.md) :es:[español](README.es.md)
@@ -55,13 +55,13 @@ Mandatory:
 Optional to get the processor properties:
 * [libgtop](https://github.com/GNOME/libgtop) to get the processors number.
 
-Required if including jb\_xml utilites:
+Required if including jb/xml utilites:
 * [libxml](http://xmlsoft.org) to deal with XML files.
 
-Required if including jb\_json utilites:
+Required if including jb/json utilites:
 * [json-glib](https://gitlab.gnome.org/GNOME/json-glib) to deal with JSON files.
 
-Needed if including jb\_win utilities and compiling with -DJBW=2 flag.
+Needed if including jb/win utilities and compiling with -DJBW=2 flag.
 * [png](http://libpng.sourceforge.net) to work with PNG files.
 * [gtk](http://www.gtk.org) to work with interactive windows.
 * [glew](http://glew.sourceforge.net) high level OpenGL functions.
@@ -86,20 +86,20 @@ You can install all required utilities and libraries using the instructions of
 This software has been built and tested in the following operative systems:
 * Arch Linux
 * Debian 12 (Linux)
-* Devuan Linux 4
+* Devuan Linux 5
 * Dragonfly BSD 6.4.0
-* Fedora Linux 38
+* Fedora Linux 39
 * FreeBSD 13.2
 * Gentoo Linux
-* Linux Mint DE 5
+* Linux Mint DE 6
 * MacOS Ventura + Homebrew
 * Manjaro Linux
 * Microsoft Windows 10 + MSYS2
 * NetBSD 9.3
-* OpenBSD 7.3
+* OpenBSD 7.4
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.5
-* Ubuntu Linux 23.04
+* Ubuntu Linux 23.10
 
 On Microsoft Windows systems you have to install
 [MSYS2](http://sourceforge.net/projects/msys2) and the required
@@ -125,11 +125,11 @@ _____________________
 > $ git clone https://github.com/jburguete/jb
 
 2. If only terminal applications are required compile the source codes with:
-> $ cd 8.0.1
+> $ cd 9.1.0
 > $ ./build\_wihtout_\gui.sh
 
 2. Or, if graphic interfaces are required, compile the source codes with:
-> $ cd 8.0.1
+> $ cd 9.1.0
 > $ ./build.sh
 
 LINKING THIS LIBRARY ON OTHER PROGRAMS
@@ -138,16 +138,14 @@ LINKING THIS LIBRARY ON OTHER PROGRAMS
 1. Link the latest version on a jb directory, i.e.:
 > $ cd YOUR\_PROGRAM\_PATH
 >
-> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/8.0.1 jb
+> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/9.1.0 jb
 
 2. Include the config and the used utility headers on your source code i.e.:
-> \#include "jb/src/jb\_config.h"
+> \#include "jb/src/math.h"
 >
-> \#include "jb/src/jb\_math.h"
+> \#include "jb/src/win.h"
 >
-> \#include "jb/src/jb\_win.h"
->
-> \#include "jb/src/jb\_xml.h"
+> \#include "jb/src/xml.h"
 
 3. Copy the used libraries in your executable directory (libjb\*.so files on
    UNIX systems or libjb\*.dll files on Microsoft Windows systems).
