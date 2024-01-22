@@ -490,8 +490,10 @@ enum JBMFluxLimiterType
 typedef struct
 {
   JBFLOAT *x;                   ///< array of numbers.
+  size_t size;                  ///< memory size of the array.
   unsigned int n;               ///< number of elements.
   unsigned int last;            ///< last element.
+  unsigned int alloc;           ///< 1 if x is allocated, 0 otherwise.
 } JBMFarray;
 
 void jbm_index_sort_flash (JBFLOAT * x, unsigned int *ni, unsigned int n);
@@ -506,6 +508,7 @@ void jbm_index_sort_flashl (JBDOUBLE * x, unsigned int *ni, unsigned int n);
 
 #endif
 
+extern void matrix_print (JBFLOAT *, unsigned int, unsigned int);
 extern void farray_print (JBMFarray *);
 
 /**
@@ -4378,6 +4381,18 @@ jbm_integral_256 (__m256d (*f) (__m256d),
 #endif
 
 /**
+ * Function to init data of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_init (JBMFarray *fa, ///< pointer to the JBMFarray struct.
+                 const unsigned int n)   ///< number of array elements.
+{
+  fa->size = n * sizeof (JBFLOAT);
+  fa->n = n;
+  fa->last = n - 1;
+}
+
+/**
  * Function to create a new JBMFarray struct.
  *
  * \return pointer to the new JBMFarray struct.
@@ -4386,20 +4401,22 @@ static inline JBMFarray*
 jbm_farray_new (const unsigned int n)   ///< number of array elements.
 {
   JBMFarray *fa;
-  size_t size;
   fa = (JBMFarray *) malloc (sizeof (JBMFarray));
-  size = n * sizeof (JBFLOAT);
+  jbm_farray_init (fa, n);
 #ifdef __AVX__
-  fa->x = (JBFLOAT *) aligned_alloc (32, size);
+  fa->x = (JBFLOAT *) aligned_alloc (32, fa->size);
 #else
 #ifdef __SSE4_2__
-  fa->x = (JBFLOAT *) aligned_alloc (16, size);
+  fa->x = (JBFLOAT *) aligned_alloc (16, fa->size);
 #else
-  fa->x = (JBFLOAT *) malloc (size);
+  fa->x = (JBFLOAT *) malloc (fa->size);
 #endif
 #endif
-  fa->n = n;
-  fa->last = n - 1;
+  if (!fa->x)
+    {
+      free (fa);
+      return NULL;
+    }
   return fa;
 }
 
@@ -4413,22 +4430,68 @@ jbm_farray_create (const JBFLOAT *x,    ///< array of JBFLOAT numbers.
                    const unsigned int n)        ///< number of array elements.
 {
   JBMFarray *fa;
-  size_t size;
-  fa = (JBMFarray *) malloc (sizeof (JBMFarray));
-  size = n * sizeof (JBFLOAT);
-#ifdef __AVX__
-  fa->x = (JBFLOAT *) aligned_alloc (32, size);
-#else
-#ifdef __SSE4_2__
-  fa->x = (JBFLOAT *) aligned_alloc (16, size);
-#else
-  fa->x = (JBFLOAT *) malloc (size);
-#endif
-#endif
-  memcpy (fa->x, x, size);
-  fa->n = n;
-  fa->last = n - 1;
+  fa = jbm_farray_new (n);
+  memcpy (fa->x, x, fa->size);
   return fa;
+}
+
+/**
+ * Function to set a JBMFarray struct from a JBFLOAT number.
+ */
+static inline void
+jbm_farray_set1 (JBMFarray *fa, ///< pointer to the JBMFarray struct.
+                 const JBFLOAT x,       ///< JBFLOAT number.
+                 const unsigned int n)  ///< number of array elements.
+{
+  JBFLOAT *xa;
+  unsigned int i;
+#if JBM_LOW_PRECISION < 3
+#ifdef __SSE4_2__
+  unsigned int n2;
+#endif
+#ifdef __AVX__
+  unsigned int n4;
+#endif
+#endif
+  jbm_farray_init (fa, n);
+  i = 0;
+  xa = fa->x;
+#if JBM_LOW_PRECISION < 3
+#ifdef __AVX__
+  n4 = n >> 2;
+  for (; n4 > 0; --n4, i += 4)
+    _mm256_store_pd (xa + i, _mm256_set1_pd (x));
+#endif
+#ifdef __SSE4_2__
+  n2 = (n - i) >> 1;
+  for (; n2 > 0; --n2, i += 2)
+    _mm_store_pd (xa + i, _mm_set1_pd (x));
+#endif
+#endif
+  for (; i < n; ++i)
+    xa[i] = x;
+}
+
+/**
+ * Function to set a JBMFarray struct from an array of JBFLOAT numbers.
+ */
+static inline void
+jbm_farray_set (JBMFarray *fa,  ///< pointer to the JBMFarray struct.
+                JBFLOAT *x,     ///< array of JBFLOAT numbers.
+                const unsigned int n)   ///< number of array elements.
+{
+  jbm_farray_init (fa, n);
+  memcpy (fa->x, x, fa->size);
+}
+
+/**
+ * Function to store a JBMFarray struct on an array of JBFLOAT numbers.
+ */
+static inline void
+jbm_farray_store (JBMFarray *fa,        ///< pointer to the JBMFarray struct.
+                  JBFLOAT *x)   ///< array of JBFLOAT numbers.
+{
+  memcpy (x, fa->x, fa->size);
 }
 
 /**
@@ -4699,6 +4762,80 @@ jbm_farray_div (JBMFarray *fr,  ///< result JBMFarray struct.
 #endif
   for (; i < n; ++i)
     xr[i] = x1[i] / x2[i];
+}
+
+/**
+ * Function to calculate the double of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_dbl (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *fd)    ///< data JBMFarray struct.
+{
+  JBFLOAT *xr, *xd;
+  unsigned int i, n;
+#if JBM_LOW_PRECISION < 3
+#ifdef __SSE4_2__
+  unsigned int n2;
+#endif
+#ifdef __AVX__
+  unsigned int n4;
+#endif
+#endif
+  i = 0;
+  n = fr->n;
+  xr = fr->x;
+  xd = fd->x;
+#if JBM_LOW_PRECISION < 3
+#ifdef __AVX__
+  n4 = n >> 2;
+  for (; n4 > 0; --n4, i += 4)
+    _mm256_store_pd (xr + i, jbm_dbl_256 (_mm256_load_pd (xd + i)));
+#endif
+#ifdef __SSE4_2__
+  n2 = (n - i) >> 1;
+  for (; n2 > 0; --n2, i += 2)
+    _mm_store_pd (xr + i, jbm_dbl_128 (_mm_load_pd (xd + i)));
+#endif
+#endif
+  for (; i < n; ++i)
+    xr[i] = jbm_fdbl (xd[i]);
+}
+
+/**
+ * Function to calculate the square of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_sqr (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *fd)    ///< data JBMFarray struct.
+{
+  JBFLOAT *xr, *xd;
+  unsigned int i, n;
+#if JBM_LOW_PRECISION < 3
+#ifdef __SSE4_2__
+  unsigned int n2;
+#endif
+#ifdef __AVX__
+  unsigned int n4;
+#endif
+#endif
+  i = 0;
+  n = fr->n;
+  xr = fr->x;
+  xd = fd->x;
+#if JBM_LOW_PRECISION < 3
+#ifdef __AVX__
+  n4 = n >> 2;
+  for (; n4 > 0; --n4, i += 4)
+    _mm256_store_pd (xr + i, jbm_sqr_256 (_mm256_load_pd (xd + i)));
+#endif
+#ifdef __SSE4_2__
+  n2 = (n - i) >> 1;
+  for (; n2 > 0; --n2, i += 2)
+    _mm_store_pd (xr + i, jbm_sqr_128 (_mm_load_pd (xd + i)));
+#endif
+#endif
+  for (; i < n; ++i)
+    xr[i] = jbm_fsqr (xd[i]);
 }
 
 /**
@@ -5063,58 +5200,56 @@ jbm_farray_interpolate (const JBMFarray *fa,
 }
 
 /**
- * Function to merge 2 increasingly sorted arrays of JBFLOAT numbers.
+ * Function to merge 2 increasingly sorted JBMFarray structs.
  *
- * \return resulting array.
+ * \return resulting JBMFarray struct.
  */
-static inline JBFLOAT *
-jbm_farray_merge (JBFLOAT *restrict fa,
-                  ///< 1st increasingly sorted array of JBFLOAT numbers.
-                  unsigned int na,
-                  ///< elements number of the 1st array.
-                  JBFLOAT *restrict fb,
-                  ///< 2nd increasingly sorted array of JBFLOAT numbers.
-                  unsigned int nb,
-                  ///< elements number of the 2nd array.
-                  unsigned int *nc)
-                  ///< pointer to the elements number of the resulting array.
+static inline JBMFarray *
+jbm_farray_merge (JBMFarray *restrict fa,
+                  ///< pointer to the 1st increasingly sorted JBMFarray struct.
+                  JBMFarray *restrict fb)
+                  ///< pointer to the 2nd increasingly sorted JBMFarray struct.
 {
-  JBFLOAT *restrict x;
-  unsigned int i, j, k;
-  x = (JBFLOAT *) malloc ((na + nb) * sizeof (JBFLOAT));
-  if (!x)
+  JBMFarray *fc;
+  JBFLOAT *xa, *xb, *xc;
+  unsigned int i, j, k, na, nb;
+  na = fa->n;
+  nb = fb->n;
+  fc = jbm_farray_new (na + nb);
+  if (!fc)
     return NULL;
+  xa = fa->x;
+  xb = fb->x;
+  xc = fc->x;
   for (i = j = k = 0; i < na || j < nb; ++k)
     {
       if (i >= na)
-        x[k] = fb[j++];
+        xc[k] = xb[j++];
       else if (j >= nb)
-        x[k] = fa[i++];
-      else if (fa[i] > fb[j])
-        x[k] = fb[j++];
-      else if (fa[i] < fb[j])
-        x[k] = fa[i++];
+        xc[k] = xa[i++];
+      else if (xa[i] > xb[j])
+        xc[k] = xb[j++];
+      else if (xa[i] < xb[j])
+        xc[k] = xa[i++];
       else
-        x[k] = fa[i++], j++;
+        xc[k] = xa[i++], j++;
     }
-  x = (JBFLOAT *) jb_realloc (x, k * sizeof (JBFLOAT));
-  *nc = k;
-  return x;
+  jbm_farray_init (fc, k);
+  return fc;
 }
 
 /**
- * Function to integrate a tabular function (JBFLOAT) in an interval.
+ * Function to integrate a tabular function, defined by 2 JBMFarray structs,in
+ * an interval.
  *
  * \return integral value.
  */
 static inline JBFLOAT
-jbm_farray_integral (JBFLOAT *restrict x,
-///< incresingly sorted array of JBFLOAT numbers defining the x-coordinates of
-///< the tabular function.
-                     JBFLOAT *restrict y,
-///< array of JBFLOAT numbers defining the y-coordinates of the tabular
+jbm_farray_integral (JBMFarray *restrict fx,
+///< incresingly sorted JBMFarray defining the x-coordinates of the tabular
 ///< function.
-                     unsigned int n,    ///< number of array elements.
+                     JBMFarray *restrict fy,
+///< JBFarray defining the y-coordinates of the tabular function.
                      JBFLOAT x1,
                      ///< left limit of the integration interval.
                      JBFLOAT x2)
@@ -5129,17 +5264,20 @@ jbm_farray_integral (JBFLOAT *restrict x,
 #elif JBM_LOW_PRECISION == 4
   const JBFLOAT c0 = 0.Q, c05 = 0.5Q;
 #endif
-  JBFLOAT *yy, *xx;
+  JBFLOAT *x, *y, *yy, *xx;
   JBFLOAT I, y1;
   int i;
-  unsigned int last;
+  unsigned int n, last;
+  n = fx->n;
+  y = fy->x;
   if (n == 0)
     {
       I = y[0] * (x2 - x1);
       goto exit1;
     }
-  // i = jbm_farray_search_extended (x1, x, n);
-  last = n - 1;
+  x = fx->x;
+  i = jbm_farray_search_extended (fx, x1);
+  last = fx->last;
   if (i < 0)
     {
       if (x2 <= x[0])
@@ -5199,22 +5337,16 @@ exit1:
  * \return mean square error.
  */
 static inline JBFLOAT
-jbm_farray_mean_square_error (JBFLOAT *restrict xa,
-///< incresingly sorted array of JBFLOAT numbers defining the x-coordinates
-///< of the 1st tabular function.
-                              JBFLOAT *restrict fa,
-///< array of JBFLOAT numbers defining the y-coordinates of the 1st tabular
-///< function.
-                              unsigned int na,
-///< number of array elements defining the 1st tabular function.
-                              JBFLOAT *restrict xr,
-///< incresingly sorted array of JBFLOAT numbers defining the x-coordinates
-///< of the 2nd tabular function.
-                              JBFLOAT *restrict fr,
-///< array of JBFLOAT numbers defining the y-coordinates of the 2nd tabular
-///< function.
-                              unsigned int nr)
-///< number of array elements defining the 2nd tabular function.
+jbm_farray_mean_square_error (JBMFarray * fxa,
+///< incresingly sorted JBMFarray struct defining the x-coordinates of the 1st
+///< tabular function.
+                              JBMFarray * fya,
+///< JBMFarray struct defining the y-coordinates of the 1st tabular function.
+                              JBMFarray * fxr,
+///< incresingly sorted JBMFarray struct defining the x-coordinates of the 2nd
+///< tabular function.
+                              JBMFarray * fyr)
+///< JBMFarray struct defining the y-coordinates of the 2nd tabular function.
 {
 #if JBM_LOW_PRECISION == 1
   JBFLOAT k = 0.f;
@@ -5225,20 +5357,26 @@ jbm_farray_mean_square_error (JBFLOAT *restrict xa,
 #elif JBM_LOW_PRECISION == 4
   JBFLOAT k = 0.Q;
 #endif
-  unsigned int i, j, lastr;
-  lastr = nr - 1;
+  JBFLOAT *xa, *ya, *xr, *yr;
+  unsigned int i, j, lastr, na;
+  lastr = fxr->last;
+  na = fxa->n;
+  xa = fxa->x;
+  ya = fya->x;
+  xr = fxr->x;
+  yr = fyr->x;
   for (i = 0; i < na && xa[i] < xr[0]; ++i)
-    k += jbm_fsqr (fa[i] - fr[0]);
+    k += jbm_fsqr (ya[i] - yr[0]);
   for (j = 0; i < na; ++i)
     {
       while (j < lastr && xa[i] > xr[j + 1])
         ++j;
       if (j == lastr)
         for (; i < na; ++i)
-          k += jbm_fsqr (fa[i] - fr[lastr]);
+          k += jbm_fsqr (ya[i] - yr[lastr]);
       else
-        k += jbm_fsqr (fa[i] - jbm_extrapolate (xa[i], xr[j], xr[j + 1], fr[j],
-                                                fr[j + 1]));
+        k += jbm_fsqr (ya[i] - jbm_extrapolate (xa[i], xr[j], xr[j + 1], yr[j],
+                                                yr[j + 1]));
     }
   k /= na;
   return k;
@@ -5251,24 +5389,18 @@ jbm_farray_mean_square_error (JBFLOAT *restrict xa,
  * \return root mean square error.
  */
 static inline JBFLOAT
-jbm_farray_root_mean_square_error (JBFLOAT *restrict xa,
-///< incresingly sorted array of JBFLOAT numbers defining the x-coordinates
-///< of the 1st tabular function.
-                                   JBFLOAT *restrict fa,
-///< array of JBFLOAT numbers defining the y-coordinates of the 1st tabular
-///< function.
-                                   unsigned int na,
-///< number of array elements defining the 1st tabular function.
-                                   JBFLOAT *restrict xr,
-///< incresingly sorted array of JBFLOAT numbers defining the x-coordinates
-///< of the 2nd tabular function.
-                                   JBFLOAT *restrict fr,
-///< array of JBFLOAT numbers defining the y-coordinates of the 2nd tabular
-///< function.
-                                   unsigned int nr)
-///< number of array elements defining the 2nd tabular function.
+jbm_farray_root_mean_square_error (JBMFarray * fxa,
+///< incresingly sorted JBMFarray struct defining the x-coordinates of the 1st
+///< tabular function.
+                                   JBMFarray * fya,
+///< JBMFarray struct defining the y-coordinates of the 1st tabular function.
+                                   JBMFarray * fxr,
+///< incresingly sorted JBMFarray struct defining the x-coordinates of the 2nd
+///< tabular function.
+                                   JBMFarray * fyr)
+///< JBMFarray struct defining the y-coordinates of the 2nd tabular function.
 {
-  return SQRT (jbm_farray_mean_square_error (xa, fa, na, xr, fr, nr));
+  return SQRT (jbm_farray_mean_square_error (fxa, fya, fxr, fyr));
 }
 
 /**
@@ -5332,8 +5464,8 @@ jbm_index_sort_merge (JBFLOAT *restrict x,      ///< array of JBFLOAT numbers.
 {
   unsigned int nn[n];
   unsigned int *ni1, *ni2, *nj, *nk, *nt;
-  int j, i1, i2, k, l;
-  unsigned int last;
+  int k;
+  unsigned int i1, i2, j, l, last;
   j = JBM_INDEX_SORT_MERGE_MIN;
   last = n - 1;
   if (last <= j)
@@ -5371,16 +5503,16 @@ jbm_index_sort_merge (JBFLOAT *restrict x,      ///< array of JBFLOAT numbers.
       if (k == -1)
         {
           ni2 = ni1 + j;
-          for (k = last - l - j, i1 = i2 = 0; i1 < j && i2 <= k;)
+          for (k = last - l - j, i1 = i2 = 0; i1 < j && k >= (int) i2;)
             {
               if (x[ni1[i1]] > x[ni2[i2]])
                 nj[l++] = ni1[i1++];
               else
                 nj[l++] = ni2[i2++];
             }
-          while (i2 <= k)
+          while (k >= (int) i2)
             nj[l++] = ni2[i2++];
-          while (i1 < j)
+          while (j > i1)
             nj[l++] = ni1[i1++];
         }
       for (; l < n; ++l)
@@ -5473,26 +5605,30 @@ static inline void
 jbm_matrix_solve (JBFLOAT *x,   ///< matrix storing the linear equations system.
                   unsigned int n)       ///< number of matrix rows.
 {
+  JBMFarray *fa, *fa2;
   JBFLOAT *f, *g;
   JBFLOAT k1, k2;
-  int j;
-  unsigned int i, k, last;
+  size_t size;
+  unsigned int i, j, k, last;
   // Setting n to the number of row elements
   last = n++;
+  fa = jbm_farray_new (n);
+  fa2 = jbm_farray_new (n);
   // Scaling every equation to reduce rounding effects.
-  for (i = n, f = x; --i > 0;)
+  for (i = n, f = x; --i > 0; f += n)
     {
-      //jbm_farray_maxmin (f, n, &k1, &k2);
+      jbm_farray_set (fa, f, n);
+      jbm_farray_maxmin (fa, &k1, &k2);
       k1 = FMAX (FABS (k1), FABS (k2));
-      for (j = (int) n; j-- > 0; ++f)
-        *f /= k1;
+      jbm_farray_div1 (fa, fa, k1);
+      jbm_farray_store (fa, f);
     }
   // Gaussian elimination
   for (i = last, f = x; --i > 0; f += n + 1)
     {
       // Obtaining the highest pivot element        
       k1 = FABS (*f);
-      for (k = j = i, g = f; --j >= 0;)
+      for (k = j = i, g = f; j-- > 0;)
         {
           g += n;
           k2 = FABS (*g);
@@ -5506,14 +5642,20 @@ jbm_matrix_solve (JBFLOAT *x,   ///< matrix storing the linear equations system.
       if (k != i)
         {
           g = f + (i - k) * n;
-          // jbm_farray_change (g, f, i + 2);
+          size = (i + 2) * sizeof (JBFLOAT);
+          memcpy (fa->x, f, size);
+          memcpy (f, g, size);
+          memcpy (g, fa->x, size);
         }
       // Eliminating column
-      for (j = i, g = f + n; --j >= 0; g += n)
+      for (j = i, g = f + n; j-- > 0; g += n)
         {
           k1 = *g / *f;
-          for (k = i + 2; --k > 0;)
-            g[k] -= k1 * f[k];
+          jbm_farray_set (fa, g + 1, i + 1);
+          jbm_farray_set (fa2, f + 1, i + 1);
+          jbm_farray_mul1 (fa2, fa2, k1);
+          jbm_farray_sub (fa, fa, fa2);
+          jbm_farray_store (fa, g + 1); 
         }
     }
   // Retrieving solutions
@@ -5526,6 +5668,8 @@ jbm_matrix_solve (JBFLOAT *x,   ///< matrix storing the linear equations system.
       for (j = n, g = f - n; --j > i; g -= n)
         *g -= *(g - i) * k1;
     }
+  jbm_farray_destroy (fa2);
+  jbm_farray_destroy (fa);
 }
 
 /**
@@ -5742,11 +5886,10 @@ jbm_matrix_solve_pentadiagonal_zero (JBFLOAT *restrict B,
  * minimum squares: \f$y=a+b\,x\f$ (JBFLOAT).
  */
 static inline void
-jbm_regression_linear (JBFLOAT *restrict x,
-                       ///< array of point x-coordinates.
-                       JBFLOAT *restrict y,
-                       ///< array of point y-coordinates.
-                       unsigned int n,  ///< points number.
+jbm_regression_linear (JBMFarray *fx,
+                       ///< JBMFarray struct of point x-coordinates.
+                       JBMFarray *fy,
+                       ///< JBMFarray struct of point y-coordinates.
                        JBFLOAT *a,
                        ///< pointer to the 0th order regression coefficient.
                        JBFLOAT *b)
@@ -5761,10 +5904,87 @@ jbm_regression_linear (JBFLOAT *restrict x,
 #elif JBM_LOW_PRECISION == 4
   const JBFLOAT c0 = 0.Q;
 #endif
+  JBFLOAT *x, *y;
   JBFLOAT syx, sy, sxx, sx;
-  unsigned int i;
+  unsigned int i, n;
+#if JBM_LOW_PRECISION < 3
+#ifdef __AVX__
+  JBFLOAT t4[4];
+  __m256d x4, y4, syx4, sy4, sxx4, sx4;
+  unsigned int n4;
+#endif
+#ifdef __SSE4_2__
+  JBFLOAT t2[2];
+  __m128d x2, y2, syx2, sy2, sxx2, sx2;
+  unsigned int n2;
+#endif
+#endif
+  x = fx->x;
+  y = fy->x;
+  n = fx->n;
+  i = 0;
   syx = sy = sxx = sx = c0;
-  for (i = 0; i < n; ++i)
+#ifdef __SSE4_2__
+  sy2 = _mm_setzero_pd ();
+  sx2 = _mm_setzero_pd ();
+  syx2 = _mm_setzero_pd ();
+  sxx2 = _mm_setzero_pd ();
+#endif
+#ifdef __AVX__
+  n4 = n >> 2;
+  sy4 = _mm256_setzero_pd ();
+  sx4 = _mm256_setzero_pd ();
+  syx4 = _mm256_setzero_pd ();
+  sxx4 = _mm256_setzero_pd ();
+  if (n4)
+    {
+      for (; n4 > 0; --n4, i += 4)
+        {
+          y4 = _mm256_load_pd (y + i);
+          x4 = _mm256_load_pd (x + i);
+          sy4 = _mm256_add_pd (sy4, y4);
+          sx4 = _mm256_add_pd (sx4, x4);
+          syx4 = _mm256_add_pd (syx4, _mm256_mul_pd (y4, x4));
+          sxx4 = _mm256_add_pd (sxx4, _mm256_mul_pd (x4, x4));
+        }
+      _mm256_store_pd (t4, sy4);
+      sy2 = _mm_load_pd (t4);
+      sy2 = _mm_add_pd (sy2, _mm_load_pd (t4 + 2));
+      _mm256_store_pd (t4, sx4);
+      sx2 = _mm_load_pd (t4);
+      sx2 = _mm_add_pd (sx2, _mm_load_pd (t4 + 2));
+      _mm256_store_pd (t4, syx4);
+      syx2 = _mm_load_pd (t4);
+      syx2 = _mm_add_pd (syx2, _mm_load_pd (t4 + 2));
+      _mm256_store_pd (t4, sxx4);
+      sxx2 = _mm_load_pd (t4);
+      sxx2 = _mm_add_pd (sxx2, _mm_load_pd (t4 + 2));
+    }
+#endif
+#ifdef __SSE4_2__
+  n2 = (n - i) >> 1;
+  if (n2)
+    {
+      for (; n2 > 0; --n2, i += 2)
+        {
+          y2 = _mm_load_pd (y + i);
+          x2 = _mm_load_pd (x + i);
+          sy2 = _mm_add_pd (sy2, y2);
+          sx2 = _mm_add_pd (sx2, x2);
+          syx2 = _mm_add_pd (syx2, _mm_mul_pd (y2, x2));
+          sxx2 = _mm_add_pd (sxx2, _mm_mul_pd (x2, x2));
+        }
+      _mm_store_pd (t2, sy2);
+      sy = t2[0] + t2[1];
+      _mm_store_pd (t2, sx2);
+      sx = t2[0] + t2[1];
+      _mm_store_pd (t2, syx2);
+      syx = t2[0] + t2[1];
+      _mm_store_pd (t2, sxx2);
+      sxx = t2[0] + t2[1];
+    }
+#endif
+  for (; i < n; ++i)
     {
       sy += y[i];
       syx += x[i] * y[i];
@@ -5780,20 +6000,23 @@ jbm_regression_linear (JBFLOAT *restrict x,
  * by minimum squares: \f$y=a\,x^b\f$ (JBFLOAT). It modifies the x and y arrays.
  */
 static inline void
-jbm_regression_exponential (JBFLOAT *restrict x,
-///< array of point x-coordinates. It is modified by the function.
-                            JBFLOAT *restrict y,
-///< array of point y-coordinates. It is modified by the function.
-                            unsigned int n,     ///< points number.
+jbm_regression_exponential (JBMFarray *fx,
+                            ///< JBMFarray struct of point x-coordinates.
+                            JBMFarray *fy,
+                            ///< JBMFarray struct of point y-coordinates.
                             JBFLOAT *a,
 ///< pointer to the constant parameter regression coefficient.
                             JBFLOAT *b)
 ///< pointer to the exponent regression coefficient.
 {
-  unsigned int i;
+  JBFLOAT *x, *y;
+  unsigned int i, n;
+  x = fx->x;
+  y = fy->x;
+  n = fx->n;
   for (i = 0; i < n; ++i)
     x[i] = LOG (x[i]), y[i] = LOG (y[i]);
-  jbm_regression_linear (x, y, n, a, b);
+  jbm_regression_linear (fx, fy, a, b);
   *a = EXP (*a);
 }
 
@@ -5802,14 +6025,13 @@ jbm_regression_exponential (JBFLOAT *restrict x,
  * by minimum squares: \f$y=A_0+A_1\,x+A_2\,x^2+\cdots\f$ (JBFLOAT).
  */
 static inline void
-jbm_regression_polynomial (JBFLOAT *restrict x,
-                           ///< array of point x-coordinates.
-                           JBFLOAT *restrict y,
-                           ///< array of point y-coordinates.
-                           unsigned int n,       ///< points number.
-                           JBFLOAT **A,
-///< pointer to the array of regression coefficients generated by the function
-///< calling to malloc.
+jbm_regression_polynomial (JBMFarray *fx,
+                           ///< JBMFarray struct of point x-coordinates.
+                           JBMFarray *fy,
+                           ///< JBMFarray struct of point y-coordinates.
+                           JBMFarray **fA,
+///< pointer to the JBMFarray struct of regression coefficients. It has to be
+///< freed with free.
                            unsigned int m)
                            ///< order of the polynomial regression.
 {
@@ -5822,14 +6044,22 @@ jbm_regression_polynomial (JBFLOAT *restrict x,
 #elif JBM_LOW_PRECISION == 4
   const JBFLOAT c0 = 0.Q, c1 = 1.Q;
 #endif
-  JBFLOAT xx[m + m + 1], yx[m + 1], B[(m + 1) * (m + 2)];
-  JBFLOAT *k;
+  JBMFarray *fxx, *fyx;
+  JBFLOAT B[(m + 1) * (m + 2)];
+  JBFLOAT *k, *x, *y, *xx, *yx;
   JBFLOAT zx, zy;
-  unsigned int i, j;
-  for (j = 0; j <= m; ++j)
-    xx[j] = yx[j] = c0;
-  for (; j <= (m << 1); ++j)
-    xx[j] = c0;
+  unsigned int i, j, n;
+  n = m + 1;
+  fyx = jbm_farray_new (n);
+  jbm_farray_set1 (fyx, c0, n);
+  n += m;
+  fxx = jbm_farray_new (n);
+  jbm_farray_set1 (fxx, c0, n);
+  n = fx->n;
+  x = fx->x;
+  y = fy->x;
+  xx = fxx->x;
+  yx = fyx->x;
   for (i = 0; i < n; ++i)
     {
       for (j = 0, zx = c1, zy = y[i]; j <= m; ++j)
@@ -5852,9 +6082,12 @@ jbm_regression_polynomial (JBFLOAT *restrict x,
       *k = yx[i];
     }
   jbm_matrix_solve (B, m + 1);
-  *A = (JBFLOAT *) malloc ((m + 1) * sizeof (JBFLOAT));
+  *fA = jbm_farray_new (m + 1);
+  x = (*fA)->x;
   for (i = 0, k = B + m + 1; i <= m; ++i, k += m + 2)
-    (*A)[i] = *k;
+    x[i] = *k;
+  jbm_farray_destroy (fyx);
+  jbm_farray_destroy (fxx);
 }
 
 /**

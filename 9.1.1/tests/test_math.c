@@ -800,6 +800,19 @@ fn14_256 (__m256d x)
 #endif
 
 void
+matrix_print (JBFLOAT *x, unsigned int nr, unsigned int nc)
+{
+  char buffer[JB_BUFFER_SIZE];
+  unsigned int i, j;
+  for (i = 0; i < nr; ++i)
+    for (j = 0; j < nc; ++j)
+      {
+        SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, x[i * nc + j]);
+        printf ("f[%u,%u]=%s\n", i, j, buffer);
+      }
+}
+
+void
 farray_print (JBMFarray * fa)
 {
   char buffer[JB_BUFFER_SIZE];
@@ -1765,9 +1778,9 @@ main (void)
   free (d_1);
 #endif
   fa = jbm_farray_create (pf, 11);
-  fa2 = jbm_farray_new (12);
+  fa2 = jbm_farray_new (11);
   fa3 = jbm_farray_new (11);
-  for (i = 0; i < 12; ++i)
+  for (i = 0; i < 11; ++i)
     fa2->x[i] = pf[11 - i];
   printf ("farray_add([1,2,4,...],[2048,1024,512,...],11)\n");
   jbm_farray_add (fa3, fa, fa2);
@@ -1787,22 +1800,26 @@ main (void)
   printf ("farray_div([1,2,4,...],[2048,1024,512,...],11)\n");
   jbm_farray_div (fa3, fa, fa2);
   farray_print (fa3);
+  printf ("farray_dbl([1,2,4,...],11)\n");
+  jbm_farray_dbl (fa3, fa);
+  farray_print (fa3);
+  printf ("farray_sqr([1,2,4,...],11)\n");
+  jbm_farray_sqr (fa3, fa);
+  farray_print (fa3);
   printf ("farray_search(2048,[1,2,4,...],11)=%d\n",
           jbm_farray_search (fa, pf[11]));
   printf ("farray_search_extended(2048,[1,2,4,...],11)=%d\n",
           jbm_farray_search_extended (fa, pf[11]));
   jbm_farray_destroy (fa);
-  fa = jbm_farray_create (pf, 12);
-  printf ("farray_search(-1,[1,2,4,...],12)=%d\n",
-          jbm_farray_search (fa, -cf1));
-  printf ("farray_search_extended(-1,[1,2,4,...],12)=%d\n",
-          jbm_farray_search_extended (fa, -cf1));
-  printf ("farray_search_extended(3,[1,2,4,...],12)=%d\n",
-          jbm_farray_search_extended (fa, cf3));
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_farray_max (fa));
-  printf ("farray_max([1,2,4,...],12)=%s\n", buffer);
-  jbm_farray_destroy (fa);
   fa = jbm_farray_create (pf, 11);
+  printf ("farray_search(-1,[1,2,4,...],11)=%d\n",
+          jbm_farray_search (fa, -cf1));
+  printf ("farray_search_extended(-1,[1,2,4,...],11)=%d\n",
+          jbm_farray_search_extended (fa, -cf1));
+  printf ("farray_search_extended(3,[1,2,4,...],11)=%d\n",
+          jbm_farray_search_extended (fa, cf3));
+  printf ("farray_search_extended(2048,[1,2,4,...],11)=%d\n",
+          jbm_farray_search_extended (fa, pf[11]));
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_farray_max (fa));
   printf ("farray_max([1,2,4,...],11)=%s\n", buffer);
   jbm_farray_destroy (fa);
@@ -1826,13 +1843,13 @@ main (void)
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_farray_max (fa));
   printf ("farray_max([1,2,4,...],1)=%s\n", buffer);
   jbm_farray_destroy (fa);
-  fa = jbm_farray_create (pf, 12);
+  fa = jbm_farray_create (pf, 11);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_farray_min (fa));
-  printf ("farray_min([1,2,4,...],12)=%s\n", buffer);
+  printf ("farray_min([1,2,4,...],11)=%s\n", buffer);
   jbm_farray_maxmin (fa, &f, &f2);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f);
   SNPRINTF (buffer2, JB_BUFFER_SIZE, FWF, f2);
-  printf ("farray_maxmin([1,2,4,...],12)=(%s,%s)\n", buffer, buffer2);
+  printf ("farray_maxmin([1,2,4,...],11)=(%s,%s)\n", buffer, buffer2);
   printf ("farray_change\n");
   jbm_farray_change (fa, fa2);
   farray_print (fa);
@@ -1840,45 +1857,40 @@ main (void)
   farray_print (fa);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
             jbm_farray_interpolate (fa, fa2, cf3));
-  printf ("farray_interpolate(3,[1,2,4,...],[2048,1024,512,...],12)=%s\n",
+  printf ("farray_interpolate(3,[1,2,4,...],[2048,1024,512,...],11)=%s\n",
           buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
             jbm_farray_interpolate (fa, fa2, cf0));
-  printf ("farray_interpolate(0,[1,2,4,...],[2048,1024,512,...],12)=%s\n",
+  printf ("farray_interpolate(0,[1,2,4,...],[2048,1024,512,...],11)=%s\n",
           buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
             jbm_farray_interpolate (fa, fa2, EXP(cf3 * cf3)));
-  printf ("farray_interpolate(exp(9),[1,2,4,...],[2048,1024,512,...],12)=%s\n",
+  printf ("farray_interpolate(exp(9),[1,2,4,...],[2048,1024,512,...],11)=%s\n",
           buffer);
-  jbm_farray_destroy (fa2);
-  jbm_farray_destroy (fa);
-/*
-  for (i = 0; i < 12; ++i)
-    farray2[i] = jbm_fdbl (farray[i]);
-  printf ("farray_merge([1,2,4,..],[2,4,8,...],12)\n");
-  farray3 = jbm_farray_merge (farray, 11, farray2, 12, &n);
-  farray_print (farray3, n);
-  free (farray3);
+  jbm_farray_dbl (fa2, fa);
+  printf ("farray_merge([1,2,4,..],[2,4,8,...],11)\n");
+  jbm_farray_destroy (fa3);
+  fa3 = jbm_farray_merge (fa, fa2);
+  farray_print (fa3);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_farray_integral (farray, farray2, 12, cf0, cf05));
+            jbm_farray_integral (fa, fa2, cf0, cf05));
   printf ("farray_integral([1,2,4,...],[2,4,8,...],11,0,0.5)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_farray_integral (farray, farray2, 12,
-                                 farray2[10], farray2[11]));
-  printf ("farray_integral([1,2,4,...],[2,4,8,...],12,2048,4096)=%s\n", buffer);
+            jbm_farray_integral (fa, fa2, pf[10], pf[11]));
+  printf ("farray_integral([1,2,4,...],[2,4,8,...],11,2048,4096)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_farray_integral (farray, farray2, 12, cf2, cf3));
-  printf ("farray_integral([1,2,4,...],[2,4,8,...],12,2,3)=%s\n", buffer);
+            jbm_farray_integral (fa, fa2, cf2, cf3));
+  printf ("farray_integral([1,2,4,...],[2,4,8,...],11,2,3)=%s\n", buffer);
+  jbm_farray_init (fa, 10);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_farray_root_mean_square_error (farray, farray, 12,
-                                               farray2, farray2, 11));
-  printf ("farray_root_mean_square_error([1,2,4,...],[1,2,4,...],12,"
+            jbm_farray_root_mean_square_error (fa, fa, fa2, fa2));
+  printf ("farray_root_mean_square_error([1,2,4,...],[1,2,4,...],10,"
           "[2,4,8,...],[2,4,8,...],11)=%s\n", buffer);
+  jbm_farray_init (fa, 11);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_farray_root_mean_square_error (farray, farray, 12,
-                                               farray, farray2, 12));
-  printf ("farray_root_mean_square_error([1,2,4,...],[1,2,4,...],12,"
-          "[1,2,4,...],[2,4,8,...],12)=%s\n", buffer);
+            jbm_farray_root_mean_square_error (fa, fa, fa, fa2));
+  printf ("farray_root_mean_square_error([1,2,4,...],[1,2,4,...],11,"
+          "[1,2,4,...],[2,4,8,...],11)=%s\n", buffer);
   printf ("matrix_solve\n");
   jbm_matrix_solve (mxf, 4);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, mxf[4]);
@@ -1895,58 +1907,60 @@ main (void)
   printf ("mxf3=%s mxf3=%s\n", buffer, buffer2);
   printf ("matrix_solve_tridiagonal\n");
   jbm_matrix_solve_tridiagonal (Cf, Df, Ef, Hf, 4);
-  farray_print (Hf, 4);
+  jbm_farray_set (fa3, Hf, 4);
+  farray_print (fa3);
   printf ("matrix_solve_tridiagonal_zero\n");
   jbm_matrix_solve_tridiagonal_zero (Czf, Dzf, Ezf, Hzf, 5);
-  farray_print (Hzf, 5);
+  jbm_farray_set (fa3, Hzf, 5);
+  farray_print (fa3);
   printf ("matrix_solve_pentadiagonal\n");
   jbm_matrix_solve_pentadiagonal (Bpf, Cpf, Dpf, Epf, Fpf, Hpf, 4);
-  farray_print (Hpf, 4);
+  jbm_farray_set (fa3, Hpf, 4);
+  farray_print (fa3);
   printf ("matrix_solve_pentadiagonal_zero\n");
   jbm_matrix_solve_pentadiagonal_zero (Bpzf, Cpzf, Dpzf, Epzf, Fpzf, Hpzf, 5);
-  farray_print (Hpzf, 5);
-  jbm_regression_linear (farray, farray2, 12, &f, &f2);
+  jbm_farray_set (fa3, Hpzf, 5);
+  farray_print (fa3);
+  jbm_regression_linear (fa, fa2, &f, &f2);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f);
   SNPRINTF (buffer2, JB_BUFFER_SIZE, FWF, f2);
-  printf ("regression_linear([1,2,4,...],[2,4,8,...],12)=(%s,%s)\n",
+  printf ("regression_linear([1,2,4,...],[2,4,8,...],11)=(%s,%s)\n",
           buffer, buffer2);
-  for (i = 0; i < 12; ++i)
-    farray2[i] = farray[11 - i];
-  jbm_regression_linear (farray, farray2, 12, &f, &f2);
+  for (i = 0; i < 11; ++i)
+    fa2->x[i] = pf[11 - i];
+  jbm_regression_linear (fa, fa2, &f, &f2);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f);
   SNPRINTF (buffer2, JB_BUFFER_SIZE, FWF, f2);
-  printf ("regression_linear([1,2,4,...],[2048,1024,512,...],12)=(%s,%s)\n",
+  printf ("regression_linear([1,2,4,...],[2048,1024,512,...],11)=(%s,%s)\n",
           buffer, buffer2);
-  jbm_regression_exponential (farray, farray2, 12, &f, &f2);
+  jbm_regression_exponential (fa, fa2, &f, &f2);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f);
   SNPRINTF (buffer2, JB_BUFFER_SIZE, FWF, f2);
-  printf ("regression_exponential([1,2,4,...],[2048,1024,512,...],12)"
+  printf ("regression_exponential([1,2,4,...],[2048,1024,512,...],11)"
           "=(%s,%s)\n",buffer, buffer2);
-  for (i = 0; i < 12; ++i)
-    {
-      farray[i] = pf[i];
-      farray2[i] = jbm_fdbl (pf[i]);
-    }
-  jbm_regression_exponential (farray, farray2, 12, &f, &f2);
+  jbm_farray_set (fa, pf, 11);
+  jbm_farray_dbl (fa2, fa);
+  jbm_regression_exponential (fa, fa2, &f, &f2);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f);
   SNPRINTF (buffer2, JB_BUFFER_SIZE, FWF, f2);
-  printf ("regression_exponential([1,2,4,...],[2,4,8,...],12)=(%s,%s)\n",
+  printf ("regression_exponential([1,2,4,...],[2,4,8,...],11)=(%s,%s)\n",
           buffer, buffer2);
-  printf ("regression_polynomial([1,2,4,...],[2,4,8,...],12,f,2)\n");
-  for (i = 0; i < 12; ++i)
-    {
-      farray[i] = pf[i];
-      farray2[i] = jbm_fdbl (pf[i]);
-    }
-  jbm_regression_polynomial (farray, farray2, 12, &A1f, 2);
-  farray_print (A1f, 3);
-  free (A1f);
-  printf ("regression_polynomial([1,2,4,...],[2048,1024,512,...],12,f,3)\n");
-  for (i = 0; i < 12; ++i)
-    farray2[i] = pf[11 - i];
-  jbm_regression_polynomial (farray, farray2, 12, &A1f, 3);
-  farray_print (A1f, 4);
-  free (A1f);
+  jbm_farray_set (fa, pf, 11);
+  jbm_farray_dbl (fa2, fa);
+  jbm_farray_destroy (fa3);
+  jbm_regression_polynomial (fa, fa2, &fa3, 2);
+  printf ("regression_polynomial([1,2,4,...],[2,4,8,...],11,f,2)\n");
+  farray_print (fa3);
+  for (i = 0; i < 11; ++i)
+    fa2->x[i] = pf[11 - i];
+  jbm_farray_destroy (fa3);
+  jbm_regression_polynomial (fa, fa2, &fa3, 3);
+  printf ("regression_polynomial([1,2,4,...],[2048,1024,512,...],11,f,3)\n");
+  farray_print (fa3);
+  jbm_farray_destroy (fa3);
+  jbm_farray_destroy (fa2);
+  jbm_farray_destroy (fa);
+/*
   printf ("regression_multilinear\n");
   jbm_regression_multilinear (rmlf1, 36, kf, 2);
   farray_print (kf, 3);
