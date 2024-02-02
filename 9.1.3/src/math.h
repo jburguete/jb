@@ -5962,12 +5962,12 @@ jbm_regression_linear (JBMFarray *fx,
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
 #ifdef __AVX__
-  JBFLOAT t4[4];
+  double t4[4];
   __m256d x4, y4, syx4, sy4, sxx4, sx4;
   unsigned int n4;
 #endif
 #ifdef __SSE4_2__
-  JBFLOAT t2[2];
+  double t2[2];
   __m128d x2, y2, syx2, sy2, sxx2, sx2;
   unsigned int n2;
 #endif
@@ -6107,23 +6107,120 @@ jbm_regression_polynomial (JBMFarray *fx,
   JBFLOAT *k, *x, *y, *xx, *yx;
   JBFLOAT zx, zy;
   unsigned int i, j, n;
+#ifdef __AVX__
+  __m256d xx4[m + m + 1], yx4[m + 1];
+  __m256d x4, y4, zx4, zy4;
+  double t4[4];
+  unsigned int n4;
+#endif
+#ifdef __SSE4_2__
+  __m128d xx2[m + m + 1], yx2[m + 1];
+  __m128d x2, y2, zx2, zy2;
+  double t2[2];
+  unsigned int n2;
+#endif
   n = m + 1;
   fyx = jbm_farray_new (n);
   jbm_farray_set1 (fyx, c0, n);
   n += m;
   fxx = jbm_farray_new (n);
   jbm_farray_set1 (fxx, c0, n);
+  i = 0;
   n = fx->n;
   x = fx->x;
   y = fy->x;
   xx = fxx->x;
   yx = fyx->x;
-  for (i = 0; i < n; ++i)
+#ifdef __AVX__
+  for (j = 0; j <= m; ++j)
+    yx4[j] = xx4[j] = _mm256_setzero_pd ();
+  for (; j <= m + m; ++j)
+    xx4[j] = _mm256_setzero_pd ();
+#endif
+#ifdef __SSE4_2__
+  for (j = 0; j <= m; ++j)
+    yx2[j] = xx2[j] = _mm_setzero_pd ();
+  for (; j <= m + m; ++j)
+    xx2[j] = _mm_setzero_pd ();
+#endif
+#ifdef __AVX__
+  n4 = n >> 2;
+  if (n4)
+    {
+      for (; n4; --n4, i += 4)
+        {
+          zx4 = _mm256_set1_pd ((double) c1);
+          x4 = _mm256_load_pd (x + i);
+          zy4 = y4 = _mm256_load_pd (y + i);
+          for (j = 0; j <= m; ++j)
+            {
+              xx4[j] = _mm256_add_pd (xx4[j], zx4);
+              yx4[j] = _mm256_add_pd (yx4[j], zy4);
+              zx4 = _mm256_mul_pd (zx4, x4);
+              zy4 = _mm256_mul_pd (zy4, y4);
+            }
+          for (; j <= m + m; ++j)
+            {
+              xx4[j] = _mm256_add_pd (xx4[j], zx4);
+              zx4 = _mm256_mul_pd (zx4, x4);
+            }
+        }
+      for (j = 0; j <= m; ++j)
+        {
+          _mm256_store_pd (t4, xx4[j]);
+          xx2[j] = _mm_add_pd (_mm_load_pd (t4), _mm_load_pd (t4 + 2));
+          _mm256_store_pd (t4, yx4[j]);
+          yx2[j] = _mm_add_pd (_mm_load_pd (t4), _mm_load_pd (t4 + 2));
+        }
+      for (; j <= m + m; ++j)
+        {
+          _mm256_store_pd (t4, xx4[j]);
+          xx2[j] = _mm_add_pd (_mm_load_pd (t4), _mm_load_pd (t4 + 2));
+        }
+    }
+#endif
+#ifdef __SSE4_2__
+  n2 = (n - i) >> 1;
+  if (n2)
+    {
+      for (; n2; --n2, i += 2)
+        {
+          zx2 = _mm_set1_pd ((double) c1);
+          x2 = _mm_load_pd (x + i);
+          zy2 = y2 = _mm_load_pd (y + i);
+          for (j = 0; j <= m; ++j)
+            {
+              xx2[j] = _mm_add_pd (xx2[j], zx2);
+              yx2[j] = _mm_add_pd (yx2[j], zy2);
+              zx2 = _mm_mul_pd (zx2, x2);
+              zy2 = _mm_mul_pd (zy2, y2);
+            }
+          for (; j <= m + m; ++j)
+            {
+              xx2[j] = _mm_add_pd (xx2[j], zx2);
+              zx2 = _mm_mul_pd (zx2, x2);
+            }
+        }
+      for (j = 0; j <= m; ++j)
+        {
+          _mm_store_pd (t2, xx2[j]);
+          xx[j] = t2[0] + t2[1];
+          _mm_store_pd (t2, yx2[j]);
+          yx[j] = t2[0] + t2[1];
+        }
+      for (; j <= m + m; ++j)
+        {
+          _mm_store_pd (t2, xx2[j]);
+          xx[j] = t2[0] + t2[1];
+        }
+    }
+#endif
+  for (; i < n; ++i)
     {
       for (j = 0, zx = c1, zy = y[i]; j <= m; ++j)
         {
-          yx[j] += zy;
           xx[j] += zx;
+          yx[j] += zy;
           zx *= x[i];
           zy *= x[i];
         }
