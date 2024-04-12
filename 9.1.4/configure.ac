@@ -1,6 +1,6 @@
 # Header
 AC_PREREQ([2.69])
-AC_INIT([jb],[9.1.3],[https://github.com/jburguete/jb])
+AC_INIT([jb],[9.1.4],[https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_TARGET
@@ -255,6 +255,7 @@ AC_TYPE_SIZE_T
 AC_CHECK_FUNC([exp10], AC_DEFINE([HAVE_EXP10], [1]))
 AC_CHECK_FUNC([fmemopen], AC_DEFINE([HAVE_FMEMOPEN], [1]))
 AC_CHECK_FUNC([get_nprocs], AC_DEFINE([HAVE_GET_NPROCS], [1]))
+AC_CHECK_FUNC([aligned_alloc], AC_DEFINE([HAVE_ALIGNED_ALLOC], [1]))
 
 # Check for font
 if test $gtk = 1; then

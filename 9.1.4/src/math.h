@@ -57,6 +57,12 @@
 #define exp10(x) (exp(x * M_LN10))
 #define exp10l(x) (expl(x * M_LN10l))
 #endif
+#if HAVE_ALIGNED_ALLOC
+#define aligned_free free
+#else
+#define aligned_alloc(a, s) (_aligned_malloc(s, a))
+#define aligned_free _aligned_free
+#endif
 
 // Selecting the precision of the JBFLOAT and JBDOUBLE types and reading and
 // writting formats
@@ -4553,7 +4559,11 @@ jbm_farray_store (JBMFarray *fa,        ///< pointer to the JBMFarray struct.
 static inline void
 jbm_farray_destroy (JBMFarray * fa)     ///< pointer to the JBWFarray struct.
 {
+#if (defined(__AVX__) || defined(__SSE4_2__))
+  aligned_free (fa->x);
+#else
   free (fa->x);
+#endif
   free (fa);
 }
 

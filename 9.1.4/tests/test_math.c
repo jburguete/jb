@@ -1302,6 +1302,7 @@ main (void)
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn14d, cd0, cd1));
   printf ("integrall(x^14,0,1)=%s\n", buffer);
 #ifdef __SSE4_2__
+  printf ("check SSE 4.2 functions\n");
   d_1 = aligned_alloc (16, 2 * sizeof (double));
   d_2 = aligned_alloc (16, 2 * sizeof (double));
   d_128 = jbm_abs_128 (_mm_set_pd (-1., 1));
@@ -1544,10 +1545,11 @@ main (void)
   _mm_store_pd (d_1, d_128);
   printf ("integral_128(x^14,[0,-1],[1,1])=[%.15le,%.15le]\n",
           d_1[0], d_1[1]);
-  free (d_2);
-  free (d_1);
+  aligned_free (d_2);
+  aligned_free (d_1);
 #endif
 #ifdef __AVX__
+  printf ("check AVX functions\n");
   d_1 = aligned_alloc (32, 4 * sizeof (double));
   d_2 = aligned_alloc (32, 4 * sizeof (double));
   d_256 = jbm_abs_256 (_mm256_set_pd (2., 0., -1., 1));
@@ -1774,12 +1776,17 @@ main (void)
   _mm256_store_pd (d_1, d_256);
   printf ("integral_256(x^14,[0,-1,0,-2],[1,1,2,2])"
           "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  free (d_2);
-  free (d_1);
+  aligned_free (d_2);
+  aligned_free (d_1);
 #endif
+  printf ("check farray functions\n");
+  printf ("0\n");
   fa = jbm_farray_create (pf, 11);
+  printf ("1\n");
   fa2 = jbm_farray_new (11);
+  printf ("2\n");
   fa3 = jbm_farray_new (11);
+  printf ("3\n");
   for (i = 0; i < 11; ++i)
     fa2->x[i] = pf[11 - i];
   printf ("farray_add([1,2,4,...],[2048,1024,512,...],11)\n");
