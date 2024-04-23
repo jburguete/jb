@@ -60,8 +60,8 @@
 #if HAVE_ALIGNED_ALLOC
 #define aligned_free free
 #else
-#define aligned_alloc(a, s) (_aligned_malloc(s, a))
-#define aligned_free _aligned_free
+#define aligned_alloc(a, s) (g_aligned_malloc(s, 1, a))
+#define aligned_free g_aligned_free
 #endif
 
 // Selecting the precision of the JBFLOAT and JBDOUBLE types and reading and
@@ -4463,10 +4463,10 @@ jbm_farray_new (const unsigned int n)   ///< number of array elements.
   fa = (JBMFarray *) malloc (sizeof (JBMFarray));
   jbm_farray_init (fa, n);
 #ifdef __AVX__
-  fa->x = (JBFLOAT *) aligned_alloc (32, fa->size);
+  fa->x = (JBFLOAT *) g_aligned_alloc (fa->size, 1, 32);
 #else
 #ifdef __SSE4_2__
-  fa->x = (JBFLOAT *) aligned_alloc (16, fa->size);
+  fa->x = (JBFLOAT *) g_aligned_alloc (fa->size, 1, 16);
 #else
   fa->x = (JBFLOAT *) malloc (fa->size);
 #endif
@@ -4536,7 +4536,7 @@ jbm_farray_set1 (JBMFarray *fa, ///< pointer to the JBMFarray struct.
  */
 static inline void
 jbm_farray_set (JBMFarray *fa,  ///< pointer to the JBMFarray struct.
-                JBFLOAT *x,     ///< array of JBFLOAT numbers.
+                const JBFLOAT *x,     ///< array of JBFLOAT numbers.
                 const unsigned int n)   ///< number of array elements.
 {
   jbm_farray_init (fa, n);
@@ -4560,7 +4560,7 @@ static inline void
 jbm_farray_destroy (JBMFarray * fa)     ///< pointer to the JBWFarray struct.
 {
 #if (defined(__AVX__) || defined(__SSE4_2__))
-  aligned_free (fa->x);
+  g_aligned_free (fa->x);
 #else
   free (fa->x);
 #endif
@@ -7331,7 +7331,7 @@ exit1:
  * \return 1 on success, 0 on error.
  */
 static inline int
-jbm_get_double (char *str,      ///< string.
+jbm_get_double (const char *str,      ///< string.
                 JBDOUBLE *x)    ///< pointer to the JBDOUBLE number.
 {
 #if JBM_HIGH_PRECISION < 4

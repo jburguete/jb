@@ -2815,7 +2815,7 @@ jbw_graphic_draw_resize (JBFLOAT *x,    ///< x-coordinates array.
       jbm_farray_destroy (f1);
       if (y2)
         {
-          f1 = jbm_farray_create (f2, n);
+          f1 = jbm_farray_create (y2, n);
           jbm_farray_maxmin (f2, &k2, &k1);
           jbm_farray_destroy (f2);
           kmax = FMAX (kmax, k2);
