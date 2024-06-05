@@ -60,7 +60,7 @@
 #if HAVE_ALIGNED_ALLOC
 #define aligned_free free
 #else
-#define aligned_alloc(a, s) (g_aligned_malloc(s, 1, a))
+#define aligned_alloc(a, s) (g_aligned_alloc(s, 1, a))
 #define aligned_free g_aligned_free
 #endif
 
