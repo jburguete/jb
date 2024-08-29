@@ -71,7 +71,7 @@ else
 fi
 
 # Checks for programs
-AC_PROG_CC([gcc-13 gcc13 gcc-12 gcc12 gcc-11 gcc11 gcc-10 gcc10 egcc gcc clang])
+AC_PROG_CC([gcc-14 gcc14 gcc-13 gcc13 gcc-12 gcc12 gcc-11 gcc11 gcc-10 gcc10 egcc gcc clang])
 AC_MSG_NOTICE([Compiler: $CC])
 $CC -v
 AC_PROG_LN_S
@@ -266,6 +266,8 @@ if test $gtk = 1; then
 		else
 			dir="/ucrt64"
 		fi
+	elif test $mac = 1; then
+		dir="/Users"
 	elif test $haiku = 1; then
 		dir="/"
 	else
