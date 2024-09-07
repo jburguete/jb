@@ -12,8 +12,8 @@ typedef struct
 
 #if JBM_LOW_PRECISION == 1
 
-const JBFLOAT pf[12] = { 1.f, 2.f, 4.f, 8.f, 16.f, 32.f, 64.f, 128.f, 256.f,
-  512.f, 1024.f, 2048.f };
+const JBFLOAT pf[15] = { 1.f, 2.f, 4.f, 8.f, 16.f, 32.f, 64.f, 128.f, 256.f,
+  512.f, 1024.f, 2048.f, 4096.f, 8192.f, 16384.f };
 const JBFLOAT cf0 = 0.f, cf1 = 1.f, cf2 = 2.f, cf3 = 3.f, cf05 = 0.5f;
 JBFLOAT mxf[] = {
   1.f, 3.f, 2.f, 1.f, 18.f,
@@ -63,8 +63,8 @@ JBFLOAT rmeff1[] = {
 
 #elif JBM_LOW_PRECISION == 2
 
-const JBFLOAT pf[12] = { 1., 2., 4., 8., 16., 32., 64., 128., 256.,
-  512., 1024., 2048. };
+const JBFLOAT pf[15] = { 1., 2., 4., 8., 16., 32., 64., 128., 256.,
+  512., 1024., 2048., 4096., 8192., 16384. };
 const JBFLOAT cf0 = 0., cf1 = 1., cf2 = 2., cf3 = 3., cf05 = 0.5;
 JBFLOAT mxf[] = {
   1., 3., 2., 1., 18.,
@@ -114,8 +114,8 @@ JBFLOAT rmeff1[] = {
 
 #elif JBM_LOW_PRECISION == 3
 
-const JBFLOAT pf[12] = { 1.L, 2.L, 4.L, 8.L, 16.L, 32.L, 64.L, 128.L, 256.L,
-  512.L, 1024.L, 2048.L };
+const JBFLOAT pf[15] = { 1.L, 2.L, 4.L, 8.L, 16.L, 32.L, 64.L, 128.L, 256.L,
+  512.L, 1024.L, 2048.L, 4096.L, 8192.L, 16384.L };
 const JBFLOAT cf0 = 0.L, cf1 = 1.L, cf2 = 2.L, cf3 = 3.L, cf05 = 0.5L;
 JBFLOAT mxf[] = {
   1.L, 3.L, 2.L, 1.L, 18.L,
@@ -165,8 +165,8 @@ JBFLOAT rmeff1[] = {
 
 #elif JBM_LOW_PRECISION == 4
 
-const JBFLOAT pf[12] = { 1.Q, 2.Q, 4.Q, 8.Q, 16.Q, 32.Q, 64.Q, 128.Q, 256.Q,
-  512.Q, 1024.Q, 2048.Q };
+const JBFLOAT pf[15] = { 1.Q, 2.Q, 4.Q, 8.Q, 16.Q, 32.Q, 64.Q, 128.Q, 256.Q,
+  512.Q, 1024.Q, 2048.Q, 4096.Q, 8192.Q, 16384.Q };
 const JBFLOAT cf0 = 0.Q, cf1 = 1.Q, cf2 = 2.Q, cf3 = 3.Q, cf05 = 0.5Q;
 JBFLOAT mxf[] = {
   1.Q, 3.Q, 2.Q, 1.Q, 18.Q,
@@ -218,8 +218,8 @@ JBFLOAT rmeff1[] = {
 
 #if JBM_HIGH_PRECISION == 1
 
-const JBDOUBLE pd[12] = { 1.f, 2.f, 4.f, 8.f, 16.f, 32.f, 64.f, 128.f, 256.f,
-  512.f, 1024.f, 2048.f };
+const JBDOUBLE pd[15] = { 1.f, 2.f, 4.f, 8.f, 16.f, 32.f, 64.f, 128.f, 256.f,
+  512.f, 1024.f, 2048.f, 4096.f, 8192.f, 16384.f };
 const JBDOUBLE cd0 = 0.f, cd1 = 1.f, cd2 = 2.f, cd3 = 3.f, cd05 = 0.5f;
 JBDOUBLE mxd[] = {
   1.f, 3.f, 2.f, 1.f, 18.f,
@@ -269,8 +269,8 @@ JBFLOAT rmedf1[] = {
 
 #elif JBM_HIGH_PRECISION == 2
 
-const JBDOUBLE pd[12] = { 1., 2., 4., 8., 16., 32., 64., 128., 256.,
-  512., 1024., 2048. };
+const JBDOUBLE pd[15] = { 1., 2., 4., 8., 16., 32., 64., 128., 256.,
+  512., 1024., 2048., 4096., 8192., 16384. };
 const JBDOUBLE cd0 = 0., cd1 = 1., cd2 = 2., cd3 = 3., cd05 = 0.5;
 JBDOUBLE mxd[] = {
   1., 3., 2., 1., 18.,
@@ -320,8 +320,8 @@ JBFLOAT rmedf1[] = {
 
 #elif JBM_HIGH_PRECISION == 3
 
-const JBDOUBLE pd[12] = { 1.L, 2.L, 4.L, 8.L, 16.L, 32.L, 64.L, 128.L, 256.L,
-  512.L, 1024.L, 2048.L };
+const JBDOUBLE pd[15] = { 1.L, 2.L, 4.L, 8.L, 16.L, 32.L, 64.L, 128.L, 256.L,
+  512.L, 1024.L, 2048.L, 4096.L, 8192.L, 16384.L };
 const JBDOUBLE cd0 = 0.L, cd1 = 1.L, cd2 = 2.L, cd3 = 3.L, cd05 = 0.5L;
 JBDOUBLE mxd[] = {
   1.L, 3.L, 2.L, 1.L, 18.L,
@@ -371,8 +371,8 @@ JBFLOAT rmedf1[] = {
 
 #elif JBM_HIGH_PRECISION == 4
 
-const JBDOUBLE pd[12] = { 1.Q, 2.Q, 4.Q, 8.Q, 16.Q, 32.Q, 64.Q, 128.Q, 256.Q,
-  512.Q, 1024.Q, 2048.Q };
+const JBDOUBLE pd[15] = { 1.Q, 2.Q, 4.Q, 8.Q, 16.Q, 32.Q, 64.Q, 128.Q, 256.Q,
+  512.Q, 1024.Q, 2048.Q, 4096.Q, 8192.Q, 16384.Q };
 const JBDOUBLE cd0 = 0.Q, cd1 = 1.Q, cd2 = 2.Q, cd3 = 3.Q, cd05 = 0.5Q;
 JBDOUBLE mxd[] = {
   1.Q, 3.Q, 2.Q, 1.Q, 18.Q,
@@ -841,8 +841,8 @@ main (void)
 {
   MatrixDouble cd[4], czd[5];
   MatrixFloat cf[4], czf[5];
-  JBDOUBLE darray[12], darray2[12], kd[3];
-  JBFLOAT farray[12], farray2[12], kf[3];
+  JBDOUBLE darray[15], darray2[15], kd[3];
+  JBFLOAT farray[15], farray2[15], kf[3];
   char buffer[JB_BUFFER_SIZE], buffer2[JB_BUFFER_SIZE];
   JBMFarray *fa, *fa2, *fa3;
   JBDOUBLE *darray3;
@@ -856,6 +856,9 @@ main (void)
 #endif
 #ifdef __AVX__
   __m256d d_256, d2_256;
+#endif
+#ifdef __AVX512F__
+  __m512d d_512, d2_512;
 #endif
   long long int iL, iL2;
   unsigned long long int uL, uL2;

@@ -1303,8 +1303,7 @@ jbm_solve_cubic_reduced (JBFLOAT a,
       k2 = k0 + k1;
       k2 = CBRT (k2);
       k0 -= k1;
-      k2 += CBRT (k0);
-      k2 -= a;
+      k2 += CBRT (k0) - a;
     }
   return k2;
 }
@@ -2244,8 +2243,7 @@ jbm_solve_cubic_reducedl (JBDOUBLE a,
       k2 = k0 + k1;
       k2 = CBRTL (k2);
       k0 -= k1;
-      k2 += CBRTL (k0);
-      k2 -= a;
+      k2 += CBRTL (k0) - a;
     }
   return k2;
 }
@@ -2842,15 +2840,13 @@ static inline __m128d
 jbm_modmin_128 (__m128d a,      ///< 1st __m128d vector.
                 const __m128d b)      ///< 2nd __m128d vector.
 {
-  __m128d aa, ab, m, z;
+  __m128d aa, ab, z;
   z = _mm_setzero_pd ();
   ab = _mm_mul_pd (a, b);
-  m = _mm_cmple_pd (ab, z);
-  a = _mm_blendv_pd (a, z, m);
+  a = _mm_blendv_pd (a, z, _mm_cmple_pd (ab, z));
   aa = jbm_abs_128 (a);
   ab = jbm_abs_128 (b);
-  m = _mm_cmpgt_pd (aa, ab);
-  return _mm_blendv_pd (a, b, m);
+  return _mm_blendv_pd (a, b, _mm_cmpgt_pd (aa, ab));
 }
 
 /**
@@ -2933,12 +2929,10 @@ jbm_interpolate_128 (const __m128d x,
                      const __m128d y2)
                      ///< __m128d vector of y-coordinates of the 2nd points.
 {
-  __m128d k, m;
+  __m128d k;
   k = jbm_extrapolate_128 (x, x1, x2, y1, y2);
-  m = _mm_cmpgt_pd (x, x1);
-  k = _mm_blendv_pd (y1, k, m);
-  m = _mm_cmplt_pd (x, x2);
-  return _mm_blendv_pd (y2, k, m);
+  k = _mm_blendv_pd (y1, k, _mm_cmpgt_pd (x, x1));
+  return _mm_blendv_pd (y2, k, _mm_cmplt_pd (x, x2));
 }
 
 /**
@@ -3194,16 +3188,14 @@ jbm_solve_quadratic_reduced_128 (__m128d a,
                                  const __m128d x2)
 ///< __m128d vector of right limits of the solution intervals.
 {
-  __m128d k1, k2, m;
+  __m128d k1, k2;
   k1 = _mm_set1_pd (-0.5);
   a = _mm_mul_pd (a, k1);
   b = _mm_sqrt_pd (_mm_sub_pd (jbm_sqr_128 (a), b));
   k1 = _mm_add_pd (a, b);
   k2 = _mm_sub_pd (a, b);
-  m = _mm_cmplt_pd (k1, x1);
-  k1 = _mm_blendv_pd (k1, k2, m);
-  m = _mm_cmpgt_pd (k1, x2);
-  return _mm_blendv_pd (k1, k2, m);
+  k1 = _mm_blendv_pd (k1, k2, _mm_cmplt_pd (k1, x1));
+  return _mm_blendv_pd (k1, k2, _mm_cmpgt_pd (k1, x2));
 }
 
 /**
@@ -3224,12 +3216,11 @@ jbm_solve_quadratic_128 (const __m128d a,
                          const __m128d x2)
 ///< __m128d vector of right limits of the solution intervals.
 {
-  __m128d k1, k2, m;
-  m = jbm_small_128 (a);
+  __m128d k1, k2;
   k1 = jbm_solve_quadratic_reduced_128 (_mm_div_pd (b, a), _mm_div_pd (c, a),
                                         x1, x2);
   k2 = _mm_div_pd (_mm_sub_pd (_mm_setzero_pd (), c), b);
-  return _mm_blendv_pd (k1, k2, m);
+  return _mm_blendv_pd (k1, k2, jbm_small_128 (a));
 }
 
 /**
@@ -3241,46 +3232,45 @@ jbm_solve_quadratic_128 (const __m128d a,
  */
 /*
 static inline __m128d
-jbm_solve_cubic_reduced (__m128d a,
-                         ///< 2nd order coefficient of the equation.
-                         __m128d b,
-                         ///< 1st order coefficient of the equation.
-                         __m128d c,
-                         ///< 0th order coefficient of the equation.
-                         __m128d x1,
-                         ///< left limit of the solution interval.
-                         __m128d x2)
-                         ///< right limit of the solution interval.
+jbm_solve_cubic_reduced_128 (__m128d a,
+                             ///< 2nd order coefficient of the equation.
+                             __m128d b,
+                             ///< 1st order coefficient of the equation.
+                             __m128d c,
+                             ///< 0th order coefficient of the equation.
+                             __m128d x1,
+                             ///< left limit of the solution interval.
+                             __m128d x2)
+                             ///< right limit of the solution interval.
 {
-  __m128d k0, k1, k2;
-  a /= 3.;
-  k0 = a * a;
-  k1 = b / 3. - k0;
-  k0 = (b * a - c) / 2. - a * k0;
-  k2 = k1 * k1 * k1 + k0 * k0;
-  if (k2 < 0.)
-    {
-      k1 = SQRT (-k1);
-      k0 = ACOS (k0 / (k1 * k1 * k1)) / 3.;
-      k1 *= 2.;
-      k2 = k1 * COS (k0) - a;
-      if (k2 < x1 || k2 > x2)
-        {
-          k2 = k1 * COS (k0 + 2. * JB_PI / 3.) - a;
-          if (k2 < x1 || k2 > x2)
-            k2 = k1 * COS (k0 - 2. * JB_PI / 3.) - a;
-        }
-    }
-  else
-    {
-      k1 = SQRT (k2);
-      k2 = k0 + k1;
-      k2 = CBRT (k2);
-      k0 -= k1;
-      k2 += CBRT (k0);
-      k2 -= a;
-    }
-  return k2;
+  __m128d k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c0, c1, c3, c2p_3, c_2, c_3;
+  c0 = _mm_setzero_pd ();
+  c1 = _mm_set1_pd (1.);
+  c2p_3 = _mm_set1_pd (2. * M_PI / 3.);
+  c_2 = _mm_set1_pd (0.5);
+  c_3 = _mm_set1_pd (1. / 3.);
+  a = _mm_mul_pd (a, c_3);
+  k0 = _mm_mul_pd (a, a);
+  k1 = _mm_fmsub_pd (b, c_3, k0);
+  k0 = _mm_fmsub_pd (_mm_fmsub_pd (b, a, c), c_2, _mm_mul_pd (a, k0));
+  k3 = _mm_mul_pd (k1, _mm_mul_pd (k1, k1));
+  k2 = _mm_fmadd_pd (k0, k0, k3);
+  l1 = _mm_sqrt_pd (_mm_sub_pd (c0, k1));
+  l0 = _mm_mul_pd (_mm_acos_pd (_mm_div_pd (k0 , k3)), c_3);
+  l1 = _mm_add_pd (l1, l1);
+  l2 = _mm_fmsub_pd (l1, _mm_cos_pd (k0), a);
+  l3 = _mm_fmsub_pd (l1, _mm_cos_pd (_mm_add_pd (l0, c2p_3)), a);
+  l3 = _mm_blendv_pd (l3, l2,
+                      _mm_or_pd (_mm_cmplt (l2, x1), _mm_cmpgt (l2, x2)));
+  l4 = _mm_fmsub_pd (l1, _mm_cos_pd (_mm_sub_pd (l0, c2p_3)), a);
+  l4 = _mm_blendv_pd (l4, l3,
+                      _mm_or_pd (_mm_cmplt (l3, x1), _mm_cmpgt (l3, x2)));
+  k1 = _mm_sqrt_pd (k2);
+  l5 = _mm_add_pd (k0, k1);
+  l5 = _mm_cbrt_pd (k2);
+  k0 = _mm_sub_pd (k0, k1);
+  l5 = _mm_add_pd (l5, _mm_sub_pd (_mm_cbrt_pd (k0), a));
+  return _mm_blendv_pd (l4, l5, _mm_cmplt_pd (k2, c0));
 }
 */
 
@@ -3306,13 +3296,12 @@ jbm_solve_cubic_128 (__m128d a,
                          __m128d x2)
 ///< __m128d vector of right limits of the solution intervals.
 {
-  __m128d m;
-  m = jbm_small_128 (a);
   return
     _mm_blendv_pd (jbm_solve_cubic_reduced (_mm_div_pd (b, a),
                                             _mm_div_pd (c, a),
                                             _mm_div_pd (d, a), x1, x2),
-                   jbm_solve_quadratic_128 (b, c, d, x1, x2), m);
+                   jbm_solve_quadratic_128 (b, c, d, x1, x2),
+		   jbm_small_128 (a));
 }
 */
 
@@ -3358,9 +3347,8 @@ jbm_flux_limiter_centred_128 (const __m128d d1,
                               const __m128d d2)
                               ///< 2nd flux limiter function parameter.
 {
-  __m128d m;
-  m = jbm_small_128 (d2);
-  return _mm_blendv_pd (_mm_div_pd (d1, d2), _mm_setzero_pd (), m);
+  return _mm_blendv_pd (_mm_div_pd (d1, d2), _mm_setzero_pd (),
+                        jbm_small_128 (d2));
 }
 
 /**
@@ -3377,12 +3365,13 @@ jbm_flux_limiter_superbee_128 (const __m128d d1,
                                const __m128d d2)
                                ///< 2nd flux limiter function parameter.
 {
-  __m128d r, m;
+  __m128d r;
   r = _mm_div_pd (d1, d2);
   r = _mm_max_pd (_mm_min_pd (jbm_dbl_128 (r), _mm_set1_pd (1.)),
                   _mm_min_pd (r, _mm_set1_pd (2.)));
-  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
-  return _mm_blendv_pd (_mm_setzero_pd (), r, m);
+  return _mm_blendv_pd (_mm_setzero_pd (), r,
+                        _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
+                                      _mm_set1_pd (FLT_EPSILON)));
 }
 
 /**
@@ -3398,10 +3387,11 @@ jbm_flux_limiter_minmod_128 (const __m128d d1,
                              const __m128d d2)
                              ///< 2nd flux limiter function parameter.
 {
-  __m128d r, m;
+  __m128d r;
   r = _mm_min_pd (_mm_div_pd (d1, d2), _mm_set1_pd (1.));
-  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
-  return _mm_blendv_pd (_mm_setzero_pd (), r, m);
+  return _mm_blendv_pd (_mm_setzero_pd (), r,
+                        _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
+                                      _mm_set1_pd (FLT_EPSILON)));
 }
 
 /**
@@ -3422,8 +3412,9 @@ jbm_flux_limiter_VanLeer_128 (const __m128d d1,
   r = _mm_div_pd (d1, d2);
   k = jbm_abs_128 (r);
   r = _mm_div_pd (_mm_add_pd (r, k), _mm_add_pd (_mm_set1_pd (1.), k));
-  k = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
-  return _mm_blendv_pd (_mm_setzero_pd (), r, k);
+  return _mm_blendv_pd (_mm_setzero_pd (), r,
+                        _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
+                                      _mm_set1_pd (FLT_EPSILON)));
 }
 
 /**
@@ -3443,8 +3434,9 @@ jbm_flux_limiter_VanAlbada_128 (const __m128d d1,
   r = _mm_div_pd (d1, d2);
   k = jbm_sqr_128 (r);
   r = _mm_div_pd (_mm_add_pd (r, k), _mm_add_pd (_mm_set1_pd (1.), k));
-  k = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
-  return _mm_blendv_pd (_mm_setzero_pd (), r, k);
+  return _mm_blendv_pd (_mm_setzero_pd (), r,
+                        _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
+                                      _mm_set1_pd (FLT_EPSILON)));
 }
 
 /**
@@ -3460,10 +3452,11 @@ jbm_flux_limiter_minsuper_128 (const __m128d d1,
                                const __m128d d2)
                                ///< 2nd flux limiter function parameter.
 {
-  __m128d r, m;
+  __m128d r;
   r = _mm_min_pd (_mm_div_pd (d1, d2), _mm_set1_pd (2.));
-  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
-  return _mm_blendv_pd (_mm_setzero_pd (), r, m);
+  return _mm_blendv_pd (_mm_setzero_pd (), r,
+                        _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
+                                      _mm_set1_pd (FLT_EPSILON)));
 }
 
 /**
@@ -3479,11 +3472,12 @@ jbm_flux_limiter_supermin_128 (const __m128d d1,
                                const __m128d d2)
                                ///< 2nd flux limiter function parameter.
 {
-  __m128d r, m;
+  __m128d r;
   r = _mm_div_pd (d1, d2);
   r = _mm_min_pd (jbm_dbl_128 (r), _mm_set1_pd (1.));
-  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
-  return _mm_blendv_pd (_mm_setzero_pd (), r, m);
+  return _mm_blendv_pd (_mm_setzero_pd (), r,
+                        _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
+                                      _mm_set1_pd (FLT_EPSILON)));
 }
 
 /**
@@ -3500,15 +3494,15 @@ jbm_flux_limiter_monotonized_central_128 (const __m128d d1,
                                           const __m128d d2)
 ///< 2nd flux limiter function parameter.
 {
-  __m128d r, rm, m;
+  __m128d r, rm;
   r = _mm_div_pd (d1, d2);
   rm = _mm_mul_pd (_mm_set1_pd (0.5), _mm_add_pd (r, _mm_set1_pd (1.)));
-  m = _mm_cmplt_pd (r, _mm_set1_pd (3.));
-  rm = _mm_blendv_pd (_mm_set1_pd (2.), rm, m);
-  m = _mm_cmpgt_pd (r, _mm_set1_pd (1. / 3.));
-  rm = _mm_blendv_pd (rm, jbm_dbl_128 (r), m);
-  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
-  return _mm_blendv_pd (_mm_set1_pd (0.), rm, m);
+  rm = _mm_blendv_pd (_mm_set1_pd (2.), rm, _mm_cmplt_pd (r, _mm_set1_pd (3.)));
+  rm = _mm_blendv_pd (rm, jbm_dbl_128 (r),
+                      _mm_cmpgt_pd (r, _mm_set1_pd (1. / 3.)));
+  return _mm_blendv_pd (_mm_set1_pd (0.), rm,
+                        _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
+                                      _mm_set1_pd (FLT_EPSILON)));
 }
 
 /**
@@ -3524,11 +3518,12 @@ jbm_flux_limiter_mean_128 (const __m128d d1,
                            const __m128d d2)
                            ///< 2nd flux limiter function parameter.
 {
-  __m128d r, m;
+  __m128d r;
   r = _mm_mul_pd (_mm_set1_pd (0.5),
                   _mm_add_pd (_mm_set1_pd (1.), _mm_div_pd (d1, d2)));
-  m = _mm_cmpgt_pd (_mm_mul_pd (d1, d2), _mm_set1_pd (FLT_EPSILON));
-  return _mm_blendv_pd (_mm_set1_pd (0.), r, m);
+  return _mm_blendv_pd (_mm_set1_pd (0.), r,
+                        _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
+                                      _mm_set1_pd (FLT_EPSILON)));
 }
 
 /**
@@ -4067,8 +4062,7 @@ jbm_solve_cubic_reduced (__m256d a,
       k2 = k0 + k1;
       k2 = CBRT (k2);
       k0 -= k1;
-      k2 += CBRT (k0);
-      k2 -= a;
+      k2 += CBRT (k0) - a;
     }
   return k2;
 }
@@ -4439,6 +4433,806 @@ jbm_integral_256 (__m256d (*f) (__m256d),
 
 #endif
 
+#ifdef __AVX512F__
+
+/**
+ * Function to calculate the absolute value of a __m512d vector.
+ *
+ * \return absolute value vector.
+ */
+static inline __m512d
+jbm_abs_512 (const __m512d x)
+{
+  return _mm512_andnot_pd (_mm512_set1_pd (-0.0), x);
+}
+
+/**
+ * Function to check small __m512d vectors.
+ *
+ * \return 1 on small number, 0 otherwise.
+ */
+static inline __mmask8
+jbm_small_512 (const __m512d x)       ///< __m512d vector.
+{
+  return _mm512_cmp_pd_mask (jbm_abs_512 (x), _mm512_set1_pd (FLT_EPSILON),
+                             _CMP_LT_OS);
+}
+
+/**
+ * Function to calculate the __m512d vector with the components with lower
+ * module in the [a, b] interval.
+ * \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
+ * 0, & a\cdot b\le 0;\\
+ * a, & a,b\ne 0,\;|a|<|b|;\\
+ * b, & a,b\ne 0,\;|a|\ge|b|;
+ * \end{array}\right.\f$.
+ *
+ * \return modmin __m512d vector.
+ */
+static inline __m512d
+jbm_modmin_512 (__m512d a,      ///< 1st __m512d vector.
+                const __m512d b)      ///< 2nd __m512d vector.
+{
+  __m512d aa, ab, z;
+  z = _mm512_setzero_pd ();
+  ab = _mm512_mul_pd (a, b);
+  a = _mm512_mask_blend_pd (_mm512_cmp_pd_mask (ab, z, _CMP_LE_OS), a, z);
+  aa = jbm_abs_512 (a);
+  ab = jbm_abs_512 (b);
+  return _mm512_mask_blend_pd (_mm512_cmp_pd_mask (aa, ab, _CMP_GT_OS), a, b);
+}
+
+/**
+ * Function to interchange 2 __m512d numbers.
+ */
+static inline void
+jbm_change_512 (__m512d *restrict a,    ///< 1st __m512d vector pointer.
+                __m512d *restrict b)    ///< 2nd __m512d vector pointer.
+{
+  __m512d c;
+  JB_CHANGE (*a, *b, c);
+}
+
+/**
+ * Function to calculate the double of a __m512d vector.
+ *
+ * \return __m512d double.
+ */
+static inline __m512d
+jbm_dbl_512 (const __m512d x)         ///< __m512d vector.
+{
+  return _mm512_add_pd (x, x);
+}
+
+/**
+ * Function to calculate the square of the components of a __m512d vector.
+ *
+ * \return __m512d vector square.
+ */
+static inline __m512d
+jbm_sqr_512 (const __m512d x)         ///< __m512d vector.
+{
+  return _mm512_mul_pd (x, x);
+}
+
+/**
+ * Function to perform an extrapolation between 2 __m512d vectors of 2D points.
+ *
+ * \return __m512d vector of y-coordinates of the extrapolated points.
+ */
+static inline __m512d
+jbm_extrapolate_512 (const __m512d x,
+                     ///< __m512d vector of x-coordinates of the extrapolated
+                     ///< points.
+                     const __m512d x1,
+                     ///< __m512d vector of x-coordinates of the 1st points.
+                     const __m512d x2,
+                     ///< __m512d vector of x-coordinates of the 2nd points.
+                     const __m512d y1,
+                     ///< __m512d vector of y-coordinates of the 1st points.
+                     const __m512d y2)
+                     ///< __m512d vector of y-coordinates of the 2nd points.
+{
+  __m512d d;
+  d = _mm512_sub_pd (x, x1);
+  return _mm512_fmadd_pd (d, _mm512_div_pd (_mm512_sub_pd (y2, y1),
+                                            _mm512_sub_pd (x2, x1)), y1);
+}
+
+/**
+ * Function to perform an interpolation between 2 __m512d vectors of 2D points.
+ *
+ * \return __m512d vector of y-coordinates of the interpolated points.
+ */
+static inline __m512d
+jbm_interpolate_512 (const __m512d x,
+                     ///< __m512d vector of x-coordinates of the interpolated
+                     ///< points.
+                     const __m512d x1,
+                     ///< __m512d vector of x-coordinates of the 1st points.
+                     const __m512d x2,
+                     ///< __m512d vector of x-coordinates of the 2nd points.
+                     const __m512d y1,
+                     ///< __m512d vector of y-coordinates of the 1st points.
+                     const __m512d y2)
+                     ///< __m512d vector of y-coordinates of the 2nd points.
+{
+  __m512d k;
+  k = jbm_extrapolate_512 (x, x1, x2, y1, y2);
+  k = _mm512_mask_blend_pd (_mm512_cmp_pd_mask (x, x1, _CMP_GT_OS), y1, k);
+  return _mm512_mask_blend_pd (_mm512_cmp_pd_mask (x, x2, _CMP_LT_OS), y2, k);
+}
+
+/**
+ * Function to calculate the length of a __m512d vector of 2D segments.
+ *
+ * \return __m512d vector of segment lengths.
+ */
+static inline __m512d
+jbm_v2_length_512 (const __m512d x1,
+///< __m512d vector of x-coordinates of the 1st points defining the segment.
+                   const __m512d y1,
+///< __m512d vector of y-coordinates of the 1st points defining the segment.
+                   const __m512d x2,
+///< __m512d vector of x-coordinates of the 2nd points defining the segment.
+                   const __m512d y2)
+///< __m512d vector of y-coordinates of the 2nd points defining the segment.
+{
+  __m512d dx, dy;
+  dx = _mm512_sub_pd (x2, x1);
+  dy = _mm512_sub_pd (y2, y1);
+  return _mm512_sqrt_pd (_mm512_add_pd (jbm_sqr_512 (dx), jbm_sqr_512 (dy)));
+}
+
+/**
+ * Function to calculate the length of a __m512d vector of 3D segments.
+ *
+ * \return __m512d vector of segment lengths.
+ */
+static inline __m512d
+jbm_v3_length_512 (const __m512d x1,
+///< __m512d vector of x-coordinates of the 1st points defining the segments.
+                   const __m512d y1,
+///< __m512d vector of y-coordinates of the 1st points defining the segments.
+                   const __m512d z1,
+///< __m512d vector of z-coordinates of the 1st points defining the segments.
+                   const __m512d x2,
+///< __m512d vector of x-coordinates of the 2nd points defining the segments.
+                   const __m512d y2,
+///< __m512d vector of y-coordinates of the 2nd points defining the segments.
+                   const __m512d z2)
+///< __m512d vector of z-coordinates of the 2nd points defining the segments.
+{
+  __m512d dx, dy, dz;
+  dx = _mm512_sub_pd (x2, x1);
+  dx = jbm_sqr_512 (dx);
+  dy = _mm512_sub_pd (y2, y1);
+  dy = jbm_sqr_512 (dy);
+  dz = _mm512_sub_pd (z2, z1);
+  dz = jbm_sqr_512 (dz);
+  return _mm512_sqrt_pd (_mm512_add_pd (dx, _mm512_add_pd (dy, dz)));
+}
+
+/**
+ * Function to calculate a __m512d vector of 1st order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_1_512 (const __m512d x,        ///< variable.
+                      const double *p)        ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, _mm512_set1_pd (p[1]), _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a __m512d vector of 2nd order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_2_512 (const __m512d x,        ///< variable.
+                      const double *p)        ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, jbm_polynomial_1_512 (x, p + 1),
+                          _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a __m512d vector of 3rd order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_3_512 (const __m512d x,        ///< variable.
+                      const double *p)        ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, jbm_polynomial_2_512 (x, p + 1),
+                          _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a __m512d vector of 4th order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_4_512 (const __m512d x,        ///< variable.
+                      const double *p)        ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, jbm_polynomial_3_512 (x, p + 1),
+                          _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a __m512d vector of 5th order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_5_512 (const __m512d x,        ///< variable.
+                      const double *p)        ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, jbm_polynomial_4_512 (x, p + 1),
+                          _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a __m512d vector of 6th order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_6_512 (const __m512d x,        ///< variable.
+                      const double *p)        ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, jbm_polynomial_5_512 (x, p + 1),
+                          _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a __m512d vector of 7th order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_7_512 (const __m512d x,        ///< variable.
+                      const double *p)        ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, jbm_polynomial_6_512 (x, p + 1),
+                          _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a __m512d vector of 8th order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_8_512 (const __m512d x,        ///< variable.
+                      const double *p)        ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, jbm_polynomial_7_512 (x, p + 1),
+                          _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a __m512d vector of 9th order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_9_512 (const __m512d x,        ///< variable.
+                      const double *p)        ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, jbm_polynomial_8_512 (x, p + 1),
+                          _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a __m512d vector of 10th order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_10_512 (const __m512d x,       ///< variable.
+                       const double *p)       ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, jbm_polynomial_9_512 (x, p + 1),
+                          _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a __m512d vector of 11th order polynomials.
+ *
+ * \return __m512d vector of polynomial values.
+ */
+static inline __m512d
+jbm_polynomial_11_512 (const __m512d x,       ///< variable.
+                       const double *p)       ///< array of coefficients.
+{
+  return _mm512_fmadd_pd (x, jbm_polynomial_10_512 (x, p + 1),
+                          _mm512_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate the solution of a __m512d vector of reduced quadratic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$x^2+a\,x+b=0\f$.
+ *
+ * \return __m512d vector of solution values.
+ */
+static inline __m512d
+jbm_solve_quadratic_reduced_512 (__m512d a,
+///< __m512d vector of 1st order coefficient of the equations.
+                                 __m512d b,
+///< __m512d vector of 0th order coefficient of the equations.
+                                 const __m512d x1,
+///< __m512d vector of left limits of the solution intervals.
+                                 const __m512d x2)
+///< __m512d vector of right limits of the solution intervals.
+{
+  __m512d k1, k2;
+  k1 = _mm512_set1_pd (-0.5);
+  a = _mm512_mul_pd (a, k1);
+  b = _mm512_sqrt_pd (_mm512_sub_pd (jbm_sqr_512 (a), b));
+  k1 = _mm512_add_pd (a, b);
+  k2 = _mm512_sub_pd (a, b);
+  k1 = _mm512_mask_blend_pd (_mm512_cmp_pd_mask (k1, x1, _CMP_LT_OS), k1, k2);
+  return _mm512_mask_blend_pd (_mm512_cmp_pd_mask (k1, x2, _CMP_GT_OS), k1, k2);
+}
+
+/**
+ * Function to calculate the solution of a __m512d vector of quadratic equations
+ * in an interval \f$\left[x_1,x_2\right]\f$ in the form \f$a\,x^2+b\,x+c=0\f$.
+ *
+ * \return __m512d vector of solution values.
+ */
+static inline __m512d
+jbm_solve_quadratic_512 (const __m512d a,
+///< __m512d vector of 2nd order coefficient of the equations.
+                         const __m512d b,
+///< __m512d vector of 1st order coefficient of the equations.
+                         const __m512d c,
+///< __m512d vector of 0th order coefficient of the equations.
+                         const __m512d x1,
+///< __m512d vector of left limits of the solution intervals.
+                         const __m512d x2)
+///< __m512d vector of right limits of the solution intervals.
+{
+  __m512d k1, k2;
+  __mmask8 m;
+  m = jbm_small_512 (a);
+  k1 = jbm_solve_quadratic_reduced_512 (_mm512_div_pd (b, a),
+                                        _mm512_div_pd (c, a), x1, x2);
+  k2 = _mm512_div_pd (_mm512_sub_pd (_mm512_setzero_pd (), c), b);
+  return _mm512_mask_blend_pd (m, k1, k2);
+}
+
+/**
+ * Function to calculate the solution of a __m512d vector of reduced cubic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$x^3+a\,x^2+b\,x+c=0\f$.
+ *
+ * \return __m512d vector of solution values.
+ */
+/*
+static inline __m512d
+jbm_solve_cubic_reduced (__m512d a,
+                         ///< 2nd order coefficient of the equation.
+                         __m512d b,
+                         ///< 1st order coefficient of the equation.
+                         __m512d c,
+                         ///< 0th order coefficient of the equation.
+                         __m512d x1,
+                         ///< left limit of the solution interval.
+                         __m512d x2)
+                         ///< right limit of the solution interval.
+{
+  __m512d k0, k1, k2;
+  a /= 3.;
+  k0 = a * a;
+  k1 = b / 3. - k0;
+  k0 = (b * a - c) / 2. - a * k0;
+  k2 = k1 * k1 * k1 + k0 * k0;
+  if (k2 < 0.)
+    {
+      k1 = SQRT (-k1);
+      k0 = ACOS (k0 / (k1 * k1 * k1)) / 3.;
+      k1 *= 2.;
+      k2 = k1 * COS (k0) - a;
+      if (k2 < x1 || k2 > x2)
+        {
+          k2 = k1 * COS (k0 + 2. * JB_PI / 3.) - a;
+          if (k2 < x1 || k2 > x2)
+            k2 = k1 * COS (k0 - 2. * JB_PI / 3.) - a;
+        }
+    }
+  else
+    {
+      k1 = SQRT (k2);
+      k2 = k0 + k1;
+      k2 = CBRT (k2);
+      k0 -= k1;
+      k2 += CBRT (k0) - a;
+    }
+  return k2;
+}
+*/
+
+/**
+ * Function to calculate the solution of a __m512d vector of cubic equations in
+ * an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$a\,x^3+b\,x^2+c\,x+d=0\f$.
+ *
+ * \return __m512d vector of solution values.
+ */
+/*
+static inline __m512d
+jbm_solve_cubic_512 (__m512d a,
+///< __m512d vector of 3rd order coefficient of the equations.
+                 __m512d b,
+///< __m512d vector of 2nd order coefficient of the equations.
+                 __m512d c,
+///< __m512d vector of 1st order coefficient of the equations.
+                 __m512d d,
+///< __m512d vector of 0th order coefficient of the equations.
+                         __m512d x1,
+///< __m512d vector of left limits of the solution intervals.
+                         __m512d x2)
+///< __m512d vector of right limits of the solution intervals.
+{
+  __m512d m;
+  m = jbm_small_512 (a);
+  return
+    _mm512_blendv_pd (jbm_solve_cubic_reduced (_mm512_div_pd (b, a),
+                                            _mm512_div_pd (c, a),
+                                            _mm512_div_pd (d, a), x1, x2),
+                   jbm_solve_quadratic_512 (b, c, d, x1, x2), m);
+}
+*/
+
+/**
+ * Function to calculate the total (1st order upwind) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=0\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_total_512 (const __m512d d1 __attribute__((unused)),
+                            ///< 1st flux limiter function parameter.
+                            const __m512d d2 __attribute__((unused)))
+  ///< 2nd flux limiter function parameter.
+{
+  return _mm512_setzero_pd ();
+}
+
+/**
+ * Function to calculate the null (2nd order upwind) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=1\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_null_512 (const __m512d d1 __attribute__((unused)),
+                           ///< 1st flux limiter function parameter.
+                           const __m512d d2 __attribute__((unused)))
+  ///< 2nd flux limiter function parameter.
+{
+  return _mm512_set1_pd (1.);
+}
+
+/**
+ * Function to calculate the centred (2nd order centred) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\frac{d_1}{d_2}\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_centred_512 (const __m512d d1,
+                              ///< 1st flux limiter function parameter.
+                              const __m512d d2)
+                              ///< 2nd flux limiter function parameter.
+{
+  __mmask8 m;
+  m = jbm_small_512 (d2);
+  return _mm512_mask_blend_pd (m, _mm512_div_pd (d1, d2), _mm512_setzero_pd ());
+}
+
+/**
+ * Function to calculate the superbee flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{2\,d_1}{d_2}\right),\,
+ * \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_superbee_512 (const __m512d d1,
+                               ///< 1st flux limiter function parameter.
+                               const __m512d d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  __m512d r;
+  __mmask8 m;
+  r = _mm512_div_pd (d1, d2);
+  r = _mm512_max_pd (_mm512_min_pd (jbm_dbl_512 (r), _mm512_set1_pd (1.)),
+                     _mm512_min_pd (r, _mm512_set1_pd (2.)));
+  m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
+                          _CMP_GT_OS);
+  return _mm512_mask_blend_pd (m, _mm512_setzero_pd (), r);
+}
+
+/**
+ * Function to calculate the minmod flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{d_1}{d_2}\right)\right]\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_minmod_512 (const __m512d d1,
+                             ///< 1st flux limiter function parameter.
+                             const __m512d d2)
+                             ///< 2nd flux limiter function parameter.
+{
+  __m512d r;
+  __mmask8 m;
+  r = _mm512_min_pd (_mm512_div_pd (d1, d2), _mm512_set1_pd (1.));
+  m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
+                          _CMP_GT_OS);
+  return _mm512_mask_blend_pd (m, _mm512_setzero_pd (), r);
+}
+
+/**
+ * Function to calculate the van Leer flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=
+ * \frac{\frac{d_1}{d_2}+\left|\frac{d_1}{d_2}\right|}
+ * {1+\left|\frac{d_1}{d_2}\right|}\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_VanLeer_512 (const __m512d d1,
+                              ///< 1st flux limiter function parameter.
+                              const __m512d d2)
+                              ///< 2nd flux limiter function parameter.
+{
+  __m512d r, k;
+  __mmask8 m;
+  r = _mm512_div_pd (d1, d2);
+  k = jbm_abs_512 (r);
+  r = _mm512_div_pd (_mm512_add_pd (r, k),
+                     _mm512_add_pd (_mm512_set1_pd (1.), k));
+  m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
+                          _CMP_GT_OS);
+  return _mm512_mask_blend_pd (m, _mm512_setzero_pd (), r);
+}
+
+/**
+ * Function to calculate the van Albada flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\frac{\frac{d_1}{d_2}+\frac{d_1^2}{d_2^2}}
+ * {1+\frac{d_1^2}{d_2^2}}\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_VanAlbada_512 (const __m512d d1,
+                                ///< 1st flux limiter function parameter.
+                                const __m512d d2)
+                                ///< 2nd flux limiter function parameter.
+{
+  __m512d r, k;
+  __mmask8 m;
+  r = _mm512_div_pd (d1, d2);
+  k = jbm_sqr_512 (r);
+  r = _mm512_div_pd (_mm512_add_pd (r, k),
+                     _mm512_add_pd (_mm512_set1_pd (1.), k));
+  m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
+                          _CMP_GT_OS);
+  return _mm512_mask_blend_pd (m, _mm512_setzero_pd (), r);
+}
+
+/**
+ * Function to calculate the minsuper flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_minsuper_512 (const __m512d d1,
+                               ///< 1st flux limiter function parameter.
+                               const __m512d d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  __m512d r;
+  __mmask8 m;
+  r = _mm512_min_pd (_mm512_div_pd (d1, d2), _mm512_set1_pd (2.));
+  m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
+                          _CMP_GT_OS);
+  return _mm512_mask_blend_pd (m, _mm512_setzero_pd (), r);
+}
+
+/**
+ * Function to calculate the supermin flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{2\,d_1}{d_2}\right)\right]\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_supermin_512 (const __m512d d1,
+                               ///< 1st flux limiter function parameter.
+                               const __m512d d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  __m512d r;
+  __mmask8 m;
+  r = _mm512_div_pd (d1, d2);
+  r = _mm512_min_pd (jbm_dbl_512 (r), _mm512_set1_pd (1.));
+  m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
+                          _CMP_GT_OS);
+  return _mm512_mask_blend_pd (m, _mm512_setzero_pd (), r);
+}
+
+/**
+ * Function to calculate the monotonized central flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(2,\,\frac{1+\frac{d_1}{d_2}}{2},\,\frac{2\,d_1}{d_2}\right)
+ * \right]\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_monotonized_central_512 (const __m512d d1,
+///< 1st flux limiter function parameter.
+                                          const __m512d d2)
+///< 2nd flux limiter function parameter.
+{
+  __m512d r, rm;
+  __mmask8 m;
+  r = _mm512_div_pd (d1, d2);
+  rm = _mm512_mul_pd (_mm512_set1_pd (0.5),
+                      _mm512_add_pd (r, _mm512_set1_pd (1.)));
+  m = _mm512_cmp_pd_mask (r, _mm512_set1_pd (3.), _CMP_LT_OS);
+  rm = _mm512_mask_blend_pd (m, _mm512_set1_pd (2.), rm);
+  m = _mm512_cmp_pd_mask (r, _mm512_set1_pd (1. / 3.), _CMP_GT_OS);
+  rm = _mm512_mask_blend_pd (m, rm, jbm_dbl_512 (r));
+  m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
+                          _CMP_GT_OS);
+  return _mm512_mask_blend_pd (m, _mm512_set1_pd (0.), rm);
+}
+
+/**
+ * Function to calculate the mean flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=
+ * \max\left(0,\,\frac{1+\frac{d_1}{d_2}}{2}\right)\f$ (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_mean_512 (const __m512d d1,
+                           ///< 1st flux limiter function parameter.
+                           const __m512d d2)
+                           ///< 2nd flux limiter function parameter.
+{
+  __m512d r;
+  __mmask8 m;
+  r = _mm512_mul_pd (_mm512_set1_pd (0.5),
+                     _mm512_add_pd (_mm512_set1_pd (1.),
+                                    _mm512_div_pd (d1, d2)));
+  m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
+                          _CMP_GT_OS);
+  return _mm512_mask_blend_pd (m, _mm512_set1_pd (0.), r);
+}
+
+/**
+ * Function to do a flux limiter function (__m512d).
+ *
+ * \return flux limiter function value.
+ */
+static inline __m512d
+jbm_flux_limiter_512 (const __m512d d1,
+                      ///< 1st flux limiter function parameter.
+                      const __m512d d2,
+                      ///< 2nd flux limiter function parameter.
+                      unsigned int type)
+                      ///< type of flux limiter function.
+{
+  switch (type)
+    {
+    case JBM_FLUX_LIMITER_TYPE_TOTAL:
+      return jbm_flux_limiter_total_512 (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_NULL:
+      return jbm_flux_limiter_null_512 (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_CENTRED:
+      return jbm_flux_limiter_centred_512 (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
+      return jbm_flux_limiter_superbee_512 (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_MINMOD:
+      return jbm_flux_limiter_minmod_512 (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
+      return jbm_flux_limiter_VanLeer_512 (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
+      return jbm_flux_limiter_VanAlbada_512 (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_MINSUPER:
+      return jbm_flux_limiter_minsuper_512 (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
+      return jbm_flux_limiter_supermin_512 (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
+      return jbm_flux_limiter_monotonized_central_512 (d1, d2);
+    }
+  return jbm_flux_limiter_mean_512 (d1, d2);
+}
+
+/**
+ * Function to approximate an integral of a function with the Gauss method
+ * defined in an interval (__m512d).
+ *
+ * \return __m512d vector of integral values.
+ */
+static inline __m512d
+jbm_integral_512 (__m512d (*f) (__m512d),
+                  ///< pointer to the function to integrate.
+                  const __m512d x1,   ///< left limit of the interval.
+                  const __m512d x2)   ///< right limit of the interval.
+{
+#if JBM_INTEGRAL_GAUSS_N == 1
+  const JBFLOAT a[1] = { 2. };
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  const JBFLOAT a[2] = { 8. / 9., 5. / 9. },
+    b[2] = { 0., 7.745966692414834e-1 };
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  const JBFLOAT a[3] = {
+    128. / 225.,
+    4.786286704993665e-1,
+    2.369268850561891e-1
+  }, b[3] = {
+    0.,
+    5.384693101056831e-1,
+    9.061798459386640e-1
+  };
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  const JBFLOAT a[4] = {
+    4.179591836734694e-1,
+    3.818300505051189e-1,
+    2.797053914892767e-1,
+    1.294849661688697e-1
+  }, b[4] = {
+    0.,
+    4.058451513773972e-1,
+    7.415311855993944e-1,
+    9.491079123427585e-1
+  };
+#endif
+  __m512d k, x, dx, h;
+#if JBM_INTEGRAL_GAUSS_N > 1
+  __m512d k2, f1, f2;
+#endif
+  unsigned int i;
+  h = _mm512_set1_pd (0.5);
+  dx = _mm512_mul_pd (h, _mm512_sub_pd (x2, x1));
+  x = _mm512_mul_pd (h, _mm512_add_pd (x2, x1));
+  k = _mm512_set1_pd (a[0]);
+  k = _mm512_mul_pd (k, f (x));
+#if JBM_INTEGRAL_GAUSS_N > 1
+  for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
+    {
+      k2 = _mm512_set1_pd (b[i]);
+      k2 = _mm512_mul_pd (k2, dx);
+      f1 = f (_mm512_sub_pd (x, k2));
+      f2 = f (_mm512_add_pd (x, k2));
+      h = _mm512_set1_pd (a[i]);
+      k = _mm512_fmadd_pd (h, _mm512_add_pd (f1, f2), k);
+    }
+#endif
+  k = _mm512_mul_pd (k, dx);
+  return k;
+}
+
+#endif
+
 /**
  * Function to init data of a JBMFarray struct.
  */
@@ -4462,6 +5256,9 @@ jbm_farray_new (const unsigned int n)   ///< number of array elements.
   JBMFarray *fa;
   fa = (JBMFarray *) malloc (sizeof (JBMFarray));
   jbm_farray_init (fa, n);
+#ifdef __AVX512F__
+  fa->x = (JBFLOAT *) g_aligned_alloc (fa->size, 1, 64);
+#else
 #ifdef __AVX__
   fa->x = (JBFLOAT *) g_aligned_alloc (fa->size, 1, 32);
 #else
@@ -4469,6 +5266,7 @@ jbm_farray_new (const unsigned int n)   ///< number of array elements.
   fa->x = (JBFLOAT *) g_aligned_alloc (fa->size, 1, 16);
 #else
   fa->x = (JBFLOAT *) malloc (fa->size);
+#endif
 #endif
 #endif
   if (!fa->x)
@@ -4511,13 +5309,21 @@ jbm_farray_set1 (JBMFarray *fa, ///< pointer to the JBMFarray struct.
 #ifdef __AVX__
   unsigned int n4;
 #endif
+#ifdef __AVX512F__
+  unsigned int n8;
+#endif
 #endif
   jbm_farray_init (fa, n);
   i = 0;
   xa = fa->x;
 #if JBM_LOW_PRECISION < 3
+#ifdef __AVX512F__
+  n8 = n >> 3;
+  for (; n8 > 0; --n8, i += 8)
+    _mm512_store_pd (xa + i, _mm512_set1_pd (x));
+#endif
 #ifdef __AVX__
-  n4 = n >> 2;
+  n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xa + i, _mm256_set1_pd (x));
 #endif
@@ -4559,7 +5365,7 @@ jbm_farray_store (JBMFarray *fa,        ///< pointer to the JBMFarray struct.
 static inline void
 jbm_farray_destroy (JBMFarray * fa)     ///< pointer to the JBWFarray struct.
 {
-#if (defined(__AVX__) || defined(__SSE4_2__))
+#if (defined(__AVX512F__) || defined(__AVX__) || defined(__SSE4_2__))
   g_aligned_free (fa->x);
 #else
   free (fa->x);
@@ -4584,6 +5390,9 @@ jbm_farray_add (JBMFarray *fr,  ///< result JBMFarray struct.
 #ifdef __AVX__
   unsigned int n4;
 #endif
+#ifdef __AVX512F__
+  unsigned int n8;
+#endif
 #endif
   i = 0;
   n = fr->n;
@@ -4591,8 +5400,14 @@ jbm_farray_add (JBMFarray *fr,  ///< result JBMFarray struct.
   x1 = f1->x;
   x2 = f2->x;
 #if JBM_LOW_PRECISION < 3
+#ifdef __AVX512F__
+  n8 = n >> 3;
+  for (; n8 > 0; --n8, i += 8)
+    _mm512_store_pd (xr + i, _mm512_add_pd (_mm512_load_pd (x1 + i),
+                                            _mm512_load_pd (x2 + i)));
+#endif
 #ifdef __AVX__
-  n4 = n >> 2;
+  n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, _mm256_add_pd (_mm256_load_pd (x1 + i),
                                             _mm256_load_pd (x2 + i)));
@@ -4625,6 +5440,9 @@ jbm_farray_sub (JBMFarray *fr,  ///< result JBMFarray struct.
 #ifdef __AVX__
   unsigned int n4;
 #endif
+#ifdef __AVX512F__
+  unsigned int n8;
+#endif
 #endif
   i = 0;
   n = fr->n;
@@ -4632,8 +5450,14 @@ jbm_farray_sub (JBMFarray *fr,  ///< result JBMFarray struct.
   x1 = f1->x;
   x2 = f2->x;
 #if JBM_LOW_PRECISION < 3
+#ifdef __AVX512F__
+  n8 = n >> 3;
+  for (; n8 > 0; --n8, i += 8)
+    _mm512_store_pd (xr + i, _mm512_sub_pd (_mm512_load_pd (x1 + i),
+                                            _mm512_load_pd (x2 + i)));
+#endif
 #ifdef __AVX__
-  n4 = n >> 2;
+  n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, _mm256_sub_pd (_mm256_load_pd (x1 + i),
                                             _mm256_load_pd (x2 + i)));
@@ -4668,14 +5492,27 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
   __m256d a4;
   unsigned int n4;
 #endif
+#ifdef __AVX512F__
+  __m512d a8;
+  unsigned int n8;
+#endif
 #endif
   i = 0;
   n = fr->n;
   xr = fr->x;
   x1 = f1->x;
 #if JBM_LOW_PRECISION < 3
+#ifdef __AVX512F__
+  n8 = n >> 3;
+  if (n8)
+    {
+      a8 = _mm512_set1_pd (x2);
+      for (; n8 > 0; --n8, i += 8)
+        _mm512_store_pd (xr + i, _mm512_mul_pd (_mm512_load_pd (x1 + i), a8));
+     }
+#endif
 #ifdef __AVX__
-  n4 = n >> 2;
+  n4 = (n - i) >> 2;
   if (n4)
     {
       a4 = _mm256_set1_pd (x2);
@@ -4716,14 +5553,27 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
   __m256d a4;
   unsigned int n4;
 #endif
+#ifdef __AVX__
+  __m512d a8;
+  unsigned int n8;
+#endif
 #endif
   i = 0;
   n = fr->n;
   xr = fr->x;
   x1 = f1->x;
 #if JBM_LOW_PRECISION < 3
+#ifdef __AVX512F__
+  n8 = n >> 3;
+  if (n8)
+    {
+      a8 = _mm512_set1_pd (x2);
+      for (; n8 > 0; --n8, i += 8)
+        _mm512_store_pd (xr + i, _mm512_div_pd (_mm512_load_pd (x1 + i), a8));
+     }
+#endif
 #ifdef __AVX__
-  n4 = n >> 2;
+  n4 = (n - i) >> 2;
   if (n4)
     {
       a4 = _mm256_set1_pd (x2);
@@ -4762,6 +5612,9 @@ jbm_farray_mul (JBMFarray *fr,  ///< result JBMFarray struct.
 #ifdef __AVX__
   unsigned int n4;
 #endif
+#ifdef __AVX512F__
+  unsigned int n8;
+#endif
 #endif
   i = 0;
   n = fr->n;
@@ -4769,8 +5622,14 @@ jbm_farray_mul (JBMFarray *fr,  ///< result JBMFarray struct.
   x1 = f1->x;
   x2 = f2->x;
 #if JBM_LOW_PRECISION < 3
+#ifdef __AVX512F__
+  n8 = n >> 3;
+  for (; n8 > 0; --n8, i += 8)
+    _mm512_store_pd (xr + i, _mm512_mul_pd (_mm512_load_pd (x1 + i),
+                                            _mm512_load_pd (x2 + i)));
+#endif
 #ifdef __AVX__
-  n4 = n >> 2;
+  n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, _mm256_mul_pd (_mm256_load_pd (x1 + i),
                                             _mm256_load_pd (x2 + i)));
@@ -4803,6 +5662,9 @@ jbm_farray_div (JBMFarray *fr,  ///< result JBMFarray struct.
 #ifdef __AVX__
   unsigned int n4;
 #endif
+#ifdef __AVX512F__
+  unsigned int n8;
+#endif
 #endif
   i = 0;
   n = fr->n;
@@ -4810,8 +5672,14 @@ jbm_farray_div (JBMFarray *fr,  ///< result JBMFarray struct.
   x1 = f1->x;
   x2 = f2->x;
 #if JBM_LOW_PRECISION < 3
+#ifdef __AVX512F__
+  n8 = n >> 3;
+  for (; n8 > 0; --n8, i += 8)
+    _mm512_store_pd (xr + i, _mm512_div_pd (_mm512_load_pd (x1 + i),
+                                            _mm512_load_pd (x2 + i)));
+#endif
 #ifdef __AVX__
-  n4 = n >> 2;
+  n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, _mm256_div_pd (_mm256_load_pd (x1 + i),
                                             _mm256_load_pd (x2 + i)));
@@ -4843,14 +5711,22 @@ jbm_farray_dbl (JBMFarray *fr,  ///< result JBMFarray struct.
 #ifdef __AVX__
   unsigned int n4;
 #endif
+#ifdef __AVX512F__
+  unsigned int n8;
+#endif
 #endif
   i = 0;
   n = fr->n;
   xr = fr->x;
   xd = fd->x;
 #if JBM_LOW_PRECISION < 3
+#ifdef __AVX512F__
+  n8 = n >> 3;
+  for (; n8 > 0; --n8, i += 8)
+    _mm512_store_pd (xr + i, jbm_dbl_512 (_mm512_load_pd (xd + i)));
+#endif
 #ifdef __AVX__
-  n4 = n >> 2;
+  n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, jbm_dbl_256 (_mm256_load_pd (xd + i)));
 #endif
@@ -4880,14 +5756,22 @@ jbm_farray_sqr (JBMFarray *fr,  ///< result JBMFarray struct.
 #ifdef __AVX__
   unsigned int n4;
 #endif
+#ifdef __AVX512F__
+  unsigned int n8;
+#endif
 #endif
   i = 0;
   n = fr->n;
   xr = fr->x;
   xd = fd->x;
 #if JBM_LOW_PRECISION < 3
+#ifdef __AVX512F__
+  n8 = n >> 3;
+  for (; n8 > 0; --n8, i += 8)
+    _mm512_store_pd (xr + i, jbm_sqr_512 (_mm512_load_pd (xd + i)));
+#endif
 #ifdef __AVX__
-  n4 = n >> 2;
+  n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, jbm_sqr_256 (_mm256_load_pd (xd + i)));
 #endif
