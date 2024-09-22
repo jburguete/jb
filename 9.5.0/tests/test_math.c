@@ -849,6 +849,7 @@ main (void)
   JBFLOAT *farray3, *A1f, *A2f, *A3f;
   JBDOUBLE d, d2;
   JBFLOAT f, f2;
+  double x, y;
 #ifdef __SSE4_2__
   double *d_1, *d_2;
   unsigned long long int *L_1;
@@ -859,6 +860,7 @@ main (void)
 #endif
 #ifdef __AVX512F__
   __m512d d_512, d2_512;
+  __mmask8 m_8;
 #endif
   long long int iL, iL2;
   unsigned long long int uL, uL2;
@@ -882,6 +884,139 @@ main (void)
     czd[i].C = Czd[i], czd[i].E = Ezd[i];
   for (i = 0; i < 5; ++i )
     czd[i].D = Dzd[i], czd[i].H = Hzd[i];
+  printf ("FLT_MIN=%lg FLT_EPSILON=%lg\n", FLT_MIN, FLT_EPSILON);
+  printf ("DBL_MIN=%lg DBL_EPSILON=%lg\n", DBL_MIN, DBL_EPSILON);
+  x = jbm_f64_rest (2., -2.);
+  printf ("rest(2,-2)=%lg\n", x);
+  x = jbm_f64_rest (-2., 2.);
+  printf ("rest(-2,2)=%lg\n", x);
+  x = jbm_f64_rest (87., 4.);
+  printf ("rest(87,4)=%lg\n", x);
+  x = jbm_f64_rest (-87., 4.);
+  printf ("rest(-87,4)=%lg\n", x);
+  x = jbm_f64_frexp (2., &i);
+  printf ("frexp(2)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (2.5, &i);
+  printf ("frexp(2.5)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (2501., &i);
+  printf ("frexp(2501)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (1e-16, &i);
+  printf ("frexp(1e-16)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (1e-320, &i);
+  printf ("frexp(1e-320)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (0., &i);
+  printf ("frexp(0)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (-2., &i);
+  printf ("frexp(-2.)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (-2.5, &i);
+  printf ("frexp(-2.5)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (-2501., &i);
+  printf ("frexp(-2501)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (-1e-16, &i);
+  printf ("frexp(-1e-16)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (-1e-320, &i);
+  printf ("frexp(-1e-320)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (0., &i);
+  printf ("frexp(-0)=%lg*2^(%d)\n", x, i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  printf ("exp2(-1100)=%.15lg\n", jbm_f64_exp2 (-1100.));
+  printf ("exp2(-1063)=%.15lg\n", jbm_f64_exp2 (-1063.));
+  printf ("exp2(-53)=%.15lg\n", jbm_f64_exp2 (-53.));
+  printf ("exp2(0)=%.15lg\n", jbm_f64_exp2 (0.));
+  printf ("exp2(53)=%.15lg\n", jbm_f64_exp2 (53.));
+  printf ("exp2(1023)=%.15lg\n", jbm_f64_exp2 (1023.));
+  printf ("exp2(1024)=%.15lg\n", jbm_f64_exp2 (1024.));
+  printf ("exp(-2)=%.15lg\n", jbm_f64_exp (-2.));
+  printf ("exp(0)=%.15lg\n", jbm_f64_exp (0.));
+  printf ("exp(2)=%.15lg\n", jbm_f64_exp (2.));
+  printf ("exp10(-320)=%.15lg\n", jbm_f64_exp10 (-320.));
+  printf ("exp10(-2)=%.15lg\n", jbm_f64_exp10 (-2.));
+  printf ("exp10(0)=%.15lg\n", jbm_f64_exp10 (0.));
+  printf ("exp10(2)=%.15lg\n", jbm_f64_exp10 (2.));
+  printf ("log2(10)=%.15lg=%.15lg\n", jbm_f64_log2(10.), M_LN10 / M_LN2);
+  printf ("log2(e)=%.15lg=%.15lg\n", jbm_f64_log2(M_E), M_LOG2E);
+  printf ("log2(1)=%.15lg\n", jbm_f64_log2(1.));
+  printf ("log2(1/e)=%.15lg=%.15lg\n", jbm_f64_log2(1. / M_E), -M_LOG2E);
+  printf ("log2(1/10)=%.15lg=%.15lg\n", jbm_f64_log2(0.1), -M_LN10 / M_LN2);
+  printf ("log2(1e-320)=%.15lg\n", jbm_f64_log2(1e-320));
+  printf ("log2(0)=%.15lg\n", jbm_f64_log2(0.));
+  printf ("log2(-1)=%.15lg\n", jbm_f64_log2(-1.));
+  printf ("log(e)=%.15lg\n", jbm_f64_log(M_E));
+  printf ("log(1)=%.15lg\n", jbm_f64_log(1.));
+  printf ("log(1/e)=%.15lg\n", jbm_f64_log(1. / M_E));
+  printf ("log10(10)=%.15lg\n", jbm_f64_log10(10.));
+  printf ("log10(1)=%.15lg\n", jbm_f64_log10(1.));
+  printf ("log10(1/10)=%.15lg\n", jbm_f64_log10(0.1));
+  printf ("log10(1e-320)=%.15lg\n", jbm_f64_log10(1e-320));
+  printf ("pown(10,31)=%.15lg\n", jbm_f64_pown(10., 31));
+  printf ("pown(10,0)=%.15lg\n", jbm_f64_pown(10., 0));
+  printf ("pown(10,-31)=%.15lg\n", jbm_f64_pown(10., -31));
+  printf ("pown(10,-321)=%.15lg\n", jbm_f64_pown(10., -321));
+  printf ("pown(10,-400)=%.15lg\n", jbm_f64_pown(10., -400));
+  printf ("pow(10,321.5)=%.15lg\n", jbm_f64_pow(10., 321.5));
+  printf ("pow(10,31.5)=%.15lg\n", jbm_f64_pow(10., 31.5));
+  printf ("pow(10,31)=%.15lg\n", jbm_f64_pow(10., 31.));
+  printf ("pow(10,0)=%.15lg\n", jbm_f64_pow(10., 0.));
+  printf ("pow(10,-31)=%.15lg\n", jbm_f64_pow(10., -31.));
+  printf ("pow(10,-31.5)=%.15lg\n", jbm_f64_pow(10., -31.5));
+  printf ("pow(10,-321)=%.15lg\n", jbm_f64_pow(10., -321.));
+  printf ("pow(10,-321.5)=%.15lg\n", jbm_f64_pow(10., -321.5));
+  printf ("pow(10,-400.5)=%.15lg\n", jbm_f64_pow(10., -400.5));
+  x = 0.;
+  printf ("sinwc(0)=%.15le=%.15le\n", sin(x), jbm_f64_sinwc(x));
+  printf ("coswc(0)=%.15le=%.15le\n", cos(x), jbm_f64_coswc(x));
+  x = M_PI / 6.;
+  printf ("sinwc(pi/6)=%.15le=%.15le\n", sin(x), jbm_f64_sinwc(x));
+  printf ("coswc(pi/6)=%.15le=%.15le\n", cos(x), jbm_f64_coswc(x));
+  x = -M_PI / 6.;
+  printf ("sinwc(-pi/6)=%.15le=%.15le\n", sin(x), jbm_f64_sinwc(x));
+  printf ("coswc(-pi/6)=%.15le=%.15le\n", cos(x), jbm_f64_coswc(x));
+  for (i = 0; i < 13; ++i)
+    {
+      x = i * M_PI / 6.;
+      printf ("sin(%upi/6)=%.15le=%.15le\n", i, sin(x), jbm_f64_sin(x));
+      printf ("cos(%upi/6)=%.15le=%.15le\n", i, cos(x), jbm_f64_cos(x));
+      printf ("tan(%upi/6)=%.15le=%.15le\n", i, tan(x), jbm_f64_tan(x));
+    }
+  printf ("atan(infinity)=%.15lg=%.15lg\n", jbm_f64_atan (INFINITY), M_PI_2);
+  printf ("atan(sqrt(3))=%.15lg=%.15lg\n", jbm_f64_atan (sqrt(3)), M_PI / 3.);
+  printf ("atan(1)=%.15lg=%.15lg\n", jbm_f64_atan (1.), M_PI_4);
+  printf ("atan(sqrt(1/3))=%.15lg=%.15lg\n",
+          jbm_f64_atan (1. / sqrt(3)), M_PI / 6.);
+  printf ("atan(0)=%.15lg=0\n", jbm_f64_atan (0.));
+  printf ("atan(-0)=%.15lg=-0\n", jbm_f64_atan (-0.));
+  printf ("atan(-sqrt(1/3))=%.15lg=%.15lg\n",
+          jbm_f64_atan (-1. / sqrt(3)), -M_PI / 6.);
+  printf ("atan(-1)=%.15lg=%.15lg\n", jbm_f64_atan (-1.), -M_PI_4);
+  printf ("atan(-sqrt(3))=%.15lg=%.15lg\n",
+          jbm_f64_atan (-sqrt(3)), -M_PI / 3.);
+  printf ("atan(-infinity)=%.15lg=%.15lg\n", jbm_f64_atan (-INFINITY), -M_PI_2);
+  printf ("atan2(1,1)=%.15lg=%.15lg\n", jbm_f64_atan2 (1., 1.), M_PI_4);
+  printf ("atan2(1,-1)=%.15lg=%.15lg\n", jbm_f64_atan2 (1., -1.), 3. * M_PI_4);
+  printf ("atan2(-1,1)=%.15lg=%.15lg\n", jbm_f64_atan2 (-1., 1.), -M_PI_4);
+  printf ("atan2(-1,-1)=%.15lg=%.15lg\n",
+          jbm_f64_atan2 (-1., -1.), -3. * M_PI_4);
+  printf ("asin(1)=%.15lg=%.15lg\n", jbm_f64_asin (1.), M_PI_2);
+  printf ("asin(1/2)=%.15lg=%.15lg\n", jbm_f64_asin (0.5), M_PI / 6.);
+  printf ("asin(0)=%.15lg=0\n", jbm_f64_asin (0.));
+  printf ("asin(-1/2)=%.15lg=%.15lg\n", jbm_f64_asin (-0.5), -M_PI / 6.);
+  printf ("asin(-1)=%.15lg=%.15lg\n", jbm_f64_asin (-1.), -M_PI_2);
+  printf ("acos(1)=%.15lg=0\n", jbm_f64_acos (1.));
+  printf ("acos(1/2)=%.15lg=%.15lg\n", jbm_f64_acos (0.5), M_PI / 3.);
+  printf ("acos(0)=%.15lg=%.15lg\n", jbm_f64_acos (0.), M_PI_2);
+  printf ("acos(-1/2)=%.15lg=%.15lg\n", jbm_f64_acos (-0.5), 2. * M_PI / 3.);
+  printf ("acos(-1)=%.15lg=%.15lg\n", jbm_f64_acos (-1.), M_PI);
   is = jbm_min (1, -1);
   printf ("min(1,-1)=%d\n", is);
   is = jbm_max (1, -1);
@@ -1779,6 +1914,254 @@ main (void)
   _mm256_store_pd (d_1, d_256);
   printf ("integral_256(x^14,[0,-1,0,-2],[1,1,2,2])"
           "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  aligned_free (d_2);
+  aligned_free (d_1);
+#endif
+#ifdef __AVX512F__
+  printf ("check AVX512 functions\n");
+  d_1 = aligned_alloc (64, 8 * sizeof (double));
+  d_2 = aligned_alloc (64, 8 * sizeof (double));
+  d_512 = jbm_abs_512 (_mm512_set_pd (4., -3., 3., -2., 2., 0., -1., 1));
+  _mm512_store_pd (d_1, d_512);
+  printf ("abs_512([1,-1,0,2,-2,3,-3,4])"
+          "=[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
+  m_8 = jbm_small_512 (_mm512_set_pd (-3., 3., -2., 2., -1., 1., -0., 0.));
+  printf ("small_512([0,-0,1,-1,2,-2,3,-3])=%08b\n", (unsigned int) m_8);
+  d_512 = jbm_modmin_512 (_mm512_set_pd (-2., 0., 0., 3., 1., 0., -1., 1.),
+                          _mm512_set_pd (-1., 2., 3., 1., -2., 1., -2., 0.5)); 
+  _mm512_store_pd (d_1, d_512);
+  printf ("modmin_512([1,-1,0,1,3,0,0,-2],[0.5,-2,1,-2,1,3,2,-1])"
+          "=[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
+  d_512 = _mm512_set_pd (0., 2., -1, 0., 3., -1., 1., 0.); 
+  d2_512 = _mm512_set_pd (3., 0., 2., -1, -4., 7., -2., 1.);
+  jbm_change_512 (&d_512, &d2_512); 
+  _mm512_store_pd (d_1, d_512);
+  _mm512_store_pd (d_2, d2_512);
+  printf ("change_512([0,1,-1,3,0,-1,2,0],[1,-2,7,-4,-1,2,0,3])"
+          "=[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]"
+          ",[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7],
+          d_2[0], d_2[1], d_2[2], d_2[3], d_2[4], d_2[5], d_2[6], d_2[7]);
+  d2_512 = jbm_dbl_512 (d_512);
+  _mm512_store_pd (d_1, d2_512);
+  printf ("dbl_512([1,-2,7,-4,-1,2,0,3])="
+          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
+  d2_512 = jbm_sqr_512 (d_512);
+  _mm512_store_pd (d_1, d2_512);
+  printf ("sqr_512([1,-2,7,-4,-1,2,0,3])="
+          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
+  d_512
+    = jbm_extrapolate_512 (_mm512_set_pd (2., -2., 4., -3., 0., 3., -1., 1.),
+                           _mm512_set1_pd (0.),
+                           _mm512_set1_pd (2.),
+                           _mm512_set1_pd (1.),
+                           _mm512_set1_pd (4.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("extrapolate_512([1,-1,3,0,-3,4,-2,2],[0,0,0,0,0,0,0,0],"
+          "[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[4,4,4,4,4,4,4,4])"
+          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
+  d_512
+    = jbm_interpolate_512 (_mm512_set_pd (2., -2., 4., -3., 0., 3., -1., 1.),
+                           _mm512_set1_pd (0.),
+                           _mm512_set1_pd (2.),
+                           _mm512_set1_pd (1.),
+                           _mm512_set1_pd (4.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("interpolate_512([1,-1,3,0,-3,4,-2,2],[0,0,0,0,0,0,0,0],"
+          "[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[4,4,4,4,4,4,4,4])"
+          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
+  d_512 = jbm_v2_length_512 (_mm512_set_pd (2., 3., -1., 4., -1., 3., 2., 1.),
+                             _mm512_set_pd (-1., 3., 2., 1., 2., 3., -1., 4.),
+                             _mm512_set_pd (6., 7., 3., 1., 2., 0., 5., -3.),
+                             _mm512_set_pd (2., 0., 5., -3., 6., 7., 3., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("v2_length_512([1,2,3,-1,4,-1,3,2],[4,-1,3,2,1,2,3,-1],"
+          "[-3,5,0,2,1,3,7,6],[1,3,7,6,-3,5,0,2])"
+          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
+  d_512 = jbm_v3_length_512 (_mm512_set_pd (2., 3., -1., 4., -1., 3., 2., 1.),
+                             _mm512_set_pd (-1., 3., 2., 1., 2., 3., -1., 4.),
+                             _mm512_set_pd (5., 0., 1., 3., 5., 0., 1., 3.),
+                             _mm512_set_pd (5., 5., 3., 0., 1., 2., 4., -1.),
+                             _mm512_set_pd (1., 2., 4., -1., 5., 5., 3., 0.),
+                             _mm512_set_pd (-1., 2., 5., 7., -1., 2., 5., 7.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("v3_length_512([1,2,3,-1,4,-1,3,2],[4,-1,3,2,1,2,3,-1],"
+          "[5,0,1,3,5,1,0,3],[-1,4,2,1,0,3,5,5],[0,3,5,5,-1,4,2,1],"
+          "[7,5,2,-1,7,5,2,-1])="
+          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
+  d_512
+    = jbm_polynomial_11_512 (_mm512_set_pd (-0.25, 0.25, 0., -0.5, -1., 0., 1., 0.5), p_1);
+  _mm512_store_pd (d_1, d_512);
+  printf ("polynomial_11_256([0.5,1,0,-1,-0.5,0,0.25,-0.25],"
+          "[1,2,4,8,16,32,64,128,512,512,1024,2048])="
+          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
+/*
+  d_512 = jbm_solve_quadratic_512 (_mm512_set_pd (1., 1., 0., 2.),
+                                   _mm512_set_pd (0., 0., -2., -1.),
+                                   _mm512_set_pd (-1., -1., 1., -1.),
+                                   _mm512_set_pd (-2., 0., 0., 0.),
+                                   _mm512_set_pd (0., 2., 2., 2.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("solve_quadratic_512([2,0,1,1],[-1,-2,0,0][-1,1,-1,-1],[0,0,0,-2],"
+          "[2,2,2,0])=[%.15le,%.15le,%.15le,%.15le]\n",
+          d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_setzero_pd (),
+                                _mm512_set1_pd (1.),
+                                JBM_FLUX_LIMITER_TYPE_TOTAL);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_total_512([0,0,0,0],[1,1,1,1])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_setzero_pd (),
+                                _mm512_set1_pd (1.),
+                                JBM_FLUX_LIMITER_TYPE_NULL);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_null_512([0,0,0,0],[1,1,1,1])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_set_pd (0., 1., 3., 1.),
+                                _mm512_set_pd (0., 3., 0., 1.),
+                                JBM_FLUX_LIMITER_TYPE_CENTRED);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_centred_512([1,3,1,0],[1,0,3,0])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_set_pd (3., 2., 1., -1.),
+                                _mm512_set_pd (2., 3., 3., 1.),
+                                JBM_FLUX_LIMITER_TYPE_SUPERBEE);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_superbee_512([-1,1,2,3],[1,3,3,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_set_pd (1., 0., 1., 0.),
+                                _mm512_set_pd (1., 1., 0., 0.),
+                                JBM_FLUX_LIMITER_TYPE_SUPERBEE);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_superbee_512([0,1,0,1],[0,0,1,1])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_set_pd (1., 3., 2., -1.),
+                                _mm512_set_pd (1., 1., 3., 1.),
+                                JBM_FLUX_LIMITER_TYPE_MINMOD);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_minmod_512([-1,2,3,1],[1,3,1,1])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_set_pd (1., 0., 2., -1.),
+                                _mm512_set_pd (0., 0., 3., 1.),
+                                JBM_FLUX_LIMITER_TYPE_VAN_LEER);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_VanLeer_512([-1,2,0,1],[1,3,0,0])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_set_pd (1., 0., 2., -1.),
+                                _mm512_set_pd (0., 0., 3., 1.),
+                                JBM_FLUX_LIMITER_TYPE_VAN_ALBADA);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_VanAlbada_512([-1,2,0,1],[1,3,0,0])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_set_pd (1., 3., 2., -1.),
+                                _mm512_set_pd (1., 1., 3., 1.),
+                                JBM_FLUX_LIMITER_TYPE_MINSUPER);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_minsuper_512([-1,2,3,1],[1,3,1,1])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_set_pd (1., 3., 1., -1.),
+                                _mm512_set_pd (1., 1., 3., 1.),
+                                JBM_FLUX_LIMITER_TYPE_SUPERMIN);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_supermin_512([-1,1,3,1],[1,3,1,1])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_set_pd (3., 2., 0.5, -1.),
+                                _mm512_set_pd (0.5, 3., 3., 1.),
+                                JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_monotonized_central_512([-1,0.5,2,3],[1,3,3,0.5])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_flux_limiter_512 (_mm512_set_pd (1., 0., 2., -1.),
+                                _mm512_set_pd (0., 0., 3., 1.),
+                                JBM_FLUX_LIMITER_TYPE_MEAN);
+  _mm512_store_pd (d_1, d_512);
+  printf ("flux_limiter_mean_512([-1,2,0,1],[1,3,0,0])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn0_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(1,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn1_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn2_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^2,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn3_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^3,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn4_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^4,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn5_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^5,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn6_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^6,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn7_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^7,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn8_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^9,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn9_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^9,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn10_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^10,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn11_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^11,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn12_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^12,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn13_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^13,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+  d_512 = jbm_integral_512 (fn14_512, _mm512_set_pd (-2., 0., -1., 0.),
+                            _mm512_set_pd (2., 2., 1., 1.));
+  _mm512_store_pd (d_1, d_512);
+  printf ("integral_512(x^14,[0,-1,0,-2],[1,1,2,2])"
+          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+*/
   aligned_free (d_2);
   aligned_free (d_1);
 #endif

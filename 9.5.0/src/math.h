@@ -47,6 +47,20 @@
 #include <immintrin.h>
 #endif
 
+/**
+ * \def JB_ALIGNED
+ * \brief Macro to define the aligned size in vectorized arrays.
+ */
+#if defined(__AVX512F__)
+#define JB_ALIGNED __attribute__((aligned(64)))
+#elif defined(__AVX__)
+#define JB_ALIGNED __attribute__((aligned(32)))
+#elif defined(__SSE4_2__)
+#define JB_ALIGNED __attribute__((aligned(16)))
+#else
+#define JB_ALIGNED
+#endif
+
 #ifndef M_PIl
 #define M_PIl M_PI              ///< high precision pi number.
 #endif
@@ -474,6 +488,41 @@
   ((y1) + (x - (x1)) * ((y2) - (y1)) / ((x2) - (x1)))
 ///< macro calculating a linear extrapolation.
 
+#define JBM_FACT0 1.            ///< 0!
+#define JBM_FACT1 1.            ///< 1!
+#define JBM_FACT2 2.            ///< 2!
+#define JBM_FACT3 6.            ///< 3!
+#define JBM_FACT4 24.           ///< 4!
+#define JBM_FACT5 120.          ///< 5!
+#define JBM_FACT6 720.          ///< 6!
+#define JBM_FACT7 5040.         ///< 7!
+#define JBM_FACT8 40320.        ///< 8!
+#define JBM_FACT9 362880.       ///< 9!
+#define JBM_FACT10 3628800.     ///< 10!
+#define JBM_FACT11 39916800.    ///< 11!
+#define JBM_FACT12 479001600.   ///< 12!
+#define JBM_FACT13 6227020800.  ///< 13!
+#define JBM_FACT14 87178291200. ///< 14!
+#define JBM_FACT15 1307674368000.       ///< 15!
+#define JBM_FACT16 20922789888000.      ///< 16!
+#define JBM_1_FACT0 (1. / JBM_FACT0)    ///< 1/0!
+#define JBM_1_FACT1 (1. / JBM_FACT1)    ///< 1/1!
+#define JBM_1_FACT2 (1. / JBM_FACT2)    ///< 1/2!
+#define JBM_1_FACT3 (1. / JBM_FACT3)    ///< 1/3!
+#define JBM_1_FACT4 (1. / JBM_FACT4)    ///< 1/4!
+#define JBM_1_FACT5 (1. / JBM_FACT5)    ///< 1/5!
+#define JBM_1_FACT6 (1. / JBM_FACT6)    ///< 1/6!
+#define JBM_1_FACT7 (1. / JBM_FACT7)    ///< 1/7!
+#define JBM_1_FACT8 (1. / JBM_FACT8)    ///< 1/8!
+#define JBM_1_FACT9 (1. / JBM_FACT9)    ///< 1/9!
+#define JBM_1_FACT10 (1. / JBM_FACT10)  ///< 1/10!
+#define JBM_1_FACT11 (1. / JBM_FACT11)  ///< 1/11!
+#define JBM_1_FACT12 (1. / JBM_FACT12)  ///< 1/12!
+#define JBM_1_FACT13 (1. / JBM_FACT13)  ///< 1/13!
+#define JBM_1_FACT14 (1. / JBM_FACT14)  ///< 1/14!
+#define JBM_1_FACT15 (1. / JBM_FACT15)  ///< 1/15!
+#define JBM_1_FACT16 (1. / JBM_FACT16)  ///< 1/16!
+
 ///> enum to select the flux limiter type.
 enum JBMFluxLimiterType
 {
@@ -518,13 +567,967 @@ extern void matrix_print (JBFLOAT *, unsigned int, unsigned int);
 extern void farray_print (JBMFarray *);
 
 /**
+ * Function to calculate the abs function (double).
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_f64_abs (const double x)    ///< double number.
+{
+  double y = x;
+  long long unsigned int *i64 = (long long unsigned int *) &y;
+  *i64 &= 0x7fffffffffffffffL;
+  return y;
+}
+
+/**
+ * Function to calculate the hypot function (double).
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_f64_hypot (const double x,  ///< 1st double number.
+               const double y)  ///< 2nd double number.
+{
+  return sqrt (x * x + y * y);
+}
+
+/**
+ * Function to calculate the rest of a division (double).
+ *
+ * \return rest value (in [0,|divisor|) interval).
+ */
+static inline double
+jbm_f64_rest (const double x,   ///< dividend (double).
+              const double d)   ///< divisor (double).
+{
+  double f;
+  f = floor (x / d);
+  return x - f * d;
+}
+
+/**
+ * Function to implement the standard frexp function (double).
+ *
+ * \return normalize fraction value in [1/2,1).
+ */
+static inline double
+jbm_f64_frexp (const double x,  ///< double number.
+               int *e)          ///< pointer to the extracted exponent.
+{
+  double y, z;
+  long long unsigned int *i64;
+  y = x;
+  i64 = (long long unsigned int *) &y;
+#if JBM_WITH_EXCEPTIONS
+  if ((*i64 & 0x7ff0000000000000L) == 0x7ff0000000000000L)
+    {
+      *e = 0;
+      return x;
+    }
+#endif
+  *i64 &= 0x7ff0000000000000L;
+  *e = (int) (*i64 >> 52) - 1023;
+  if (!*i64)
+    {
+      y = x;
+      *i64 &= 0x000fffffffffffffL;
+      if (!*i64)
+        {
+          *e = 0;
+          return 0.;
+        }
+      *i64 = 0x0010000000000000L;
+      z = x / y;
+      i64 = (long long unsigned int *) &z;
+      *i64 &= 0x7ff0000000000000L;
+      *e = (int) (*i64 >> 52) - 2044;
+      y *= z;
+    }
+  else
+    ++(*e);
+  return 0.5 * x / y;
+}
+
+/**
+ * Function to calculate the function 2^n with n an integer number (int).
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_exp2n (int e)           ///< exponent number (int).
+{
+  double y;
+  long long unsigned int *i64;
+  if (e > 1023)
+    return INFINITY;
+  i64 = (long long unsigned int *) &y;
+  if (e > -1023)
+    *i64 = (1023L + e) << 52L;
+  else
+    *i64 = 0x0008000000000000L >> (-e - 1023);
+  return y;
+}
+
+/**
+ * Function to implement the standard ldexp function (double).
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_f64_ldexp (const double x,  ///< double number.
+               int e)           ///< exponent number (int).
+{
+  return x * jbm_f64_exp2n (e);
+}
+
+/**
+ * Function to calculate a 1st order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_1 (const double x,  ///< double value.
+               const double *p) ///< array of coefficients.
+{
+  return p[0] + x * p[1];
+}
+
+/**
+ * Function to calculate a 2nd order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_2 (const double x,  ///< double value.
+               const double *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_1 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 3rd order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_3 (const double x,  ///< double value.
+               const double *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_2 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 4th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_4 (const double x,  ///< double value.
+               const double *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_3 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 5th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_5 (const double x,  ///< double value.
+               const double *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_4 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 6th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_6 (const double x,  ///< double value.
+               const double *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_5 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 7th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_7 (const double x,  ///< double value.
+               const double *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_6 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 8th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_8 (const double x,  ///< double value.
+               const double *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_7 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 9th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_9 (const double x,  ///< double value.
+               const double *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_8 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 10th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_10 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_9 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 11th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_11 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_10 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 12th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_12 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_11 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 13th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_13 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_12 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 14th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_14 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_13 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 15th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_15 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_14 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 16th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_16 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_15 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 17th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_17 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_16 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 18th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_18 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_17 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 19th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_19 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_18 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 20th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_20 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_19 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 21th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_21 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_20 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 22th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_22 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_21 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 23th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_23 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_22 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 24th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_24 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_23 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 25th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_25 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_24 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 26th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_26 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_25 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 27th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_27 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_26 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 28th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_28 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_27 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 29th order polynomial (double).
+ *
+ * \return polynomial value.
+ */
+static inline double
+jbm_f64_pol_29 (const double x, ///< double value.
+                const double *p)        ///< array of coefficients.
+{
+  return p[0] + x * jbm_f64_pol_28 (x, p + 1);
+}
+
+/**
+ * Function to calculate the well conditionated function exp(x) for x in
+ * [-log(2)/2,log(2)/2] by the following Taylor' serie:
+ * \fn$exp(x)\approx\sum_{i=0}^13x^i/i!\fn$.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_expwc (const double x)
+               ///< double number \fn$\in\left[-\log(2)/2,\log(2)/2\right]\fn$.
+{
+  const double a[14] JB_ALIGNED = { JBM_1_FACT0, JBM_1_FACT1, JBM_1_FACT2,
+    JBM_1_FACT3, JBM_1_FACT4, JBM_1_FACT5, JBM_1_FACT6, JBM_1_FACT7,
+    JBM_1_FACT8, JBM_1_FACT9, JBM_1_FACT10, JBM_1_FACT11, JBM_1_FACT12,
+    JBM_1_FACT13
+  };
+  return jbm_f64_pol_13 (x, a);
+}
+
+/**
+ * Function to calculate the function 2^x using the jbm_f64_expwc and
+ * jbm_f64_exp2n functions.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_exp2 (const double x)   ///< double number.
+{
+  double y, f;
+  y = floor (x);
+  f = x - y;
+  y = jbm_f64_exp2n ((int) y);
+  return y * M_SQRT2 * jbm_f64_expwc ((f - 0.5) * M_LN2);
+}
+
+/**
+ * Function to calculate the function exp(x) using the jbm_f64_exp2 function.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_exp (const double x)    ///< double number.
+{
+  return jbm_f64_exp2 (x * M_LOG2E);
+}
+
+/**
+ * Function to calculate the function 10^x using the jbm_f64_exp2 function.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_exp10 (const double x)  ///< double number.
+{
+  return jbm_f64_exp2 (x * M_LN10 / M_LN2);
+}
+
+/**
+ * Function to calculate the well conditionated function log(1+x) for x in
+ * [-1/3,1/3] by the following Taylor' serie:
+ * \fn$log(1+x)\approx\sum_{i=1}^{30}\frac{(-1)^{n+1}\,x^n}{n!}\fn$.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_logwc (const double x)  ///< double number.
+{
+  const double a[30] = { 1., -1. / 2., 1. / 3., -1. / 4., 1. / 5., -1. / 6.,
+    1. / 7., -1. / 8., 1. / 9., -1. / 10., 1. / 11., -1. / 12., 1. / 13.,
+    -1. / 14., 1. / 15., -1. / 16., 1. / 17., -1. / 18., 1. / 19., -1. / 20.,
+    1. / 21., -1. / 22., 1. / 23., -1. / 24., 1. / 25., -1. / 26., 1. / 27.,
+    -1. / 28., 1. / 29., -1. / 30.
+  };
+  double x1;
+  x1 = x - 1.;
+  return x1 * jbm_f64_pol_29 (x1, a);
+}
+
+/**
+ * Function to calculate the function log_2(x) using jbm_f64_logwc and
+ * jbm_f64_frexp
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_log2 (const double x)   ///< double number.
+{
+  double y;
+  int e;
+  if (x < 0.)
+    return sqrt(-1.);
+  if (x <= 0.)
+    return -INFINITY;
+  y = jbm_f64_frexp (x, &e);
+  return jbm_f64_logwc (y * 4. / 3.) * M_LOG2E - 0.41503749927884378
+    + (double) e; 
+}
+
+/**
+ * Function to calculate the function log(x) using jbm_f64_log2.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_log (const double x)    ///< double number.
+{
+  return jbm_f64_log2 (x) * M_LN2;
+}
+
+/**
+ * Function to calculate the function log10(x) using jbm_f64_log2.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_log10 (const double x)  ///< double number.
+{
+  return jbm_f64_log2 (x) * M_LN2 / M_LN10;
+}
+
+/**
+ * Function to calculate the function x^e with e an integer number.
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_f64_pown (const double x,   ///< double number.
+              int e)            ///< exponent (int).
+{
+  double f, xn;
+  unsigned int i;
+  f = 1.;
+  if (e < 0)
+    xn = 1. / xn;
+  else
+    xn = x;
+  i = (unsigned int) abs (e);
+  while (i)
+    {
+      if (i & 1)
+        f *= xn;
+      xn *= xn;  
+      i >>= 1;
+    }
+  return f;
+}
+
+/**
+ * Function to calculate the function pow using the jbm_f64_exp2 and
+ * jbm_f64_log2 functions.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_pow (const double x,    ///< double number.
+             const double e)    ///< exponent (double).
+{
+  double f;
+  f = floor (e);
+  if (f == e)
+    return jbm_f64_pown (x, (int) e);
+  return jbm_f64_exp2 (e * jbm_f64_log2 (x));
+}
+
+/**
+ * Function to calculate the function cbrt(x) using the jbm_f64_pow function.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_cbrt (const double x)  ///< double number.
+{
+  double f;
+  f = jbm_f64_abs (x);
+  f = jbm_f64_pow (x, 1. / 3.);
+  if (x < 0.)
+    f = -f;
+  return f;
+}
+
+/**
+ * Function to calculate the well conditionated function sin(x) for x in
+ * [-pi/4,pi/4] by the following Taylor' serie:
+ * \fn$sin(x)\approx x\,\left(1-x^2/3!+x^4/5!-x^6/7!+x^8/9!-x^{10}/11!
+ * +x^{12}/12!-x^{14}/15!\right)\fn$.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_sinwc (const double x)
+               ///< double number \fn$\in\left[-\pi/4,\pi/4\right]\fn$.
+{
+  const double a[8] JB_ALIGNED = { JBM_1_FACT1, -JBM_1_FACT3, JBM_1_FACT5,
+    -JBM_1_FACT7, JBM_1_FACT9, -JBM_1_FACT11, JBM_1_FACT13, -JBM_1_FACT15
+  };
+  return x * jbm_f64_pol_7 (x * x, a);
+}
+
+/**
+ * Function to calculate the well conditionated function cos(x) for x in
+ * [-pi/4,pi/4] by the following Taylor' serie:
+ * \fn$sin(x)\approx1-x^2/2!+x^4/4!-x^6/6!+x^8/8!-x^{10}/10!+x^{12}/12!
+ * -x^{14}/14!+x^{16}/16!\right)\fn$.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_coswc (const double x)
+               ///< double number \fn$\in\left[-\pi/4,\pi/4\right]\fn$.
+{
+  const double a[9] JB_ALIGNED = { JBM_1_FACT0, -JBM_1_FACT2, JBM_1_FACT4,
+    -JBM_1_FACT6, JBM_1_FACT8, -JBM_1_FACT10, JBM_1_FACT12, -JBM_1_FACT14,
+    JBM_1_FACT16
+  };
+  return jbm_f64_pol_8 (x * x, a);
+}
+
+/**
+ * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * x in [-pi/4,pi/4] from jbm_f64_sinwc and jbm_f64_coswc approximations.
+ */
+static inline void
+jbm_f64_sincoswc (const double x,
+                  ///< double number \fn$\in\left[-\pi/4,\pi/4\right]\fn$.
+                  double *s,
+                  ///< pointer to the sin function value.
+                  double *c)
+                  ///< pointer to the cos function value.
+{
+  *s = jbm_f64_sinwc (x);
+  *c = jbm_f64_coswc (x);
+}
+
+/**
+ * Function to calculate the function sin(x) from jbm_f64_sinwc and
+ * jbm_f64_coswc approximations.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_sin (const double x)    ///< double number.
+{
+  double y;
+  unsigned int i;
+  y = jbm_f64_rest (x, 2. * M_PI);
+  i = (unsigned int) floor (y / M_PI_4);
+  if (i < 1)
+    return jbm_f64_sinwc (y);
+  if (i < 2)
+    return jbm_f64_coswc (M_PI_2 - y);
+  if (i < 3)
+    return jbm_f64_sinwc (M_PI - y);
+  if (i < 7)
+    return -jbm_f64_coswc (3. * M_PI_2 - y);
+  return jbm_f64_sinwc (y - 2. * M_PI);
+}
+
+/**
+ * Function to calculate the function cos(x) from jbm_f64_sinwc and
+ * jbm_f64_coswc approximations.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_cos (const double x)    ///< double number.
+{
+  double y;
+  unsigned int i;
+  y = jbm_f64_rest (x, 2. * M_PI);
+  i = (unsigned int) floor (y / M_PI_4);
+  if (i < 1)
+    return jbm_f64_coswc (y);
+  if (i < 3)
+    return jbm_f64_sinwc (M_PI_2 - y);
+  if (i < 5)
+    return -jbm_f64_coswc (M_PI - y);
+  if (i < 7)
+    return jbm_f64_sinwc (y - 3. * M_PI_2);
+  return jbm_f64_coswc (y - 2. * M_PI);
+}
+
+/**
+ * Function to calculate the functions sin(x) and cos(x) from jbm_f64_sinwc and
+ * jbm_f64_coswc approximations.
+ */
+static inline void
+jbm_f64_sincos (const double x,
+                ///< double number \fn$\in\left[-\pi/4,\pi/4\right]\fn$.
+                double *s,      ///< pointer to the sin function value.
+                double *c)      ///< pointer to the cos function value.
+{
+  double y;
+  unsigned int i;
+  y = jbm_f64_rest (x, 2. * M_PI);
+  i = (unsigned int) floor (y / M_PI_4);
+  if (i < 1)
+    {
+      *s = jbm_f64_sinwc (y);
+      *c = jbm_f64_coswc (y);
+    }
+  else if (i < 3)
+    {
+      y = M_PI_2 - y;
+      *s = jbm_f64_coswc (y);
+      *c = jbm_f64_sinwc (y);
+    }
+  else if (i < 5)
+    {
+      y = M_PI - y;
+      *s = jbm_f64_sinwc (y);
+      *c = -jbm_f64_coswc (y);
+    }
+  else if (i < 7)
+    {
+      y -= 3. * M_PI_2;
+      *s = -jbm_f64_coswc (y);
+      *c = jbm_f64_sinwc (y);
+    }
+  else
+    {
+      y -= 2. * M_PI;
+      *s = jbm_f64_sinwc (y);
+      *c = jbm_f64_coswc (y);
+    }
+}
+
+/**
+ * Function to calculate the function tan(x) from jbm_f64_sinwc and
+ * jbm_f64_coswc approximations.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_tan (const double x)    ///< double number.
+{
+  double s, c;
+  jbm_f64_sincos (x, &s, &c);
+  return s / c;
+}
+
+/**
+ * Function to calculate the well conditionated function atan(x) for x in
+ * [-1/2,1/2] by the following Taylor' serie:
+ * \fn$atan(x)\approx\sum_{i=0}^{23}\frac{(-1)^{2n}\,x^{2\,n+1}}{2\,n+1}\fn$.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_atanwc0 (const double x)
+                 ///< double number \fn$\in\left[0,\frac12\right]\fn$.
+{
+  const double a[24] JB_ALIGNED = { 1., -1. / 3., 1. / 5., -1. / 7., 1. / 9.,
+    -1. / 11., 1. / 13., -1. / 15., 1. / 17., -1. / 19., 1. / 21., -1. / 23.,
+    1. / 25., -1. / 27., 1. / 29., -1. / 31., 1. / 33., -1. / 35., 1. / 37.,
+    -1. / 39., 1. / 41., -1. / 43., 1. / 45., -1. / 47.
+  };
+
+  return x * jbm_f64_pol_23 (x * x, a);
+}
+
+/**
+ * Function to calculate the well conditionated function atan(x) for x in
+ * [1/2,3/2] by the following Taylor' serie:
+ * \fn$atan(1+x)\approx
+ * \frac{\pi}{4}
+ * +\frac{x}{2}
+ * -\frac{x^2}{4}
+ * +\frac{x^3}{12}
+ * -\frac{x^5}{40}
+ * +\frac{x^6}{48}
+ * -\frac{x^7}{112}
+ * +\frac{x^9}{288}
+ * -\frac{x^{10}}{320}
+ * +\frac{x^{11}}{704}
+ * -\frac{x^{13}}{1664}
+ * +\frac{x^{14}}{1792}
+ * -\frac{x^{15}}{3840}
+ * +\frac{x^{17}}{8704}
+ * -\frac{x^{18}}{9216}
+ * +\frac{x^{19}}{19456}
+ * -\frac{x^{21}}{43008}
+ * +\frac{x^{22}}{45056}
+ * -\frac{x^{23}}{94208}
+ * +\frac{x^{25}}{204800}
+ * -\frac{x^{26}}{212992}
+ * +\frac{x^{27}}{442368}
+ * -\frac{x^{29}}{950272}
+ * +\frac{x^{30}}{983040}
+ * -\frac{x^{31}}{2031616}\fn$.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_f64_atanwc1 (const double x)
+                 ///< double number \fn$\in\left[\frac12,1\right]\fn$.
+{
+  const double a1[8] = { 1. / 2., -1. / 40., 1. / 288., -1. / 1664., 1. / 8704.,
+    -1. / 43008., 1. / 204800., -1. / 950272.
+  };
+  const double a2[8] = { -1. / 4., 1. / 48., -1. / 320., 1. / 1792.,
+    -1. / 9216., 1. / 45056., -1. / 212992., 1. / 983040.
+  };
+  const double a3[8] = { 1. / 12., -1. / 112., 1. / 704., -1. / 3840.,
+    1. / 19456., -1. / 94208., 1. / 442368., -1. / 2031616.
+  };
+  double x1, x4;
+  x1 = x - 1.;
+  x4 = x1 * x1;
+  x4 *= x4;
+  return M_PI_4 + x1 * (jbm_f64_pol_7 (x4, a1)
+                        + x1 * (jbm_f64_pol_7 (x4, a2)
+                                + x1 * jbm_f64_pol_7 (x4, a3)));
+}
+
+/**
+ * Function to calculate the function atan(x) using the jbm_f64_atanwc0 and
+ * jbm_f64_atancw1 functions.
+ *
+ * \return function value (in [-pi/2,pi/2]).
+ */
+static inline double
+jbm_f64_atan (const double x)   ///< double number.
+{
+  double f, ax;
+  ax = jbm_f64_abs (x);
+  if (ax > 1.5)
+    {
+      ax = 1. / ax;
+      if (ax > 0.5)
+        f = M_PI_2 - jbm_f64_atanwc1 (ax);
+      else
+        f = M_PI_2 - jbm_f64_atanwc0 (ax);
+    }
+  else
+    {
+      if (ax > 0.5)
+        f = jbm_f64_atanwc1 (ax);
+      else
+        f = jbm_f64_atanwc0 (ax);
+    }
+  if (x < 0.)
+    f = -f;
+  return f;
+}
+
+/**
+ * Function to calculate the function atan2(y,x) using the jbm_f64_atan
+ * function.
+ *
+ * \return function value (in [-pi,pi]).
+ */
+static inline double
+jbm_f64_atan2 (const double y,  ///< double y component.
+               const double x)  ///< double x component.
+{
+  double f;
+  f = jbm_f64_atan (y / x);
+  if (x < 0.)
+    if (y < 0.)
+      f -= M_PI;
+    else
+      f += M_PI;
+  return f;
+}
+
+/**
+ * Function to calculate the function asin(x) using the jbm_f64_atan function.
+ *
+ * \return function value (in [-pi/2,pi/2]).
+ */
+static inline double
+jbm_f64_asin (const double x)   ///< double number.
+{
+  return jbm_f64_atan (x / sqrt (1 - x * x));
+}
+
+/**
+ * Function to calculate the function acos(x) using the jbm_f64_atan function.
+ *
+ * \return function value (in [0,pi]).
+ */
+static inline double
+jbm_f64_acos (const double x)   ///< double number.
+{
+  double f;
+  f = jbm_f64_atan (sqrt (1 - x * x) / x);
+  if (x < 0.)
+    f += M_PI;
+  return f;
+}
+
+/**
  * Function to calculate the minimum of 2 int numbers.
  *
  * \return minimum int number.
  */
 static inline int
-jbm_min (const int a,                 ///< 1st int number.
-         const int b)                 ///< 2nd int number.
+jbm_min (const int a,           ///< 1st int number.
+         const int b)           ///< 2nd int number.
 {
   return JBM_MIN (a, b);
 }
@@ -535,8 +1538,8 @@ jbm_min (const int a,                 ///< 1st int number.
  * \return maximum int number.
  */
 static inline int
-jbm_max (const int a,                 ///< 1st int number.
-         const int b)                 ///< 2nd int number.
+jbm_max (const int a,           ///< 1st int number.
+         const int b)           ///< 2nd int number.
 {
   return JBM_MAX (a, b);
 }
@@ -553,8 +1556,8 @@ jbm_max (const int a,                 ///< 1st int number.
  * \return modmin int number.
  */
 static inline int
-jbm_modmin (const int a,              ///< 1st int number.
-            const int b)              ///< 2nd int number.
+jbm_modmin (const int a,        ///< 1st int number.
+            const int b)        ///< 2nd int number.
 {
   return JBM_MODMIN (a, b);
 }
@@ -565,7 +1568,7 @@ jbm_modmin (const int a,              ///< 1st int number.
  * \return int double.
  */
 static inline int
-jbm_dbl (const int x)                 ///< unsigned int number.
+jbm_dbl (const int x)           ///< unsigned int number.
 {
   return JBM_DBL (x);
 }
@@ -576,7 +1579,7 @@ jbm_dbl (const int x)                 ///< unsigned int number.
  * \return int square.
  */
 static inline int
-jbm_sqr (const int x)                 ///< int number.
+jbm_sqr (const int x)           ///< int number.
 {
   return JBM_SQR (x);
 }
@@ -598,8 +1601,8 @@ jbm_change (int *restrict a,    ///< 1st int number pointer.
  * \return minimum unsigned int number.
  */
 static inline unsigned int
-jbm_minu (const unsigned int a,       ///< 1st unsigned int number.
-          const unsigned int b)       ///< 2nd unsigned int number.
+jbm_minu (const unsigned int a, ///< 1st unsigned int number.
+          const unsigned int b) ///< 2nd unsigned int number.
 {
   return JBM_MIN (a, b);
 }
@@ -610,8 +1613,8 @@ jbm_minu (const unsigned int a,       ///< 1st unsigned int number.
  * \return maximum unsigned int number.
  */
 static inline unsigned int
-jbm_maxu (const unsigned int a,       ///< 1st unsigned int number.
-          const unsigned int b)       ///< 2nd unsigned int number.
+jbm_maxu (const unsigned int a, ///< 1st unsigned int number.
+          const unsigned int b) ///< 2nd unsigned int number.
 {
   return JBM_MAX (a, b);
 }
@@ -622,7 +1625,7 @@ jbm_maxu (const unsigned int a,       ///< 1st unsigned int number.
  * \return unsigned int double.
  */
 static inline unsigned int
-jbm_dblu (const unsigned int x)       ///< unsigned int number.
+jbm_dblu (const unsigned int x) ///< unsigned int number.
 {
   return JBM_DBL (x);
 }
@@ -633,7 +1636,7 @@ jbm_dblu (const unsigned int x)       ///< unsigned int number.
  * \return unsigned int square.
  */
 static inline unsigned int
-jbm_sqru (const unsigned int x)       ///< unsigned int number.
+jbm_sqru (const unsigned int x) ///< unsigned int number.
 {
   return JBM_SQR (x);
 }
@@ -657,8 +1660,8 @@ jbm_changeu (unsigned int *restrict a,
  * \return maximum long int number.
  */
 static inline long int
-jbm_maxl (const long int a,           ///< 1st long int number.
-          const long int b)           ///< 2nd long int number.
+jbm_maxl (const long int a,     ///< 1st long int number.
+          const long int b)     ///< 2nd long int number.
 {
   return JBM_MAX (a, b);
 }
@@ -669,8 +1672,8 @@ jbm_maxl (const long int a,           ///< 1st long int number.
  * \return minimum long int number.
  */
 static inline long int
-jbm_minl (const long int a,           ///< 1st long int number.
-          const long int b)           ///< 2nd long int number.
+jbm_minl (const long int a,     ///< 1st long int number.
+          const long int b)     ///< 2nd long int number.
 {
   return JBM_MIN (a, b);
 }
@@ -687,8 +1690,8 @@ jbm_minl (const long int a,           ///< 1st long int number.
  * \return modmin long int number.
  */
 static inline long int
-jbm_modminl (const long int a,        ///< 1st long int number.
-             const long int b)        ///< 2nd long int number.
+jbm_modminl (const long int a,  ///< 1st long int number.
+             const long int b)  ///< 2nd long int number.
 {
   return (int) JBM_MODMINL (a, b);
 }
@@ -710,7 +1713,7 @@ jbm_changel (long int *restrict a,      ///< 1st long int number pointer.
  * \return long int square.
  */
 static inline long int
-jbm_sqrl (const long int x)           ///< long int number.
+jbm_sqrl (const long int x)     ///< long int number.
 {
   return JBM_SQR (x);
 }
@@ -721,7 +1724,7 @@ jbm_sqrl (const long int x)           ///< long int number.
  * \return long int double.
  */
 static inline long int
-jbm_dbll (const long int x)           ///< long int number.
+jbm_dbll (const long int x)     ///< long int number.
 {
   return JBM_DBL (x);
 }
@@ -732,8 +1735,8 @@ jbm_dbll (const long int x)           ///< long int number.
  * \return maximum unsigned long int number.
  */
 static inline unsigned long int
-jbm_maxul (const unsigned long int a, ///< 1st unsigned long int number.
-           const unsigned long int b) ///< 2nd unsigned long int number.
+jbm_maxul (const unsigned long int a,   ///< 1st unsigned long int number.
+           const unsigned long int b)   ///< 2nd unsigned long int number.
 {
   return JBM_MAX (a, b);
 }
@@ -744,8 +1747,8 @@ jbm_maxul (const unsigned long int a, ///< 1st unsigned long int number.
  * \return minimum unsigned long int number.
  */
 static inline unsigned long int
-jbm_minul (const unsigned long int a, ///< 1st unsigned long int number.
-           const unsigned long int b) ///< 2nd unsigned long int number.
+jbm_minul (const unsigned long int a,   ///< 1st unsigned long int number.
+           const unsigned long int b)   ///< 2nd unsigned long int number.
 {
   return JBM_MIN (a, b);
 }
@@ -769,7 +1772,7 @@ jbm_changeul (unsigned long int *restrict a,
  * \return unsigned long int double.
  */
 static inline unsigned long int
-jbm_dblul (const unsigned long int x) ///< unsigned long int number.
+jbm_dblul (const unsigned long int x)   ///< unsigned long int number.
 {
   return JBM_DBL (x);
 }
@@ -780,7 +1783,7 @@ jbm_dblul (const unsigned long int x) ///< unsigned long int number.
  * \return unsigned long int square.
  */
 static inline unsigned long int
-jbm_sqrul (const unsigned long int x) ///< unsigned long int number.
+jbm_sqrul (const unsigned long int x)   ///< unsigned long int number.
 {
   return JBM_SQR (x);
 }
@@ -791,8 +1794,8 @@ jbm_sqrul (const unsigned long int x) ///< unsigned long int number.
  * \return maximum long long int number.
  */
 static inline long long int
-jbm_maxll (const long long int a,     ///< 1st long long int number.
-           const long long int b)     ///< 2nd long long int number.
+jbm_maxll (const long long int a,       ///< 1st long long int number.
+           const long long int b)       ///< 2nd long long int number.
 {
   return JBM_MAX (a, b);
 }
@@ -803,8 +1806,8 @@ jbm_maxll (const long long int a,     ///< 1st long long int number.
  * \return minimum long long int number.
  */
 static inline long long int
-jbm_minll (const long long int a,     ///< 1st long long int number.
-           const long long int b)     ///< 2nd long long int number.
+jbm_minll (const long long int a,       ///< 1st long long int number.
+           const long long int b)       ///< 2nd long long int number.
 {
   return JBM_MIN (a, b);
 }
@@ -821,8 +1824,8 @@ jbm_minll (const long long int a,     ///< 1st long long int number.
  * \return modmin long long int number.
  */
 static inline long long int
-jbm_modminll (const long long int a,  ///< 1st long long int number.
-              const long long int b)  ///< 2nd long long int number.
+jbm_modminll (const long long int a,    ///< 1st long long int number.
+              const long long int b)    ///< 2nd long long int number.
 {
   return JBM_MODMINLL (a, b);
 }
@@ -846,7 +1849,7 @@ jbm_changell (long long int *restrict a,
  * \return long long int square.
  */
 static inline long long int
-jbm_sqrll (const long long int x)     ///< long long int number.
+jbm_sqrll (const long long int x)       ///< long long int number.
 {
   return JBM_SQR (x);
 }
@@ -857,7 +1860,7 @@ jbm_sqrll (const long long int x)     ///< long long int number.
  * \return long long int double.
  */
 static inline long long int
-jbm_dblll (const long long int x)     ///< long long int number.
+jbm_dblll (const long long int x)       ///< long long int number.
 {
   return JBM_DBL (x);
 }
@@ -868,8 +1871,10 @@ jbm_dblll (const long long int x)     ///< long long int number.
  * \return maximum unsigned long long int number.
  */
 static inline unsigned long long int
-jbm_maxull (const unsigned long long int a,   ///< 1st unsigned long long int number.
-            const unsigned long long int b)   ///< 2nd unsigned long long int number.
+jbm_maxull (const unsigned long long int a,
+            ///< 1st unsigned long long int number.
+            const unsigned long long int b)
+            ///< 2nd unsigned long long int number.
 {
   return JBM_MAX (a, b);
 }
@@ -880,8 +1885,10 @@ jbm_maxull (const unsigned long long int a,   ///< 1st unsigned long long int nu
  * \return minimum unsigned long long int number.
  */
 static inline unsigned long long int
-jbm_minull (const unsigned long long int a,   ///< 1st unsigned long long int number.
-            const unsigned long long int b)   ///< 2nd unsigned long long int number.
+jbm_minull (const unsigned long long int a,
+            ///< 1st unsigned long long int number.
+            const unsigned long long int b)
+            ///< 2nd unsigned long long int number.
 {
   return JBM_MIN (a, b);
 }
@@ -905,7 +1912,8 @@ jbm_changeull (unsigned long long int *restrict a,
  * \return unsigned long long int square.
  */
 static inline unsigned long long int
-jbm_sqrull (const unsigned long long int x)   ///< unsigned long long int number.
+jbm_sqrull (const unsigned long long int x)
+            ///< unsigned long long int number.
 {
   return JBM_SQR (x);
 }
@@ -916,7 +1924,8 @@ jbm_sqrull (const unsigned long long int x)   ///< unsigned long long int number
  * \return unsigned long long int double.
  */
 static inline unsigned long long int
-jbm_dblull (const unsigned long long int x)   ///< unsigned long long int number.
+jbm_dblull (const unsigned long long int x)
+            ///< unsigned long long int number.
 {
   return JBM_DBL (x);
 }
@@ -927,7 +1936,7 @@ jbm_dblull (const unsigned long long int x)   ///< unsigned long long int number
  * \return 1 on small number, 0 otherwise.
  */
 static inline int
-jbm_small (const JBFLOAT x)           ///< JBFLOAT number.
+jbm_small (const JBFLOAT x)     ///< JBFLOAT number.
 {
   if (FABS (x) < JBM_EPSILON)
     return 1;
@@ -946,8 +1955,8 @@ jbm_small (const JBFLOAT x)           ///< JBFLOAT number.
  * \return modmin JBFLOAT number.
  */
 static inline JBFLOAT
-jbm_fmodmin (const JBFLOAT a,         ///< 1st JBFLOAT number.
-             const JBFLOAT b)         ///< 2nd JBFLOAT number.
+jbm_fmodmin (const JBFLOAT a,   ///< 1st JBFLOAT number.
+             const JBFLOAT b)   ///< 2nd JBFLOAT number.
 {
   return JBM_FMODMIN (a, b);
 }
@@ -958,7 +1967,7 @@ jbm_fmodmin (const JBFLOAT a,         ///< 1st JBFLOAT number.
  * \return JBFLOAT double.
  */
 static inline JBFLOAT
-jbm_fdbl (const JBFLOAT x)            ///< JBFLOAT number.
+jbm_fdbl (const JBFLOAT x)      ///< JBFLOAT number.
 {
   return JBM_DBL (x);
 }
@@ -969,7 +1978,7 @@ jbm_fdbl (const JBFLOAT x)            ///< JBFLOAT number.
  * \return JBFLOAT square.
  */
 static inline JBFLOAT
-jbm_fsqr (const JBFLOAT x)            ///< JBFLOAT number.
+jbm_fsqr (const JBFLOAT x)      ///< JBFLOAT number.
 {
   return JBM_SQR (x);
 }
@@ -991,11 +2000,12 @@ jbm_fchange (JBFLOAT *restrict a,       ///< 1st JBFLOAT number pointer.
  * \return y-coordinate of the extrapolated point.
  */
 static inline JBFLOAT
-jbm_extrapolate (const JBFLOAT x,     ///< x-coordinate of the extrapolated point.
-                 const JBFLOAT x1,    ///< x-coordinate of the 1st point.
-                 const JBFLOAT x2,    ///< x-coordinate of the 2nd point.
-                 const JBFLOAT y1,    ///< y-coordinate of the 1st point.
-                 const JBFLOAT y2)    ///< y-coordinate of the 2nd point.
+jbm_extrapolate (const JBFLOAT x,
+                 ///< x-coordinate of the extrapolated point.
+                 const JBFLOAT x1,      ///< x-coordinate of the 1st point.
+                 const JBFLOAT x2,      ///< x-coordinate of the 2nd point.
+                 const JBFLOAT y1,      ///< y-coordinate of the 1st point.
+                 const JBFLOAT y2)      ///< y-coordinate of the 2nd point.
 {
   return JBM_EXTRAPOLATE (x, x1, x2, y1, y2);
 }
@@ -1007,11 +2017,12 @@ jbm_extrapolate (const JBFLOAT x,     ///< x-coordinate of the extrapolated poin
  * \return y-coordinate of the interpolated point.
  */
 static inline JBFLOAT
-jbm_interpolate (const JBFLOAT x,     ///< x-coordinate of the interpolated point.
-                 const JBFLOAT x1,    ///< x-coordinate of the 1st point.
-                 const JBFLOAT x2,    ///< x-coordinate of the 2nd point.
-                 const JBFLOAT y1,    ///< y-coordinate of the 1st point.
-                 const JBFLOAT y2)    ///< y-coordinate of the 2nd point.
+jbm_interpolate (const JBFLOAT x,
+                 ///< x-coordinate of the interpolated point.
+                 const JBFLOAT x1,      ///< x-coordinate of the 1st point.
+                 const JBFLOAT x2,      ///< x-coordinate of the 2nd point.
+                 const JBFLOAT y1,      ///< y-coordinate of the 1st point.
+                 const JBFLOAT y2)      ///< y-coordinate of the 2nd point.
 {
   if (x <= x1)
     return y1;
@@ -1066,8 +2077,8 @@ jbm_v3_length (const JBFLOAT x1,
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_1 (const JBFLOAT x,    ///< variable.
-                  const JBFLOAT *p)   ///< array of coefficients.
+jbm_polynomial_1 (const JBFLOAT x,      ///< variable.
+                  const JBFLOAT *p)     ///< array of coefficients.
 {
   return p[0] + x * p[1];
 }
@@ -1078,8 +2089,8 @@ jbm_polynomial_1 (const JBFLOAT x,    ///< variable.
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_2 (const JBFLOAT x,    ///< variable.
-                  const JBFLOAT *p)   ///< array of coefficients.
+jbm_polynomial_2 (const JBFLOAT x,      ///< variable.
+                  const JBFLOAT *p)     ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_1 (x, p + 1);
 }
@@ -1090,8 +2101,8 @@ jbm_polynomial_2 (const JBFLOAT x,    ///< variable.
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_3 (const JBFLOAT x,    ///< variable.
-                  const JBFLOAT *p)   ///< array of coefficients.
+jbm_polynomial_3 (const JBFLOAT x,      ///< variable.
+                  const JBFLOAT *p)     ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_2 (x, p + 1);
 }
@@ -1102,8 +2113,8 @@ jbm_polynomial_3 (const JBFLOAT x,    ///< variable.
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_4 (const JBFLOAT x,    ///< variable.
-                  const JBFLOAT *p)   ///< array of coefficients.
+jbm_polynomial_4 (const JBFLOAT x,      ///< variable.
+                  const JBFLOAT *p)     ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_3 (x, p + 1);
 }
@@ -1114,8 +2125,8 @@ jbm_polynomial_4 (const JBFLOAT x,    ///< variable.
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_5 (const JBFLOAT x,    ///< variable.
-                  const JBFLOAT *p)   ///< array of coefficients.
+jbm_polynomial_5 (const JBFLOAT x,      ///< variable.
+                  const JBFLOAT *p)     ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_4 (x, p + 1);
 }
@@ -1126,8 +2137,8 @@ jbm_polynomial_5 (const JBFLOAT x,    ///< variable.
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_6 (const JBFLOAT x,    ///< variable.
-                  const JBFLOAT *p)   ///< array of coefficients.
+jbm_polynomial_6 (const JBFLOAT x,      ///< variable.
+                  const JBFLOAT *p)     ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_5 (x, p + 1);
 }
@@ -1138,8 +2149,8 @@ jbm_polynomial_6 (const JBFLOAT x,    ///< variable.
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_7 (const JBFLOAT x,    ///< variable.
-                  const JBFLOAT *p)   ///< array of coefficients.
+jbm_polynomial_7 (const JBFLOAT x,      ///< variable.
+                  const JBFLOAT *p)     ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_6 (x, p + 1);
 }
@@ -1150,8 +2161,8 @@ jbm_polynomial_7 (const JBFLOAT x,    ///< variable.
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_8 (const JBFLOAT x,    ///< variable.
-                  const JBFLOAT *p)   ///< array of coefficients.
+jbm_polynomial_8 (const JBFLOAT x,      ///< variable.
+                  const JBFLOAT *p)     ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_7 (x, p + 1);
 }
@@ -1162,8 +2173,8 @@ jbm_polynomial_8 (const JBFLOAT x,    ///< variable.
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_9 (const JBFLOAT x,    ///< variable.
-                  const JBFLOAT *p)   ///< array of coefficients.
+jbm_polynomial_9 (const JBFLOAT x,      ///< variable.
+                  const JBFLOAT *p)     ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_8 (x, p + 1);
 }
@@ -1174,8 +2185,8 @@ jbm_polynomial_9 (const JBFLOAT x,    ///< variable.
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_10 (const JBFLOAT x,   ///< variable.
-                   const JBFLOAT *p)  ///< array of coefficients.
+jbm_polynomial_10 (const JBFLOAT x,     ///< variable.
+                   const JBFLOAT *p)    ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_9 (x, p + 1);
 }
@@ -1186,8 +2197,8 @@ jbm_polynomial_10 (const JBFLOAT x,   ///< variable.
  * \return polynomial value.
  */
 static inline JBFLOAT
-jbm_polynomial_11 (const JBFLOAT x,   ///< variable.
-                   const JBFLOAT *p)  ///< array of coefficients.
+jbm_polynomial_11 (const JBFLOAT x,     ///< variable.
+                   const JBFLOAT *p)    ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_10 (x, p + 1);
 }
@@ -1719,8 +2730,8 @@ jbm_flux_limiter (const JBFLOAT d1,
 static inline JBFLOAT
 jbm_integral (JBFLOAT (*f) (JBFLOAT),
               ///< pointer to the function to integrate.
-              const JBFLOAT x1,       ///< left limit of the interval.
-              const JBFLOAT x2)       ///< right limit of the interval.
+              const JBFLOAT x1, ///< left limit of the interval.
+              const JBFLOAT x2) ///< right limit of the interval.
 {
 #if JBM_LOW_PRECISION == 1
   const JBFLOAT c05 = 0.5f;
@@ -1867,7 +2878,7 @@ jbm_integral (JBFLOAT (*f) (JBFLOAT),
  * \return 1 on small number, 0 otherwise.
  */
 static inline int
-jbm_smalll (const JBDOUBLE x)         ///< JBDOUBLE number.
+jbm_smalll (const JBDOUBLE x)   ///< JBDOUBLE number.
 {
   if (FABSL (x) < JBM_EPSILONL)
     return 1;
@@ -1886,8 +2897,8 @@ jbm_smalll (const JBDOUBLE x)         ///< JBDOUBLE number.
  * \return modmin JBDOUBLE number.
  */
 static inline JBDOUBLE
-jbm_fmodminl (const JBDOUBLE a,       ///< 1st JBDOUBLE number.
-              const JBDOUBLE b)       ///< 2nd JBDOUBLE number.
+jbm_fmodminl (const JBDOUBLE a, ///< 1st JBDOUBLE number.
+              const JBDOUBLE b) ///< 2nd JBDOUBLE number.
 {
   return JBM_FMODMINL (a, b);
 }
@@ -1898,7 +2909,7 @@ jbm_fmodminl (const JBDOUBLE a,       ///< 1st JBDOUBLE number.
  * \return JBDOUBLE double.
  */
 static inline JBDOUBLE
-jbm_fdbll (const JBDOUBLE x)          ///< JBDOUBLE number.
+jbm_fdbll (const JBDOUBLE x)    ///< JBDOUBLE number.
 {
   return JBM_DBL (x);
 }
@@ -1909,7 +2920,7 @@ jbm_fdbll (const JBDOUBLE x)          ///< JBDOUBLE number.
  * \return JBDOUBLE square.
  */
 static inline JBDOUBLE
-jbm_fsqrl (const JBDOUBLE x)          ///< JBDOUBLE number.
+jbm_fsqrl (const JBDOUBLE x)    ///< JBDOUBLE number.
 {
   return JBM_SQR (x);
 }
@@ -1931,11 +2942,12 @@ jbm_fchangel (JBDOUBLE *restrict a,     ///< 1st JBDOUBLE number pointer.
  * \return y-coordinate of the extrapolated point.
  */
 static inline JBDOUBLE
-jbm_extrapolatel (const JBDOUBLE x,   ///< x-coordinate of the extrapolated point.
-                  const JBDOUBLE x1,  ///< x-coordinate of the 1st point.
-                  const JBDOUBLE x2,  ///< x-coordinate of the 2nd point.
-                  const JBDOUBLE y1,  ///< y-coordinate of the 1st point.
-                  const JBDOUBLE y2)  ///< y-coordinate of the 2nd point.
+jbm_extrapolatel (const JBDOUBLE x,
+                  ///< x-coordinate of the extrapolated point.
+                  const JBDOUBLE x1,    ///< x-coordinate of the 1st point.
+                  const JBDOUBLE x2,    ///< x-coordinate of the 2nd point.
+                  const JBDOUBLE y1,    ///< y-coordinate of the 1st point.
+                  const JBDOUBLE y2)    ///< y-coordinate of the 2nd point.
 {
   return JBM_EXTRAPOLATE (x, x1, x2, y1, y2);
 }
@@ -1947,11 +2959,12 @@ jbm_extrapolatel (const JBDOUBLE x,   ///< x-coordinate of the extrapolated poin
  * \return y-coordinate of the interpolated point.
  */
 static inline JBDOUBLE
-jbm_interpolatel (const JBDOUBLE x,   ///< x-coordinate of the interpolated point.
-                  const JBDOUBLE x1,  ///< x-coordinate of the 1st point.
-                  const JBDOUBLE x2,  ///< x-coordinate of the 2nd point.
-                  const JBDOUBLE y1,  ///< y-coordinate of the 1st point.
-                  const JBDOUBLE y2)  ///< y-coordinate of the 2nd point.
+jbm_interpolatel (const JBDOUBLE x,
+                  ///< x-coordinate of the interpolated point.
+                  const JBDOUBLE x1,    ///< x-coordinate of the 1st point.
+                  const JBDOUBLE x2,    ///< x-coordinate of the 2nd point.
+                  const JBDOUBLE y1,    ///< y-coordinate of the 1st point.
+                  const JBDOUBLE y2)    ///< y-coordinate of the 2nd point.
 {
   if (x <= x1)
     return y1;
@@ -2006,8 +3019,8 @@ jbm_v3_lengthl (const JBDOUBLE x1,
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_1l (const JBDOUBLE x,  ///< variable.
-                   const JBDOUBLE *p) ///< array of coefficients.
+jbm_polynomial_1l (const JBDOUBLE x,    ///< variable.
+                   const JBDOUBLE *p)   ///< array of coefficients.
 {
   return p[0] + x * p[1];
 }
@@ -2018,8 +3031,8 @@ jbm_polynomial_1l (const JBDOUBLE x,  ///< variable.
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_2l (const JBDOUBLE x,  ///< variable.
-                   const JBDOUBLE *p) ///< array of coefficients.
+jbm_polynomial_2l (const JBDOUBLE x,    ///< variable.
+                   const JBDOUBLE *p)   ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_1l (x, p + 1);
 }
@@ -2030,8 +3043,8 @@ jbm_polynomial_2l (const JBDOUBLE x,  ///< variable.
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_3l (const JBDOUBLE x,  ///< variable.
-                   const JBDOUBLE *p) ///< array of coefficients.
+jbm_polynomial_3l (const JBDOUBLE x,    ///< variable.
+                   const JBDOUBLE *p)   ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_2l (x, p + 1);
 }
@@ -2042,8 +3055,8 @@ jbm_polynomial_3l (const JBDOUBLE x,  ///< variable.
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_4l (const JBDOUBLE x,  ///< variable.
-                   const JBDOUBLE *p) ///< array of coefficients.
+jbm_polynomial_4l (const JBDOUBLE x,    ///< variable.
+                   const JBDOUBLE *p)   ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_3l (x, p + 1);
 }
@@ -2054,8 +3067,8 @@ jbm_polynomial_4l (const JBDOUBLE x,  ///< variable.
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_5l (const JBDOUBLE x,  ///< variable.
-                   const JBDOUBLE *p) ///< array of coefficients.
+jbm_polynomial_5l (const JBDOUBLE x,    ///< variable.
+                   const JBDOUBLE *p)   ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_4l (x, p + 1);
 }
@@ -2066,8 +3079,8 @@ jbm_polynomial_5l (const JBDOUBLE x,  ///< variable.
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_6l (const JBDOUBLE x,  ///< variable.
-                   const JBDOUBLE *p) ///< array of coefficients.
+jbm_polynomial_6l (const JBDOUBLE x,    ///< variable.
+                   const JBDOUBLE *p)   ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_5l (x, p + 1);
 }
@@ -2078,8 +3091,8 @@ jbm_polynomial_6l (const JBDOUBLE x,  ///< variable.
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_7l (const JBDOUBLE x,  ///< variable.
-                   const JBDOUBLE *p) ///< array of coefficients.
+jbm_polynomial_7l (const JBDOUBLE x,    ///< variable.
+                   const JBDOUBLE *p)   ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_6l (x, p + 1);
 }
@@ -2090,8 +3103,8 @@ jbm_polynomial_7l (const JBDOUBLE x,  ///< variable.
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_8l (const JBDOUBLE x,  ///< variable.
-                   const JBDOUBLE *p) ///< array of coefficients.
+jbm_polynomial_8l (const JBDOUBLE x,    ///< variable.
+                   const JBDOUBLE *p)   ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_7l (x, p + 1);
 }
@@ -2102,8 +3115,8 @@ jbm_polynomial_8l (const JBDOUBLE x,  ///< variable.
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_9l (const JBDOUBLE x,  ///< variable.
-                   const JBDOUBLE *p) ///< array of coefficients.
+jbm_polynomial_9l (const JBDOUBLE x,    ///< variable.
+                   const JBDOUBLE *p)   ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_8l (x, p + 1);
 }
@@ -2114,8 +3127,8 @@ jbm_polynomial_9l (const JBDOUBLE x,  ///< variable.
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_10l (const JBDOUBLE x, ///< variable.
-                    const JBDOUBLE *p)        ///< array of coefficients.
+jbm_polynomial_10l (const JBDOUBLE x,   ///< variable.
+                    const JBDOUBLE *p)  ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_9l (x, p + 1);
 }
@@ -2126,8 +3139,8 @@ jbm_polynomial_10l (const JBDOUBLE x, ///< variable.
  * \return polynomial value.
  */
 static inline JBDOUBLE
-jbm_polynomial_11l (const JBDOUBLE x, ///< variable.
-                    const JBDOUBLE *p)        ///< array of coefficients.
+jbm_polynomial_11l (const JBDOUBLE x,   ///< variable.
+                    const JBDOUBLE *p)  ///< array of coefficients.
 {
   return p[0] + x * jbm_polynomial_10l (x, p + 1);
 }
@@ -2588,10 +3601,10 @@ jbm_flux_limiter_meanl (const JBDOUBLE d1,
  */
 static inline JBDOUBLE
 jbm_flux_limiterl (const JBDOUBLE d1,
-                  ///< 1st flux limiter function parameter.
-                  const JBDOUBLE d2,
-                  ///< 2nd flux limiter function parameter.
-                  unsigned int type)
+                   ///< 1st flux limiter function parameter.
+                   const JBDOUBLE d2,
+                   ///< 2nd flux limiter function parameter.
+                   unsigned int type)
                   ///< type of flux limiter function.
 {
   switch (type)
@@ -2820,7 +3833,7 @@ jbm_abs_128 (const __m128d x)
  * \return 1 on small number, 0 otherwise.
  */
 static inline __m128d
-jbm_small_128 (const __m128d x)       ///< __m128d vector.
+jbm_small_128 (const __m128d x) ///< __m128d vector.
 {
   return _mm_cmplt_pd (jbm_abs_128 (x), _mm_set1_pd (FLT_EPSILON));
 }
@@ -2838,7 +3851,7 @@ jbm_small_128 (const __m128d x)       ///< __m128d vector.
  */
 static inline __m128d
 jbm_modmin_128 (__m128d a,      ///< 1st __m128d vector.
-                const __m128d b)      ///< 2nd __m128d vector.
+                const __m128d b)        ///< 2nd __m128d vector.
 {
   __m128d aa, ab, z;
   z = _mm_setzero_pd ();
@@ -2866,7 +3879,7 @@ jbm_change_128 (__m128d *restrict a,    ///< 1st __m128d vector pointer.
  * \return __m128d double.
  */
 static inline __m128d
-jbm_dbl_128 (const __m128d x)         ///< __m128d vector.
+jbm_dbl_128 (const __m128d x)   ///< __m128d vector.
 {
   return _mm_add_pd (x, x);
 }
@@ -2877,7 +3890,7 @@ jbm_dbl_128 (const __m128d x)         ///< __m128d vector.
  * \return __m128d vector square.
  */
 static inline __m128d
-jbm_sqr_128 (const __m128d x)         ///< __m128d vector.
+jbm_sqr_128 (const __m128d x)   ///< __m128d vector.
 {
   return _mm_mul_pd (x, x);
 }
@@ -2991,8 +4004,8 @@ jbm_v3_length_128 (const __m128d x1,
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_1_128 (const __m128d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_1_128 (const __m128d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, _mm_set1_pd (p[1]), _mm_set1_pd (p[0]));
@@ -3007,8 +4020,8 @@ jbm_polynomial_1_128 (const __m128d x,        ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_2_128 (const __m128d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_2_128 (const __m128d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, jbm_polynomial_1_128 (x, p + 1), _mm_set1_pd (p[0]));
@@ -3024,8 +4037,8 @@ jbm_polynomial_2_128 (const __m128d x,        ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_3_128 (const __m128d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_3_128 (const __m128d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, jbm_polynomial_2_128 (x, p + 1), _mm_set1_pd (p[0]));
@@ -3041,8 +4054,8 @@ jbm_polynomial_3_128 (const __m128d x,        ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_4_128 (const __m128d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_4_128 (const __m128d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, jbm_polynomial_3_128 (x, p + 1), _mm_set1_pd (p[0]));
@@ -3058,8 +4071,8 @@ jbm_polynomial_4_128 (const __m128d x,        ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_5_128 (const __m128d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_5_128 (const __m128d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, jbm_polynomial_4_128 (x, p + 1), _mm_set1_pd (p[0]));
@@ -3075,8 +4088,8 @@ jbm_polynomial_5_128 (const __m128d x,        ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_6_128 (const __m128d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_6_128 (const __m128d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, jbm_polynomial_5_128 (x, p + 1), _mm_set1_pd (p[0]));
@@ -3092,8 +4105,8 @@ jbm_polynomial_6_128 (const __m128d x,        ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_7_128 (const __m128d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_7_128 (const __m128d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, jbm_polynomial_6_128 (x, p + 1), _mm_set1_pd (p[0]));
@@ -3109,8 +4122,8 @@ jbm_polynomial_7_128 (const __m128d x,        ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_8_128 (const __m128d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_8_128 (const __m128d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, jbm_polynomial_7_128 (x, p + 1), _mm_set1_pd (p[0]));
@@ -3126,8 +4139,8 @@ jbm_polynomial_8_128 (const __m128d x,        ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_9_128 (const __m128d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_9_128 (const __m128d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, jbm_polynomial_8_128 (x, p + 1), _mm_set1_pd (p[0]));
@@ -3143,8 +4156,8 @@ jbm_polynomial_9_128 (const __m128d x,        ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_10_128 (const __m128d x,       ///< variable.
-                       const double *p)       ///< array of coefficients.
+jbm_polynomial_10_128 (const __m128d x, ///< variable.
+                       const double *p) ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, jbm_polynomial_9_128 (x, p + 1), _mm_set1_pd (p[0]));
@@ -3160,8 +4173,8 @@ jbm_polynomial_10_128 (const __m128d x,       ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_11_128 (const __m128d x,       ///< variable.
-                       const double *p)       ///< array of coefficients.
+jbm_polynomial_11_128 (const __m128d x, ///< variable.
+                       const double *p) ///< array of coefficients.
 {
 #ifdef __AVX__
   return _mm_fmadd_pd (x, jbm_polynomial_10_128 (x, p + 1), _mm_set1_pd (p[0]));
@@ -3574,8 +4587,8 @@ jbm_flux_limiter_128 (const __m128d d1,
 static inline __m128d
 jbm_integral_128 (__m128d (*f) (__m128d),
                   ///< pointer to the function to integrate.
-                  const __m128d x1,   ///< left limit of the interval.
-                  const __m128d x2)   ///< right limit of the interval.
+                  const __m128d x1,     ///< left limit of the interval.
+                  const __m128d x2)     ///< right limit of the interval.
 {
 #if JBM_INTEGRAL_GAUSS_N == 1
   const JBFLOAT a[1] = { 2. };
@@ -3655,7 +4668,7 @@ jbm_abs_256 (const __m256d x)
  * \return 1 on small number, 0 otherwise.
  */
 static inline __m256d
-jbm_small_256 (const __m256d x)       ///< __m256d vector.
+jbm_small_256 (const __m256d x) ///< __m256d vector.
 {
   return _mm256_cmp_pd (jbm_abs_256 (x), _mm256_set1_pd (FLT_EPSILON),
                         _CMP_LT_OS);
@@ -3674,7 +4687,7 @@ jbm_small_256 (const __m256d x)       ///< __m256d vector.
  */
 static inline __m256d
 jbm_modmin_256 (__m256d a,      ///< 1st __m256d vector.
-                const __m256d b)      ///< 2nd __m256d vector.
+                const __m256d b)        ///< 2nd __m256d vector.
 {
   __m256d aa, ab, m, z;
   z = _mm256_setzero_pd ();
@@ -3704,7 +4717,7 @@ jbm_change_256 (__m256d *restrict a,    ///< 1st __m256d vector pointer.
  * \return __m256d double.
  */
 static inline __m256d
-jbm_dbl_256 (const __m256d x)         ///< __m256d vector.
+jbm_dbl_256 (const __m256d x)   ///< __m256d vector.
 {
   return _mm256_add_pd (x, x);
 }
@@ -3715,7 +4728,7 @@ jbm_dbl_256 (const __m256d x)         ///< __m256d vector.
  * \return __m256d vector square.
  */
 static inline __m256d
-jbm_sqr_256 (const __m256d x)         ///< __m256d vector.
+jbm_sqr_256 (const __m256d x)   ///< __m256d vector.
 {
   return _mm256_mul_pd (x, x);
 }
@@ -3826,8 +4839,8 @@ jbm_v3_length_256 (const __m256d x1,
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_1_256 (const __m256d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_1_256 (const __m256d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, _mm256_set1_pd (p[1]), _mm256_set1_pd (p[0]));
 }
@@ -3838,8 +4851,8 @@ jbm_polynomial_1_256 (const __m256d x,        ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_2_256 (const __m256d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_2_256 (const __m256d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_1_256 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -3851,8 +4864,8 @@ jbm_polynomial_2_256 (const __m256d x,        ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_3_256 (const __m256d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_3_256 (const __m256d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_2_256 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -3864,8 +4877,8 @@ jbm_polynomial_3_256 (const __m256d x,        ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_4_256 (const __m256d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_4_256 (const __m256d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_3_256 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -3877,8 +4890,8 @@ jbm_polynomial_4_256 (const __m256d x,        ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_5_256 (const __m256d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_5_256 (const __m256d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_4_256 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -3890,8 +4903,8 @@ jbm_polynomial_5_256 (const __m256d x,        ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_6_256 (const __m256d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_6_256 (const __m256d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_5_256 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -3903,8 +4916,8 @@ jbm_polynomial_6_256 (const __m256d x,        ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_7_256 (const __m256d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_7_256 (const __m256d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_6_256 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -3916,8 +4929,8 @@ jbm_polynomial_7_256 (const __m256d x,        ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_8_256 (const __m256d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_8_256 (const __m256d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_7_256 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -3929,8 +4942,8 @@ jbm_polynomial_8_256 (const __m256d x,        ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_9_256 (const __m256d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_9_256 (const __m256d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_8_256 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -3942,8 +4955,8 @@ jbm_polynomial_9_256 (const __m256d x,        ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_10_256 (const __m256d x,       ///< variable.
-                       const double *p)       ///< array of coefficients.
+jbm_polynomial_10_256 (const __m256d x, ///< variable.
+                       const double *p) ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_9_256 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -3955,8 +4968,8 @@ jbm_polynomial_10_256 (const __m256d x,       ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_11_256 (const __m256d x,       ///< variable.
-                       const double *p)       ///< array of coefficients.
+jbm_polynomial_11_256 (const __m256d x, ///< variable.
+                       const double *p) ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_10_256 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -4375,8 +5388,8 @@ jbm_flux_limiter_256 (const __m256d d1,
 static inline __m256d
 jbm_integral_256 (__m256d (*f) (__m256d),
                   ///< pointer to the function to integrate.
-                  const __m256d x1,   ///< left limit of the interval.
-                  const __m256d x2)   ///< right limit of the interval.
+                  const __m256d x1,     ///< left limit of the interval.
+                  const __m256d x2)     ///< right limit of the interval.
 {
 #if JBM_INTEGRAL_GAUSS_N == 1
   const JBFLOAT a[1] = { 2. };
@@ -4452,7 +5465,7 @@ jbm_abs_512 (const __m512d x)
  * \return 1 on small number, 0 otherwise.
  */
 static inline __mmask8
-jbm_small_512 (const __m512d x)       ///< __m512d vector.
+jbm_small_512 (const __m512d x) ///< __m512d vector.
 {
   return _mm512_cmp_pd_mask (jbm_abs_512 (x), _mm512_set1_pd (FLT_EPSILON),
                              _CMP_LT_OS);
@@ -4471,7 +5484,7 @@ jbm_small_512 (const __m512d x)       ///< __m512d vector.
  */
 static inline __m512d
 jbm_modmin_512 (__m512d a,      ///< 1st __m512d vector.
-                const __m512d b)      ///< 2nd __m512d vector.
+                const __m512d b)        ///< 2nd __m512d vector.
 {
   __m512d aa, ab, z;
   z = _mm512_setzero_pd ();
@@ -4499,7 +5512,7 @@ jbm_change_512 (__m512d *restrict a,    ///< 1st __m512d vector pointer.
  * \return __m512d double.
  */
 static inline __m512d
-jbm_dbl_512 (const __m512d x)         ///< __m512d vector.
+jbm_dbl_512 (const __m512d x)   ///< __m512d vector.
 {
   return _mm512_add_pd (x, x);
 }
@@ -4510,7 +5523,7 @@ jbm_dbl_512 (const __m512d x)         ///< __m512d vector.
  * \return __m512d vector square.
  */
 static inline __m512d
-jbm_sqr_512 (const __m512d x)         ///< __m512d vector.
+jbm_sqr_512 (const __m512d x)   ///< __m512d vector.
 {
   return _mm512_mul_pd (x, x);
 }
@@ -4619,8 +5632,8 @@ jbm_v3_length_512 (const __m512d x1,
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_1_512 (const __m512d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_1_512 (const __m512d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, _mm512_set1_pd (p[1]), _mm512_set1_pd (p[0]));
 }
@@ -4631,8 +5644,8 @@ jbm_polynomial_1_512 (const __m512d x,        ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_2_512 (const __m512d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_2_512 (const __m512d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, jbm_polynomial_1_512 (x, p + 1),
                           _mm512_set1_pd (p[0]));
@@ -4644,8 +5657,8 @@ jbm_polynomial_2_512 (const __m512d x,        ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_3_512 (const __m512d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_3_512 (const __m512d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, jbm_polynomial_2_512 (x, p + 1),
                           _mm512_set1_pd (p[0]));
@@ -4657,8 +5670,8 @@ jbm_polynomial_3_512 (const __m512d x,        ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_4_512 (const __m512d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_4_512 (const __m512d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, jbm_polynomial_3_512 (x, p + 1),
                           _mm512_set1_pd (p[0]));
@@ -4670,8 +5683,8 @@ jbm_polynomial_4_512 (const __m512d x,        ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_5_512 (const __m512d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_5_512 (const __m512d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, jbm_polynomial_4_512 (x, p + 1),
                           _mm512_set1_pd (p[0]));
@@ -4683,8 +5696,8 @@ jbm_polynomial_5_512 (const __m512d x,        ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_6_512 (const __m512d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_6_512 (const __m512d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, jbm_polynomial_5_512 (x, p + 1),
                           _mm512_set1_pd (p[0]));
@@ -4696,8 +5709,8 @@ jbm_polynomial_6_512 (const __m512d x,        ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_7_512 (const __m512d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_7_512 (const __m512d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, jbm_polynomial_6_512 (x, p + 1),
                           _mm512_set1_pd (p[0]));
@@ -4709,8 +5722,8 @@ jbm_polynomial_7_512 (const __m512d x,        ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_8_512 (const __m512d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_8_512 (const __m512d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, jbm_polynomial_7_512 (x, p + 1),
                           _mm512_set1_pd (p[0]));
@@ -4722,8 +5735,8 @@ jbm_polynomial_8_512 (const __m512d x,        ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_9_512 (const __m512d x,        ///< variable.
-                      const double *p)        ///< array of coefficients.
+jbm_polynomial_9_512 (const __m512d x,  ///< variable.
+                      const double *p)  ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, jbm_polynomial_8_512 (x, p + 1),
                           _mm512_set1_pd (p[0]));
@@ -4735,8 +5748,8 @@ jbm_polynomial_9_512 (const __m512d x,        ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_10_512 (const __m512d x,       ///< variable.
-                       const double *p)       ///< array of coefficients.
+jbm_polynomial_10_512 (const __m512d x, ///< variable.
+                       const double *p) ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, jbm_polynomial_9_512 (x, p + 1),
                           _mm512_set1_pd (p[0]));
@@ -4748,8 +5761,8 @@ jbm_polynomial_10_512 (const __m512d x,       ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_11_512 (const __m512d x,       ///< variable.
-                       const double *p)       ///< array of coefficients.
+jbm_polynomial_11_512 (const __m512d x, ///< variable.
+                       const double *p) ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, jbm_polynomial_10_512 (x, p + 1),
                           _mm512_set1_pd (p[0]));
@@ -5175,8 +6188,8 @@ jbm_flux_limiter_512 (const __m512d d1,
 static inline __m512d
 jbm_integral_512 (__m512d (*f) (__m512d),
                   ///< pointer to the function to integrate.
-                  const __m512d x1,   ///< left limit of the interval.
-                  const __m512d x2)   ///< right limit of the interval.
+                  const __m512d x1,     ///< left limit of the interval.
+                  const __m512d x2)     ///< right limit of the interval.
 {
 #if JBM_INTEGRAL_GAUSS_N == 1
   const JBFLOAT a[1] = { 2. };
@@ -5238,7 +6251,7 @@ jbm_integral_512 (__m512d (*f) (__m512d),
  */
 static inline void
 jbm_farray_init (JBMFarray *fa, ///< pointer to the JBMFarray struct.
-                 const unsigned int n)   ///< number of array elements.
+                 const unsigned int n)  ///< number of array elements.
 {
   fa->size = n * sizeof (JBFLOAT);
   fa->n = n;
@@ -5250,7 +6263,7 @@ jbm_farray_init (JBMFarray *fa, ///< pointer to the JBMFarray struct.
  *
  * \return pointer to the new JBMFarray struct.
  */
-static inline JBMFarray*
+static inline JBMFarray *
 jbm_farray_new (const unsigned int n)   ///< number of array elements.
 {
   JBMFarray *fa;
@@ -5282,7 +6295,7 @@ jbm_farray_new (const unsigned int n)   ///< number of array elements.
  *
  * \return pointer to the new JBMFarray struct.
  */
-static inline JBMFarray*
+static inline JBMFarray *
 jbm_farray_create (const JBFLOAT *x,    ///< array of JBFLOAT numbers.
                    const unsigned int n)        ///< number of array elements.
 {
@@ -5342,7 +6355,7 @@ jbm_farray_set1 (JBMFarray *fa, ///< pointer to the JBMFarray struct.
  */
 static inline void
 jbm_farray_set (JBMFarray *fa,  ///< pointer to the JBMFarray struct.
-                const JBFLOAT *x,     ///< array of JBFLOAT numbers.
+                const JBFLOAT *x,       ///< array of JBFLOAT numbers.
                 const unsigned int n)   ///< number of array elements.
 {
   jbm_farray_init (fa, n);
@@ -5363,7 +6376,7 @@ jbm_farray_store (JBMFarray *fa,        ///< pointer to the JBMFarray struct.
  * Function to free the memory used by a JBMFarray struct.
  */
 static inline void
-jbm_farray_destroy (JBMFarray * fa)     ///< pointer to the JBWFarray struct.
+jbm_farray_destroy (JBMFarray *fa)      ///< pointer to the JBWFarray struct.
 {
 #if (defined(__AVX512F__) || defined(__AVX__) || defined(__SSE4_2__))
   g_aligned_free (fa->x);
@@ -5478,8 +6491,8 @@ jbm_farray_sub (JBMFarray *fr,  ///< result JBMFarray struct.
  */
 static inline void
 jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *f1, ///< multiplier JBMFarray struct.
-                 const JBFLOAT x2)    ///< multiplicand JBFLOAT number.
+                 const JBMFarray *f1,   ///< multiplier JBMFarray struct.
+                 const JBFLOAT x2)      ///< multiplicand JBFLOAT number.
 {
   JBFLOAT *xr, *x1;
   unsigned int i, n;
@@ -5509,7 +6522,7 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
       a8 = _mm512_set1_pd (x2);
       for (; n8 > 0; --n8, i += 8)
         _mm512_store_pd (xr + i, _mm512_mul_pd (_mm512_load_pd (x1 + i), a8));
-     }
+    }
 #endif
 #ifdef __AVX__
   n4 = (n - i) >> 2;
@@ -5518,7 +6531,7 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
       a4 = _mm256_set1_pd (x2);
       for (; n4 > 0; --n4, i += 4)
         _mm256_store_pd (xr + i, _mm256_mul_pd (_mm256_load_pd (x1 + i), a4));
-     }
+    }
 #endif
 #ifdef __SSE4_2__
   n2 = (n - i) >> 1;
@@ -5527,7 +6540,7 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
       s2 = _mm_set1_pd (x2);
       for (; n2 > 0; --n2, i += 2)
         _mm_store_pd (xr + i, _mm_mul_pd (_mm_load_pd (x1 + i), s2));
-     }
+    }
 #endif
 #endif
   for (; i < n; ++i)
@@ -5539,8 +6552,8 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
  */
 static inline void
 jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *f1, ///< dividend JBMFarray struct.
-                 const JBFLOAT x2)    ///< divisor JBFLOAT number.
+                 const JBMFarray *f1,   ///< dividend JBMFarray struct.
+                 const JBFLOAT x2)      ///< divisor JBFLOAT number.
 {
   JBFLOAT *xr, *x1;
   unsigned int i, n;
@@ -5570,7 +6583,7 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
       a8 = _mm512_set1_pd (x2);
       for (; n8 > 0; --n8, i += 8)
         _mm512_store_pd (xr + i, _mm512_div_pd (_mm512_load_pd (x1 + i), a8));
-     }
+    }
 #endif
 #ifdef __AVX__
   n4 = (n - i) >> 2;
@@ -5579,7 +6592,7 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
       a4 = _mm256_set1_pd (x2);
       for (; n4 > 0; --n4, i += 4)
         _mm256_store_pd (xr + i, _mm256_div_pd (_mm256_load_pd (x1 + i), a4));
-     }
+    }
 #endif
 #ifdef __SSE4_2__
   n2 = (n - i) >> 1;
@@ -5588,7 +6601,7 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
       s2 = _mm_set1_pd (x2);
       for (; n2 > 0; --n2, i += 2)
         _mm_store_pd (xr + i, _mm_div_pd (_mm_load_pd (x1 + i), s2));
-     }
+    }
 #endif
 #endif
   for (; i < n; ++i)
@@ -5600,8 +6613,8 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
  */
 static inline void
 jbm_farray_mul (JBMFarray *fr,  ///< result JBMFarray struct.
-                const JBMFarray *f1,  ///< multiplier JBMFarray struct.
-                const JBMFarray *f2)  ///< multiplicand JBMFarray struct.
+                const JBMFarray *f1,    ///< multiplier JBMFarray struct.
+                const JBMFarray *f2)    ///< multiplicand JBMFarray struct.
 {
   JBFLOAT *xr, *x1, *x2;
   unsigned int i, n;
@@ -5650,8 +6663,8 @@ jbm_farray_mul (JBMFarray *fr,  ///< result JBMFarray struct.
  */
 static inline void
 jbm_farray_div (JBMFarray *fr,  ///< result JBMFarray struct.
-                const JBMFarray *f1,  ///< dividend JBMFarray struct.
-                const JBMFarray *f2)  ///< divisor JBMFarray struct.
+                const JBMFarray *f1,    ///< dividend JBMFarray struct.
+                const JBMFarray *f2)    ///< divisor JBMFarray struct.
 {
   JBFLOAT *xr, *x1, *x2;
   unsigned int i, n;
@@ -5792,8 +6805,8 @@ jbm_farray_sqr (JBMFarray *fr,  ///< result JBMFarray struct.
  * \return interval number.
  */
 static inline unsigned int
-jbm_farray_search (const JBMFarray *fa,       ///< JBMFarray struct.
-                   const JBFLOAT x)   ///< number to search.
+jbm_farray_search (const JBMFarray *fa, ///< JBMFarray struct.
+                   const JBFLOAT x)     ///< number to search.
 {
   JBFLOAT *xx;
   unsigned int i, j, n;
@@ -5816,15 +6829,15 @@ jbm_farray_search (const JBMFarray *fa,       ///< JBMFarray struct.
  * \return interval number, -1 if x<fa[0] or n-1 if x>fa[n-1].
  */
 static inline int
-jbm_farray_search_extended (const JBMFarray *fa,      ///< JBMFarray struct.
-                            const JBFLOAT x)  ///< number to search.
+jbm_farray_search_extended (const JBMFarray *fa,        ///< JBMFarray struct.
+                            const JBFLOAT x)    ///< number to search.
 {
   JBFLOAT *xx;
   xx = fa->x;
   if (x < xx[0])
     return -1;
   if (x >= xx[fa->last])
-    return  (int) fa->last;
+    return (int) fa->last;
   return (int) jbm_farray_search (fa, x);
 }
 
@@ -5834,7 +6847,7 @@ jbm_farray_search_extended (const JBMFarray *fa,      ///< JBMFarray struct.
  * \return the highest value.
  */
 static inline JBFLOAT
-jbm_farray_max (const JBMFarray *fa)  ///< JBMFarray struct.
+jbm_farray_max (const JBMFarray *fa)    ///< JBMFarray struct.
 {
   JBFLOAT *xx;
   JBFLOAT k;
@@ -5921,7 +6934,7 @@ jbm_farray_max (const JBMFarray *fa)  ///< JBMFarray struct.
  * \return the lowest value.
  */
 static inline JBFLOAT
-jbm_farray_min (const JBMFarray *fa)  ///< JBMFarray struct.
+jbm_farray_min (const JBMFarray *fa)    ///< JBMFarray struct.
 {
   JBFLOAT *xx;
   JBFLOAT k;
@@ -5968,7 +6981,7 @@ jbm_farray_min (const JBMFarray *fa)  ///< JBMFarray struct.
       k = xx[0];
       i = 1;
     }
-    
+
 #else
 #ifdef __SSE4_2__
   n2 = n >> 1;
@@ -6007,7 +7020,7 @@ jbm_farray_min (const JBMFarray *fa)  ///< JBMFarray struct.
  * Function to find the highest and the lowest elements of a JBMFarray struct.
  */
 static inline void
-jbm_farray_maxmin (const JBMFarray *fa,       ///< JBMFarray struct.
+jbm_farray_maxmin (const JBMFarray *fa, ///< JBMFarray struct.
                    JBFLOAT *max,        ///< the highest value.
                    JBFLOAT *min)        ///< the lowest value.
 {
@@ -6038,8 +7051,8 @@ jbm_farray_maxmin (const JBMFarray *fa,       ///< JBMFarray struct.
       while (--n4 > 0)
         {
           a4 = _mm256_load_pd (xx + i);
-          amax4 = _mm256_max_pd (amax4, a4); 
-          amin4 = _mm256_min_pd (amin4, a4); 
+          amax4 = _mm256_max_pd (amax4, a4);
+          amin4 = _mm256_min_pd (amin4, a4);
           i += 4;
         }
       _mm256_store_pd (amax, amax4);
@@ -6134,7 +7147,7 @@ jbm_farray_interpolate (const JBMFarray *fa,
 ///< JBMFarray struct defining the increasingly sorted array of x-coordinates.
                         const JBMFarray *fb,
 ///< JBMFarray struct defining the array of y-coordinates.
-                        const JBFLOAT x)      ///< x-coordinate of the point.
+                        const JBFLOAT x)        ///< x-coordinate of the point.
 {
   JBFLOAT *fx, *fy;
   unsigned int i;
@@ -6284,15 +7297,15 @@ exit1:
  * \return mean square error.
  */
 static inline JBFLOAT
-jbm_farray_mean_square_error (JBMFarray * fxa,
+jbm_farray_mean_square_error (JBMFarray *fxa,
 ///< incresingly sorted JBMFarray struct defining the x-coordinates of the 1st
 ///< tabular function.
-                              JBMFarray * fya,
+                              JBMFarray *fya,
 ///< JBMFarray struct defining the y-coordinates of the 1st tabular function.
-                              JBMFarray * fxr,
+                              JBMFarray *fxr,
 ///< incresingly sorted JBMFarray struct defining the x-coordinates of the 2nd
 ///< tabular function.
-                              JBMFarray * fyr)
+                              JBMFarray *fyr)
 ///< JBMFarray struct defining the y-coordinates of the 2nd tabular function.
 {
 #if JBM_LOW_PRECISION == 1
@@ -6336,15 +7349,15 @@ jbm_farray_mean_square_error (JBMFarray * fxa,
  * \return root mean square error.
  */
 static inline JBFLOAT
-jbm_farray_root_mean_square_error (JBMFarray * fxa,
+jbm_farray_root_mean_square_error (JBMFarray *fxa,
 ///< incresingly sorted JBMFarray struct defining the x-coordinates of the 1st
 ///< tabular function.
-                                   JBMFarray * fya,
+                                   JBMFarray *fya,
 ///< JBMFarray struct defining the y-coordinates of the 1st tabular function.
-                                   JBMFarray * fxr,
+                                   JBMFarray *fxr,
 ///< incresingly sorted JBMFarray struct defining the x-coordinates of the 2nd
 ///< tabular function.
-                                   JBMFarray * fyr)
+                                   JBMFarray *fyr)
 ///< JBMFarray struct defining the y-coordinates of the 2nd tabular function.
 {
   return SQRT (jbm_farray_mean_square_error (fxa, fya, fxr, fyr));
@@ -6602,7 +7615,7 @@ jbm_matrix_solve (JBFLOAT *x,   ///< matrix storing the linear equations system.
           jbm_farray_set (fa2, f + 1, i + 1);
           jbm_farray_mul1 (fa2, fa2, k1);
           jbm_farray_sub (fa, fa, fa2);
-          jbm_farray_store (fa, g + 1); 
+          jbm_farray_store (fa, g + 1);
         }
     }
   // Retrieving solutions
@@ -6730,7 +7743,7 @@ jbm_matrix_solve_pentadiagonal (JBFLOAT *restrict B,
                                 JBFLOAT *restrict F,
                                 ///< double-right diagonal array.
                                 JBFLOAT *restrict H,    ///< final column array.
-                                unsigned int n)  ///< number of matrix rows.
+                                unsigned int n) ///< number of matrix rows.
 {
   JBFLOAT k;
   unsigned int i;
@@ -7210,10 +8223,11 @@ jbm_regression_multiexponential (JBFLOAT **restrict x,
 ///< array of arrays of point coordinates in format:
 ///< \f$[f_0,\cdots,f_n],[x_0,\cdots,x_n],[y_0,\cdots,y_n],\cdots\f$. It is
 ///< modified by the function.
-                                 unsigned int n, ///< points number.
+                                 unsigned int n,        ///< points number.
                                  JBFLOAT *restrict a,
 ///< array of regression coefficients.
-                                 unsigned int m) ///< number of variables.
+                                 unsigned int m)
+///< number of variables.
 {
   JBFLOAT *c;
   int i, j;
@@ -7998,8 +9012,8 @@ jbm_darray_max (JBDOUBLE *fa,   ///< array of JBDOUBLE numbers.
  * \return the lowest value.
  */
 static inline JBDOUBLE
-jbm_darray_min (JBDOUBLE *fa,    ///< array of JBDOUBLE numbers.
-                unsigned int n)  ///< number of the ending array element.
+jbm_darray_min (JBDOUBLE *fa,   ///< array of JBDOUBLE numbers.
+                unsigned int n) ///< number of the ending array element.
 {
   JBDOUBLE k;
   unsigned int i;
@@ -8014,7 +9028,7 @@ jbm_darray_min (JBDOUBLE *fa,    ///< array of JBDOUBLE numbers.
  * numbers.
  */
 static inline void
-jbm_darray_maxmin (JBDOUBLE *fa, ///< array of JBDOUBLE numbers.
+jbm_darray_maxmin (JBDOUBLE *fa,        ///< array of JBDOUBLE numbers.
                    unsigned int n,      ///< number of the ending array element.
                    JBDOUBLE *max,       ///< the highest value.
                    JBDOUBLE *min)       ///< the lowest value.
@@ -8215,7 +9229,7 @@ exit1:
  * \return 1 on success, 0 on error.
  */
 static inline int
-jbm_get_double (const char *str,      ///< string.
+jbm_get_double (const char *str,        ///< string.
                 JBDOUBLE *x)    ///< pointer to the JBDOUBLE number.
 {
 #if JBM_HIGH_PRECISION < 4

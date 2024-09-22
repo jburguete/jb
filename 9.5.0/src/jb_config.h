@@ -42,6 +42,8 @@
 #define FRS "%"JB_BUFFER_SIZE"s"        ///< format of the string buffer input.
 
 #define JBM_INTEGRAL_GAUSS_N 4  ///< method of gaussian integral.
+#define JBM_WITH_EXCEPTIONS 0
+///< macro to use NAN and INFINITY exceptions in mathematical functions.
 
 #define JBW_GRAPHIC_N_TICS 6    ///< maximum number of tics in a JBWGraphic.
 #define JBW_GRAPHIC_N_CHARS 12
