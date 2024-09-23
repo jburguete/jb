@@ -488,6 +488,41 @@
   ((y1) + (x - (x1)) * ((y2) - (y1)) / ((x2) - (x1)))
 ///< macro calculating a linear extrapolation.
 
+#define JBM_FACT0f 1.f          ///< 0!
+#define JBM_FACT1f 1.f          ///< 1!
+#define JBM_FACT2f 2.f          ///< 2!
+#define JBM_FACT3f 6.f          ///< 3!
+#define JBM_FACT4f 24.f         ///< 4!
+#define JBM_FACT5f 120.f        ///< 5!
+#define JBM_FACT6f 720.f        ///< 6!
+#define JBM_FACT7f 5040.f       ///< 7!
+#define JBM_FACT8f 40320.f      ///< 8!
+#define JBM_FACT9f 362880.f     ///< 9!
+#define JBM_FACT10f 3628800.f   ///< 10!
+#define JBM_FACT11f 39916800.f  ///< 11!
+#define JBM_FACT12f 479001600.f ///< 12!
+#define JBM_FACT13f 6227020800.f        ///< 13!
+#define JBM_FACT14f 87178291200.f       ///< 14!
+#define JBM_FACT15f 1307674368000.f     ///< 15!
+#define JBM_FACT16f 20922789888000.f    ///< 16!
+#define JBM_1_FACT0f (1.f / JBM_FACT0f) ///< 1/0!
+#define JBM_1_FACT1f (1.f / JBM_FACT1f) ///< 1/1!
+#define JBM_1_FACT2f (1.f / JBM_FACT2f) ///< 1/2!
+#define JBM_1_FACT3f (1.f / JBM_FACT3f) ///< 1/3!
+#define JBM_1_FACT4f (1.f / JBM_FACT4f) ///< 1/4!
+#define JBM_1_FACT5f (1.f / JBM_FACT5f) ///< 1/5!
+#define JBM_1_FACT6f (1.f / JBM_FACT6f) ///< 1/6!
+#define JBM_1_FACT7f (1.f / JBM_FACT7f) ///< 1/7!
+#define JBM_1_FACT8f (1.f / JBM_FACT8f) ///< 1/8!
+#define JBM_1_FACT9f (1.f / JBM_FACT9f) ///< 1/9!
+#define JBM_1_FACT10f (1.f / JBM_FACT10f)       ///< 1/10!
+#define JBM_1_FACT11f (1.f / JBM_FACT11f)       ///< 1/11!
+#define JBM_1_FACT12f (1.f / JBM_FACT12f)       ///< 1/12!
+#define JBM_1_FACT13f (1.f / JBM_FACT13f)       ///< 1/13!
+#define JBM_1_FACT14f (1.f / JBM_FACT14f)       ///< 1/14!
+#define JBM_1_FACT15f (1.f / JBM_FACT15f)       ///< 1/15!
+#define JBM_1_FACT16f (1.f / JBM_FACT16f)       ///< 1/16!
+
 #define JBM_FACT0 1.            ///< 0!
 #define JBM_FACT1 1.            ///< 1!
 #define JBM_FACT2 2.            ///< 2!
@@ -540,6 +575,24 @@ enum JBMFluxLimiterType
 };
 
 /**
+ * union to work with bits in float numbers.
+ */
+typedef union
+{
+  float x;                      ///< floating point.
+  long unsigned int i;          ///< bits.
+} JBMF32;
+
+/**
+ * union to work with bits in double numbers.
+ */
+typedef union
+{
+  double x;                     ///< floating point.
+  long long unsigned int i;     ///< bits.
+} JBMF64;
+
+/**
  * struct to define arrays of JBFLOAT numbers.
  */
 typedef struct
@@ -567,6 +620,922 @@ extern void matrix_print (JBFLOAT *, unsigned int, unsigned int);
 extern void farray_print (JBMFarray *);
 
 /**
+ * Function to calculate the abs function (float).
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_f32_abs (const float x)     ///< float number.
+{
+  JBMF32 y;
+  y.x = x;
+  y.i &= 0x7fffffffl;
+  return y.x;
+}
+
+/**
+ * Function to calculate the hypot function (float).
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_f32_hypot (const float x,   ///< 1st float number.
+               const float y)   ///< 2nd float number.
+{
+  return sqrtf (x * x + y * y);
+}
+
+/**
+ * Function to calculate the rest of a division (float).
+ *
+ * \return rest value (in [0,|divisor|) interval).
+ */
+static inline float
+jbm_f32_rest (const float x,    ///< dividend (float).
+              const float d)    ///< divisor (float).
+{
+  float f;
+  f = floorf (x / d);
+  return x - f * d;
+}
+
+/**
+ * Function to implement the standard frexp function (float).
+ *
+ * \return normalize fraction value in [1/2,1).
+ */
+static inline float
+jbm_f32_frexp (const float x,   ///< float number.
+               int *e)          ///< pointer to the extracted exponent.
+{
+  JBMF32 y, z;
+  y.x = x;
+  y.i &= 0x7f800000l;
+  if (y.i == 0x7f800000l)
+    {
+      *e = 0;
+      return x;
+    }
+  *e = (int) (y.i >> 23l) - 127;
+  if (!y.i)
+    {
+      y.x = x;
+      y.i &= 0x007fffffl;
+      if (!y.i)
+        {
+          *e = 0;
+          return x;
+        }
+      y.i = 0x00400000l;
+      z.x = x / y.x;
+      z.i &= 0x7f800000l;
+      *e = (int) (z.i >> 23l) - 252;
+      y.x *= z.x;
+    }
+  else
+    ++(*e);
+  return 0.5f * x / y.x;
+}
+
+/**
+ * Function to calculate the function \f$2^n\f$ with n an integer number (int).
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_exp2n (int e)           ///< exponent number (int).
+{
+  JBMF32 x;
+  if (e > 127)
+    return INFINITY;
+  if (e > -127)
+    x.i = (127 + e) << 23l;
+  else
+    x.i = 0x00400000l >> (-e - 127);
+  return x.x;
+}
+
+/**
+ * Function to implement the standard ldexp function (float).
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_f32_ldexp (const float x,   ///< float number.
+               int e)           ///< exponent number (int).
+{
+  return x * jbm_f32_exp2n (e);
+}
+
+/**
+ * Function to calculate a 1st order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_1 (const float x,   ///< float value.
+               const float *p)  ///< array of coefficients.
+{
+  return p[0] + x * p[1];
+}
+
+/**
+ * Function to calculate a 2nd order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_2 (const float x,   ///< float value.
+               const float *p)  ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_1 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 3rd order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_3 (const float x,   ///< float value.
+               const float *p)  ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_2 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 4th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_4 (const float x,   ///< float value.
+               const float *p)  ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_3 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 5th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_5 (const float x,   ///< float value.
+               const float *p)  ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_4 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 6th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_6 (const float x,   ///< float value.
+               const float *p)  ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_5 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 7th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_7 (const float x,   ///< float value.
+               const float *p)  ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_6 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 8th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_8 (const float x,   ///< float value.
+               const float *p)  ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_7 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 9th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_9 (const float x,   ///< float value.
+               const float *p)  ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_8 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 10th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_10 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_9 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 11th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_11 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_10 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 12th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_12 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_11 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 13th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_13 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_12 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 14th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_14 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_13 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 15th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_15 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_14 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 16th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_16 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_15 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 17th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_17 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_16 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 18th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_18 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_17 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 19th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_19 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_18 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 20th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_20 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_19 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 21th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_21 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_20 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 22th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_22 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_21 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 23th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_23 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_22 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 24th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_24 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_23 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 25th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_25 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_24 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 26th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_26 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_25 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 27th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_27 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_26 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 28th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_28 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_27 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 29th order polynomial (float).
+ *
+ * \return polynomial value.
+ */
+static inline float
+jbm_f32_pol_29 (const float x,  ///< float value.
+                const float *p) ///< array of coefficients.
+{
+  return p[0] + x * jbm_f32_pol_28 (x, p + 1);
+}
+
+/**
+ * Function to calculate the well conditionated function exp(x) for x in
+ * [-log(2)/2,log(2)/2] by the following Taylor' serie:
+ * \f$\exp(x)\approx\sum_{n=0}^7\frac{x^n}{n!}\f$.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_expwc (const float x)
+               ///< float number \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
+{
+  const float a[8] JB_ALIGNED = { JBM_1_FACT0f, JBM_1_FACT1f, JBM_1_FACT2f,
+    JBM_1_FACT3f, JBM_1_FACT4f, JBM_1_FACT5f, JBM_1_FACT6f, JBM_1_FACT7f
+  };
+  return jbm_f32_pol_7 (x, a);
+}
+
+/**
+ * Function to calculate the function exp2(x) using the jbm_f32_expwc and
+ * jbm_f32_exp2n functions.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_exp2 (const float x)    ///< float number.
+{
+  float y, f;
+  y = floorf (x);
+  f = x - y;
+  y = jbm_f32_exp2n ((int) y);
+  return y * M_SQRT2f * jbm_f32_expwc ((f - 0.5f) * M_LN2f);
+}
+
+/**
+ * Function to calculate the function exp(x) using the jbm_f32_exp2 function.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_exp (const float x)     ///< float number.
+{
+  return jbm_f32_exp2 (x * M_LOG2Ef);
+}
+
+/**
+ * Function to calculate the function exp10(x) using the jbm_f32_exp2 function.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_exp10 (const float x)   ///< float number.
+{
+  return jbm_f32_exp2 (x * M_LN10f / M_LN2f);
+}
+
+/**
+ * Function to calculate the well conditionated function log(1+x) for x in
+ * [-1/3,1/3] by the following Taylor' serie:
+ * \f$log(1+x)\approx\sum_{i=1}^{12}\frac{(-1)^{n+1}\,x^n}{n!}\f$.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_logwc (const float x)   ///< float number.
+{
+  const float a[13] = { 1.f, -1.f / 2.f, 1.f / 3.f, -1.f / 4.f, 1.f / 5.f,
+    -1.f / 6.f, 1.f / 7.f, -1.f / 8.f, 1.f / 9.f, -1.f / 10.f, 1.f / 11.f,
+    -1.f / 12.f, 
+  };
+  float x1;
+  x1 = x - 1.f;
+  return x1 * jbm_f32_pol_12 (x1, a);
+}
+
+/**
+ * Function to calculate the function log_2(x) using jbm_f32_logwc and
+ * jbm_f32_frexp
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_log2 (const float x)    ///< float number.
+{
+  float y;
+  int e;
+  if (x < 0.f)
+    return sqrtf(-1.f);
+  if (x <= 0.f)
+    return -INFINITY;
+  y = jbm_f32_frexp (x, &e);
+  return jbm_f32_logwc (y * 4.f / 3.f) * M_LOG2Ef - 0.415037499f + (float) e; 
+}
+
+/**
+ * Function to calculate the function log(x) using jbm_f32_log2.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_log (const float x)     ///< float number.
+{
+  return jbm_f32_log2 (x) * M_LN2f;
+}
+
+/**
+ * Function to calculate the function log10(x) using jbm_f32_log2.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_log10 (const float x)   ///< float number.
+{
+  return jbm_f32_log2 (x) * M_LN2f / M_LN10f;
+}
+
+/**
+ * Function to calculate the function x^e with e an integer number.
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_f32_pown (const float x,    ///< float number.
+              int e)            ///< exponent (int).
+{
+  float f, xn;
+  unsigned int i;
+  f = 1.f;
+  if (e < 0)
+    xn = 1.f / x;
+  else
+    xn = x;
+  i = (unsigned int) abs (e);
+  while (i)
+    {
+      if (i & 1)
+        f *= xn;
+      xn *= xn;  
+      i >>= 1;
+    }
+  return f;
+}
+
+/**
+ * Function to calculate the function pow using the jbm_f32_exp2 and
+ * jbm_f32_log2 functions.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_pow (const float x,     ///< float number.
+             const float e)     ///< exponent (float).
+{
+  float f;
+  f = floorf (e);
+  if (f == e)
+    return jbm_f32_pown (x, (int) e);
+  return jbm_f32_exp2 (e * jbm_f32_log2 (x));
+}
+
+/**
+ * Function to calculate the function cbrt(x) using the jbm_f32_pow function.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_cbrt (const float x)    ///< float number.
+{
+  float f;
+  f = jbm_f32_abs (x);
+  f = jbm_f32_pow (x, 1.f / 3.f);
+  if (x < 0.f)
+    f = -f;
+  return f;
+}
+
+/**
+ * Function to calculate the well conditionated function sin(x) for x in
+ * [-pi/4,pi/4] by the following Taylor' serie:
+ * \f$\sin(x)\approx\sum_{n=0}^4\frac{(-1)^n\,x^{2\,n+1}}{(2\,n+1)!}\f$.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_sinwc (const float x)
+               ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  const float a[5] JB_ALIGNED = { JBM_1_FACT1f, -JBM_1_FACT3f, JBM_1_FACT5f,
+    -JBM_1_FACT7f, JBM_1_FACT9f
+  };
+  return x * jbm_f32_pol_4 (x * x, a);
+}
+
+/**
+ * Function to calculate the well conditionated function cos(x) for x in
+ * [-pi/4,pi/4] by the following Taylor' serie:
+ * \f$\cos(x)\approx\sum_{n=0}^4\frac{(-1)^n\,x^{2\,n}}{(2\,n)!}\f$.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_coswc (const float x)
+               ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  const float a[5] JB_ALIGNED = { JBM_1_FACT0f, -JBM_1_FACT2f, JBM_1_FACT4f,
+    -JBM_1_FACT6f, JBM_1_FACT8f
+  };
+  return jbm_f32_pol_4 (x * x, a);
+}
+
+/**
+ * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * x in [-pi/4,pi/4] from jbm_f32_sinwc and jbm_f32_coswc approximations.
+ */
+static inline void
+jbm_f32_sincoswc (const float x,
+                  ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                  float *s,     ///< pointer to the sin function value.
+                  float *c)     ///< pointer to the cos function value.
+{
+  *s = jbm_f32_sinwc (x);
+  *c = jbm_f32_coswc (x);
+}
+
+/**
+ * Function to calculate the function sin(x) from jbm_f32_sinwc and
+ * jbm_f32_coswc approximations.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_sin (const float x)     ///< float number.
+{
+  float y;
+  unsigned int i;
+  y = jbm_f32_rest (x, 2.f * M_PIf);
+  i = (unsigned int) floorf (y / M_PI_4f);
+  if (i < 1)
+    return jbm_f32_sinwc (y);
+  if (i < 2)
+    return jbm_f32_coswc (M_PI_2f - y);
+  if (i < 3)
+    return jbm_f32_sinwc (M_PIf - y);
+  if (i < 7)
+    return -jbm_f32_coswc (3.f * M_PI_2f - y);
+  return jbm_f32_sinwc (y - 2.f * M_PIf);
+}
+
+/**
+ * Function to calculate the function cos(x) from jbm_f32_sinwc and
+ * jbm_f32_coswc approximations.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_cos (const float x)     ///< float number.
+{
+  float y;
+  unsigned int i;
+  y = jbm_f32_rest (x, 2.f * M_PIf);
+  i = (unsigned int) floorf (y / M_PI_4f);
+  if (i < 1)
+    return jbm_f32_coswc (y);
+  if (i < 3)
+    return jbm_f32_sinwc (M_PI_2f - y);
+  if (i < 5)
+    return -jbm_f32_coswc (M_PIf - y);
+  if (i < 7)
+    return jbm_f32_sinwc (y - 3.f * M_PI_2f);
+  return jbm_f32_coswc (y - 2.f * M_PIf);
+}
+
+/**
+ * Function to calculate the functions sin(x) and cos(x) from jbm_f32_sinwc and
+ * jbm_f32_coswc approximations.
+ */
+static inline void
+jbm_f32_sincos (const float x,
+                ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                float *s,       ///< pointer to the sin function value.
+                float *c)       ///< pointer to the cos function value.
+{
+  float y;
+  unsigned int i;
+  y = jbm_f32_rest (x, 2.f * M_PIf);
+  i = (unsigned int) floorf (y / M_PI_4f);
+  if (i < 1)
+    {
+      *s = jbm_f32_sinwc (y);
+      *c = jbm_f32_coswc (y);
+    }
+  else if (i < 3)
+    {
+      y = M_PI_2f - y;
+      *s = jbm_f32_coswc (y);
+      *c = jbm_f32_sinwc (y);
+    }
+  else if (i < 5)
+    {
+      y = M_PIf - y;
+      *s = jbm_f32_sinwc (y);
+      *c = -jbm_f32_coswc (y);
+    }
+  else if (i < 7)
+    {
+      y -= 3.f * M_PI_2f;
+      *s = -jbm_f32_coswc (y);
+      *c = jbm_f32_sinwc (y);
+    }
+  else
+    {
+      y -= 2.f * M_PIf;
+      *s = jbm_f32_sinwc (y);
+      *c = jbm_f32_coswc (y);
+    }
+}
+
+/**
+ * Function to calculate the function tan(x) from jbm_f32_sinwc and
+ * jbm_f32_coswc approximations.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_tan (const float x)     ///< float number.
+{
+  float s, c;
+  jbm_f32_sincos (x, &s, &c);
+  return s / c;
+}
+
+/**
+ * Function to calculate the well conditionated function atan(x) for x in
+ * [-1/2,1/2] by the following Taylor' serie:
+ * \f$atan(x)\approx\sum_{i=0}^9\frac{(-1)^{2\,n}\,x^{2\,n+1}}{2\,n+1}\f$.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_atanwc0 (const float x)
+                 ///< float number \f$\in\left[0,\frac12\right]\f$.
+{
+  const float a[10] JB_ALIGNED = { 1.f, -1.f / 3.f, 1.f / 5.f, -1.f / 7.f,
+    1.f / 9.f, -1.f / 11.f, 1.f / 13.f, -1.f / 15.f, 1.f / 17.f, -1.f / 19.f
+  };
+
+  return x * jbm_f32_pol_9 (x * x, a);
+}
+
+/**
+ * Function to calculate the well conditionated function atan(x) for x in
+ * [1/2,3/2] by the following Taylor' serie:
+ * \f$atan(1+x)\approx
+ * \frac{\pi}{4}
+ * +\frac{x}{2}
+ * -\frac{x^2}{4}
+ * +\frac{x^3}{12}
+ * -\frac{x^5}{40}
+ * +\frac{x^6}{48}
+ * -\frac{x^7}{112}
+ * +\frac{x^9}{288}
+ * -\frac{x^{10}}{320}
+ * +\frac{x^{11}}{704}
+ * -\frac{x^{13}}{1664}\f$.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_f32_atanwc1 (const float x)
+                 ///< float number \f$\in\left[\frac12,1\right]\f$.
+{
+  const float a1[4] = { 1.f / 2.f, -1.f / 40.f, 1.f / 288.f, -1.f / 1664.f };
+  const float a2[4] = { -1.f / 4.f, 1.f / 48.f, -1.f / 320.f, 1.f / 1792.f };
+  const float a3[4] = { 1.f / 12.f, -1.f / 112.f, 1.f / 704.f, -1.f / 3840.f };
+  float x1, x4;
+  x1 = x - 1.f;
+  x4 = x1 * x1;
+  x4 *= x4;
+  return M_PI_4f + x1 * (jbm_f32_pol_3 (x4, a1)
+                         + x1 * (jbm_f32_pol_3 (x4, a2)
+                                 + x1 * jbm_f32_pol_3 (x4, a3)));
+}
+
+/**
+ * Function to calculate the function atan(x) using the jbm_f32_atanwc0 and
+ * jbm_f32_atancw1 functions.
+ *
+ * \return function value (in [-pi/2,pi/2]).
+ */
+static inline float
+jbm_f32_atan (const float x)    ///< float number.
+{
+  float f, ax;
+  ax = jbm_f32_abs (x);
+  if (ax > 1.5f)
+    {
+      ax = 1.f / ax;
+      if (ax > 0.5f)
+        f = M_PI_2f - jbm_f32_atanwc1 (ax);
+      else
+        f = M_PI_2f - jbm_f32_atanwc0 (ax);
+    }
+  else
+    {
+      if (ax > 0.5f)
+        f = jbm_f32_atanwc1 (ax);
+      else
+        f = jbm_f32_atanwc0 (ax);
+    }
+  if (x < 0.f)
+    f = -f;
+  return f;
+}
+
+/**
+ * Function to calculate the function atan2(y,x) using the jbm_f32_atan
+ * function.
+ *
+ * \return function value (in [-pi,pi]).
+ */
+static inline float
+jbm_f32_atan2 (const float y,   ///< float y component.
+               const float x)   ///< float x component.
+{
+  float f;
+  f = jbm_f32_atan (y / x);
+  if (x < 0.f)
+    if (y < 0.f)
+      f -= M_PIf;
+    else
+      f += M_PIf;
+  return f;
+}
+
+/**
+ * Function to calculate the function asin(x) using the jbm_f32_atan function.
+ *
+ * \return function value (in [-pi/2,pi/2]).
+ */
+static inline float
+jbm_f32_asin (const float x)    ///< float number.
+{
+  return jbm_f32_atan (x / sqrtf (1.f - x * x));
+}
+
+/**
+ * Function to calculate the function acos(x) using the jbm_f32_atan function.
+ *
+ * \return function value (in [0,pi]).
+ */
+static inline float
+jbm_f32_acos (const float x)    ///< float number.
+{
+  float f;
+  f = jbm_f32_atan (sqrtf (1.f - x * x) / x);
+  if (x < 0.f)
+    f += M_PIf;
+  return f;
+}
+
+
+/**
  * Function to calculate the abs function (double).
  *
  * \return function value (double).
@@ -574,10 +1543,10 @@ extern void farray_print (JBMFarray *);
 static inline double
 jbm_f64_abs (const double x)    ///< double number.
 {
-  double y = x;
-  long long unsigned int *i64 = (long long unsigned int *) &y;
-  *i64 &= 0x7fffffffffffffffL;
-  return y;
+  JBMF64 y;
+  y.x = x;
+  y.i &= 0x7fffffffffffffffL;
+  return y.x;
 }
 
 /**
@@ -615,38 +1584,33 @@ static inline double
 jbm_f64_frexp (const double x,  ///< double number.
                int *e)          ///< pointer to the extracted exponent.
 {
-  double y, z;
-  long long unsigned int *i64;
-  y = x;
-  i64 = (long long unsigned int *) &y;
-#if JBM_WITH_EXCEPTIONS
-  if ((*i64 & 0x7ff0000000000000L) == 0x7ff0000000000000L)
+  JBMF64 y, z;
+  y.x = x;
+  y.i &= 0x7ff0000000000000L;
+  if (y.i == 0x7ff0000000000000L)
     {
       *e = 0;
       return x;
     }
-#endif
-  *i64 &= 0x7ff0000000000000L;
-  *e = (int) (*i64 >> 52) - 1023;
-  if (!*i64)
+  *e = (int) (y.i >> 52L) - 1023;
+  if (!y.i)
     {
-      y = x;
-      *i64 &= 0x000fffffffffffffL;
-      if (!*i64)
+      y.x = x;
+      y.i &= 0x000fffffffffffffL;
+      if (!y.i)
         {
           *e = 0;
-          return 0.;
+          return x;
         }
-      *i64 = 0x0010000000000000L;
-      z = x / y;
-      i64 = (long long unsigned int *) &z;
-      *i64 &= 0x7ff0000000000000L;
-      *e = (int) (*i64 >> 52) - 2044;
-      y *= z;
+      y.i = 0x0010000000000000L;
+      z.x = x / y.x;
+      z.i &= 0x7ff0000000000000L;
+      *e = (int) (z.i >> 52) - 2044;
+      y.x *= z.x;
     }
   else
     ++(*e);
-  return 0.5 * x / y;
+  return 0.5 * x / y.x;
 }
 
 /**
@@ -657,16 +1621,14 @@ jbm_f64_frexp (const double x,  ///< double number.
 static inline double
 jbm_f64_exp2n (int e)           ///< exponent number (int).
 {
-  double y;
-  long long unsigned int *i64;
+  JBMF64 x;
   if (e > 1023)
     return INFINITY;
-  i64 = (long long unsigned int *) &y;
   if (e > -1023)
-    *i64 = (1023L + e) << 52L;
+    x.i = (1023L + e) << 52L;
   else
-    *i64 = 0x0008000000000000L >> (-e - 1023);
-  return y;
+    x.i = 0x0008000000000000L >> (-e - 1023);
+  return x.x;
 }
 
 /**
@@ -1032,13 +1994,13 @@ jbm_f64_pol_29 (const double x, ///< double value.
 /**
  * Function to calculate the well conditionated function exp(x) for x in
  * [-log(2)/2,log(2)/2] by the following Taylor' serie:
- * \fn$exp(x)\approx\sum_{i=0}^13x^i/i!\fn$.
+ * \f$\exp(x)\approx\sum_{n=0}^{13}\frac{x^n}{n!}\f$.
  *
  * \return function value.
  */
 static inline double
 jbm_f64_expwc (const double x)
-               ///< double number \fn$\in\left[-\log(2)/2,\log(2)/2\right]\fn$.
+               ///< double number \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
 {
   const double a[14] JB_ALIGNED = { JBM_1_FACT0, JBM_1_FACT1, JBM_1_FACT2,
     JBM_1_FACT3, JBM_1_FACT4, JBM_1_FACT5, JBM_1_FACT6, JBM_1_FACT7,
@@ -1049,7 +2011,7 @@ jbm_f64_expwc (const double x)
 }
 
 /**
- * Function to calculate the function 2^x using the jbm_f64_expwc and
+ * Function to calculate the function exp2(x) using the jbm_f64_expwc and
  * jbm_f64_exp2n functions.
  *
  * \return function value.
@@ -1076,7 +2038,7 @@ jbm_f64_exp (const double x)    ///< double number.
 }
 
 /**
- * Function to calculate the function 10^x using the jbm_f64_exp2 function.
+ * Function to calculate the function exp10(x) using the jbm_f64_exp2 function.
  *
  * \return function value.
  */
@@ -1089,7 +2051,7 @@ jbm_f64_exp10 (const double x)  ///< double number.
 /**
  * Function to calculate the well conditionated function log(1+x) for x in
  * [-1/3,1/3] by the following Taylor' serie:
- * \fn$log(1+x)\approx\sum_{i=1}^{30}\frac{(-1)^{n+1}\,x^n}{n!}\fn$.
+ * \f$log(1+x)\approx\sum_{i=1}^{30}\frac{(-1)^{n+1}\,x^n}{n!}\f$.
  *
  * \return function value.
  */
@@ -1162,7 +2124,7 @@ jbm_f64_pown (const double x,   ///< double number.
   unsigned int i;
   f = 1.;
   if (e < 0)
-    xn = 1. / xn;
+    xn = 1. / x;
   else
     xn = x;
   i = (unsigned int) abs (e);
@@ -1212,14 +2174,13 @@ jbm_f64_cbrt (const double x)  ///< double number.
 /**
  * Function to calculate the well conditionated function sin(x) for x in
  * [-pi/4,pi/4] by the following Taylor' serie:
- * \fn$sin(x)\approx x\,\left(1-x^2/3!+x^4/5!-x^6/7!+x^8/9!-x^{10}/11!
- * +x^{12}/12!-x^{14}/15!\right)\fn$.
+ * \f$\sin(x)\approx\sum_{n=0}^7\frac{(-1)^n\,x^{2\,n+1}}{(2\,n+1)!}\f$.
  *
  * \return function value.
  */
 static inline double
 jbm_f64_sinwc (const double x)
-               ///< double number \fn$\in\left[-\pi/4,\pi/4\right]\fn$.
+               ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
   const double a[8] JB_ALIGNED = { JBM_1_FACT1, -JBM_1_FACT3, JBM_1_FACT5,
     -JBM_1_FACT7, JBM_1_FACT9, -JBM_1_FACT11, JBM_1_FACT13, -JBM_1_FACT15
@@ -1230,14 +2191,13 @@ jbm_f64_sinwc (const double x)
 /**
  * Function to calculate the well conditionated function cos(x) for x in
  * [-pi/4,pi/4] by the following Taylor' serie:
- * \fn$sin(x)\approx1-x^2/2!+x^4/4!-x^6/6!+x^8/8!-x^{10}/10!+x^{12}/12!
- * -x^{14}/14!+x^{16}/16!\right)\fn$.
+ * \f$\cos(x)\approx\sum_{n=0}^8\frac{(-1)^n\,x^{2\,n}}{(2\,n)!}\f$.
  *
  * \return function value.
  */
 static inline double
 jbm_f64_coswc (const double x)
-               ///< double number \fn$\in\left[-\pi/4,\pi/4\right]\fn$.
+               ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
   const double a[9] JB_ALIGNED = { JBM_1_FACT0, -JBM_1_FACT2, JBM_1_FACT4,
     -JBM_1_FACT6, JBM_1_FACT8, -JBM_1_FACT10, JBM_1_FACT12, -JBM_1_FACT14,
@@ -1252,11 +2212,9 @@ jbm_f64_coswc (const double x)
  */
 static inline void
 jbm_f64_sincoswc (const double x,
-                  ///< double number \fn$\in\left[-\pi/4,\pi/4\right]\fn$.
-                  double *s,
-                  ///< pointer to the sin function value.
-                  double *c)
-                  ///< pointer to the cos function value.
+                  ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                  double *s,    ///< pointer to the sin function value.
+                  double *c)    ///< pointer to the cos function value.
 {
   *s = jbm_f64_sinwc (x);
   *c = jbm_f64_coswc (x);
@@ -1316,7 +2274,7 @@ jbm_f64_cos (const double x)    ///< double number.
  */
 static inline void
 jbm_f64_sincos (const double x,
-                ///< double number \fn$\in\left[-\pi/4,\pi/4\right]\fn$.
+                ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                 double *s,      ///< pointer to the sin function value.
                 double *c)      ///< pointer to the cos function value.
 {
@@ -1372,13 +2330,13 @@ jbm_f64_tan (const double x)    ///< double number.
 /**
  * Function to calculate the well conditionated function atan(x) for x in
  * [-1/2,1/2] by the following Taylor' serie:
- * \fn$atan(x)\approx\sum_{i=0}^{23}\frac{(-1)^{2n}\,x^{2\,n+1}}{2\,n+1}\fn$.
+ * \f$atan(x)\approx\sum_{i=0}^{23}\frac{(-1)^{2\,n}\,x^{2\,n+1}}{2\,n+1}\f$.
  *
  * \return function value.
  */
 static inline double
 jbm_f64_atanwc0 (const double x)
-                 ///< double number \fn$\in\left[0,\frac12\right]\fn$.
+                 ///< double number \f$\in\left[0,\frac12\right]\f$.
 {
   const double a[24] JB_ALIGNED = { 1., -1. / 3., 1. / 5., -1. / 7., 1. / 9.,
     -1. / 11., 1. / 13., -1. / 15., 1. / 17., -1. / 19., 1. / 21., -1. / 23.,
@@ -1392,7 +2350,7 @@ jbm_f64_atanwc0 (const double x)
 /**
  * Function to calculate the well conditionated function atan(x) for x in
  * [1/2,3/2] by the following Taylor' serie:
- * \fn$atan(1+x)\approx
+ * \f$atan(1+x)\approx
  * \frac{\pi}{4}
  * +\frac{x}{2}
  * -\frac{x^2}{4}
@@ -1417,13 +2375,13 @@ jbm_f64_atanwc0 (const double x)
  * +\frac{x^{27}}{442368}
  * -\frac{x^{29}}{950272}
  * +\frac{x^{30}}{983040}
- * -\frac{x^{31}}{2031616}\fn$.
+ * -\frac{x^{31}}{2031616}\f$.
  *
  * \return function value.
  */
 static inline double
 jbm_f64_atanwc1 (const double x)
-                 ///< double number \fn$\in\left[\frac12,1\right]\fn$.
+                 ///< double number \f$\in\left[\frac12,1\right]\f$.
 {
   const double a1[8] = { 1. / 2., -1. / 40., 1. / 288., -1. / 1664., 1. / 8704.,
     -1. / 43008., 1. / 204800., -1. / 950272.
@@ -1502,7 +2460,7 @@ jbm_f64_atan2 (const double y,  ///< double y component.
 static inline double
 jbm_f64_asin (const double x)   ///< double number.
 {
-  return jbm_f64_atan (x / sqrt (1 - x * x));
+  return jbm_f64_atan (x / sqrt (1. - x * x));
 }
 
 /**
@@ -1514,7 +2472,7 @@ static inline double
 jbm_f64_acos (const double x)   ///< double number.
 {
   double f;
-  f = jbm_f64_atan (sqrt (1 - x * x) / x);
+  f = jbm_f64_atan (sqrt (1. - x * x) / x);
   if (x < 0.)
     f += M_PI;
   return f;

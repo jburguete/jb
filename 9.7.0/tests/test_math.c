@@ -850,6 +850,7 @@ main (void)
   JBDOUBLE d, d2;
   JBFLOAT f, f2;
   double x, y;
+  float xf, yf;
 #ifdef __SSE4_2__
   double *d_1, *d_2;
   unsigned long long int *L_1;
@@ -885,6 +886,137 @@ main (void)
   for (i = 0; i < 5; ++i )
     czd[i].D = Dzd[i], czd[i].H = Hzd[i];
   printf ("FLT_MIN=%lg FLT_EPSILON=%lg\n", FLT_MIN, FLT_EPSILON);
+  xf = jbm_f32_rest (2.f, -2.f);
+  printf ("rest(2,-2)=%g\n", xf);
+  xf = jbm_f32_rest (-2.f, 2.f);
+  printf ("rest(-2,2)=%g\n", xf);
+  xf = jbm_f32_rest (87.f, 4.f);
+  printf ("rest(87,4)=%g\n", xf);
+  xf = jbm_f32_rest (-87.f, 4.f);
+  printf ("rest(-87,4)=%g\n", xf);
+  xf = jbm_f32_frexp (2.f, &i);
+  printf ("frexp(2)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (2.5f, &i);
+  printf ("frexp(2.5)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (2501.f, &i);
+  printf ("frexp(2501)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (1e-16f, &i);
+  printf ("frexp(1e-16)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (1e-40f, &i);
+  printf ("frexp(1e-40)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (0.f, &i);
+  printf ("frexp(0)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (-2.f, &i);
+  printf ("frexp(-2)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (-2.5f, &i);
+  printf ("frexp(-2.5)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (-2501.f, &i);
+  printf ("frexp(-2501)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (-1e-16f, &i);
+  printf ("frexp(-1e-16)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (-1e-40f, &i);
+  printf ("frexp(-1e-40)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (0.f, &i);
+  printf ("frexp(-0)=%g*2^(%d)\n", xf, i);
+  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_f32_ldexp (xf, i));
+  printf ("exp2(-160)=%.8g\n", jbm_f32_exp2 (-150.f));
+  printf ("exp2(-130)=%.8g\n", jbm_f32_exp2 (-130.f));
+  printf ("exp2(-53)=%.8g\n", jbm_f32_exp2 (-53.f));
+  printf ("exp2(0)=%.8g\n", jbm_f32_exp2 (0.f));
+  printf ("exp2(53)=%.8g\n", jbm_f32_exp2 (53.f));
+  printf ("exp2(127)=%.8g\n", jbm_f32_exp2 (127.f));
+  printf ("exp2(128)=%.8g\n", jbm_f32_exp2 (128.f));
+  printf ("exp(-2)=%.8g\n", jbm_f32_exp (-2.f));
+  printf ("exp(0)=%.8g\n", jbm_f32_exp (0.f));
+  printf ("exp(2)=%.8g\n", jbm_f32_exp (2.f));
+  printf ("exp10(-40)=%.8g\n", jbm_f32_exp10 (-40.f));
+  printf ("exp10(-2)=%.8g\n", jbm_f32_exp10 (-2.f));
+  printf ("exp10(0)=%.8g\n", jbm_f32_exp10 (0.f));
+  printf ("exp10(2)=%.8g\n", jbm_f32_exp10 (2.f));
+  printf ("log2(10)=%.8g=%.8g\n", jbm_f32_log2(10.f), M_LN10f / M_LN2f);
+  printf ("log2(e)=%.8g=%.8g\n", jbm_f32_log2(M_Ef), M_LOG2Ef);
+  printf ("log2(1)=%.8g\n", jbm_f32_log2(1.f));
+  printf ("log2(1/e)=%.8g=%.8g\n", jbm_f32_log2(1.f / M_Ef), -M_LOG2Ef);
+  printf ("log2(1/10)=%.8g=%.8g\n", jbm_f32_log2(0.1f), -M_LN10f / M_LN2f);
+  printf ("log2(1e-40)=%.8g\n", jbm_f32_log2(1e-40f));
+  printf ("log2(0)=%.8g\n", jbm_f32_log2(0.f));
+  printf ("log2(-1)=%.8g\n", jbm_f32_log2(-1.f));
+  printf ("log(e)=%.8g\n", jbm_f32_log(M_Ef));
+  printf ("log(1)=%.8g\n", jbm_f32_log(1.f));
+  printf ("log(1/e)=%.8g\n", jbm_f32_log(1.f / M_Ef));
+  printf ("log10(10)=%.8g\n", jbm_f32_log10(10.f));
+  printf ("log10(1)=%.8g\n", jbm_f32_log10(1.f));
+  printf ("log10(1/10)=%.8g\n", jbm_f32_log10(0.1f));
+  printf ("log10(1e-40)=%.8g\n", jbm_f32_log10(1e-40f));
+  printf ("pown(10,31)=%.8g\n", jbm_f32_pown(10.f, 31));
+  printf ("pown(10,0)=%.8g\n", jbm_f32_pown(10.f, 0));
+  printf ("pown(10,-31)=%.8g\n", jbm_f32_pown(10.f, -31));
+  printf ("pown(10,-40)=%.8g\n", jbm_f32_pown(10.f, -51));
+  printf ("pown(10,-50)=%.8g\n", jbm_f32_pown(10.f, -50));
+  printf ("pow(10,40.5)=%.8g\n", jbm_f32_pow(10.f, 40.5f));
+  printf ("pow(10,31.5)=%.8g\n", jbm_f32_pow(10.f, 31.5f));
+  printf ("pow(10,31)=%.8g\n", jbm_f32_pow(10.f, 31.f));
+  printf ("pow(10,0)=%.8g\n", jbm_f32_pow(10.f, 0.f));
+  printf ("pow(10,-31)=%.8g\n", jbm_f32_pow(10.f, -31.f));
+  printf ("pow(10,-31.5)=%.8g\n", jbm_f32_pow(10.f, -31.5f));
+  printf ("pow(10,-40)=%.8g\n", jbm_f32_pow(10.f, -40.f));
+  printf ("pow(10,-40.5)=%.8g\n", jbm_f32_pow(10.f, -40.5f));
+  printf ("pow(10,-50)=%.8g\n", jbm_f32_pow(10.f, -50.f));
+  xf = 0.f;
+  printf ("sinwc(0)=%.8le=%.8le\n", sin(xf), jbm_f32_sinwc(xf));
+  printf ("coswc(0)=%.8le=%.8le\n", cos(xf), jbm_f32_coswc(xf));
+  xf = M_PIf / 6.f;
+  printf ("sinwc(pi/6)=%.8le=%.8le\n", sin(xf), jbm_f32_sinwc(xf));
+  printf ("coswc(pi/6)=%.8le=%.8le\n", cos(xf), jbm_f32_coswc(xf));
+  xf = -M_PIf / 6.f;
+  printf ("sinwc(-pi/6)=%.8le=%.8le\n", sin(xf), jbm_f32_sinwc(xf));
+  printf ("coswc(-pi/6)=%.8le=%.8le\n", cos(xf), jbm_f32_coswc(xf));
+  for (i = 0; i < 13; ++i)
+    {
+      xf = i * M_PIf / 6.f;
+      printf ("sin(%upi/6)=%.8le=%.8le\n", i, sin(xf), jbm_f32_sin(xf));
+      printf ("cos(%upi/6)=%.8le=%.8le\n", i, cos(xf), jbm_f32_cos(xf));
+      printf ("tan(%upi/6)=%.8le=%.8le\n", i, tan(xf), jbm_f32_tan(xf));
+    }
+  printf ("atan(infinity)=%.8g=%.8g\n", jbm_f32_atan (INFINITY), M_PI_2f);
+  printf ("atan(sqrt(3))=%.8g=%.8g\n", jbm_f32_atan (sqrt(3.f)), M_PIf / 3.f);
+  printf ("atan(1)=%.8g=%.8g\n", jbm_f32_atan (1.f), M_PI_4f);
+  printf ("atan(sqrt(1/3))=%.8g=%.8g\n",
+          jbm_f32_atan (1.f / sqrt(3.f)), M_PIf / 6.f);
+  printf ("atan(0)=%.8g=0\n", jbm_f32_atan (0.f));
+  printf ("atan(-0)=%.8g=-0\n", jbm_f32_atan (-0.f));
+  printf ("atan(-sqrt(1/3))=%.8g=%.8g\n",
+          jbm_f32_atan (-1.f / sqrt(3.f)), -M_PIf / 6.f);
+  printf ("atan(-1)=%.8g=%.8g\n", jbm_f32_atan (-1.f), -M_PI_4f);
+  printf ("atan(-sqrt(3))=%.8g=%.8g\n",
+          jbm_f32_atan (-sqrt(3.f)), -M_PIf / 3.f);
+  printf ("atan(-infinity)=%.8g=%.8g\n", jbm_f32_atan (-INFINITY), -M_PI_2f);
+  printf ("atan2(1,1)=%.8g=%.8g\n", jbm_f32_atan2 (1.f, 1.f), M_PI_4f);
+  printf ("atan2(1,-1)=%.8g=%.8g\n", jbm_f32_atan2 (1.f, -1.f), 3.f * M_PI_4f);
+  printf ("atan2(-1,1)=%.8g=%.8g\n", jbm_f32_atan2 (-1.f, 1.f), -M_PI_4f);
+  printf ("atan2(-1,-1)=%.8g=%.8g\n",
+          jbm_f32_atan2 (-1.f, -1.f), -3.f * M_PI_4f);
+  printf ("asin(1)=%.8g=%.8g\n", jbm_f32_asin (1.f), M_PI_2f);
+  printf ("asin(1/2)=%.8g=%.8g\n", jbm_f32_asin (0.5f), M_PIf / 6.f);
+  printf ("asin(0)=%.8g=0\n", jbm_f32_asin (0.f));
+  printf ("asin(-1/2)=%.8g=%.8g\n", jbm_f32_asin (-0.5f), -M_PIf / 6.f);
+  printf ("asin(-1)=%.8g=%.8g\n", jbm_f32_asin (-1.f), -M_PI_2f);
+  printf ("acos(1)=%.8g=0\n", jbm_f32_acos (1.f));
+  printf ("acos(1/2)=%.8g=%.8g\n", jbm_f32_acos (0.5f), M_PIf / 3.f);
+  printf ("acos(0)=%.8g=%.8g\n", jbm_f32_acos (0.f), M_PI_2f);
+  printf ("acos(-1/2)=%.8g=%.8g\n", jbm_f32_acos (-0.5f), 2.f * M_PIf / 3.);
+  printf ("acos(-1)=%.8g=%.8g\n", jbm_f32_acos (-1.f), M_PIf);
   printf ("DBL_MIN=%lg DBL_EPSILON=%lg\n", DBL_MIN, DBL_EPSILON);
   x = jbm_f64_rest (2., -2.);
   printf ("rest(2,-2)=%lg\n", x);
@@ -990,17 +1122,17 @@ main (void)
       printf ("tan(%upi/6)=%.15le=%.15le\n", i, tan(x), jbm_f64_tan(x));
     }
   printf ("atan(infinity)=%.15lg=%.15lg\n", jbm_f64_atan (INFINITY), M_PI_2);
-  printf ("atan(sqrt(3))=%.15lg=%.15lg\n", jbm_f64_atan (sqrt(3)), M_PI / 3.);
+  printf ("atan(sqrt(3))=%.15lg=%.15lg\n", jbm_f64_atan (sqrt(3.)), M_PI / 3.);
   printf ("atan(1)=%.15lg=%.15lg\n", jbm_f64_atan (1.), M_PI_4);
   printf ("atan(sqrt(1/3))=%.15lg=%.15lg\n",
-          jbm_f64_atan (1. / sqrt(3)), M_PI / 6.);
+          jbm_f64_atan (1. / sqrt(3.)), M_PI / 6.);
   printf ("atan(0)=%.15lg=0\n", jbm_f64_atan (0.));
   printf ("atan(-0)=%.15lg=-0\n", jbm_f64_atan (-0.));
   printf ("atan(-sqrt(1/3))=%.15lg=%.15lg\n",
-          jbm_f64_atan (-1. / sqrt(3)), -M_PI / 6.);
+          jbm_f64_atan (-1. / sqrt(3.)), -M_PI / 6.);
   printf ("atan(-1)=%.15lg=%.15lg\n", jbm_f64_atan (-1.), -M_PI_4);
   printf ("atan(-sqrt(3))=%.15lg=%.15lg\n",
-          jbm_f64_atan (-sqrt(3)), -M_PI / 3.);
+          jbm_f64_atan (-sqrt(3.)), -M_PI / 3.);
   printf ("atan(-infinity)=%.15lg=%.15lg\n", jbm_f64_atan (-INFINITY), -M_PI_2);
   printf ("atan2(1,1)=%.15lg=%.15lg\n", jbm_f64_atan2 (1., 1.), M_PI_4);
   printf ("atan2(1,-1)=%.15lg=%.15lg\n", jbm_f64_atan2 (1., -1.), 3. * M_PI_4);
