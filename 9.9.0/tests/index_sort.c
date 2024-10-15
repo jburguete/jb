@@ -4,7 +4,7 @@
 #include <gsl/gsl_rng.h>
 
 void
-sort_interchange (JBFLOAT * x,  ///<
+sort_interchange (JBFLOAT *x,   ///<
                   unsigned int *ni,     ///<
                   unsigned int n,       ///<
                   unsigned int k)       ///<
@@ -25,7 +25,7 @@ sort_interchange (JBFLOAT * x,  ///<
 }
 
 void
-sort_interchangel (JBDOUBLE * x,        ///<
+sort_interchangel (JBDOUBLE *x, ///<
                    unsigned int *ni,    ///<
                    unsigned int n,      ///<
                    unsigned int k)      ///<
@@ -46,7 +46,7 @@ sort_interchangel (JBDOUBLE * x,        ///<
 }
 
 void
-sort_insertion (JBFLOAT * x,    ///<
+sort_insertion (JBFLOAT *x,     ///<
                 unsigned int *ni,       ///<
                 unsigned int n, ///<
                 unsigned int k) ///<
@@ -67,7 +67,7 @@ sort_insertion (JBFLOAT * x,    ///<
 }
 
 void
-sort_insertionl (JBDOUBLE * x,  ///<
+sort_insertionl (JBDOUBLE *x,   ///<
                  unsigned int *ni,      ///<
                  unsigned int n,        ///<
                  unsigned int k)        ///<
@@ -88,7 +88,7 @@ sort_insertionl (JBDOUBLE * x,  ///<
 }
 
 void
-sort_merge (JBFLOAT * x,        ///<
+sort_merge (JBFLOAT *x,         ///<
             unsigned int *ni,   ///<
             unsigned int n,     ///<
             unsigned int k)     ///<
@@ -109,7 +109,7 @@ sort_merge (JBFLOAT * x,        ///<
 }
 
 void
-sort_mergel (JBDOUBLE * x,      ///<
+sort_mergel (JBDOUBLE *x,       ///<
              unsigned int *ni,  ///<
              unsigned int n,    ///<
              unsigned int k)    ///<
@@ -130,7 +130,7 @@ sort_mergel (JBDOUBLE * x,      ///<
 }
 
 void
-sort_flash (JBFLOAT * x,        ///<
+sort_flash (JBFLOAT *x,         ///<
             unsigned int *ni,   ///<
             unsigned int n,     ///<
             unsigned int k)     ///<
@@ -151,7 +151,7 @@ sort_flash (JBFLOAT * x,        ///<
 }
 
 void
-sort_flashl (JBDOUBLE * x,      ///<
+sort_flashl (JBDOUBLE *x,       ///<
              unsigned int *ni,  ///<
              unsigned int n,    ///<
              unsigned int k)    ///<

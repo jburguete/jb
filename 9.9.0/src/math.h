@@ -625,7 +625,7 @@ extern void farray_print (JBMFarray *);
  * \return function value (float).
  */
 static inline float
-jbm_f32_abs (const float x)     ///< float number.
+jbm_abs_f32 (const float x)     ///< float number.
 {
   JBMF32 y;
   y.x = x;
@@ -639,7 +639,7 @@ jbm_f32_abs (const float x)     ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_f32_hypot (const float x,   ///< 1st float number.
+jbm_hypot_f32 (const float x,   ///< 1st float number.
                const float y)   ///< 2nd float number.
 {
   return sqrtf (x * x + y * y);
@@ -651,7 +651,7 @@ jbm_f32_hypot (const float x,   ///< 1st float number.
  * \return rest value (in [0,|divisor|) interval).
  */
 static inline float
-jbm_f32_rest (const float x,    ///< dividend (float).
+jbm_rest_f32 (const float x,    ///< dividend (float).
               const float d)    ///< divisor (float).
 {
   float f;
@@ -665,7 +665,7 @@ jbm_f32_rest (const float x,    ///< dividend (float).
  * \return normalize fraction value in [1/2,1).
  */
 static inline float
-jbm_f32_frexp (const float x,   ///< float number.
+jbm_frexp_f32 (const float x,   ///< float number.
                int *e)          ///< pointer to the extracted exponent.
 {
   JBMF32 y, z;
@@ -689,7 +689,7 @@ jbm_f32_frexp (const float x,   ///< float number.
       y.i = 0x00400000l;
       z.x = x / y.x;
       z.i &= 0x7f800000l;
-      *e = (int) (z.i >> 23l) - 252;
+      *e = (int) (z.i >> 23l) - 253;
       y.x *= z.x;
     }
   else
@@ -703,13 +703,15 @@ jbm_f32_frexp (const float x,   ///< float number.
  * \return function value.
  */
 static inline float
-jbm_f32_exp2n (int e)           ///< exponent number (int).
+jbm_exp2n_f32 (int e)           ///< exponent number (int).
 {
   JBMF32 x;
   if (e > 127)
     return INFINITY;
+  if (e < -150)
+    return 0.f;
   if (e > -127)
-    x.i = (127 + e) << 23l;
+    x.i = (127l + e) << 23l;
   else
     x.i = 0x00400000l >> (-e - 127);
   return x.x;
@@ -721,10 +723,10 @@ jbm_f32_exp2n (int e)           ///< exponent number (int).
  * \return function value (float).
  */
 static inline float
-jbm_f32_ldexp (const float x,   ///< float number.
+jbm_ldexp_f32 (const float x,   ///< float number.
                int e)           ///< exponent number (int).
 {
-  return x * jbm_f32_exp2n (e);
+  return x * jbm_exp2n_f32 (e);
 }
 
 /**
@@ -733,8 +735,8 @@ jbm_f32_ldexp (const float x,   ///< float number.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_1 (const float x,   ///< float value.
-               const float *p)  ///< array of coefficients.
+jbm_polynomial_1_f32 (const float x,    ///< float value.
+                      const float *p)   ///< array of coefficients.
 {
   return p[0] + x * p[1];
 }
@@ -745,10 +747,10 @@ jbm_f32_pol_1 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_2 (const float x,   ///< float value.
-               const float *p)  ///< array of coefficients.
+jbm_polynomial_2_f32 (const float x,    ///< float value.
+                      const float *p)   ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_1 (x, p + 1);
+  return p[0] + x * jbm_polynomial_1_f32 (x, p + 1);
 }
 
 /**
@@ -757,10 +759,10 @@ jbm_f32_pol_2 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_3 (const float x,   ///< float value.
-               const float *p)  ///< array of coefficients.
+jbm_polynomial_3_f32 (const float x,    ///< float value.
+                      const float *p)   ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_2 (x, p + 1);
+  return p[0] + x * jbm_polynomial_2_f32 (x, p + 1);
 }
 
 /**
@@ -769,10 +771,10 @@ jbm_f32_pol_3 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_4 (const float x,   ///< float value.
-               const float *p)  ///< array of coefficients.
+jbm_polynomial_4_f32 (const float x,    ///< float value.
+                      const float *p)   ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_3 (x, p + 1);
+  return p[0] + x * jbm_polynomial_3_f32 (x, p + 1);
 }
 
 /**
@@ -781,10 +783,10 @@ jbm_f32_pol_4 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_5 (const float x,   ///< float value.
-               const float *p)  ///< array of coefficients.
+jbm_polynomial_5_f32 (const float x,    ///< float value.
+                      const float *p)   ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_4 (x, p + 1);
+  return p[0] + x * jbm_polynomial_4_f32 (x, p + 1);
 }
 
 /**
@@ -793,10 +795,10 @@ jbm_f32_pol_5 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_6 (const float x,   ///< float value.
-               const float *p)  ///< array of coefficients.
+jbm_polynomial_6_f32 (const float x,    ///< float value.
+                      const float *p)   ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_5 (x, p + 1);
+  return p[0] + x * jbm_polynomial_5_f32 (x, p + 1);
 }
 
 /**
@@ -805,10 +807,10 @@ jbm_f32_pol_6 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_7 (const float x,   ///< float value.
-               const float *p)  ///< array of coefficients.
+jbm_polynomial_7_f32 (const float x,    ///< float value.
+                      const float *p)   ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_6 (x, p + 1);
+  return p[0] + x * jbm_polynomial_6_f32 (x, p + 1);
 }
 
 /**
@@ -817,10 +819,10 @@ jbm_f32_pol_7 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_8 (const float x,   ///< float value.
-               const float *p)  ///< array of coefficients.
+jbm_polynomial_8_f32 (const float x,    ///< float value.
+                      const float *p)   ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_7 (x, p + 1);
+  return p[0] + x * jbm_polynomial_7_f32 (x, p + 1);
 }
 
 /**
@@ -829,10 +831,10 @@ jbm_f32_pol_8 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_9 (const float x,   ///< float value.
-               const float *p)  ///< array of coefficients.
+jbm_polynomial_9_f32 (const float x,    ///< float value.
+                      const float *p)   ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_8 (x, p + 1);
+  return p[0] + x * jbm_polynomial_8_f32 (x, p + 1);
 }
 
 /**
@@ -841,10 +843,10 @@ jbm_f32_pol_9 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_10 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_10_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_9 (x, p + 1);
+  return p[0] + x * jbm_polynomial_9_f32 (x, p + 1);
 }
 
 /**
@@ -853,10 +855,10 @@ jbm_f32_pol_10 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_11 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_11_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_10 (x, p + 1);
+  return p[0] + x * jbm_polynomial_10_f32 (x, p + 1);
 }
 
 /**
@@ -865,10 +867,10 @@ jbm_f32_pol_11 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_12 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_12_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_11 (x, p + 1);
+  return p[0] + x * jbm_polynomial_11_f32 (x, p + 1);
 }
 
 /**
@@ -877,10 +879,10 @@ jbm_f32_pol_12 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_13 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_13_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_12 (x, p + 1);
+  return p[0] + x * jbm_polynomial_12_f32 (x, p + 1);
 }
 
 /**
@@ -889,10 +891,10 @@ jbm_f32_pol_13 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_14 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_14_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_13 (x, p + 1);
+  return p[0] + x * jbm_polynomial_13_f32 (x, p + 1);
 }
 
 /**
@@ -901,10 +903,10 @@ jbm_f32_pol_14 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_15 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_15_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_14 (x, p + 1);
+  return p[0] + x * jbm_polynomial_14_f32 (x, p + 1);
 }
 
 /**
@@ -913,10 +915,10 @@ jbm_f32_pol_15 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_16 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_16_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_15 (x, p + 1);
+  return p[0] + x * jbm_polynomial_15_f32 (x, p + 1);
 }
 
 /**
@@ -925,10 +927,10 @@ jbm_f32_pol_16 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_17 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_17_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_16 (x, p + 1);
+  return p[0] + x * jbm_polynomial_16_f32 (x, p + 1);
 }
 
 /**
@@ -937,10 +939,10 @@ jbm_f32_pol_17 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_18 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_18_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_17 (x, p + 1);
+  return p[0] + x * jbm_polynomial_17_f32 (x, p + 1);
 }
 
 /**
@@ -949,10 +951,10 @@ jbm_f32_pol_18 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_19 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_19_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_18 (x, p + 1);
+  return p[0] + x * jbm_polynomial_18_f32 (x, p + 1);
 }
 
 /**
@@ -961,10 +963,10 @@ jbm_f32_pol_19 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_20 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_20_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_19 (x, p + 1);
+  return p[0] + x * jbm_polynomial_19_f32 (x, p + 1);
 }
 
 /**
@@ -973,10 +975,10 @@ jbm_f32_pol_20 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_21 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_21_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_20 (x, p + 1);
+  return p[0] + x * jbm_polynomial_20_f32 (x, p + 1);
 }
 
 /**
@@ -985,10 +987,10 @@ jbm_f32_pol_21 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_22 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_22_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_21 (x, p + 1);
+  return p[0] + x * jbm_polynomial_21_f32 (x, p + 1);
 }
 
 /**
@@ -997,10 +999,10 @@ jbm_f32_pol_22 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_23 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_23_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_22 (x, p + 1);
+  return p[0] + x * jbm_polynomial_22_f32 (x, p + 1);
 }
 
 /**
@@ -1009,10 +1011,10 @@ jbm_f32_pol_23 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_24 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_24_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_23 (x, p + 1);
+  return p[0] + x * jbm_polynomial_23_f32 (x, p + 1);
 }
 
 /**
@@ -1021,10 +1023,10 @@ jbm_f32_pol_24 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_25 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_25_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_24 (x, p + 1);
+  return p[0] + x * jbm_polynomial_24_f32 (x, p + 1);
 }
 
 /**
@@ -1033,10 +1035,10 @@ jbm_f32_pol_25 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_26 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_26_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_25 (x, p + 1);
+  return p[0] + x * jbm_polynomial_25_f32 (x, p + 1);
 }
 
 /**
@@ -1045,10 +1047,10 @@ jbm_f32_pol_26 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_27 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_27_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_26 (x, p + 1);
+  return p[0] + x * jbm_polynomial_26_f32 (x, p + 1);
 }
 
 /**
@@ -1057,10 +1059,10 @@ jbm_f32_pol_27 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_28 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_28_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_27 (x, p + 1);
+  return p[0] + x * jbm_polynomial_27_f32 (x, p + 1);
 }
 
 /**
@@ -1069,10 +1071,268 @@ jbm_f32_pol_28 (const float x,  ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_f32_pol_29 (const float x,  ///< float value.
-                const float *p) ///< array of coefficients.
+jbm_polynomial_29_f32 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f32_pol_28 (x, p + 1);
+  return p[0] + x * jbm_polynomial_28_f32 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 1st order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_1_f32 (const float x,      ///< float value.
+                    const float *p)     ///< array of coefficients.
+{
+  return p[0] / (1.f + x * p[1]);
+}
+
+/**
+ * Function to calculate a 2nd order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_2_f32 (const float x,      ///< float value.
+                    const float *p)     ///< array of coefficients.
+{
+  return jbm_polynomial_1_f32 (x, p) / (1.f + x * p[2]);
+}
+
+/**
+ * Function to calculate a 3rd order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_3_f32 (const float x,      ///< float value.
+                    const float *p)     ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 4th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_4_f32 (const float x,      ///< float value.
+                    const float *p)     ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 5th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_5_f32 (const float x,      ///< float value.
+                    const float *p)     ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 6th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_6_f32 (const float x,      ///< float value.
+                    const float *p)     ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 7th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_7_f32 (const float x,      ///< float value.
+                    const float *p)     ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 8th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_8_f32 (const float x,      ///< float value.
+                    const float *p)     ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 9th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_9_f32 (const float x,      ///< float value.
+                    const float *p)     ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 10th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_10_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_f32 (const float x,     ///< float value.
+                     const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 11));
 }
 
 /**
@@ -1083,51 +1343,89 @@ jbm_f32_pol_29 (const float x,  ///< float value.
  * \return function value.
  */
 static inline float
-jbm_f32_expwc (const float x)
+jbm_expwc_f32 (const float x)
                ///< float number \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
 {
+// Taylor' serie
+/*
   const float a[8] JB_ALIGNED = { JBM_1_FACT0f, JBM_1_FACT1f, JBM_1_FACT2f,
     JBM_1_FACT3f, JBM_1_FACT4f, JBM_1_FACT5f, JBM_1_FACT6f, JBM_1_FACT7f
   };
-  return jbm_f32_pol_7 (x, a);
+  return jbm_polynomial_7_f32 (x, a);
+*/
+// Faster
+  const float a[7] JB_ALIGNED = {
+    1.000000000000000000000000000000000e+00f,
+    1.000000017023318040417309375512461e+00f,
+    5.000000021268108714292592469778157e-01f,
+    1.666649307443897793566104426979129e-01f,
+    4.166644978305165824979912269211368e-02f,
+    8.370477561522544486154479079486582e-03f,
+    1.393530110103816244689472997027511e-03f
+  };
+  return jbm_polynomial_6_f32 (x, a);
 }
 
 /**
- * Function to calculate the function exp2(x) using the jbm_f32_expwc and
- * jbm_f32_exp2n functions.
+ * Function to calculate the function exp2(x) using the jbm_expwc_f32 and
+ * jbm_exp2n_f32 functions.
  *
  * \return function value.
  */
 static inline float
-jbm_f32_exp2 (const float x)    ///< float number.
+jbm_exp2_f32 (const float x)    ///< float number.
 {
   float y, f;
+  if (x > 128.f)
+    return INFINITY;
   y = floorf (x);
   f = x - y;
-  y = jbm_f32_exp2n ((int) y);
-  return y * M_SQRT2f * jbm_f32_expwc ((f - 0.5f) * M_LN2f);
+  y = jbm_exp2n_f32 ((int) y);
+  return y * M_SQRT2f * jbm_expwc_f32 ((f - 0.5f) * M_LN2f);
 }
 
 /**
- * Function to calculate the function exp(x) using the jbm_f32_exp2 function.
+ * Function to calculate the function exp(x) using the jbm_exp2_f32 function.
  *
  * \return function value.
  */
 static inline float
-jbm_f32_exp (const float x)     ///< float number.
+jbm_exp_f32 (const float x)     ///< float number.
 {
-  return jbm_f32_exp2 (x * M_LOG2Ef);
+  return jbm_exp2_f32 (x * M_LOG2Ef);
 }
 
 /**
- * Function to calculate the function exp10(x) using the jbm_f32_exp2 function.
+ * Function to calculate the function exp10(x) using the jbm_exp2_f32 function.
  *
  * \return function value.
  */
 static inline float
-jbm_f32_exp10 (const float x)   ///< float number.
+jbm_exp10_f32 (const float x)   ///< float number.
 {
-  return jbm_f32_exp2 (x * M_LN10f / M_LN2f);
+  return jbm_exp2_f32 (x * M_LN10f / M_LN2f);
+}
+
+/**
+ * Function to calculate the function expm1(x) using the jbm_expwc_f32 and
+ * jbm_exp_f32 functions.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_expm1_f32 (const float x)   ///< float number.
+{
+  const float a[6] JB_ALIGNED = {
+    1.000000017023318040417309375512461e+00f,
+    5.000000021268108714292592469778157e-01f,
+    1.666649307443897793566104426979129e-01f,
+    4.166644978305165824979912269211368e-02f,
+    8.370477561522544486154479079486582e-03f,
+    1.393530110103816244689472997027511e-03f
+  };
+  if (jbm_abs_f32 (x) < M_LN2f / 2.f)
+    return x * jbm_polynomial_5_f32 (x, a);
+  return jbm_exp_f32 (x) - 1.f;
 }
 
 /**
@@ -1138,56 +1436,71 @@ jbm_f32_exp10 (const float x)   ///< float number.
  * \return function value.
  */
 static inline float
-jbm_f32_logwc (const float x)   ///< float number.
+jbm_logwc_f32 (const float x)   ///< float number.
 {
+// Taylor' serie
+/*
   const float a[13] = { 1.f, -1.f / 2.f, 1.f / 3.f, -1.f / 4.f, 1.f / 5.f,
     -1.f / 6.f, 1.f / 7.f, -1.f / 8.f, 1.f / 9.f, -1.f / 10.f, 1.f / 11.f,
-    -1.f / 12.f, 
+    -1.f / 12.f
   };
   float x1;
   x1 = x - 1.f;
-  return x1 * jbm_f32_pol_12 (x1, a);
+  return x1 * jbm_polynomial_12_f32 (x1, a);
+*/
+// Faster
+  const float a[6] = {
+    1.000000025881968133802113420593511e+00f,
+    1.011558616425352128515141325896526e+00f,
+    1.883784679123831627698211124744501e-01f,
+    1.511558668484767968349208589705767e+00f,
+    6.108272496542924505968134916147412e-01f,
+    5.155508332718994147754595889783726e-02f
+  };
+  float x1;
+  x1 = x - 1.f;
+  return x1 * jbm_rational_5_f32 (x1, a);
 }
 
 /**
- * Function to calculate the function log_2(x) using jbm_f32_logwc and
- * jbm_f32_frexp
+ * Function to calculate the function log_2(x) using jbm_logwc_f32 and
+ * jbm_frexp_f32
  *
  * \return function value.
  */
 static inline float
-jbm_f32_log2 (const float x)    ///< float number.
+jbm_log2_f32 (const float x)    ///< float number.
 {
   float y;
   int e;
   if (x < 0.f)
-    return sqrtf(-1.f);
+    return sqrtf (-1.f);
   if (x <= 0.f)
     return -INFINITY;
-  y = jbm_f32_frexp (x, &e);
-  return jbm_f32_logwc (y * 4.f / 3.f) * M_LOG2Ef - 0.415037499f + (float) e; 
+  y = jbm_frexp_f32 (x, &e);
+  return jbm_logwc_f32 (y * 4.f / 3.f) * M_LOG2Ef - 0.415037499f + (float) e;
 }
 
 /**
- * Function to calculate the function log(x) using jbm_f32_log2.
+ * Function to calculate the function log(x) using jbm_log2_f32.
  *
  * \return function value.
  */
 static inline float
-jbm_f32_log (const float x)     ///< float number.
+jbm_log_f32 (const float x)     ///< float number.
 {
-  return jbm_f32_log2 (x) * M_LN2f;
+  return jbm_log2_f32 (x) * M_LN2f;
 }
 
 /**
- * Function to calculate the function log10(x) using jbm_f32_log2.
+ * Function to calculate the function log10(x) using jbm_log2_f32.
  *
  * \return function value.
  */
 static inline float
-jbm_f32_log10 (const float x)   ///< float number.
+jbm_log10_f32 (const float x)   ///< float number.
 {
-  return jbm_f32_log2 (x) * M_LN2f / M_LN10f;
+  return jbm_log2_f32 (x) * M_LN2f / M_LN10f;
 }
 
 /**
@@ -1196,7 +1509,7 @@ jbm_f32_log10 (const float x)   ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_f32_pown (const float x,    ///< float number.
+jbm_pown_f32 (const float x,    ///< float number.
               int e)            ///< exponent (int).
 {
   float f, xn;
@@ -1211,40 +1524,40 @@ jbm_f32_pown (const float x,    ///< float number.
     {
       if (i & 1)
         f *= xn;
-      xn *= xn;  
+      xn *= xn;
       i >>= 1;
     }
   return f;
 }
 
 /**
- * Function to calculate the function pow using the jbm_f32_exp2 and
- * jbm_f32_log2 functions.
+ * Function to calculate the function pow using the jbm_exp2_f32 and
+ * jbm_log2_f32 functions.
  *
  * \return function value.
  */
 static inline float
-jbm_f32_pow (const float x,     ///< float number.
+jbm_pow_f32 (const float x,     ///< float number.
              const float e)     ///< exponent (float).
 {
   float f;
   f = floorf (e);
   if (f == e)
-    return jbm_f32_pown (x, (int) e);
-  return jbm_f32_exp2 (e * jbm_f32_log2 (x));
+    return jbm_pown_f32 (x, (int) e);
+  return jbm_exp2_f32 (e * jbm_log2_f32 (x));
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_f32_pow function.
+ * Function to calculate the function cbrt(x) using the jbm_pow_f32 function.
  *
  * \return function value.
  */
 static inline float
-jbm_f32_cbrt (const float x)    ///< float number.
+jbm_cbrt_f32 (const float x)    ///< float number.
 {
   float f;
-  f = jbm_f32_abs (x);
-  f = jbm_f32_pow (x, 1.f / 3.f);
+  f = jbm_abs_f32 (x);
+  f = jbm_pow_f32 (x, 1.f / 3.f);
   if (x < 0.f)
     f = -f;
   return f;
@@ -1258,13 +1571,24 @@ jbm_f32_cbrt (const float x)    ///< float number.
  * \return function value.
  */
 static inline float
-jbm_f32_sinwc (const float x)
+jbm_sinwc_f32 (const float x)
                ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
+// Taylor' serie
+/*
   const float a[5] JB_ALIGNED = { JBM_1_FACT1f, -JBM_1_FACT3f, JBM_1_FACT5f,
     -JBM_1_FACT7f, JBM_1_FACT9f
   };
-  return x * jbm_f32_pol_4 (x * x, a);
+  return x * jbm_polynomial_4_f32 (x * x, a);
+*/
+// Faster
+  const float a[4] JB_ALIGNED = {
+    9.999999992442543934491415295683794e-01f,
+    -1.666665963296521748934451982809823e-01f,
+    8.332478851480645009343686604819204e-03f,
+    -1.955187177182355975580341195818018e-04f
+  };
+  return x * jbm_polynomial_3_f32 (x * x, a);
 }
 
 /**
@@ -1275,133 +1599,143 @@ jbm_f32_sinwc (const float x)
  * \return function value.
  */
 static inline float
-jbm_f32_coswc (const float x)
+jbm_coswc_f32 (const float x)
                ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
+// Taylor' serie
+/*
   const float a[5] JB_ALIGNED = { JBM_1_FACT0f, -JBM_1_FACT2f, JBM_1_FACT4f,
     -JBM_1_FACT6f, JBM_1_FACT8f
   };
-  return jbm_f32_pol_4 (x * x, a);
+  return jbm_polynomial_4_f32 (x * x, a);
+*/
+// Faster
+  const float a[4] JB_ALIGNED = {
+    9.999999932128176743613757869334921e-01f,
+    -4.999993683051796046368781623262508e-01f,
+    4.165899147001424142698507088182203e-02f,
+    -1.362883066172439741490690427261611e-03f
+  };
+  return jbm_polynomial_3_f32 (x * x, a);
 }
 
 /**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
- * x in [-pi/4,pi/4] from jbm_f32_sinwc and jbm_f32_coswc approximations.
+ * x in [-pi/4,pi/4] from jbm_sinwc_f32 and jbm_coswc_f32 approximations.
  */
 static inline void
-jbm_f32_sincoswc (const float x,
+jbm_sincoswc_f32 (const float x,
                   ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   float *s,     ///< pointer to the sin function value.
                   float *c)     ///< pointer to the cos function value.
 {
-  *s = jbm_f32_sinwc (x);
-  *c = jbm_f32_coswc (x);
+  *s = jbm_sinwc_f32 (x);
+  *c = jbm_coswc_f32 (x);
 }
 
 /**
- * Function to calculate the function sin(x) from jbm_f32_sinwc and
- * jbm_f32_coswc approximations.
+ * Function to calculate the function sin(x) from jbm_sinwc_f32 and
+ * jbm_coswc_f32 approximations.
  *
  * \return function value.
  */
 static inline float
-jbm_f32_sin (const float x)     ///< float number.
+jbm_sin_f32 (const float x)     ///< float number.
 {
   float y;
   unsigned int i;
-  y = jbm_f32_rest (x, 2.f * M_PIf);
+  y = jbm_rest_f32 (x, 2.f * M_PIf);
   i = (unsigned int) floorf (y / M_PI_4f);
   if (i < 1)
-    return jbm_f32_sinwc (y);
-  if (i < 2)
-    return jbm_f32_coswc (M_PI_2f - y);
+    return jbm_sinwc_f32 (y);
   if (i < 3)
-    return jbm_f32_sinwc (M_PIf - y);
-  if (i < 7)
-    return -jbm_f32_coswc (3.f * M_PI_2f - y);
-  return jbm_f32_sinwc (y - 2.f * M_PIf);
-}
-
-/**
- * Function to calculate the function cos(x) from jbm_f32_sinwc and
- * jbm_f32_coswc approximations.
- *
- * \return function value.
- */
-static inline float
-jbm_f32_cos (const float x)     ///< float number.
-{
-  float y;
-  unsigned int i;
-  y = jbm_f32_rest (x, 2.f * M_PIf);
-  i = (unsigned int) floorf (y / M_PI_4f);
-  if (i < 1)
-    return jbm_f32_coswc (y);
-  if (i < 3)
-    return jbm_f32_sinwc (M_PI_2f - y);
+    return jbm_coswc_f32 (M_PI_2f - y);
   if (i < 5)
-    return -jbm_f32_coswc (M_PIf - y);
+    return jbm_sinwc_f32 (M_PIf - y);
   if (i < 7)
-    return jbm_f32_sinwc (y - 3.f * M_PI_2f);
-  return jbm_f32_coswc (y - 2.f * M_PIf);
+    return -jbm_coswc_f32 (3.f * M_PI_2f - y);
+  return jbm_sinwc_f32 (y - 2.f * M_PIf);
 }
 
 /**
- * Function to calculate the functions sin(x) and cos(x) from jbm_f32_sinwc and
- * jbm_f32_coswc approximations.
+ * Function to calculate the function cos(x) from jbm_sinwc_f32 and
+ * jbm_coswc_f32 approximations.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_cos_f32 (const float x)     ///< float number.
+{
+  float y;
+  unsigned int i;
+  y = jbm_rest_f32 (x, 2.f * M_PIf);
+  i = (unsigned int) floorf (y / M_PI_4f);
+  if (i < 1)
+    return jbm_coswc_f32 (y);
+  if (i < 3)
+    return jbm_sinwc_f32 (M_PI_2f - y);
+  if (i < 5)
+    return -jbm_coswc_f32 (M_PIf - y);
+  if (i < 7)
+    return jbm_sinwc_f32 (y - 3.f * M_PI_2f);
+  return jbm_coswc_f32 (y - 2.f * M_PIf);
+}
+
+/**
+ * Function to calculate the functions sin(x) and cos(x) from jbm_sinwc_f32 and
+ * jbm_coswc_f32 approximations.
  */
 static inline void
-jbm_f32_sincos (const float x,
+jbm_sincos_f32 (const float x,
                 ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                 float *s,       ///< pointer to the sin function value.
                 float *c)       ///< pointer to the cos function value.
 {
   float y;
   unsigned int i;
-  y = jbm_f32_rest (x, 2.f * M_PIf);
+  y = jbm_rest_f32 (x, 2.f * M_PIf);
   i = (unsigned int) floorf (y / M_PI_4f);
   if (i < 1)
     {
-      *s = jbm_f32_sinwc (y);
-      *c = jbm_f32_coswc (y);
+      *s = jbm_sinwc_f32 (y);
+      *c = jbm_coswc_f32 (y);
     }
   else if (i < 3)
     {
       y = M_PI_2f - y;
-      *s = jbm_f32_coswc (y);
-      *c = jbm_f32_sinwc (y);
+      *s = jbm_coswc_f32 (y);
+      *c = jbm_sinwc_f32 (y);
     }
   else if (i < 5)
     {
       y = M_PIf - y;
-      *s = jbm_f32_sinwc (y);
-      *c = -jbm_f32_coswc (y);
+      *s = jbm_sinwc_f32 (y);
+      *c = -jbm_coswc_f32 (y);
     }
   else if (i < 7)
     {
       y -= 3.f * M_PI_2f;
-      *s = -jbm_f32_coswc (y);
-      *c = jbm_f32_sinwc (y);
+      *s = -jbm_coswc_f32 (y);
+      *c = jbm_sinwc_f32 (y);
     }
   else
     {
       y -= 2.f * M_PIf;
-      *s = jbm_f32_sinwc (y);
-      *c = jbm_f32_coswc (y);
+      *s = jbm_sinwc_f32 (y);
+      *c = jbm_coswc_f32 (y);
     }
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_f32_sinwc and
- * jbm_f32_coswc approximations.
+ * Function to calculate the function tan(x) from jbm_sincos_f32.
  *
  * \return function value.
  */
 static inline float
-jbm_f32_tan (const float x)     ///< float number.
+jbm_tan_f32 (const float x)     ///< float number.
 {
   float s, c;
-  jbm_f32_sincos (x, &s, &c);
+  jbm_sincos_f32 (x, &s, &c);
   return s / c;
 }
 
@@ -1413,14 +1747,24 @@ jbm_f32_tan (const float x)     ///< float number.
  * \return function value.
  */
 static inline float
-jbm_f32_atanwc0 (const float x)
+jbm_atanwc0_f32 (const float x)
                  ///< float number \f$\in\left[0,\frac12\right]\f$.
 {
+// Taylor' serie
+/*
   const float a[10] JB_ALIGNED = { 1.f, -1.f / 3.f, 1.f / 5.f, -1.f / 7.f,
     1.f / 9.f, -1.f / 11.f, 1.f / 13.f, -1.f / 15.f, 1.f / 17.f, -1.f / 19.f
   };
-
-  return x * jbm_f32_pol_9 (x * x, a);
+  return x * jbm_polynomial_9_f32 (x * x, a);
+*/
+// Faster
+  const float a[4] JB_ALIGNED = {
+    9.999998404873014384133529526824489e-01f,
+    4.956684719852140058950449309014760e-01f,
+    8.289870587881024045809995000473547e-01f,
+    7.665833354275392020984659296343084e-02f
+  };
+  return x * jbm_rational_3_f32 (x * x, a);
 }
 
 /**
@@ -1442,9 +1786,11 @@ jbm_f32_atanwc0 (const float x)
  * \return function value.
  */
 static inline float
-jbm_f32_atanwc1 (const float x)
+jbm_atanwc1_f32 (const float x)
                  ///< float number \f$\in\left[\frac12,1\right]\f$.
 {
+// Taylor' serie
+/*
   const float a1[4] = { 1.f / 2.f, -1.f / 40.f, 1.f / 288.f, -1.f / 1664.f };
   const float a2[4] = { -1.f / 4.f, 1.f / 48.f, -1.f / 320.f, 1.f / 1792.f };
   const float a3[4] = { 1.f / 12.f, -1.f / 112.f, 1.f / 704.f, -1.f / 3840.f };
@@ -1452,36 +1798,51 @@ jbm_f32_atanwc1 (const float x)
   x1 = x - 1.f;
   x4 = x1 * x1;
   x4 *= x4;
-  return M_PI_4f + x1 * (jbm_f32_pol_3 (x4, a1)
-                         + x1 * (jbm_f32_pol_3 (x4, a2)
-                                 + x1 * jbm_f32_pol_3 (x4, a3)));
+  return M_PI_4f + x1 * (jbm_polynomial_3_f32 (x4, a1)
+                         + x1 * (jbm_polynomial_3_f32 (x4, a2)
+                                 + x1 * jbm_polynomial_3_f32 (x4, a3)));
+*/
+// Faster
+  const float a[8] = {
+    7.853981625513994575313180177654967e-01f,
+    1.574520194153474942490572629731245e+00f,
+    1.048010179978561933037327123628686e+00f,
+    2.592800060950390639859781517494658e-01f,
+    1.368121600801066467847214410809042e+00f,
+    7.817043832372322477745480043093985e-01f,
+    1.618608866301317634139743158049663e-01f,
+    6.251230254346320494278371312309655e-04f
+  };
+  float x1;
+  x1 = x - 1.f;
+  return jbm_rational_7_f32 (x1, a);
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_f32_atanwc0 and
- * jbm_f32_atancw1 functions.
+ * Function to calculate the function atan(x) using the jbm_atanwc0_f32 and
+ * jbm_atanwc1_f32 functions.
  *
  * \return function value (in [-pi/2,pi/2]).
  */
 static inline float
-jbm_f32_atan (const float x)    ///< float number.
+jbm_atan_f32 (const float x)    ///< float number.
 {
   float f, ax;
-  ax = jbm_f32_abs (x);
+  ax = jbm_abs_f32 (x);
   if (ax > 1.5f)
     {
       ax = 1.f / ax;
       if (ax > 0.5f)
-        f = M_PI_2f - jbm_f32_atanwc1 (ax);
+        f = M_PI_2f - jbm_atanwc1_f32 (ax);
       else
-        f = M_PI_2f - jbm_f32_atanwc0 (ax);
+        f = M_PI_2f - jbm_atanwc0_f32 (ax);
     }
   else
     {
       if (ax > 0.5f)
-        f = jbm_f32_atanwc1 (ax);
+        f = jbm_atanwc1_f32 (ax);
       else
-        f = jbm_f32_atanwc0 (ax);
+        f = jbm_atanwc0_f32 (ax);
     }
   if (x < 0.f)
     f = -f;
@@ -1489,51 +1850,221 @@ jbm_f32_atan (const float x)    ///< float number.
 }
 
 /**
- * Function to calculate the function atan2(y,x) using the jbm_f32_atan
+ * Function to calculate the function atan2(y,x) using the jbm_atan_f32
  * function.
  *
  * \return function value (in [-pi,pi]).
  */
 static inline float
-jbm_f32_atan2 (const float y,   ///< float y component.
+jbm_atan2_f32 (const float y,   ///< float y component.
                const float x)   ///< float x component.
 {
   float f;
-  f = jbm_f32_atan (y / x);
+  f = jbm_atan_f32 (y / x);
   if (x < 0.f)
-    if (y < 0.f)
-      f -= M_PIf;
-    else
-      f += M_PIf;
+    {
+      if (y < 0.f)
+        f -= M_PIf;
+      else
+        f += M_PIf;
+    }
   return f;
 }
 
 /**
- * Function to calculate the function asin(x) using the jbm_f32_atan function.
+ * Function to calculate the function asin(x) using the jbm_atan_f32 function.
  *
  * \return function value (in [-pi/2,pi/2]).
  */
 static inline float
-jbm_f32_asin (const float x)    ///< float number.
+jbm_asin_f32 (const float x)    ///< float number.
 {
-  return jbm_f32_atan (x / sqrtf (1.f - x * x));
+  return jbm_atan_f32 (x / sqrtf (1.f - x * x));
 }
 
 /**
- * Function to calculate the function acos(x) using the jbm_f32_atan function.
+ * Function to calculate the function acos(x) using the jbm_atan_f32 function.
  *
  * \return function value (in [0,pi]).
  */
 static inline float
-jbm_f32_acos (const float x)    ///< float number.
+jbm_acos_f32 (const float x)    ///< float number.
 {
   float f;
-  f = jbm_f32_atan (sqrtf (1.f - x * x) / x);
+  f = jbm_atan_f32 (sqrtf (1.f - x * x) / x);
   if (x < 0.f)
     f += M_PIf;
   return f;
 }
 
+/**
+ * Function to calculate the function sinh(x)
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_sinh_f32 (const float x)    ///< float number.
+{
+  float f;
+  f = jbm_exp_f32 (x);
+  return 0.5f * (f - 1.f / f);
+}
+
+/**
+ * Function to calculate the function cosh(x)
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_cosh_f32 (const float x)    ///< float number.
+{
+  float f;
+  f = jbm_exp_f32 (x);
+  return 0.5f * (f + 1.f / f);
+}
+
+/**
+ * Function to calculate the function tanh(x)
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_tanh_f32 (const float x)    ///< float number.
+{
+  float f;
+  if (x > 0.f)
+    {
+      f = jbm_exp_f32 (-x);
+      f *= f;
+      return (1.f - f) / (1.f + f);
+    }
+  f = jbm_exp_f32 (x);
+  f *= f;
+  return (f - 1.f) / (f + 1.f);
+}
+
+/**
+ * Function to calculate the function asinh(x)
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_asinh_f32 (const float x)   ///< float number.
+{
+  return jbm_log_f32 (x + sqrtf (x * x + 1.f));
+}
+
+/**
+ * Function to calculate the function acosh(x)
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_acosh_f32 (const float x)   ///< float number.
+{
+  return jbm_log_f32 (x + sqrtf (x * x - 1.f));
+}
+
+/**
+ * Function to calculate the function atanh(x)
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_atanh_f32 (const float x)   ///< float number.
+{
+  return 0.5f * jbm_log_f32 ((1.f + x) / (1.f - x));
+}
+
+/**
+ * Function to calculate the well conditionated function erf(x) for x in
+ * [-1,1] by the following Taylor' serie:
+ * \f$erf(x)\approx\frac{2}{\sqrt{\pi}}\,
+ * \sum_{i=0}^8\frac{(-1)^n\,x^{2\,n+1}}{n!\,(2\,n+1)}\f$.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_erfwc_f32 (const float x)
+             ///< float number \f$\in\left[-1,1\right]\f$.
+{
+// Taylor' serie
+// Faster
+  const float a[7] JB_ALIGNED = {
+    1.1283791666852785983688752932265643e+00f,
+    -3.7612635859585740378914600312914042e-01f,
+    1.1283732030120247802299985300220263e-01f,
+    -2.6861399417485986983433648257956338e-02f,
+    5.2055958879483142227128541564988751e-03f,
+    -8.1870778064413060035916518722950608e-04f,
+    8.5175869273000099571451271669843055e-05f
+  };
+  return x * jbm_polynomial_6_f32 (x * x, a);
+}
+
+/**
+ * Function to calculate the well conditionated function erfc(x) for
+ * \f$x\in[1,\infty]\f$ by the following Taylor' serie:
+ * \f$erfc(x)\approx\frac{x\,\exp\left(-\frac{1}{x^2}\right)}{\sqrt{\pi}}\,
+ * \sum_{i=0}^8\frac{(-1)^n\,x^{2\,n+1}}{n!\,(2\,n+1)}\f$.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_erfcwc_f32 (const float x)
+                ///< float number \f$\in\left[1,\infty\right]\f$.
+{
+// Taylor' serie
+// Faster
+  const float a[8] JB_ALIGNED = {
+    9.9999969060415943564818078583137764e-01f,
+    5.9760585774782651506828019699718722e+00f,
+    7.9133473492440670403006161471502580e+00f,
+    1.8893665663175011109436580545348846e+00f,
+    6.4760176256414820879830154653238450e+00f,
+    1.0402908358496967296102032718812172e+01f,
+    4.0794827981948933585478485349126701e+00f,
+    1.8090857835808128030458583206876380e-01f
+  };
+  double xi;
+  if (x > 9.4192801f)
+    return 0.f;
+  xi = 1.f / x;
+  return jbm_rational_7_f32 (xi * xi, a) / jbm_exp_f32 (xi * xi)
+    / (sqrtf (M_PIf) * xi);
+}
+
+/**
+ * Function to calculate the function erf(x) using jbm_erfwc_f32 and
+ * jbm_erfcwc_f32
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_erf_f32 (const float x)     ///< float number.
+{
+  float ax;
+  ax = jbm_abs_f32 (x);
+  if (ax > 1.f)
+    return x / ax * (1.f - jbm_erfcwc_f32 (ax));
+  return jbm_erfwc_f32 (x);
+}
+
+/**
+ * Function to calculate the function erfc(x) using jbm_erfwc_f32 and
+ * jbm_erfcwc_f32
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_erfc_f32 (const float x)    ///< float number.
+{
+  float ax;
+  ax = jbm_abs_f32 (x);
+  if (ax > 1.f)
+    return x / ax * jbm_erfcwc_f32 (ax);
+  return 1.f - jbm_erfwc_f32 (x);
+}
 
 /**
  * Function to calculate the abs function (double).
@@ -1541,7 +2072,7 @@ jbm_f32_acos (const float x)    ///< float number.
  * \return function value (double).
  */
 static inline double
-jbm_f64_abs (const double x)    ///< double number.
+jbm_abs_f64 (const double x)    ///< double number.
 {
   JBMF64 y;
   y.x = x;
@@ -1555,7 +2086,7 @@ jbm_f64_abs (const double x)    ///< double number.
  * \return function value (double).
  */
 static inline double
-jbm_f64_hypot (const double x,  ///< 1st double number.
+jbm_hypot_f64 (const double x,  ///< 1st double number.
                const double y)  ///< 2nd double number.
 {
   return sqrt (x * x + y * y);
@@ -1567,7 +2098,7 @@ jbm_f64_hypot (const double x,  ///< 1st double number.
  * \return rest value (in [0,|divisor|) interval).
  */
 static inline double
-jbm_f64_rest (const double x,   ///< dividend (double).
+jbm_rest_f64 (const double x,   ///< dividend (double).
               const double d)   ///< divisor (double).
 {
   double f;
@@ -1581,7 +2112,7 @@ jbm_f64_rest (const double x,   ///< dividend (double).
  * \return normalize fraction value in [1/2,1).
  */
 static inline double
-jbm_f64_frexp (const double x,  ///< double number.
+jbm_frexp_f64 (const double x,  ///< double number.
                int *e)          ///< pointer to the extracted exponent.
 {
   JBMF64 y, z;
@@ -1619,11 +2150,13 @@ jbm_f64_frexp (const double x,  ///< double number.
  * \return function value.
  */
 static inline double
-jbm_f64_exp2n (int e)           ///< exponent number (int).
+jbm_exp2n_f64 (int e)           ///< exponent number (int).
 {
   JBMF64 x;
   if (e > 1023)
     return INFINITY;
+  if (e < -1074)
+    return 0.;
   if (e > -1023)
     x.i = (1023L + e) << 52L;
   else
@@ -1637,10 +2170,10 @@ jbm_f64_exp2n (int e)           ///< exponent number (int).
  * \return function value (double).
  */
 static inline double
-jbm_f64_ldexp (const double x,  ///< double number.
+jbm_ldexp_f64 (const double x,  ///< double number.
                int e)           ///< exponent number (int).
 {
-  return x * jbm_f64_exp2n (e);
+  return x * jbm_exp2n_f64 (e);
 }
 
 /**
@@ -1649,8 +2182,8 @@ jbm_f64_ldexp (const double x,  ///< double number.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_1 (const double x,  ///< double value.
-               const double *p) ///< array of coefficients.
+jbm_polynomial_1_f64 (const double x,   ///< double value.
+                      const double *p)  ///< array of coefficients.
 {
   return p[0] + x * p[1];
 }
@@ -1661,10 +2194,10 @@ jbm_f64_pol_1 (const double x,  ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_2 (const double x,  ///< double value.
-               const double *p) ///< array of coefficients.
+jbm_polynomial_2_f64 (const double x,   ///< double value.
+                      const double *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_1 (x, p + 1);
+  return p[0] + x * jbm_polynomial_1_f64 (x, p + 1);
 }
 
 /**
@@ -1673,10 +2206,10 @@ jbm_f64_pol_2 (const double x,  ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_3 (const double x,  ///< double value.
-               const double *p) ///< array of coefficients.
+jbm_polynomial_3_f64 (const double x,   ///< double value.
+                      const double *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_2 (x, p + 1);
+  return p[0] + x * jbm_polynomial_2_f64 (x, p + 1);
 }
 
 /**
@@ -1685,10 +2218,10 @@ jbm_f64_pol_3 (const double x,  ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_4 (const double x,  ///< double value.
-               const double *p) ///< array of coefficients.
+jbm_polynomial_4_f64 (const double x,   ///< double value.
+                      const double *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_3 (x, p + 1);
+  return p[0] + x * jbm_polynomial_3_f64 (x, p + 1);
 }
 
 /**
@@ -1697,10 +2230,10 @@ jbm_f64_pol_4 (const double x,  ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_5 (const double x,  ///< double value.
-               const double *p) ///< array of coefficients.
+jbm_polynomial_5_f64 (const double x,   ///< double value.
+                      const double *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_4 (x, p + 1);
+  return p[0] + x * jbm_polynomial_4_f64 (x, p + 1);
 }
 
 /**
@@ -1709,10 +2242,10 @@ jbm_f64_pol_5 (const double x,  ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_6 (const double x,  ///< double value.
-               const double *p) ///< array of coefficients.
+jbm_polynomial_6_f64 (const double x,   ///< double value.
+                      const double *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_5 (x, p + 1);
+  return p[0] + x * jbm_polynomial_5_f64 (x, p + 1);
 }
 
 /**
@@ -1721,10 +2254,10 @@ jbm_f64_pol_6 (const double x,  ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_7 (const double x,  ///< double value.
-               const double *p) ///< array of coefficients.
+jbm_polynomial_7_f64 (const double x,   ///< double value.
+                      const double *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_6 (x, p + 1);
+  return p[0] + x * jbm_polynomial_6_f64 (x, p + 1);
 }
 
 /**
@@ -1733,10 +2266,10 @@ jbm_f64_pol_7 (const double x,  ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_8 (const double x,  ///< double value.
-               const double *p) ///< array of coefficients.
+jbm_polynomial_8_f64 (const double x,   ///< double value.
+                      const double *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_7 (x, p + 1);
+  return p[0] + x * jbm_polynomial_7_f64 (x, p + 1);
 }
 
 /**
@@ -1745,10 +2278,10 @@ jbm_f64_pol_8 (const double x,  ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_9 (const double x,  ///< double value.
-               const double *p) ///< array of coefficients.
+jbm_polynomial_9_f64 (const double x,   ///< double value.
+                      const double *p)  ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_8 (x, p + 1);
+  return p[0] + x * jbm_polynomial_8_f64 (x, p + 1);
 }
 
 /**
@@ -1757,10 +2290,10 @@ jbm_f64_pol_9 (const double x,  ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_10 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_10_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_9 (x, p + 1);
+  return p[0] + x * jbm_polynomial_9_f64 (x, p + 1);
 }
 
 /**
@@ -1769,10 +2302,10 @@ jbm_f64_pol_10 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_11 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_11_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_10 (x, p + 1);
+  return p[0] + x * jbm_polynomial_10_f64 (x, p + 1);
 }
 
 /**
@@ -1781,10 +2314,10 @@ jbm_f64_pol_11 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_12 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_12_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_11 (x, p + 1);
+  return p[0] + x * jbm_polynomial_11_f64 (x, p + 1);
 }
 
 /**
@@ -1793,10 +2326,10 @@ jbm_f64_pol_12 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_13 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_13_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_12 (x, p + 1);
+  return p[0] + x * jbm_polynomial_12_f64 (x, p + 1);
 }
 
 /**
@@ -1805,10 +2338,10 @@ jbm_f64_pol_13 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_14 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_14_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_13 (x, p + 1);
+  return p[0] + x * jbm_polynomial_13_f64 (x, p + 1);
 }
 
 /**
@@ -1817,10 +2350,10 @@ jbm_f64_pol_14 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_15 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_15_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_14 (x, p + 1);
+  return p[0] + x * jbm_polynomial_14_f64 (x, p + 1);
 }
 
 /**
@@ -1829,10 +2362,10 @@ jbm_f64_pol_15 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_16 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_16_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_15 (x, p + 1);
+  return p[0] + x * jbm_polynomial_15_f64 (x, p + 1);
 }
 
 /**
@@ -1841,10 +2374,10 @@ jbm_f64_pol_16 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_17 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_17_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_16 (x, p + 1);
+  return p[0] + x * jbm_polynomial_16_f64 (x, p + 1);
 }
 
 /**
@@ -1853,10 +2386,10 @@ jbm_f64_pol_17 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_18 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_18_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_17 (x, p + 1);
+  return p[0] + x * jbm_polynomial_17_f64 (x, p + 1);
 }
 
 /**
@@ -1865,10 +2398,10 @@ jbm_f64_pol_18 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_19 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_19_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_18 (x, p + 1);
+  return p[0] + x * jbm_polynomial_18_f64 (x, p + 1);
 }
 
 /**
@@ -1877,10 +2410,10 @@ jbm_f64_pol_19 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_20 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_20_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_19 (x, p + 1);
+  return p[0] + x * jbm_polynomial_19_f64 (x, p + 1);
 }
 
 /**
@@ -1889,10 +2422,10 @@ jbm_f64_pol_20 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_21 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_21_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_20 (x, p + 1);
+  return p[0] + x * jbm_polynomial_20_f64 (x, p + 1);
 }
 
 /**
@@ -1901,10 +2434,10 @@ jbm_f64_pol_21 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_22 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_22_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_21 (x, p + 1);
+  return p[0] + x * jbm_polynomial_21_f64 (x, p + 1);
 }
 
 /**
@@ -1913,10 +2446,10 @@ jbm_f64_pol_22 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_23 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_23_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_22 (x, p + 1);
+  return p[0] + x * jbm_polynomial_22_f64 (x, p + 1);
 }
 
 /**
@@ -1925,10 +2458,10 @@ jbm_f64_pol_23 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_24 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_24_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_23 (x, p + 1);
+  return p[0] + x * jbm_polynomial_23_f64 (x, p + 1);
 }
 
 /**
@@ -1937,10 +2470,10 @@ jbm_f64_pol_24 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_25 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_25_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_24 (x, p + 1);
+  return p[0] + x * jbm_polynomial_24_f64 (x, p + 1);
 }
 
 /**
@@ -1949,10 +2482,10 @@ jbm_f64_pol_25 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_26 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_26_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_25 (x, p + 1);
+  return p[0] + x * jbm_polynomial_25_f64 (x, p + 1);
 }
 
 /**
@@ -1961,10 +2494,10 @@ jbm_f64_pol_26 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_27 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_27_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_26 (x, p + 1);
+  return p[0] + x * jbm_polynomial_26_f64 (x, p + 1);
 }
 
 /**
@@ -1973,10 +2506,10 @@ jbm_f64_pol_27 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_28 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_28_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_27 (x, p + 1);
+  return p[0] + x * jbm_polynomial_27_f64 (x, p + 1);
 }
 
 /**
@@ -1985,10 +2518,268 @@ jbm_f64_pol_28 (const double x, ///< double value.
  * \return polynomial value.
  */
 static inline double
-jbm_f64_pol_29 (const double x, ///< double value.
-                const double *p)        ///< array of coefficients.
+jbm_polynomial_29_f64 (const double x,  ///< double value.
+                       const double *p) ///< array of coefficients.
 {
-  return p[0] + x * jbm_f64_pol_28 (x, p + 1);
+  return p[0] + x * jbm_polynomial_28_f64 (x, p + 1);
+}
+
+/**
+ * Function to calculate a 1st order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_1_f64 (const double x,     ///< double value.
+                    const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1l + x * p[1]);
+}
+
+/**
+ * Function to calculate a 2nd order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_2_f64 (const double x,     ///< double value.
+                    const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_1_f64 (x, p) / (1l + x * p[2]);
+}
+
+/**
+ * Function to calculate a 3rd order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_3_f64 (const double x,     ///< double value.
+                    const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1l + x * jbm_polynomial_1_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 4th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_4_f64 (const double x,     ///< double value.
+                    const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1l + x * jbm_polynomial_1_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 5th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_5_f64 (const double x,     ///< double value.
+                    const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1l + x * jbm_polynomial_2_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 6th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_6_f64 (const double x,     ///< double value.
+                    const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1l + x * jbm_polynomial_2_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 7th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_7_f64 (const double x,     ///< double value.
+                    const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1l + x * jbm_polynomial_3_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 8th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_8_f64 (const double x,     ///< double value.
+                    const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1l + x * jbm_polynomial_3_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 9th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_9_f64 (const double x,     ///< double value.
+                    const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1l + x * jbm_polynomial_4_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 10th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_10_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1l + x * jbm_polynomial_4_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1l + x * jbm_polynomial_5_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1l + x * jbm_polynomial_5_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1l + x * jbm_polynomial_6_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1l + x * jbm_polynomial_6_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1l + x * jbm_polynomial_7_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1l + x * jbm_polynomial_7_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1l + x * jbm_polynomial_8_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1l + x * jbm_polynomial_8_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1l + x * jbm_polynomial_9_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_f64 (const double x,    ///< double value.
+                     const double *p)   ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f64 (x, p) / (1l + x * jbm_polynomial_9_f64 (x, p + 11));
 }
 
 /**
@@ -1999,53 +2790,100 @@ jbm_f64_pol_29 (const double x, ///< double value.
  * \return function value.
  */
 static inline double
-jbm_f64_expwc (const double x)
+jbm_expwc_f64 (const double x)
                ///< double number \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
 {
-  const double a[14] JB_ALIGNED = { JBM_1_FACT0, JBM_1_FACT1, JBM_1_FACT2,
+// Taylor' serie
+/*
+  const double a[13] JB_ALIGNED = { JBM_1_FACT0, JBM_1_FACT1, JBM_1_FACT2,
     JBM_1_FACT3, JBM_1_FACT4, JBM_1_FACT5, JBM_1_FACT6, JBM_1_FACT7,
-    JBM_1_FACT8, JBM_1_FACT9, JBM_1_FACT10, JBM_1_FACT11, JBM_1_FACT12,
-    JBM_1_FACT13
+    JBM_1_FACT8, JBM_1_FACT9, JBM_1_FACT10, JBM_1_FACT11, JBM_1_FACT12
   };
-  return jbm_f64_pol_13 (x, a);
+  return jbm_polynomial_12_f64 (x, a);
+*/
+// Faster
+  const double a[12] JB_ALIGNED = {
+    9.999999999999999997838163532087274e-01,
+    9.999999999999999999833739467402774e-01,
+    5.000000000000002596203293039992897e-01,
+    1.666666666666666866333205620302255e-01,
+    4.166666666662206776515348098645875e-02,
+    8.333333333329903347381473589540194e-03,
+    1.388888891414483956743792033814084e-03,
+    1.984126986069370681499890695786226e-04,
+    2.480152809337277452837040995633428e-05,
+    2.755727368725456071780832482731923e-06,
+    2.761664918870128907713466953573490e-07,
+    2.509774066243861824686198016708688e-08
+  };
+  return jbm_polynomial_11_f64 (x, a);
 }
 
 /**
- * Function to calculate the function exp2(x) using the jbm_f64_expwc and
- * jbm_f64_exp2n functions.
+ * Function to calculate the function exp2(x) using the jbm_expwc_f64 and
+ * jbm_exp2n_f64 functions.
  *
  * \return function value.
  */
 static inline double
-jbm_f64_exp2 (const double x)   ///< double number.
+jbm_exp2_f64 (const double x)   ///< double number.
 {
   double y, f;
+  if (x > 1024.)
+    return INFINITY;
   y = floor (x);
   f = x - y;
-  y = jbm_f64_exp2n ((int) y);
-  return y * M_SQRT2 * jbm_f64_expwc ((f - 0.5) * M_LN2);
+  y = jbm_exp2n_f64 ((int) y);
+  return y * M_SQRT2 * jbm_expwc_f64 ((f - 0.5) * M_LN2);
 }
 
 /**
- * Function to calculate the function exp(x) using the jbm_f64_exp2 function.
+ * Function to calculate the function exp(x) using the jbm_exp2_f64 function.
  *
  * \return function value.
  */
 static inline double
-jbm_f64_exp (const double x)    ///< double number.
+jbm_exp_f64 (const double x)    ///< double number.
 {
-  return jbm_f64_exp2 (x * M_LOG2E);
+  return jbm_exp2_f64 (x * M_LOG2E);
 }
 
 /**
- * Function to calculate the function exp10(x) using the jbm_f64_exp2 function.
+ * Function to calculate the function exp10(x) using the jbm_exp2_f64 function.
  *
  * \return function value.
  */
 static inline double
-jbm_f64_exp10 (const double x)  ///< double number.
+jbm_exp10_f64 (const double x)  ///< double number.
 {
-  return jbm_f64_exp2 (x * M_LN10 / M_LN2);
+  return jbm_exp2_f64 (x * M_LN10 / M_LN2);
+}
+
+/**
+ * Function to calculate the function expm1(x) using the jbm_expwc_f64 and
+ * jbm_exp_f64 functions.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_expm1_f64 (const double x)  ///< double number.
+{
+  const double a[11] JB_ALIGNED = {
+    9.999999999999999999833739467402774e-01,
+    5.000000000000002596203293039992897e-01,
+    1.666666666666666866333205620302255e-01,
+    4.166666666662206776515348098645875e-02,
+    8.333333333329903347381473589540194e-03,
+    1.388888891414483956743792033814084e-03,
+    1.984126986069370681499890695786226e-04,
+    2.480152809337277452837040995633428e-05,
+    2.755727368725456071780832482731923e-06,
+    2.761664918870128907713466953573490e-07,
+    2.509774066243861824686198016708688e-08
+  };
+  if (jbm_abs_f64 (x) < M_LN2 / 2.)
+    return x * jbm_polynomial_10_f64 (x, a);
+  return jbm_exp_f64 (x) - 1.;
 }
 
 /**
@@ -2056,8 +2894,10 @@ jbm_f64_exp10 (const double x)  ///< double number.
  * \return function value.
  */
 static inline double
-jbm_f64_logwc (const double x)  ///< double number.
+jbm_logwc_f64 (const double x)  ///< double number.
 {
+// Taylor' serie
+/*
   const double a[30] = { 1., -1. / 2., 1. / 3., -1. / 4., 1. / 5., -1. / 6.,
     1. / 7., -1. / 8., 1. / 9., -1. / 10., 1. / 11., -1. / 12., 1. / 13.,
     -1. / 14., 1. / 15., -1. / 16., 1. / 17., -1. / 18., 1. / 19., -1. / 20.,
@@ -2066,49 +2906,69 @@ jbm_f64_logwc (const double x)  ///< double number.
   };
   double x1;
   x1 = x - 1.;
-  return x1 * jbm_f64_pol_29 (x1, a);
+  return x1 * jbm_polynomial_29_f64 (x1, a);
+*/
+// Faster
+  const double a[13] JB_ALIGNED = {
+    1.000000000000000000104597362545641e+00,
+    2.734299924674267908661838147000582e+00,
+    2.758600639771016407880540580834316e+00,
+    1.250181039443469845819061388524411e+00,
+    2.437790933599749448299833468226381e-01,
+    1.511532957893565993680436414510365e-02,
+    3.234299924674267857931530479289925e+00,
+    4.042417268774817193696261884108770e+00,
+    2.443289698939469004880423389988057e+00,
+    7.265265010732872060655946427315411e-01,
+    9.435967939347741843896703595852574e-02,
+    3.536154911896361147830377698021396e-03,
+    -1.809840791707837975029422825309329e-05
+  };
+  double x1;
+  x1 = x - 1.;
+  return x1 * jbm_rational_12_f64 (x1, a);
 }
 
 /**
- * Function to calculate the function log_2(x) using jbm_f64_logwc and
- * jbm_f64_frexp
+ * Function to calculate the function log_2(x) using jbm_logwc_f64 and
+ * jbm_frexp_f64
  *
  * \return function value.
  */
 static inline double
-jbm_f64_log2 (const double x)   ///< double number.
+jbm_log2_f64 (const double x)   ///< double number.
 {
   double y;
   int e;
   if (x < 0.)
-    return sqrt(-1.);
+    return sqrt (-1.);
   if (x <= 0.)
     return -INFINITY;
-  y = jbm_f64_frexp (x, &e);
-  return jbm_f64_logwc (y * 4. / 3.) * M_LOG2E - 0.41503749927884378
-    + (double) e; 
+  y = jbm_frexp_f64 (x, &e);
+  return jbm_logwc_f64 (y * 4. / 3.) * M_LOG2E - 0.41503749927884378
+    + (double) e;
 }
 
 /**
- * Function to calculate the function log(x) using jbm_f64_log2.
+ * Function to calculate the function log(x) using jbm_log2_f64.
  *
  * \return function value.
  */
 static inline double
-jbm_f64_log (const double x)    ///< double number.
+jbm_log_f64 (const double x)    ///< double number.
 {
-  return jbm_f64_log2 (x) * M_LN2;
+  return jbm_log2_f64 (x) * M_LN2;
 }
 
 /**
- * Function to calculate the function log10(x) using jbm_f64_log2.
+ * Function to calculate the function log10(x) using jbm_log2_f64.
  *
  * \return function value.
  */
 static inline double
-jbm_f64_log10 (const double x)  ///< double number.
+jbm_log10_f64 (const double x)  ///< double number.
 {
-  return jbm_f64_log2 (x) * M_LN2 / M_LN10;
+  return jbm_log2_f64 (x) * M_LN2 / M_LN10;
 }
 
 /**
@@ -2117,7 +2977,7 @@ jbm_f64_log10 (const double x)  ///< double number.
  * \return function value (double).
  */
 static inline double
-jbm_f64_pown (const double x,   ///< double number.
+jbm_pown_f64 (const double x,   ///< double number.
               int e)            ///< exponent (int).
 {
   double f, xn;
@@ -2132,40 +2992,40 @@ jbm_f64_pown (const double x,   ///< double number.
     {
       if (i & 1)
         f *= xn;
-      xn *= xn;  
+      xn *= xn;
       i >>= 1;
     }
   return f;
 }
 
 /**
- * Function to calculate the function pow using the jbm_f64_exp2 and
- * jbm_f64_log2 functions.
+ * Function to calculate the function pow using the jbm_exp2_f64 and
+ * jbm_log2_f64 functions.
  *
  * \return function value.
  */
 static inline double
-jbm_f64_pow (const double x,    ///< double number.
+jbm_pow_f64 (const double x,    ///< double number.
              const double e)    ///< exponent (double).
 {
   double f;
   f = floor (e);
   if (f == e)
-    return jbm_f64_pown (x, (int) e);
-  return jbm_f64_exp2 (e * jbm_f64_log2 (x));
+    return jbm_pown_f64 (x, (int) e);
+  return jbm_exp2_f64 (e * jbm_log2_f64 (x));
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_f64_pow function.
+ * Function to calculate the function cbrt(x) using the jbm_pow_f64 function.
  *
  * \return function value.
  */
 static inline double
-jbm_f64_cbrt (const double x)  ///< double number.
+jbm_cbrt_f64 (const double x)   ///< double number.
 {
   double f;
-  f = jbm_f64_abs (x);
-  f = jbm_f64_pow (x, 1. / 3.);
+  f = jbm_abs_f64 (x);
+  f = jbm_pow_f64 (x, 1. / 3.);
   if (x < 0.)
     f = -f;
   return f;
@@ -2179,13 +3039,27 @@ jbm_f64_cbrt (const double x)  ///< double number.
  * \return function value.
  */
 static inline double
-jbm_f64_sinwc (const double x)
+jbm_sinwc_f64 (const double x)
                ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
+// Taylor' serie
+/*
   const double a[8] JB_ALIGNED = { JBM_1_FACT1, -JBM_1_FACT3, JBM_1_FACT5,
     -JBM_1_FACT7, JBM_1_FACT9, -JBM_1_FACT11, JBM_1_FACT13, -JBM_1_FACT15
   };
-  return x * jbm_f64_pol_7 (x * x, a);
+  return x * jbm_polynomial_7_f64 (x * x, a);
+*/
+// Faster
+  const double a[7] JB_ALIGNED = {
+    9.999999999999999998802057969320874e-01,
+    -1.666666666666666273459597213911935e-01,
+    8.333333333331441760545173263516067e-03,
+    -1.984126983815729584164212554147258e-04,
+    2.755731697106782623392907719143142e-06,
+    -2.505132708008770069161618073007165e-08,
+    1.593252903446589328253475184152266e-10
+  };
+  return x * jbm_polynomial_6_f64 (x * x, a);
 }
 
 /**
@@ -2196,134 +3070,132 @@ jbm_f64_sinwc (const double x)
  * \return function value.
  */
 static inline double
-jbm_f64_coswc (const double x)
+jbm_coswc_f64 (const double x)
                ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
+// Taylor' serie
+/*
   const double a[9] JB_ALIGNED = { JBM_1_FACT0, -JBM_1_FACT2, JBM_1_FACT4,
     -JBM_1_FACT6, JBM_1_FACT8, -JBM_1_FACT10, JBM_1_FACT12, -JBM_1_FACT14,
     JBM_1_FACT16
   };
-  return jbm_f64_pol_8 (x * x, a);
+  return jbm_polynomial_8_f64 (x * x, a);
+*/
+// Faster
+  const double a[9] JB_ALIGNED = {
+    1.000000000000000000000000000000000e+00,
+    -4.999999999999999999395180355733868e-01,
+    4.166666666666665940314006798427481e-02,
+    -1.388888888888659117243940415685643e-03,
+    2.480158729863213173156268076859265e-05,
+    -2.755731740637054611763200448376674e-07,
+    2.087619443813264716434572030223809e-09,
+    -1.138681044418777064689951909124715e-11
+  };
+  return jbm_polynomial_7_f64 (x * x, a);
 }
 
 /**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
- * x in [-pi/4,pi/4] from jbm_f64_sinwc and jbm_f64_coswc approximations.
+ * x in [-pi/4,pi/4] from jbm_sinwc_f64 and jbm_coswc_f64 approximations.
  */
 static inline void
-jbm_f64_sincoswc (const double x,
+jbm_sincoswc_f64 (const double x,
                   ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   double *s,    ///< pointer to the sin function value.
                   double *c)    ///< pointer to the cos function value.
 {
-  *s = jbm_f64_sinwc (x);
-  *c = jbm_f64_coswc (x);
+  double s0;
+  *s = s0 = jbm_sinwc_f64 (x);
+  *c = sqrt (1. - s0 * s0);
 }
 
 /**
- * Function to calculate the function sin(x) from jbm_f64_sinwc and
- * jbm_f64_coswc approximations.
+ * Function to calculate the function sin(x) from jbm_sinwc_f64 and
+ * jbm_coswc_f64 approximations.
  *
  * \return function value.
  */
 static inline double
-jbm_f64_sin (const double x)    ///< double number.
+jbm_sin_f64 (const double x)    ///< double number.
 {
   double y;
-  unsigned int i;
-  y = jbm_f64_rest (x, 2. * M_PI);
-  i = (unsigned int) floor (y / M_PI_4);
-  if (i < 1)
-    return jbm_f64_sinwc (y);
-  if (i < 2)
-    return jbm_f64_coswc (M_PI_2 - y);
-  if (i < 3)
-    return jbm_f64_sinwc (M_PI - y);
-  if (i < 7)
-    return -jbm_f64_coswc (3. * M_PI_2 - y);
-  return jbm_f64_sinwc (y - 2. * M_PI);
+  y = jbm_rest_f64 (x, 2. * M_PI);
+  if (y < M_PI_4)
+    return jbm_sinwc_f64 (y);
+  if (y < 3. * M_PI_4)
+    return jbm_coswc_f64 (M_PI_2 - y);
+  if (y < 5. * M_PI_4)
+    return jbm_sinwc_f64 (M_PI - y);
+  if (y < 7. * M_PI_4)
+    return -jbm_coswc_f64 (3. * M_PI_2 - y);
+  return jbm_sinwc_f64 (y - 2. * M_PI);
 }
 
 /**
- * Function to calculate the function cos(x) from jbm_f64_sinwc and
- * jbm_f64_coswc approximations.
+ * Function to calculate the function cos(x) from jbm_sinwc_f64 and
+ * jbm_coswc_f64 approximations.
  *
  * \return function value.
  */
 static inline double
-jbm_f64_cos (const double x)    ///< double number.
+jbm_cos_f64 (const double x)    ///< double number.
 {
   double y;
-  unsigned int i;
-  y = jbm_f64_rest (x, 2. * M_PI);
-  i = (unsigned int) floor (y / M_PI_4);
-  if (i < 1)
-    return jbm_f64_coswc (y);
-  if (i < 3)
-    return jbm_f64_sinwc (M_PI_2 - y);
-  if (i < 5)
-    return -jbm_f64_coswc (M_PI - y);
-  if (i < 7)
-    return jbm_f64_sinwc (y - 3. * M_PI_2);
-  return jbm_f64_coswc (y - 2. * M_PI);
+  y = jbm_rest_f64 (x, 2. * M_PI);
+  if (y < M_PI_4)
+    return jbm_coswc_f64 (y);
+  if (y < 3. * M_PI_4)
+    return jbm_sinwc_f64 (M_PI_2 - y);
+  if (y < 5. * M_PI_4)
+    return -jbm_coswc_f64 (M_PI - y);
+  if (y < 7. * M_PI_4)
+    return jbm_sinwc_f64 (y - 3. * M_PI_2);
+  return jbm_coswc_f64 (y - 2. * M_PI);
 }
 
 /**
- * Function to calculate the functions sin(x) and cos(x) from jbm_f64_sinwc and
- * jbm_f64_coswc approximations.
+ * Function to calculate the functions sin(x) and cos(x) from jbm_sinwc_f64 and
+ * jbm_coswc_f64 approximations.
  */
 static inline void
-jbm_f64_sincos (const double x,
+jbm_sincos_f64 (const double x,
                 ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                 double *s,      ///< pointer to the sin function value.
                 double *c)      ///< pointer to the cos function value.
 {
   double y;
-  unsigned int i;
-  y = jbm_f64_rest (x, 2. * M_PI);
-  i = (unsigned int) floor (y / M_PI_4);
-  if (i < 1)
-    {
-      *s = jbm_f64_sinwc (y);
-      *c = jbm_f64_coswc (y);
-    }
-  else if (i < 3)
-    {
-      y = M_PI_2 - y;
-      *s = jbm_f64_coswc (y);
-      *c = jbm_f64_sinwc (y);
-    }
-  else if (i < 5)
+  y = jbm_rest_f64 (x, 2. * M_PI);
+  if (y < M_PI_4)
+    jbm_sincoswc_f64 (y, s, c);
+  if (y < 3. * M_PI_4)
+    jbm_sincoswc_f64 (M_PI_2 - y, c, s);
+  if (y < 5. * M_PI_4)
     {
       y = M_PI - y;
-      *s = jbm_f64_sinwc (y);
-      *c = -jbm_f64_coswc (y);
+      *s = jbm_sinwc_f64 (y);
+      *c = -jbm_coswc_f64 (y);
     }
-  else if (i < 7)
+  if (y < 7. * M_PI_4)
     {
       y -= 3. * M_PI_2;
-      *s = -jbm_f64_coswc (y);
-      *c = jbm_f64_sinwc (y);
+      *s = -jbm_coswc_f64 (y);
+      *c = jbm_sinwc_f64 (y);
     }
   else
-    {
-      y -= 2. * M_PI;
-      *s = jbm_f64_sinwc (y);
-      *c = jbm_f64_coswc (y);
-    }
+    jbm_sincoswc_f64 (y - 2. * M_PI, s, c);
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_f64_sinwc and
- * jbm_f64_coswc approximations.
+ * Function to calculate the function tan(x) from jbm_sincos_f64.
  *
  * \return function value.
  */
 static inline double
-jbm_f64_tan (const double x)    ///< double number.
+jbm_tan_f64 (const double x)    ///< double number.
 {
   double s, c;
-  jbm_f64_sincos (x, &s, &c);
+  jbm_sincos_f64 (x, &s, &c);
   return s / c;
 }
 
@@ -2335,16 +3207,32 @@ jbm_f64_tan (const double x)    ///< double number.
  * \return function value.
  */
 static inline double
-jbm_f64_atanwc0 (const double x)
+jbm_atanwc0_f64 (const double x)
                  ///< double number \f$\in\left[0,\frac12\right]\f$.
 {
+// Taylor' serie
+/*
   const double a[24] JB_ALIGNED = { 1., -1. / 3., 1. / 5., -1. / 7., 1. / 9.,
     -1. / 11., 1. / 13., -1. / 15., 1. / 17., -1. / 19., 1. / 21., -1. / 23.,
     1. / 25., -1. / 27., 1. / 29., -1. / 31., 1. / 33., -1. / 35., 1. / 37.,
     -1. / 39., 1. / 41., -1. / 43., 1. / 45., -1. / 47.
   };
-
-  return x * jbm_f64_pol_23 (x * x, a);
+  return x * jbm_polynomial_23_f64 (x * x, a);
+*/
+// Faster
+  const double a[10] JB_ALIGNED = {
+    9.999999999999999999897101010338286e-01,
+    1.981468010646850513929332898240438e+00,
+    1.279964608924214982231942118792163e+00,
+    2.969347701028866499751297816285443e-01,
+    1.777956238300436469118861315989006e-02,
+    2.314801343980183829273765900620553e+00,
+    1.851565056917614431023509878591616e+00,
+    5.940199964693883319287833147435503e-01,
+    6.504801168368755483291771526717268e-02,
+    1.096906094564165631528252396880330e-03
+  };
+  return x * jbm_rational_9_f64 (x * x, a);
 }
 
 /**
@@ -2380,9 +3268,11 @@ jbm_f64_atanwc0 (const double x)
  * \return function value.
  */
 static inline double
-jbm_f64_atanwc1 (const double x)
+jbm_atanwc1_f64 (const double x)
                  ///< double number \f$\in\left[\frac12,1\right]\f$.
 {
+// Taylor' serie
+/*
   const double a1[8] = { 1. / 2., -1. / 40., 1. / 288., -1. / 1664., 1. / 8704.,
     -1. / 43008., 1. / 204800., -1. / 950272.
   };
@@ -2396,36 +3286,59 @@ jbm_f64_atanwc1 (const double x)
   x1 = x - 1.;
   x4 = x1 * x1;
   x4 *= x4;
-  return M_PI_4 + x1 * (jbm_f64_pol_7 (x4, a1)
-                        + x1 * (jbm_f64_pol_7 (x4, a2)
-                                + x1 * jbm_f64_pol_7 (x4, a3)));
+  return M_PI_4 + x1 * (jbm_polynomial_7_f64 (x4, a1)
+                        + x1 * (jbm_polynomial_7_f64 (x4, a2)
+                                + x1 * jbm_polynomial_7_f64 (x4, a3)));
+*/
+  const double a[17] = {
+    7.853981633974483096156608458198760e-01,
+    3.601984892893552888446596034013743e+00,
+    7.448737523784523062345888768933038e+00,
+    9.108243441406051089899511566690817e+00,
+    7.204663321275367236164003161377379e+00,
+    3.774051962703551180441105222178421e+00,
+    1.278128531270100171168598709263967e+00,
+    2.558168198482474293837934585867171e-01,
+    2.316958370612903229780162116449401e-02,
+    3.949569832803139666507142241190221e+00,
+    7.287962811909918776930672406956272e+00,
+    8.108398334891285028766424751109526e+00,
+    5.912063783445853373660667634153289e+00,
+    2.881072971433143316156409228146077e+00,
+    9.139492248819354600861753305345088e-01,
+    1.722481812317596098868074214865513e-01,
+    1.475022698014619042563166916036221e-02
+  };
+  double x1;
+  x1 = x - 1.;
+  return jbm_rational_16_f64 (x1, a);
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_f64_atanwc0 and
- * jbm_f64_atancw1 functions.
+ * Function to calculate the function atan(x) using the jbm_atanwc0_f64 and
+ * jbm_atanwc1_f64 functions.
  *
  * \return function value (in [-pi/2,pi/2]).
  */
 static inline double
-jbm_f64_atan (const double x)   ///< double number.
+jbm_atan_f64 (const double x)   ///< double number.
 {
   double f, ax;
-  ax = jbm_f64_abs (x);
+  ax = jbm_abs_f64 (x);
   if (ax > 1.5)
     {
       ax = 1. / ax;
       if (ax > 0.5)
-        f = M_PI_2 - jbm_f64_atanwc1 (ax);
+        f = M_PI_2 - jbm_atanwc1_f64 (ax);
       else
-        f = M_PI_2 - jbm_f64_atanwc0 (ax);
+        f = M_PI_2 - jbm_atanwc0_f64 (ax);
     }
   else
     {
       if (ax > 0.5)
-        f = jbm_f64_atanwc1 (ax);
+        f = jbm_atanwc1_f64 (ax);
       else
-        f = jbm_f64_atanwc0 (ax);
+        f = jbm_atanwc0_f64 (ax);
     }
   if (x < 0.)
     f = -f;
@@ -2433,49 +3346,236 @@ jbm_f64_atan (const double x)   ///< double number.
 }
 
 /**
- * Function to calculate the function atan2(y,x) using the jbm_f64_atan
+ * Function to calculate the function atan2(y,x) using the jbm_atan_f64
  * function.
  *
  * \return function value (in [-pi,pi]).
  */
 static inline double
-jbm_f64_atan2 (const double y,  ///< double y component.
+jbm_atan2_f64 (const double y,  ///< double y component.
                const double x)  ///< double x component.
 {
   double f;
-  f = jbm_f64_atan (y / x);
+  f = jbm_atan_f64 (y / x);
   if (x < 0.)
-    if (y < 0.)
-      f -= M_PI;
-    else
-      f += M_PI;
+    {
+      if (y < 0.)
+        f -= M_PI;
+      else
+        f += M_PI;
+    }
   return f;
 }
 
 /**
- * Function to calculate the function asin(x) using the jbm_f64_atan function.
+ * Function to calculate the function asin(x) using the jbm_atan_f64 function.
  *
  * \return function value (in [-pi/2,pi/2]).
  */
 static inline double
-jbm_f64_asin (const double x)   ///< double number.
+jbm_asin_f64 (const double x)   ///< double number.
 {
-  return jbm_f64_atan (x / sqrt (1. - x * x));
+  return jbm_atan_f64 (x / sqrt (1. - x * x));
 }
 
 /**
- * Function to calculate the function acos(x) using the jbm_f64_atan function.
+ * Function to calculate the function acos(x) using the jbm_atan_f64 function.
  *
  * \return function value (in [0,pi]).
  */
 static inline double
-jbm_f64_acos (const double x)   ///< double number.
+jbm_acos_f64 (const double x)   ///< double number.
 {
   double f;
-  f = jbm_f64_atan (sqrt (1. - x * x) / x);
+  f = jbm_atan_f64 (sqrt (1. - x * x) / x);
   if (x < 0.)
     f += M_PI;
   return f;
+}
+
+/**
+ * Function to calculate the function sinh(x)
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_sinh_f64 (const double x)   ///< double number.
+{
+  double f;
+  f = jbm_exp_f64 (x);
+  return 0.5 * (f - 1. / f);
+}
+
+/**
+ * Function to calculate the function cosh(x)
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_cosh_f64 (const double x)   ///< double number.
+{
+  double f;
+  f = jbm_exp_f64 (x);
+  return 0.5 * (f + 1. / f);
+}
+
+/**
+ * Function to calculate the function tanh(x)
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_tanh_f64 (const double x)   ///< double number.
+{
+  double f;
+  if (x > 0.)
+    {
+      f = jbm_exp_f64 (-x);
+      f *= f;
+      return (1. - f) / (1. + f);
+    }
+  f = jbm_exp_f64 (x);
+  f *= f;
+  return (f - 1.) / (f + 1.);
+}
+
+/**
+ * Function to calculate the function asinh(x)
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_asinh_f64 (const double x)  ///< double number.
+{
+  return jbm_log_f64 (x + sqrt (x * x + 1.));
+}
+
+/**
+ * Function to calculate the function acosh(x)
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_acosh_f64 (const double x)  ///< double number.
+{
+  return jbm_log_f64 (x + sqrt (x * x - 1.));
+}
+
+/**
+ * Function to calculate the function atanh(x)
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_atanh_f64 (const double x)  ///< double number.
+{
+  return 0.5 * jbm_log_f64 ((1. + x) / (1. - x));
+}
+
+/**
+ * Function to calculate the well conditionated function erf(x) for x in
+ * [-1,1] by the following Taylor' serie:
+ * \f$erf(x)\approx\frac{2}{\sqrt{\pi}}\,
+ * \sum_{i=0}^8\frac{(-1)^n\,x^{2\,n+1}}{n!\,(2\,n+1)}\f$.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_erfwc_f64 (const double x)
+             ///< double number \f$\in\left[-1,1\right]\f$.
+{
+// Taylor' serie
+// Faster
+  const double a[10] JB_ALIGNED = {
+    1.1283791670955125741568625140595924e+00,
+    1.4214718479810524638132403970020488e-01,
+    4.5306179971396543690857253459349899e-02,
+    1.8274816817509842382145455741517242e-03,
+    1.9503007205367896132091567678475243e-04,
+    4.5930799587872320487565036900734355e-01,
+    9.3254221872966235149934861274412522e-02,
+    1.0583028318143433311933480099172922e-02,
+    6.8136985371491773172998872537320205e-04,
+    2.0308921409930923470822806343114398e-05
+  };
+  return x * jbm_rational_9_f64 (x * x, a);
+}
+
+/**
+ * Function to calculate the well conditionated function erfc(x) for
+ * \f$x\in[1,\infty]\f$ by the following Taylor' serie:
+ * \f$erfc(x)\approx\frac{x\,\exp\left(-\frac{1}{x^2}\right)}{\sqrt{\pi}}\,
+ * \sum_{i=0}^8\frac{(-1)^n\,x^{2\,n+1}}{n!\,(2\,n+1)}\f$.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_erfcwc_f64 (const double x)
+                ///< double number \f$\in\left[1,\infty\right]\f$.
+{
+// Taylor' serie
+// Faster
+  const double a[21] JB_ALIGNED = {
+    9.9999999999999941475737000369065819e-01,
+    3.6634327269813033732437351132353762e+01,
+    5.1821691614203419723474795630465805e+02,
+    3.6641372883071054833718510655089329e+03,
+    1.4035549126673829749384297700844511e+04,
+    2.9595070020815710819716711319852673e+04,
+    3.3493463583121848546425787921251302e+04,
+    1.9011856282959289729874891225757657e+04,
+    4.7366247076322482685970468264930599e+03,
+    3.9133724410449548827255365761052606e+02,
+    4.5085069955708687117148807109853997e+00,
+    3.7134327269812416859747159969397586e+01,
+    5.3603407977711361100838084258758547e+02,
+    3.9061785827204312472078409205007469e+03,
+    1.5649677223633826150632806308847180e+04,
+    3.5281175725499895598828057916145505e+04,
+    4.4137359854772607938136325391361908e+04,
+    2.9182447833465037346445877276855299e+04,
+    9.2563463542181707573307714470724826e+03,
+    1.1657507955046270801602404112392476e+03,
+    3.7122953780533481920127151328777440e+01
+  };
+  double xi;
+  if (x > 2.6641747557046326e+01)
+    return 0.;
+  xi = 1. / x;
+  return jbm_rational_20_f64 (xi * xi, a) / jbm_exp_f64 (xi * xi)
+    / (sqrt (M_PI) * xi);
+}
+
+/**
+ * Function to calculate the function erf(x) using jbm_erfwc_f64 and
+ * jbm_erfcwc_f64
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_erf_f64 (const double x)    ///< double number.
+{
+  double ax;
+  ax = jbm_abs_f64 (x);
+  if (ax > 1.)
+    return x / ax * (1. - jbm_erfcwc_f64 (ax));
+  return jbm_erfwc_f64 (x);
+}
+
+/**
+ * Function to calculate the function erfc(x) using jbm_erfwc_f64 and
+ * jbm_erfcwc_f64
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_erfc_f64 (const double x)   ///< double number.
+{
+  double ax;
+  ax = jbm_abs_f64 (x);
+  if (ax > 1.)
+    return x / ax * jbm_erfcwc_f64 (ax);
+  return 1. - jbm_erfwc_f64 (x);
 }
 
 /**
@@ -4255,7 +5355,7 @@ static inline JBDOUBLE
 jbm_flux_limiter_totall (const JBDOUBLE d1 __attribute__((unused)),
                          ///< 1st flux limiter function parameter.
                          const JBDOUBLE d2 __attribute__((unused)))
-                         ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
 #if JBM_HIGH_PRECISION == 1
   const JBDOUBLE c0 = 0.f;
@@ -4279,7 +5379,7 @@ static inline JBDOUBLE
 jbm_flux_limiter_nulll (const JBDOUBLE d1 __attribute__((unused)),
                         ///< 1st flux limiter function parameter.
                         const JBDOUBLE d2 __attribute__((unused)))
-                        ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
 #if JBM_HIGH_PRECISION == 1
   const JBDOUBLE c1 = 1.f;
@@ -4774,15 +5874,155 @@ jbm_integrall (JBDOUBLE (*f) (JBDOUBLE),
 
 #ifdef __SSE4_2__
 
+#ifndef __FMA__
+
+static inline __m128d
+_mm_fmadd_pd (const __m128d x, const __m128d y, const __m128d z)
+{
+  return _mm_add_pd (_mm_mul_pd (x, y), z);
+}
+
+static inline __m128d
+_mm_fmsub_pd (const __m128d x, const __m128d y, const __m128d z)
+{
+  return _mm_sub_pd (_mm_mul_pd (x, y), z);
+}
+
+static inline __m128d
+_mm_fnmadd_pd (const __m128d x, const __m128d y, const __m128d z)
+{
+  return _mm_sub_pd (z, _mm_mul_pd (x, y));
+}
+
+static inline __m128d
+_mm_fnmsub_pd (const __m128d x, const __m128d y, const __m128d z)
+{
+  return _mm_sub_pd (_mm_setzero_pd (), _mm_fmadd_pd (x, y, z));
+}
+
+#endif
+
 /**
  * Function to calculate the absolute value of a __m128d vector.
  *
  * \return absolute value vector.
  */
 static inline __m128d
-jbm_abs_128 (const __m128d x)
+jbm_abs_2xf64 (const __m128d x)
 {
   return _mm_andnot_pd (_mm_set1_pd (-0.0), x);
+}
+
+/**
+ * Function to calculate the hypot function (__m128d).
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_hpot_2xf64 (const __m128d x,        ///< 1st __m128d vector.
+                const __m128d y)        ///< 2nd __m128d vector.
+{
+  return _mm_sqrt_pd (_mm_fmadd_pd (x, x, _mm_mul_pd (y, y)));
+}
+
+/**
+ * Function to calculate the f32 of a division (__m128d).
+ *
+ * \return f32 value (in [0,|divisor|) interval).
+ */
+static inline __m128d
+jbm_rest_2xf64 (const __m128d x,        ///< dividend (__m128d).
+                const __m128d d)        ///< divisor (__m128d).
+{
+  __m128d f;
+  f = _mm_floor_pd (_mm_div_pd (x, d));
+  return _mm_fnmadd_pd (f, d, x);
+}
+
+/**
+ * Function to implement the standard f32 function (__m128d).
+ *
+ * \return normalize fraction value in [1/2,1).
+ */
+static inline __m128d
+jbm_frexp_2xf64 (const __m128d x,       ///< __m128d vector.
+                 int *e)        ///< pointer to the extracted exponents vector.
+{
+  JBMF64 a[2] JB_ALIGNED, y[2] JB_ALIGNED;
+  JBMF64 z;
+  unsigned int i;
+#ifdef __AVX512F__
+  __mmask8 m;
+#else
+  int m;
+#endif
+  _mm_store_pd ((double *) a, x);
+  m = 0;
+  for (i = 0; i < 2; ++i)
+    {
+      y[i].i = a[i].i & 0x7ff0000000000000L;
+      if (y[i].i == 0x7ff0000000000000L)
+        {
+          e[i] = 0;
+          continue;
+        }
+      e[i] = (int) (y[i].i >> 52L) - 1023;
+      if (!y[i].i)
+        {
+          y[i].x = a[i].x;
+          y[i].i &= 0x000fffffffffffffL;
+          if (!y[i].i)
+            {
+              e[i] = 0;
+              continue;
+            }
+          y[i].i = 0x0010000000000000L;
+          z.x = a[i].x / y[i].x;
+          z.i &= 0x7ff0000000000000L;
+          e[i] = (int) (z.i >> 52) - 2044;
+          y[i].x *= z.x;
+        }
+      else
+        ++e[i];
+      m |= 1 << i;
+    }
+  return _mm_mask_mul_pd (x, m, x, _mm_div_pd (_mm_set1_pd (0.5),
+                                               _mm_load_pd ((double *) y)));
+}
+
+/**
+ * Function to calculate the function \f$2^n\f$ with n an integer number (int).
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_exp2n_2xf64 (int *e)        ///< exponent vector (int).
+{
+  JBMF64 x[2] JB_ALIGNED;
+  unsigned int i, m;
+  for (i = m = 0; i < 2; ++i)
+    {
+      if (e[i] > 1023)
+        continue;
+      if (e[i] > -1023)
+        x[i].i = (1023L + e[i]) << 52L;
+      else
+        x[i].i = 0x0008000000000000L >> (-e[i] - 1023);
+      m |= 1 << i;
+    }
+  return _mm_blend_pd (_mm_set1_pd (INFINITY), _mm_load_pd ((double *) x), m);
+}
+
+/**
+ * Function to implement the standard f32 function (__m128d).
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_ldexp_2xf64 (const __m128d x,       ///< __m128d vector.
+                 int *e)        ///< exponent vector (int).
+{
+  return _mm_mul_pd (x, jbm_exp2n_2xf64 (e));
 }
 
 /**
@@ -4791,9 +6031,9 @@ jbm_abs_128 (const __m128d x)
  * \return 1 on small number, 0 otherwise.
  */
 static inline __m128d
-jbm_small_128 (const __m128d x) ///< __m128d vector.
+jbm_small_2xf64 (const __m128d x)       ///< __m128d vector.
 {
-  return _mm_cmplt_pd (jbm_abs_128 (x), _mm_set1_pd (FLT_EPSILON));
+  return _mm_cmplt_pd (jbm_abs_2xf64 (x), _mm_set1_pd (FLT_EPSILON));
 }
 
 /**
@@ -4808,24 +6048,24 @@ jbm_small_128 (const __m128d x) ///< __m128d vector.
  * \return modmin __m128d vector.
  */
 static inline __m128d
-jbm_modmin_128 (__m128d a,      ///< 1st __m128d vector.
-                const __m128d b)        ///< 2nd __m128d vector.
+jbm_modmin_2xf64 (const __m128d a,      ///< 1st __m128d vector.
+                  const __m128d b)      ///< 2nd __m128d vector.
 {
-  __m128d aa, ab, z;
+  __m128d aa, ab, y, z;
   z = _mm_setzero_pd ();
   ab = _mm_mul_pd (a, b);
-  a = _mm_blendv_pd (a, z, _mm_cmple_pd (ab, z));
-  aa = jbm_abs_128 (a);
-  ab = jbm_abs_128 (b);
-  return _mm_blendv_pd (a, b, _mm_cmpgt_pd (aa, ab));
+  y = _mm_blendv_pd (a, z, _mm_cmple_pd (ab, z));
+  aa = jbm_abs_2xf64 (y);
+  ab = jbm_abs_2xf64 (b);
+  return _mm_blendv_pd (y, b, _mm_cmpgt_pd (aa, ab));
 }
 
 /**
  * Function to interchange 2 __m128d numbers.
  */
 static inline void
-jbm_change_128 (__m128d *restrict a,    ///< 1st __m128d vector pointer.
-                __m128d *restrict b)    ///< 2nd __m128d vector pointer.
+jbm_change_2xf64 (__m128d *restrict a,  ///< 1st __m128d vector pointer.
+                  __m128d *restrict b)  ///< 2nd __m128d vector pointer.
 {
   __m128d c;
   JB_CHANGE (*a, *b, c);
@@ -4837,7 +6077,7 @@ jbm_change_128 (__m128d *restrict a,    ///< 1st __m128d vector pointer.
  * \return __m128d double.
  */
 static inline __m128d
-jbm_dbl_128 (const __m128d x)   ///< __m128d vector.
+jbm_dbl_2xf64 (const __m128d x) ///< __m128d vector.
 {
   return _mm_add_pd (x, x);
 }
@@ -4848,7 +6088,7 @@ jbm_dbl_128 (const __m128d x)   ///< __m128d vector.
  * \return __m128d vector square.
  */
 static inline __m128d
-jbm_sqr_128 (const __m128d x)   ///< __m128d vector.
+jbm_sqr_2xf64 (const __m128d x) ///< __m128d vector.
 {
   return _mm_mul_pd (x, x);
 }
@@ -4859,27 +6099,22 @@ jbm_sqr_128 (const __m128d x)   ///< __m128d vector.
  * \return __m128d vector of y-coordinates of the extrapolated points.
  */
 static inline __m128d
-jbm_extrapolate_128 (const __m128d x,
-                     ///< __m128d vector of x-coordinates of the extrapolated
-                     ///< points.
-                     const __m128d x1,
-                     ///< __m128d vector of x-coordinates of the 1st points.
-                     const __m128d x2,
-                     ///< __m128d vector of x-coordinates of the 2nd points.
-                     const __m128d y1,
-                     ///< __m128d vector of y-coordinates of the 1st points.
-                     const __m128d y2)
+jbm_extrapolate_2xf64 (const __m128d x,
+                       ///< __m128d vector of x-coordinates of the extrapolated
+                       ///< points.
+                       const __m128d x1,
+                       ///< __m128d vector of x-coordinates of the 1st points.
+                       const __m128d x2,
+                       ///< __m128d vector of x-coordinates of the 2nd points.
+                       const __m128d y1,
+                       ///< __m128d vector of y-coordinates of the 1st points.
+                       const __m128d y2)
                      ///< __m128d vector of y-coordinates of the 2nd points.
 {
   __m128d d;
   d = _mm_sub_pd (x, x1);
-#ifdef __AVX__
   return _mm_fmadd_pd (d, _mm_div_pd (_mm_sub_pd (y2, y1),
                                       _mm_sub_pd (x2, x1)), y1);
-#else
-  d = _mm_mul_pd (d, _mm_div_pd (_mm_sub_pd (y2, y1), _mm_sub_pd (x2, x1)));
-  return _mm_add_pd (y1, d);
-#endif
 }
 
 /**
@@ -4888,20 +6123,20 @@ jbm_extrapolate_128 (const __m128d x,
  * \return __m128d vector of y-coordinates of the interpolated points.
  */
 static inline __m128d
-jbm_interpolate_128 (const __m128d x,
-                     ///< __m128d vector of x-coordinates of the interpolated
-                     ///< points.
-                     const __m128d x1,
-                     ///< __m128d vector of x-coordinates of the 1st points.
-                     const __m128d x2,
-                     ///< __m128d vector of x-coordinates of the 2nd points.
-                     const __m128d y1,
-                     ///< __m128d vector of y-coordinates of the 1st points.
-                     const __m128d y2)
+jbm_interpolate_2xf64 (const __m128d x,
+                       ///< __m128d vector of x-coordinates of the interpolated
+                       ///< points.
+                       const __m128d x1,
+                       ///< __m128d vector of x-coordinates of the 1st points.
+                       const __m128d x2,
+                       ///< __m128d vector of x-coordinates of the 2nd points.
+                       const __m128d y1,
+                       ///< __m128d vector of y-coordinates of the 1st points.
+                       const __m128d y2)
                      ///< __m128d vector of y-coordinates of the 2nd points.
 {
   __m128d k;
-  k = jbm_extrapolate_128 (x, x1, x2, y1, y2);
+  k = jbm_extrapolate_2xf64 (x, x1, x2, y1, y2);
   k = _mm_blendv_pd (y1, k, _mm_cmpgt_pd (x, x1));
   return _mm_blendv_pd (y2, k, _mm_cmplt_pd (x, x2));
 }
@@ -4912,19 +6147,19 @@ jbm_interpolate_128 (const __m128d x,
  * \return __m128d vector of segment lengths.
  */
 static inline __m128d
-jbm_v2_length_128 (const __m128d x1,
+jbm_v2_length_2xf64 (const __m128d x1,
 ///< __m128d vector of x-coordinates of the 1st points defining the segment.
-                   const __m128d y1,
+                     const __m128d y1,
 ///< __m128d vector of y-coordinates of the 1st points defining the segment.
-                   const __m128d x2,
+                     const __m128d x2,
 ///< __m128d vector of x-coordinates of the 2nd points defining the segment.
-                   const __m128d y2)
+                     const __m128d y2)
 ///< __m128d vector of y-coordinates of the 2nd points defining the segment.
 {
   __m128d dx, dy;
   dx = _mm_sub_pd (x2, x1);
   dy = _mm_sub_pd (y2, y1);
-  return _mm_sqrt_pd (_mm_add_pd (jbm_sqr_128 (dx), jbm_sqr_128 (dy)));
+  return _mm_sqrt_pd (_mm_add_pd (jbm_sqr_2xf64 (dx), jbm_sqr_2xf64 (dy)));
 }
 
 /**
@@ -4933,26 +6168,26 @@ jbm_v2_length_128 (const __m128d x1,
  * \return __m128d vector of segment lengths.
  */
 static inline __m128d
-jbm_v3_length_128 (const __m128d x1,
+jbm_v3_length_2xf64 (const __m128d x1,
 ///< __m128d vector of x-coordinates of the 1st points defining the segments.
-                   const __m128d y1,
+                     const __m128d y1,
 ///< __m128d vector of y-coordinates of the 1st points defining the segments.
-                   const __m128d z1,
+                     const __m128d z1,
 ///< __m128d vector of z-coordinates of the 1st points defining the segments.
-                   const __m128d x2,
+                     const __m128d x2,
 ///< __m128d vector of x-coordinates of the 2nd points defining the segments.
-                   const __m128d y2,
+                     const __m128d y2,
 ///< __m128d vector of y-coordinates of the 2nd points defining the segments.
-                   const __m128d z2)
+                     const __m128d z2)
 ///< __m128d vector of z-coordinates of the 2nd points defining the segments.
 {
   __m128d dx, dy, dz;
   dx = _mm_sub_pd (x2, x1);
-  dx = jbm_sqr_128 (dx);
+  dx = jbm_sqr_2xf64 (dx);
   dy = _mm_sub_pd (y2, y1);
-  dy = jbm_sqr_128 (dy);
+  dy = jbm_sqr_2xf64 (dy);
   dz = _mm_sub_pd (z2, z1);
-  dz = jbm_sqr_128 (dz);
+  dz = jbm_sqr_2xf64 (dz);
   return _mm_sqrt_pd (_mm_add_pd (dx, _mm_add_pd (dy, dz)));
 }
 
@@ -4962,14 +6197,10 @@ jbm_v3_length_128 (const __m128d x1,
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_1_128 (const __m128d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_1_2xf64 (const __m128d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-#ifdef __AVX__
   return _mm_fmadd_pd (x, _mm_set1_pd (p[1]), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]), _mm_mul_pd (x, _mm_set1_pd (p[1])));
-#endif
 }
 
 /**
@@ -4978,15 +6209,11 @@ jbm_polynomial_1_128 (const __m128d x,  ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_2_128 (const __m128d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_2_2xf64 (const __m128d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-#ifdef __AVX__
-  return _mm_fmadd_pd (x, jbm_polynomial_1_128 (x, p + 1), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]),
-                     _mm_mul_pd (x, jbm_polynomial_1_128 (x, p + 1)));
-#endif
+  return _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
 }
 
 /**
@@ -4995,15 +6222,11 @@ jbm_polynomial_2_128 (const __m128d x,  ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_3_128 (const __m128d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_3_2xf64 (const __m128d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-#ifdef __AVX__
-  return _mm_fmadd_pd (x, jbm_polynomial_2_128 (x, p + 1), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]),
-                     _mm_mul_pd (x, jbm_polynomial_2_128 (x, p + 1)));
-#endif
+  return _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
 }
 
 /**
@@ -5012,15 +6235,11 @@ jbm_polynomial_3_128 (const __m128d x,  ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_4_128 (const __m128d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_4_2xf64 (const __m128d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-#ifdef __AVX__
-  return _mm_fmadd_pd (x, jbm_polynomial_3_128 (x, p + 1), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]),
-                     _mm_mul_pd (x, jbm_polynomial_3_128 (x, p + 1)));
-#endif
+  return _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
 }
 
 /**
@@ -5029,15 +6248,11 @@ jbm_polynomial_4_128 (const __m128d x,  ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_5_128 (const __m128d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_5_2xf64 (const __m128d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-#ifdef __AVX__
-  return _mm_fmadd_pd (x, jbm_polynomial_4_128 (x, p + 1), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]),
-                     _mm_mul_pd (x, jbm_polynomial_4_128 (x, p + 1)));
-#endif
+  return _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
 }
 
 /**
@@ -5046,15 +6261,11 @@ jbm_polynomial_5_128 (const __m128d x,  ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_6_128 (const __m128d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_6_2xf64 (const __m128d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-#ifdef __AVX__
-  return _mm_fmadd_pd (x, jbm_polynomial_5_128 (x, p + 1), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]),
-                     _mm_mul_pd (x, jbm_polynomial_5_128 (x, p + 1)));
-#endif
+  return _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
 }
 
 /**
@@ -5063,15 +6274,11 @@ jbm_polynomial_6_128 (const __m128d x,  ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_7_128 (const __m128d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_7_2xf64 (const __m128d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-#ifdef __AVX__
-  return _mm_fmadd_pd (x, jbm_polynomial_6_128 (x, p + 1), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]),
-                     _mm_mul_pd (x, jbm_polynomial_6_128 (x, p + 1)));
-#endif
+  return _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
 }
 
 /**
@@ -5080,15 +6287,11 @@ jbm_polynomial_7_128 (const __m128d x,  ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_8_128 (const __m128d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_8_2xf64 (const __m128d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-#ifdef __AVX__
-  return _mm_fmadd_pd (x, jbm_polynomial_7_128 (x, p + 1), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]),
-                     _mm_mul_pd (x, jbm_polynomial_7_128 (x, p + 1)));
-#endif
+  return _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
 }
 
 /**
@@ -5097,15 +6300,11 @@ jbm_polynomial_8_128 (const __m128d x,  ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_9_128 (const __m128d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_9_2xf64 (const __m128d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-#ifdef __AVX__
-  return _mm_fmadd_pd (x, jbm_polynomial_8_128 (x, p + 1), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]),
-                     _mm_mul_pd (x, jbm_polynomial_8_128 (x, p + 1)));
-#endif
+  return _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
 }
 
 /**
@@ -5114,15 +6313,11 @@ jbm_polynomial_9_128 (const __m128d x,  ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_10_128 (const __m128d x, ///< variable.
-                       const double *p) ///< array of coefficients.
+jbm_polynomial_10_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of coefficients.
 {
-#ifdef __AVX__
-  return _mm_fmadd_pd (x, jbm_polynomial_9_128 (x, p + 1), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]),
-                     _mm_mul_pd (x, jbm_polynomial_9_128 (x, p + 1)));
-#endif
+  return _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
 }
 
 /**
@@ -5131,15 +6326,727 @@ jbm_polynomial_10_128 (const __m128d x, ///< variable.
  * \return const __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_11_128 (const __m128d x, ///< variable.
-                       const double *p) ///< array of coefficients.
+jbm_polynomial_11_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of coefficients.
 {
-#ifdef __AVX__
-  return _mm_fmadd_pd (x, jbm_polynomial_10_128 (x, p + 1), _mm_set1_pd (p[0]));
-#else
-  return _mm_add_pd (_mm_set1_pd (p[0]),
-                     _mm_mul_pd (x, jbm_polynomial_10_128 (x, p + 1)));
-#endif
+  return _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 12nd order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_12_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 13rd order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_13_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 14th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_14_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 15th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_15_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 16th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_16_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 17th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_17_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 18th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_18_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 19th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_19_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 10th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_20_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 11th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_21_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 12nd order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_22_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 13rd order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_23_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 14th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_24_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 15th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_25_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 16th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_26_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 17th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_27_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_26_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 18th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_28_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_27_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate a const __m128d vector of 19th order polynomials.
+ *
+ * \return const __m128d vector of polynomial values.
+ */
+static inline __m128d
+jbm_polynomial_29_2xf64 (const __m128d x,       ///< variable.
+                         const double *p)       ///< array of 1coefficients.
+{
+  return _mm_fmadd_pd (x, jbm_polynomial_28_2xf64 (x, p + 1),
+                       _mm_set1_pd (p[0]));
+}
+
+/**
+ * Function to calculate the well conditionated function exp(x) for x in
+ * [-log(2)/2,log(2)/2] by the following Taylor' serie:
+ * \f$\exp(x)\approx\sum_{n=0}^{13}\frac{x^n}{n!}\f$.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_expwc_2xf64 (const __m128d x)
+///< __m128d vector of numbers \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
+{
+  const double a[13] JB_ALIGNED = { JBM_1_FACT0, JBM_1_FACT1, JBM_1_FACT2,
+    JBM_1_FACT3, JBM_1_FACT4, JBM_1_FACT5, JBM_1_FACT6, JBM_1_FACT7,
+    JBM_1_FACT8, JBM_1_FACT9, JBM_1_FACT10, JBM_1_FACT11, JBM_1_FACT12
+  };
+  return jbm_polynomial_12_2xf64 (x, a);
+}
+
+/**
+ * Function to calculate the function exp2(x) using the jbm_expwc_2xf64 and
+ * jbm_exp2n_2xf64 functions.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_exp2_2xf64 (const __m128d x)        ///< __m128d vector.
+{
+  double el[2] JB_ALIGNED;
+  __m128d y, f;
+  int e[2];
+  y = _mm_floor_pd (x);
+  _mm_store_pd (el, y);
+  f = _mm_sub_pd (x, y);
+  e[0] = (int) el[0];
+  e[1] = (int) el[1];
+  y = jbm_exp2n_2xf64 (e);
+  f = jbm_expwc_2xf64 (_mm_mul_pd (_mm_set1_pd (M_LN2),
+                                   _mm_sub_pd (f, _mm_set1_pd (0.5))));
+  return _mm_mul_pd (y, _mm_mul_pd (_mm_set1_pd (M_SQRT2), f));
+}
+
+/**
+ * Function to calculate the function exp(x) using the jbm_exp2_2xf64 function.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_exp_2xf64 (const __m128d x) ///< __m128d vector.
+{
+  return jbm_exp2_2xf64 (_mm_mul_pd (x, _mm_set1_pd (M_LOG2E)));
+}
+
+/**
+ * Function to calculate the function exp10(x) using the jbm_exp2_2xf64 function.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_exp10_2xf64 (const __m128d x)       ///< __m128d vector.
+{
+  return jbm_exp2_2xf64 (_mm_mul_pd (x, _mm_set1_pd (M_LN10 / M_LN2)));
+}
+
+/**
+ * Function to calculate the well conditionated function log(1+x) for x in
+ * [-1/3,1/3] by the following Taylor' serie:
+ * \f$log(1+x)\approx\sum_{i=1}^{30}\frac{(-1)^{n+1}\,x^n}{n!}\f$.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_logwc_2xf64 (const __m128d x)       ///< __m128d vector.
+{
+  const double a[30] JB_ALIGNED = { 1., -1. / 2., 1. / 3., -1. / 4., 1. / 5.,
+    -1. / 6., 1. / 7., -1. / 8., 1. / 9., -1. / 10., 1. / 11., -1. / 12.,
+    1. / 13., -1. / 14., 1. / 15., -1. / 16., 1. / 17., -1. / 18., 1. / 19.,
+    -1. / 20., 1. / 21., -1. / 22., 1. / 23., -1. / 24., 1. / 25., -1. / 26.,
+    1. / 27., -1. / 28., 1. / 29., -1. / 30.
+  };
+  __m128d x1;
+  x1 = _mm_sub_pd (x, _mm_set1_pd (1.));
+  return _mm_mul_pd (x1, jbm_polynomial_29_2xf64 (x1, a));
+}
+
+/**
+ * Function to calculate the function log_2(x) using jbm_logwc_2xf64 and
+ * jbm_frexp_2xf64
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_log2_2xf64 (const __m128d x)        ///< __m128d vector.
+{
+  __m128d y, z;
+  int e[2];
+  y = jbm_frexp_2xf64 (x, e);
+  y = _mm_fmadd_pd (jbm_logwc_2xf64 (_mm_mul_pd (y, _mm_set1_pd (4. / 3.))),
+                    _mm_set1_pd (M_LOG2E),
+                    _mm_sub_pd (_mm_set_pd ((double) e[1], (double) e[0]),
+                                _mm_set1_pd (0.41503749927884378)));
+  z = _mm_setzero_pd ();
+  y = _mm_blendv_pd (_mm_set1_pd (sqrt (-1.)), y, _mm_cmplt_pd (x, z));
+  y = _mm_blendv_pd (_mm_set1_pd (-INFINITY), y, _mm_cmple_pd (x, z));
+  return y;
+}
+
+/**
+ * Function to calculate the function log(x) using jbm_log2_2xf64.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_log_2xf64 (const __m128d x) ///< __m128d vector.
+{
+  return _mm_mul_pd (jbm_log2_2xf64 (x), _mm_set1_pd (M_LN2));
+}
+
+/**
+ * Function to calculate the function log10(x) using jbm_log2_2xf64.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_log10_2xf64 (const __m128d x)       ///< __m128d vector.
+{
+  return _mm_mul_pd (jbm_log2_2xf64 (x), _mm_set1_pd (M_LN2 / M_LN10));
+}
+
+/**
+ * Function to calculate the function x^e with e an integer number.
+ *
+ * \return function value (__m128d) (__m128d).
+ */
+static inline __m128d
+jbm_pown_2xf64 (const __m128d x,        ///< __m128d vector.
+                int e)          ///< exponent (int).
+{
+  __m128d f, xn;
+  unsigned int i;
+  f = _mm_set1_pd (1.);
+  if (e < 0)
+    xn = _mm_div_pd (f, x);
+  else
+    xn = x;
+  i = (unsigned int) abs (e);
+  while (i)
+    {
+      if (i & 1)
+        f = _mm_mul_pd (f, xn);
+      xn = _mm_mul_pd (xn, xn);
+      i >>= 1;
+    }
+  return f;
+}
+
+/**
+ * Function to calculate the function f32 using the jbm_exp2_2xf64 and
+ * jbm_log2_2xf64 functions.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_pow_2xf64 (const __m128d x, ///< __m128d vector.
+               const double e)  ///< exponent (__m128d).
+{
+  double f;
+  f = floor (e);
+  if (f == e)
+    return jbm_pown_2xf64 (x, (int) e);
+  return jbm_exp2_2xf64 (_mm_mul_pd (_mm_set1_pd (e), jbm_log2_2xf64 (x)));
+}
+
+/**
+ * Function to calculate the function cbrt(x) using the jbm_pow_2xf64 function.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_cbrt_2xf64 (const __m128d x)        ///< __m128d vector.
+{
+  __m128d f, z;
+  f = jbm_abs_2xf64 (x);
+  f = jbm_pow_2xf64 (x, 1. / 3.);
+  z = _mm_setzero_pd ();
+  return _mm_blendv_pd (f, _mm_sub_pd (z, f), _mm_cmplt_pd (x, z));
+}
+
+/**
+ * Function to calculate the well conditionated function sin(x) for x in
+ * [-pi/4,pi/4] by the following Taylor' serie:
+ * \f$\sin(x)\approx\sum_{n=0}^7\frac{(-1)^n\,x^{2\,n+1}}{(2\,n+1)!}\f$.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_sinwc_2xf64 (const __m128d x)
+                 ///< __m128d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  const double a[8] JB_ALIGNED = { JBM_1_FACT1, -JBM_1_FACT3, JBM_1_FACT5,
+    -JBM_1_FACT7, JBM_1_FACT9, -JBM_1_FACT11, JBM_1_FACT13, -JBM_1_FACT15
+  };
+  return _mm_mul_pd (x, jbm_polynomial_7_2xf64 (_mm_mul_pd (x, x), a));
+}
+
+/**
+ * Function to calculate the well conditionated function cos(x) for x in
+ * [-pi/4,pi/4] by the following Taylor' serie:
+ * \f$\cos(x)\approx\sum_{n=0}^8\frac{(-1)^n\,x^{2\,n}}{(2\,n)!}\f$.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_coswc_2xf64 (const __m128d x)
+                 ///< __m128d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  const double a[9] JB_ALIGNED = { JBM_1_FACT0, -JBM_1_FACT2, JBM_1_FACT4,
+    -JBM_1_FACT6, JBM_1_FACT8, -JBM_1_FACT10, JBM_1_FACT12, -JBM_1_FACT14,
+    JBM_1_FACT16
+  };
+  return jbm_polynomial_8_2xf64 (_mm_mul_pd (x, x), a);
+}
+
+/**
+ * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * x in [-pi/4,pi/4] from jbm_sinwc_2xf64 and jbm_coswc_2xf64 approximations.
+ */
+static inline void
+jbm_sincoswc_2xf64 (const __m128d x,
+                    ///< __m128d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                    __m128d *s,
+                    ///< pointer to the f32 function value (__m128d).
+                    __m128d *c)
+                    ///< pointer to the f32 function value (__m128d).
+{
+  __m128d s0;
+  *s = s0 = jbm_sinwc_2xf64 (x);
+  *c = _mm_sqrt_pd (_mm_fnmadd_pd (x, x, _mm_set1_pd (1.)));
+}
+
+/**
+ * Function to calculate the function sin(x) from jbm_sinwc_2xf64 and
+ * jbm_coswc_2xf64 approximations.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_sin_2xf64 (const __m128d x) ///< __m128d vector.
+{
+  __m128d y, z, f;
+  y = jbm_rest_2xf64 (x, _mm_set1_pd (2. * M_PI));
+  z = _mm_sub_pd (_mm_set1_pd (3. * M_PI_2), y);
+  f = _mm_blendv_pd (jbm_sinwc_2xf64 (_mm_sub_pd (y, _mm_set1_pd (2. * M_PI))),
+                     _mm_sub_pd (_mm_setzero_pd (), jbm_coswc_2xf64 (z)),
+                     _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4)));
+  z = _mm_sub_pd (_mm_set1_pd (M_PI), y);
+  f = _mm_blendv_pd (f, jbm_sinwc_2xf64 (z),
+                     _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4)));
+  z = _mm_sub_pd (_mm_set1_pd (M_PI_2), y);
+  f = _mm_blendv_pd (f, jbm_coswc_2xf64 (z),
+                     _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4)));
+  return _mm_blendv_pd (f, jbm_sinwc_2xf64 (y),
+                        _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4)));
+}
+
+/**
+ * Function to calculate the function cos(x) from jbm_sinwc_2xf64 and
+ * jbm_coswc_2xf64 approximations.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_cos_2xf64 (const __m128d x) ///< __m128d vector.
+{
+  __m128d y, z, f;
+  y = jbm_rest_2xf64 (x, _mm_set1_pd (2. * M_PI));
+  z = _mm_sub_pd (y, _mm_set1_pd (3. * M_PI_2));
+  f = _mm_blendv_pd (jbm_coswc_2xf64 (_mm_sub_pd (y, _mm_set1_pd (2. * M_PI))),
+                     jbm_sinwc_2xf64 (z),
+                     _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4)));
+  z = _mm_sub_pd (_mm_set1_pd (M_PI), y);
+  f = _mm_blendv_pd (f, _mm_sub_pd (_mm_setzero_pd (), jbm_coswc_2xf64 (z)),
+                     _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4)));
+  z = _mm_sub_pd (_mm_set1_pd (M_PI_2), y);
+  f = _mm_blendv_pd (f, jbm_sinwc_2xf64 (z),
+                     _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4)));
+  return _mm_blendv_pd (f, jbm_coswc_2xf64 (y),
+                        _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4)));
+}
+
+/**
+ * Function to calculate the functions sin(x) and cos(x) from jbm_sinwc_2xf64 and
+ * jbm_coswc_2xf64 approximations.
+ */
+static inline void
+jbm_sincos_2xf64 (const __m128d x,
+                  ///< __m128d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                  __m128d *s,   ///< pointer to the f32 function value (__m128d).
+                  __m128d *c)   ///< pointer to the f32 function value (__m128d).
+{
+  __m128d y, s1, c1, s2, c2, m, z;
+  z = _mm_setzero_pd ();
+  y = jbm_rest_2xf64 (x, _mm_set1_pd (2. * M_PI));
+  jbm_sincoswc_2xf64 (_mm_sub_pd (y, _mm_set1_pd (2. * M_PI)), &s1, &c1);
+  jbm_sincoswc_2xf64 (_mm_sub_pd (y, _mm_set1_pd (3. * M_PI_2)), &s2, &c2);
+  m = _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4));
+  s1 = _mm_blendv_pd (s1, _mm_sub_pd (z, c2), m);
+  c1 = _mm_blendv_pd (c1, s2, m);
+  jbm_sincoswc_2xf64 (_mm_sub_pd (_mm_set1_pd (M_PI), y), &s2, &c2);
+  m = _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4));
+  s1 = _mm_blendv_pd (s1, s2, m);
+  c1 = _mm_blendv_pd (c1, _mm_sub_pd (z, c2), m);
+  jbm_sincoswc_2xf64 (_mm_sub_pd (_mm_set1_pd (M_PI_2), y), &s2, &c2);
+  m = _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4));
+  s1 = _mm_blendv_pd (s1, c2, m);
+  c1 = _mm_blendv_pd (c1, s2, m);
+  jbm_sincoswc_2xf64 (y, &s2, &c2);
+  m = _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4));
+  *s = _mm_blendv_pd (s1, s2, m);
+  *c = _mm_blendv_pd (c1, c2, m);
+}
+
+/**
+ * Function to calculate the function tan(x) from jbm_sinwc_2xf64 and
+ * jbm_coswc_2xf64 approximations.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_tan_2xf64 (const __m128d x) ///< __m128d vector.
+{
+  __m128d s, c;
+  jbm_sincos_2xf64 (x, &s, &c);
+  return _mm_div_pd (s, c);
+}
+
+/**
+ * Function to calculate the well conditionated function atan(x) for x in
+ * [-1/2,1/2] by the following Taylor' serie:
+ * \f$atan(x)\approx\sum_{i=0}^{23}\frac{(-1)^{2\,n}\,x^{2\,n+1}}{2\,n+1}\f$.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_atanwc0_2xf64 (const __m128d x)
+                   ///< __m128d vector \f$\in\left[0,\frac12\right]\f$.
+{
+  const double a[24] JB_ALIGNED = { 1., -1. / 3., 1. / 5., -1. / 7., 1. / 9.,
+    -1. / 11., 1. / 13., -1. / 15., 1. / 17., -1. / 19., 1. / 21., -1. / 23.,
+    1. / 25., -1. / 27., 1. / 29., -1. / 31., 1. / 33., -1. / 35., 1. / 37.,
+    -1. / 39., 1. / 41., -1. / 43., 1. / 45., -1. / 47.
+  };
+  return _mm_mul_pd (x, jbm_polynomial_23_2xf64 (_mm_mul_pd (x, x), a));
+}
+
+/**
+ * Function to calculate the well conditionated function atan(x) for x in
+ * [1/2,3/2] by the following Taylor' serie:
+ * \f$atan(1+x)\approx
+ * \frac{\pi}{4}
+ * +\frac{x}{2}
+ * -\frac{x^2}{4}
+ * +\frac{x^3}{12}
+ * -\frac{x^5}{40}
+ * +\frac{x^6}{48}
+ * -\frac{x^7}{112}
+ * +\frac{x^9}{288}
+ * -\frac{x^{10}}{320}
+ * +\frac{x^{11}}{704}
+ * -\frac{x^{13}}{1664}
+ * +\frac{x^{14}}{1792}
+ * -\frac{x^{15}}{3840}
+ * +\frac{x^{17}}{8704}
+ * -\frac{x^{18}}{9216}
+ * +\frac{x^{19}}{19456}
+ * -\frac{x^{21}}{43008}
+ * +\frac{x^{22}}{45056}
+ * -\frac{x^{23}}{94208}
+ * +\frac{x^{25}}{204800}
+ * -\frac{x^{26}}{212992}
+ * +\frac{x^{27}}{442368}
+ * -\frac{x^{29}}{950272}
+ * +\frac{x^{30}}{983040}
+ * -\frac{x^{31}}{2031616}\f$.
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_atanwc1_2xf64 (const __m128d x)
+                   ///< __m128d vector \f$\in\left[\frac12,1\right]\f$.
+{
+  const double a1[8] JB_ALIGNED = { 1. / 2., -1. / 40., 1. / 288., -1. / 1664.,
+    1. / 8704., -1. / 43008., 1. / 204800., -1. / 950272.
+  };
+  const double a2[8] JB_ALIGNED = { -1. / 4., 1. / 48., -1. / 320., 1. / 1792.,
+    -1. / 9216., 1. / 45056., -1. / 212992., 1. / 983040.
+  };
+  const double a3[8] JB_ALIGNED =
+    { 1. / 12., -1. / 112., 1. / 704., -1. / 3840.,
+    1. / 19456., -1. / 94208., 1. / 442368., -1. / 2031616.
+  };
+  __m128d x1, x4, f;
+  x1 = _mm_sub_pd (x, _mm_set1_pd (1.));
+  x4 = _mm_mul_pd (x1, x1);
+  x4 = _mm_mul_pd (x4, x4);
+  f = _mm_fmadd_pd (x1, jbm_polynomial_7_2xf64 (x4, a3),
+                    jbm_polynomial_7_2xf64 (x4, a2));
+  f = _mm_fmadd_pd (x1, f, jbm_polynomial_7_2xf64 (x4, a1));
+  return _mm_fmadd_pd (x1, f, _mm_set1_pd (M_PI_4));
+}
+
+/**
+ * Function to calculate the function atan(x) using the jbm_atanwc0_2xf64 and
+ * jbm_atanwc1_2xf64 functions.
+ *
+ * \return function value (__m128d in [-pi/2,pi/2]).
+ */
+static inline __m128d
+jbm_atan_2xf64 (const __m128d x)        ///< double number.
+{
+  __m128d f, ax, ax1, z, pi2;
+  z = _mm_setzero_pd ();
+  ax = jbm_abs_2xf64 (x);
+  ax1 = _mm_div_pd (_mm_set1_pd (1.), ax);
+  pi2 = _mm_set1_pd (M_PI_2);
+  f = _mm_blendv_pd (jbm_atanwc0_2xf64 (ax), jbm_atanwc1_2xf64 (ax),
+                     _mm_cmpgt_pd (ax, _mm_set1_pd (0.5)));
+  f = _mm_blendv_pd (f, _mm_sub_pd (pi2, jbm_atanwc0_2xf64 (ax1)),
+                     _mm_cmpgt_pd (ax, _mm_set1_pd (1.5)));
+  f = _mm_blendv_pd (f, _mm_sub_pd (pi2, jbm_atanwc1_2xf64 (ax1)),
+                     _mm_cmpgt_pd (ax, _mm_set1_pd (2.)));
+  return _mm_blendv_pd (f, _mm_sub_pd (z, f), _mm_cmplt_pd (x, z));
+}
+
+/**
+ * Function to calculate the function atan2(y,x) using the jbm_atan_2xf64
+ * function.
+ *
+ * \return function value (__m128d in [-pi,pi]).
+ */
+static inline __m128d
+jbm_atan2_2xf64 (const __m128d y,       ///< __m128d y component.
+                 const __m128d x)       ///< __m128d x component.
+{
+  __m128d f, mx, my, z, pi;
+  z = _mm_setzero_pd ();
+  pi = _mm_set1_pd (M_PI);
+  f = jbm_atan_2xf64 (_mm_div_pd (y, x));
+  mx = _mm_cmplt_pd (x, z);
+  my = _mm_cmplt_pd (y, z);
+  f = _mm_blendv_pd (f, _mm_sub_pd (f, pi), _mm_and_pd (my, mx));
+  return _mm_blendv_pd (f, _mm_add_pd (f, pi), _mm_andnot_pd (my, mx));
+}
+
+/**
+ * Function to calculate the function asin(x) using the jbm_atan_2xf64 function.
+ *
+ * \return function value (__m128d in [-pi/2,pi/2]).
+ */
+static inline __m128d
+jbm_asin_2xf64 (const __m128d x)        ///< __m128d number.
+{
+  __m128d f;
+  f = _mm_sqrt_pd (_mm_fnmadd_pd (x, x, _mm_set1_pd (1.)));
+  f = jbm_atan_2xf64 (_mm_div_pd (x, f));
+  return f;
+}
+
+/**
+ * Function to calculate the function acos(x) using the jbm_atan_2x2xf64 function.
+ *
+ * \return function value (__m128d in [0,pi]).
+ */
+static inline __m128d
+jbm_acos_2xf64 (const __m128d x)        ///< __m128d number.
+{
+  __m128d f;
+  f = _mm_sqrt_pd (_mm_fnmadd_pd (x, x, _mm_set1_pd (1.)));
+  f = jbm_atan_2xf64 (_mm_div_pd (f, x));
+  return _mm_blendv_pd (f, _mm_add_pd (f, _mm_set1_pd (M_PI)),
+                        _mm_cmplt_pd (x, _mm_setzero_pd ()));
 }
 
 /**
@@ -5150,19 +7057,19 @@ jbm_polynomial_11_128 (const __m128d x, ///< variable.
  * \return __m128d vector of solution values.
  */
 static inline __m128d
-jbm_solve_quadratic_reduced_128 (__m128d a,
+jbm_solve_quadratic_reduced_2xf64 (__m128d a,
 ///< __m128d vector of 1st order coefficient of the equations.
-                                 __m128d b,
+                                   __m128d b,
 ///< __m128d vector of 0th order coefficient of the equations.
-                                 const __m128d x1,
+                                   const __m128d x1,
 ///< __m128d vector of left limits of the solution intervals.
-                                 const __m128d x2)
+                                   const __m128d x2)
 ///< __m128d vector of right limits of the solution intervals.
 {
   __m128d k1, k2;
   k1 = _mm_set1_pd (-0.5);
   a = _mm_mul_pd (a, k1);
-  b = _mm_sqrt_pd (_mm_sub_pd (jbm_sqr_128 (a), b));
+  b = _mm_sqrt_pd (_mm_sub_pd (jbm_sqr_2xf64 (a), b));
   k1 = _mm_add_pd (a, b);
   k2 = _mm_sub_pd (a, b);
   k1 = _mm_blendv_pd (k1, k2, _mm_cmplt_pd (k1, x1));
@@ -5176,22 +7083,22 @@ jbm_solve_quadratic_reduced_128 (__m128d a,
  * \return __m128d vector of solution values.
  */
 static inline __m128d
-jbm_solve_quadratic_128 (const __m128d a,
+jbm_solve_quadratic_2xf64 (const __m128d a,
 ///< __m128d vector of 2nd order coefficient of the equations.
-                         const __m128d b,
+                           const __m128d b,
 ///< __m128d vector of 1st order coefficient of the equations.
-                         const __m128d c,
+                           const __m128d c,
 ///< __m128d vector of 0th order coefficient of the equations.
-                         const __m128d x1,
+                           const __m128d x1,
 ///< __m128d vector of left limits of the solution intervals.
-                         const __m128d x2)
+                           const __m128d x2)
 ///< __m128d vector of right limits of the solution intervals.
 {
   __m128d k1, k2;
-  k1 = jbm_solve_quadratic_reduced_128 (_mm_div_pd (b, a), _mm_div_pd (c, a),
-                                        x1, x2);
+  k1 = jbm_solve_quadratic_reduced_2xf64 (_mm_div_pd (b, a), _mm_div_pd (c, a),
+                                          x1, x2);
   k2 = _mm_div_pd (_mm_sub_pd (_mm_setzero_pd (), c), b);
-  return _mm_blendv_pd (k1, k2, jbm_small_128 (a));
+  return _mm_blendv_pd (k1, k2, jbm_small_2xf64 (a));
 }
 
 /**
@@ -5201,49 +7108,46 @@ jbm_solve_quadratic_128 (const __m128d a,
  *
  * \return __m128d vector of solution values.
  */
-/*
 static inline __m128d
-jbm_solve_cubic_reduced_128 (__m128d a,
-                             ///< 2nd order coefficient of the equation.
-                             __m128d b,
-                             ///< 1st order coefficient of the equation.
-                             __m128d c,
-                             ///< 0th order coefficient of the equation.
-                             __m128d x1,
-                             ///< left limit of the solution interval.
-                             __m128d x2)
-                             ///< right limit of the solution interval.
+jbm_solve_cubic_reduced_2xf64 (const __m128d a,
+                               ///< 2nd order coefficient of the equation.
+                               const __m128d b,
+                               ///< 1st order coefficient of the equation.
+                               const __m128d c,
+                               ///< 0th order coefficient of the equation.
+                               const __m128d x1,
+                               ///< left limit of the solution interval.
+                               const __m128d x2)
+                               ///< right limit of the solution interval.
 {
-  __m128d k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c0, c1, c3, c2p_3, c_2, c_3;
+  __m128d a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c0, c2p_3, c_2, c_3;
   c0 = _mm_setzero_pd ();
-  c1 = _mm_set1_pd (1.);
   c2p_3 = _mm_set1_pd (2. * M_PI / 3.);
   c_2 = _mm_set1_pd (0.5);
   c_3 = _mm_set1_pd (1. / 3.);
-  a = _mm_mul_pd (a, c_3);
-  k0 = _mm_mul_pd (a, a);
+  a3 = _mm_mul_pd (a, c_3);
+  k0 = _mm_mul_pd (a3, a3);
   k1 = _mm_fmsub_pd (b, c_3, k0);
-  k0 = _mm_fmsub_pd (_mm_fmsub_pd (b, a, c), c_2, _mm_mul_pd (a, k0));
+  k0 = _mm_fmsub_pd (_mm_fmsub_pd (b, a3, c), c_2, _mm_mul_pd (a3, k0));
   k3 = _mm_mul_pd (k1, _mm_mul_pd (k1, k1));
   k2 = _mm_fmadd_pd (k0, k0, k3);
   l1 = _mm_sqrt_pd (_mm_sub_pd (c0, k1));
-  l0 = _mm_mul_pd (_mm_acos_pd (_mm_div_pd (k0 , k3)), c_3);
+  l0 = _mm_mul_pd (jbm_acos_2xf64 (_mm_div_pd (k0, k3)), c_3);
   l1 = _mm_add_pd (l1, l1);
-  l2 = _mm_fmsub_pd (l1, _mm_cos_pd (k0), a);
-  l3 = _mm_fmsub_pd (l1, _mm_cos_pd (_mm_add_pd (l0, c2p_3)), a);
+  l2 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (k0), a3);
+  l3 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (_mm_add_pd (l0, c2p_3)), a3);
   l3 = _mm_blendv_pd (l3, l2,
-                      _mm_or_pd (_mm_cmplt (l2, x1), _mm_cmpgt (l2, x2)));
-  l4 = _mm_fmsub_pd (l1, _mm_cos_pd (_mm_sub_pd (l0, c2p_3)), a);
+                      _mm_or_pd (_mm_cmplt_pd (l2, x1), _mm_cmpgt_pd (l2, x2)));
+  l4 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (_mm_sub_pd (l0, c2p_3)), a);
   l4 = _mm_blendv_pd (l4, l3,
-                      _mm_or_pd (_mm_cmplt (l3, x1), _mm_cmpgt (l3, x2)));
+                      _mm_or_pd (_mm_cmplt_pd (l3, x1), _mm_cmpgt_pd (l3, x2)));
   k1 = _mm_sqrt_pd (k2);
   l5 = _mm_add_pd (k0, k1);
-  l5 = _mm_cbrt_pd (k2);
+  l5 = jbm_cbrt_2xf64 (k2);
   k0 = _mm_sub_pd (k0, k1);
-  l5 = _mm_add_pd (l5, _mm_sub_pd (_mm_cbrt_pd (k0), a));
+  l5 = _mm_add_pd (l5, _mm_sub_pd (jbm_cbrt_2xf64 (k0), a3));
   return _mm_blendv_pd (l4, l5, _mm_cmplt_pd (k2, c0));
 }
-*/
 
 /**
  * Function to calculate the solution of a __m128d vector of cubic equations in
@@ -5252,29 +7156,27 @@ jbm_solve_cubic_reduced_128 (__m128d a,
  *
  * \return __m128d vector of solution values.
  */
-/*
 static inline __m128d
-jbm_solve_cubic_128 (__m128d a,
+jbm_solve_cubic_2xf64 (__m128d a,
 ///< __m128d vector of 3rd order coefficient of the equations.
-                 __m128d b,
+                       __m128d b,
 ///< __m128d vector of 2nd order coefficient of the equations.
-                 __m128d c,
+                       __m128d c,
 ///< __m128d vector of 1st order coefficient of the equations.
-                 __m128d d,
+                       __m128d d,
 ///< __m128d vector of 0th order coefficient of the equations.
-                         __m128d x1,
+                       __m128d x1,
 ///< __m128d vector of left limits of the solution intervals.
-                         __m128d x2)
+                       __m128d x2)
 ///< __m128d vector of right limits of the solution intervals.
 {
   return
-    _mm_blendv_pd (jbm_solve_cubic_reduced (_mm_div_pd (b, a),
-                                            _mm_div_pd (c, a),
-                                            _mm_div_pd (d, a), x1, x2),
-                   jbm_solve_quadratic_128 (b, c, d, x1, x2),
-		   jbm_small_128 (a));
+    _mm_blendv_pd (jbm_solve_cubic_reduced_2xf64 (_mm_div_pd (b, a),
+                                                  _mm_div_pd (c, a),
+                                                  _mm_div_pd (d, a), x1, x2),
+                   jbm_solve_quadratic_2xf64 (b, c, d, x1, x2),
+                   jbm_small_2xf64 (a));
 }
-*/
 
 /**
  * Function to calculate the total (1st order upwind) flux limiter:
@@ -5283,9 +7185,9 @@ jbm_solve_cubic_128 (__m128d a,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_total_128 (const __m128d d1 __attribute__((unused)),
-                            ///< 1st flux limiter function parameter.
-                            const __m128d d2 __attribute__((unused)))
+jbm_flux_limiter_total_2xf64 (const __m128d d1 __attribute__((unused)),
+                              ///< 1st flux limiter function parameter.
+                              const __m128d d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
   return _mm_setzero_pd ();
@@ -5298,9 +7200,9 @@ jbm_flux_limiter_total_128 (const __m128d d1 __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_null_128 (const __m128d d1 __attribute__((unused)),
-                           ///< 1st flux limiter function parameter.
-                           const __m128d d2 __attribute__((unused)))
+jbm_flux_limiter_null_2xf64 (const __m128d d1 __attribute__((unused)),
+                             ///< 1st flux limiter function parameter.
+                             const __m128d d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
   return _mm_set1_pd (1.);
@@ -5313,13 +7215,13 @@ jbm_flux_limiter_null_128 (const __m128d d1 __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_centred_128 (const __m128d d1,
-                              ///< 1st flux limiter function parameter.
-                              const __m128d d2)
+jbm_flux_limiter_centred_2xf64 (const __m128d d1,
+                                ///< 1st flux limiter function parameter.
+                                const __m128d d2)
                               ///< 2nd flux limiter function parameter.
 {
   return _mm_blendv_pd (_mm_div_pd (d1, d2), _mm_setzero_pd (),
-                        jbm_small_128 (d2));
+                        jbm_small_2xf64 (d2));
 }
 
 /**
@@ -5331,14 +7233,14 @@ jbm_flux_limiter_centred_128 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_superbee_128 (const __m128d d1,
-                               ///< 1st flux limiter function parameter.
-                               const __m128d d2)
+jbm_flux_limiter_superbee_2xf64 (const __m128d d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const __m128d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m128d r;
   r = _mm_div_pd (d1, d2);
-  r = _mm_max_pd (_mm_min_pd (jbm_dbl_128 (r), _mm_set1_pd (1.)),
+  r = _mm_max_pd (_mm_min_pd (jbm_dbl_2xf64 (r), _mm_set1_pd (1.)),
                   _mm_min_pd (r, _mm_set1_pd (2.)));
   return _mm_blendv_pd (_mm_setzero_pd (), r,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
@@ -5353,9 +7255,9 @@ jbm_flux_limiter_superbee_128 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_minmod_128 (const __m128d d1,
-                             ///< 1st flux limiter function parameter.
-                             const __m128d d2)
+jbm_flux_limiter_minmod_2xf64 (const __m128d d1,
+                               ///< 1st flux limiter function parameter.
+                               const __m128d d2)
                              ///< 2nd flux limiter function parameter.
 {
   __m128d r;
@@ -5374,14 +7276,14 @@ jbm_flux_limiter_minmod_128 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_VanLeer_128 (const __m128d d1,
-                              ///< 1st flux limiter function parameter.
-                              const __m128d d2)
+jbm_flux_limiter_VanLeer_2xf64 (const __m128d d1,
+                                ///< 1st flux limiter function parameter.
+                                const __m128d d2)
                               ///< 2nd flux limiter function parameter.
 {
   __m128d r, k;
   r = _mm_div_pd (d1, d2);
-  k = jbm_abs_128 (r);
+  k = jbm_abs_2xf64 (r);
   r = _mm_div_pd (_mm_add_pd (r, k), _mm_add_pd (_mm_set1_pd (1.), k));
   return _mm_blendv_pd (_mm_setzero_pd (), r,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
@@ -5396,14 +7298,14 @@ jbm_flux_limiter_VanLeer_128 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_VanAlbada_128 (const __m128d d1,
-                                ///< 1st flux limiter function parameter.
-                                const __m128d d2)
+jbm_flux_limiter_VanAlbada_2xf64 (const __m128d d1,
+                                  ///< 1st flux limiter function parameter.
+                                  const __m128d d2)
                                 ///< 2nd flux limiter function parameter.
 {
   __m128d r, k;
   r = _mm_div_pd (d1, d2);
-  k = jbm_sqr_128 (r);
+  k = jbm_sqr_2xf64 (r);
   r = _mm_div_pd (_mm_add_pd (r, k), _mm_add_pd (_mm_set1_pd (1.), k));
   return _mm_blendv_pd (_mm_setzero_pd (), r,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
@@ -5418,9 +7320,9 @@ jbm_flux_limiter_VanAlbada_128 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_minsuper_128 (const __m128d d1,
-                               ///< 1st flux limiter function parameter.
-                               const __m128d d2)
+jbm_flux_limiter_minsuper_2xf64 (const __m128d d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const __m128d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m128d r;
@@ -5438,14 +7340,14 @@ jbm_flux_limiter_minsuper_128 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_supermin_128 (const __m128d d1,
-                               ///< 1st flux limiter function parameter.
-                               const __m128d d2)
+jbm_flux_limiter_supermin_2xf64 (const __m128d d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const __m128d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m128d r;
   r = _mm_div_pd (d1, d2);
-  r = _mm_min_pd (jbm_dbl_128 (r), _mm_set1_pd (1.));
+  r = _mm_min_pd (jbm_dbl_2xf64 (r), _mm_set1_pd (1.));
   return _mm_blendv_pd (_mm_setzero_pd (), r,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
                                       _mm_set1_pd (FLT_EPSILON)));
@@ -5460,16 +7362,16 @@ jbm_flux_limiter_supermin_128 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_monotonized_central_128 (const __m128d d1,
+jbm_flux_limiter_monotonized_central_2xf64 (const __m128d d1,
 ///< 1st flux limiter function parameter.
-                                          const __m128d d2)
+                                            const __m128d d2)
 ///< 2nd flux limiter function parameter.
 {
   __m128d r, rm;
   r = _mm_div_pd (d1, d2);
   rm = _mm_mul_pd (_mm_set1_pd (0.5), _mm_add_pd (r, _mm_set1_pd (1.)));
   rm = _mm_blendv_pd (_mm_set1_pd (2.), rm, _mm_cmplt_pd (r, _mm_set1_pd (3.)));
-  rm = _mm_blendv_pd (rm, jbm_dbl_128 (r),
+  rm = _mm_blendv_pd (rm, jbm_dbl_2xf64 (r),
                       _mm_cmpgt_pd (r, _mm_set1_pd (1. / 3.)));
   return _mm_blendv_pd (_mm_set1_pd (0.), rm,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
@@ -5484,9 +7386,9 @@ jbm_flux_limiter_monotonized_central_128 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_mean_128 (const __m128d d1,
-                           ///< 1st flux limiter function parameter.
-                           const __m128d d2)
+jbm_flux_limiter_mean_2xf64 (const __m128d d1,
+                             ///< 1st flux limiter function parameter.
+                             const __m128d d2)
                            ///< 2nd flux limiter function parameter.
 {
   __m128d r;
@@ -5503,37 +7405,37 @@ jbm_flux_limiter_mean_128 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_128 (const __m128d d1,
-                      ///< 1st flux limiter function parameter.
-                      const __m128d d2,
-                      ///< 2nd flux limiter function parameter.
-                      unsigned int type)
+jbm_flux_limiter_2xf64 (const __m128d d1,
+                        ///< 1st flux limiter function parameter.
+                        const __m128d d2,
+                        ///< 2nd flux limiter function parameter.
+                        unsigned int type)
                       ///< type of flux limiter function.
 {
   switch (type)
     {
     case JBM_FLUX_LIMITER_TYPE_TOTAL:
-      return jbm_flux_limiter_total_128 (d1, d2);
+      return jbm_flux_limiter_total_2xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_NULL:
-      return jbm_flux_limiter_null_128 (d1, d2);
+      return jbm_flux_limiter_null_2xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_CENTRED:
-      return jbm_flux_limiter_centred_128 (d1, d2);
+      return jbm_flux_limiter_centred_2xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
-      return jbm_flux_limiter_superbee_128 (d1, d2);
+      return jbm_flux_limiter_superbee_2xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_minmod_128 (d1, d2);
+      return jbm_flux_limiter_minmod_2xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
-      return jbm_flux_limiter_VanLeer_128 (d1, d2);
+      return jbm_flux_limiter_VanLeer_2xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
-      return jbm_flux_limiter_VanAlbada_128 (d1, d2);
+      return jbm_flux_limiter_VanAlbada_2xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINSUPER:
-      return jbm_flux_limiter_minsuper_128 (d1, d2);
+      return jbm_flux_limiter_minsuper_2xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
-      return jbm_flux_limiter_supermin_128 (d1, d2);
+      return jbm_flux_limiter_supermin_2xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
-      return jbm_flux_limiter_monotonized_central_128 (d1, d2);
+      return jbm_flux_limiter_monotonized_central_2xf64 (d1, d2);
     }
-  return jbm_flux_limiter_mean_128 (d1, d2);
+  return jbm_flux_limiter_mean_2xf64 (d1, d2);
 }
 
 /**
@@ -5543,10 +7445,10 @@ jbm_flux_limiter_128 (const __m128d d1,
  * \return __m128d vector of integral values.
  */
 static inline __m128d
-jbm_integral_128 (__m128d (*f) (__m128d),
-                  ///< pointer to the function to integrate.
-                  const __m128d x1,     ///< left limit of the interval.
-                  const __m128d x2)     ///< right limit of the interval.
+jbm_integral_2xf64 (__m128d (*f) (__m128d),
+                    ///< pointer to the function to integrate.
+                    const __m128d x1,   ///< left limit of the interval.
+                    const __m128d x2)   ///< right limit of the interval.
 {
 #if JBM_INTEGRAL_GAUSS_N == 1
   const JBFLOAT a[1] = { 2. };
@@ -5594,11 +7496,7 @@ jbm_integral_128 (__m128d (*f) (__m128d),
       f1 = f (_mm_sub_pd (x, k2));
       f2 = f (_mm_add_pd (x, k2));
       h = _mm_set1_pd (a[i]);
-#ifdef __AVX__
       k = _mm_fmadd_pd (h, _mm_add_pd (f1, f2), k);
-#else
-      k = _mm_add_pd (k, _mm_mul_pd (h, _mm_add_pd (f1, f2)));
-#endif
     }
 #endif
   k = _mm_mul_pd (k, dx);
@@ -5615,7 +7513,7 @@ jbm_integral_128 (__m128d (*f) (__m128d),
  * \return absolute value vector.
  */
 static inline __m256d
-jbm_abs_256 (const __m256d x)
+jbm_abs_4xf64 (const __m256d x)
 {
   return _mm256_andnot_pd (_mm256_set1_pd (-0.0), x);
 }
@@ -5626,9 +7524,9 @@ jbm_abs_256 (const __m256d x)
  * \return 1 on small number, 0 otherwise.
  */
 static inline __m256d
-jbm_small_256 (const __m256d x) ///< __m256d vector.
+jbm_small_4xf64 (const __m256d x)       ///< __m256d vector.
 {
-  return _mm256_cmp_pd (jbm_abs_256 (x), _mm256_set1_pd (FLT_EPSILON),
+  return _mm256_cmp_pd (jbm_abs_4xf64 (x), _mm256_set1_pd (FLT_EPSILON),
                         _CMP_LT_OS);
 }
 
@@ -5644,16 +7542,16 @@ jbm_small_256 (const __m256d x) ///< __m256d vector.
  * \return modmin __m256d vector.
  */
 static inline __m256d
-jbm_modmin_256 (__m256d a,      ///< 1st __m256d vector.
-                const __m256d b)        ///< 2nd __m256d vector.
+jbm_modmin_4xf64 (__m256d a,    ///< 1st __m256d vector.
+                  const __m256d b)      ///< 2nd __m256d vector.
 {
   __m256d aa, ab, m, z;
   z = _mm256_setzero_pd ();
   ab = _mm256_mul_pd (a, b);
   m = _mm256_cmp_pd (ab, z, _CMP_LE_OS);
   a = _mm256_blendv_pd (a, z, m);
-  aa = jbm_abs_256 (a);
-  ab = jbm_abs_256 (b);
+  aa = jbm_abs_4xf64 (a);
+  ab = jbm_abs_4xf64 (b);
   m = _mm256_cmp_pd (aa, ab, _CMP_GT_OS);
   return _mm256_blendv_pd (a, b, m);
 }
@@ -5662,8 +7560,8 @@ jbm_modmin_256 (__m256d a,      ///< 1st __m256d vector.
  * Function to interchange 2 __m256d numbers.
  */
 static inline void
-jbm_change_256 (__m256d *restrict a,    ///< 1st __m256d vector pointer.
-                __m256d *restrict b)    ///< 2nd __m256d vector pointer.
+jbm_change_4xf64 (__m256d *restrict a,  ///< 1st __m256d vector pointer.
+                  __m256d *restrict b)  ///< 2nd __m256d vector pointer.
 {
   __m256d c;
   JB_CHANGE (*a, *b, c);
@@ -5675,7 +7573,7 @@ jbm_change_256 (__m256d *restrict a,    ///< 1st __m256d vector pointer.
  * \return __m256d double.
  */
 static inline __m256d
-jbm_dbl_256 (const __m256d x)   ///< __m256d vector.
+jbm_dbl_4xf64 (const __m256d x) ///< __m256d vector.
 {
   return _mm256_add_pd (x, x);
 }
@@ -5686,7 +7584,7 @@ jbm_dbl_256 (const __m256d x)   ///< __m256d vector.
  * \return __m256d vector square.
  */
 static inline __m256d
-jbm_sqr_256 (const __m256d x)   ///< __m256d vector.
+jbm_sqr_4xf64 (const __m256d x) ///< __m256d vector.
 {
   return _mm256_mul_pd (x, x);
 }
@@ -5697,16 +7595,16 @@ jbm_sqr_256 (const __m256d x)   ///< __m256d vector.
  * \return __m256d vector of y-coordinates of the extrapolated points.
  */
 static inline __m256d
-jbm_extrapolate_256 (const __m256d x,
-                     ///< __m256d vector of x-coordinates of the extrapolated
-                     ///< points.
-                     const __m256d x1,
-                     ///< __m256d vector of x-coordinates of the 1st points.
-                     const __m256d x2,
-                     ///< __m256d vector of x-coordinates of the 2nd points.
-                     const __m256d y1,
-                     ///< __m256d vector of y-coordinates of the 1st points.
-                     const __m256d y2)
+jbm_extrapolate_4xf64 (const __m256d x,
+                       ///< __m256d vector of x-coordinates of the extrapolated
+                       ///< points.
+                       const __m256d x1,
+                       ///< __m256d vector of x-coordinates of the 1st points.
+                       const __m256d x2,
+                       ///< __m256d vector of x-coordinates of the 2nd points.
+                       const __m256d y1,
+                       ///< __m256d vector of y-coordinates of the 1st points.
+                       const __m256d y2)
                      ///< __m256d vector of y-coordinates of the 2nd points.
 {
   __m256d d;
@@ -5721,20 +7619,20 @@ jbm_extrapolate_256 (const __m256d x,
  * \return __m256d vector of y-coordinates of the interpolated points.
  */
 static inline __m256d
-jbm_interpolate_256 (const __m256d x,
-                     ///< __m256d vector of x-coordinates of the interpolated
-                     ///< points.
-                     const __m256d x1,
-                     ///< __m256d vector of x-coordinates of the 1st points.
-                     const __m256d x2,
-                     ///< __m256d vector of x-coordinates of the 2nd points.
-                     const __m256d y1,
-                     ///< __m256d vector of y-coordinates of the 1st points.
-                     const __m256d y2)
+jbm_interpolate_4xf64 (const __m256d x,
+                       ///< __m256d vector of x-coordinates of the interpolated
+                       ///< points.
+                       const __m256d x1,
+                       ///< __m256d vector of x-coordinates of the 1st points.
+                       const __m256d x2,
+                       ///< __m256d vector of x-coordinates of the 2nd points.
+                       const __m256d y1,
+                       ///< __m256d vector of y-coordinates of the 1st points.
+                       const __m256d y2)
                      ///< __m256d vector of y-coordinates of the 2nd points.
 {
   __m256d k, m;
-  k = jbm_extrapolate_256 (x, x1, x2, y1, y2);
+  k = jbm_extrapolate_4xf64 (x, x1, x2, y1, y2);
   m = _mm256_cmp_pd (x, x1, _CMP_GT_OS);
   k = _mm256_blendv_pd (y1, k, m);
   m = _mm256_cmp_pd (x, x2, _CMP_LT_OS);
@@ -5747,19 +7645,20 @@ jbm_interpolate_256 (const __m256d x,
  * \return __m256d vector of segment lengths.
  */
 static inline __m256d
-jbm_v2_length_256 (const __m256d x1,
+jbm_v2_length_4xf64 (const __m256d x1,
 ///< __m256d vector of x-coordinates of the 1st points defining the segment.
-                   const __m256d y1,
+                     const __m256d y1,
 ///< __m256d vector of y-coordinates of the 1st points defining the segment.
-                   const __m256d x2,
+                     const __m256d x2,
 ///< __m256d vector of x-coordinates of the 2nd points defining the segment.
-                   const __m256d y2)
+                     const __m256d y2)
 ///< __m256d vector of y-coordinates of the 2nd points defining the segment.
 {
   __m256d dx, dy;
   dx = _mm256_sub_pd (x2, x1);
   dy = _mm256_sub_pd (y2, y1);
-  return _mm256_sqrt_pd (_mm256_add_pd (jbm_sqr_256 (dx), jbm_sqr_256 (dy)));
+  return
+    _mm256_sqrt_pd (_mm256_add_pd (jbm_sqr_4xf64 (dx), jbm_sqr_4xf64 (dy)));
 }
 
 /**
@@ -5768,26 +7667,26 @@ jbm_v2_length_256 (const __m256d x1,
  * \return __m256d vector of segment lengths.
  */
 static inline __m256d
-jbm_v3_length_256 (const __m256d x1,
+jbm_v3_length_4xf64 (const __m256d x1,
 ///< __m256d vector of x-coordinates of the 1st points defining the segments.
-                   const __m256d y1,
+                     const __m256d y1,
 ///< __m256d vector of y-coordinates of the 1st points defining the segments.
-                   const __m256d z1,
+                     const __m256d z1,
 ///< __m256d vector of z-coordinates of the 1st points defining the segments.
-                   const __m256d x2,
+                     const __m256d x2,
 ///< __m256d vector of x-coordinates of the 2nd points defining the segments.
-                   const __m256d y2,
+                     const __m256d y2,
 ///< __m256d vector of y-coordinates of the 2nd points defining the segments.
-                   const __m256d z2)
+                     const __m256d z2)
 ///< __m256d vector of z-coordinates of the 2nd points defining the segments.
 {
   __m256d dx, dy, dz;
   dx = _mm256_sub_pd (x2, x1);
-  dx = jbm_sqr_256 (dx);
+  dx = jbm_sqr_4xf64 (dx);
   dy = _mm256_sub_pd (y2, y1);
-  dy = jbm_sqr_256 (dy);
+  dy = jbm_sqr_4xf64 (dy);
   dz = _mm256_sub_pd (z2, z1);
-  dz = jbm_sqr_256 (dz);
+  dz = jbm_sqr_4xf64 (dz);
   return _mm256_sqrt_pd (_mm256_add_pd (dx, _mm256_add_pd (dy, dz)));
 }
 
@@ -5797,8 +7696,8 @@ jbm_v3_length_256 (const __m256d x1,
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_1_256 (const __m256d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_1_4xf64 (const __m256d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, _mm256_set1_pd (p[1]), _mm256_set1_pd (p[0]));
 }
@@ -5809,10 +7708,10 @@ jbm_polynomial_1_256 (const __m256d x,  ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_2_256 (const __m256d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_2_4xf64 (const __m256d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm256_fmadd_pd (x, jbm_polynomial_1_256 (x, p + 1),
+  return _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
@@ -5822,10 +7721,10 @@ jbm_polynomial_2_256 (const __m256d x,  ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_3_256 (const __m256d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_3_4xf64 (const __m256d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm256_fmadd_pd (x, jbm_polynomial_2_256 (x, p + 1),
+  return _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
@@ -5835,10 +7734,10 @@ jbm_polynomial_3_256 (const __m256d x,  ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_4_256 (const __m256d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_4_4xf64 (const __m256d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm256_fmadd_pd (x, jbm_polynomial_3_256 (x, p + 1),
+  return _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
@@ -5848,10 +7747,10 @@ jbm_polynomial_4_256 (const __m256d x,  ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_5_256 (const __m256d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_5_4xf64 (const __m256d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm256_fmadd_pd (x, jbm_polynomial_4_256 (x, p + 1),
+  return _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
@@ -5861,10 +7760,10 @@ jbm_polynomial_5_256 (const __m256d x,  ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_6_256 (const __m256d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_6_4xf64 (const __m256d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm256_fmadd_pd (x, jbm_polynomial_5_256 (x, p + 1),
+  return _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
@@ -5874,10 +7773,10 @@ jbm_polynomial_6_256 (const __m256d x,  ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_7_256 (const __m256d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_7_4xf64 (const __m256d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm256_fmadd_pd (x, jbm_polynomial_6_256 (x, p + 1),
+  return _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
@@ -5887,10 +7786,10 @@ jbm_polynomial_7_256 (const __m256d x,  ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_8_256 (const __m256d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_8_4xf64 (const __m256d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm256_fmadd_pd (x, jbm_polynomial_7_256 (x, p + 1),
+  return _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
@@ -5900,10 +7799,10 @@ jbm_polynomial_8_256 (const __m256d x,  ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_9_256 (const __m256d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_9_4xf64 (const __m256d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm256_fmadd_pd (x, jbm_polynomial_8_256 (x, p + 1),
+  return _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
@@ -5913,10 +7812,10 @@ jbm_polynomial_9_256 (const __m256d x,  ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_10_256 (const __m256d x, ///< variable.
-                       const double *p) ///< array of coefficients.
+jbm_polynomial_10_4xf64 (const __m256d x,       ///< variable.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm256_fmadd_pd (x, jbm_polynomial_9_256 (x, p + 1),
+  return _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
@@ -5926,10 +7825,10 @@ jbm_polynomial_10_256 (const __m256d x, ///< variable.
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_11_256 (const __m256d x, ///< variable.
-                       const double *p) ///< array of coefficients.
+jbm_polynomial_11_4xf64 (const __m256d x,       ///< variable.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm256_fmadd_pd (x, jbm_polynomial_10_256 (x, p + 1),
+  return _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
@@ -5941,19 +7840,19 @@ jbm_polynomial_11_256 (const __m256d x, ///< variable.
  * \return __m256d vector of solution values.
  */
 static inline __m256d
-jbm_solve_quadratic_reduced_256 (__m256d a,
+jbm_solve_quadratic_reduced_4xf64 (__m256d a,
 ///< __m256d vector of 1st order coefficient of the equations.
-                                 __m256d b,
+                                   __m256d b,
 ///< __m256d vector of 0th order coefficient of the equations.
-                                 const __m256d x1,
+                                   const __m256d x1,
 ///< __m256d vector of left limits of the solution intervals.
-                                 const __m256d x2)
+                                   const __m256d x2)
 ///< __m256d vector of right limits of the solution intervals.
 {
   __m256d k1, k2, m;
   k1 = _mm256_set1_pd (-0.5);
   a = _mm256_mul_pd (a, k1);
-  b = _mm256_sqrt_pd (_mm256_sub_pd (jbm_sqr_256 (a), b));
+  b = _mm256_sqrt_pd (_mm256_sub_pd (jbm_sqr_4xf64 (a), b));
   k1 = _mm256_add_pd (a, b);
   k2 = _mm256_sub_pd (a, b);
   m = _mm256_cmp_pd (k1, x1, _CMP_LT_OS);
@@ -5969,21 +7868,21 @@ jbm_solve_quadratic_reduced_256 (__m256d a,
  * \return __m256d vector of solution values.
  */
 static inline __m256d
-jbm_solve_quadratic_256 (const __m256d a,
+jbm_solve_quadratic_4xf64 (const __m256d a,
 ///< __m256d vector of 2nd order coefficient of the equations.
-                         const __m256d b,
+                           const __m256d b,
 ///< __m256d vector of 1st order coefficient of the equations.
-                         const __m256d c,
+                           const __m256d c,
 ///< __m256d vector of 0th order coefficient of the equations.
-                         const __m256d x1,
+                           const __m256d x1,
 ///< __m256d vector of left limits of the solution intervals.
-                         const __m256d x2)
+                           const __m256d x2)
 ///< __m256d vector of right limits of the solution intervals.
 {
   __m256d k1, k2, m;
-  m = jbm_small_256 (a);
-  k1 = jbm_solve_quadratic_reduced_256 (_mm256_div_pd (b, a),
-                                        _mm256_div_pd (c, a), x1, x2);
+  m = jbm_small_4xf64 (a);
+  k1 = jbm_solve_quadratic_reduced_4xf64 (_mm256_div_pd (b, a),
+                                          _mm256_div_pd (c, a), x1, x2);
   k2 = _mm256_div_pd (_mm256_sub_pd (_mm256_setzero_pd (), c), b);
   return _mm256_blendv_pd (k1, k2, m);
 }
@@ -6048,7 +7947,7 @@ jbm_solve_cubic_reduced (__m256d a,
  */
 /*
 static inline __m256d
-jbm_solve_cubic_256 (__m256d a,
+jbm_solve_cubic_4xf64 (__m256d a,
 ///< __m256d vector of 3rd order coefficient of the equations.
                  __m256d b,
 ///< __m256d vector of 2nd order coefficient of the equations.
@@ -6062,12 +7961,12 @@ jbm_solve_cubic_256 (__m256d a,
 ///< __m256d vector of right limits of the solution intervals.
 {
   __m256d m;
-  m = jbm_small_256 (a);
+  m = jbm_small_4xf64 (a);
   return
     _mm256_blendv_pd (jbm_solve_cubic_reduced (_mm256_div_pd (b, a),
                                             _mm256_div_pd (c, a),
                                             _mm256_div_pd (d, a), x1, x2),
-                   jbm_solve_quadratic_256 (b, c, d, x1, x2), m);
+                   jbm_solve_quadratic_4xf64 (b, c, d, x1, x2), m);
 }
 */
 
@@ -6078,9 +7977,9 @@ jbm_solve_cubic_256 (__m256d a,
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_total_256 (const __m256d d1 __attribute__((unused)),
-                            ///< 1st flux limiter function parameter.
-                            const __m256d d2 __attribute__((unused)))
+jbm_flux_limiter_total_4xf64 (const __m256d d1 __attribute__((unused)),
+                              ///< 1st flux limiter function parameter.
+                              const __m256d d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
   return _mm256_setzero_pd ();
@@ -6093,9 +7992,9 @@ jbm_flux_limiter_total_256 (const __m256d d1 __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_null_256 (const __m256d d1 __attribute__((unused)),
-                           ///< 1st flux limiter function parameter.
-                           const __m256d d2 __attribute__((unused)))
+jbm_flux_limiter_null_4xf64 (const __m256d d1 __attribute__((unused)),
+                             ///< 1st flux limiter function parameter.
+                             const __m256d d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
   return _mm256_set1_pd (1.);
@@ -6108,13 +8007,13 @@ jbm_flux_limiter_null_256 (const __m256d d1 __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_centred_256 (const __m256d d1,
-                              ///< 1st flux limiter function parameter.
-                              const __m256d d2)
+jbm_flux_limiter_centred_4xf64 (const __m256d d1,
+                                ///< 1st flux limiter function parameter.
+                                const __m256d d2)
                               ///< 2nd flux limiter function parameter.
 {
   __m256d m;
-  m = jbm_small_256 (d2);
+  m = jbm_small_4xf64 (d2);
   return _mm256_blendv_pd (_mm256_div_pd (d1, d2), _mm256_setzero_pd (), m);
 }
 
@@ -6127,14 +8026,14 @@ jbm_flux_limiter_centred_256 (const __m256d d1,
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_superbee_256 (const __m256d d1,
-                               ///< 1st flux limiter function parameter.
-                               const __m256d d2)
+jbm_flux_limiter_superbee_4xf64 (const __m256d d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const __m256d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m256d r, m;
   r = _mm256_div_pd (d1, d2);
-  r = _mm256_max_pd (_mm256_min_pd (jbm_dbl_256 (r), _mm256_set1_pd (1.)),
+  r = _mm256_max_pd (_mm256_min_pd (jbm_dbl_4xf64 (r), _mm256_set1_pd (1.)),
                      _mm256_min_pd (r, _mm256_set1_pd (2.)));
   m = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
                      _CMP_GT_OS);
@@ -6149,9 +8048,9 @@ jbm_flux_limiter_superbee_256 (const __m256d d1,
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_minmod_256 (const __m256d d1,
-                             ///< 1st flux limiter function parameter.
-                             const __m256d d2)
+jbm_flux_limiter_minmod_4xf64 (const __m256d d1,
+                               ///< 1st flux limiter function parameter.
+                               const __m256d d2)
                              ///< 2nd flux limiter function parameter.
 {
   __m256d r, m;
@@ -6170,14 +8069,14 @@ jbm_flux_limiter_minmod_256 (const __m256d d1,
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_VanLeer_256 (const __m256d d1,
-                              ///< 1st flux limiter function parameter.
-                              const __m256d d2)
+jbm_flux_limiter_VanLeer_4xf64 (const __m256d d1,
+                                ///< 1st flux limiter function parameter.
+                                const __m256d d2)
                               ///< 2nd flux limiter function parameter.
 {
   __m256d r, k;
   r = _mm256_div_pd (d1, d2);
-  k = jbm_abs_256 (r);
+  k = jbm_abs_4xf64 (r);
   r = _mm256_div_pd (_mm256_add_pd (r, k),
                      _mm256_add_pd (_mm256_set1_pd (1.), k));
   k = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
@@ -6193,14 +8092,14 @@ jbm_flux_limiter_VanLeer_256 (const __m256d d1,
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_VanAlbada_256 (const __m256d d1,
-                                ///< 1st flux limiter function parameter.
-                                const __m256d d2)
+jbm_flux_limiter_VanAlbada_4xf64 (const __m256d d1,
+                                  ///< 1st flux limiter function parameter.
+                                  const __m256d d2)
                                 ///< 2nd flux limiter function parameter.
 {
   __m256d r, k;
   r = _mm256_div_pd (d1, d2);
-  k = jbm_sqr_256 (r);
+  k = jbm_sqr_4xf64 (r);
   r = _mm256_div_pd (_mm256_add_pd (r, k),
                      _mm256_add_pd (_mm256_set1_pd (1.), k));
   k = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
@@ -6216,9 +8115,9 @@ jbm_flux_limiter_VanAlbada_256 (const __m256d d1,
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_minsuper_256 (const __m256d d1,
-                               ///< 1st flux limiter function parameter.
-                               const __m256d d2)
+jbm_flux_limiter_minsuper_4xf64 (const __m256d d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const __m256d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m256d r, m;
@@ -6236,14 +8135,14 @@ jbm_flux_limiter_minsuper_256 (const __m256d d1,
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_supermin_256 (const __m256d d1,
-                               ///< 1st flux limiter function parameter.
-                               const __m256d d2)
+jbm_flux_limiter_supermin_4xf64 (const __m256d d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const __m256d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m256d r, m;
   r = _mm256_div_pd (d1, d2);
-  r = _mm256_min_pd (jbm_dbl_256 (r), _mm256_set1_pd (1.));
+  r = _mm256_min_pd (jbm_dbl_4xf64 (r), _mm256_set1_pd (1.));
   m = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
                      _CMP_GT_OS);
   return _mm256_blendv_pd (_mm256_setzero_pd (), r, m);
@@ -6258,9 +8157,9 @@ jbm_flux_limiter_supermin_256 (const __m256d d1,
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_monotonized_central_256 (const __m256d d1,
+jbm_flux_limiter_monotonized_central_4xf64 (const __m256d d1,
 ///< 1st flux limiter function parameter.
-                                          const __m256d d2)
+                                            const __m256d d2)
 ///< 2nd flux limiter function parameter.
 {
   __m256d r, rm, m;
@@ -6270,7 +8169,7 @@ jbm_flux_limiter_monotonized_central_256 (const __m256d d1,
   m = _mm256_cmp_pd (r, _mm256_set1_pd (3.), _CMP_LT_OS);
   rm = _mm256_blendv_pd (_mm256_set1_pd (2.), rm, m);
   m = _mm256_cmp_pd (r, _mm256_set1_pd (1. / 3.), _CMP_GT_OS);
-  rm = _mm256_blendv_pd (rm, jbm_dbl_256 (r), m);
+  rm = _mm256_blendv_pd (rm, jbm_dbl_4xf64 (r), m);
   m = _mm256_cmp_pd (_mm256_mul_pd (d1, d2), _mm256_set1_pd (FLT_EPSILON),
                      _CMP_GT_OS);
   return _mm256_blendv_pd (_mm256_set1_pd (0.), rm, m);
@@ -6284,9 +8183,9 @@ jbm_flux_limiter_monotonized_central_256 (const __m256d d1,
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_mean_256 (const __m256d d1,
-                           ///< 1st flux limiter function parameter.
-                           const __m256d d2)
+jbm_flux_limiter_mean_4xf64 (const __m256d d1,
+                             ///< 1st flux limiter function parameter.
+                             const __m256d d2)
                            ///< 2nd flux limiter function parameter.
 {
   __m256d r, m;
@@ -6304,37 +8203,37 @@ jbm_flux_limiter_mean_256 (const __m256d d1,
  * \return flux limiter function value.
  */
 static inline __m256d
-jbm_flux_limiter_256 (const __m256d d1,
-                      ///< 1st flux limiter function parameter.
-                      const __m256d d2,
-                      ///< 2nd flux limiter function parameter.
-                      unsigned int type)
+jbm_flux_limiter_4xf64 (const __m256d d1,
+                        ///< 1st flux limiter function parameter.
+                        const __m256d d2,
+                        ///< 2nd flux limiter function parameter.
+                        unsigned int type)
                       ///< type of flux limiter function.
 {
   switch (type)
     {
     case JBM_FLUX_LIMITER_TYPE_TOTAL:
-      return jbm_flux_limiter_total_256 (d1, d2);
+      return jbm_flux_limiter_total_4xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_NULL:
-      return jbm_flux_limiter_null_256 (d1, d2);
+      return jbm_flux_limiter_null_4xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_CENTRED:
-      return jbm_flux_limiter_centred_256 (d1, d2);
+      return jbm_flux_limiter_centred_4xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
-      return jbm_flux_limiter_superbee_256 (d1, d2);
+      return jbm_flux_limiter_superbee_4xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_minmod_256 (d1, d2);
+      return jbm_flux_limiter_minmod_4xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
-      return jbm_flux_limiter_VanLeer_256 (d1, d2);
+      return jbm_flux_limiter_VanLeer_4xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
-      return jbm_flux_limiter_VanAlbada_256 (d1, d2);
+      return jbm_flux_limiter_VanAlbada_4xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINSUPER:
-      return jbm_flux_limiter_minsuper_256 (d1, d2);
+      return jbm_flux_limiter_minsuper_4xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
-      return jbm_flux_limiter_supermin_256 (d1, d2);
+      return jbm_flux_limiter_supermin_4xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
-      return jbm_flux_limiter_monotonized_central_256 (d1, d2);
+      return jbm_flux_limiter_monotonized_central_4xf64 (d1, d2);
     }
-  return jbm_flux_limiter_mean_256 (d1, d2);
+  return jbm_flux_limiter_mean_4xf64 (d1, d2);
 }
 
 /**
@@ -6344,10 +8243,10 @@ jbm_flux_limiter_256 (const __m256d d1,
  * \return __m256d vector of integral values.
  */
 static inline __m256d
-jbm_integral_256 (__m256d (*f) (__m256d),
-                  ///< pointer to the function to integrate.
-                  const __m256d x1,     ///< left limit of the interval.
-                  const __m256d x2)     ///< right limit of the interval.
+jbm_integral_4xf64 (__m256d (*f) (__m256d),
+                    ///< pointer to the function to integrate.
+                    const __m256d x1,   ///< left limit of the interval.
+                    const __m256d x2)   ///< right limit of the interval.
 {
 #if JBM_INTEGRAL_GAUSS_N == 1
   const JBFLOAT a[1] = { 2. };
@@ -6412,7 +8311,7 @@ jbm_integral_256 (__m256d (*f) (__m256d),
  * \return absolute value vector.
  */
 static inline __m512d
-jbm_abs_512 (const __m512d x)
+jbm_abs_8xf64 (const __m512d x)
 {
   return _mm512_andnot_pd (_mm512_set1_pd (-0.0), x);
 }
@@ -6423,9 +8322,9 @@ jbm_abs_512 (const __m512d x)
  * \return 1 on small number, 0 otherwise.
  */
 static inline __mmask8
-jbm_small_512 (const __m512d x) ///< __m512d vector.
+jbm_small_8xf64 (const __m512d x)       ///< __m512d vector.
 {
-  return _mm512_cmp_pd_mask (jbm_abs_512 (x), _mm512_set1_pd (FLT_EPSILON),
+  return _mm512_cmp_pd_mask (jbm_abs_8xf64 (x), _mm512_set1_pd (FLT_EPSILON),
                              _CMP_LT_OS);
 }
 
@@ -6441,15 +8340,15 @@ jbm_small_512 (const __m512d x) ///< __m512d vector.
  * \return modmin __m512d vector.
  */
 static inline __m512d
-jbm_modmin_512 (__m512d a,      ///< 1st __m512d vector.
-                const __m512d b)        ///< 2nd __m512d vector.
+jbm_modmin_8xf64 (__m512d a,    ///< 1st __m512d vector.
+                  const __m512d b)      ///< 2nd __m512d vector.
 {
   __m512d aa, ab, z;
   z = _mm512_setzero_pd ();
   ab = _mm512_mul_pd (a, b);
   a = _mm512_mask_blend_pd (_mm512_cmp_pd_mask (ab, z, _CMP_LE_OS), a, z);
-  aa = jbm_abs_512 (a);
-  ab = jbm_abs_512 (b);
+  aa = jbm_abs_8xf64 (a);
+  ab = jbm_abs_8xf64 (b);
   return _mm512_mask_blend_pd (_mm512_cmp_pd_mask (aa, ab, _CMP_GT_OS), a, b);
 }
 
@@ -6457,8 +8356,8 @@ jbm_modmin_512 (__m512d a,      ///< 1st __m512d vector.
  * Function to interchange 2 __m512d numbers.
  */
 static inline void
-jbm_change_512 (__m512d *restrict a,    ///< 1st __m512d vector pointer.
-                __m512d *restrict b)    ///< 2nd __m512d vector pointer.
+jbm_change_8xf64 (__m512d *restrict a,  ///< 1st __m512d vector pointer.
+                  __m512d *restrict b)  ///< 2nd __m512d vector pointer.
 {
   __m512d c;
   JB_CHANGE (*a, *b, c);
@@ -6470,7 +8369,7 @@ jbm_change_512 (__m512d *restrict a,    ///< 1st __m512d vector pointer.
  * \return __m512d double.
  */
 static inline __m512d
-jbm_dbl_512 (const __m512d x)   ///< __m512d vector.
+jbm_dbl_8xf64 (const __m512d x) ///< __m512d vector.
 {
   return _mm512_add_pd (x, x);
 }
@@ -6481,7 +8380,7 @@ jbm_dbl_512 (const __m512d x)   ///< __m512d vector.
  * \return __m512d vector square.
  */
 static inline __m512d
-jbm_sqr_512 (const __m512d x)   ///< __m512d vector.
+jbm_sqr_8xf64 (const __m512d x) ///< __m512d vector.
 {
   return _mm512_mul_pd (x, x);
 }
@@ -6492,16 +8391,16 @@ jbm_sqr_512 (const __m512d x)   ///< __m512d vector.
  * \return __m512d vector of y-coordinates of the extrapolated points.
  */
 static inline __m512d
-jbm_extrapolate_512 (const __m512d x,
-                     ///< __m512d vector of x-coordinates of the extrapolated
-                     ///< points.
-                     const __m512d x1,
-                     ///< __m512d vector of x-coordinates of the 1st points.
-                     const __m512d x2,
-                     ///< __m512d vector of x-coordinates of the 2nd points.
-                     const __m512d y1,
-                     ///< __m512d vector of y-coordinates of the 1st points.
-                     const __m512d y2)
+jbm_extrapolate_8xf64 (const __m512d x,
+                       ///< __m512d vector of x-coordinates of the extrapolated
+                       ///< points.
+                       const __m512d x1,
+                       ///< __m512d vector of x-coordinates of the 1st points.
+                       const __m512d x2,
+                       ///< __m512d vector of x-coordinates of the 2nd points.
+                       const __m512d y1,
+                       ///< __m512d vector of y-coordinates of the 1st points.
+                       const __m512d y2)
                      ///< __m512d vector of y-coordinates of the 2nd points.
 {
   __m512d d;
@@ -6516,20 +8415,20 @@ jbm_extrapolate_512 (const __m512d x,
  * \return __m512d vector of y-coordinates of the interpolated points.
  */
 static inline __m512d
-jbm_interpolate_512 (const __m512d x,
-                     ///< __m512d vector of x-coordinates of the interpolated
-                     ///< points.
-                     const __m512d x1,
-                     ///< __m512d vector of x-coordinates of the 1st points.
-                     const __m512d x2,
-                     ///< __m512d vector of x-coordinates of the 2nd points.
-                     const __m512d y1,
-                     ///< __m512d vector of y-coordinates of the 1st points.
-                     const __m512d y2)
+jbm_interpolate_8xf64 (const __m512d x,
+                       ///< __m512d vector of x-coordinates of the interpolated
+                       ///< points.
+                       const __m512d x1,
+                       ///< __m512d vector of x-coordinates of the 1st points.
+                       const __m512d x2,
+                       ///< __m512d vector of x-coordinates of the 2nd points.
+                       const __m512d y1,
+                       ///< __m512d vector of y-coordinates of the 1st points.
+                       const __m512d y2)
                      ///< __m512d vector of y-coordinates of the 2nd points.
 {
   __m512d k;
-  k = jbm_extrapolate_512 (x, x1, x2, y1, y2);
+  k = jbm_extrapolate_8xf64 (x, x1, x2, y1, y2);
   k = _mm512_mask_blend_pd (_mm512_cmp_pd_mask (x, x1, _CMP_GT_OS), y1, k);
   return _mm512_mask_blend_pd (_mm512_cmp_pd_mask (x, x2, _CMP_LT_OS), y2, k);
 }
@@ -6540,19 +8439,20 @@ jbm_interpolate_512 (const __m512d x,
  * \return __m512d vector of segment lengths.
  */
 static inline __m512d
-jbm_v2_length_512 (const __m512d x1,
+jbm_v2_length_8xf64 (const __m512d x1,
 ///< __m512d vector of x-coordinates of the 1st points defining the segment.
-                   const __m512d y1,
+                     const __m512d y1,
 ///< __m512d vector of y-coordinates of the 1st points defining the segment.
-                   const __m512d x2,
+                     const __m512d x2,
 ///< __m512d vector of x-coordinates of the 2nd points defining the segment.
-                   const __m512d y2)
+                     const __m512d y2)
 ///< __m512d vector of y-coordinates of the 2nd points defining the segment.
 {
   __m512d dx, dy;
   dx = _mm512_sub_pd (x2, x1);
   dy = _mm512_sub_pd (y2, y1);
-  return _mm512_sqrt_pd (_mm512_add_pd (jbm_sqr_512 (dx), jbm_sqr_512 (dy)));
+  return
+    _mm512_sqrt_pd (_mm512_add_pd (jbm_sqr_8xf64 (dx), jbm_sqr_8xf64 (dy)));
 }
 
 /**
@@ -6561,26 +8461,26 @@ jbm_v2_length_512 (const __m512d x1,
  * \return __m512d vector of segment lengths.
  */
 static inline __m512d
-jbm_v3_length_512 (const __m512d x1,
+jbm_v3_length_8xf64 (const __m512d x1,
 ///< __m512d vector of x-coordinates of the 1st points defining the segments.
-                   const __m512d y1,
+                     const __m512d y1,
 ///< __m512d vector of y-coordinates of the 1st points defining the segments.
-                   const __m512d z1,
+                     const __m512d z1,
 ///< __m512d vector of z-coordinates of the 1st points defining the segments.
-                   const __m512d x2,
+                     const __m512d x2,
 ///< __m512d vector of x-coordinates of the 2nd points defining the segments.
-                   const __m512d y2,
+                     const __m512d y2,
 ///< __m512d vector of y-coordinates of the 2nd points defining the segments.
-                   const __m512d z2)
+                     const __m512d z2)
 ///< __m512d vector of z-coordinates of the 2nd points defining the segments.
 {
   __m512d dx, dy, dz;
   dx = _mm512_sub_pd (x2, x1);
-  dx = jbm_sqr_512 (dx);
+  dx = jbm_sqr_8xf64 (dx);
   dy = _mm512_sub_pd (y2, y1);
-  dy = jbm_sqr_512 (dy);
+  dy = jbm_sqr_8xf64 (dy);
   dz = _mm512_sub_pd (z2, z1);
-  dz = jbm_sqr_512 (dz);
+  dz = jbm_sqr_8xf64 (dz);
   return _mm512_sqrt_pd (_mm512_add_pd (dx, _mm512_add_pd (dy, dz)));
 }
 
@@ -6590,8 +8490,8 @@ jbm_v3_length_512 (const __m512d x1,
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_1_512 (const __m512d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_1_8xf64 (const __m512d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
   return _mm512_fmadd_pd (x, _mm512_set1_pd (p[1]), _mm512_set1_pd (p[0]));
 }
@@ -6602,10 +8502,10 @@ jbm_polynomial_1_512 (const __m512d x,  ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_2_512 (const __m512d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_2_8xf64 (const __m512d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm512_fmadd_pd (x, jbm_polynomial_1_512 (x, p + 1),
+  return _mm512_fmadd_pd (x, jbm_polynomial_1_8xf64 (x, p + 1),
                           _mm512_set1_pd (p[0]));
 }
 
@@ -6615,10 +8515,10 @@ jbm_polynomial_2_512 (const __m512d x,  ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_3_512 (const __m512d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_3_8xf64 (const __m512d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm512_fmadd_pd (x, jbm_polynomial_2_512 (x, p + 1),
+  return _mm512_fmadd_pd (x, jbm_polynomial_2_8xf64 (x, p + 1),
                           _mm512_set1_pd (p[0]));
 }
 
@@ -6628,10 +8528,10 @@ jbm_polynomial_3_512 (const __m512d x,  ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_4_512 (const __m512d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_4_8xf64 (const __m512d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm512_fmadd_pd (x, jbm_polynomial_3_512 (x, p + 1),
+  return _mm512_fmadd_pd (x, jbm_polynomial_3_8xf64 (x, p + 1),
                           _mm512_set1_pd (p[0]));
 }
 
@@ -6641,10 +8541,10 @@ jbm_polynomial_4_512 (const __m512d x,  ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_5_512 (const __m512d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_5_8xf64 (const __m512d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm512_fmadd_pd (x, jbm_polynomial_4_512 (x, p + 1),
+  return _mm512_fmadd_pd (x, jbm_polynomial_4_8xf64 (x, p + 1),
                           _mm512_set1_pd (p[0]));
 }
 
@@ -6654,10 +8554,10 @@ jbm_polynomial_5_512 (const __m512d x,  ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_6_512 (const __m512d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_6_8xf64 (const __m512d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm512_fmadd_pd (x, jbm_polynomial_5_512 (x, p + 1),
+  return _mm512_fmadd_pd (x, jbm_polynomial_5_8xf64 (x, p + 1),
                           _mm512_set1_pd (p[0]));
 }
 
@@ -6667,10 +8567,10 @@ jbm_polynomial_6_512 (const __m512d x,  ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_7_512 (const __m512d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_7_8xf64 (const __m512d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm512_fmadd_pd (x, jbm_polynomial_6_512 (x, p + 1),
+  return _mm512_fmadd_pd (x, jbm_polynomial_6_8xf64 (x, p + 1),
                           _mm512_set1_pd (p[0]));
 }
 
@@ -6680,10 +8580,10 @@ jbm_polynomial_7_512 (const __m512d x,  ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_8_512 (const __m512d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_8_8xf64 (const __m512d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm512_fmadd_pd (x, jbm_polynomial_7_512 (x, p + 1),
+  return _mm512_fmadd_pd (x, jbm_polynomial_7_8xf64 (x, p + 1),
                           _mm512_set1_pd (p[0]));
 }
 
@@ -6693,10 +8593,10 @@ jbm_polynomial_8_512 (const __m512d x,  ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_9_512 (const __m512d x,  ///< variable.
-                      const double *p)  ///< array of coefficients.
+jbm_polynomial_9_8xf64 (const __m512d x,        ///< variable.
+                        const double *p)        ///< array of coefficients.
 {
-  return _mm512_fmadd_pd (x, jbm_polynomial_8_512 (x, p + 1),
+  return _mm512_fmadd_pd (x, jbm_polynomial_8_8xf64 (x, p + 1),
                           _mm512_set1_pd (p[0]));
 }
 
@@ -6706,10 +8606,10 @@ jbm_polynomial_9_512 (const __m512d x,  ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_10_512 (const __m512d x, ///< variable.
-                       const double *p) ///< array of coefficients.
+jbm_polynomial_10_8xf64 (const __m512d x,       ///< variable.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm512_fmadd_pd (x, jbm_polynomial_9_512 (x, p + 1),
+  return _mm512_fmadd_pd (x, jbm_polynomial_9_8xf64 (x, p + 1),
                           _mm512_set1_pd (p[0]));
 }
 
@@ -6719,10 +8619,10 @@ jbm_polynomial_10_512 (const __m512d x, ///< variable.
  * \return __m512d vector of polynomial values.
  */
 static inline __m512d
-jbm_polynomial_11_512 (const __m512d x, ///< variable.
-                       const double *p) ///< array of coefficients.
+jbm_polynomial_11_8xf64 (const __m512d x,       ///< variable.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm512_fmadd_pd (x, jbm_polynomial_10_512 (x, p + 1),
+  return _mm512_fmadd_pd (x, jbm_polynomial_10_8xf64 (x, p + 1),
                           _mm512_set1_pd (p[0]));
 }
 
@@ -6734,19 +8634,19 @@ jbm_polynomial_11_512 (const __m512d x, ///< variable.
  * \return __m512d vector of solution values.
  */
 static inline __m512d
-jbm_solve_quadratic_reduced_512 (__m512d a,
+jbm_solve_quadratic_reduced_8xf64 (__m512d a,
 ///< __m512d vector of 1st order coefficient of the equations.
-                                 __m512d b,
+                                   __m512d b,
 ///< __m512d vector of 0th order coefficient of the equations.
-                                 const __m512d x1,
+                                   const __m512d x1,
 ///< __m512d vector of left limits of the solution intervals.
-                                 const __m512d x2)
+                                   const __m512d x2)
 ///< __m512d vector of right limits of the solution intervals.
 {
   __m512d k1, k2;
   k1 = _mm512_set1_pd (-0.5);
   a = _mm512_mul_pd (a, k1);
-  b = _mm512_sqrt_pd (_mm512_sub_pd (jbm_sqr_512 (a), b));
+  b = _mm512_sqrt_pd (_mm512_sub_pd (jbm_sqr_8xf64 (a), b));
   k1 = _mm512_add_pd (a, b);
   k2 = _mm512_sub_pd (a, b);
   k1 = _mm512_mask_blend_pd (_mm512_cmp_pd_mask (k1, x1, _CMP_LT_OS), k1, k2);
@@ -6760,22 +8660,22 @@ jbm_solve_quadratic_reduced_512 (__m512d a,
  * \return __m512d vector of solution values.
  */
 static inline __m512d
-jbm_solve_quadratic_512 (const __m512d a,
+jbm_solve_quadratic_8xf64 (const __m512d a,
 ///< __m512d vector of 2nd order coefficient of the equations.
-                         const __m512d b,
+                           const __m512d b,
 ///< __m512d vector of 1st order coefficient of the equations.
-                         const __m512d c,
+                           const __m512d c,
 ///< __m512d vector of 0th order coefficient of the equations.
-                         const __m512d x1,
+                           const __m512d x1,
 ///< __m512d vector of left limits of the solution intervals.
-                         const __m512d x2)
+                           const __m512d x2)
 ///< __m512d vector of right limits of the solution intervals.
 {
   __m512d k1, k2;
   __mmask8 m;
-  m = jbm_small_512 (a);
-  k1 = jbm_solve_quadratic_reduced_512 (_mm512_div_pd (b, a),
-                                        _mm512_div_pd (c, a), x1, x2);
+  m = jbm_small_8xf64 (a);
+  k1 = jbm_solve_quadratic_reduced_8xf64 (_mm512_div_pd (b, a),
+                                          _mm512_div_pd (c, a), x1, x2);
   k2 = _mm512_div_pd (_mm512_sub_pd (_mm512_setzero_pd (), c), b);
   return _mm512_mask_blend_pd (m, k1, k2);
 }
@@ -6840,7 +8740,7 @@ jbm_solve_cubic_reduced (__m512d a,
  */
 /*
 static inline __m512d
-jbm_solve_cubic_512 (__m512d a,
+jbm_solve_cubic_8xf64 (__m512d a,
 ///< __m512d vector of 3rd order coefficient of the equations.
                  __m512d b,
 ///< __m512d vector of 2nd order coefficient of the equations.
@@ -6854,12 +8754,12 @@ jbm_solve_cubic_512 (__m512d a,
 ///< __m512d vector of right limits of the solution intervals.
 {
   __m512d m;
-  m = jbm_small_512 (a);
+  m = jbm_small_8xf64 (a);
   return
     _mm512_blendv_pd (jbm_solve_cubic_reduced (_mm512_div_pd (b, a),
                                             _mm512_div_pd (c, a),
                                             _mm512_div_pd (d, a), x1, x2),
-                   jbm_solve_quadratic_512 (b, c, d, x1, x2), m);
+                   jbm_solve_quadratic_8xf64 (b, c, d, x1, x2), m);
 }
 */
 
@@ -6870,9 +8770,9 @@ jbm_solve_cubic_512 (__m512d a,
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_total_512 (const __m512d d1 __attribute__((unused)),
-                            ///< 1st flux limiter function parameter.
-                            const __m512d d2 __attribute__((unused)))
+jbm_flux_limiter_total_8xf64 (const __m512d d1 __attribute__((unused)),
+                              ///< 1st flux limiter function parameter.
+                              const __m512d d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
   return _mm512_setzero_pd ();
@@ -6885,9 +8785,9 @@ jbm_flux_limiter_total_512 (const __m512d d1 __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_null_512 (const __m512d d1 __attribute__((unused)),
-                           ///< 1st flux limiter function parameter.
-                           const __m512d d2 __attribute__((unused)))
+jbm_flux_limiter_null_8xf64 (const __m512d d1 __attribute__((unused)),
+                             ///< 1st flux limiter function parameter.
+                             const __m512d d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
   return _mm512_set1_pd (1.);
@@ -6900,13 +8800,13 @@ jbm_flux_limiter_null_512 (const __m512d d1 __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_centred_512 (const __m512d d1,
-                              ///< 1st flux limiter function parameter.
-                              const __m512d d2)
+jbm_flux_limiter_centred_8xf64 (const __m512d d1,
+                                ///< 1st flux limiter function parameter.
+                                const __m512d d2)
                               ///< 2nd flux limiter function parameter.
 {
   __mmask8 m;
-  m = jbm_small_512 (d2);
+  m = jbm_small_8xf64 (d2);
   return _mm512_mask_blend_pd (m, _mm512_div_pd (d1, d2), _mm512_setzero_pd ());
 }
 
@@ -6919,15 +8819,15 @@ jbm_flux_limiter_centred_512 (const __m512d d1,
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_superbee_512 (const __m512d d1,
-                               ///< 1st flux limiter function parameter.
-                               const __m512d d2)
+jbm_flux_limiter_superbee_8xf64 (const __m512d d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const __m512d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m512d r;
   __mmask8 m;
   r = _mm512_div_pd (d1, d2);
-  r = _mm512_max_pd (_mm512_min_pd (jbm_dbl_512 (r), _mm512_set1_pd (1.)),
+  r = _mm512_max_pd (_mm512_min_pd (jbm_dbl_8xf64 (r), _mm512_set1_pd (1.)),
                      _mm512_min_pd (r, _mm512_set1_pd (2.)));
   m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
                           _CMP_GT_OS);
@@ -6942,9 +8842,9 @@ jbm_flux_limiter_superbee_512 (const __m512d d1,
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_minmod_512 (const __m512d d1,
-                             ///< 1st flux limiter function parameter.
-                             const __m512d d2)
+jbm_flux_limiter_minmod_8xf64 (const __m512d d1,
+                               ///< 1st flux limiter function parameter.
+                               const __m512d d2)
                              ///< 2nd flux limiter function parameter.
 {
   __m512d r;
@@ -6964,15 +8864,15 @@ jbm_flux_limiter_minmod_512 (const __m512d d1,
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_VanLeer_512 (const __m512d d1,
-                              ///< 1st flux limiter function parameter.
-                              const __m512d d2)
+jbm_flux_limiter_VanLeer_8xf64 (const __m512d d1,
+                                ///< 1st flux limiter function parameter.
+                                const __m512d d2)
                               ///< 2nd flux limiter function parameter.
 {
   __m512d r, k;
   __mmask8 m;
   r = _mm512_div_pd (d1, d2);
-  k = jbm_abs_512 (r);
+  k = jbm_abs_8xf64 (r);
   r = _mm512_div_pd (_mm512_add_pd (r, k),
                      _mm512_add_pd (_mm512_set1_pd (1.), k));
   m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
@@ -6988,15 +8888,15 @@ jbm_flux_limiter_VanLeer_512 (const __m512d d1,
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_VanAlbada_512 (const __m512d d1,
-                                ///< 1st flux limiter function parameter.
-                                const __m512d d2)
+jbm_flux_limiter_VanAlbada_8xf64 (const __m512d d1,
+                                  ///< 1st flux limiter function parameter.
+                                  const __m512d d2)
                                 ///< 2nd flux limiter function parameter.
 {
   __m512d r, k;
   __mmask8 m;
   r = _mm512_div_pd (d1, d2);
-  k = jbm_sqr_512 (r);
+  k = jbm_sqr_8xf64 (r);
   r = _mm512_div_pd (_mm512_add_pd (r, k),
                      _mm512_add_pd (_mm512_set1_pd (1.), k));
   m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
@@ -7012,9 +8912,9 @@ jbm_flux_limiter_VanAlbada_512 (const __m512d d1,
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_minsuper_512 (const __m512d d1,
-                               ///< 1st flux limiter function parameter.
-                               const __m512d d2)
+jbm_flux_limiter_minsuper_8xf64 (const __m512d d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const __m512d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m512d r;
@@ -7033,15 +8933,15 @@ jbm_flux_limiter_minsuper_512 (const __m512d d1,
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_supermin_512 (const __m512d d1,
-                               ///< 1st flux limiter function parameter.
-                               const __m512d d2)
+jbm_flux_limiter_supermin_8xf64 (const __m512d d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const __m512d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m512d r;
   __mmask8 m;
   r = _mm512_div_pd (d1, d2);
-  r = _mm512_min_pd (jbm_dbl_512 (r), _mm512_set1_pd (1.));
+  r = _mm512_min_pd (jbm_dbl_8xf64 (r), _mm512_set1_pd (1.));
   m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
                           _CMP_GT_OS);
   return _mm512_mask_blend_pd (m, _mm512_setzero_pd (), r);
@@ -7056,9 +8956,9 @@ jbm_flux_limiter_supermin_512 (const __m512d d1,
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_monotonized_central_512 (const __m512d d1,
+jbm_flux_limiter_monotonized_central_8xf64 (const __m512d d1,
 ///< 1st flux limiter function parameter.
-                                          const __m512d d2)
+                                            const __m512d d2)
 ///< 2nd flux limiter function parameter.
 {
   __m512d r, rm;
@@ -7069,7 +8969,7 @@ jbm_flux_limiter_monotonized_central_512 (const __m512d d1,
   m = _mm512_cmp_pd_mask (r, _mm512_set1_pd (3.), _CMP_LT_OS);
   rm = _mm512_mask_blend_pd (m, _mm512_set1_pd (2.), rm);
   m = _mm512_cmp_pd_mask (r, _mm512_set1_pd (1. / 3.), _CMP_GT_OS);
-  rm = _mm512_mask_blend_pd (m, rm, jbm_dbl_512 (r));
+  rm = _mm512_mask_blend_pd (m, rm, jbm_dbl_8xf64 (r));
   m = _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2), _mm512_set1_pd (FLT_EPSILON),
                           _CMP_GT_OS);
   return _mm512_mask_blend_pd (m, _mm512_set1_pd (0.), rm);
@@ -7083,9 +8983,9 @@ jbm_flux_limiter_monotonized_central_512 (const __m512d d1,
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_mean_512 (const __m512d d1,
-                           ///< 1st flux limiter function parameter.
-                           const __m512d d2)
+jbm_flux_limiter_mean_8xf64 (const __m512d d1,
+                             ///< 1st flux limiter function parameter.
+                             const __m512d d2)
                            ///< 2nd flux limiter function parameter.
 {
   __m512d r;
@@ -7104,37 +9004,37 @@ jbm_flux_limiter_mean_512 (const __m512d d1,
  * \return flux limiter function value.
  */
 static inline __m512d
-jbm_flux_limiter_512 (const __m512d d1,
-                      ///< 1st flux limiter function parameter.
-                      const __m512d d2,
-                      ///< 2nd flux limiter function parameter.
-                      unsigned int type)
+jbm_flux_limiter_8xf64 (const __m512d d1,
+                        ///< 1st flux limiter function parameter.
+                        const __m512d d2,
+                        ///< 2nd flux limiter function parameter.
+                        unsigned int type)
                       ///< type of flux limiter function.
 {
   switch (type)
     {
     case JBM_FLUX_LIMITER_TYPE_TOTAL:
-      return jbm_flux_limiter_total_512 (d1, d2);
+      return jbm_flux_limiter_total_8xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_NULL:
-      return jbm_flux_limiter_null_512 (d1, d2);
+      return jbm_flux_limiter_null_8xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_CENTRED:
-      return jbm_flux_limiter_centred_512 (d1, d2);
+      return jbm_flux_limiter_centred_8xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
-      return jbm_flux_limiter_superbee_512 (d1, d2);
+      return jbm_flux_limiter_superbee_8xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_minmod_512 (d1, d2);
+      return jbm_flux_limiter_minmod_8xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
-      return jbm_flux_limiter_VanLeer_512 (d1, d2);
+      return jbm_flux_limiter_VanLeer_8xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
-      return jbm_flux_limiter_VanAlbada_512 (d1, d2);
+      return jbm_flux_limiter_VanAlbada_8xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINSUPER:
-      return jbm_flux_limiter_minsuper_512 (d1, d2);
+      return jbm_flux_limiter_minsuper_8xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
-      return jbm_flux_limiter_supermin_512 (d1, d2);
+      return jbm_flux_limiter_supermin_8xf64 (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
-      return jbm_flux_limiter_monotonized_central_512 (d1, d2);
+      return jbm_flux_limiter_monotonized_central_8xf64 (d1, d2);
     }
-  return jbm_flux_limiter_mean_512 (d1, d2);
+  return jbm_flux_limiter_mean_8xf64 (d1, d2);
 }
 
 /**
@@ -7144,10 +9044,10 @@ jbm_flux_limiter_512 (const __m512d d1,
  * \return __m512d vector of integral values.
  */
 static inline __m512d
-jbm_integral_512 (__m512d (*f) (__m512d),
-                  ///< pointer to the function to integrate.
-                  const __m512d x1,     ///< left limit of the interval.
-                  const __m512d x2)     ///< right limit of the interval.
+jbm_integral_8xf64 (__m512d (*f) (__m512d),
+                    ///< pointer to the function to integrate.
+                    const __m512d x1,   ///< left limit of the interval.
+                    const __m512d x2)   ///< right limit of the interval.
 {
 #if JBM_INTEGRAL_GAUSS_N == 1
   const JBFLOAT a[1] = { 2. };
@@ -7694,17 +9594,17 @@ jbm_farray_dbl (JBMFarray *fr,  ///< result JBMFarray struct.
 #ifdef __AVX512F__
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xr + i, jbm_dbl_512 (_mm512_load_pd (xd + i)));
+    _mm512_store_pd (xr + i, jbm_dbl_8xf64 (_mm512_load_pd (xd + i)));
 #endif
 #ifdef __AVX__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xr + i, jbm_dbl_256 (_mm256_load_pd (xd + i)));
+    _mm256_store_pd (xr + i, jbm_dbl_4xf64 (_mm256_load_pd (xd + i)));
 #endif
 #ifdef __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xr + i, jbm_dbl_128 (_mm_load_pd (xd + i)));
+    _mm_store_pd (xr + i, jbm_dbl_2xf64 (_mm_load_pd (xd + i)));
 #endif
 #endif
   for (; i < n; ++i)
@@ -7739,17 +9639,17 @@ jbm_farray_sqr (JBMFarray *fr,  ///< result JBMFarray struct.
 #ifdef __AVX512F__
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xr + i, jbm_sqr_512 (_mm512_load_pd (xd + i)));
+    _mm512_store_pd (xr + i, jbm_sqr_8xf64 (_mm512_load_pd (xd + i)));
 #endif
 #ifdef __AVX__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xr + i, jbm_sqr_256 (_mm256_load_pd (xd + i)));
+    _mm256_store_pd (xr + i, jbm_sqr_4xf64 (_mm256_load_pd (xd + i)));
 #endif
 #ifdef __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xr + i, jbm_sqr_128 (_mm_load_pd (xd + i)));
+    _mm_store_pd (xr + i, jbm_sqr_2xf64 (_mm_load_pd (xd + i)));
 #endif
 #endif
   for (; i < n; ++i)
@@ -8889,7 +10789,7 @@ jbm_regression_linear (JBMFarray *fx,
           x2 = _mm_load_pd (x + i);
           sy2 = _mm_add_pd (sy2, y2);
           sx2 = _mm_add_pd (sx2, x2);
-#ifdef __AVX
+#ifdef __FMA__
           syx2 = _mm_fmadd_pd (y2, x2, syx2);
           sxx2 = _mm_fmadd_pd (x2, x2, sxx2);
 #else

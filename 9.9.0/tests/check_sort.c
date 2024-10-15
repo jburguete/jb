@@ -4,7 +4,7 @@
 #include <gsl/gsl_rng.h>
 
 int
-check_array (JBFLOAT * x,       ///<
+check_array (JBFLOAT *x,        ///<
              unsigned int *ni,  ///<
              int n)             ///<
 {
@@ -16,7 +16,7 @@ check_array (JBFLOAT * x,       ///<
 }
 
 int
-check_arrayl (JBDOUBLE * x,     ///<
+check_arrayl (JBDOUBLE *x,      ///<
               unsigned int *ni, ///<
               int n)            ///<
 {
@@ -28,7 +28,7 @@ check_arrayl (JBDOUBLE * x,     ///<
 }
 
 int
-check_interchange (JBFLOAT * x, ///<
+check_interchange (JBFLOAT *x,  ///<
                    unsigned int *ni,    ///<
                    int n)       ///<
 {
@@ -40,7 +40,7 @@ check_interchange (JBFLOAT * x, ///<
 }
 
 int
-check_interchangel (JBDOUBLE * x,       ///<
+check_interchangel (JBDOUBLE *x,        ///<
                     unsigned int *ni,   ///<
                     int n)      ///<
 {
@@ -52,7 +52,7 @@ check_interchangel (JBDOUBLE * x,       ///<
 }
 
 int
-check_insertion (JBFLOAT * x,   ///<
+check_insertion (JBFLOAT *x,    ///<
                  unsigned int *ni,      ///<
                  int n)         ///<
 {
@@ -64,7 +64,7 @@ check_insertion (JBFLOAT * x,   ///<
 }
 
 int
-check_insertionl (JBDOUBLE * x, ///<
+check_insertionl (JBDOUBLE *x,  ///<
                   unsigned int *ni,     ///<
                   int n)        ///<
 {
@@ -76,7 +76,7 @@ check_insertionl (JBDOUBLE * x, ///<
 }
 
 int
-check_merge (JBFLOAT * x,       ///<
+check_merge (JBFLOAT *x,        ///<
              unsigned int *ni,  ///<
              int n)             ///<
 {
@@ -88,7 +88,7 @@ check_merge (JBFLOAT * x,       ///<
 }
 
 int
-check_mergel (JBDOUBLE * x,     ///<
+check_mergel (JBDOUBLE *x,      ///<
               unsigned int *ni, ///<
               int n)            ///<
 {
@@ -100,7 +100,7 @@ check_mergel (JBDOUBLE * x,     ///<
 }
 
 int
-check_flash (JBFLOAT * x,       ///<
+check_flash (JBFLOAT *x,        ///<
              unsigned int *ni,  ///<
              int n)             ///<
 {
@@ -112,7 +112,7 @@ check_flash (JBFLOAT * x,       ///<
 }
 
 int
-check_flashl (JBDOUBLE * x,     ///<
+check_flashl (JBDOUBLE *x,      ///<
               unsigned int *ni, ///<
               int n)            ///<
 {
@@ -124,7 +124,7 @@ check_flashl (JBDOUBLE * x,     ///<
 }
 
 void
-print_array (JBFLOAT * x,       ///<
+print_array (JBFLOAT *x,        ///<
              unsigned int *ni,  ///<
              int n,             ///<
              char *label)       ///<
@@ -141,7 +141,7 @@ print_array (JBFLOAT * x,       ///<
 }
 
 void
-print_arrayl (JBDOUBLE * x,     ///<
+print_arrayl (JBDOUBLE *x,      ///<
               unsigned int *ni, ///<
               int n,            ///<
               char *label)      ///<

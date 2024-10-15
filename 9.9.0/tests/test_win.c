@@ -52,7 +52,7 @@ jbw_sdl_draw_render (void)
 JBWGraphic *graphic;
 
 static void
-jbw_glfw_window_close (JBWGraphic * graphic)
+jbw_glfw_window_close (JBWGraphic *graphic)
 {
   jbw_graphic_loop_quit ();
   glfwSetWindowShouldClose (graphic->window, 1);
@@ -61,7 +61,7 @@ jbw_glfw_window_close (JBWGraphic * graphic)
 #endif
 
 void
-draw1 (JBWGraphic * graphic __attribute__((unused)))
+draw1 (JBWGraphic *graphic __attribute__((unused)))
 {
   const JBFLOAT x[3] = { 0., 1., 3. };
   const JBFLOAT y[3] = { 0., 1., 3. };
@@ -75,7 +75,7 @@ draw1 (JBWGraphic * graphic __attribute__((unused)))
 }
 
 void
-draw2 (JBWGraphic * graphic)
+draw2 (JBWGraphic *graphic)
 {
   const char *str1 = "draw2";
   const char *str2 = "graphic draw 2";
@@ -89,14 +89,14 @@ draw2 (JBWGraphic * graphic)
 }
 
 void
-cb_open1 (JBWGraphic * graphic)
+cb_open1 (JBWGraphic *graphic)
 {
   jbw_graphic_set_draw (graphic, draw1);
   jbw_graphic_render ();
 }
 
 void
-cb_open2 (JBWGraphic * graphic)
+cb_open2 (JBWGraphic *graphic)
 {
   jbw_graphic_set_draw (graphic, draw2);
   jbw_graphic_render ();
