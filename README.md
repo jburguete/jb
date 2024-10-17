@@ -99,7 +99,7 @@ This software has been built and tested in the following operative systems:
 * OpenBSD 7.6
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.5
-* Ubuntu Linux 23.10
+* Ubuntu Linux 24.10
 
 On Microsoft Windows systems you have to install
 [MSYS2](http://sourceforge.net/projects/msys2) and the required

@@ -105,7 +105,7 @@ d'exploitation:
 * OpenBSD 7.6
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.5
-* Ubuntu Linux 23.10
+* Ubuntu Linux 24.10
 
 Avec systèmes Microsoft Windows on doit installer
 [MSYS2](http://sourceforge.net/projects/msys2) et en plus les bibliothèques et
