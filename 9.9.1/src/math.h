@@ -676,7 +676,6 @@ jbm_frexp_f32 (const float x,   ///< float number.
       *e = 0;
       return x;
     }
-  *e = (int) (y.i >> 23l) - 127;
   if (!y.i)
     {
       y.x = x;
@@ -693,7 +692,7 @@ jbm_frexp_f32 (const float x,   ///< float number.
       y.x *= z.x;
     }
   else
-    ++(*e);
+    *e = (int) (y.i >> 23l) - 126;
   return 0.5f * x / y.x;
 }
 
@@ -2123,7 +2122,6 @@ jbm_frexp_f64 (const double x,  ///< double number.
       *e = 0;
       return x;
     }
-  *e = (int) (y.i >> 52L) - 1023;
   if (!y.i)
     {
       y.x = x;
@@ -2136,11 +2134,11 @@ jbm_frexp_f64 (const double x,  ///< double number.
       y.i = 0x0010000000000000L;
       z.x = x / y.x;
       z.i &= 0x7ff0000000000000L;
-      *e = (int) (z.i >> 52) - 2044;
+      *e = (int) (z.i >> 52L) - 2044;
       y.x *= z.x;
     }
   else
-    ++(*e);
+    *e = (int) (y.i >> 52L) - 1022;
   return 0.5 * x / y.x;
 }
 

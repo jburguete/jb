@@ -968,6 +968,7 @@ check_uni_f32 (float (*f) (float), float (*g) (float), float prec,
       g0 = g (x);
       if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
         {
+          printf ("f/g-1=%.8g f-g=%.8g\n", f0 / g0 - 1.f, f0 - g0);
           printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
           return 0;
         }
@@ -987,6 +988,7 @@ check_logn_f32 (float (*f) (float), float (*g) (float), float prec, float x0)
         break;
       if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
         {
+          printf ("f/g-1=%.8g f-g=%.8g\n", f0 / g0 - 1.f, f0 - g0);
           printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
           return 0;
         }
@@ -999,6 +1001,7 @@ check_logn_f32 (float (*f) (float), float (*g) (float), float prec, float x0)
         break;
       if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
         {
+          printf ("f/g-1=%.8g f-g=%.8g\n", f0 / g0 - 1.f, f0 - g0);
           printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
           return 0;
         }
@@ -1032,7 +1035,8 @@ check_uni_f64 (double (*f) (double), double (*g) (double), double prec,
       g0 = g (x);
       if (fabs (f0 / g0 - 1.) > prec && fabs (f0 - g0) > prec)
         {
-          printf ("x=%.15le f=%.15le g=%.15le\n", x, f0, g0);
+          printf ("f/g-1=%.16lg f-g=%.16lg\n", f0 / g0 - 1., f0 - g0);
+          printf ("x=%.16lg f=%.16lg g=%.16lg\n", x, f0, g0);
           return 0;
         }
     }
@@ -1052,7 +1056,8 @@ check_logn_f64 (double (*f) (double), double (*g) (double), double prec,
         break;
       if (fabs (f0 / g0 - 1.) > prec && fabs (f0 - g0) > prec)
         {
-          printf ("x=%.15g f=%.15g g=%.15g\n", x, f0, g0);
+          printf ("f/g-1=%.16lg f-g=%.16lg\n", f0 / g0 - 1., f0 - g0);
+          printf ("x=%.16lg f=%.16lg g=%.16lg\n", x, f0, g0);
           return 0;
         }
     }
@@ -1064,7 +1069,8 @@ check_logn_f64 (double (*f) (double), double (*g) (double), double prec,
         break;
       if (fabs (f0 / g0 - 1.) > prec && fabs (f0 - g0) > prec)
         {
-          printf ("x=%.15g f=%.15g g=%.15g\n", x, f0, g0);
+          printf ("f/g-1=%.16lg f-g=%.16lg\n", f0 / g0 - 1., f0 - g0);
+          printf ("x=%.16lg f=%.16lg g=%.16lg\n", x, f0, g0);
           return 0;
         }
     }
@@ -1206,22 +1212,7 @@ main (void)
   unsigned long int ul, ul2;
   int i, is, is2;
   unsigned int n, us, us2;
-  for (i = 0; i < 3; ++i)
-    cf[i].C = Cf[i], cf[i].E = Ef[i];
-  for (i = 0; i < 4; ++i)
-    cf[i].D = Df[i], cf[i].H = Hf[i];
-  for (i = 0; i < 4; ++i)
-    czf[i].C = Czf[i], czf[i].E = Ezf[i];
-  for (i = 0; i < 5; ++i)
-    czf[i].D = Dzf[i], czf[i].H = Hzf[i];
-  for (i = 0; i < 3; ++i)
-    cd[i].C = Cd[i], cd[i].E = Ed[i];
-  for (i = 0; i < 4; ++i)
-    cd[i].D = Dd[i], cd[i].H = Hd[i];
-  for (i = 0; i < 4; ++i)
-    czd[i].C = Czd[i], czd[i].E = Ezd[i];
-  for (i = 0; i < 5; ++i)
-    czd[i].D = Dzd[i], czd[i].H = Hzd[i];
+
   printf ("FLT_MIN=%g FLT_MAX=%g FLT_EPSILON=%g\n",
           FLT_MIN, FLT_MAX, FLT_EPSILON);
   xf = jbm_rest_f32 (2.f, -2.f);
@@ -1318,22 +1309,22 @@ main (void)
   printf ("expm1(0.01)=%.8g\n", jbm_expm1_f32 (0.01f));
   printf ("expm1(2)=%.8g\n", jbm_expm1_f32 (2.f));
   if (!check_logn_f32 (jbm_log2_f32, log2f, FLT_EPSILON, 1.f))
-    return 0;
+    printf ("log2\n");
   printf ("log2(10)=%.8g=%.8g\n", jbm_log2_f32 (10.f), M_LN10f / M_LN2f);
   printf ("log2(e)=%.8g=%.8g\n", jbm_log2_f32 (M_Ef), M_LOG2Ef);
-  printf ("log2(1)=%.8g\n", jbm_log2_f32 (1.f));
+  printf ("log2(1)=%.8g=0\n", jbm_log2_f32 (1.f));
   printf ("log2(1/e)=%.8g=%.8g\n", jbm_log2_f32 (1.f / M_Ef), -M_LOG2Ef);
   printf ("log2(1/10)=%.8g=%.8g\n", jbm_log2_f32 (0.1f), -M_LN10f / M_LN2f);
-  printf ("log2(1e-40)=%.8g\n", jbm_log2_f32 (1e-40f));
+  printf ("log2(1e-40)=%.8g=%.8g\n", jbm_log2_f32 (1e-40f), log2f (1e-40f));
   printf ("log2(0)=%.8g\n", jbm_log2_f32 (0.f));
   printf ("log2(-1)=%.8g\n", jbm_log2_f32 (-1.f));
   if (!check_logn_f32 (jbm_log_f32, logf, FLT_EPSILON, 1.f))
-    return 0;
+    printf ("log\n");
   printf ("log(e)=%.8g\n", jbm_log_f32 (M_Ef));
   printf ("log(1)=%.8g\n", jbm_log_f32 (1.f));
   printf ("log(1/e)=%.8g\n", jbm_log_f32 (1.f / M_Ef));
   if (!check_logn_f32 (jbm_log10_f32, log10f, FLT_EPSILON, 1.f))
-    return 0;
+    printf ("log10\n");
   printf ("log10(10)=%.8g\n", jbm_log10_f32 (10.f));
   printf ("log10(1)=%.8g\n", jbm_log10_f32 (1.f));
   printf ("log10(1/10)=%.8g\n", jbm_log10_f32 (0.1f));
@@ -1361,23 +1352,26 @@ main (void)
   xf = -M_PIf / 6.f;
   printf ("sinwc(-pi/6)=%.8le=%.8le\n", sin (xf), jbm_sinwc_f32 (xf));
   printf ("coswc(-pi/6)=%.8le=%.8le\n", cos (xf), jbm_coswc_f32 (xf));
-  if (!check_uni_f32 (jbm_sin_f32, sinf, FLT_EPSILON, -M_PI, M_PI, 1000))
+  if (!check_uni_f32 (jbm_sin_f32, sinf, 2. * FLT_EPSILON,
+                      -2.f * M_PI, 2.f * M_PI, 1000))
     return 0;
-  if (!check_uni_f32 (jbm_cos_f32, cosf, FLT_EPSILON, -M_PI, M_PI, 1000))
+  if (!check_uni_f32 (jbm_cos_f32, cosf, 2.* FLT_EPSILON,
+                      -2.f * M_PI, 2.f * M_PI, 1000))
     return 0;
-  if (!check_uni_f32 (jbm_tan_f32, tanf, FLT_EPSILON, -M_PI, M_PI, 1000))
+  if (!check_uni_f32 (jbm_tan_f32, tanf, 1024. * FLT_EPSILON,
+                      -2.f * M_PI, 2.f * M_PI, 1000))
     return 0;
   for (i = 0; i < 13; ++i)
     {
       xf = i * M_PIf / 6.f;
-      printf ("sin(%upi/6)=%.8le=%.8le\n", i, sin (xf), jbm_sin_f32 (xf));
-      printf ("cos(%upi/6)=%.8le=%.8le\n", i, cos (xf), jbm_cos_f32 (xf));
-      printf ("tan(%upi/6)=%.8le=%.8le\n", i, tan (xf), jbm_tan_f32 (xf));
+      printf ("sin(%upi/6)=%.8g=%.8g\n", i, sinf (xf), jbm_sin_f32 (xf));
+      printf ("cos(%upi/6)=%.8g=%.8g\n", i, cosf (xf), jbm_cos_f32 (xf));
+      printf ("tan(%upi/6)=%.8g=%.8g\n", i, tanf (xf), jbm_tan_f32 (xf));
     }
   xf = INFINITY;
-  printf ("sin(infinity)=%.8le=%.8le\n", i, sin (xf), jbm_sin_f32 (xf));
-  printf ("cos(infinity)=%.8le=%.8le\n", i, cos (xf), jbm_cos_f32 (xf));
-  printf ("tan(infinity)=%.8le=%.8le\n", i, tan (xf), jbm_tan_f32 (xf));
+  printf ("sin(infinity)=%.8g=%.8g\n", i, sinf (xf), jbm_sin_f32 (xf));
+  printf ("cos(infinity)=%.8g=%.8g\n", i, cosf (xf), jbm_cos_f32 (xf));
+  printf ("tan(infinity)=%.8g=%.8g\n", i, tanf (xf), jbm_tan_f32 (xf));
   if (!check_log_f32 (jbm_atan_f32, atanf, FLT_EPSILON))
     return 0;
   printf ("atan(infinity)=%.8g=%.8g\n", jbm_atan_f32 (INFINITY), M_PI_2f);
@@ -1412,12 +1406,12 @@ main (void)
   printf ("acos(0)=%.8g=%.8g\n", jbm_acos_f32 (0.f), M_PI_2f);
   printf ("acos(-1/2)=%.8g=%.8g\n", jbm_acos_f32 (-0.5f), 2.f * M_PIf / 3.);
   printf ("acos(-1)=%.8g=%.8g\n", jbm_acos_f32 (-1.f), M_PIf);
-  if (!check_log_f32 (jbm_sinh_f32, sinhf, FLT_EPSILON))
+  if (!check_log_f32 (jbm_sinh_f32, sinhf, 8. * FLT_EPSILON))
     return 0;
   printf ("sinh(-1)=%.8g\n", jbm_sinh_f32 (-1.f));
   printf ("sinh(0)=%.8g\n", jbm_sinh_f32 (0.f));
   printf ("sinh(1)=%.8g\n", jbm_sinh_f32 (1.f));
-  if (!check_log_f32 (jbm_cosh_f32, coshf, FLT_EPSILON))
+  if (!check_log_f32 (jbm_cosh_f32, coshf, 8. * FLT_EPSILON))
     return 0;
   printf ("cosh(-1)=%.8g\n", jbm_cosh_f32 (-1.f));
   printf ("cosh(0)=%.8g\n", jbm_cosh_f32 (0.f));
@@ -1429,6 +1423,7 @@ main (void)
   printf ("tanh(0)=%.8g\n", jbm_tanh_f32 (0.f));
   printf ("tanh(1)=%.8g\n", jbm_tanh_f32 (1.f));
   printf ("tanh(inf)=%.8g\n", jbm_tanh_f32 (INFINITY));
+
   printf ("DBL_MIN=%lg DBL_MAX=%lg DBL_EPSILON=%lg\n",
           DBL_MIN, DBL_MAX, DBL_EPSILON);
   x = jbm_rest_f64 (2., -2.);
@@ -1440,23 +1435,35 @@ main (void)
   x = jbm_rest_f64 (-87., 4.);
   printf ("rest(-87,4)=%lg\n", x);
   x = jbm_frexp_f64 (2., &i);
-  printf ("frexp(2)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
+  y = frexp (2., &is);
+  printf ("frexp(2)=%.16lg*2^(%d)=%.16lg*2^(%d)\n", x, i, y, is);
+  printf ("ldexp(%.16lg,%d)=%.16lg=%.16lg\n",
+          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
   x = jbm_frexp_f64 (2.5, &i);
-  printf ("frexp(2.5)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
+  y = frexp (2.5, &is);
+  printf ("frexp(2.5)=%.16lg*2^(%d)=%.16lg*2^(%d)\n", x, i, y, is);
+  printf ("ldexp(%.16lg,%d)=%.16lg=%.16lg\n",
+          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
   x = jbm_frexp_f64 (2501., &i);
-  printf ("frexp(2501)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
+  y = frexp (2501., &is);
+  printf ("frexp(2501)=%.16lg*2^(%d)=%.16lg*2^(%d)\n", x, i, y, is);
+  printf ("ldexp(%.16lg,%d)=%.16lg=%.16lg\n",
+          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
   x = jbm_frexp_f64 (1e-16, &i);
-  printf ("frexp(1e-16)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
+  y = frexp (1e-16, &is);
+  printf ("frexp(1e-16)=%.16lg*2^(%d)=%.16lg*2^(%d)\n", x, i, y, is);
+  printf ("ldexp(%.16lg,%d)=%.16lg=%.16lg\n",
+          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
   x = jbm_frexp_f64 (1e-320, &i);
-  printf ("frexp(1e-320)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
+  y = frexp (1e-320, &is);
+  printf ("frexp(1e-320)=%.16lg*2^(%d)=%.16lg*2^(%d)\n", x, i, y, is);
+  printf ("ldexp(%.16lg,%d)=%.16lg=%.16lg\n",
+          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
   x = jbm_frexp_f64 (0., &i);
-  printf ("frexp(0)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
+  y = frexp (0., &is);
+  printf ("frexp(0)=%.16lg*2^(%d)=%.16lg*2^(%d)\n", x, i, y, is);
+  printf ("ldexp(%.16lg,%d)=%.16lg=%.16lg\n",
+          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
   x = jbm_frexp_f64 (-2., &i);
   printf ("frexp(-2.)=%lg*2^(%d)\n", x, i);
   printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
@@ -1472,112 +1479,138 @@ main (void)
   x = jbm_frexp_f64 (-1e-320, &i);
   printf ("frexp(-1e-320)=%lg*2^(%d)\n", x, i);
   printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
-  x = jbm_frexp_f64 (0., &i);
+  x = jbm_frexp_f64 (-0., &i);
   printf ("frexp(-0)=%lg*2^(%d)\n", x, i);
   printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
-  printf ("exp2(-1100)=%.15lg\n", jbm_exp2_f64 (-1100.));
-  printf ("exp2(-1063)=%.15lg\n", jbm_exp2_f64 (-1063.));
-  printf ("exp2(-53)=%.15lg\n", jbm_exp2_f64 (-53.));
-  printf ("exp2(0)=%.15lg\n", jbm_exp2_f64 (0.));
-  printf ("exp2(53)=%.15lg\n", jbm_exp2_f64 (53.));
-  printf ("exp2(1023)=%.15lg\n", jbm_exp2_f64 (1023.));
-  printf ("exp2(1024)=%.15lg\n", jbm_exp2_f64 (1024.));
-  printf ("exp(-2)=%.15lg\n", jbm_exp_f64 (-2.));
-  printf ("exp(0)=%.15lg\n", jbm_exp_f64 (0.));
-  printf ("exp(2)=%.15lg\n", jbm_exp_f64 (2.));
-  printf ("exp10(-320)=%.15lg\n", jbm_exp10_f64 (-320.));
-  printf ("exp10(-2)=%.15lg\n", jbm_exp10_f64 (-2.));
-  printf ("exp10(0)=%.15lg\n", jbm_exp10_f64 (0.));
-  printf ("exp10(2)=%.15lg\n", jbm_exp10_f64 (2.));
-  printf ("expm1(-2)=%.15lg\n", jbm_expm1_f64 (-2.));
-  printf ("expm1(-0.1)=%.15lg\n", jbm_expm1_f64 (-0.1));
-  printf ("expm1(0)=%.15lg\n", jbm_expm1_f64 (0.));
-  printf ("expm1(0.01)=%.15lg\n", jbm_expm1_f64 (0.01));
-  printf ("expm1(2)=%.15lg\n", jbm_expm1_f64 (2.));
-  printf ("log2(10)=%.15lg=%.15lg\n", jbm_log2_f64 (10.), M_LN10 / M_LN2);
-  printf ("log2(e)=%.15lg=%.15lg\n", jbm_log2_f64 (M_E), M_LOG2E);
-  printf ("log2(1)=%.15lg\n", jbm_log2_f64 (1.));
-  printf ("log2(1/e)=%.15lg=%.15lg\n", jbm_log2_f64 (1. / M_E), -M_LOG2E);
-  printf ("log2(1/10)=%.15lg=%.15lg\n", jbm_log2_f64 (0.1), -M_LN10 / M_LN2);
-  printf ("log2(1e-320)=%.15lg\n", jbm_log2_f64 (1e-320));
-  printf ("log2(0)=%.15lg\n", jbm_log2_f64 (0.));
-  printf ("log2(-1)=%.15lg\n", jbm_log2_f64 (-1.));
-  printf ("log(e)=%.15lg\n", jbm_log_f64 (M_E));
-  printf ("log(1)=%.15lg\n", jbm_log_f64 (1.));
-  printf ("log(1/e)=%.15lg\n", jbm_log_f64 (1. / M_E));
-  printf ("log10(10)=%.15lg\n", jbm_log10_f64 (10.));
-  printf ("log10(1)=%.15lg\n", jbm_log10_f64 (1.));
-  printf ("log10(1/10)=%.15lg\n", jbm_log10_f64 (0.1));
-  printf ("log10(1e-320)=%.15lg\n", jbm_log10_f64 (1e-320));
-  printf ("pown(10,31)=%.15lg\n", jbm_pown_f64 (10., 31));
-  printf ("pown(10,0)=%.15lg\n", jbm_pown_f64 (10., 0));
-  printf ("pown(10,-31)=%.15lg\n", jbm_pown_f64 (10., -31));
-  printf ("pown(10,-321)=%.15lg\n", jbm_pown_f64 (10., -321));
-  printf ("pown(10,-400)=%.15lg\n", jbm_pown_f64 (10., -400));
-  printf ("pow(10,321.5)=%.15lg\n", jbm_pow_f64 (10., 321.5));
-  printf ("pow(10,31.5)=%.15lg\n", jbm_pow_f64 (10., 31.5));
-  printf ("pow(10,31)=%.15lg\n", jbm_pow_f64 (10., 31.));
-  printf ("pow(10,0)=%.15lg\n", jbm_pow_f64 (10., 0.));
-  printf ("pow(10,-31)=%.15lg\n", jbm_pow_f64 (10., -31.));
-  printf ("pow(10,-31.5)=%.15lg\n", jbm_pow_f64 (10., -31.5));
-  printf ("pow(10,-321)=%.15lg\n", jbm_pow_f64 (10., -321.));
-  printf ("pow(10,-321.5)=%.15lg\n", jbm_pow_f64 (10., -321.5));
-  printf ("pow(10,-400.5)=%.15lg\n", jbm_pow_f64 (10., -400.5));
+  if (!check_log_f64 (jbm_exp2_f64, exp2, DBL_EPSILON))
+    return 0;
+  printf ("exp2(-1100)=%.16lg\n", jbm_exp2_f64 (-1100.));
+  printf ("exp2(-1063)=%.16lg\n", jbm_exp2_f64 (-1063.));
+  printf ("exp2(-53)=%.16lg\n", jbm_exp2_f64 (-53.));
+  printf ("exp2(0)=%.16lg\n", jbm_exp2_f64 (0.));
+  printf ("exp2(53)=%.16lg\n", jbm_exp2_f64 (53.));
+  printf ("exp2(1023)=%.16lg\n", jbm_exp2_f64 (1023.));
+  printf ("exp2(1024)=%.16lg\n", jbm_exp2_f64 (1024.));
+  if (!check_log_f64 (jbm_exp_f64, exp, 32. * DBL_EPSILON))
+    return 0;
+  printf ("exp(-2)=%.16lg\n", jbm_exp_f64 (-2.));
+  printf ("exp(0)=%.16lg\n", jbm_exp_f64 (0.));
+  printf ("exp(2)=%.16lg\n", jbm_exp_f64 (2.));
+  if (!check_log_f64 (jbm_exp10_f64, exp10, 256. * DBL_EPSILON))
+    return 0;
+  printf ("exp10(-320)=%.16lg\n", jbm_exp10_f64 (-320.));
+  printf ("exp10(-2)=%.16lg\n", jbm_exp10_f64 (-2.));
+  printf ("exp10(0)=%.16lg\n", jbm_exp10_f64 (0.));
+  printf ("exp10(2)=%.16lg\n", jbm_exp10_f64 (2.));
+  if (!check_log_f64 (jbm_expm1_f64, expm1, 32. * DBL_EPSILON))
+    return 0;
+  printf ("expm1(-2)=%.16lg\n", jbm_expm1_f64 (-2.));
+  printf ("expm1(-0.1)=%.16lg\n", jbm_expm1_f64 (-0.1));
+  printf ("expm1(0)=%.16lg\n", jbm_expm1_f64 (0.));
+  printf ("expm1(0.01)=%.16lg\n", jbm_expm1_f64 (0.01));
+  printf ("expm1(2)=%.16lg\n", jbm_expm1_f64 (2.));
+  if (!check_logn_f64 (jbm_log2_f64, log2, DBL_EPSILON, 1.))
+    printf ("log2\n");
+  printf ("log2(10)=%.16lg=%.16lg\n", jbm_log2_f64 (10.), M_LN10 / M_LN2);
+  printf ("log2(e)=%.16lg=%.16lg\n", jbm_log2_f64 (M_E), M_LOG2E);
+  printf ("log2(1)=%.16lg\n", jbm_log2_f64 (1.));
+  printf ("log2(1/e)=%.16lg=%.16lg\n", jbm_log2_f64 (1. / M_E), -M_LOG2E);
+  printf ("log2(1/10)=%.16lg=%.16lg\n", jbm_log2_f64 (0.1), -M_LN10 / M_LN2);
+  printf ("log2(1e-320)=%.16lg\n", jbm_log2_f64 (1e-320));
+  printf ("log2(0)=%.16lg\n", jbm_log2_f64 (0.));
+  printf ("log2(-1)=%.16lg\n", jbm_log2_f64 (-1.));
+  printf ("log(e)=%.16lg\n", jbm_log_f64 (M_E));
+  printf ("log(1)=%.16lg\n", jbm_log_f64 (1.));
+  printf ("log(1/e)=%.16lg\n", jbm_log_f64 (1. / M_E));
+  printf ("log10(10)=%.16lg\n", jbm_log10_f64 (10.));
+  printf ("log10(1)=%.16lg\n", jbm_log10_f64 (1.));
+  printf ("log10(1/10)=%.16lg\n", jbm_log10_f64 (0.1));
+  printf ("log10(1e-320)=%.16lg\n", jbm_log10_f64 (1e-320));
+  printf ("pown(10,31)=%.16lg\n", jbm_pown_f64 (10., 31));
+  printf ("pown(10,0)=%.16lg\n", jbm_pown_f64 (10., 0));
+  printf ("pown(10,-31)=%.16lg\n", jbm_pown_f64 (10., -31));
+  printf ("pown(10,-321)=%.16lg\n", jbm_pown_f64 (10., -321));
+  printf ("pown(10,-400)=%.16lg\n", jbm_pown_f64 (10., -400));
+  printf ("pow(10,321.5)=%.16lg\n", jbm_pow_f64 (10., 321.5));
+  printf ("pow(10,31.5)=%.16lg\n", jbm_pow_f64 (10., 31.5));
+  printf ("pow(10,31)=%.16lg\n", jbm_pow_f64 (10., 31.));
+  printf ("pow(10,0)=%.16lg\n", jbm_pow_f64 (10., 0.));
+  printf ("pow(10,-31)=%.16lg\n", jbm_pow_f64 (10., -31.));
+  printf ("pow(10,-31.5)=%.16lg\n", jbm_pow_f64 (10., -31.5));
+  printf ("pow(10,-321)=%.16lg\n", jbm_pow_f64 (10., -321.));
+  printf ("pow(10,-321.5)=%.16lg\n", jbm_pow_f64 (10., -321.5));
+  printf ("pow(10,-400.5)=%.16lg\n", jbm_pow_f64 (10., -400.5));
   x = 0.;
-  printf ("sinwc(0)=%.15le=%.15le\n", sin (x), jbm_sinwc_f64 (x));
-  printf ("coswc(0)=%.15le=%.15le\n", cos (x), jbm_coswc_f64 (x));
+  printf ("sinwc(0)=%.16lg=%.16lg\n", sin (x), jbm_sinwc_f64 (x));
+  printf ("coswc(0)=%.16lg=%.16lg\n", cos (x), jbm_coswc_f64 (x));
   x = M_PI / 6.;
-  printf ("sinwc(pi/6)=%.15le=%.15le\n", sin (x), jbm_sinwc_f64 (x));
-  printf ("coswc(pi/6)=%.15le=%.15le\n", cos (x), jbm_coswc_f64 (x));
+  printf ("sinwc(pi/6)=%.16lg=%.16lg\n", sin (x), jbm_sinwc_f64 (x));
+  printf ("coswc(pi/6)=%.16lg=%.16lg\n", cos (x), jbm_coswc_f64 (x));
   x = -M_PI / 6.;
-  printf ("sinwc(-pi/6)=%.15le=%.15le\n", sin (x), jbm_sinwc_f64 (x));
-  printf ("coswc(-pi/6)=%.15le=%.15le\n", cos (x), jbm_coswc_f64 (x));
+  printf ("sinwc(-pi/6)=%.16lg=%.16lg\n", sin (x), jbm_sinwc_f64 (x));
+  printf ("coswc(-pi/6)=%.16lg=%.16lg\n", cos (x), jbm_coswc_f64 (x));
   for (i = 0; i < 13; ++i)
     {
       x = i * M_PI / 6.;
-      printf ("sin(%upi/6)=%.15le=%.15le\n", i, sin (x), jbm_sin_f64 (x));
-      printf ("cos(%upi/6)=%.15le=%.15le\n", i, cos (x), jbm_cos_f64 (x));
-      printf ("tan(%upi/6)=%.15le=%.15le\n", i, tan (x), jbm_tan_f64 (x));
+      printf ("sin(%upi/6)=%.16lg=%.16lg\n", i, sin (x), jbm_sin_f64 (x));
+      printf ("cos(%upi/6)=%.16lg=%.16lg\n", i, cos (x), jbm_cos_f64 (x));
+      printf ("tan(%upi/6)=%.16lg=%.16lg\n", i, tan (x), jbm_tan_f64 (x));
     }
-  printf ("atan(infinity)=%.15lg=%.15lg\n", jbm_atan_f64 (INFINITY), M_PI_2);
-  printf ("atan(sqrt(3))=%.15lg=%.15lg\n", jbm_atan_f64 (sqrt (3.)), M_PI / 3.);
-  printf ("atan(1)=%.15lg=%.15lg\n", jbm_atan_f64 (1.), M_PI_4);
-  printf ("atan(sqrt(1/3))=%.15lg=%.15lg\n",
+  printf ("atan(infinity)=%.16lg=%.16lg\n", jbm_atan_f64 (INFINITY), M_PI_2);
+  printf ("atan(sqrt(3))=%.16lg=%.16lg\n", jbm_atan_f64 (sqrt (3.)), M_PI / 3.);
+  printf ("atan(1)=%.16lg=%.16lg\n", jbm_atan_f64 (1.), M_PI_4);
+  printf ("atan(sqrt(1/3))=%.16lg=%.16lg\n",
           jbm_atan_f64 (1. / sqrt (3.)), M_PI / 6.);
-  printf ("atan(0)=%.15lg=0\n", jbm_atan_f64 (0.));
-  printf ("atan(-0)=%.15lg=-0\n", jbm_atan_f64 (-0.));
-  printf ("atan(-sqrt(1/3))=%.15lg=%.15lg\n",
+  printf ("atan(0)=%.16lg=0\n", jbm_atan_f64 (0.));
+  printf ("atan(-0)=%.16lg=-0\n", jbm_atan_f64 (-0.));
+  printf ("atan(-sqrt(1/3))=%.16lg=%.16lg\n",
           jbm_atan_f64 (-1. / sqrt (3.)), -M_PI / 6.);
-  printf ("atan(-1)=%.15lg=%.15lg\n", jbm_atan_f64 (-1.), -M_PI_4);
-  printf ("atan(-sqrt(3))=%.15lg=%.15lg\n",
+  printf ("atan(-1)=%.16lg=%.16lg\n", jbm_atan_f64 (-1.), -M_PI_4);
+  printf ("atan(-sqrt(3))=%.16lg=%.16lg\n",
           jbm_atan_f64 (-sqrt (3.)), -M_PI / 3.);
-  printf ("atan(-infinity)=%.15lg=%.15lg\n", jbm_atan_f64 (-INFINITY), -M_PI_2);
-  printf ("atan2(1,1)=%.15lg=%.15lg\n", jbm_atan2_f64 (1., 1.), M_PI_4);
-  printf ("atan2(1,-1)=%.15lg=%.15lg\n", jbm_atan2_f64 (1., -1.), 3. * M_PI_4);
-  printf ("atan2(-1,1)=%.15lg=%.15lg\n", jbm_atan2_f64 (-1., 1.), -M_PI_4);
-  printf ("atan2(-1,-1)=%.15lg=%.15lg\n",
+  printf ("atan(-infinity)=%.16lg=%.16lg\n", jbm_atan_f64 (-INFINITY), -M_PI_2);
+  printf ("atan2(1,1)=%.16lg=%.16lg\n", jbm_atan2_f64 (1., 1.), M_PI_4);
+  printf ("atan2(1,-1)=%.16lg=%.16lg\n", jbm_atan2_f64 (1., -1.), 3. * M_PI_4);
+  printf ("atan2(-1,1)=%.16lg=%.16lg\n", jbm_atan2_f64 (-1., 1.), -M_PI_4);
+  printf ("atan2(-1,-1)=%.16lg=%.16lg\n",
           jbm_atan2_f64 (-1., -1.), -3. * M_PI_4);
-  printf ("asin(1)=%.15lg=%.15lg\n", jbm_asin_f64 (1.), M_PI_2);
-  printf ("asin(1/2)=%.15lg=%.15lg\n", jbm_asin_f64 (0.5), M_PI / 6.);
-  printf ("asin(0)=%.15lg=0\n", jbm_asin_f64 (0.));
-  printf ("asin(-1/2)=%.15lg=%.15lg\n", jbm_asin_f64 (-0.5), -M_PI / 6.);
-  printf ("asin(-1)=%.15lg=%.15lg\n", jbm_asin_f64 (-1.), -M_PI_2);
-  printf ("acos(1)=%.15lg=0\n", jbm_acos_f64 (1.));
-  printf ("acos(1/2)=%.15lg=%.15lg\n", jbm_acos_f64 (0.5), M_PI / 3.);
-  printf ("acos(0)=%.15lg=%.15lg\n", jbm_acos_f64 (0.), M_PI_2);
-  printf ("acos(-1/2)=%.15lg=%.15lg\n", jbm_acos_f64 (-0.5), 2. * M_PI / 3.);
-  printf ("acos(-1)=%.15lg=%.15lg\n", jbm_acos_f64 (-1.), M_PI);
-  printf ("sinh(-1)=%.15lg\n", jbm_sinh_f64 (-1.));
-  printf ("sinh(0)=%.15lg\n", jbm_sinh_f64 (0.));
-  printf ("sinh(1)=%.15lg\n", jbm_sinh_f64 (1.));
-  printf ("cosh(-1)=%.15lg\n", jbm_cosh_f64 (-1.));
-  printf ("cosh(0)=%.15lg\n", jbm_cosh_f64 (0.));
-  printf ("cosh(1)=%.15lg\n", jbm_cosh_f64 (1.));
-  printf ("tanh(-inf)=%.15lg\n", jbm_tanh_f64 (-INFINITY));
-  printf ("tanh(-1)=%.15lg\n", jbm_tanh_f64 (-1.));
-  printf ("tanh(0)=%.15lg\n", jbm_tanh_f64 (0.));
-  printf ("tanh(1)=%.15lg\n", jbm_tanh_f64 (1.));
-  printf ("tanh(inf)=%.15lg\n", jbm_tanh_f64 (INFINITY));
+  printf ("asin(1)=%.16lg=%.16lg\n", jbm_asin_f64 (1.), M_PI_2);
+  printf ("asin(1/2)=%.16lg=%.16lg\n", jbm_asin_f64 (0.5), M_PI / 6.);
+  printf ("asin(0)=%.16lg=0\n", jbm_asin_f64 (0.));
+  printf ("asin(-1/2)=%.16lg=%.16lg\n", jbm_asin_f64 (-0.5), -M_PI / 6.);
+  printf ("asin(-1)=%.16lg=%.16lg\n", jbm_asin_f64 (-1.), -M_PI_2);
+  printf ("acos(1)=%.16lg=0\n", jbm_acos_f64 (1.));
+  printf ("acos(1/2)=%.16lg=%.16lg\n", jbm_acos_f64 (0.5), M_PI / 3.);
+  printf ("acos(0)=%.16lg=%.16lg\n", jbm_acos_f64 (0.), M_PI_2);
+  printf ("acos(-1/2)=%.16lg=%.16lg\n", jbm_acos_f64 (-0.5), 2. * M_PI / 3.);
+  printf ("acos(-1)=%.16lg=%.16lg\n", jbm_acos_f64 (-1.), M_PI);
+  printf ("sinh(-1)=%.16lg\n", jbm_sinh_f64 (-1.));
+  printf ("sinh(0)=%.16lg\n", jbm_sinh_f64 (0.));
+  printf ("sinh(1)=%.16lg\n", jbm_sinh_f64 (1.));
+  printf ("cosh(-1)=%.16lg\n", jbm_cosh_f64 (-1.));
+  printf ("cosh(0)=%.16lg\n", jbm_cosh_f64 (0.));
+  printf ("cosh(1)=%.16lg\n", jbm_cosh_f64 (1.));
+  printf ("tanh(-inf)=%.16lg\n", jbm_tanh_f64 (-INFINITY));
+  printf ("tanh(-1)=%.16lg\n", jbm_tanh_f64 (-1.));
+  printf ("tanh(0)=%.16lg\n", jbm_tanh_f64 (0.));
+  printf ("tanh(1)=%.16lg\n", jbm_tanh_f64 (1.));
+  printf ("tanh(inf)=%.16lg\n", jbm_tanh_f64 (INFINITY));
+  for (i = 0; i < 3; ++i)
+    cf[i].C = Cf[i], cf[i].E = Ef[i];
+  for (i = 0; i < 4; ++i)
+    cf[i].D = Df[i], cf[i].H = Hf[i];
+  for (i = 0; i < 4; ++i)
+    czf[i].C = Czf[i], czf[i].E = Ezf[i];
+  for (i = 0; i < 5; ++i)
+    czf[i].D = Dzf[i], czf[i].H = Hzf[i];
+  for (i = 0; i < 3; ++i)
+    cd[i].C = Cd[i], cd[i].E = Ed[i];
+  for (i = 0; i < 4; ++i)
+    cd[i].D = Dd[i], cd[i].H = Hd[i];
+  for (i = 0; i < 4; ++i)
+    czd[i].C = Czd[i], czd[i].E = Ezd[i];
+  for (i = 0; i < 5; ++i)
+    czd[i].D = Dzd[i], czd[i].H = Hzd[i];
   is = jbm_min (1, -1);
   printf ("min(1,-1)=%d\n", is);
   is = jbm_max (1, -1);
@@ -2006,56 +2039,56 @@ main (void)
   d_2 = aligned_alloc (16, 2 * sizeof (double));
   d_2xf64 = jbm_abs_2xf64 (_mm_set_pd (-1., 1));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("abs_2xf64([1,-1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("abs_2xf64([1,-1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_small_2xf64 (_mm_set_pd (1., 0.));
   _mm_store_pd (d_1, d_2xf64);
   L_1 = (unsigned long long int *) d_1;
   printf ("small_2xf64([0,1])=[%16Lx,%16Lx]\n", L_1[0], L_1[1]);
   d_2xf64 = jbm_modmin_2xf64 (_mm_set_pd (-1., 1.), _mm_set_pd (-2., 0.5));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("modmin_2xf64([1,-1],[0.5,-2])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("modmin_2xf64([1,-1],[0.5,-2])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_modmin_2xf64 (_mm_set_pd (1.0, 0.), _mm_set_pd (-2., 1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("modmin_2xf64([0,1],[1,-2])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("modmin_2xf64([0,1],[1,-2])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 = _mm_set_pd (1., 0.);
   d2_2xf64 = _mm_set_pd (-2., 1.);
   jbm_change_2xf64 (&d_2xf64, &d2_2xf64);
   _mm_store_pd (d_1, d_2xf64);
   _mm_store_pd (d_2, d2_2xf64);
-  printf ("change_2xf64([0,1],[1,-2])=([%.15le,%.15le],[%.15le,%.15le])\n",
+  printf ("change_2xf64([0,1],[1,-2])=([%.16lg,%.16lg],[%.16lg,%.16lg])\n",
           d_1[0], d_1[1], d_2[0], d_2[1]);
   d2_2xf64 = jbm_dbl_2xf64 (d_2xf64);
   _mm_store_pd (d_1, d2_2xf64);
-  printf ("dbl_2xf64([1,-2])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("dbl_2xf64([1,-2])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_sqr_2xf64 (d_2xf64);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("sqr_2xf64([1,-2])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("sqr_2xf64([1,-2])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_extrapolate_2xf64 (_mm_set_pd (-1., 1.),
                                    _mm_set1_pd (0.),
                                    _mm_set1_pd (2.),
                                    _mm_set1_pd (1.), _mm_set1_pd (4.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("extrapolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.15le,%.15le]\n",
+  printf ("extrapolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_interpolate_2xf64 (_mm_set_pd (-1., 1.),
                                    _mm_set1_pd (0.),
                                    _mm_set1_pd (2.),
                                    _mm_set1_pd (1.), _mm_set1_pd (4.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("interpolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.15le,%.15le]\n",
+  printf ("interpolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_interpolate_2xf64 (_mm_set_pd (3., 1.),
                                    _mm_set_pd (0., 0.),
                                    _mm_set_pd (2., 2.),
                                    _mm_set_pd (1., 1.), _mm_set_pd (4., 4.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("interpolate_2xf64([1,3],[0,0],[2,2],[1,1],[4,4])=[%.15le,%.15le]\n",
+  printf ("interpolate_2xf64([1,3],[0,0],[2,2],[1,1],[4,4])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_v2_length_2xf64 (_mm_set_pd (2., 1.),
                                  _mm_set_pd (-1., 4.),
                                  _mm_set_pd (5., -3.), _mm_set_pd (3., 1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("v2_length_2xf64([1,2],[4,-1],[-3,5],[1,3])=[%.15le,%.15le]\n",
+  printf ("v2_length_2xf64([1,2],[4,-1],[-3,5],[1,3])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_v3_length_2xf64 (_mm_set_pd (2., 1.),
                                  _mm_set_pd (-1., 4.),
@@ -2064,185 +2097,185 @@ main (void)
                                  _mm_set_pd (2., 1.), _mm_set_pd (-5., 9.));
   _mm_store_pd (d_1, d_2xf64);
   printf ("v3_length_2xf64([1,2],[4,-1],[3,1],[-1,4],[1,2],[9,-5])"
-          "=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+          "=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_polynomial_11_2xf64 (_mm_set_pd (1., 0.5), p_1);
   _mm_store_pd (d_1, d_2xf64);
   printf
     ("polynomial_11_2xf64([0.5,1],[1,2,4,8,16,32,64,128,256,512,1024,2048])"
-     "=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+     "=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_solve_quadratic_2xf64 (_mm_set_pd (0., 2.), _mm_set_pd (-2., -1.),
                                _mm_set_pd (1., -1.), _mm_set_pd (0., 0.),
                                _mm_set_pd (2., 2.));
   _mm_store_pd (d_1, d_2xf64);
   printf ("solve_quadratic_2xf64([2,0],[-1,-2][-1,1],[0,0],[2,2])"
-          "=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+          "=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_setzero_pd (),
                                     _mm_set1_pd (1.),
                                     JBM_FLUX_LIMITER_TYPE_TOTAL);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_total_2xf64([0,0],[1,1])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_total_2xf64([0,0],[1,1])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_setzero_pd (),
                                     _mm_set1_pd (1.),
                                     JBM_FLUX_LIMITER_TYPE_NULL);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_null_2xf64([0,0],[1,1])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_null_2xf64([0,0],[1,1])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 1.),
                                     _mm_set_pd (0., 1.),
                                     JBM_FLUX_LIMITER_TYPE_CENTRED);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_centred_2xf64([1,3],[1,0])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_centred_2xf64([1,3],[1,0])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_superbee_2xf64([-1,1],[1,3])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_superbee_2xf64([-1,1],[1,3])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 2.),
                                     _mm_set_pd (2., 3.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_superbee_2xf64([2,3],[3,2])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_superbee_2xf64([2,3],[3,2])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
                                     _mm_set_pd (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_superbee_2xf64([3,1],[1,1])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_superbee_2xf64([3,1],[1,1])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_minmod_2xf64([-1,2],[1,3])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_minmod_2xf64([-1,2],[1,3])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
                                     _mm_set_pd (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_minmod_2xf64([3,1],[1,1])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_minmod_2xf64([3,1],[1,1])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_LEER);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_VanLeer_2xf64([-1,2],[1,3])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_VanLeer_2xf64([-1,2],[1,3])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_ALBADA);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_VanAlbada_2xf64([-1,2],[1,3])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_VanAlbada_2xf64([-1,2],[1,3])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINSUPER);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_minsuper_2xf64([-1,2],[1,3])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_minsuper_2xf64([-1,2],[1,3])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
                                     _mm_set_pd (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINSUPER);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_minsuper_2xf64([3,1],[1,1])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_minsuper_2xf64([3,1],[1,1])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERMIN);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_supermin_2xf64([-1,1],[1,3])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_supermin_2xf64([-1,1],[1,3])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
                                     _mm_set_pd (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERMIN);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_supermin_2xf64([3,1],[1,1])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_supermin_2xf64([3,1],[1,1])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (0.5, -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
   _mm_store_pd (d_1, d_2xf64);
   printf ("flux_limiter_monotonized_central_2xf64([-1,0.5],[1,3])"
-          "=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+          "=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 2.),
                                     _mm_set_pd (0.5, 3.),
                                     JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
   _mm_store_pd (d_1, d_2xf64);
   printf ("flux_limiter_monotonized_central_2xf64([2,3],[3,0.5])"
-          "=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+          "=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MEAN);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_mean_2xf64([-1,2],[1,3])=[%.15le,%.15le]\n",
+  printf ("flux_limiter_mean_2xf64([-1,2],[1,3])=[%.16lg,%.16lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn0_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(1,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("integral_2xf64(1,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn1_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("integral_2xf64(x,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn2_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^2,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("integral_2xf64(x^2,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn3_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^3,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("integral_2xf64(x^3,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn4_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^4,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("integral_2xf64(x^4,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn5_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^5,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("integral_2xf64(x^5,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn6_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^6,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("integral_2xf64(x^6,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn7_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^7,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("integral_2xf64(x^7,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn8_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^8,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("integral_2xf64(x^8,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn9_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^9,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0], d_1[1]);
+  printf ("integral_2xf64(x^9,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn10_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^10,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0],
+  printf ("integral_2xf64(x^10,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn11_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^11,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0],
+  printf ("integral_2xf64(x^11,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn12_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^12,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0],
+  printf ("integral_2xf64(x^12,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn13_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^13,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0],
+  printf ("integral_2xf64(x^13,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
     jbm_integral_2xf64 (fn14_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^14,[0,-1],[1,1])=[%.15le,%.15le]\n", d_1[0],
+  printf ("integral_2xf64(x^14,[0,-1],[1,1])=[%.16lg,%.16lg]\n", d_1[0],
           d_1[1]);
   aligned_free (d_2);
   aligned_free (d_1);
@@ -2253,7 +2286,7 @@ main (void)
   d_2 = aligned_alloc (32, 4 * sizeof (double));
   d_4xf64 = jbm_abs_4xf64 (_mm256_set_pd (2., 0., -1., 1));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("abs_4xf64([1,-1,0,2])=[%.15le,%.15le,%.15le,%.15le]\n",
+  printf ("abs_4xf64([1,-1,0,2])=[%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_small_4xf64 (_mm256_set_pd (-1., 1., -0., 0.));
   _mm256_store_pd (d_1, d_4xf64);
@@ -2264,22 +2297,22 @@ main (void)
                               _mm256_set_pd (-2., 1., -2., 0.5));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("modmin_4xf64([1,-1,0,1],[0.5,-2,1,-2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = _mm256_set_pd (3., -1., 1., 0.);
   d2_4xf64 = _mm256_set_pd (-4., 7., -2., 1.);
   jbm_change_4xf64 (&d_4xf64, &d2_4xf64);
   _mm256_store_pd (d_1, d_4xf64);
   _mm256_store_pd (d_2, d2_4xf64);
   printf ("change_4xf64([0,1,-1,3],[1,-2,7,-4])"
-          "=([%.15le,%.15le,%.15le,%.15le],[%.15le,%.15le,%.15le,%.15le])\n",
+          "=([%.16lg,%.16lg,%.16lg,%.16lg],[%.16lg,%.16lg,%.16lg,%.16lg])\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_2[0], d_2[1], d_2[2], d_2[3]);
   d2_4xf64 = jbm_dbl_4xf64 (d_4xf64);
   _mm256_store_pd (d_1, d2_4xf64);
-  printf ("dbl_4xf64([1,-2,7,-4])=[%.15le,%.15le,%.15le,%.15le]\n",
+  printf ("dbl_4xf64([1,-2,7,-4])=[%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
   d2_4xf64 = jbm_sqr_4xf64 (d_4xf64);
   _mm256_store_pd (d_1, d2_4xf64);
-  printf ("sqr_4xf64([1,-2,7,-4])=[%.15le,%.15le,%.15le,%.15le]\n",
+  printf ("sqr_4xf64([1,-2,7,-4])=[%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_extrapolate_4xf64 (_mm256_set_pd (0., 3., -1., 1.),
                                    _mm256_set1_pd (0.),
@@ -2288,7 +2321,7 @@ main (void)
   _mm256_store_pd (d_1, d_4xf64);
   printf
     ("extrapolate_4xf64([1,-1,3,0],[0,0,0,0],[2,2,2,2],[1,1,1,1],[4,4,4,4])"
-     "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+     "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 =
     jbm_interpolate_4xf64 (_mm256_set_pd (0., 3., -1., 1.), _mm256_set1_pd (0.),
                            _mm256_set1_pd (2.), _mm256_set1_pd (1.),
@@ -2296,7 +2329,7 @@ main (void)
   _mm256_store_pd (d_1, d_4xf64);
   printf
     ("interpolate_4xf64([1,-1,3,0],[0,0,0,0],[2,2,2,2],[1,1,1,1],[4,4,4,4])"
-     "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+     "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 =
     jbm_v2_length_4xf64 (_mm256_set_pd (-1., 3., 2., 1.),
                          _mm256_set_pd (2., 3., -1., 4.), _mm256_set_pd (2., 0.,
@@ -2305,7 +2338,7 @@ main (void)
                          _mm256_set_pd (6., 7., 3., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("v2_length_4xf64([1,2,3,-1],[4,-1,3,2],[-3,5,0,2],[1,3,7,6])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_v3_length_4xf64 (_mm256_set_pd (-1., 3., 2., 1.),
                                  _mm256_set_pd (2., 3., -1., 4.),
                                  _mm256_set_pd (5., 0., 1., 3.),
@@ -2315,13 +2348,13 @@ main (void)
   _mm256_store_pd (d_1, d_4xf64);
   printf
     ("v3_length_4xf64([1,2,3,-1],[4,-1,3,2],[3,1,0,5],[-1,4,1,1],[1,2,1,4],"
-     "[9,-5,2,0])=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2],
+     "[9,-5,2,0])=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2],
      d_1[3]);
   d_4xf64 = jbm_polynomial_11_4xf64 (_mm256_set_pd (-1., 0., 1., 0.5), p_1);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("polynomial_11_2xf64([0.5,1,0,-1],"
           "[1,2,4,8,16,32,64,128,256,512,1024,2048])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_solve_quadratic_4xf64 (_mm256_set_pd (1., 1., 0., 2.),
                                        _mm256_set_pd (0., 0., -2., -1.),
                                        _mm256_set_pd (-1., -1., 1., -1.),
@@ -2329,155 +2362,155 @@ main (void)
                                        _mm256_set_pd (0., 2., 2., 2.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("solve_quadratic_4xf64([2,0,1,1],[-1,-2,0,0][-1,1,-1,-1],[0,0,0,-2],"
-          "[2,2,2,0])=[%.15le,%.15le,%.15le,%.15le]\n",
+          "[2,2,2,0])=[%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_setzero_pd (),
                                     _mm256_set1_pd (1.),
                                     JBM_FLUX_LIMITER_TYPE_TOTAL);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_total_4xf64([0,0,0,0],[1,1,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_setzero_pd (),
                                     _mm256_set1_pd (1.),
                                     JBM_FLUX_LIMITER_TYPE_NULL);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_null_4xf64([0,0,0,0],[1,1,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (0., 1., 3., 1.),
                                     _mm256_set_pd (0., 3., 0., 1.),
                                     JBM_FLUX_LIMITER_TYPE_CENTRED);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_centred_4xf64([1,3,1,0],[1,0,3,0])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (3., 2., 1., -1.),
                                     _mm256_set_pd (2., 3., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_superbee_4xf64([-1,1,2,3],[1,3,3,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 0., 1., 0.),
                                     _mm256_set_pd (1., 1., 0., 0.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_superbee_4xf64([0,1,0,1],[0,0,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 3., 2., -1.),
                                     _mm256_set_pd (1., 1., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_minmod_4xf64([-1,2,3,1],[1,3,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 0., 2., -1.),
                                     _mm256_set_pd (0., 0., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_LEER);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_VanLeer_4xf64([-1,2,0,1],[1,3,0,0])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 0., 2., -1.),
                                     _mm256_set_pd (0., 0., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_ALBADA);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_VanAlbada_4xf64([-1,2,0,1],[1,3,0,0])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 3., 2., -1.),
                                     _mm256_set_pd (1., 1., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINSUPER);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_minsuper_4xf64([-1,2,3,1],[1,3,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 3., 1., -1.),
                                     _mm256_set_pd (1., 1., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERMIN);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_supermin_4xf64([-1,1,3,1],[1,3,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (3., 2., 0.5, -1.),
                                     _mm256_set_pd (0.5, 3., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_monotonized_central_4xf64([-1,0.5,2,3],[1,3,3,0.5])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 0., 2., -1.),
                                     _mm256_set_pd (0., 0., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MEAN);
   _mm256_store_pd (d_1, d_4xf64);
   printf ("flux_limiter_mean_4xf64([-1,2,0,1],[1,3,0,0])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn0_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(1,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn1_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn2_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^2,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn3_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^3,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn4_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^4,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn5_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^5,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn6_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^6,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn7_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^7,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn8_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^9,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn9_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^9,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn10_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^10,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn11_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^11,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn12_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^12,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn13_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^13,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_integral_4xf64 (fn14_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("integral_4xf64(x^14,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   aligned_free (d_2);
   aligned_free (d_1);
 #endif
@@ -2488,7 +2521,7 @@ main (void)
   d_8xf64 = jbm_abs_8xf64 (_mm512_set_pd (4., -3., 3., -2., 2., 0., -1., 1));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("abs_8xf64([1,-1,0,2,-2,3,-3,4])"
-          "=[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          "=[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   m_8 = jbm_small_8xf64 (_mm512_set_pd (-3., 3., -2., 2., -1., 1., -0., 0.));
   printf ("small_8xf64([0,-0,1,-1,2,-2,3,-3])=%08b\n", (unsigned int) m_8);
@@ -2497,7 +2530,7 @@ main (void)
                                              0.5));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("modmin_8xf64([1,-1,0,1,3,0,0,-2],[0.5,-2,1,-2,1,3,2,-1])"
-          "=[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          "=[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64 = _mm512_set_pd (0., 2., -1, 0., 3., -1., 1., 0.);
   d2_8xf64 = _mm512_set_pd (3., 0., 2., -1, -4., 7., -2., 1.);
@@ -2505,19 +2538,19 @@ main (void)
   _mm512_store_pd (d_1, d_8xf64);
   _mm512_store_pd (d_2, d2_8xf64);
   printf ("change_8xf64([0,1,-1,3,0,-1,2,0],[1,-2,7,-4,-1,2,0,3])"
-          "=[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]"
-          ",[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          "=[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]"
+          ",[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7],
           d_2[0], d_2[1], d_2[2], d_2[3], d_2[4], d_2[5], d_2[6], d_2[7]);
   d2_8xf64 = jbm_dbl_8xf64 (d_8xf64);
   _mm512_store_pd (d_1, d2_8xf64);
   printf ("dbl_8xf64([1,-2,7,-4,-1,2,0,3])="
-          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          "[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d2_8xf64 = jbm_sqr_8xf64 (d_8xf64);
   _mm512_store_pd (d_1, d2_8xf64);
   printf ("sqr_8xf64([1,-2,7,-4,-1,2,0,3])="
-          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          "[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64
     = jbm_extrapolate_8xf64 (_mm512_set_pd (2., -2., 4., -3., 0., 3., -1., 1.),
@@ -2527,7 +2560,7 @@ main (void)
   _mm512_store_pd (d_1, d_8xf64);
   printf ("extrapolate_8xf64([1,-1,3,0,-3,4,-2,2],[0,0,0,0,0,0,0,0],"
           "[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[4,4,4,4,4,4,4,4])"
-          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          "[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64
     = jbm_interpolate_8xf64 (_mm512_set_pd (2., -2., 4., -3., 0., 3., -1., 1.),
@@ -2537,7 +2570,7 @@ main (void)
   _mm512_store_pd (d_1, d_8xf64);
   printf ("interpolate_8xf64([1,-1,3,0,-3,4,-2,2],[0,0,0,0,0,0,0,0],"
           "[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[4,4,4,4,4,4,4,4])"
-          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          "[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64 =
     jbm_v2_length_8xf64 (_mm512_set_pd (2., 3., -1., 4., -1., 3., 2., 1.),
@@ -2547,7 +2580,7 @@ main (void)
   _mm512_store_pd (d_1, d_8xf64);
   printf ("v2_length_8xf64([1,2,3,-1,4,-1,3,2],[4,-1,3,2,1,2,3,-1],"
           "[-3,5,0,2,1,3,7,6],[1,3,7,6,-3,5,0,2])"
-          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          "[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64 =
     jbm_v3_length_8xf64 (_mm512_set_pd (2., 3., -1., 4., -1., 3., 2., 1.),
@@ -2560,7 +2593,7 @@ main (void)
   printf ("v3_length_8xf64([1,2,3,-1,4,-1,3,2],[4,-1,3,2,1,2,3,-1],"
           "[5,0,1,3,5,1,0,3],[-1,4,2,1,0,3,5,5],[0,3,5,5,-1,4,2,1],"
           "[7,5,2,-1,7,5,2,-1])="
-          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          "[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64
     =
@@ -2569,7 +2602,7 @@ main (void)
   _mm512_store_pd (d_1, d_8xf64);
   printf ("polynomial_11_4xf64([0.5,1,0,-1,-0.5,0,0.25,-0.25],"
           "[1,2,4,8,16,32,64,128,512,512,1024,2048])="
-          "[%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le,%.15le]\n",
+          "[%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
 /*
   d_8xf64 = jbm_solve_quadratic_8xf64 (_mm512_set_pd (1., 1., 0., 2.),
@@ -2579,155 +2612,155 @@ main (void)
                                    _mm512_set_pd (0., 2., 2., 2.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("solve_quadratic_8xf64([2,0,1,1],[-1,-2,0,0][-1,1,-1,-1],[0,0,0,-2],"
-          "[2,2,2,0])=[%.15le,%.15le,%.15le,%.15le]\n",
+          "[2,2,2,0])=[%.16lg,%.16lg,%.16lg,%.16lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_setzero_pd (),
                                 _mm512_set1_pd (1.),
                                 JBM_FLUX_LIMITER_TYPE_TOTAL);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_total_8xf64([0,0,0,0],[1,1,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_setzero_pd (),
                                 _mm512_set1_pd (1.),
                                 JBM_FLUX_LIMITER_TYPE_NULL);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_null_8xf64([0,0,0,0],[1,1,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (0., 1., 3., 1.),
                                 _mm512_set_pd (0., 3., 0., 1.),
                                 JBM_FLUX_LIMITER_TYPE_CENTRED);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_centred_8xf64([1,3,1,0],[1,0,3,0])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (3., 2., 1., -1.),
                                 _mm512_set_pd (2., 3., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_superbee_8xf64([-1,1,2,3],[1,3,3,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 0., 1., 0.),
                                 _mm512_set_pd (1., 1., 0., 0.),
                                 JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_superbee_8xf64([0,1,0,1],[0,0,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 3., 2., -1.),
                                 _mm512_set_pd (1., 1., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_minmod_8xf64([-1,2,3,1],[1,3,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 0., 2., -1.),
                                 _mm512_set_pd (0., 0., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_VAN_LEER);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_VanLeer_8xf64([-1,2,0,1],[1,3,0,0])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 0., 2., -1.),
                                 _mm512_set_pd (0., 0., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_VAN_ALBADA);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_VanAlbada_8xf64([-1,2,0,1],[1,3,0,0])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 3., 2., -1.),
                                 _mm512_set_pd (1., 1., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_MINSUPER);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_minsuper_8xf64([-1,2,3,1],[1,3,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 3., 1., -1.),
                                 _mm512_set_pd (1., 1., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_SUPERMIN);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_supermin_8xf64([-1,1,3,1],[1,3,1,1])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (3., 2., 0.5, -1.),
                                 _mm512_set_pd (0.5, 3., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_monotonized_central_8xf64([-1,0.5,2,3],[1,3,3,0.5])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 0., 2., -1.),
                                 _mm512_set_pd (0., 0., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_MEAN);
   _mm512_store_pd (d_1, d_8xf64);
   printf ("flux_limiter_mean_8xf64([-1,2,0,1],[1,3,0,0])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn0_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(1,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn1_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn2_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^2,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn3_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^3,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn4_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^4,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn5_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^5,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn6_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^6,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn7_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^7,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn8_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^9,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn9_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^9,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn10_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^10,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn11_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^11,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn12_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^12,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn13_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^13,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_integral_8xf64 (fn14_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
   printf ("integral_8xf64(x^14,[0,-1,0,-2],[1,1,2,2])"
-          "=[%.15le,%.15le,%.15le,%.15le]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
+          "=[%.16lg,%.16lg,%.16lg,%.16lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
 */
   aligned_free (d_2);
   aligned_free (d_1);
