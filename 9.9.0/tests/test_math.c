@@ -968,7 +968,7 @@ check_uni_f32 (float (*f) (float), float (*g) (float), float prec,
       g0 = g (x);
       if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
         {
-          printf ("x=%.6e f=%.6e g=%.6e\n", x, f0, g0);
+          printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
           return 0;
         }
     }
@@ -987,7 +987,7 @@ check_logn_f32 (float (*f) (float), float (*g) (float), float prec, float x0)
         break;
       if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
         {
-          printf ("x=%.6g f=%.6g g=%.6g\n", x, f0, g0);
+          printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
           return 0;
         }
     }
@@ -999,7 +999,7 @@ check_logn_f32 (float (*f) (float), float (*g) (float), float prec, float x0)
         break;
       if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
         {
-          printf ("x=%.6g f=%.6g g=%.6g\n", x, f0, g0);
+          printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
           return 0;
         }
     }
@@ -1095,6 +1095,7 @@ check_uni (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
         x = xmax;
       f0 = f (x);
       g0 = g (x);
+// Fix: 1.f      
       if (FABS (f0 / g0 - 1.f) > prec && FABS (f0 - g0) > prec)
         {
           printf ("x=" FWF " f=" FWF " g=" FWF "\n", x, f0, g0);
@@ -1109,6 +1110,7 @@ check_logn (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
             JBFLOAT x0)
 {
   JBFLOAT x, f0, g0;
+// Fix: .f      
   for (x = x0; isfinite (x); x *= 2.f)
     {
       f0 = f (x);
@@ -1139,6 +1141,7 @@ check_logn (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
 int
 check_log (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec)
 {
+// Fix: .f      
   if (!check_logn (f, g, prec, 1.f))
     return 0;
   return check_logn (f, g, prec, -1.f);
@@ -1160,6 +1163,7 @@ check_unil (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE (*g) (JBDOUBLE), JBDOUBLE prec,
         x = xmax;
       f0 = f (x);
       g0 = g (x);
+// Fix: .f      
       if (FABSL (f0 / g0 - 1.) > prec && FABSL (f0 - g0) > prec)
         {
           printf ("x=" FWL " f=" FWL " g=" FWL "\n", x, f0, g0);
@@ -1229,41 +1233,63 @@ main (void)
   xf = jbm_rest_f32 (-87.f, 4.f);
   printf ("rest(-87,4)=%g\n", xf);
   xf = jbm_frexp_f32 (2.f, &i);
-  printf ("frexp(2)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  yf = frexpf (2.f, &is);
+  printf ("frexp(2)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
+  printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
+          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
   xf = jbm_frexp_f32 (2.5f, &i);
-  printf ("frexp(2.5)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  yf = frexpf (2.5f, &is);
+  printf ("frexp(2.5)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
+  printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
+          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
   xf = jbm_frexp_f32 (2501.f, &i);
-  printf ("frexp(2501)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  yf = frexpf (2501.f, &is);
+  printf ("frexp(2501)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
+  printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
+          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
   xf = jbm_frexp_f32 (1e-16f, &i);
-  printf ("frexp(1e-16)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  yf = frexpf (1e-16f, &is);
+  printf ("frexp(1e-16)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
+  printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
+          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
   xf = jbm_frexp_f32 (1e-40f, &i);
-  printf ("frexp(1e-40)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  yf = frexpf (1e-40f, &is);
+  printf ("frexp(1e-40)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
+  printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
+          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
+  xf = jbm_frexp_f32 (1e-45f, &i);
+  yf = frexpf (1e-45f, &is);
+  printf ("frexp(1e-45)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
+  printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
+          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
+  xf = jbm_frexp_f32 (1e-44f, &i);
+  yf = frexpf (1e-44f, &is);
+  printf ("frexp(1e-44)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
+  printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
+          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
   xf = jbm_frexp_f32 (0.f, &i);
-  printf ("frexp(0)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  yf = frexpf (0.f, &is);
+  printf ("frexp(0)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
+  printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
+          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
   xf = jbm_frexp_f32 (-2.f, &i);
-  printf ("frexp(-2)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  printf ("frexp(-2)=%.8g*2^(%d)\n", xf, i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
   xf = jbm_frexp_f32 (-2.5f, &i);
-  printf ("frexp(-2.5)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  printf ("frexp(-2.5)=%.8g*2^(%d)\n", xf, i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
   xf = jbm_frexp_f32 (-2501.f, &i);
-  printf ("frexp(-2501)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  printf ("frexp(-2501)=%.8g*2^(%d)\n", xf, i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
   xf = jbm_frexp_f32 (-1e-16f, &i);
-  printf ("frexp(-1e-16)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  printf ("frexp(-1e-16)=%.8g*2^(%d)\n", xf, i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
   xf = jbm_frexp_f32 (-1e-40f, &i);
-  printf ("frexp(-1e-40)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  printf ("frexp(-1e-40)=%.8g*2^(%d)\n", xf, i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
   xf = jbm_frexp_f32 (0.f, &i);
-  printf ("frexp(-0)=%g*2^(%d)\n", xf, i);
-  printf ("ldexp(%g,%d)=%g\n", xf, i, jbm_ldexp_f32 (xf, i));
+  printf ("frexp(-0)=%.8g*2^(%d)\n", xf, i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
   if (!check_log_f32 (jbm_exp2_f32, exp2f, FLT_EPSILON))
     return 0;
   printf ("exp2(-160)=%.8g\n", jbm_exp2_f32 (-150.f));
@@ -1273,18 +1299,26 @@ main (void)
   printf ("exp2(53)=%.8g\n", jbm_exp2_f32 (53.f));
   printf ("exp2(127)=%.8g\n", jbm_exp2_f32 (127.f));
   printf ("exp2(128)=%.8g\n", jbm_exp2_f32 (128.f));
+  if (!check_log_f32 (jbm_exp_f32, expf, 8. * FLT_EPSILON))
+    return 0;
   printf ("exp(-2)=%.8g\n", jbm_exp_f32 (-2.f));
   printf ("exp(0)=%.8g\n", jbm_exp_f32 (0.f));
   printf ("exp(2)=%.8g\n", jbm_exp_f32 (2.f));
+  if (!check_log_f32 (jbm_exp10_f32, exp10f, 16. * FLT_EPSILON))
+    return 0;
   printf ("exp10(-40)=%.8g\n", jbm_exp10_f32 (-40.f));
   printf ("exp10(-2)=%.8g\n", jbm_exp10_f32 (-2.f));
   printf ("exp10(0)=%.8g\n", jbm_exp10_f32 (0.f));
   printf ("exp10(2)=%.8g\n", jbm_exp10_f32 (2.f));
+  if (!check_log_f32 (jbm_expm1_f32, expm1f, 8. * FLT_EPSILON))
+    return 0;
   printf ("expm1(-2)=%.8g\n", jbm_expm1_f32 (-2.f));
   printf ("expm1(-0.1)=%.8g\n", jbm_expm1_f32 (-0.1f));
   printf ("expm1(0)=%.8g\n", jbm_expm1_f32 (0.f));
   printf ("expm1(0.01)=%.8g\n", jbm_expm1_f32 (0.01f));
   printf ("expm1(2)=%.8g\n", jbm_expm1_f32 (2.f));
+  if (!check_logn_f32 (jbm_log2_f32, log2f, FLT_EPSILON, 1.f))
+    return 0;
   printf ("log2(10)=%.8g=%.8g\n", jbm_log2_f32 (10.f), M_LN10f / M_LN2f);
   printf ("log2(e)=%.8g=%.8g\n", jbm_log2_f32 (M_Ef), M_LOG2Ef);
   printf ("log2(1)=%.8g\n", jbm_log2_f32 (1.f));
@@ -1293,9 +1327,13 @@ main (void)
   printf ("log2(1e-40)=%.8g\n", jbm_log2_f32 (1e-40f));
   printf ("log2(0)=%.8g\n", jbm_log2_f32 (0.f));
   printf ("log2(-1)=%.8g\n", jbm_log2_f32 (-1.f));
+  if (!check_logn_f32 (jbm_log_f32, logf, FLT_EPSILON, 1.f))
+    return 0;
   printf ("log(e)=%.8g\n", jbm_log_f32 (M_Ef));
   printf ("log(1)=%.8g\n", jbm_log_f32 (1.f));
   printf ("log(1/e)=%.8g\n", jbm_log_f32 (1.f / M_Ef));
+  if (!check_logn_f32 (jbm_log10_f32, log10f, FLT_EPSILON, 1.f))
+    return 0;
   printf ("log10(10)=%.8g\n", jbm_log10_f32 (10.f));
   printf ("log10(1)=%.8g\n", jbm_log10_f32 (1.f));
   printf ("log10(1/10)=%.8g\n", jbm_log10_f32 (0.1f));
@@ -1323,6 +1361,12 @@ main (void)
   xf = -M_PIf / 6.f;
   printf ("sinwc(-pi/6)=%.8le=%.8le\n", sin (xf), jbm_sinwc_f32 (xf));
   printf ("coswc(-pi/6)=%.8le=%.8le\n", cos (xf), jbm_coswc_f32 (xf));
+  if (!check_uni_f32 (jbm_sin_f32, sinf, FLT_EPSILON, -M_PI, M_PI, 1000))
+    return 0;
+  if (!check_uni_f32 (jbm_cos_f32, cosf, FLT_EPSILON, -M_PI, M_PI, 1000))
+    return 0;
+  if (!check_uni_f32 (jbm_tan_f32, tanf, FLT_EPSILON, -M_PI, M_PI, 1000))
+    return 0;
   for (i = 0; i < 13; ++i)
     {
       xf = i * M_PIf / 6.f;
@@ -1330,6 +1374,12 @@ main (void)
       printf ("cos(%upi/6)=%.8le=%.8le\n", i, cos (xf), jbm_cos_f32 (xf));
       printf ("tan(%upi/6)=%.8le=%.8le\n", i, tan (xf), jbm_tan_f32 (xf));
     }
+  xf = INFINITY;
+  printf ("sin(infinity)=%.8le=%.8le\n", i, sin (xf), jbm_sin_f32 (xf));
+  printf ("cos(infinity)=%.8le=%.8le\n", i, cos (xf), jbm_cos_f32 (xf));
+  printf ("tan(infinity)=%.8le=%.8le\n", i, tan (xf), jbm_tan_f32 (xf));
+  if (!check_log_f32 (jbm_atan_f32, atanf, FLT_EPSILON))
+    return 0;
   printf ("atan(infinity)=%.8g=%.8g\n", jbm_atan_f32 (INFINITY), M_PI_2f);
   printf ("atan(sqrt(3))=%.8g=%.8g\n", jbm_atan_f32 (sqrt (3.f)), M_PIf / 3.f);
   printf ("atan(1)=%.8g=%.8g\n", jbm_atan_f32 (1.f), M_PI_4f);
@@ -1348,22 +1398,32 @@ main (void)
   printf ("atan2(-1,1)=%.8g=%.8g\n", jbm_atan2_f32 (-1.f, 1.f), -M_PI_4f);
   printf ("atan2(-1,-1)=%.8g=%.8g\n",
           jbm_atan2_f32 (-1.f, -1.f), -3.f * M_PI_4f);
+  if (!check_log_f32 (jbm_asin_f32, asinf, FLT_EPSILON))
+    return 0;
   printf ("asin(1)=%.8g=%.8g\n", jbm_asin_f32 (1.f), M_PI_2f);
   printf ("asin(1/2)=%.8g=%.8g\n", jbm_asin_f32 (0.5f), M_PIf / 6.f);
   printf ("asin(0)=%.8g=0\n", jbm_asin_f32 (0.f));
   printf ("asin(-1/2)=%.8g=%.8g\n", jbm_asin_f32 (-0.5f), -M_PIf / 6.f);
   printf ("asin(-1)=%.8g=%.8g\n", jbm_asin_f32 (-1.f), -M_PI_2f);
+  if (!check_log_f32 (jbm_acos_f32, acosf, FLT_EPSILON))
+    return 0;
   printf ("acos(1)=%.8g=0\n", jbm_acos_f32 (1.f));
   printf ("acos(1/2)=%.8g=%.8g\n", jbm_acos_f32 (0.5f), M_PIf / 3.f);
   printf ("acos(0)=%.8g=%.8g\n", jbm_acos_f32 (0.f), M_PI_2f);
   printf ("acos(-1/2)=%.8g=%.8g\n", jbm_acos_f32 (-0.5f), 2.f * M_PIf / 3.);
   printf ("acos(-1)=%.8g=%.8g\n", jbm_acos_f32 (-1.f), M_PIf);
+  if (!check_log_f32 (jbm_sinh_f32, sinhf, FLT_EPSILON))
+    return 0;
   printf ("sinh(-1)=%.8g\n", jbm_sinh_f32 (-1.f));
   printf ("sinh(0)=%.8g\n", jbm_sinh_f32 (0.f));
   printf ("sinh(1)=%.8g\n", jbm_sinh_f32 (1.f));
+  if (!check_log_f32 (jbm_cosh_f32, coshf, FLT_EPSILON))
+    return 0;
   printf ("cosh(-1)=%.8g\n", jbm_cosh_f32 (-1.f));
   printf ("cosh(0)=%.8g\n", jbm_cosh_f32 (0.f));
   printf ("cosh(1)=%.8g\n", jbm_cosh_f32 (1.f));
+  if (!check_log_f32 (jbm_tanh_f32, tanhf, FLT_EPSILON))
+    return 0;
   printf ("tanh(-inf)=%.8g\n", jbm_tanh_f32 (-INFINITY));
   printf ("tanh(-1)=%.8g\n", jbm_tanh_f32 (-1.f));
   printf ("tanh(0)=%.8g\n", jbm_tanh_f32 (0.f));

@@ -94,18 +94,18 @@ d'exploitation:
 * Debian 12 (Linux)
 * Devuan Linux 5
 * Dragonfly BSD 6.4.0
-* Fedora Linux 39
-* FreeBSD 13.2
+* Fedora Linux 40
+* FreeBSD 14.1
 * Gentoo Linux
 * Linux Mint DE 6
 * MacOS Ventura + Homebrew
 * Manjaro Linux
-* Microsoft Windows 10 + MSYS2
-* NetBSD 9.3
-* OpenBSD 7.6
+* Microsoft Windows 11 + MSYS2
+* NetBSD 10.0
+* OpenBSD 7.5
 * OpenInidiana Hipster
 * OpenSUSE Linux 15.5
-* Ubuntu Linux 24.10
+* Ubuntu Linux 
 
 Avec systèmes Microsoft Windows on doit installer
 [MSYS2](http://sourceforge.net/projects/msys2) et en plus les bibliothèques et
@@ -113,7 +113,7 @@ les outils requis. On peut suivre les instructions détaillées dans le
 didacticiel
 [install-unix](https://github.com/jburguete/install-unix/blob/master/tutorial.pdf).
 
-Avec NetBSD 9.3, pour utiliser le derniére version du compilateur GCC, il faut
+Avec NetBSD 10.0, pour utiliser le derniére version du compilateur GCC, il faut
 faire avant dans le terminal:
 > $ export PATH="/usr/pkg/gcc12/bin:$PATH"
 
@@ -121,7 +121,7 @@ Pour faire le changement permanent on peut ajouter à la dernière ligne du
 fichier ".profile" dans le répertoire racine du utilisateur:
 > PATH="/usr/pkg/gcc12/bin:$PATH"
 
-Avec OpenBSD 7.6 on doit faire avant dans le terminal:
+Avec OpenBSD 7.5 on doit faire avant dans le terminal:
 > $ export AUTOCONF\_VERSION=2.69 AUTOMAKE\_VERSION=1.16
 
 INSTRUCTIONS DE CONSTRUCTION
