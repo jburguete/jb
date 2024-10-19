@@ -61,16 +61,107 @@
 #define JB_ALIGNED
 #endif
 
-#ifndef M_PIl
-#define M_PIl M_PI              ///< high precision pi number.
+#ifndef M_Ef
+#define	M_Ef M_E                ///< single precision e number.
+#endif
+#ifndef M_LOG2Ef
+#define	M_LOG2Ef M_LOG2E        ///< single precision log2(e) number.
+#endif
+#ifndef M_LOG10Ef
+#define	M_LOG10Ef M_LOG10E      ///< single precision log10(e) number.
+#endif
+#ifndef M_LN2f
+#define	M_LN2f M_LN2            ///< single precision log(2) number.
+#endif
+#ifndef M_LN10f
+#define	M_LN10f M_LN10          ///< single precision log(10) number.
+#endif
+#ifndef M_PIf
+#define	M_PIf M_PI              ///< single precision pi number.
+#endif
+#ifndef M_PI_2f
+#define	M_PI_2f M_PI_2          ///< single precision pi/2 number.
+#endif
+#ifndef M_PI_4f
+#define	M_PI_4f M_PI_4          ///< single precision pi/4 number.
+#endif
+#ifndef M_1_PIf
+#define	M_1_PIf M_1_PI          ///< single precision 1/pi number.
+#endif
+#ifndef M_2_PIf
+#define	M_2_PIf M_2_PI          ///< single precision 2/pi number.
+#endif
+#ifndef M_2_SQRTPIf
+#define	M_2_SQRTPIf M_2_SQRTPI  ///< single precision 2/sqrt(pi) number.
+#endif
+#ifndef M_SQRT2f
+#define	M_SQRT2f M_SQRT2        ///< single precision sqrt(2) number.
+#endif
+#ifndef M_SQRT1_2f
+#define	M_SQRT1_2f M_SQRT1_2    ///< single precision sqrt(1/2) number.
+#endif
+#ifndef M_El
+#define	M_El M_E                ///< double precision e number.
+#endif
+#ifndef M_LOG2El
+#define	M_LOG2El M_LOG2E        ///< double precision log2(e) number.
+#endif
+#ifndef M_LOG10El
+#define	M_LOG10El M_LOG10E      ///< double precision log10(e) number.
+#endif
+#ifndef M_LN2l
+#define	M_LN2l M_LN2            ///< double precision log(2) number.
 #endif
 #ifndef M_LN10l
-#define M_LN10l M_LN10          ///< high precision ln(10) number.
+#define	M_LN10l M_LN10          ///< double precision log(10) number.
 #endif
+#ifndef M_PIl
+#define	M_PIl M_PI              ///< double precision pi number.
+#endif
+#ifndef M_PI_2l
+#define	M_PI_2l M_PI_2          ///< double precision pi/2 number.
+#endif
+#ifndef M_PI_4l
+#define	M_PI_4l M_PI_4          ///< double precision pi/4 number.
+#endif
+#ifndef M_1_PIl
+#define	M_1_PIl M_1_PI          ///< double precision 1/pi number.
+#endif
+#ifndef M_2_PIl
+#define	M_2_PIl M_2_PI          ///< double precision 2/pi number.
+#endif
+#ifndef M_2_SQRTPIl
+#define	M_2_SQRTPIl M_2_SQRTPI  ///< double precision 2/sqrt(pi) number.
+#endif
+#ifndef M_SQRT2l
+#define	M_SQRT2l M_SQRT2        ///< double precision sqrt(2) number.
+#endif
+#ifndef M_SQRT1_2l
+#define	M_SQRT1_2l M_SQRT1_2    ///< double precision sqrt(1/2) number.
+#endif
+
 #if !HAVE_EXP10
-#define exp10(x) (exp(x * M_LN10))
-#define exp10l(x) (expl(x * M_LN10l))
+
+static inline float
+exp10f(float x)
+{
+  return expf(x * M_LN10f);
+}
+
+static inline double
+exp10(double x)
+{
+  return exp(x * M_LN10);
+}
+
+static inline long double
+exp10l(long double x)
+{
+  return expl(x * M_LN10l);
+}
+
 #endif
+
 #if HAVE_ALIGNED_ALLOC
 #define aligned_free free
 #else
