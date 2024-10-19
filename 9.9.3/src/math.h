@@ -2622,7 +2622,7 @@ static inline double
 jbm_rational_1_f64 (const double x,     ///< double value.
                     const double *p)    ///< array of coefficients.
 {
-  return p[0] / (1l + x * p[1]);
+  return p[0] / (1. + x * p[1]);
 }
 
 /**
@@ -2634,7 +2634,7 @@ static inline double
 jbm_rational_2_f64 (const double x,     ///< double value.
                     const double *p)    ///< array of coefficients.
 {
-  return jbm_polynomial_1_f64 (x, p) / (1l + x * p[2]);
+  return jbm_polynomial_1_f64 (x, p) / (1. + x * p[2]);
 }
 
 /**
@@ -2647,7 +2647,7 @@ jbm_rational_3_f64 (const double x,     ///< double value.
                     const double *p)    ///< array of coefficients.
 {
   return
-    jbm_polynomial_1_f64 (x, p) / (1l + x * jbm_polynomial_1_f64 (x, p + 2));
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 2));
 }
 
 /**
@@ -2660,7 +2660,7 @@ jbm_rational_4_f64 (const double x,     ///< double value.
                     const double *p)    ///< array of coefficients.
 {
   return
-    jbm_polynomial_2_f64 (x, p) / (1l + x * jbm_polynomial_1_f64 (x, p + 3));
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 3));
 }
 
 /**
@@ -2673,7 +2673,7 @@ jbm_rational_5_f64 (const double x,     ///< double value.
                     const double *p)    ///< array of coefficients.
 {
   return
-    jbm_polynomial_2_f64 (x, p) / (1l + x * jbm_polynomial_2_f64 (x, p + 3));
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 3));
 }
 
 /**
@@ -2686,7 +2686,7 @@ jbm_rational_6_f64 (const double x,     ///< double value.
                     const double *p)    ///< array of coefficients.
 {
   return
-    jbm_polynomial_3_f64 (x, p) / (1l + x * jbm_polynomial_2_f64 (x, p + 4));
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 4));
 }
 
 /**
@@ -2699,7 +2699,7 @@ jbm_rational_7_f64 (const double x,     ///< double value.
                     const double *p)    ///< array of coefficients.
 {
   return
-    jbm_polynomial_3_f64 (x, p) / (1l + x * jbm_polynomial_3_f64 (x, p + 4));
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 4));
 }
 
 /**
@@ -2712,7 +2712,7 @@ jbm_rational_8_f64 (const double x,     ///< double value.
                     const double *p)    ///< array of coefficients.
 {
   return
-    jbm_polynomial_4_f64 (x, p) / (1l + x * jbm_polynomial_3_f64 (x, p + 5));
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 5));
 }
 
 /**
@@ -2725,7 +2725,7 @@ jbm_rational_9_f64 (const double x,     ///< double value.
                     const double *p)    ///< array of coefficients.
 {
   return
-    jbm_polynomial_4_f64 (x, p) / (1l + x * jbm_polynomial_4_f64 (x, p + 5));
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 5));
 }
 
 /**
@@ -2738,7 +2738,7 @@ jbm_rational_10_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_5_f64 (x, p) / (1l + x * jbm_polynomial_4_f64 (x, p + 6));
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 6));
 }
 
 /**
@@ -2751,7 +2751,7 @@ jbm_rational_11_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_5_f64 (x, p) / (1l + x * jbm_polynomial_5_f64 (x, p + 6));
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 6));
 }
 
 /**
@@ -2764,7 +2764,7 @@ jbm_rational_12_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_6_f64 (x, p) / (1l + x * jbm_polynomial_5_f64 (x, p + 7));
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 7));
 }
 
 /**
@@ -2777,7 +2777,7 @@ jbm_rational_13_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_6_f64 (x, p) / (1l + x * jbm_polynomial_6_f64 (x, p + 7));
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 7));
 }
 
 /**
@@ -2790,7 +2790,7 @@ jbm_rational_14_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_7_f64 (x, p) / (1l + x * jbm_polynomial_6_f64 (x, p + 8));
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 8));
 }
 
 /**
@@ -2803,7 +2803,7 @@ jbm_rational_15_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_7_f64 (x, p) / (1l + x * jbm_polynomial_7_f64 (x, p + 8));
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 8));
 }
 
 /**
@@ -2816,7 +2816,7 @@ jbm_rational_16_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_8_f64 (x, p) / (1l + x * jbm_polynomial_7_f64 (x, p + 9));
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 9));
 }
 
 /**
@@ -2829,7 +2829,7 @@ jbm_rational_17_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_8_f64 (x, p) / (1l + x * jbm_polynomial_8_f64 (x, p + 9));
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 9));
 }
 
 /**
@@ -2842,7 +2842,7 @@ jbm_rational_18_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_9_f64 (x, p) / (1l + x * jbm_polynomial_8_f64 (x, p + 10));
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 10));
 }
 
 /**
@@ -2855,7 +2855,7 @@ jbm_rational_19_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_9_f64 (x, p) / (1l + x * jbm_polynomial_9_f64 (x, p + 10));
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 10));
 }
 
 /**
@@ -2868,7 +2868,7 @@ jbm_rational_20_f64 (const double x,    ///< double value.
                      const double *p)   ///< array of coefficients.
 {
   return
-    jbm_polynomial_10_f64 (x, p) / (1l + x * jbm_polynomial_9_f64 (x, p + 11));
+    jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 11));
 }
 
 /**
