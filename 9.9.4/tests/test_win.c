@@ -105,6 +105,7 @@ cb_open2 (JBWGraphic *graphic)
 int
 main (int argn, char **argc)
 {
+  char win_title[JB_BUFFER_SIZE];
 #if HAVE_GTKGLAREA
   JBWGraphic *graphic;
 #endif
@@ -200,7 +201,9 @@ main (int argn, char **argc)
 #else
   window = (GtkWindow *) gtk_window_new (GTK_WINDOW_TOPLEVEL);
 #endif
-  gtk_window_set_title (window, "test_win");
+  snprintf (win_title, JB_BUFFER_SIZE, "GTK %u: test_win",
+            (unsigned int) GTK_MAJOR_VERSION);
+  gtk_window_set_title (window, win_title);
   gtk_window_set_child (window, GTK_WIDGET (grid));
 #if HAVE_GTKGLAREA
   jbw_graphic_loop_pointer = g_main_loop_new (NULL, 0);

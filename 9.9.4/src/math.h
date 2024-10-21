@@ -1719,8 +1719,9 @@ jbm_sincoswc_f32 (const float x,
                   float *s,     ///< pointer to the sin function value.
                   float *c)     ///< pointer to the cos function value.
 {
-  *s = jbm_sinwc_f32 (x);
-  *c = jbm_coswc_f32 (x);
+  float s0;
+  *s = s0 = jbm_sinwc_f32 (x);
+  *c = sqrtf (1.f - s0 * s0);
 }
 
 /**
@@ -1733,16 +1734,14 @@ static inline float
 jbm_sin_f32 (const float x)     ///< float number.
 {
   float y;
-  unsigned int i;
   y = jbm_rest_f32 (x, 2.f * M_PIf);
-  i = (unsigned int) floorf (y / M_PI_4f);
-  if (i < 1)
+  if (y < M_PI_4f)
     return jbm_sinwc_f32 (y);
-  if (i < 3)
+  if (y < 3.f * M_PI_4f)
     return jbm_coswc_f32 (M_PI_2f - y);
-  if (i < 5)
+  if (y < 5.f * M_PI_4f)
     return jbm_sinwc_f32 (M_PIf - y);
-  if (i < 7)
+  if (y < 7.f * M_PI_4f)
     return -jbm_coswc_f32 (3.f * M_PI_2f - y);
   return jbm_sinwc_f32 (y - 2.f * M_PIf);
 }
@@ -1757,16 +1756,14 @@ static inline float
 jbm_cos_f32 (const float x)     ///< float number.
 {
   float y;
-  unsigned int i;
   y = jbm_rest_f32 (x, 2.f * M_PIf);
-  i = (unsigned int) floorf (y / M_PI_4f);
-  if (i < 1)
+  if (y < M_PI_4f)
     return jbm_coswc_f32 (y);
-  if (i < 3)
+  if (y < 3.f * M_PI_4f)
     return jbm_sinwc_f32 (M_PI_2f - y);
-  if (i < 5)
+  if (y < 5.f * M_PI_4f)
     return -jbm_coswc_f32 (M_PIf - y);
-  if (i < 7)
+  if (y < 7.f * M_PI_4f)
     return jbm_sinwc_f32 (y - 3.f * M_PI_2f);
   return jbm_coswc_f32 (y - 2.f * M_PIf);
 }
@@ -1782,38 +1779,23 @@ jbm_sincos_f32 (const float x,
                 float *c)       ///< pointer to the cos function value.
 {
   float y;
-  unsigned int i;
   y = jbm_rest_f32 (x, 2.f * M_PIf);
-  i = (unsigned int) floorf (y / M_PI_4f);
-  if (i < 1)
+  if (y < M_PI_4f)
+    jbm_sincoswc_f32 (y, s, c);
+  else if (y < 3.f * M_PI_4f)
+    jbm_sincoswc_f32 (M_PI_2f - y, c, s);
+  else if (y < 5.f * M_PI_4f)
     {
-      *s = jbm_sinwc_f32 (y);
-      *c = jbm_coswc_f32 (y);
+      jbm_sincoswc_f32 (M_PIf - y, s, c);
+      *c = -(*c);
     }
-  else if (i < 3)
+  else if (y < 7.f * M_PI_4f)
     {
-      y = M_PI_2f - y;
-      *s = jbm_coswc_f32 (y);
-      *c = jbm_sinwc_f32 (y);
-    }
-  else if (i < 5)
-    {
-      y = M_PIf - y;
-      *s = jbm_sinwc_f32 (y);
-      *c = -jbm_coswc_f32 (y);
-    }
-  else if (i < 7)
-    {
-      y -= 3.f * M_PI_2f;
-      *s = -jbm_coswc_f32 (y);
-      *c = jbm_sinwc_f32 (y);
+      jbm_sincoswc_f32 (y - 3.f * M_PI_2f, c, s);
+      *s = -(*s);
     }
   else
-    {
-      y -= 2.f * M_PIf;
-      *s = jbm_sinwc_f32 (y);
-      *c = jbm_coswc_f32 (y);
-    }
+    jbm_sincoswc_f32 (y- 2.f * M_PIf, s, c);
 }
 
 /**
@@ -3015,7 +2997,8 @@ jbm_logwc_f64 (const double x)  ///< double number.
   };
   double x1;
   x1 = x - 1.;
-  return x1 * jbm_rational_12_f64 (x1, a);
+  return x1 * jbm_polynomial_5_f64 (x1, a)
+    / (1. + x1 * jbm_polynomial_6_f64 (x1, a + 6));
 }
 
 /**
@@ -3257,19 +3240,17 @@ jbm_sincos_f64 (const double x,
   y = jbm_rest_f64 (x, 2. * M_PI);
   if (y < M_PI_4)
     jbm_sincoswc_f64 (y, s, c);
-  if (y < 3. * M_PI_4)
+  else if (y < 3. * M_PI_4)
     jbm_sincoswc_f64 (M_PI_2 - y, c, s);
-  if (y < 5. * M_PI_4)
+  else if (y < 5. * M_PI_4)
     {
-      y = M_PI - y;
-      *s = jbm_sinwc_f64 (y);
-      *c = -jbm_coswc_f64 (y);
+      jbm_sincoswc_f64 (M_PI - y, s, c);
+      *c = -(*c);
     }
-  if (y < 7. * M_PI_4)
+  else if (y < 7. * M_PI_4)
     {
-      y -= 3. * M_PI_2;
-      *s = -jbm_coswc_f64 (y);
-      *c = jbm_sinwc_f64 (y);
+      jbm_sincoswc_f64 (y - 3. * M_PI_2, c, s);
+      *s = -(*s);
     }
   else
     jbm_sincoswc_f64 (y - 2. * M_PI, s, c);
