@@ -41,6 +41,7 @@ test_json_c = $(TESTS)test_json.c
 test_win_c = $(TESTS)test_win.c
 index_sort_c = $(TESTS)index_sort.c
 check_sort_c = $(TESTS)check_sort.c
+efficiency_math_c = $(TESTS)efficiency_math.c
 
 jb_config_pgo = $(OBJ)jb_config@SUFFIX@.pgo
 def_pgo = $(OBJ)def@SUFFIX@.pgo
@@ -55,6 +56,7 @@ test_json_pgo = $(OBJ)test_json@SUFFIX@.pgo
 test_win_pgo = $(OBJ)test_win@SUFFIX@.pgo
 index_sort_pgo = $(OBJ)index_sort@SUFFIX@.pgo
 check_sort_pgo = $(OBJ)check_sort@SUFFIX@.pgo
+efficiency_math_pgo = $(OBJ)efficiency_math@SUFFIX@.pgo
 
 libjbpgo = $(BINPGO)libjbpgo@SUFFIX@@SO@
 libjbmpgo = $(BINPGO)libjbmpgo@SUFFIX@@SO@
@@ -69,6 +71,7 @@ test_json_binpgo = $(BINPGO)test_jsonpgo@SUFFIX@@EXE@
 test_win_binpgo = $(BINPGO)test_winpgo@SUFFIX@@EXE@
 index_sort_binpgo = $(BINPGO)index_sortpgo@SUFFIX@@EXE@
 check_sort_binpgo = $(BINPGO)check_sortpgo@SUFFIX@@EXE@
+efficiency_math_binpgo = $(BINPGO)efficiency_mathpgo@SUFFIX@@EXE@
 
 jb_config_o = $(OBJ)jb_config@SUFFIX@.o
 def_o = $(OBJ)def@SUFFIX@.o
@@ -83,6 +86,7 @@ test_json_o = $(OBJ)test_json@SUFFIX@.o
 test_win_o = $(OBJ)test_win@SUFFIX@.o
 index_sort_o = $(OBJ)index_sort@SUFFIX@.o
 check_sort_o = $(OBJ)check_sort@SUFFIX@.o
+efficiency_math_o = $(OBJ)efficiency_math@SUFFIX@.o
 
 libjb = $(BIN)libjb@SUFFIX@@SO@
 libjbm = $(BIN)libjbm@SUFFIX@@SO@
@@ -97,12 +101,13 @@ test_json_bin = $(BIN)test_json@SUFFIX@@EXE@
 test_win_bin = $(BIN)test_win@SUFFIX@@EXE@
 index_sort_bin = $(BIN)index_sort@SUFFIX@@EXE@
 check_sort_bin = $(BIN)check_sort@SUFFIX@@EXE@
+efficiency_math_bin = $(BIN)efficiency_math@SUFFIX@@EXE@
 
 src = $(config_h) $(jb_config_h) $(def_h) $(math_h) $(xml_h) \
 	$(json_h) $(win_h) $(def_c) $(math_c) $(xml_c) \
 	$(json_c) $(win_c)
 testsbin = $(test_math_bin) $(test_xml_bin) $(test_json_bin) $(index_sort_bin) \
-	$(check_sort_bin)
+	$(check_sort_bin) $(efficiency_math_bin)
 tests = $(test_win_bin)
 exebin = $(libjb) $(libjbm) $(libjbxml) $(libjbjson) $(libjbbin)
 exe = $(libjbwin)
@@ -118,6 +123,7 @@ test_json_dep = $(test_json_c) $(json_h) $(math_h) $(dep)
 test_win_dep = $(test_win_c) $(win_h) $(math_h) $(dep)
 index_sort_dep = $(index_sort_c) $(math_h) $(dep)
 check_sort_dep = $(check_sort_c) $(math_h) $(dep)
+efficiency_math_dep = $(efficiency_math_c) $(math_h) $(dep)
 
 ifeq (@PGO@, 1)
 ifeq (@CC@, clang)
@@ -135,7 +141,8 @@ PGOGENERATE = -fprofile-generate
 PGOUSE = -fprofile-use -fprofile-correction
 endif
 testsbinpgo = $(test_math_binpgo) $(test_xml_binpgo) \
-	$(test_json_binpgo) $(index_sort_binpgo) $(check_sort_binpgo)
+	$(test_json_binpgo) $(index_sort_binpgo) $(check_sort_binpgo) \
+	$(efficiency_math_binpgo)
 testspgo = $(test_win_binpgo)
 DEFDEP = $(testsbinpgo)
 MATHDEP = $(testsbinpgo)
@@ -148,6 +155,7 @@ TEST_JSON_DEP = $(testsbinpgo)
 TEST_WIN_DEP = $(testspgo)
 INDEX_SORT_DEP = $(testsbinpgo)
 CHECK_SORT_DEP = $(testsbinpgo)
+EFFICIENCY_MATH_DEP = $(testsbinpgo)
 else
 DEFDEP = $(defdep)
 MATHDEP = $(mathdep)
@@ -160,6 +168,7 @@ TEST_JSON_DEP = $(test_json_dep)
 TEST_WIN_DEP = $(test_win_dep)
 INDEX_SORT_DEP = $(index_sort_dep)
 CHECK_SORT_DEP = $(check_sort_dep)
+EFFICIENCY_MATH_DEP = $(efficiency_math_dep)
 endif
 VULKAN = @VULKAN@
 ifeq ($(VULKAN), 1)
@@ -223,6 +232,9 @@ $(index_sort_pgo): $(index_sort_dep)
 $(check_sort_pgo): $(check_sort_dep)
 	$(CC) $(TESTS_CFLAGS) $(PGOGENERATE) $(check_sort_c) \
 		-o $(check_sort_pgo)
+$(efficiency_math_pgo): $(efficiency_math_dep)
+	$(CC) $(TESTS_CFLAGS) $(PGOGENERATE) -c -DJBW=1 $(efficiency_math_c) \
+		-o $(efficiency_math_pgo)
 
 # PGO dynamic libraries
 $(libjbpgo): $(def_pgo)
@@ -278,6 +290,11 @@ $(check_sort_binpgo): $(check_sort_pgo) $(libjbmpgo)
 	cd $(BINPGO); ./check_sortpgo@SUFFIX@ 1000 2
 	cd $(BINPGO); ./check_sortpgo@SUFFIX@ 1000 3
 	cd $(BINPGO); ./check_sortpgo@SUFFIX@ 1000 4
+$(efficiency_math_binpgo): $(efficiency_math_pgo) $(libjbmpgo)
+	$(CC) $(PGOGENERATE) $(efficiency_math_pgo) \
+		-o $(efficiency_math_binpgo) $(TESTS_LDFLAGS) $(EXEFLAGSPGO) \
+		-ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
+	cd $(BINPGO); $(mathprefix) ./efficiency_mathpgo@SUFFIX@ 1000
 
 # Objects
 $(def_o): $(DEFDEP)
@@ -309,6 +326,9 @@ $(index_sort_o): $(INDEX_SORT_DEP)
 	$(CC) $(TESTS_CFLAGS) $(PGOUSE) $(index_sort_c) -o $(index_sort_o)
 $(check_sort_o): $(CHECK_SORT_DEP)
 	$(CC) $(TESTS_CFLAGS) $(PGOUSE) $(check_sort_c) -o $(check_sort_o)
+$(efficiency_math_o): $(EFFICIENCY_MATH_DEP)
+	$(CC) $(TESTS_CFLAGS) $(PGOUSE) $(efficiency_math_c) \
+		-o $(efficiency_math_o)
 
 # Dynamic libraries
 $(libjb): $(def_o)
@@ -347,6 +367,9 @@ $(index_sort_bin): $(index_sort_o) $(libjbm)
 		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm@SUFFIX@ -ljb@SUFFIX@
 $(check_sort_bin): $(check_sort_o) $(libjbm)
 	$(CC) $(PGOUSE) $(check_sort_o) -o $(check_sort_bin) \
+		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm@SUFFIX@ -ljb@SUFFIX@
+$(efficiency_math_bin): $(efficiency_math_o) $(libjbm)
+	$(CC) $(PGOUSE) $(efficiency_math_o) -o $(efficiency_math_bin) \
 		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm@SUFFIX@ -ljb@SUFFIX@
 
 # Shaders
