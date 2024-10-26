@@ -4,49 +4,55 @@
 #define SEED 7l
 #define N 100000
 
-double
+void
 efficiency_f32 (float (*f)(float), float xmin, float xmax, unsigned long int n,
                 char *label)
 {
   gsl_rng *rng;
-  float *x;
-  float y, dx;
+  float *x, *y;
+  float z, dx;
   clock_t t0, t;
   unsigned int i;
   rng = gsl_rng_alloc (gsl_rng_taus2);
   gsl_rng_set (rng, SEED);
   x = (float *) malloc (n * sizeof (float));
+  y = (float *) malloc (n * sizeof (float));
   for (i = 0, dx = xmax - xmin; i < n; ++i)
     x[i] = xmin + dx * gsl_rng_uniform (rng);
   t0 = clock ();
-  for (i = 0, y = 0.; i < n; ++i)
-    y += f (x[i]);
+  for (i = 0; i < n; ++i)
+    y[i] = f (x[i]);
   t = clock ();
+  for (i = 0, z = 0., dx = 1.; i < n; ++i, dx = -dx)
+    z += dx * y[i];
   printf ("%s time=%lg sum=%g\n",
-          label, (t - t0) / (((double) n) * CLOCKS_PER_SEC), y);
+          label, (t - t0) / (((double) n) * CLOCKS_PER_SEC), z);
   gsl_rng_free (rng);
 }
 
-double
+void
 efficiency_f64 (double (*f)(double), double xmin, double xmax,
                 unsigned long int n, char *label)
 {
   gsl_rng *rng;
-  double *x;
-  double y, dx;
+  double *x, *y;
+  double z, dx;
   clock_t t0, t;
   unsigned int i;
   rng = gsl_rng_alloc (gsl_rng_taus2);
   gsl_rng_set (rng, SEED);
   x = (double *) malloc (n * sizeof (double));
+  y = (double *) malloc (n * sizeof (double));
   for (i = 0, dx = xmax - xmin; i < n; ++i)
     x[i] = xmin + dx * gsl_rng_uniform (rng);
   t0 = clock ();
-  for (i = 0, y = 0.; i < n; ++i)
-    y += f (x[i]);
+  for (i = 0; i < n; ++i)
+    y[i] = f (x[i]);
   t = clock ();
+  for (i = 0, z = 0., dx = 1.; i < n; ++i, dx = -dx)
+    z += dx * y[i];
   printf ("%s time=%lg sum=%lg\n",
-          label, (t - t0) / (((double) n) * CLOCKS_PER_SEC), y);
+          label, (t - t0) / (((double) n) * CLOCKS_PER_SEC), z);
   gsl_rng_free (rng);
 }
 
