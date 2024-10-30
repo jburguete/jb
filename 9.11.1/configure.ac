@@ -1,6 +1,6 @@
 # Header
 AC_PREREQ([2.69])
-AC_INIT([jb],[9.11.0],[https://github.com/jburguete/jb])
+AC_INIT([jb],[9.11.1],[https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_TARGET
@@ -149,6 +149,7 @@ AC_SUBST(PGO, [$pgo])
 # Checks for libraries
 AC_SEARCH_LIBS([fmaxl], [m])
 AC_SEARCH_LIBS([textdomain], [intl])
+AC_SEARCH_LIBS([sinq], [quadmath])
 PKG_CHECK_MODULES([XML], [libxml-2.0])
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 PKG_CHECK_MODULES([GTHREAD], [gthread-2.0])
@@ -246,6 +247,7 @@ fi
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h],,
 	AC_MSG_ERROR([Missing standard headers]))
 AC_CHECK_HEADER([sys/sysinfo.h], AC_DEFINE([HAVE_SYSINFO], [1]))
+AC_CHECK_HEADER([quadmath.h], AC_DEFINE([HAVE_QUADMATH], [1]))
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
@@ -318,6 +320,6 @@ else
 fi
 
 # Final output
-AC_CONFIG_HEADERS([src/config.h])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_HEADERS([src/config.h tests/config.h])
+AC_CONFIG_FILES([Makefile tests/Makefile])
 AC_OUTPUT

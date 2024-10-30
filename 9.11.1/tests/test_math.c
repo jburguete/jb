@@ -1386,9 +1386,9 @@ main (void)
       printf ("tan(%upi/6)=%.8g=%.8g\n", i, tanf (xf), jbm_tan_f32 (xf));
     }
   xf = INFINITY;
-  printf ("sin(infinity)=%.8g=%.8g\n", i, sinf (xf), jbm_sin_f32 (xf));
-  printf ("cos(infinity)=%.8g=%.8g\n", i, cosf (xf), jbm_cos_f32 (xf));
-  printf ("tan(infinity)=%.8g=%.8g\n", i, tanf (xf), jbm_tan_f32 (xf));
+  printf ("sin(infinity)=%.8g=%.8g\n", sinf (xf), jbm_sin_f32 (xf));
+  printf ("cos(infinity)=%.8g=%.8g\n", cosf (xf), jbm_cos_f32 (xf));
+  printf ("tan(infinity)=%.8g=%.8g\n", tanf (xf), jbm_tan_f32 (xf));
   if (!check_log_f32 (jbm_atan_f32, atanf, FLT_EPSILON))
     return 0;
   printf ("check atan: OK\n");
@@ -1619,9 +1619,9 @@ main (void)
       printf ("tan(%upi/6)=%.17lg=%.17lg\n", i, tan (x), jbm_tan_f64 (x));
     }
   x = INFINITY;
-  printf ("sin(infinity)=%.17lg=%.17lg\n", i, sin (x), jbm_sin_f64 (x));
-  printf ("cos(infinity)=%.17lg=%.17lg\n", i, cos (x), jbm_cos_f64 (x));
-  printf ("tan(infinity)=%.17lg=%.17lg\n", i, tan (x), jbm_tan_f64 (x));
+  printf ("sin(infinity)=%.17lg=%.17lg\n", sin (x), jbm_sin_f64 (x));
+  printf ("cos(infinity)=%.17lg=%.17lg\n", cos (x), jbm_cos_f64 (x));
+  printf ("tan(infinity)=%.17lg=%.17lg\n", tan (x), jbm_tan_f64 (x));
   if (!check_log_f64 (jbm_atan_f64, atan, DBL_EPSILON))
     return 0;
   printf ("check atan: OK\n");
@@ -1768,33 +1768,33 @@ main (void)
   jbm_changeul (&ul, &ul2);
   printf ("changeul(1l,2l)=(%lu,%lu)\n", ul, ul2);
   iL = jbm_minll (1L, -1L);
-  printf ("minll(1L,-1L)=%Ld\n", iL);
+  printf ("minll(1L,-1L)=%lld\n", iL);
   iL = jbm_maxll (1L, -1L);
-  printf ("maxll(1L,-1L)=%Ld\n", iL);
+  printf ("maxll(1L,-1L)=%lld\n", iL);
   iL = jbm_modminll (1L, -1L);
-  printf ("modminll(1L,-1L)=%Ld\n", iL);
+  printf ("modminll(1L,-1L)=%lld\n", iL);
   iL = jbm_modminll (1L, 2L);
-  printf ("modminll(1L,2L)=%Ld\n", iL);
+  printf ("modminll(1L,2L)=%lld\n", iL);
   iL = jbm_modminll (-2L, -1L);
-  printf ("modminll(-2L,-1L)=%Ld\n", iL);
+  printf ("modminll(-2L,-1L)=%lld\n", iL);
   iL = jbm_dblll (1L);
-  printf ("dbll((1L)=%Ld\n", iL);
+  printf ("dbll((1L)=%lld\n", iL);
   iL = jbm_sqrll (-1L);
-  printf ("sqrll(-1L)=%Ld\n", iL);
+  printf ("sqrll(-1L)=%lld\n", iL);
   iL = 1L, iL2 = -1L;
   jbm_changell (&iL, &iL2);
-  printf ("changell(1L,-1L)=(%Ld,%Ld)\n", iL, iL2);
+  printf ("changell(1L,-1L)=(%lld,%lld)\n", iL, iL2);
   uL = jbm_minull (1L, 2L);
-  printf ("minull(1L,2L)=%Lu\n", uL);
+  printf ("minull(1L,2L)=%llu\n", uL);
   uL = jbm_maxull (1L, 2L);
-  printf ("maxull(1L,2L)=%Lu\n", uL);
+  printf ("maxull(1L,2L)=%llu\n", uL);
   uL = jbm_dblull (1L);
-  printf ("dbLull(1L)=%Lu\n", uL);
+  printf ("dbLull(1L)=%llu\n", uL);
   uL = jbm_sqrull (1L);
-  printf ("sqrull(1L)=%Lu\n", uL);
+  printf ("sqrull(1L)=%llu\n", uL);
   uL = 1L, uL2 = 2L;
   jbm_changeull (&uL, &uL2);
-  printf ("changeull(1L,2L)=(%Lu,%Lu)\n", uL, uL2);
+  printf ("changeull(1L,2L)=(%llu,%llu)\n", uL, uL2);
   printf ("small(0)=%d\n", jbm_small (cf0));
   printf ("small(1)=%d\n", jbm_small (cf1));
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_fmodmin (cf1, cf2));
@@ -2143,7 +2143,7 @@ main (void)
   d_2xf64 = jbm_small_2xf64 (_mm_set_pd (1., 0.));
   _mm_store_pd (d_1, d_2xf64);
   L_1 = (unsigned long long int *) d_1;
-  printf ("small_2xf64([0,1])=[%16Lx,%16Lx]\n", L_1[0], L_1[1]);
+  printf ("small_2xf64([0,1])=[%16llx,%16llx]\n", L_1[0], L_1[1]);
   d_2xf64 = jbm_modmin_2xf64 (_mm_set_pd (-1., 1.), _mm_set_pd (-2., 0.5));
   _mm_store_pd (d_1, d_2xf64);
   printf ("modmin_2xf64([1,-1],[0.5,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
@@ -2391,7 +2391,7 @@ main (void)
   d_4xf64 = jbm_small_4xf64 (_mm256_set_pd (-1., 1., -0., 0.));
   _mm256_store_pd (d_1, d_4xf64);
   L_1 = (unsigned long long int *) d_1;
-  printf ("small_4xf64([0,-0,1,-1])=[%16Lx,%16Lx,%16Lx,%16Lx]\n",
+  printf ("small_4xf64([0,-0,1,-1])=[%16llx,%16llx,%16llx,%16llx]\n",
           L_1[0], L_1[1], L_1[2], L_1[3]);
   d_4xf64 = jbm_modmin_4xf64 (_mm256_set_pd (1., 0., -1., 1.),
                               _mm256_set_pd (-2., 1., -2., 0.5));

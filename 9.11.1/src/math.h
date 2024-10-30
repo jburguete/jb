@@ -11477,8 +11477,15 @@ jbm_frexp_2xf64 (const __m128d x,       ///< __m128d vector.
         ++e[i];
       m |= 1 << i;
     }
+#ifdef __AVX512F__
   return _mm_mask_mul_pd (x, m, x, _mm_div_pd (_mm_set1_pd (0.5),
                                                _mm_load_pd ((double *) y)));
+#else
+  return _mm_blend_pd (x,
+                       _mm_mul_pd (x,
+                                   _mm_div_pd (_mm_set1_pd (0.5),
+                                               _mm_load_pd ((double *) y))), m);
+#endif
 }
 
 /**

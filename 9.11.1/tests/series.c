@@ -1,10 +1,17 @@
+#include "config.h"
+
 #define DEBUG 0
 #define CHECK_NUMBER 10000
 #define FAST 1
 #define MAX 42
-#define PRECISION 4
 #define TEST_MATRIX 0
 #define TEST_RATIONAL 0
+
+#if HAVE_QUADMATH
+#define PRECISION 4
+#else
+#define PRECISION 3
+#endif
 
 #define _GNU_SOURCE
 #include <stdio.h>

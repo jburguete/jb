@@ -1,0 +1,19 @@
+CC = @CC@ @ARCH@ @LTO@
+CFLAGS = @CFLAGS@ @PRECISION@ @QUADMATH_CFLAGS@ -O3 -pedantic -Wall -Wextra
+LIBS = @LDFLAGS@ @LIBS@ @QUADMATH_LIBS@ -lm
+src1 = series.c
+res1 = precision
+src2 = bounds.c
+res2 = limits
+
+all: $(res2) $(res1)
+
+$(res1): $(src1) Makefile
+	$(CC) $(CFLAGS) $(src1) -o series $(LIBS)
+	strip series
+	./series > $(res1)
+
+$(res2): $(src2) Makefile
+	$(CC) $(CFLAGS) $(src2) -o bounds $(LIBS)
+	strip bounds
+	./bounds > $(res2)

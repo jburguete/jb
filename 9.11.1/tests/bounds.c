@@ -1,7 +1,19 @@
+#include "config.h"
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
+#if HAVE_QUADMATH
 #include <quadmath.h>
+#endif
+
+#define FF "%.7e"
+#define FD "%.16le"
+#if __x86_64
+#define FLD "%.19Le"
+#elif __riscv
+#define FLD "%.34Le"
+#endif
+#define FQ "%.34Qe"
 
 void
 print_bits (char *label, void *p, unsigned int n)
@@ -21,7 +33,9 @@ main ()
   char buffer[64];
   unsigned long int *v64;
   unsigned int *v32;
+#if HAVE_QUADMATH
   __float128 xq, xq2;
+#endif
   long double xld, xld2;
   double xd, xd2;
   float xf, xf2;
@@ -34,7 +48,15 @@ main ()
   short int is;
   unsigned short int us;
 
-  printf ("SIZES\n");
+  printf ("ARCHITECTURE\n");
+#if __x86_64
+  printf ("X86-64\n");
+#endif
+#if __riscv
+  printf ("RISCV\n");
+#endif
+
+  printf ("\nSIZES\n");
   printf ("void*: %lu bits\n", (unsigned long int) 8l * sizeof (void *));
   printf ("char: %lu bits\n", (unsigned long int) 8l * sizeof (char));
   printf ("short int: %lu bits\n", (unsigned long int) 8l * sizeof (short int));
@@ -46,45 +68,47 @@ main ()
   printf ("double: %lu bits\n", (unsigned long int) 8l * sizeof (double));
   printf ("long double: %lu bits\n",
           (unsigned long int) 8l * sizeof (long double));
-  printf ("__float128: %lu bits\n",
-          (unsigned long int) 8l * sizeof (__float128));
+  printf ("_Float128: %lu bits\n",
+          (unsigned long int) 8l * sizeof (_Float128));
 
   printf ("\nLIMITS\n");
-  printf ("FLT_MIN=%.7e\n", (float) FLT_MIN);
-  printf ("FLT_MIN_EXP=%.7e\n", (float) FLT_MIN_EXP);
-  printf ("FLT_MIN_10_EXP=%.7e\n", (float) FLT_MIN_10_EXP);
-  printf ("FLT_MAX=%.7e\n", (float) FLT_MAX);
-  printf ("FLT_MAX_EXP=%.7e\n", (float) FLT_MAX_EXP);
-  printf ("FLT_MAX_10_EXP=%.7e\n", (float) FLT_MAX_10_EXP);
-  printf ("FLT_EPSILON=%.7e\n", (float) FLT_EPSILON);
-  printf ("DBL_MIN=%.16le\n", (double) DBL_MIN);
-  printf ("DBL_MIN_EXP=%.16le\n", (double) DBL_MIN_EXP);
-  printf ("DBL_MIN_10_EXP=%.16le\n", (double) DBL_MIN_10_EXP);
-  printf ("DBL_MAX=%.16le\n", (double) DBL_MAX);
-  printf ("DBL_MAX_EXP=%.16le\n", (double) DBL_MAX_EXP);
-  printf ("DBL_MAX_10_EXP=%.16le\n", (double) DBL_MAX_10_EXP);
-  printf ("DBL_EPSILON=%.16le\n", (double) DBL_EPSILON);
-  printf ("LDBL_MIN=%.19Le\n", (long double) LDBL_MIN);
-  printf ("LDBL_MIN_EXP=%.19Le\n", (long double) LDBL_MIN_EXP);
-  printf ("LDBL_MIN_10_EXP=%.19Le\n", (long double) LDBL_MIN_10_EXP);
-  printf ("LDBL_MAX=%.19Le\n", (long double) LDBL_MAX);
-  printf ("LDBL_MAX_EXP=%.19Le\n", (long double) LDBL_MAX_EXP);
-  printf ("LDBL_MAX_10_EXP=%.19Le\n", (long double) LDBL_MAX_10_EXP);
-  printf ("LDBL_EPSILON=%.19Le\n", (long double) LDBL_EPSILON);
-  quadmath_snprintf (buffer, 64, "%.34Qe", (__float128) FLT128_MIN);
+  printf ("FLT_MIN=" FF "\n", (float) FLT_MIN);
+  printf ("FLT_MIN_EXP=" FF "\n", (float) FLT_MIN_EXP);
+  printf ("FLT_MIN_10_EXP=" FF "\n", (float) FLT_MIN_10_EXP);
+  printf ("FLT_MAX=" FF "\n", (float) FLT_MAX);
+  printf ("FLT_MAX_EXP=" FF "\n", (float) FLT_MAX_EXP);
+  printf ("FLT_MAX_10_EXP=" FF "\n", (float) FLT_MAX_10_EXP);
+  printf ("FLT_EPSILON=" FF "\n", (float) FLT_EPSILON);
+  printf ("DBL_MIN=" FD "\n", (double) DBL_MIN);
+  printf ("DBL_MIN_EXP=" FD "\n", (double) DBL_MIN_EXP);
+  printf ("DBL_MIN_10_EXP=" FD "\n", (double) DBL_MIN_10_EXP);
+  printf ("DBL_MAX=" FD "\n", (double) DBL_MAX);
+  printf ("DBL_MAX_EXP=" FD "\n", (double) DBL_MAX_EXP);
+  printf ("DBL_MAX_10_EXP=" FD "\n", (double) DBL_MAX_10_EXP);
+  printf ("DBL_EPSILON=" FD "\n", (double) DBL_EPSILON);
+  printf ("LDBL_MIN=" FLD "\n", (long double) LDBL_MIN);
+  printf ("LDBL_MIN_EXP=" FLD "\n", (long double) LDBL_MIN_EXP);
+  printf ("LDBL_MIN_10_EXP=" FLD "\n", (long double) LDBL_MIN_10_EXP);
+  printf ("LDBL_MAX=" FLD "\n", (long double) LDBL_MAX);
+  printf ("LDBL_MAX_EXP=" FLD "\n", (long double) LDBL_MAX_EXP);
+  printf ("LDBL_MAX_10_EXP=" FLD "\n", (long double) LDBL_MAX_10_EXP);
+  printf ("LDBL_EPSILON=" FLD "\n", (long double) LDBL_EPSILON);
+#if HAVE_QUADMATH
+  quadmath_snprintf (buffer, 64, FQ, (__float128) FLT128_MIN);
   printf ("FLT128_MIN=%s\n", buffer);
-  quadmath_snprintf (buffer, 64, "%.34Qe", (__float128) FLT128_MIN_EXP);
+  quadmath_snprintf (buffer, 64, FQ, (__float128) FLT128_MIN_EXP);
   printf ("FLT128_MIN_EXP=%s\n", buffer);
-  quadmath_snprintf (buffer, 64, "%.34Qe", (__float128) FLT128_MIN_10_EXP);
+  quadmath_snprintf (buffer, 64, FQ, (__float128) FLT128_MIN_10_EXP);
   printf ("FLT128_MIN_10_EXP=%s\n", buffer);
-  quadmath_snprintf (buffer, 64, "%.34Qe", (__float128) FLT128_MAX);
+  quadmath_snprintf (buffer, 64, FQ, (__float128) FLT128_MAX);
   printf ("FLT128_MAX=%s\n", buffer);
-  quadmath_snprintf (buffer, 64, "%.34Qe", (__float128) FLT128_MAX_EXP);
+  quadmath_snprintf (buffer, 64, FQ, (__float128) FLT128_MAX_EXP);
   printf ("FLT128_MAX_EXP=%s\n", buffer);
-  quadmath_snprintf (buffer, 64, "%.34Qe", (__float128) FLT128_MAX_10_EXP);
+  quadmath_snprintf (buffer, 64, FQ, (__float128) FLT128_MAX_10_EXP);
   printf ("FLT128_MAX_10_EXP=%s\n", buffer);
-  quadmath_snprintf (buffer, 64, "%.34Qe", (__float128) FLT128_EPSILON);
+  quadmath_snprintf (buffer, 64, FQ, (__float128) FLT128_EPSILON);
   printf ("FLT128_EPSILON=%s\n", buffer);
+#endif
 
   printf ("\nBITS\n");
   us = 0x0000;
@@ -168,21 +192,22 @@ main ()
   xd = 1.;
   print_bits ("1", &xd, 8);
   xld = LDBL_MIN;
-  print_bits ("LDBL_MIN", &xld, 10);
+  print_bits ("LDBL_MIN", &xld, 16);
   xld = LDBL_MIN_EXP;
-  print_bits ("LDBL_MIN_EXP", &xld, 10);
+  print_bits ("LDBL_MIN_EXP", &xld, 16);
   xld = LDBL_MIN_10_EXP;
-  print_bits ("LDBL_MIN_10_EXP", &xld, 10);
+  print_bits ("LDBL_MIN_10_EXP", &xld, 16);
   xld = LDBL_MAX;
-  print_bits ("LDBL_MAX", &xld, 10);
+  print_bits ("LDBL_MAX", &xld, 16);
   xld = LDBL_MAX_EXP;
-  print_bits ("LDBL_MAX_EXP", &xld, 10);
+  print_bits ("LDBL_MAX_EXP", &xld, 16);
   xld = LDBL_MAX_10_EXP;
-  print_bits ("LDBL_MAX_10_EXP", &xld, 10);
+  print_bits ("LDBL_MAX_10_EXP", &xld, 16);
   xld = LDBL_EPSILON;
-  print_bits ("LDBL_EPSILON", &xld, 10);
+  print_bits ("LDBL_EPSILON", &xld, 16);
   xld = 1.L;
-  print_bits ("1", &xld, 10);
+  print_bits ("1", &xld, 16);
+#if HAVE_QUADMATH
   xq = FLT128_MIN;
   print_bits ("FLT128_MIN", &xq, 16);
   xq = FLT128_MIN_EXP;
@@ -197,83 +222,107 @@ main ()
   print_bits ("FLT128_MAX_10_EXP", &xq, 16);
   xq = FLT128_EPSILON;
   print_bits ("FLT128_EPSILON", &xq, 16);
-  xq = 1.Q;
+  xq = 1.F128;
   print_bits ("1", &xq, 16);
+#endif
 
   printf ("\nFROM BITS\n");
   v32 = (unsigned int *) &xf;
   *v32 = 0x7f7fffff;
-  printf ("FLT_MAX=%.7e\n", (float) FLT_MAX);
-  printf ("JBM_FLT_MAX=%.7e\n", xf);
-  printf ("FLT_MIN=%.7e\n", (float) FLT_MIN);
+  printf ("FLT_MAX=" FF "\n", (float) FLT_MAX);
+  printf ("JBM_FLT_MAX=" FF "\n", xf);
+  printf ("FLT_MIN=" FF "\n", (float) FLT_MIN);
   *v32 = 0x00800000;
-  printf ("JBM_FLT_NORM_MIN=%.7e\n", xf);
+  printf ("JBM_FLT_NORM_MIN=" FF "\n", xf);
   *v32 = 0x00000001;
-  printf ("JBM_FLT_MIN=%.7e\n", xf);
+  printf ("JBM_FLT_MIN=" FF "\n", xf);
   *v32 = 0x3f800000;
   v32 = (unsigned int *) &xf2;
   *v32 = 0x3f800001;
-  printf ("FLT_EPSILON=%.7e\n", (float) FLT_EPSILON);
-  printf ("JBM_FLT_EPSILON=%.7e\n", xf2 - xf);
+  printf ("FLT_EPSILON=" FF "\n", (float) FLT_EPSILON);
+  printf ("JBM_FLT_EPSILON=" FF "\n", xf2 - xf);
   v64 = (unsigned long int *) &xd;
   *v64 = 0x7fefffffffffffff;
-  printf ("DBL_MAX=%.16le\n", (double) DBL_MAX);
-  printf ("JBM_DBL_MAX=%.16le\n", xd);
+  printf ("DBL_MAX=" FD "\n", (double) DBL_MAX);
+  printf ("JBM_DBL_MAX=" FD "\n", xd);
   *v64 = 0x0010000000000000;
-  printf ("DBL_MIN=%.16le\n", (double) DBL_MIN);
-  printf ("JBM_DBL_NORM_MIN=%.16le\n", xd);
+  printf ("DBL_MIN=" FD "\n", (double) DBL_MIN);
+  printf ("JBM_DBL_NORM_MIN=" FD "\n", xd);
   *v64 = 0x0000000000000001;
-  printf ("JBM_DBL_MIN=%.16le\n", xd);
+  printf ("JBM_DBL_MIN=" FD "\n", xd);
   *v64 = 0x3ff0000000000000;
   v64 = (unsigned long int *) &xd2;
   *v64 = 0x3ff0000000000001;
-  printf ("DBL_EPSILON=%.16le\n", (double) DBL_EPSILON);
-  printf ("JBM_DBL_EPSILON=%.16le\n", xd2 - xd);
+  printf ("DBL_EPSILON=" FD "\n", (double) DBL_EPSILON);
+  printf ("JBM_DBL_EPSILON=" FD "\n", xd2 - xd);
   v64 = (unsigned long int *) &xld;
+#if __x86_64
   v64[0] = 0xffffffffffffffff;
   v64[1] = 0x0000000000007ffe;
-  printf ("LDBL_MAX=%.19Le\n", (long double) LDBL_MAX);
-  printf ("JBM_LDBL_MAX=%.19Le\n", xld);
+  printf ("LDBL_MAX=" FLD "\n", (long double) LDBL_MAX);
+  printf ("JBM_LDBL_MAX=" FLD "\n", xld);
   v64[0] = 0x8000000000000000;
   v64[1] = 0x0000000000000000;
-  printf ("LDBL_MIN=%.19Le\n", (long double) LDBL_MIN);
-  printf ("JBM_LDBL_NORM_MIN=%.19Le\n", xld);
+  printf ("LDBL_MIN=" FLD "\n", (long double) LDBL_MIN);
+  printf ("JBM_LDBL_NORM_MIN=" FLD "\n", xld);
   v64[0] = 0x0000000000000001;
   v64[1] = 0x0000000000000000;
-  printf ("JBM_LDBL_MIN=%.19Le\n", xld);
+  printf ("JBM_LDBL_MIN=" FLD "\n", xld);
   v64[0] = 0x8000000000000000;
   v64[1] = 0x0000000000003fff;
   v64 = (unsigned long int *) &xld2;
   v64[0] = 0x8000000000000001;
   v64[1] = 0x0000000000003fff;
-  printf ("LDBL_EPSILON=%.19Le\n", (long double) LDBL_EPSILON);
-  printf ("JBM_LDBL_EPSILON=%.19Le\n", xld2 - xld);
+  printf ("LDBL_EPSILON=" FLD "\n", (long double) LDBL_EPSILON);
+  printf ("JBM_LDBL_EPSILON=" FLD "\n", xld2 - xld);
+#elif __riscv
+  v64[0] = 0xffffffffffffffff;
+  v64[1] = 0x7ffeffffffffffff;
+  printf ("LDBL_MAX=" FLD "\n", (long double) LDBL_MAX);
+  printf ("JBM_LDBL_MAX=" FLD "\n", xld);
+  v64[0] = 0x0000000000000000;
+  v64[1] = 0x0001000000000000;
+  printf ("LDBL_MIN=" FLD "\n", (long double) LDBL_MIN);
+  printf ("JBM_LDBL_NORM_MIN=" FLD "\n", xld);
+  v64[0] = 0x0000000000000001;
+  v64[1] = 0x0000000000000000;
+  printf ("JBM_LDBL_MIN=" FLD "\n", xld);
+  v64[0] = 0x0000000000000000;
+  v64[1] = 0x3fff000000000000;
+  v64 = (unsigned long int *) &xld2;
+  v64[0] = 0x0000000000000001;
+  v64[1] = 0x3fff000000000000;
+  printf ("LDBL_EPSILON=" FLD "\n", (long double) LDBL_EPSILON);
+  printf ("JBM_LDBL_EPSILON=" FLD "\n", xld2 - xld);
+#endif
+#if HAVE_QUADMATH
   v64 = (unsigned long int *) &xq;
   v64[0] = 0xffffffffffffffff;
   v64[1] = 0x7ffeffffffffffff;
-  quadmath_snprintf (buffer, 64, "%.34Qe", (__float128) FLT128_MAX);
+  quadmath_snprintf (buffer, 64, FQ, (__float128) FLT128_MAX);
   printf ("FLT128_MAX=%s\n", buffer);
-  quadmath_snprintf (buffer, 64, "%.34Qe", xq);
+  quadmath_snprintf (buffer, 64, FQ, xq);
   printf ("JBM_FLT128_MAX=%s\n", buffer);
   v64[0] = 0x0000000000000000;
   v64[1] = 0x0001000000000000;
-  quadmath_snprintf (buffer, 64, "%.34Qe", (__float128) FLT128_MIN);
+  quadmath_snprintf (buffer, 64, FQ, (__float128) FLT128_MIN);
   printf ("FLT128_MIN=%s\n", buffer);
-  quadmath_snprintf (buffer, 64, "%.34Qe", xq);
+  quadmath_snprintf (buffer, 64, FQ, xq);
   printf ("JBM_FLT128_NORM_MIN=%s\n", buffer);
   v64[0] = 0x0000000000000001;
   v64[1] = 0x0000000000000000;
-  quadmath_snprintf (buffer, 64, "%.34Qe", xq);
+  quadmath_snprintf (buffer, 64, FQ, xq);
   printf ("JBM_FLT128_MIN=%s\n", buffer);
   v64[0] = 0x0000000000000000;
   v64[1] = 0x3fff000000000000;
   v64 = (unsigned long int *) &xq2;
   v64[0] = 0x0000000000000001;
   v64[1] = 0x3fff000000000000;
-  quadmath_snprintf (buffer, 64, "%.34Qe", (__float128) FLT128_EPSILON);
+  quadmath_snprintf (buffer, 64, FQ, (__float128) FLT128_EPSILON);
   printf ("FLT128_EPSILON=%s\n", buffer);
-  quadmath_snprintf (buffer, 64, "%.34Qe", xq2 - xq);
+  quadmath_snprintf (buffer, 64, FQ, xq2 - xq);
   printf ("JBM_FLT128_EPSILON=%s\n", buffer);
+#endif
 
   return 0;
 }
