@@ -1173,8 +1173,8 @@ jbm_polynomial_29_f32 (const float x,   ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_1_f32 (const float x,      ///< float value.
-                    const float *p)     ///< array of coefficients.
+jbm_rational_1_0_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
 {
   return p[0] / (1.f + x * p[1]);
 }
@@ -1185,8 +1185,20 @@ jbm_rational_1_f32 (const float x,      ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_2_f32 (const float x,      ///< float value.
-                    const float *p)     ///< array of coefficients.
+jbm_rational_2_0_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_1_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 2nd order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_2_1_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
 {
   return jbm_polynomial_1_f32 (x, p) / (1.f + x * p[2]);
 }
@@ -1197,11 +1209,35 @@ jbm_rational_2_f32 (const float x,      ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_3_f32 (const float x,      ///< float value.
-                    const float *p)     ///< array of coefficients.
+jbm_rational_3_0_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_2_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 3rd order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_3_1_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 3rd order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_3_2_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_2_f32 (x, p) / (1.f + x * p[3]);
 }
 
 /**
@@ -1210,11 +1246,48 @@ jbm_rational_3_f32 (const float x,      ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_4_f32 (const float x,      ///< float value.
-                    const float *p)     ///< array of coefficients.
+jbm_rational_4_0_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_3_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 4th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_4_1_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 4th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_4_2_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 4th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_4_3_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_3_f32 (x, p) / (1.f + x * p[4]);
 }
 
 /**
@@ -1223,11 +1296,61 @@ jbm_rational_4_f32 (const float x,      ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_5_f32 (const float x,      ///< float value.
-                    const float *p)     ///< array of coefficients.
+jbm_rational_5_0_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_4_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 5th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_5_1_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 5th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_5_2_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 5th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_5_3_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 5th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_5_4_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_4_f32 (x, p) / (1.f + x * p[5]);
 }
 
 /**
@@ -1236,11 +1359,74 @@ jbm_rational_5_f32 (const float x,      ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_6_f32 (const float x,      ///< float value.
-                    const float *p)     ///< array of coefficients.
+jbm_rational_6_0_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_5_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 6th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_6_1_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 6th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_6_2_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 6th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_6_3_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 6th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_6_4_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 6th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_6_5_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_5_f32 (x, p) / (1.f + x * p[6]);
 }
 
 /**
@@ -1249,11 +1435,87 @@ jbm_rational_6_f32 (const float x,      ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_7_f32 (const float x,      ///< float value.
-                    const float *p)     ///< array of coefficients.
+jbm_rational_7_0_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_6_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 7th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_7_1_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 7th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_7_2_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 7th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_7_3_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 7th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_7_4_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 7th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_7_5_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 7th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_7_6_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_6_f32 (x, p) / (1.f + x * p[7]);
 }
 
 /**
@@ -1262,11 +1524,100 @@ jbm_rational_7_f32 (const float x,      ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_8_f32 (const float x,      ///< float value.
-                    const float *p)     ///< array of coefficients.
+jbm_rational_8_0_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_7_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 8th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_8_1_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 8th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_8_2_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 8th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_8_3_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 8th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_8_4_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 8th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_8_5_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 8th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_8_6_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 8th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_8_7_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_7_f32 (x, p) / (1.f + x * p[8]);
 }
 
 /**
@@ -1275,11 +1626,113 @@ jbm_rational_8_f32 (const float x,      ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_9_f32 (const float x,      ///< float value.
-                    const float *p)     ///< array of coefficients.
+jbm_rational_9_0_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_8_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 9th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_9_1_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 9th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_9_2_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 9th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_9_3_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 9th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_9_4_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 9th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_9_5_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 9th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_9_6_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 9th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_9_7_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 9th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_9_8_f32 (const float x,     ///< float value.
+                      const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_8_f32 (x, p) / (1.f + x * p[9]);
 }
 
 /**
@@ -1288,11 +1741,126 @@ jbm_rational_9_f32 (const float x,      ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_10_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_10_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_9_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 10th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_10_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 10th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_10_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 10th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_10_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 10th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_10_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 10th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_10_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 10th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_10_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 10th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_10_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 10th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_10_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 10th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_10_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_9_f32 (x, p) / (1.f + x * p[10]);
 }
 
 /**
@@ -1301,11 +1869,139 @@ jbm_rational_10_f32 (const float x,     ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_11_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_11_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_10_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 11th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_11_10_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_10_f32 (x, p) / (1.f + x * p[11]);
 }
 
 /**
@@ -1314,11 +2010,152 @@ jbm_rational_11_f32 (const float x,     ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_12_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_12_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_11_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_10_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 12th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_12_11_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_11_f32 (x, p) / (1.f + x * p[12]);
 }
 
 /**
@@ -1327,11 +2164,165 @@ jbm_rational_12_f32 (const float x,     ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_13_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_13_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_12_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_10_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_11_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 13th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_13_12_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_12_f32 (x, p) / (1.f + x * p[13]);
 }
 
 /**
@@ -1340,11 +2331,178 @@ jbm_rational_13_f32 (const float x,     ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_14_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_14_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_13_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_10_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_11_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_12_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 14th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_14_13_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_13_f32 (x, p) / (1.f + x * p[14]);
 }
 
 /**
@@ -1353,11 +2511,191 @@ jbm_rational_14_f32 (const float x,     ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_15_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_15_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_14_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_10_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_11_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_12_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_13_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 15th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_15_14_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_14_f32 (x, p) / (1.f + x * p[15]);
 }
 
 /**
@@ -1366,11 +2704,204 @@ jbm_rational_15_f32 (const float x,     ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_16_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_16_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_15_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_10_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_11_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_12_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_13_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_14_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 16th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_16_15_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_15_f32 (x, p) / (1.f + x * p[16]);
 }
 
 /**
@@ -1379,11 +2910,217 @@ jbm_rational_16_f32 (const float x,     ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_17_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_17_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_16_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_15_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_10_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_11_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_12_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_13_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_14_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_15_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_15_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 16));
+}
+
+/**
+ * Function to calculate a 17th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_17_16_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_16_f32 (x, p) / (1.f + x * p[17]);
 }
 
 /**
@@ -1392,11 +3129,230 @@ jbm_rational_17_f32 (const float x,     ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_18_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_18_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_17_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_16_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_15_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_10_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_11_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_12_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_13_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_14_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_15_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_15_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 16));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_16_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_16_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 17));
+}
+
+/**
+ * Function to calculate a 18th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_18_17_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_17_f32 (x, p) / (1.f + x * p[18]);
 }
 
 /**
@@ -1405,11 +3361,243 @@ jbm_rational_18_f32 (const float x,     ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_19_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_19_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_18_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_17_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_16_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_15_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_10_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_11_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_12_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_13_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_14_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_15_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_15_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 16));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_16_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_16_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 17));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_17_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_17_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 18));
+}
+
+/**
+ * Function to calculate a 19th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_19_18_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_18_f32 (x, p) / (1.f + x * p[19]);
 }
 
 /**
@@ -1418,40 +3606,574 @@ jbm_rational_19_f32 (const float x,     ///< float value.
  * \return rational value.
  */
 static inline float
-jbm_rational_20_f32 (const float x,     ///< float value.
-                     const float *p)    ///< array of coefficients.
+jbm_rational_20_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_19_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_18_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_17_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_16_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_15_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_10_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
 {
   return
     jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 11));
 }
 
 /**
- * Function to calculate the well conditionated function exp(x) for x in
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_11_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_12_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_13_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_14_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_15_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_15_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 16));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_16_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_16_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 17));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_17_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_17_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 18));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_18_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_18_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 19));
+}
+
+/**
+ * Function to calculate a 20th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_20_19_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_19_f32 (x, p) / (1.f + x * p[20]);
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_0_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return p[0] / (1.f + x * jbm_polynomial_20_f32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_1_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_19_f32 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_2_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_18_f32 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_3_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_17_f32 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_4_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_16_f32 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_5_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_15_f32 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_6_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_7_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_8_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_9_f32 (const float x,     ///< float value.
+                       const float *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_10_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_11_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_12_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_13_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_14_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_15_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_15_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 16));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_16_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_16_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 17));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_17_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_17_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 18));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_18_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_18_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 19));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_19_f32 (const float x,         ///< float value.
+                        const float *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_19_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 20));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value.
+ */
+static inline float
+jbm_rational_21_20_f32 (const float x,     ///< float value.
+                        const float *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_20_f32 (x, p) / (1.f + x * p[21]);
+}
+
+/**
+ * Function to calculate the well conditionated function expm1(x) for x in
  * [-log(2)/2,log(2)/2] by the following Taylor' serie:
+ * \f$\exp(x)-1\approx\sum_{n=0}^7\frac{x^n}{n!}-1\f$.
+ *
+ * \return function value.
+ */
+static inline float
+jbm_expm1wc_f32 (const float x)
+                 ///< float number \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
+{
+// Taylor' serie
+/*
+  const float a[7] JB_ALIGNED = { JBM_1_FACT1f, JBM_1_FACT2f,
+    JBM_1_FACT3f, JBM_1_FACT4f, JBM_1_FACT5f, JBM_1_FACT6f, JBM_1_FACT7f
+  };
+  return x * jbm_polynomial_6_f32 (x, a);
+*/
+// Faster
+  const float a1=9.9999999917826835759154742878523887e-01f;
+  const float a2=-4.9999999958913417879577371439261924e-01f;
+  const float a3=8.3333136366700581865508474051734715e-02f;
+  const float a5=-1.3833464660905326042591440964123531e-03f;
+  return x * a1 / (1.f + x * (a2 + x * (a3 + x * x * a5)));
+}
+
+/**
+ * Function to calculate the well conditionated function exp2(x) for x in [0,1]
+ * by the following Taylor' serie:
  * \f$\exp(x)\approx\sum_{n=0}^7\frac{x^n}{n!}\f$.
  *
  * \return function value.
  */
 static inline float
-jbm_expwc_f32 (const float x)
-               ///< float number \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
+jbm_exp2wc_f32 (const float x)
+                ///< float number \f$\in[0,1]\f$.
 {
-// Taylor' serie
-/*
-  const float a[8] JB_ALIGNED = { JBM_1_FACT0f, JBM_1_FACT1f, JBM_1_FACT2f,
-    JBM_1_FACT3f, JBM_1_FACT4f, JBM_1_FACT5f, JBM_1_FACT6f, JBM_1_FACT7f
-  };
-  return jbm_polynomial_7_f32 (x, a);
-*/
-// Faster
-  const float a[7] JB_ALIGNED = {
-    1.000000000000000000000000000000000e+00f,
-    1.000000017023318040417309375512461e+00f,
-    5.000000021268108714292592469778157e-01f,
-    1.666649307443897793566104426979129e-01f,
-    4.166644978305165824979912269211368e-02f,
-    8.370477561522544486154479079486582e-03f,
-    1.393530110103816244689472997027511e-03f
+  const float a[7] = {
+    1.0000000000000000000000000000000000e+00f,
+    6.9314686072833467549614190619455902e-01f,
+    2.4023118169610183345256217102144910e-01f,
+    5.5478530109176099769719280450854577e-02f,
+    9.6865061954622047550464877418812215e-03f,
+    1.2383545075613684860722656859898531e-03f,
+    2.1856676336381804045788890526617381e-04f
   };
   return jbm_polynomial_6_f32 (x, a);
 }
@@ -1466,19 +4188,19 @@ static inline float
 jbm_exp2_f32 (const float x)    ///< float number.
 {
   float y, f;
-  if (x > 128.f)
+  if (x >= FLT_MAX_EXP)
     return INFINITY;
   y = floorf (x);
   f = x - y;
   y = jbm_exp2n_f32 ((int) y);
-  return y * M_SQRT2f * jbm_expwc_f32 ((f - 0.5f) * M_LN2f);
+  return y * jbm_exp2wc_f32 (f);
 }
 
 /**
  * Function to calculate the function exp(x) using the jbm_exp2_f32 function.
  *
  * \return function value.
- */
+ /*/
 static inline float
 jbm_exp_f32 (const float x)     ///< float number.
 {
@@ -1497,7 +4219,7 @@ jbm_exp10_f32 (const float x)   ///< float number.
 }
 
 /**
- * Function to calculate the function expm1(x) using the jbm_expwc_f32 and
+ * Function to calculate the function expm1(x) using the jbm_expm1wc_f32 and
  * jbm_exp_f32 functions.
  *
  * \return function value.
@@ -1505,16 +4227,8 @@ jbm_exp10_f32 (const float x)   ///< float number.
 static inline float
 jbm_expm1_f32 (const float x)   ///< float number.
 {
-  const float a[6] JB_ALIGNED = {
-    1.000000017023318040417309375512461e+00f,
-    5.000000021268108714292592469778157e-01f,
-    1.666649307443897793566104426979129e-01f,
-    4.166644978305165824979912269211368e-02f,
-    8.370477561522544486154479079486582e-03f,
-    1.393530110103816244689472997027511e-03f
-  };
   if (jbm_abs_f32 (x) < M_LN2f / 2.f)
-    return x * jbm_polynomial_5_f32 (x, a);
+    return jbm_expm1wc_f32 (x);
   return jbm_exp_f32 (x) - 1.f;
 }
 
@@ -1540,16 +4254,16 @@ jbm_logwc_f32 (const float x)   ///< float number.
 */
 // Faster
   const float a[6] = {
-    1.000000025881968133802113420593511e+00f,
-    1.011558616425352128515141325896526e+00f,
-    1.883784679123831627698211124744501e-01f,
-    1.511558668484767968349208589705767e+00f,
-    6.108272496542924505968134916147412e-01f,
-    5.155508332718994147754595889783726e-02f
+    1.0000000258819681338021134205935107e+00,
+    1.0115586164253521285151413258965259e+00,
+    1.8837846791238316276982111247445010e-01,
+    1.5115586684847679683492085897057674e+00,
+    6.1082724965429245059681349161474123e-01,
+    5.1555083327189941477545958897837256e-02
   };
   float x1;
   x1 = x - 1.f;
-  return x1 * jbm_rational_5_f32 (x1, a);
+  return x1 * jbm_rational_5_2_f32 (x1, a);
 }
 
 /**
@@ -1673,10 +4387,10 @@ jbm_sinwc_f32 (const float x)
 */
 // Faster
   const float a[4] JB_ALIGNED = {
-    9.999999992442543934491415295683794e-01f,
-    -1.666665963296521748934451982809823e-01f,
-    8.332478851480645009343686604819204e-03f,
-    -1.955187177182355975580341195818018e-04f
+    9.9999999652998170520234859388240338e-01f,
+    -1.6666653850132705938945722106817969e-01f,
+    8.3322256622392457162205759786691734e-03f,
+    -1.9524867674489682553254582414001857e-04f
   };
   return x * jbm_polynomial_3_f32 (x * x, a);
 }
@@ -1700,13 +4414,14 @@ jbm_coswc_f32 (const float x)
   return jbm_polynomial_4_f32 (x * x, a);
 */
 // Faster
-  const float a[4] JB_ALIGNED = {
-    9.999999932128176743613757869334921e-01f,
-    -4.999993683051796046368781623262508e-01f,
-    4.165899147001424142698507088182203e-02f,
-    -1.362883066172439741490690427261611e-03f
+  const float a[5] JB_ALIGNED = {
+    1.0000000000000000000000000000000000e+00f,
+    -4.9999999965238906843549904534867220e-01f,
+    4.1666653828165636463917247496043632e-02f,
+    -1.3887779469291056608109602187665577e-03f,
+    2.4484799013341679093941386831846651e-05f
   };
-  return jbm_polynomial_3_f32 (x * x, a);
+  return jbm_polynomial_4_f32 (x * x, a);
 }
 
 /**
@@ -1831,12 +4546,12 @@ jbm_atanwc0_f32 (const float x)
 */
 // Faster
   const float a[4] JB_ALIGNED = {
-    9.999998404873014384133529526824489e-01f,
-    4.956684719852140058950449309014760e-01f,
-    8.289870587881024045809995000473547e-01f,
-    7.665833354275392020984659296343084e-02f
+    9.9999984048730143841335295268244848e-01f,
+    4.9566847198521400589504493089955823e-01f,
+    8.2898705878810240458099950004542931e-01f,
+    7.6658333542753920209846592962853791e-02f
   };
-  return x * jbm_rational_3_f32 (x * x, a);
+  return x * jbm_rational_3_1_f32 (x * x, a);
 }
 
 /**
@@ -1876,18 +4591,18 @@ jbm_atanwc1_f32 (const float x)
 */
 // Faster
   const float a[8] = {
-    7.853981625513994575313180177654967e-01f,
-    1.574520194153474942490572629731245e+00f,
-    1.048010179978561933037327123628686e+00f,
-    2.592800060950390639859781517494658e-01f,
-    1.368121600801066467847214410809042e+00f,
-    7.817043832372322477745480043093985e-01f,
-    1.618608866301317634139743158049663e-01f,
-    6.251230254346320494278371312309655e-04f
+    7.8539816255139945753131801776549671e-01f,
+    1.5745201941534749424905726297312445e+00f,
+    1.0480101799785619330373271236286859e+00f,
+    2.5928000609503906398597815174946580e-01f,
+    1.3681216008010664678472144108090419e+00f,
+    7.8170438323723224777454800430939851e-01f,
+    1.6186088663013176341397431580496626e-01f,
+    6.2512302543463204942783713123096548e-04f
   };
   float x1;
   x1 = x - 1.f;
-  return jbm_rational_7_f32 (x1, a);
+  return jbm_rational_7_3_f32 (x1, a);
 }
 
 /**
@@ -2003,16 +4718,14 @@ jbm_cosh_f32 (const float x)    ///< float number.
 static inline float
 jbm_tanh_f32 (const float x)    ///< float number.
 {
-  float f;
-  if (x > 0.f)
-    {
-      f = jbm_exp_f32 (-x);
-      f *= f;
-      return (1.f - f) / (1.f + f);
-    }
+  float f, fi;
+  if (x > FLT_MAX_EXP * M_LN2f)
+    return 1.f;
+  if (x < -FLT_MAX_EXP * M_LN2f)
+    return -1.f;
   f = jbm_exp_f32 (x);
-  f *= f;
-  return (f - 1.f) / (f + 1.f);
+  fi = 1.f / f;
+  return (f - fi) / (f + fi);
 }
 
 /**
@@ -2062,16 +4775,15 @@ jbm_erfwc_f32 (const float x)
 {
 // Taylor' serie
 // Faster
-  const float a[7] JB_ALIGNED = {
-    1.1283791666852785983688752932265643e+00f,
-    -3.7612635859585740378914600312914042e-01f,
-    1.1283732030120247802299985300220263e-01f,
-    -2.6861399417485986983433648257956338e-02f,
-    5.2055958879483142227128541564988751e-03f,
-    -8.1870778064413060035916518722950608e-04f,
-    8.5175869273000099571451271669843055e-05f
+  const float a[6] JB_ALIGNED = {
+    1.1283791671633124547603970137089329e+00f,
+    1.1356247077387072221530473806173895e-01f,
+    3.3606359392673594485175487779855494e-02f,
+    4.3397545597876753616401102540952801e-01f,
+    7.4441296041206635020857929305718177e-02f,
+    5.2260592856163505486272407800095742e-03f
   };
-  return x * jbm_polynomial_6_f32 (x * x, a);
+  return x * jbm_rational_5_2_f32 (x * x, a);
 }
 
 /**
@@ -2088,22 +4800,21 @@ jbm_erfcwc_f32 (const float x)
 {
 // Taylor' serie
 // Faster
-  const float a[8] JB_ALIGNED = {
-    9.9999969060415943564818078583137764e-01f,
-    5.9760585774782651506828019699718722e+00f,
-    7.9133473492440670403006161471502580e+00f,
-    1.8893665663175011109436580545348846e+00f,
-    6.4760176256414820879830154653238450e+00f,
-    1.0402908358496967296102032718812172e+01f,
-    4.0794827981948933585478485349126701e+00f,
-    1.8090857835808128030458583206876380e-01f
+  const float a[7] JB_ALIGNED = {
+    5.6417962023351554413770679960328574e-01f,
+    2.3085500715363033466329871319200434e+00f,
+    1.7209980198136762966815388181512637e+00f,
+    1.2533702979322160290926200365560996e-01f,
+    4.5911646381868975753466374304753288e+00f,
+    4.6068950402797304947622178191893468e+00f,
+    8.3853078328521940300319957043349985e-01f
   };
-  double xi;
-  if (x > 9.4192801f)
+  float xi, x2;
+  if (x > 9.1945494491346722541126284791161797e+00f)
     return 0.f;
-  xi = 1.f / x;
-  return jbm_rational_7_f32 (xi * xi, a) / jbm_exp_f32 (xi * xi)
-    / (sqrtf (M_PIf) * xi);
+  x2 = x * x;
+  xi = 1.f / x2;
+  return jbm_rational_6_3_f32 (xi, a) / (x * jbm_exp_f32 (x2));
 }
 
 /**
@@ -2134,7 +4845,7 @@ jbm_erfc_f32 (const float x)    ///< float number.
   float ax;
   ax = jbm_abs_f32 (x);
   if (ax > 1.f)
-    return x / ax * jbm_erfcwc_f32 (ax);
+    return 1.f - x / ax * (1.f - jbm_erfcwc_f32 (ax));
   return 1.f - jbm_erfwc_f32 (x);
 }
 
@@ -2231,7 +4942,7 @@ jbm_exp2n_f64 (int e)           ///< exponent number (int).
   if (e > -1023)
     x.i = (1023L + e) << 52L;
   else
-    x.i = 0x0008000000000000L >> (-e - 1023);
+    x.i = 0x0008000000000000L >> (-e - 1023L);
   return x.x;
 }
 
@@ -2601,8 +5312,8 @@ jbm_polynomial_29_f64 (const double x,  ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_1_f64 (const double x,     ///< double value.
-                    const double *p)    ///< array of coefficients.
+jbm_rational_1_0_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
 {
   return p[0] / (1. + x * p[1]);
 }
@@ -2613,8 +5324,20 @@ jbm_rational_1_f64 (const double x,     ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_2_f64 (const double x,     ///< double value.
-                    const double *p)    ///< array of coefficients.
+jbm_rational_2_0_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_1_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 2nd order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_2_1_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
 {
   return jbm_polynomial_1_f64 (x, p) / (1. + x * p[2]);
 }
@@ -2625,11 +5348,35 @@ jbm_rational_2_f64 (const double x,     ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_3_f64 (const double x,     ///< double value.
-                    const double *p)    ///< array of coefficients.
+jbm_rational_3_0_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_2_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 3rd order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_3_1_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 3rd order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_3_2_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_2_f64 (x, p) / (1. + x * p[3]);
 }
 
 /**
@@ -2638,11 +5385,48 @@ jbm_rational_3_f64 (const double x,     ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_4_f64 (const double x,     ///< double value.
-                    const double *p)    ///< array of coefficients.
+jbm_rational_4_0_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_3_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 4th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_4_1_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 4th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_4_2_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 4th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_4_3_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_3_f64 (x, p) / (1. + x * p[4]);
 }
 
 /**
@@ -2651,11 +5435,61 @@ jbm_rational_4_f64 (const double x,     ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_5_f64 (const double x,     ///< double value.
-                    const double *p)    ///< array of coefficients.
+jbm_rational_5_0_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_4_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 5th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_5_1_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 5th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_5_2_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 5th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_5_3_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 5th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_5_4_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_4_f64 (x, p) / (1. + x * p[5]);
 }
 
 /**
@@ -2664,11 +5498,74 @@ jbm_rational_5_f64 (const double x,     ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_6_f64 (const double x,     ///< double value.
-                    const double *p)    ///< array of coefficients.
+jbm_rational_6_0_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_5_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 6th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_6_1_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 6th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_6_2_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 6th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_6_3_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 6th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_6_4_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 6th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_6_5_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_5_f64 (x, p) / (1. + x * p[6]);
 }
 
 /**
@@ -2677,11 +5574,87 @@ jbm_rational_6_f64 (const double x,     ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_7_f64 (const double x,     ///< double value.
-                    const double *p)    ///< array of coefficients.
+jbm_rational_7_0_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_6_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 7th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_7_1_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 7th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_7_2_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 7th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_7_3_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 7th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_7_4_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 7th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_7_5_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 7th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_7_6_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_6_f64 (x, p) / (1. + x * p[7]);
 }
 
 /**
@@ -2690,11 +5663,100 @@ jbm_rational_7_f64 (const double x,     ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_8_f64 (const double x,     ///< double value.
-                    const double *p)    ///< array of coefficients.
+jbm_rational_8_0_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_7_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 8th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_8_1_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 8th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_8_2_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 8th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_8_3_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 8th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_8_4_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 8th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_8_5_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 8th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_8_6_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 8th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_8_7_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_7_f64 (x, p) / (1. + x * p[8]);
 }
 
 /**
@@ -2703,11 +5765,113 @@ jbm_rational_8_f64 (const double x,     ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_9_f64 (const double x,     ///< double value.
-                    const double *p)    ///< array of coefficients.
+jbm_rational_9_0_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_8_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 9th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_9_1_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 9th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_9_2_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 9th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_9_3_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 9th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_9_4_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 9th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_9_5_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 9th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_9_6_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 9th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_9_7_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 9th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_9_8_f64 (const double x,     ///< double value.
+                      const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_8_f64 (x, p) / (1. + x * p[9]);
 }
 
 /**
@@ -2716,11 +5880,126 @@ jbm_rational_9_f64 (const double x,     ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_10_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_10_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_9_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 10th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_10_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 10th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_10_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 10th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_10_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 10th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_10_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 10th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_10_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 10th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_10_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 10th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_10_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 10th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_10_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 10th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_10_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_9_f64 (x, p) / (1. + x * p[10]);
 }
 
 /**
@@ -2729,11 +6008,139 @@ jbm_rational_10_f64 (const double x,    ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_11_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_11_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_10_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 11th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_11_10_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_10_f64 (x, p) / (1. + x * p[11]);
 }
 
 /**
@@ -2742,11 +6149,152 @@ jbm_rational_11_f64 (const double x,    ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_12_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_12_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_11_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_10_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_10_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 12th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_12_11_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_11_f64 (x, p) / (1. + x * p[12]);
 }
 
 /**
@@ -2755,11 +6303,165 @@ jbm_rational_12_f64 (const double x,    ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_13_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_13_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_12_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_11_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_10_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_10_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_11_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 13th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_13_12_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_12_f64 (x, p) / (1. + x * p[13]);
 }
 
 /**
@@ -2768,11 +6470,178 @@ jbm_rational_13_f64 (const double x,    ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_14_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_14_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_13_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_12_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_11_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_10_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_10_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_11_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_12_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 14th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_14_13_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_13_f64 (x, p) / (1. + x * p[14]);
 }
 
 /**
@@ -2781,11 +6650,191 @@ jbm_rational_14_f64 (const double x,    ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_15_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_15_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_14_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_13_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_12_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_11_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_10_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_10_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_11_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_12_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_13_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 15th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_15_14_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_14_f64 (x, p) / (1. + x * p[15]);
 }
 
 /**
@@ -2794,11 +6843,204 @@ jbm_rational_15_f64 (const double x,    ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_16_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_16_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_15_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_14_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_13_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_12_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_11_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_10_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_10_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_11_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_12_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_13_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_14_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 16th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_16_15_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_15_f64 (x, p) / (1. + x * p[16]);
 }
 
 /**
@@ -2807,11 +7049,217 @@ jbm_rational_16_f64 (const double x,    ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_17_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_17_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_16_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_15_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_14_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_13_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_12_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_11_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_10_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_10_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_11_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_12_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_13_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_14_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_15_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_15_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 16));
+}
+
+/**
+ * Function to calculate a 17th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_17_16_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_16_f64 (x, p) / (1. + x * p[17]);
 }
 
 /**
@@ -2820,11 +7268,230 @@ jbm_rational_17_f64 (const double x,    ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_18_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_18_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_17_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_16_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_15_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_14_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_13_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_12_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_11_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_10_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_10_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_11_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_12_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_13_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_14_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_15_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_15_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 16));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_16_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_16_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 17));
+}
+
+/**
+ * Function to calculate a 18th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_18_17_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_17_f64 (x, p) / (1. + x * p[18]);
 }
 
 /**
@@ -2833,11 +7500,243 @@ jbm_rational_18_f64 (const double x,    ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_19_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_19_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_18_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_17_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_16_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_15_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_14_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_13_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_12_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_11_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_10_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
 {
   return
     jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_10_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_11_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_12_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_13_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_14_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_15_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_15_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 16));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_16_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_16_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 17));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_17_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_17_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 18));
+}
+
+/**
+ * Function to calculate a 19th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_19_18_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_18_f64 (x, p) / (1. + x * p[19]);
 }
 
 /**
@@ -2846,52 +7745,591 @@ jbm_rational_19_f64 (const double x,    ///< double value.
  * \return rational value.
  */
 static inline double
-jbm_rational_20_f64 (const double x,    ///< double value.
-                     const double *p)   ///< array of coefficients.
+jbm_rational_20_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_19_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_18_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_17_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_16_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_15_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_14_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_13_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_12_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_11_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_10_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_10_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
 {
   return
     jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 11));
 }
 
 /**
- * Function to calculate the well conditionated function exp(x) for x in
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_11_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_12_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_13_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_14_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_15_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_15_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 16));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_16_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_16_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 17));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_17_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_17_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 18));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_18_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_18_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 19));
+}
+
+/**
+ * Function to calculate a 20th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_20_19_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_19_f64 (x, p) / (1. + x * p[20]);
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_0_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return p[0] / (1. + x * jbm_polynomial_20_f64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_1_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_1_f64 (x, p) / (1. + x * jbm_polynomial_19_f64 (x, p + 2));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_2_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_2_f64 (x, p) / (1. + x * jbm_polynomial_18_f64 (x, p + 3));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_3_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_3_f64 (x, p) / (1. + x * jbm_polynomial_17_f64 (x, p + 4));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_4_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_4_f64 (x, p) / (1. + x * jbm_polynomial_16_f64 (x, p + 5));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_5_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_5_f64 (x, p) / (1. + x * jbm_polynomial_15_f64 (x, p + 6));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_6_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_6_f64 (x, p) / (1. + x * jbm_polynomial_14_f64 (x, p + 7));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_7_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_7_f64 (x, p) / (1. + x * jbm_polynomial_13_f64 (x, p + 8));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_8_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_8_f64 (x, p) / (1. + x * jbm_polynomial_12_f64 (x, p + 9));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_9_f64 (const double x,     ///< double value.
+                       const double *p)    ///< array of coefficients.
+{
+  return
+    jbm_polynomial_9_f64 (x, p) / (1. + x * jbm_polynomial_11_f64 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_10_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_10_f64 (x, p) / (1. + x * jbm_polynomial_10_f64 (x, p + 11));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_11_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_11_f64 (x, p) / (1. + x * jbm_polynomial_9_f64 (x, p + 12));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_12_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_12_f64 (x, p) / (1. + x * jbm_polynomial_8_f64 (x, p + 13));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_13_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_13_f64 (x, p) / (1. + x * jbm_polynomial_7_f64 (x, p + 14));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_14_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_14_f64 (x, p) / (1. + x * jbm_polynomial_6_f64 (x, p + 15));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_15_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_15_f64 (x, p) / (1. + x * jbm_polynomial_5_f64 (x, p + 16));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_16_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_16_f64 (x, p) / (1. + x * jbm_polynomial_4_f64 (x, p + 17));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_17_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_17_f64 (x, p) / (1. + x * jbm_polynomial_3_f64 (x, p + 18));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_18_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_18_f64 (x, p) / (1. + x * jbm_polynomial_2_f64 (x, p + 19));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_19_f64 (const double x,         ///< double value.
+                        const double *p)        ///< array of coefficients.
+{
+  return
+    jbm_polynomial_19_f64 (x, p) / (1. + x * jbm_polynomial_1_f64 (x, p + 20));
+}
+
+/**
+ * Function to calculate a 21th order rational (double).
+ *
+ * \return rational value.
+ */
+static inline double
+jbm_rational_21_20_f64 (const double x,     ///< double value.
+                        const double *p)    ///< array of coefficients.
+{
+  return jbm_polynomial_20_f64 (x, p) / (1. + x * p[21]);
+}
+
+/**
+ * Function to calculate the well conditionated function expm1(x) for x in
  * [-log(2)/2,log(2)/2] by the following Taylor' serie:
- * \f$\exp(x)\approx\sum_{n=0}^{13}\frac{x^n}{n!}\f$.
+ * \f$\exp(x)-1\approx\sum_{n=0}^{13}\frac{x^n}{n!}-1\f$.
  *
  * \return function value.
  */
 static inline double
-jbm_expwc_f64 (const double x)
-               ///< double number \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
+jbm_expm1wc_f64 (const double x)
+                 ///< double number \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
 {
 // Taylor' serie
 /*
-  const double a[13] JB_ALIGNED = { JBM_1_FACT0, JBM_1_FACT1, JBM_1_FACT2,
+  const double a[12] JB_ALIGNED = { JBM_1_FACT1, JBM_1_FACT2,
     JBM_1_FACT3, JBM_1_FACT4, JBM_1_FACT5, JBM_1_FACT6, JBM_1_FACT7,
     JBM_1_FACT8, JBM_1_FACT9, JBM_1_FACT10, JBM_1_FACT11, JBM_1_FACT12
   };
-  return jbm_polynomial_12_f64 (x, a);
+  return x * jbm_polynomial_11_f64 (x, a);
 */
 // Faster
-  const double a[12] JB_ALIGNED = {
-    9.999999999999999997838163532087274e-01,
-    9.999999999999999999833739467402774e-01,
-    5.000000000000002596203293039992897e-01,
-    1.666666666666666866333205620302255e-01,
-    4.166666666662206776515348098645875e-02,
-    8.333333333329903347381473589540194e-03,
-    1.388888891414483956743792033814084e-03,
-    1.984126986069370681499890695786226e-04,
-    2.480152809337277452837040995633428e-05,
-    2.755727368725456071780832482731923e-06,
-    2.761664918870128907713466953573490e-07,
-    2.509774066243861824686198016708688e-08
-  };
-  return jbm_polynomial_11_f64 (x, a);
+  const double a1=9.9999999999999999866523626874215789e-01;
+  const double a3=2.4998453858981619674396608301250598e-02;
+  const double a4=-4.9999999999999999933261730198779978e-01;
+  const double a5=1.0833178719231388723914535942973379e-01;
+  const double a6=-1.2499226929490809837198234785821115e-02;
+  const double a7=6.9431559947707471609539363612700440e-04;
+  const double a9=-1.6512957626515476078093301716091145e-06;
+  double x2;
+  x2 = x * x;
+  return x * (a1 + x2 * a3)
+    / (1. + x * (a4 + x * (a5 + x * (a6 + x * (a7 + x2 * a9)))));
 }
 
 /**
- * Function to calculate the function exp2(x) using the jbm_expwc_f64 and
+ * Function to calculate the well conditionated function exp2(x) for x in [0,1]
+ * by the following Taylor' serie:
+ * \f$\exp(x)\approx\sum_{n=0}^7\frac{x^n}{n!}\f$.
+ *
+ * \return function value.
+ */
+static inline double
+jbm_exp2wc_f64 (const double x)
+                ///< double number \f$\in[0,1]\f$.
+{
+  const double a[11] = {
+    1.0000000000000000000000000000000000e+00,
+    3.5324464160776157561870873030858037e-01,
+    5.5726188114087417626793519052430392e-02,
+    4.9794664779672329730006391328596054e-03,
+    2.5696766500385563533145513033700273e-04,
+    6.2985082749669456733647499053841285e-06,
+    -3.3990253895218437504130399181004685e-01,
+    5.1102167694878854560231687504362842e-02,
+    -4.2923660062672093556805841384253418e-03,
+    2.0397216803284294746970787132187830e-04,
+    -4.4537179125887109629652401561427060e-06
+  };
+  return jbm_rational_10_5_f64 (x, a);
+}
+
+/**
+ * Function to calculate the function exp2(x) using the jbm_expm1wc_f64 and
  * jbm_exp2n_f64 functions.
  *
  * \return function value.
@@ -2900,12 +8338,12 @@ static inline double
 jbm_exp2_f64 (const double x)   ///< double number.
 {
   double y, f;
-  if (x > 1024.)
+  if (x >= DBL_MAX_EXP)
     return INFINITY;
   y = floor (x);
   f = x - y;
   y = jbm_exp2n_f64 ((int) y);
-  return y * M_SQRT2 * jbm_expwc_f64 ((f - 0.5) * M_LN2);
+  return y * jbm_exp2wc_f64 (f);
 }
 
 /**
@@ -2931,7 +8369,7 @@ jbm_exp10_f64 (const double x)  ///< double number.
 }
 
 /**
- * Function to calculate the function expm1(x) using the jbm_expwc_f64 and
+ * Function to calculate the function expm1(x) using the jbm_expm1wc_f64 and
  * jbm_exp_f64 functions.
  *
  * \return function value.
@@ -2939,21 +8377,8 @@ jbm_exp10_f64 (const double x)  ///< double number.
 static inline double
 jbm_expm1_f64 (const double x)  ///< double number.
 {
-  const double a[11] JB_ALIGNED = {
-    9.999999999999999999833739467402774e-01,
-    5.000000000000002596203293039992897e-01,
-    1.666666666666666866333205620302255e-01,
-    4.166666666662206776515348098645875e-02,
-    8.333333333329903347381473589540194e-03,
-    1.388888891414483956743792033814084e-03,
-    1.984126986069370681499890695786226e-04,
-    2.480152809337277452837040995633428e-05,
-    2.755727368725456071780832482731923e-06,
-    2.761664918870128907713466953573490e-07,
-    2.509774066243861824686198016708688e-08
-  };
   if (jbm_abs_f64 (x) < M_LN2 / 2.)
-    return x * jbm_polynomial_10_f64 (x, a);
+    return jbm_expm1wc_f64 (x);
   return jbm_exp_f64 (x) - 1.;
 }
 
@@ -2981,24 +8406,23 @@ jbm_logwc_f64 (const double x)  ///< double number.
 */
 // Faster
   const double a[13] JB_ALIGNED = {
-    1.000000000000000000104597362545641e+00,
-    2.734299924674267908661838147000582e+00,
-    2.758600639771016407880540580834316e+00,
-    1.250181039443469845819061388524411e+00,
-    2.437790933599749448299833468226381e-01,
-    1.511532957893565993680436414510365e-02,
-    3.234299924674267857931530479289925e+00,
-    4.042417268774817193696261884108770e+00,
-    2.443289698939469004880423389988057e+00,
-    7.265265010732872060655946427315411e-01,
-    9.435967939347741843896703595852574e-02,
-    3.536154911896361147830377698021396e-03,
-    -1.809840791707837975029422825309329e-05
+    1.0000000000000000000991330702450564e+00,
+    2.7501292882902831742240611646179318e+00,
+    2.7984826075541055793814624205584875e+00,
+    1.2862771601364446667115392035141334e+00,
+    2.5782675466084068559235804764987348e-01,
+    1.7285328011515291046568208695830479e-02,
+    8.8468103102739228351268706054407429e-05,
+    3.2501292882902831263112217242314566e+00,
+    4.0902139183659139894496990853758034e+00,
+    2.4980076898893197333036676084736935e+00,
+    7.5595828222271915248539401401421376e-01,
+    1.0178952775879062001662609095879288e-01,
+    4.2873485695243041169977061417556298e-03
   };
   double x1;
   x1 = x - 1.;
-  return x1 * jbm_polynomial_5_f64 (x1, a)
-    / (1. + x1 * jbm_polynomial_6_f64 (x1, a + 6));
+  return x1 * jbm_rational_12_6_f64 (x1, a);
 }
 
 /**
@@ -3123,13 +8547,13 @@ jbm_sinwc_f64 (const double x)
 */
 // Faster
   const double a[7] JB_ALIGNED = {
-    9.999999999999999998802057969320874e-01,
-    -1.666666666666666273459597213911935e-01,
-    8.333333333331441760545173263516067e-03,
-    -1.984126983815729584164212554147258e-04,
-    2.755731697106782623392907719143142e-06,
-    -2.505132708008770069161618073007165e-08,
-    1.593252903446589328253475184152266e-10
+    9.9999999999999999903298528022992608e-01,
+    -1.6666666666666655053351577460983916e-01,
+    8.3333333333296595862456464924174883e-03,
+    -1.9841269836544823130841945764534327e-04,
+    2.7557316317701496371521577585751979e-06,
+    -2.5051208834780181372040633623490924e-08,
+    1.5924807404448211967660639660668199e-10
   };
   return x * jbm_polynomial_6_f64 (x * x, a);
 }
@@ -3154,15 +8578,15 @@ jbm_coswc_f64 (const double x)
   return jbm_polynomial_8_f64 (x * x, a);
 */
 // Faster
-  const double a[9] JB_ALIGNED = {
-    1.000000000000000000000000000000000e+00,
-    -4.999999999999999999395180355733868e-01,
-    4.166666666666665940314006798427481e-02,
-    -1.388888888888659117243940415685643e-03,
-    2.480158729863213173156268076859265e-05,
-    -2.755731740637054611763200448376674e-07,
-    2.087619443813264716434572030223809e-09,
-    -1.138681044418777064689951909124715e-11
+  const double a[8] JB_ALIGNED = {
+    1.0000000000000000000000000000000000e+00,
+    -4.9999999999999999993951803557338505e-01,
+    4.1666666666666659403140067984185230e-02,
+    -1.3888888888886591172439404142742802e-03,
+    2.4801587298632131731562671126858188e-05,
+    -2.7557317406370546117628828935636779e-07,
+    2.0876194438132647163852946046090933e-09,
+    -1.1386810444187770618168073556226784e-11
   };
   return jbm_polynomial_7_f64 (x * x, a);
 }
@@ -3291,18 +8715,18 @@ jbm_atanwc0_f64 (const double x)
 */
 // Faster
   const double a[10] JB_ALIGNED = {
-    9.999999999999999999897101010338286e-01,
-    1.981468010646850513929332898240438e+00,
-    1.279964608924214982231942118792163e+00,
-    2.969347701028866499751297816285443e-01,
-    1.777956238300436469118861315989006e-02,
-    2.314801343980183829273765900620553e+00,
-    1.851565056917614431023509878591616e+00,
-    5.940199964693883319287833147435503e-01,
-    6.504801168368755483291771526717268e-02,
-    1.096906094564165631528252396880330e-03
+    9.9999999999999999988350098880131410e-01,
+    1.9790364737826274474033003211225036e+00,
+    1.2763597145212189564865953502384577e+00,
+    2.9546746828946397414064200278471676e-01,
+    1.7639277573399157020779462118021500e-02,
+    2.3123698071159607081902867468765628e+00,
+    1.8471496502265516962365125891076585e+00,
+    5.9156719979799457278683486027185371e-01,
+    6.4625846927010323822388899418597147e-02,
+    1.0861419677837522058022889198563474e-03
   };
-  return x * jbm_rational_9_f64 (x * x, a);
+  return x * jbm_rational_9_4_f64 (x * x, a);
 }
 
 /**
@@ -3361,27 +8785,27 @@ jbm_atanwc1_f64 (const double x)
                                 + x1 * jbm_polynomial_7_f64 (x4, a3)));
 */
   const double a[17] = {
-    7.853981633974483096156608458198760e-01,
-    3.601984892893552888446596034013743e+00,
-    7.448737523784523062345888768933038e+00,
-    9.108243441406051089899511566690817e+00,
-    7.204663321275367236164003161377379e+00,
-    3.774051962703551180441105222178421e+00,
-    1.278128531270100171168598709263967e+00,
-    2.558168198482474293837934585867171e-01,
-    2.316958370612903229780162116449401e-02,
-    3.949569832803139666507142241190221e+00,
-    7.287962811909918776930672406956272e+00,
-    8.108398334891285028766424751109526e+00,
-    5.912063783445853373660667634153289e+00,
-    2.881072971433143316156409228146077e+00,
-    9.139492248819354600861753305345088e-01,
-    1.722481812317596098868074214865513e-01,
-    1.475022698014619042563166916036221e-02
+    7.8539816339744830961566084581987599e-01,
+    3.6019848928935528884465960340137432e+00,
+    7.4487375237845230623458887689330376e+00,
+    9.1082434414060510898995115666908167e+00,
+    7.2046633212753672361640031613773788e+00,
+    3.7740519627035511804411052221784210e+00,
+    1.2781285312701001711685987092639674e+00,
+    2.5581681984824742938379345858671711e-01,
+    2.3169583706129032297801621164494009e-02,
+    3.9495698328031396665071422411902205e+00,
+    7.2879628119099187769306724069562724e+00,
+    8.1083983348912850287664247511095260e+00,
+    5.9120637834458533736606676341532886e+00,
+    2.8810729714331433161564092281460773e+00,
+    9.1394922488193546008617533053450878e-01,
+    1.7224818123175960988680742148655125e-01,
+    1.4750226980146190425631669160362206e-02
   };
   double x1;
   x1 = x - 1.;
-  return jbm_rational_16_f64 (x1, a);
+  return jbm_rational_16_8_f64 (x1, a);
 }
 
 /**
@@ -3497,16 +8921,14 @@ jbm_cosh_f64 (const double x)   ///< double number.
 static inline double
 jbm_tanh_f64 (const double x)   ///< double number.
 {
-  double f;
-  if (x > 0.)
-    {
-      f = jbm_exp_f64 (-x);
-      f *= f;
-      return (1. - f) / (1. + f);
-    }
+  double f, fi;
+  if (x > DBL_MAX_EXP * M_LN2)
+    return 1.;
+  if (x < -DBL_MAX_EXP * M_LN2)
+    return -1.;
   f = jbm_exp_f64 (x);
-  f *= f;
-  return (f - 1.) / (f + 1.);
+  fi = 1. / f;
+  return (f - fi) / (f + fi);
 }
 
 /**
@@ -3568,7 +8990,7 @@ jbm_erfwc_f64 (const double x)
     6.8136985371491773172998872537320205e-04,
     2.0308921409930923470822806343114398e-05
   };
-  return x * jbm_rational_9_f64 (x * x, a);
+  return x * jbm_rational_9_4_f64 (x * x, a);
 }
 
 /**
@@ -3585,35 +9007,34 @@ jbm_erfcwc_f64 (const double x)
 {
 // Taylor' serie
 // Faster
-  const double a[21] JB_ALIGNED = {
-    9.9999999999999941475737000369065819e-01,
-    3.6634327269813033732437351132353762e+01,
-    5.1821691614203419723474795630465805e+02,
-    3.6641372883071054833718510655089329e+03,
-    1.4035549126673829749384297700844511e+04,
-    2.9595070020815710819716711319852673e+04,
-    3.3493463583121848546425787921251302e+04,
-    1.9011856282959289729874891225757657e+04,
-    4.7366247076322482685970468264930599e+03,
-    3.9133724410449548827255365761052606e+02,
-    4.5085069955708687117148807109853997e+00,
-    3.7134327269812416859747159969397586e+01,
-    5.3603407977711361100838084258758547e+02,
-    3.9061785827204312472078409205007469e+03,
-    1.5649677223633826150632806308847180e+04,
-    3.5281175725499895598828057916145505e+04,
-    4.4137359854772607938136325391361908e+04,
-    2.9182447833465037346445877276855299e+04,
-    9.2563463542181707573307714470724826e+03,
-    1.1657507955046270801602404112392476e+03,
-    3.7122953780533481920127151328777440e+01
+  const double a[20] JB_ALIGNED = {
+    5.6418958354768736707807038060591287e-01,
+    1.8051004415450257700285888350571745e+01,
+    2.1978219451671353319983356065665088e+02,
+    1.3135543664738650878483887343660389e+03,
+    4.1552074737112564208523224542484942e+03,
+    7.0140036833571466406946177380947218e+03,
+    6.0814897620756423483352064472819201e+03,
+    2.4716090267123526561153586847227986e+03,
+    3.9072656162657605245145918429749559e+02,
+    1.5321763159343648122655993535976766e+01,
+    3.2494572288843474761386366235855875e+01,
+    4.0505108318039781318636258588369267e+02,
+    2.5082441072710807496968122050254421e+03,
+    8.3696120695844859053134346627847901e+03,
+    1.5311376533884028526757156864523534e+04,
+    1.4999652684109269275947348307975533e+04,
+    7.3688417906033169004375128026677106e+03,
+    1.5922490423907197067525615756231569e+03,
+    1.1458397755882851692192015995289270e+02,
+    1.1569654725157914741257111396878130e+00
   };
-  double xi;
-  if (x > 2.6641747557046326e+01)
+  double xi, x2;
+  if (x > 2.6543258454250981382470219714223799e+01)
     return 0.;
-  xi = 1. / x;
-  return jbm_rational_20_f64 (xi * xi, a) / jbm_exp_f64 (xi * xi)
-    / (sqrt (M_PI) * xi);
+  x2 = x * x;
+  xi = 1. / x2;
+  return jbm_rational_19_9_f64 (xi, a) / (x * jbm_exp_f64 (x2));
 }
 
 /**
@@ -3644,7 +9065,7 @@ jbm_erfc_f64 (const double x)   ///< double number.
   double ax;
   ax = jbm_abs_f64 (x);
   if (ax > 1.)
-    return x / ax * jbm_erfcwc_f64 (ax);
+    return 1. - x / ax * (1. - jbm_erfcwc_f64 (ax));
   return 1. - jbm_erfwc_f64 (x);
 }
 

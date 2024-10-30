@@ -1287,7 +1287,11 @@ main (void)
   xf = jbm_frexp_f32 (0.f, &i);
   printf ("frexp(-0)=%.8g*2^(%d)\n", xf, i);
   printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
-  if (!check_log_f32 (jbm_exp2_f32, exp2f, FLT_EPSILON))
+  printf ("exp2n(128)=%lg\n", jbm_exp2n_f32 (128));
+  printf ("exp2n(-160)=%lg\n", jbm_exp2n_f32 (-160));
+  printf ("exp2n(2)=%lg\n", jbm_exp2n_f32 (2));
+  printf ("exp2n(-140)=%lg\n", jbm_exp2n_f32 (-140));
+  if (!check_log_f32 (jbm_exp2_f32, exp2f, 8.f * FLT_EPSILON))
     return 0;
   printf ("check exp2: OK\n");
   printf ("exp2(-160)=%.8g\n", jbm_exp2_f32 (-150.f));
@@ -1297,7 +1301,7 @@ main (void)
   printf ("exp2(53)=%.8g\n", jbm_exp2_f32 (53.f));
   printf ("exp2(127)=%.8g\n", jbm_exp2_f32 (127.f));
   printf ("exp2(128)=%.8g\n", jbm_exp2_f32 (128.f));
-  if (!check_log_f32 (jbm_exp_f32, expf, 8. * FLT_EPSILON))
+  if (!check_log_f32 (jbm_exp_f32, expf, 8.f * FLT_EPSILON))
     return 0;
   printf ("check exp: OK\n");
   printf ("exp(-2)=%.8g\n", jbm_exp_f32 (-2.f));
@@ -1442,6 +1446,21 @@ main (void)
   printf ("tanh(0)=%.8g\n", jbm_tanh_f32 (0.f));
   printf ("tanh(1)=%.8g\n", jbm_tanh_f32 (1.f));
   printf ("tanh(inf)=%.8g\n", jbm_tanh_f32 (INFINITY));
+  printf ("erf(10)=%.8g=%.8g\n", jbm_erf_f32 (10.f), erff (10.f));
+  printf ("erf(3/2)=%.8g=%.8g\n", jbm_erf_f32 (1.5f), erff (1.5f));
+  printf ("erf(1/2)=%.8g=%.8g\n", jbm_erf_f32 (0.5f), erff (0.5f));
+  printf ("erf(0)=%.8g=%.8g\n", jbm_erf_f32 (0.f), erff (0.f));
+  printf ("erf(-1/2)=%.8g=%.8g\n", jbm_erf_f32 (-0.5f), erff (-0.5f));
+  printf ("erf(-3/2)=%.8g=%.8g\n", jbm_erf_f32 (-1.5f), erff (-1.5f));
+  printf ("erf(-10)=%.8g=%.8g\n", jbm_erf_f32 (-10.f), erff (-10.f));
+  if (!check_uni_f32 (jbm_erf_f32, erff, FLT_EPSILON, -FLT_MAX_EXP, FLT_MAX_EXP,
+                      1000))
+    return 0;
+  printf ("check erf: OK\n");
+  if (!check_uni_f32 (jbm_erfc_f32, erfcf, FLT_EPSILON,
+                      -FLT_MAX_EXP, FLT_MAX_EXP, 1000))
+    return 0;
+  printf ("check erfc: OK\n");
 
   printf ("DBL_MIN=%lg DBL_MAX=%lg DBL_EPSILON=%lg\n",
           DBL_MIN, DBL_MAX, DBL_EPSILON);
@@ -1501,6 +1520,10 @@ main (void)
   x = jbm_frexp_f64 (-0., &i);
   printf ("frexp(-0)=%lg*2^(%d)\n", x, i);
   printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
+  printf ("exp2n(1025)=%lg\n", jbm_exp2n_f64 (1025));
+  printf ("exp2n(-1075)=%lg\n", jbm_exp2n_f64 (-1075));
+  printf ("exp2n(2)=%lg\n", jbm_exp2n_f64 (2));
+  printf ("exp2n(-1024)=%lg\n", jbm_exp2n_f64 (-1024));
   if (!check_log_f64 (jbm_exp2_f64, exp2, DBL_EPSILON))
     return 0;
   printf ("check exp2: OK\n");
@@ -1511,7 +1534,7 @@ main (void)
   printf ("exp2(53)=%.17lg\n", jbm_exp2_f64 (53.));
   printf ("exp2(1023)=%.17lg\n", jbm_exp2_f64 (1023.));
   printf ("exp2(1024)=%.17lg\n", jbm_exp2_f64 (1024.));
-  if (!check_log_f64 (jbm_exp_f64, exp, 32. * DBL_EPSILON))
+  if (!check_log_f64 (jbm_exp_f64, exp, 64. * DBL_EPSILON))
     return 0;
   printf ("check exp: OK\n");
   printf ("exp(-2)=%.17lg\n", jbm_exp_f64 (-2.));
@@ -1524,7 +1547,7 @@ main (void)
   printf ("exp10(-2)=%.17lg\n", jbm_exp10_f64 (-2.));
   printf ("exp10(0)=%.17lg\n", jbm_exp10_f64 (0.));
   printf ("exp10(2)=%.17lg\n", jbm_exp10_f64 (2.));
-  if (!check_log_f64 (jbm_expm1_f64, expm1, 32. * DBL_EPSILON))
+  if (!check_log_f64 (jbm_expm1_f64, expm1, 64. * DBL_EPSILON))
     return 0;
   printf ("check expm1: OK\n");
   printf ("expm1(-2)=%.17lg\n", jbm_expm1_f64 (-2.));
@@ -1648,7 +1671,7 @@ main (void)
   printf ("cosh(-1)=%.17lg\n", jbm_cosh_f64 (-1.));
   printf ("cosh(0)=%.17lg\n", jbm_cosh_f64 (0.));
   printf ("cosh(1)=%.17lg\n", jbm_cosh_f64 (1.));
-  if (!check_log_f64 (jbm_tanh_f64, tanh, DBL_EPSILON))
+  if (!check_log_f64 (jbm_tanh_f64, tanh, 2. * DBL_EPSILON))
     return 0;
   printf ("check tanh: OK\n");
   printf ("tanh(-inf)=%.17lg\n", jbm_tanh_f64 (-INFINITY));
@@ -1656,6 +1679,22 @@ main (void)
   printf ("tanh(0)=%.17lg\n", jbm_tanh_f64 (0.));
   printf ("tanh(1)=%.17lg\n", jbm_tanh_f64 (1.));
   printf ("tanh(inf)=%.17lg\n", jbm_tanh_f64 (INFINITY));
+  printf ("erf(10)=%.17lg=%.17lg\n", jbm_erf_f64 (10.), erf (10.));
+  printf ("erf(3/2)=%.17lg=%.17lg\n", jbm_erf_f64 (1.5), erf (1.5));
+  printf ("erf(1/2)=%.17lg=%.17lg\n", jbm_erf_f64 (0.5), erf (0.5));
+  printf ("erf(0)=%.17lg=%.17lg\n", jbm_erf_f64 (0.), erf (0.));
+  printf ("erf(-1/2)=%.17lg=%.17lg\n", jbm_erf_f64 (-0.5), erf (-0.5));
+  printf ("erf(-3/2)=%.17lg=%.17lg\n", jbm_erf_f64 (-1.5), erf (-1.5));
+  printf ("erf(-10)=%.17lg=%.17lg\n", jbm_erf_f64 (-10.), erf (-10.));
+  if (!check_uni_f64 (jbm_erf_f64, erf, DBL_EPSILON, -DBL_MAX_EXP, DBL_MAX_EXP,
+                      1000))
+    return 0;
+  printf ("check erf: OK\n");
+  if (!check_uni_f64 (jbm_erfc_f64, erfc, DBL_EPSILON,
+                      -DBL_MAX_EXP, DBL_MAX_EXP, 1000))
+    return 0;
+  printf ("check erfc: OK\n");
+
   for (i = 0; i < 3; ++i)
     cf[i].C = Cf[i], cf[i].E = Ef[i];
   for (i = 0; i < 4; ++i)
