@@ -10,10 +10,35 @@
 #define FD "%.16le"
 #if __x86_64
 #define FLD "%.19Le"
+#define ARCH "amd64"
 #elif __riscv
 #define FLD "%.34Le"
+#define ARCH "riscv"
 #endif
 #define FQ "%.34Qe"
+#if __linux__
+#define OS "Linux"
+#elif __FreeBSD__
+#define OS "FreeBSD"
+#elif __OpenBSD__
+#define OS "OpenBSD"
+#elif __NetBSD__
+#define OS "NetBSD"
+#elif __DragonFly__
+#define OS "DragonFlyBSD"
+#elif __sun__
+#define OS "SunOS"
+#elif __HAIKU__
+#define OS "Haiku"
+#elif __gnu_hurd__
+#define OS "Hurd"
+#elif __APPLE__
+#define OS "MacOS"
+#elif __WIN32__
+#define OS "Windows (32 bits)"
+#elif __WIN64__
+#define OS "Windows (64 bits)"
+#endif
 
 void
 print_bits (char *label, void *p, unsigned int n)
@@ -48,13 +73,8 @@ main ()
   short int is;
   unsigned short int us;
 
-  printf ("ARCHITECTURE\n");
-#if __x86_64
-  printf ("X86-64\n");
-#endif
-#if __riscv
-  printf ("RISCV\n");
-#endif
+  printf ("ARCHITECTURE=%s\n", ARCH);
+  printf ("OS=%s\n", OS);
 
   printf ("\nSIZES\n");
   printf ("void*: %lu bits\n", (unsigned long int) 8l * sizeof (void *));
