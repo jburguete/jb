@@ -1,6 +1,6 @@
 CC = @CC@ @ARCH@ @LTO@
-CFLAGS = @CFLAGS@ @PRECISION@ @QUADMATH_CFLAGS@ -O3 -pedantic -Wall -Wextra
-LIBS = @LDFLAGS@ @LIBS@ @QUADMATH_LIBS@ -lm
+CFLAGS = @CFLAGS@ -O3 -pedantic -Wall -Wextra
+LIBS = @LDFLAGS@ @LIBS@
 src1 = series.c
 res1 = precision
 src2 = bounds.c

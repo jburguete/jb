@@ -149,7 +149,6 @@ AC_SUBST(PGO, [$pgo])
 # Checks for libraries
 AC_SEARCH_LIBS([fmaxl], [m])
 AC_SEARCH_LIBS([textdomain], [intl])
-AC_SEARCH_LIBS([sinq], [quadmath])
 PKG_CHECK_MODULES([XML], [libxml-2.0])
 PKG_CHECK_MODULES([GLIB], [glib-2.0])
 PKG_CHECK_MODULES([GTHREAD], [gthread-2.0])
@@ -320,6 +319,6 @@ else
 fi
 
 # Final output
-AC_CONFIG_HEADERS([src/config.h tests/config.h])
-AC_CONFIG_FILES([Makefile tests/Makefile])
+AC_CONFIG_HEADERS([src/config.h])
+AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
