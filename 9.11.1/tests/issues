@@ -1,1 +1,1 @@
-lond double does not work on Win64 (msys2+ucrt+gcc)
+lond double formats do not write/read correctly on Win64 (msys2+ucrt+gcc)
