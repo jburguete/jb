@@ -1,1 +1,5 @@
-lond double formats do not write/read correctly on Win64 (msys2+ucrt+gcc)
+* long double formats do not write/read correctly on Win64 (msys2+ucrt+gcc)
+
+* OpenGL not supported on:
+	- Debian Hurd
+	- last version of OpenIndiana Hipster
