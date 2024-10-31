@@ -34,10 +34,10 @@
 #define OS "Hurd"
 #elif __APPLE__
 #define OS "MacOS"
-#elif __WIN32__
-#define OS "Windows (32 bits)"
 #elif __WIN64__
 #define OS "Windows (64 bits)"
+#elif __WIN32__
+#define OS "Windows (32 bits)"
 #endif
 
 void

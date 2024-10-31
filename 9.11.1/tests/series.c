@@ -794,8 +794,6 @@ main (int argn, char **argc __attribute__((unused)))
 {
   FLOAT x;
 
-  stderr = stdout;
-
   // check arguments
   if (argn != 1)
     {

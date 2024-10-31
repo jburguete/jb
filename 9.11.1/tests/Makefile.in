@@ -10,10 +10,10 @@ all: $(res2) $(res1)
 
 $(res1): $(src1) Makefile
 	$(CC) $(CFLAGS) $(src1) -o series $(LIBS)
-	strip series
+	strip series@EXE@
 	./series > $(res1)
 
 $(res2): $(src2) Makefile
 	$(CC) $(CFLAGS) $(src2) -o bounds $(LIBS)
-	strip bounds
+	strip bounds@EXE@
 	./bounds > $(res2)

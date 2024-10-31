@@ -1,0 +1,1 @@
+lond double does not work on Win64 (msys2+ucrt+gcc)
