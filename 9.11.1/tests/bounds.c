@@ -8,12 +8,15 @@
 
 #define FF "%.7e"
 #define FD "%.16le"
-#if __x86_64
+#if __amd64
 #define FLD "%.19Le"
 #define ARCH "amd64"
 #elif __riscv
 #define FLD "%.34Le"
 #define ARCH "riscv"
+#elif __386
+#define FLD "%.19Le"
+#define ARCH "x86"
 #endif
 #define FQ "%.34Qe"
 #if __linux__
