@@ -849,14 +849,14 @@ main (int argn, char **argc __attribute__((unused)))
 
   // erf
   iterate ("erf(x)", ERF, K0, K1, K0, -1);
-  x = number_find (ERFC, (FLOAT) FLT_MIN, K1, K100);
-  number_print (stderr, "erfc(x)=FLT_MIN => x", x);
+  x = (FLOAT) 1.4012985e-45f;
+  x = number_find (ERFC, x, K1, K100);
+  number_print (stdout, "max x for erfcf", x);
   iterate ("x*exp(1/x^2)*erfc(1/x)", erfc_iq, K1 / x, K1, K0, 1);
-  x = number_find (ERFC, (FLOAT) DBL_MIN, K1, K100);
-  number_print (stderr, "erfc(x)=DBL_MIN => x", x);
+  x = (FLOAT) 4.9406564584124654e-324;
+  x = number_find (ERFC, x, K1, K100);
+  number_print (stdout, "max x for erfc", x);
   iterate ("x*exp(1/x^2)*erfc(1/x)", erfc_iq, K1 / x, K1, K0, 1);
-  number_print (stderr, "erfc(x)*exp(x^2)/x, x", number_min (erfc_iq));
-  number_print (stderr, "max(exp(x)), sqrt(x)", SQRT (number_max (EXP)));
 
   return 0;
 }

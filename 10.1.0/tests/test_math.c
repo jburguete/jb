@@ -1,5 +1,7 @@
 #include "../src/math.h"
 
+#define MAX_ITERATIONS 1024
+
 typedef struct
 {
   JBFLOAT A, B, C, D, E, F, G, H;
@@ -951,6 +953,18 @@ darray_print (JBDOUBLE *fa, unsigned int n)
 }
 
 int
+check_f32 (float x, float f0, float g0, float prec)
+{
+  if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
+    {
+      printf ("f/g-1=%.8g f-g=%.8g\n", f0 / g0 - 1.f, f0 - g0);
+      printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
+      return 0;
+    }
+  return 1;
+}
+
+int
 check_uni_f32 (float (*f) (float), float (*g) (float), float prec,
                float xmin, float xmax, unsigned int n)
 {
@@ -958,7 +972,7 @@ check_uni_f32 (float (*f) (float), float (*g) (float), float prec,
   unsigned int i, n1;
   n1 = n - 1;
   dx = xmax - xmin;
-  for (i = 0, x = xmin; i < n; ++i)
+  for (i = 0; i < n; ++i)
     {
       if (i < n1)
         x = xmin + i * dx / n1;
@@ -966,12 +980,8 @@ check_uni_f32 (float (*f) (float), float (*g) (float), float prec,
         x = xmax;
       f0 = f (x);
       g0 = g (x);
-      if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
-        {
-          printf ("f/g-1=%.8g f-g=%.8g\n", f0 / g0 - 1.f, f0 - g0);
-          printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
-          return 0;
-        }
+      if (!check_f32 (x, f0, g0, prec))
+        return 0;
     }
   return 1;
 }
@@ -986,12 +996,8 @@ check_logn_f32 (float (*f) (float), float (*g) (float), float prec, float x0)
       g0 = g (x);
       if (!isfinite (f0) && !isfinite (g0))
         break;
-      if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
-        {
-          printf ("f/g-1=%.8g f-g=%.8g\n", f0 / g0 - 1.f, f0 - g0);
-          printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
-          return 0;
-        }
+      if (!check_f32 (x, f0, g0, prec))
+        return 0;
     }
   for (x = x0; fabsf (x) > 0.f; x *= 0.5f)
     {
@@ -999,12 +1005,8 @@ check_logn_f32 (float (*f) (float), float (*g) (float), float prec, float x0)
       g0 = g (x);
       if (!isfinite (f0) && !isfinite (g0))
         break;
-      if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
-        {
-          printf ("f/g-1=%.8g f-g=%.8g\n", f0 / g0 - 1.f, f0 - g0);
-          printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
-          return 0;
-        }
+      if (!check_f32 (x, f0, g0, prec))
+        return 0;
     }
   return 1;
 }
@@ -1017,6 +1019,48 @@ check_log_f32 (float (*f) (float), float (*g) (float), float prec)
   return check_logn_f32 (f, g, prec, -1.f);
 }
 
+unsigned int
+test_uni_f32 (float (*f) (float), float (*g) (float), float xmin, float xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_f32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_f32 (float (*f) (float), float (*g) (float))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_f32 (f, g, n * FLT_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_f32 (float (*f) (float), float (*g) (float), float x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_f32 (f, g, n * FLT_EPSILON, x0))
+      break;
+  return n;
+}
+
+int
+check_f64 (double x, double f0, double g0, double prec)
+{
+  if (fabs (f0 / g0 - 1.) > prec && fabs (f0 - g0) > prec)
+    {
+      printf ("f/g-1=%.17lg f-g=%.17lg\n", f0 / g0 - 1., f0 - g0);
+      printf ("x=%.17lg f=%.17lg g=%.17lg\n", x, f0, g0);
+      return 0;
+    }
+  return 1;
+}
+
 int
 check_uni_f64 (double (*f) (double), double (*g) (double), double prec,
                double xmin, double xmax, unsigned int n)
@@ -1025,7 +1069,7 @@ check_uni_f64 (double (*f) (double), double (*g) (double), double prec,
   unsigned int i, n1;
   n1 = n - 1;
   dx = xmax - xmin;
-  for (i = 0, x = xmin; i < n; ++i)
+  for (i = 0; i < n; ++i)
     {
       if (i < n1)
         x = xmin + i * dx / n1;
@@ -1033,12 +1077,8 @@ check_uni_f64 (double (*f) (double), double (*g) (double), double prec,
         x = xmax;
       f0 = f (x);
       g0 = g (x);
-      if (fabs (f0 / g0 - 1.) > prec && fabs (f0 - g0) > prec)
-        {
-          printf ("f/g-1=%.17lg f-g=%.17lg\n", f0 / g0 - 1., f0 - g0);
-          printf ("x=%.17lg f=%.17lg g=%.17lg\n", x, f0, g0);
-          return 0;
-        }
+      if (!check_f64 (x, f0, g0, prec))
+        return 0;
     }
   return 1;
 }
@@ -1054,12 +1094,8 @@ check_logn_f64 (double (*f) (double), double (*g) (double), double prec,
       g0 = g (x);
       if (!isfinite (f0) && !isfinite (g0))
         break;
-      if (fabs (f0 / g0 - 1.) > prec && fabs (f0 - g0) > prec)
-        {
-          printf ("f/g-1=%.17lg f-g=%.17lg\n", f0 / g0 - 1., f0 - g0);
-          printf ("x=%.17lg f=%.17lg g=%.17lg\n", x, f0, g0);
-          return 0;
-        }
+      if (!check_f64 (x, f0, g0, prec))
+        return 0;
     }
   for (x = x0; fabs (x) > 0.; x *= 0.5)
     {
@@ -1067,12 +1103,8 @@ check_logn_f64 (double (*f) (double), double (*g) (double), double prec,
       g0 = g (x);
       if (!isfinite (f0) && !isfinite (g0))
         break;
-      if (fabs (f0 / g0 - 1.) > prec && fabs (f0 - g0) > prec)
-        {
-          printf ("f/g-1=%.17lg f-g=%.17lg\n", f0 / g0 - 1., f0 - g0);
-          printf ("x=%.17lg f=%.17lg g=%.17lg\n", x, f0, g0);
-          return 0;
-        }
+      if (!check_f64 (x, f0, g0, prec))
+        return 0;
     }
   return 1;
 }
@@ -1084,6 +1116,703 @@ check_log_f64 (double (*f) (double), double (*g) (double), double prec)
     return 0;
   return check_logn_f64 (f, g, prec, -1.);
 }
+
+unsigned int
+test_uni_f64 (double (*f) (double), double (*g) (double),
+              double xmin, double xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_f64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_f64 (double (*f) (double), double (*g) (double))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_f64 (f, g, n * DBL_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_f64 (double (*f) (double), double (*g) (double), double x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_f64 (f, g, n * DBL_EPSILON, x0))
+      break;
+  return n;
+}
+
+#ifdef __SSE4_2__
+
+int
+check_uni_4xf32 (__m128 (*f) (__m128), float (*g) (float), float prec,
+                 float xmin, float xmax, unsigned int n)
+{
+  float x[4] JB_ALIGNED , f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  float dx;
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  dx = xmax - xmin;
+  for (i = 0; i < n;)
+    {
+      for (j = 0; j < 4; ++j, ++i)
+        {
+          if (i < n1)
+            x[j] = xmin + i * dx / n1;
+          else
+            x[j] = xmax;
+          g0[j] = g (x[j]);
+	}
+      _mm_store_ps (f0, f (_mm_load_ps (x)));
+      for (j = 0; j < 4; ++j)
+        if (!check_f32 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_4xf32 (__m128 (*f) (__m128), float (*g) (float), float prec,
+                  float x0)
+{
+  float x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  float xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 4; ++j, xn *= 2.f)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm_store_ps (f0, f (_mm_load_ps (x)));
+      for (j = 0; j < 4; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+	  if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabsf (xn) > 0.f;)
+    {
+      for (j = 0; j < 4; ++j, xn *= 0.5f)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm_store_ps (f0, f (_mm_load_ps (x)));
+      for (j = 0; j < 4; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+	  if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_log_4xf32 (__m128 (*f) (__m128), float (*g) (float), float prec)
+{
+  if (!check_logn_4xf32 (f, g, prec, 1.f))
+    return 0;
+  return check_logn_4xf32 (f, g, prec, -1.f);
+}
+
+unsigned int
+test_uni_4xf32 (__m128 (*f) (__m128), float (*g) (float),
+                float xmin, float xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_4xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_4xf32 (__m128 (*f) (__m128), float (*g) (float))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_4xf32 (f, g, n * FLT_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_4xf32 (__m128 (*f) (__m128), float (*g) (float), float x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_4xf32 (f, g, n * FLT_EPSILON, x0))
+      break;
+  return n;
+}
+
+int
+check_uni_2xf64 (__m128d (*f) (__m128d), double (*g) (double), double prec,
+                 double xmin, double xmax, unsigned int n)
+{
+  double x[2] JB_ALIGNED , f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
+  double dx;
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  dx = xmax - xmin;
+  for (i = 0; i < n;)
+    {
+      for (j = 0; j < 2; ++j, ++i)
+        {
+          if (i < n1)
+            x[j] = xmin + i * dx / n1;
+          else
+            x[j] = xmax;
+          g0[j] = g (x[j]);
+	}
+      _mm_store_pd (f0, f (_mm_load_pd (x)));
+      for (j = 0; j < 2; ++j)
+        if (!check_f64 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_2xf64 (__m128d (*f) (__m128d), double (*g) (double), double prec,
+                  double x0)
+{
+  double x[2] JB_ALIGNED, f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
+  double xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 2; ++j, xn *= 2.)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm_store_pd (f0, f (_mm_load_pd (x)));
+      for (j = 0; j < 2; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+	  if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabs (xn) > 0.;)
+    {
+      for (j = 0; j < 2; ++j, xn *= 0.5)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm_store_pd (f0, f (_mm_load_pd (x)));
+      for (j = 0; j < 2; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+	  if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_log_2xf64 (__m128d (*f) (__m128d), double (*g) (double), double prec)
+{
+  if (!check_logn_2xf64 (f, g, prec, 1.))
+    return 0;
+  return check_logn_2xf64 (f, g, prec, -1.);
+}
+
+unsigned int
+test_uni_2xf64 (__m128d (*f) (__m128d), double (*g) (double),
+                double xmin, double xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_2xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_2xf64 (__m128d (*f) (__m128d), double (*g) (double))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_2xf64 (f, g, n * DBL_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_2xf64 (__m128d (*f) (__m128d), double (*g) (double), double x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_2xf64 (f, g, n * DBL_EPSILON, x0))
+      break;
+  return n;
+}
+
+#endif
+
+#ifdef __AVX__
+
+int
+check_uni_8xf32 (__m256 (*f) (__m256), float (*g) (float), float prec,
+                 float xmin, float xmax, unsigned int n)
+{
+  float x[8] JB_ALIGNED , f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  float dx;
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  dx = xmax - xmin;
+  for (i = 0; i < n;)
+    {
+      for (j = 0; j < 8; ++j, ++i)
+        {
+          if (i < n1)
+            x[j] = xmin + i * dx / n1;
+          else
+            x[j] = xmax;
+          g0[j] = g (x[j]);
+	}
+      _mm256_store_ps (f0, f (_mm256_load_ps (x)));
+      for (j = 0; j < 8; ++j)
+        if (!check_f32 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_8xf32 (__m256 (*f) (__m256), float (*g) (float), float prec,
+                  float x0)
+{
+  float x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  float xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 8; ++j, xn *= 2.f)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm256_store_ps (f0, f (_mm256_load_ps (x)));
+      for (j = 0; j < 8; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+	  if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabsf (xn) > 0.f;)
+    {
+      for (j = 0; j < 8; ++j, xn *= 0.5f)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm256_store_ps (f0, f (_mm256_load_ps (x)));
+      for (j = 0; j < 8; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+	  if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_log_8xf32 (__m256 (*f) (__m256), float (*g) (float), float prec)
+{
+  if (!check_logn_8xf32 (f, g, prec, 1.f))
+    return 0;
+  return check_logn_8xf32 (f, g, prec, -1.f);
+}
+
+unsigned int
+test_uni_8xf32 (__m256 (*f) (__m256), float (*g) (float),
+                float xmin, float xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_8xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_8xf32 (__m256 (*f) (__m256), float (*g) (float))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_8xf32 (f, g, n * FLT_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_8xf32 (__m256 (*f) (__m256), float (*g) (float), float x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_8xf32 (f, g, n * FLT_EPSILON, x0))
+      break;
+  return n;
+}
+
+int
+check_uni_4xf64 (__m256d (*f) (__m256d), double (*g) (double), double prec,
+                 double xmin, double xmax, unsigned int n)
+{
+  double x[4] JB_ALIGNED , f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  double dx;
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  dx = xmax - xmin;
+  for (i = 0; i < n;)
+    {
+      for (j = 0; j < 4; ++j, ++i)
+        {
+          if (i < n1)
+            x[j] = xmin + i * dx / n1;
+          else
+            x[j] = xmax;
+          g0[j] = g (x[j]);
+	}
+      _mm256_store_pd (f0, f (_mm256_load_pd (x)));
+      for (j = 0; j < 4; ++j)
+        if (!check_f64 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_4xf64 (__m256d (*f) (__m256d), double (*g) (double), double prec,
+                  double x0)
+{
+  double x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  double xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 4; ++j, xn *= 2.)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm256_store_pd (f0, f (_mm256_load_pd (x)));
+      for (j = 0; j < 4; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+	  if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabs (xn) > 0.;)
+    {
+      for (j = 0; j < 4; ++j, xn *= 0.5)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm256_store_pd (f0, f (_mm256_load_pd (x)));
+      for (j = 0; j < 4; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+	  if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_log_4xf64 (__m256d (*f) (__m256d), double (*g) (double), double prec)
+{
+  if (!check_logn_4xf64 (f, g, prec, 1.))
+    return 0;
+  return check_logn_4xf64 (f, g, prec, -1.);
+}
+
+unsigned int
+test_uni_4xf64 (__m256d (*f) (__m256d), double (*g) (double),
+                double xmin, double xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_4xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_4xf64 (__m256d (*f) (__m256d), double (*g) (double))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_4xf64 (f, g, n * DBL_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_4xf64 (__m256d (*f) (__m256d), double (*g) (double), double x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_4xf64 (f, g, n * DBL_EPSILON, x0))
+      break;
+  return n;
+}
+
+#endif
+
+#ifdef __AVX512F__
+
+int
+check_uni_16xf32 (__m512 (*f) (__m512), float (*g) (float), float prec,
+                 float xmin, float xmax, unsigned int n)
+{
+  float x[16] JB_ALIGNED , f0[16] JB_ALIGNED, g0[16] JB_ALIGNED;
+  float dx;
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  dx = xmax - xmin;
+  for (i = 0; i < n;)
+    {
+      for (j = 0; j < 16; ++j, ++i)
+        {
+          if (i < n1)
+            x[j] = xmin + i * dx / n1;
+          else
+            x[j] = xmax;
+          g0[j] = g (x[j]);
+	}
+      _mm512_store_ps (f0, f (_mm512_load_ps (x)));
+      for (j = 0; j < 16; ++j)
+        if (!check_f32 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_16xf32 (__m512 (*f) (__m512), float (*g) (float), float prec,
+                  float x0)
+{
+  float x[16] JB_ALIGNED, f0[16] JB_ALIGNED, g0[16] JB_ALIGNED;
+  float xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 16; ++j, xn *= 2.f)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm512_store_ps (f0, f (_mm512_load_ps (x)));
+      for (j = 0; j < 16; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+	  if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabsf (xn) > 0.f;)
+    {
+      for (j = 0; j < 16; ++j, xn *= 0.5f)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm512_store_ps (f0, f (_mm512_load_ps (x)));
+      for (j = 0; j < 16; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+	  if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_log_16xf32 (__m512 (*f) (__m512), float (*g) (float), float prec)
+{
+  if (!check_logn_16xf32 (f, g, prec, 1.f))
+    return 0;
+  return check_logn_16xf32 (f, g, prec, -1.f);
+}
+
+unsigned int
+test_uni_16xf32 (__m512 (*f) (__m512), float (*g) (float),
+                float xmin, float xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_16xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_16xf32 (__m512 (*f) (__m512), float (*g) (float))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_16xf32 (f, g, n * FLT_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_16xf32 (__m512 (*f) (__m512), float (*g) (float), float x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_16xf32 (f, g, n * FLT_EPSILON, x0))
+      break;
+  return n;
+}
+
+int
+check_uni_8xf64 (__m512d (*f) (__m512d), double (*g) (double), double prec,
+                 double xmin, double xmax, unsigned int n)
+{
+  double x[8] JB_ALIGNED , f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  double dx;
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  dx = xmax - xmin;
+  for (i = 0; i < n;)
+    {
+      for (j = 0; j < 8; ++j, ++i)
+        {
+          if (i < n1)
+            x[j] = xmin + i * dx / n1;
+          else
+            x[j] = xmax;
+          g0[j] = g (x[j]);
+	}
+      _mm512_store_pd (f0, f (_mm512_load_pd (x)));
+      for (j = 0; j < 8; ++j)
+        if (!check_f64 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_8xf64 (__m512d (*f) (__m512d), double (*g) (double), double prec,
+                  double x0)
+{
+  double x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  double xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 8; ++j, xn *= 2.)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm512_store_pd (f0, f (_mm512_load_pd (x)));
+      for (j = 0; j < 8; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+	  if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabs (xn) > 0.;)
+    {
+      for (j = 0; j < 8; ++j, xn *= 0.5)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      _mm512_store_pd (f0, f (_mm512_load_pd (x)));
+      for (j = 0; j < 8; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+	  if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_log_8xf64 (__m512d (*f) (__m512d), double (*g) (double), double prec)
+{
+  if (!check_logn_8xf64 (f, g, prec, 1.))
+    return 0;
+  return check_logn_8xf64 (f, g, prec, -1.);
+}
+
+unsigned int
+test_uni_8xf64 (__m512d (*f) (__m512d), double (*g) (double),
+                double xmin, double xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_8xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_8xf64 (__m512d (*f) (__m512d), double (*g) (double))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_8xf64 (f, g, n * DBL_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_8xf64 (__m512d (*f) (__m512d), double (*g) (double), double x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_8xf64 (f, g, n * DBL_EPSILON, x0))
+      break;
+  return n;
+}
+
+#endif
 
 int
 check_uni (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
@@ -1185,6 +1914,198 @@ log1 (double x)
   return log (1. + x);
 }
 
+float
+number_find_f32 (float (*f) (const float), const float y,
+                 const float xmin, const float xmax)
+{
+  float x0, x1, x2, f0, f2;
+  unsigned int i;
+  x1 = xmin;
+  x2 = xmax;
+  f0 = f (x1) - y;
+  f2 = f (x2) - y;
+  if (f0 * f2 > 0.f)
+    {
+      printf ("Unable to find\n");
+      return 0.f;
+    }
+  if (f0 < 0.f)
+    {
+      for (i = 0; i < 128; ++i)
+        {
+          x0 = 0.5f * (x1 + x2);
+          f0 = f (x0);
+          if (f0 > y)
+            x2 = x0;
+          else
+            x1 = x0;
+        }
+    }
+  else
+    {
+      for (i = 0; i < 128; ++i)
+        {
+          x0 = 0.5f * (x1 + x2);
+          f0 = f (x0);
+          if (f0 < y)
+            x2 = x0;
+          else
+            x1 = x0;
+        }
+    }
+  return x0;
+}
+
+float
+number_max_f32 (float (*f) (const float))
+{
+  float x0, x1, x2;
+  unsigned int i;
+  x2 = x1 = 1.f;
+  while (finitef (x2) && finitef (f (x2)))
+    {
+      x1 = x2;
+      x2 += x2;
+    }
+  while (!finitef (x1) && !finitef (f (x1)))
+    {
+      x2 = x1;
+      x1 *= 0.5f;
+    }
+  for (i = 0; i < 128; ++i)
+    {
+      x0 = 0.5f * (x1 + x2);
+      if (finitef (x0) && finitef (f (x0)))
+        x1 = x0;
+      else
+        x2 = x0;
+    }
+  return x1;
+}
+
+float
+number_min_f32 (float (*f) (const float))
+{
+  float x0, x1, x2;
+  unsigned int i;
+  x2 = x1 = 1.f;
+  while (x1 > 0.f && finitef (f (x1)))
+    {
+      x2 = x1;
+      x1 *= 0.5f;
+    }
+  while (finitef (x2) && !finitef (f (x2)))
+    {
+      x1 = x2;
+      x2 += x2;
+    }
+  for (i = 0; i < 128; ++i)
+    {
+      x0 = 0.5f * (x1 + x2);
+      if (x0 > 0.f && finitef (x0) && finitef (f (x0)))
+        x2 = x0;
+      else
+        x1 = x0;
+    }
+  return x2;
+}
+
+double
+number_find_f64 (double (*f) (const double), const double y,
+                 const double xmin, const double xmax)
+{
+  double x0, x1, x2, f0, f2;
+  unsigned int i;
+  x1 = xmin;
+  x2 = xmax;
+  f0 = f (x1) - y;
+  f2 = f (x2) - y;
+  if (f0 * f2 > 0.)
+    {
+      printf ("Unable to find\n");
+      return 0.;
+    }
+  if (f0 < 0.)
+    {
+      for (i = 0; i < 128; ++i)
+        {
+          x0 = 0.5 * (x1 + x2);
+          f0 = f (x0);
+          if (f0 > y)
+            x2 = x0;
+          else
+            x1 = x0;
+        }
+    }
+  else
+    {
+      for (i = 0; i < 128; ++i)
+        {
+          x0 = 0.5 * (x1 + x2);
+          f0 = f (x0);
+          if (f0 < y)
+            x2 = x0;
+          else
+            x1 = x0;
+        }
+    }
+  return x0;
+}
+
+double
+number_max_f64 (double (*f) (const double))
+{
+  double x0, x1, x2;
+  unsigned int i;
+  x2 = x1 = 1.;
+  while (finite (x2) && finite (f (x2)))
+    {
+      x1 = x2;
+      x2 += x2;
+    }
+  while (!finite (x1) && !finite (f (x1)))
+    {
+      x2 = x1;
+      x1 *= 0.5;
+    }
+  for (i = 0; i < 128; ++i)
+    {
+      x0 = 0.5 * (x1 + x2);
+      if (finite (x0) && finite (f (x0)))
+        x1 = x0;
+      else
+        x2 = x0;
+    }
+  return x1;
+}
+
+double
+number_min_f64 (double (*f) (const double))
+{
+  double x0, x1, x2;
+  unsigned int i;
+  x2 = x1 = 1.;
+  while (x1 > 0. && finite (f (x1)))
+    {
+      x2 = x1;
+      x1 *= 0.5;
+    }
+  while (finite (x2) && !finite (f (x2)))
+    {
+      x1 = x2;
+      x2 += x2;
+    }
+  for (i = 0; i < 128; ++i)
+    {
+      x0 = 0.5 * (x1 + x2);
+      if (x0 > 0. && finite (x0) && finite (f (x0)))
+        x2 = x0;
+      else
+        x1 = x0;
+    }
+  return x2;
+}
+
 int
 main (void)
 {
@@ -1219,8 +2140,641 @@ main (void)
   int i, is, is2;
   unsigned int n, us, us2;
 
+  // constants
   printf ("FLT_MIN=%g FLT_MAX=%g FLT_EPSILON=%g\n",
           FLT_MIN, FLT_MAX, FLT_EPSILON);
+  printf ("DBL_MIN=%lg DBL_MAX=%lg DBL_EPSILON=%lg\n",
+          DBL_MIN, DBL_MAX, DBL_EPSILON);
+
+  // extreme values
+  printf ("max x for exp2=%.7e=%.7e\n",
+          number_max_f32 (jbm_exp2_f32), (float) FLT_MAX_EXP);
+
+  printf ("max x for exp=%.7e\n", number_max_f32 (jbm_exp_f32));
+  printf ("max x for exp10=%.7e=%.7e\n",
+          number_max_f32 (jbm_exp10_f32), (float) FLT_MAX_10_EXP);
+  printf ("max x for expm1=%.7e\n", number_max_f32 (jbm_expm1_f32));
+  printf ("min x for log2=%.7e\n", number_min_f32 (jbm_log2_f32));
+  printf ("min x for log=%.7e\n", number_min_f32 (jbm_log_f32));
+  printf ("min x for log10=%.7e\n", number_min_f32 (jbm_log10_f32));
+  printf ("max x for sinh=%.7e\n", number_max_f32 (jbm_sinh_f32));
+  printf ("max x for cosh=%.7e\n", number_max_f32 (jbm_cosh_f32));
+  x = number_find_f64 (erfc, (double) JBM_FLT_MIN, 1., 100.);
+  printf ("erfc(x)=JBM_FLT_MIN => x=%.7le\n", x);
+  printf ("max x for exp2=%.16le=%.16le\n",
+          number_max_f64 (jbm_exp2_f64), (double) DBL_MAX_EXP);
+
+  printf ("max x for exp=%.16le\n", number_max_f64 (jbm_exp_f64));
+  printf ("max x for exp10=%.16le=%.16le\n",
+          number_max_f64 (jbm_exp10_f64), (double) DBL_MAX_10_EXP);
+  printf ("max x for expm1=%.16le\n", number_max_f64 (jbm_expm1_f64));
+  printf ("min x for log2=%.16le\n", number_min_f64 (jbm_log2_f64));
+  printf ("min x for log=%.16le\n", number_min_f64 (jbm_log_f64));
+  printf ("min x for log10=%.16le\n", number_min_f64 (jbm_log10_f64));
+  printf ("max x for sinh=%.16le\n", number_max_f64 (jbm_sinh_f64));
+  printf ("max x for cosh=%.16le\n", number_max_f64 (jbm_cosh_f64));
+  x = number_find_f64 (erfc, (double) JBM_DBL_MIN, 1., 100.);
+  printf ("erfc(x)=JBM_DBL_MIN => x=%.16le\n", x);
+
+  // checks
+
+  printf ("checking float functions\n");
+  n = test_log_f32 (jbm_exp2_f32, exp2f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp2: OK(%u)\n", n);
+  n = test_log_f32 (jbm_exp_f32, expf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp: OK(%u)\n", n);
+  n = test_log_f32 (jbm_exp10_f32, exp10f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp10: OK(%u)\n", n);
+  n = test_log_f32 (jbm_expm1_f32, expm1f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check expm1: OK(%u)\n", n);
+  n = test_logn_f32 (jbm_log2_f32, log2f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log2: OK(%u)\n", n);
+  n = test_logn_f32 (jbm_log_f32, logf, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log: OK(%u)\n", n);
+  n = test_logn_f32 (jbm_log10_f32, log10f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log10: OK(%u)\n", n);
+  n = test_uni_f32 (jbm_sin_f32, sinf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sin: OK(%u)\n", n);
+  n = test_uni_f32 (jbm_cos_f32, cosf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cos: OK(%u)\n", n);
+  n = test_uni_f32 (jbm_tan_f32, tanf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    printf ("check tan: No\n");
+  n = test_log_f32 (jbm_atan_f32, atanf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check atan: OK(%u)\n", n);
+  n = test_uni_f32 (jbm_asin_f32, asinf, -1.f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check asin: OK(%u)\n", n);
+  n = test_uni_f32 (jbm_acos_f32, acosf, -1.f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check acos: OK(%u)\n", n);
+  n = test_log_f32 (jbm_sinh_f32, sinhf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sinh: OK(%u)\n", n);
+  n = test_log_f32 (jbm_cosh_f32, coshf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cosh: OK(%u)\n", n);
+  n = test_log_f32 (jbm_tanh_f32, tanhf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check tanh: OK(%u)\n", n);
+  n = test_uni_f32 (jbm_erf_f32, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erf: OK(%u)\n", n);
+  n = test_uni_f32 (jbm_erfc_f32, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erfc: OK(%u)\n", n);
+
+  printf ("checking double functions\n");
+  n = test_log_f64 (jbm_exp2_f64, exp2);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp2: OK(%u)\n", n);
+  n = test_log_f64 (jbm_exp_f64, exp);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp: OK(%u)\n", n);
+  n = test_log_f64 (jbm_exp10_f64, exp10);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp10: OK(%u)\n", n);
+  n = test_log_f64 (jbm_expm1_f64, expm1);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check expm1: OK(%u)\n", n);
+  n = test_logn_f64 (jbm_log2_f64, log2, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log2: OK(%u)\n", n);
+  n = test_logn_f64 (jbm_log_f64, log, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log: OK(%u)\n", n);
+  n = test_logn_f64 (jbm_log10_f64, log10, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log10: OK(%u)\n", n);
+  n = test_uni_f64 (jbm_sin_f64, sin, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sin: OK(%u)\n", n);
+  n = test_uni_f64 (jbm_cos_f64, cos, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cos: OK(%u)\n", n);
+  n = test_uni_f64 (jbm_tan_f64, tan, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    printf ("check tan: No\n");
+  n = test_log_f64 (jbm_atan_f64, atan);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check atan: OK(%u)\n", n);
+  n = test_uni_f64 (jbm_asin_f64, asin, -1., 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check asin: OK(%u)\n", n);
+  n = test_uni_f64 (jbm_acos_f64, acos, -1., 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check acos: OK(%u)\n", n);
+  n = test_log_f64 (jbm_sinh_f64, sinh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sinh: OK(%u)\n", n);
+  n = test_log_f64 (jbm_cosh_f64, cosh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cosh: OK(%u)\n", n);
+  n = test_log_f64 (jbm_tanh_f64, tanh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check tanh: OK(%u)\n", n);
+  n = test_uni_f64 (jbm_erf_f64, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erf: OK(%u)\n", n);
+  n = test_uni_f64 (jbm_erfc_f64, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erfc: OK(%u)\n", n);
+
+#ifdef __SSE4_2__
+
+  printf ("checking __m128 functions\n");
+  n = test_log_4xf32 (jbm_exp2_4xf32, exp2f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp2: OK(%u)\n", n);
+  n = test_log_4xf32 (jbm_exp_4xf32, expf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp: OK(%u)\n", n);
+  n = test_log_4xf32 (jbm_exp10_4xf32, exp10f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp10: OK(%u)\n", n);
+  n = test_log_4xf32 (jbm_expm1_4xf32, expm1f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check expm1: OK(%u)\n", n);
+  n = test_logn_4xf32 (jbm_log2_4xf32, log2f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log2: OK(%u)\n", n);
+  n = test_logn_4xf32 (jbm_log_4xf32, logf, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log: OK(%u)\n", n);
+  n = test_logn_4xf32 (jbm_log10_4xf32, log10f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log10: OK(%u)\n", n);
+  n = test_uni_4xf32 (jbm_sin_4xf32, sinf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sin: OK(%u)\n", n);
+  n = test_uni_4xf32 (jbm_cos_4xf32, cosf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cos: OK(%u)\n", n);
+  n = test_uni_4xf32 (jbm_tan_4xf32, tanf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    printf ("check tan: No\n");
+  n = test_log_4xf32 (jbm_atan_4xf32, atanf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check atan: OK(%u)\n", n);
+  n = test_uni_4xf32 (jbm_asin_4xf32, asinf, -1.f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check asin: OK(%u)\n", n);
+  n = test_uni_4xf32 (jbm_acos_4xf32, acosf, -1.f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check acos: OK(%u)\n", n);
+  n = test_log_4xf32 (jbm_sinh_4xf32, sinhf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sinh: OK(%u)\n", n);
+  n = test_log_4xf32 (jbm_cosh_4xf32, coshf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cosh: OK(%u)\n", n);
+  n = test_log_4xf32 (jbm_tanh_4xf32, tanhf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check tanh: OK(%u)\n", n);
+  n = test_uni_4xf32 (jbm_erf_4xf32, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erf: OK(%u)\n", n);
+  n = test_uni_4xf32 (jbm_erfc_4xf32, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erfc: OK(%u)\n", n);
+
+  printf ("checking __m128d functions\n");
+  n = test_log_2xf64 (jbm_exp2_2xf64, exp2);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp2: OK(%u)\n", n);
+  n = test_log_2xf64 (jbm_exp_2xf64, exp);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp: OK(%u)\n", n);
+  n = test_log_2xf64 (jbm_exp10_2xf64, exp10);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp10: OK(%u)\n", n);
+  n = test_log_2xf64 (jbm_expm1_2xf64, expm1);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check expm1: OK(%u)\n", n);
+  n = test_logn_2xf64 (jbm_log2_2xf64, log2, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log2: OK(%u)\n", n);
+  n = test_logn_2xf64 (jbm_log_2xf64, log, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log: OK(%u)\n", n);
+  n = test_logn_2xf64 (jbm_log10_2xf64, log10, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log10: OK(%u)\n", n);
+  n = test_uni_2xf64 (jbm_sin_2xf64, sin, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sin: OK(%u)\n", n);
+  n = test_uni_2xf64 (jbm_cos_2xf64, cos, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cos: OK(%u)\n", n);
+  n = test_uni_2xf64 (jbm_tan_2xf64, tan, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    printf ("check tan: No\n");
+  n = test_log_2xf64 (jbm_atan_2xf64, atan);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check atan: OK(%u)\n", n);
+  n = test_uni_2xf64 (jbm_asin_2xf64, asin, -1., 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check asin: OK(%u)\n", n);
+  n = test_uni_2xf64 (jbm_acos_2xf64, acos, -1., 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check acos: OK(%u)\n", n);
+  n = test_log_2xf64 (jbm_sinh_2xf64, sinh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sinh: OK(%u)\n", n);
+  n = test_log_2xf64 (jbm_cosh_2xf64, cosh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cosh: OK(%u)\n", n);
+  n = test_log_2xf64 (jbm_tanh_2xf64, tanh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check tanh: OK(%u)\n", n);
+  n = test_uni_2xf64 (jbm_erf_2xf64, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erf: OK(%u)\n", n);
+  n = test_uni_2xf64 (jbm_erfc_2xf64, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erfc: OK(%u)\n", n);
+
+#endif
+
+#if __AVX__
+
+  printf ("checking __m256 functions\n");
+  n = test_log_8xf32 (jbm_exp2_8xf32, exp2f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp2: OK(%u)\n", n);
+  n = test_log_8xf32 (jbm_exp_8xf32, expf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp: OK(%u)\n", n);
+  n = test_log_8xf32 (jbm_exp10_8xf32, exp10f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp10: OK(%u)\n", n);
+  n = test_log_8xf32 (jbm_expm1_8xf32, expm1f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check expm1: OK(%u)\n", n);
+  n = test_logn_8xf32 (jbm_log2_8xf32, log2f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log2: OK(%u)\n", n);
+  n = test_logn_8xf32 (jbm_log_8xf32, logf, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log: OK(%u)\n", n);
+  n = test_logn_8xf32 (jbm_log10_8xf32, log10f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log10: OK(%u)\n", n);
+  n = test_uni_8xf32 (jbm_sin_8xf32, sinf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sin: OK(%u)\n", n);
+  n = test_uni_8xf32 (jbm_cos_8xf32, cosf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cos: OK(%u)\n", n);
+  n = test_uni_8xf32 (jbm_tan_8xf32, tanf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    printf ("check tan: No\n");
+  n = test_log_8xf32 (jbm_atan_8xf32, atanf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check atan: OK(%u)\n", n);
+  n = test_uni_8xf32 (jbm_asin_8xf32, asinf, -1.f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check asin: OK(%u)\n", n);
+  n = test_uni_8xf32 (jbm_acos_8xf32, acosf, -1.f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check acos: OK(%u)\n", n);
+  n = test_log_8xf32 (jbm_sinh_8xf32, sinhf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sinh: OK(%u)\n", n);
+  n = test_log_8xf32 (jbm_cosh_8xf32, coshf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cosh: OK(%u)\n", n);
+  n = test_log_8xf32 (jbm_tanh_8xf32, tanhf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check tanh: OK(%u)\n", n);
+  n = test_uni_8xf32 (jbm_erf_8xf32, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erf: OK(%u)\n", n);
+  n = test_uni_8xf32 (jbm_erfc_8xf32, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erfc: OK(%u)\n", n);
+
+  printf ("checking __m256d functions\n");
+  n = test_log_4xf64 (jbm_exp2_4xf64, exp2);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp2: OK(%u)\n", n);
+  n = test_log_4xf64 (jbm_exp_4xf64, exp);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp: OK(%u)\n", n);
+  n = test_log_4xf64 (jbm_exp10_4xf64, exp10);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp10: OK(%u)\n", n);
+  n = test_log_4xf64 (jbm_expm1_4xf64, expm1);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check expm1: OK(%u)\n", n);
+  n = test_logn_4xf64 (jbm_log2_4xf64, log2, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log2: OK(%u)\n", n);
+  n = test_logn_4xf64 (jbm_log_4xf64, log, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log: OK(%u)\n", n);
+  n = test_logn_4xf64 (jbm_log10_4xf64, log10, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log10: OK(%u)\n", n);
+  n = test_uni_4xf64 (jbm_sin_4xf64, sin, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sin: OK(%u)\n", n);
+  n = test_uni_4xf64 (jbm_cos_4xf64, cos, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cos: OK(%u)\n", n);
+  n = test_uni_4xf64 (jbm_tan_4xf64, tan, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    printf ("check tan: No\n");
+  n = test_log_4xf64 (jbm_atan_4xf64, atan);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check atan: OK(%u)\n", n);
+  n = test_uni_4xf64 (jbm_asin_4xf64, asin, -1., 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check asin: OK(%u)\n", n);
+  n = test_uni_4xf64 (jbm_acos_4xf64, acos, -1., 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check acos: OK(%u)\n", n);
+  n = test_log_4xf64 (jbm_sinh_4xf64, sinh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sinh: OK(%u)\n", n);
+  n = test_log_4xf64 (jbm_cosh_4xf64, cosh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cosh: OK(%u)\n", n);
+  n = test_log_4xf64 (jbm_tanh_4xf64, tanh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check tanh: OK(%u)\n", n);
+  n = test_uni_4xf64 (jbm_erf_4xf64, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erf: OK(%u)\n", n);
+  n = test_uni_4xf64 (jbm_erfc_4xf64, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erfc: OK(%u)\n", n);
+
+#endif
+
+#if __AVX512F__
+
+  printf ("checking __m512 functions\n");
+  n = test_log_16xf32 (jbm_exp2_16xf32, exp2f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp2: OK(%u)\n", n);
+  n = test_log_16xf32 (jbm_exp_16xf32, expf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp: OK(%u)\n", n);
+  n = test_log_16xf32 (jbm_exp10_16xf32, exp10f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp10: OK(%u)\n", n);
+  n = test_log_16xf32 (jbm_expm1_16xf32, expm1f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check expm1: OK(%u)\n", n);
+  n = test_logn_16xf32 (jbm_log2_16xf32, log2f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log2: OK(%u)\n", n);
+  n = test_logn_16xf32 (jbm_log_16xf32, logf, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log: OK(%u)\n", n);
+  n = test_logn_16xf32 (jbm_log10_16xf32, log10f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log10: OK(%u)\n", n);
+  n = test_uni_16xf32 (jbm_sin_16xf32, sinf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sin: OK(%u)\n", n);
+  n = test_uni_16xf32 (jbm_cos_16xf32, cosf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cos: OK(%u)\n", n);
+  n = test_uni_16xf32 (jbm_tan_16xf32, tanf, -2.f * M_PIf, 2.f * M_PIf);
+  if (n == MAX_ITERATIONS)
+    printf ("check tan: No\n");
+  n = test_log_16xf32 (jbm_atan_16xf32, atanf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check atan: OK(%u)\n", n);
+  n = test_uni_16xf32 (jbm_asin_16xf32, asinf, -1.f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check asin: OK(%u)\n", n);
+  n = test_uni_16xf32 (jbm_acos_16xf32, acosf, -1.f, 1.f);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check acos: OK(%u)\n", n);
+  n = test_log_16xf32 (jbm_sinh_16xf32, sinhf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sinh: OK(%u)\n", n);
+  n = test_log_16xf32 (jbm_cosh_16xf32, coshf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cosh: OK(%u)\n", n);
+  n = test_log_16xf32 (jbm_tanh_16xf32, tanhf);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check tanh: OK(%u)\n", n);
+  n = test_uni_16xf32 (jbm_erf_16xf32, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erf: OK(%u)\n", n);
+  n = test_uni_16xf32 (jbm_erfc_16xf32, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erfc: OK(%u)\n", n);
+
+  printf ("checking __m512d functions\n");
+  n = test_log_8xf64 (jbm_exp2_8xf64, exp2);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp2: OK(%u)\n", n);
+  n = test_log_8xf64 (jbm_exp_8xf64, exp);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp: OK(%u)\n", n);
+  n = test_log_8xf64 (jbm_exp10_8xf64, exp10);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check exp10: OK(%u)\n", n);
+  n = test_log_8xf64 (jbm_expm1_8xf64, expm1);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check expm1: OK(%u)\n", n);
+  n = test_logn_8xf64 (jbm_log2_8xf64, log2, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log2: OK(%u)\n", n);
+  n = test_logn_8xf64 (jbm_log_8xf64, log, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log: OK(%u)\n", n);
+  n = test_logn_8xf64 (jbm_log10_8xf64, log10, 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check log10: OK(%u)\n", n);
+  n = test_uni_8xf64 (jbm_sin_8xf64, sin, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sin: OK(%u)\n", n);
+  n = test_uni_8xf64 (jbm_cos_8xf64, cos, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cos: OK(%u)\n", n);
+  n = test_uni_8xf64 (jbm_tan_8xf64, tan, -2. * M_PI, 2. * M_PI);
+  if (n == MAX_ITERATIONS)
+    printf ("check tan: No\n");
+  n = test_log_8xf64 (jbm_atan_8xf64, atan);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check atan: OK(%u)\n", n);
+  n = test_uni_8xf64 (jbm_asin_8xf64, asin, -1., 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check asin: OK(%u)\n", n);
+  n = test_uni_8xf64 (jbm_acos_8xf64, acos, -1., 1.);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check acos: OK(%u)\n", n);
+  n = test_log_8xf64 (jbm_sinh_8xf64, sinh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check sinh: OK(%u)\n", n);
+  n = test_log_8xf64 (jbm_cosh_8xf64, cosh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cosh: OK(%u)\n", n);
+  n = test_log_8xf64 (jbm_tanh_8xf64, tanh);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check tanh: OK(%u)\n", n);
+  n = test_uni_8xf64 (jbm_erf_8xf64, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erf: OK(%u)\n", n);
+  n = test_uni_8xf64 (jbm_erfc_8xf64, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check erfc: OK(%u)\n", n);
+
+#endif
+
+  // tests
   xf = jbm_rest_f32 (2.f, -2.f);
   printf ("rest(2,-2)=%g\n", xf);
   xf = jbm_rest_f32 (-2.f, 2.f);
@@ -1291,9 +2845,6 @@ main (void)
   printf ("exp2n(-160)=%lg\n", jbm_exp2n_f32 (-160));
   printf ("exp2n(2)=%lg\n", jbm_exp2n_f32 (2));
   printf ("exp2n(-140)=%lg\n", jbm_exp2n_f32 (-140));
-  if (!check_log_f32 (jbm_exp2_f32, exp2f, 8.f * FLT_EPSILON))
-    return 0;
-  printf ("check exp2: OK\n");
   printf ("exp2(-160)=%.8g\n", jbm_exp2_f32 (-150.f));
   printf ("exp2(-130)=%.8g\n", jbm_exp2_f32 (-130.f));
   printf ("exp2(-53)=%.8g\n", jbm_exp2_f32 (-53.f));
@@ -1301,29 +2852,18 @@ main (void)
   printf ("exp2(53)=%.8g\n", jbm_exp2_f32 (53.f));
   printf ("exp2(127)=%.8g\n", jbm_exp2_f32 (127.f));
   printf ("exp2(128)=%.8g\n", jbm_exp2_f32 (128.f));
-  if (!check_log_f32 (jbm_exp_f32, expf, 8.f * FLT_EPSILON))
-    return 0;
-  printf ("check exp: OK\n");
   printf ("exp(-2)=%.8g\n", jbm_exp_f32 (-2.f));
   printf ("exp(0)=%.8g\n", jbm_exp_f32 (0.f));
   printf ("exp(2)=%.8g\n", jbm_exp_f32 (2.f));
-  if (!check_log_f32 (jbm_exp10_f32, exp10f, 16. * FLT_EPSILON))
-    return 0;
-  printf ("check exp10: OK\n");
   printf ("exp10(-40)=%.8g\n", jbm_exp10_f32 (-40.f));
   printf ("exp10(-2)=%.8g\n", jbm_exp10_f32 (-2.f));
   printf ("exp10(0)=%.8g\n", jbm_exp10_f32 (0.f));
   printf ("exp10(2)=%.8g\n", jbm_exp10_f32 (2.f));
-  if (!check_log_f32 (jbm_expm1_f32, expm1f, 8. * FLT_EPSILON))
-    return 0;
-  printf ("check expm1: OK\n");
   printf ("expm1(-2)=%.8g\n", jbm_expm1_f32 (-2.f));
   printf ("expm1(-0.1)=%.8g\n", jbm_expm1_f32 (-0.1f));
   printf ("expm1(0)=%.8g\n", jbm_expm1_f32 (0.f));
   printf ("expm1(0.01)=%.8g\n", jbm_expm1_f32 (0.01f));
   printf ("expm1(2)=%.8g\n", jbm_expm1_f32 (2.f));
-  if (!check_logn_f32 (jbm_log2_f32, log2f, FLT_EPSILON, 1.f))
-    printf ("log2\n");
   printf ("log2(10)=%.8g=%.8g\n", jbm_log2_f32 (10.f), M_LN10f / M_LN2f);
   printf ("log2(e)=%.8g=%.8g\n", jbm_log2_f32 (M_Ef), M_LOG2Ef);
   printf ("log2(1)=%.8g=0\n", jbm_log2_f32 (1.f));
@@ -1332,13 +2872,9 @@ main (void)
   printf ("log2(1e-40)=%.8g=%.8g\n", jbm_log2_f32 (1e-40f), log2f (1e-40f));
   printf ("log2(0)=%.8g\n", jbm_log2_f32 (0.f));
   printf ("log2(-1)=%.8g\n", jbm_log2_f32 (-1.f));
-  if (!check_logn_f32 (jbm_log_f32, logf, FLT_EPSILON, 1.f))
-    printf ("log\n");
   printf ("log(e)=%.8g\n", jbm_log_f32 (M_Ef));
   printf ("log(1)=%.8g\n", jbm_log_f32 (1.f));
   printf ("log(1/e)=%.8g\n", jbm_log_f32 (1.f / M_Ef));
-  if (!check_logn_f32 (jbm_log10_f32, log10f, FLT_EPSILON, 1.f))
-    printf ("log10\n");
   printf ("log10(10)=%.8g\n", jbm_log10_f32 (10.f));
   printf ("log10(1)=%.8g\n", jbm_log10_f32 (1.f));
   printf ("log10(1/10)=%.8g\n", jbm_log10_f32 (0.1f));
@@ -1366,18 +2902,6 @@ main (void)
   xf = -M_PIf / 6.f;
   printf ("sinwc(-pi/6)=%.8le=%.8le\n", sin (xf), jbm_sinwc_f32 (xf));
   printf ("coswc(-pi/6)=%.8le=%.8le\n", cos (xf), jbm_coswc_f32 (xf));
-  if (!check_uni_f32 (jbm_sin_f32, sinf, 2.f * FLT_EPSILON,
-                      -2.f * M_PIf, 2.f * M_PIf, 1000))
-    return 0;
-  printf ("check sin: OK\n");
-  if (!check_uni_f32 (jbm_cos_f32, cosf, 2.f * FLT_EPSILON,
-                      -2.f * M_PIf, 2.f * M_PIf, 1000))
-    return 0;
-  printf ("check cos: OK\n");
-  if (!check_uni_f32 (jbm_tan_f32, tanf, 1024.f * FLT_EPSILON,
-                      -2.f * M_PIf, 2.f * M_PIf, 1000))
-    return 0;
-  printf ("check tan: OK\n");
   for (i = 0; i < 13; ++i)
     {
       xf = i * M_PIf / 6.f;
@@ -1389,9 +2913,6 @@ main (void)
   printf ("sin(infinity)=%.8g=%.8g\n", sinf (xf), jbm_sin_f32 (xf));
   printf ("cos(infinity)=%.8g=%.8g\n", cosf (xf), jbm_cos_f32 (xf));
   printf ("tan(infinity)=%.8g=%.8g\n", tanf (xf), jbm_tan_f32 (xf));
-  if (!check_log_f32 (jbm_atan_f32, atanf, FLT_EPSILON))
-    return 0;
-  printf ("check atan: OK\n");
   printf ("atan(infinity)=%.8g=%.8g\n", jbm_atan_f32 (INFINITY), M_PI_2f);
   printf ("atan(sqrt(3))=%.8g=%.8g\n", jbm_atan_f32 (sqrt (3.f)), M_PIf / 3.f);
   printf ("atan(1)=%.8g=%.8g\n", jbm_atan_f32 (1.f), M_PI_4f);
@@ -1410,37 +2931,22 @@ main (void)
   printf ("atan2(-1,1)=%.8g=%.8g\n", jbm_atan2_f32 (-1.f, 1.f), -M_PI_4f);
   printf ("atan2(-1,-1)=%.8g=%.8g\n",
           jbm_atan2_f32 (-1.f, -1.f), -3.f * M_PI_4f);
-  if (!check_log_f32 (jbm_asin_f32, asinf, FLT_EPSILON))
-    return 0;
-  printf ("check asin: OK\n");
   printf ("asin(1)=%.8g=%.8g\n", jbm_asin_f32 (1.f), M_PI_2f);
   printf ("asin(1/2)=%.8g=%.8g\n", jbm_asin_f32 (0.5f), M_PIf / 6.f);
   printf ("asin(0)=%.8g=0\n", jbm_asin_f32 (0.f));
   printf ("asin(-1/2)=%.8g=%.8g\n", jbm_asin_f32 (-0.5f), -M_PIf / 6.f);
   printf ("asin(-1)=%.8g=%.8g\n", jbm_asin_f32 (-1.f), -M_PI_2f);
-  if (!check_log_f32 (jbm_acos_f32, acosf, FLT_EPSILON))
-    return 0;
-  printf ("check acos: OK\n");
   printf ("acos(1)=%.8g=0\n", jbm_acos_f32 (1.f));
   printf ("acos(1/2)=%.8g=%.8g\n", jbm_acos_f32 (0.5f), M_PIf / 3.f);
   printf ("acos(0)=%.8g=%.8g\n", jbm_acos_f32 (0.f), M_PI_2f);
   printf ("acos(-1/2)=%.8g=%.8g\n", jbm_acos_f32 (-0.5f), 2.f * M_PIf / 3.);
   printf ("acos(-1)=%.8g=%.8g\n", jbm_acos_f32 (-1.f), M_PIf);
-  if (!check_log_f32 (jbm_sinh_f32, sinhf, 8. * FLT_EPSILON))
-    return 0;
-  printf ("check sinh: OK\n");
   printf ("sinh(-1)=%.8g\n", jbm_sinh_f32 (-1.f));
   printf ("sinh(0)=%.8g\n", jbm_sinh_f32 (0.f));
   printf ("sinh(1)=%.8g\n", jbm_sinh_f32 (1.f));
-  if (!check_log_f32 (jbm_cosh_f32, coshf, 8. * FLT_EPSILON))
-    return 0;
-  printf ("check cosh: OK\n");
   printf ("cosh(-1)=%.8g\n", jbm_cosh_f32 (-1.f));
   printf ("cosh(0)=%.8g\n", jbm_cosh_f32 (0.f));
   printf ("cosh(1)=%.8g\n", jbm_cosh_f32 (1.f));
-  if (!check_log_f32 (jbm_tanh_f32, tanhf, FLT_EPSILON))
-    return 0;
-  printf ("check tanh: OK\n");
   printf ("tanh(-inf)=%.8g\n", jbm_tanh_f32 (-INFINITY));
   printf ("tanh(-1)=%.8g\n", jbm_tanh_f32 (-1.f));
   printf ("tanh(0)=%.8g\n", jbm_tanh_f32 (0.f));
@@ -1453,17 +2959,15 @@ main (void)
   printf ("erf(-1/2)=%.8g=%.8g\n", jbm_erf_f32 (-0.5f), erff (-0.5f));
   printf ("erf(-3/2)=%.8g=%.8g\n", jbm_erf_f32 (-1.5f), erff (-1.5f));
   printf ("erf(-10)=%.8g=%.8g\n", jbm_erf_f32 (-10.f), erff (-10.f));
-  if (!check_uni_f32 (jbm_erf_f32, erff, FLT_EPSILON, -FLT_MAX_EXP, FLT_MAX_EXP,
-                      1000))
-    return 0;
-  printf ("check erf: OK\n");
-  if (!check_uni_f32 (jbm_erfc_f32, erfcf, FLT_EPSILON,
-                      -FLT_MAX_EXP, FLT_MAX_EXP, 1000))
-    return 0;
-  printf ("check erfc: OK\n");
+  printf ("erfc(10)=%.8g=%.8g\n", jbm_erfc_f32 (10.f), erfcf (10.f));
+  printf ("erfc(3/2)=%.8g=%.8g\n", jbm_erfc_f32 (1.5f), erfcf (1.5f));
+  printf ("erfc(1/2)=%.8g=%.8g\n", jbm_erfc_f32 (0.5f), erfcf (0.5f));
+  printf ("erfc(0)=%.8g=%.8g\n", jbm_erfc_f32 (0.f), erfcf (0.f));
+  printf ("erfc(-1/2)=%.8g=%.8g\n", jbm_erfc_f32 (-0.5f), erfcf (-0.5f));
+  printf ("erfc(-3/2)=%.8g=%.8g\n", jbm_erfc_f32 (-1.5f), erfcf (-1.5f));
+  printf ("erfc(-10)=%.8g=%.8g\n", jbm_erfc_f32 (-10.f), erfcf (-10.f));
 
-  printf ("DBL_MIN=%lg DBL_MAX=%lg DBL_EPSILON=%lg\n",
-          DBL_MIN, DBL_MAX, DBL_EPSILON);
+  printf ("Checking 64 bits functions\n");
   x = jbm_rest_f64 (2., -2.);
   printf ("rest(2,-2)=%lg\n", x);
   x = jbm_rest_f64 (-2., 2.);
@@ -1524,9 +3028,6 @@ main (void)
   printf ("exp2n(-1075)=%lg\n", jbm_exp2n_f64 (-1075));
   printf ("exp2n(2)=%lg\n", jbm_exp2n_f64 (2));
   printf ("exp2n(-1024)=%lg\n", jbm_exp2n_f64 (-1024));
-  if (!check_log_f64 (jbm_exp2_f64, exp2, DBL_EPSILON))
-    return 0;
-  printf ("check exp2: OK\n");
   printf ("exp2(-1100)=%.17lg\n", jbm_exp2_f64 (-1100.));
   printf ("exp2(-1063)=%.17lg\n", jbm_exp2_f64 (-1063.));
   printf ("exp2(-53)=%.17lg\n", jbm_exp2_f64 (-53.));
@@ -1534,30 +3035,18 @@ main (void)
   printf ("exp2(53)=%.17lg\n", jbm_exp2_f64 (53.));
   printf ("exp2(1023)=%.17lg\n", jbm_exp2_f64 (1023.));
   printf ("exp2(1024)=%.17lg\n", jbm_exp2_f64 (1024.));
-  if (!check_log_f64 (jbm_exp_f64, exp, 64. * DBL_EPSILON))
-    return 0;
-  printf ("check exp: OK\n");
   printf ("exp(-2)=%.17lg\n", jbm_exp_f64 (-2.));
   printf ("exp(0)=%.17lg\n", jbm_exp_f64 (0.));
   printf ("exp(2)=%.17lg\n", jbm_exp_f64 (2.));
-  if (!check_log_f64 (jbm_exp10_f64, exp10, 256. * DBL_EPSILON))
-    return 0;
-  printf ("check exp10: OK\n");
   printf ("exp10(-320)=%.17lg\n", jbm_exp10_f64 (-320.));
   printf ("exp10(-2)=%.17lg\n", jbm_exp10_f64 (-2.));
   printf ("exp10(0)=%.17lg\n", jbm_exp10_f64 (0.));
   printf ("exp10(2)=%.17lg\n", jbm_exp10_f64 (2.));
-  if (!check_log_f64 (jbm_expm1_f64, expm1, 64. * DBL_EPSILON))
-    return 0;
-  printf ("check expm1: OK\n");
   printf ("expm1(-2)=%.17lg\n", jbm_expm1_f64 (-2.));
   printf ("expm1(-0.1)=%.17lg\n", jbm_expm1_f64 (-0.1));
   printf ("expm1(0)=%.17lg\n", jbm_expm1_f64 (0.));
   printf ("expm1(0.01)=%.17lg\n", jbm_expm1_f64 (0.01));
   printf ("expm1(2)=%.17lg\n", jbm_expm1_f64 (2.));
-  if (!check_logn_f64 (jbm_log2_f64, log2, DBL_EPSILON, 1.))
-    printf ("log2\n");
-  printf ("log2(10)=%.17lg=%.17lg\n", jbm_log2_f64 (10.), M_LN10 / M_LN2);
   printf ("log2(e)=%.17lg=%.17lg\n", jbm_log2_f64 (M_E), M_LOG2E);
   printf ("log2(1)=%.17lg\n", jbm_log2_f64 (1.));
   printf ("log2(1/e)=%.17lg=%.17lg\n", jbm_log2_f64 (1. / M_E), -M_LOG2E);
@@ -1565,14 +3054,8 @@ main (void)
   printf ("log2(1e-320)=%.17lg\n", jbm_log2_f64 (1e-320));
   printf ("log2(0)=%.17lg\n", jbm_log2_f64 (0.));
   printf ("log2(-1)=%.17lg\n", jbm_log2_f64 (-1.));
-  if (!check_logn_f64 (jbm_log_f64, log, DBL_EPSILON, 1.))
-    printf ("log\n");
-  printf ("log(e)=%.17lg\n", jbm_log_f64 (M_E));
   printf ("log(1)=%.17lg\n", jbm_log_f64 (1.));
   printf ("log(1/e)=%.17lg\n", jbm_log_f64 (1. / M_E));
-  if (!check_logn_f64 (jbm_log10_f64, log10, DBL_EPSILON, 1.))
-    printf ("log10\n");
-  printf ("log10(10)=%.17lg\n", jbm_log10_f64 (10.));
   printf ("log10(1)=%.17lg\n", jbm_log10_f64 (1.));
   printf ("log10(1/10)=%.17lg\n", jbm_log10_f64 (0.1));
   printf ("log10(1e-320)=%.17lg\n", jbm_log10_f64 (1e-320));
@@ -1599,18 +3082,6 @@ main (void)
   x = -M_PI / 6.;
   printf ("sinwc(-pi/6)=%.17lg=%.17lg\n", sin (x), jbm_sinwc_f64 (x));
   printf ("coswc(-pi/6)=%.17lg=%.17lg\n", cos (x), jbm_coswc_f64 (x));
-  if (!check_uni_f64 (jbm_sin_f64, sin, 2. * DBL_EPSILON,
-                      -2. * M_PI, 2. * M_PI, 1000))
-    return 0;
-  printf ("check sin: OK\n");
-  if (!check_uni_f64 (jbm_cos_f64, cos, DBL_EPSILON,
-                      -2. * M_PI, 2. * M_PI, 1000))
-    return 0;
-  printf ("check cos: OK\n");
-  if (!check_uni_f64 (jbm_tan_f64, tan, 1024. * DBL_EPSILON,
-                      -2. * M_PI, 2. * M_PI, 1000))
-    return 0;
-  printf ("check tan: OK\n");
   for (i = 0; i < 13; ++i)
     {
       x = i * M_PI / 6.;
@@ -1622,9 +3093,6 @@ main (void)
   printf ("sin(infinity)=%.17lg=%.17lg\n", sin (x), jbm_sin_f64 (x));
   printf ("cos(infinity)=%.17lg=%.17lg\n", cos (x), jbm_cos_f64 (x));
   printf ("tan(infinity)=%.17lg=%.17lg\n", tan (x), jbm_tan_f64 (x));
-  if (!check_log_f64 (jbm_atan_f64, atan, DBL_EPSILON))
-    return 0;
-  printf ("check atan: OK\n");
   printf ("atan(infinity)=%.17lg=%.17lg\n", jbm_atan_f64 (INFINITY), M_PI_2);
   printf ("atan(sqrt(3))=%.17lg=%.17lg\n", jbm_atan_f64 (sqrt (3.)), M_PI / 3.);
   printf ("atan(1)=%.17lg=%.17lg\n", jbm_atan_f64 (1.), M_PI_4);
@@ -1643,37 +3111,22 @@ main (void)
   printf ("atan2(-1,1)=%.17lg=%.17lg\n", jbm_atan2_f64 (-1., 1.), -M_PI_4);
   printf ("atan2(-1,-1)=%.17lg=%.17lg\n",
           jbm_atan2_f64 (-1., -1.), -3. * M_PI_4);
-  if (!check_log_f64 (jbm_asin_f64, asin, DBL_EPSILON))
-    return 0;
-  printf ("check asin: OK\n");
   printf ("asin(1)=%.17lg=%.17lg\n", jbm_asin_f64 (1.), M_PI_2);
   printf ("asin(1/2)=%.17lg=%.17lg\n", jbm_asin_f64 (0.5), M_PI / 6.);
   printf ("asin(0)=%.17lg=0\n", jbm_asin_f64 (0.));
   printf ("asin(-1/2)=%.17lg=%.17lg\n", jbm_asin_f64 (-0.5), -M_PI / 6.);
   printf ("asin(-1)=%.17lg=%.17lg\n", jbm_asin_f64 (-1.), -M_PI_2);
-  if (!check_log_f64 (jbm_acos_f64, acos, DBL_EPSILON))
-    return 0;
-  printf ("check acos: OK\n");
   printf ("acos(1)=%.17lg=0\n", jbm_acos_f64 (1.));
   printf ("acos(1/2)=%.17lg=%.17lg\n", jbm_acos_f64 (0.5), M_PI / 3.);
   printf ("acos(0)=%.17lg=%.17lg\n", jbm_acos_f64 (0.), M_PI_2);
   printf ("acos(-1/2)=%.17lg=%.17lg\n", jbm_acos_f64 (-0.5), 2. * M_PI / 3.);
   printf ("acos(-1)=%.17lg=%.17lg\n", jbm_acos_f64 (-1.), M_PI);
-  if (!check_log_f64 (jbm_sinh_f64, sinh, 64. * DBL_EPSILON))
-    return 0;
-  printf ("check sinh: OK\n");
   printf ("sinh(-1)=%.17lg\n", jbm_sinh_f64 (-1.));
   printf ("sinh(0)=%.17lg\n", jbm_sinh_f64 (0.));
   printf ("sinh(1)=%.17lg\n", jbm_sinh_f64 (1.));
-  if (!check_log_f64 (jbm_cosh_f64, cosh, 64. * DBL_EPSILON))
-    return 0;
-  printf ("check cosh: OK\n");
   printf ("cosh(-1)=%.17lg\n", jbm_cosh_f64 (-1.));
   printf ("cosh(0)=%.17lg\n", jbm_cosh_f64 (0.));
   printf ("cosh(1)=%.17lg\n", jbm_cosh_f64 (1.));
-  if (!check_log_f64 (jbm_tanh_f64, tanh, 2. * DBL_EPSILON))
-    return 0;
-  printf ("check tanh: OK\n");
   printf ("tanh(-inf)=%.17lg\n", jbm_tanh_f64 (-INFINITY));
   printf ("tanh(-1)=%.17lg\n", jbm_tanh_f64 (-1.));
   printf ("tanh(0)=%.17lg\n", jbm_tanh_f64 (0.));
@@ -1686,14 +3139,13 @@ main (void)
   printf ("erf(-1/2)=%.17lg=%.17lg\n", jbm_erf_f64 (-0.5), erf (-0.5));
   printf ("erf(-3/2)=%.17lg=%.17lg\n", jbm_erf_f64 (-1.5), erf (-1.5));
   printf ("erf(-10)=%.17lg=%.17lg\n", jbm_erf_f64 (-10.), erf (-10.));
-  if (!check_uni_f64 (jbm_erf_f64, erf, DBL_EPSILON, -DBL_MAX_EXP, DBL_MAX_EXP,
-                      1000))
-    return 0;
-  printf ("check erf: OK\n");
-  if (!check_uni_f64 (jbm_erfc_f64, erfc, DBL_EPSILON,
-                      -DBL_MAX_EXP, DBL_MAX_EXP, 1000))
-    return 0;
-  printf ("check erfc: OK\n");
+  printf ("erfc(10)=%.17lg=%.17lg\n", jbm_erfc_f64 (10.), erfc (10.));
+  printf ("erfc(3/2)=%.17lg=%.17lg\n", jbm_erfc_f64 (1.5), erfc (1.5));
+  printf ("erfc(1/2)=%.17lg=%.17lg\n", jbm_erfc_f64 (0.5), erfc (0.5));
+  printf ("erfc(0)=%.17lg=%.17lg\n", jbm_erfc_f64 (0.), erfc (0.));
+  printf ("erfc(-1/2)=%.17lg=%.17lg\n", jbm_erfc_f64 (-0.5), erfc (-0.5));
+  printf ("erfc(-3/2)=%.17lg=%.17lg\n", jbm_erfc_f64 (-1.5), erfc (-1.5));
+  printf ("erfc(-10)=%.17lg=%.17lg\n", jbm_erfc_f64 (-10.), erfc (-10.));
 
   for (i = 0; i < 3; ++i)
     cf[i].C = Cf[i], cf[i].E = Ef[i];
@@ -2133,6 +3585,7 @@ main (void)
   printf ("integrall(x^13,0,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn14d, cd0, cd1));
   printf ("integrall(x^14,0,1)=%s\n", buffer);
+
 #ifdef __SSE4_2__
   printf ("check SSE 4.2 functions\n");
   d_1 = aligned_alloc (16, 2 * sizeof (double));
