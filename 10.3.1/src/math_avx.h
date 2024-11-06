@@ -58,7 +58,7 @@ print_m256i32 (FILE *file, const char *label, __m256i x)
 {
   int y[8] JB_ALIGNED;
   unsigned int i;
-  _mm256_store_epi32 (y, x);
+  _mm256_store_si256 ((__m128i *) y, x);
   for (i = 0; i < 8; ++i)
     fprintf (file, "%s[%u]=%d\n", label, i, y[i]);
 }
@@ -68,7 +68,7 @@ print_m256i64 (FILE *file, const char *label, __m256i x)
 {
   long long int y[4] JB_ALIGNED;
   unsigned int i;
-  _mm256_store_epi64 (y, x);
+  _mm256_store_si256 ((__m128i *) y, x);
   for (i = 0; i < 4; ++i)
     fprintf (file, "%s[%u]=%llu\n", label, i, y[i]);
 }
@@ -15198,11 +15198,19 @@ jbm_exp2wc_4xf64 (const __m256d x)
 static inline __m256d
 jbm_exp2_4xf64 (const __m256d x)        ///< __m256d vector.
 {
-  __m256d y, f;
+  __m256d y, f, z;
+  __m256i i;
   y = _mm256_floor_pd (x);
   f = _mm256_sub_pd (x, y);
-  y = jbm_exp2n_4xf64 (_mm256_cvtpd_epi64 (y));
-  return _mm256_mul_pd (y, jbm_exp2wc_4xf64 (f));
+#ifdef __AVX512F__
+  i = _mm256_cvtpd_epi64 (y);
+#else
+  z = _mm256_set1_pd (0x0018000000000000);
+  y = _mm256_add_pd (y, z);
+  i = _mm267_sub_epi64 (_mm256_castpd_si256 (y), _mm_castpd_si256 (z));
+#endif
+  z = jbm_exp2n_4xf64 (i);
+  return _mm256_mul_pd (z, jbm_exp2wc_4xf64 (f));
 }
 
 /**
@@ -15284,8 +15292,15 @@ jbm_log2_4xf64 (const __m256d x)        ///< __m256d vector.
 {
   __m256d y, z;
   __m256i e;
-  y = jbm_frexp_4xf64 (x, &e);
-  y = _mm256_add_pd (jbm_log2wc_4xf64 (y), _mm256_cvtepi64_pd (e));
+  y = jbm_log2wc_4xf64 ( jbm_frexp_4xf64 (x, &e));
+#ifdef __AVX512F__
+  z = _mm256_cvtepi64_pd (e);
+#else
+  z = _mm256_set1_pd (0x0018000000000000);
+  e = _mm256_add_epi64 (e, _mm256_castpd_si128 (z));
+  z = _mm256_sub_pd (_mm_castsi256_pd (e), z);
+#endif
+  y = _mm256_add_pd (y, z);
   z = _mm256_setzero_pd ();
   y = _mm256_blendv_pd (y, _mm256_set1_pd (-INFINITY),
                         _mm256_cmp_pd (x, z, _CMP_GT_OS));

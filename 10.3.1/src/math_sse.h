@@ -51,14 +51,14 @@ typedef union
   __m128i i;                    ///< bits.
 } JBM2xF64;
 
-/* Debug functions
+// Debug functions
 
 static inline void
 print_m128i32 (FILE *file, const char *label, __m128i x)
 {
   int y[4] JB_ALIGNED;
   unsigned int i;
-  _mm_store_epi32 (y, x);
+  _mm_store_si128 ((__m128i *) y, x);
   for (i = 0; i < 4; ++i)
     fprintf (file, "%s[%u]=%d\n", label, i, y[i]);
 }
@@ -68,7 +68,7 @@ print_m128i64 (FILE *file, const char *label, __m128i x)
 {
   long long int y[2] JB_ALIGNED;
   unsigned int i;
-  _mm_store_epi64 (y, x);
+  _mm_store_si128 ((__m128i *) y, x);
   for (i = 0; i < 2; ++i)
     fprintf (file, "%s[%u]=%llu\n", label, i, y[i]);
 }
@@ -93,9 +93,31 @@ print_m128d (FILE *file, const char *label, __m128d x)
     fprintf (file, "%s[%u]=%.17lg\n", label, i, y[i]);
 }
 
-*/
-
 #ifndef __FMA__
+
+static inline __m128
+_mm_fmadd_ps (const __m128 x, const __m128 y, const __m128 z)
+{
+  return _mm_add_ps (_mm_mul_ps (x, y), z);
+}
+
+static inline __m128
+_mm_fmsub_ps (const __m128 x, const __m128 y, const __m128 z)
+{
+  return _mm_sub_ps (_mm_mul_ps (x, y), z);
+}
+
+static inline __m128
+_mm_fnmadd_ps (const __m128 x, const __m128 y, const __m128 z)
+{
+  return _mm_sub_ps (z, _mm_mul_ps (x, y));
+}
+
+static inline __m128
+_mm_fnmsub_ps (const __m128 x, const __m128 y, const __m128 z)
+{
+  return _mm_sub_ps (_mm_setzero_ps (), _mm_fmadd_ps (x, y, z));
+}
 
 static inline __m128d
 _mm_fmadd_pd (const __m128d x, const __m128d y, const __m128d z)
@@ -119,6 +141,34 @@ static inline __m128d
 _mm_fnmsub_pd (const __m128d x, const __m128d y, const __m128d z)
 {
   return _mm_sub_pd (_mm_setzero_pd (), _mm_fmadd_pd (x, y, z));
+}
+
+#endif
+
+#ifndef __AVX__
+
+static inline __m128i
+_mm_sllv_epi32 (__m128i x, __m128i i)
+{
+  int xx[4] JB_ALIGNED, ii[4] JB_ALIGNED;
+  _mm_store_si128 ((__m128i *) xx, x);
+  _mm_store_si128 ((__m128i *) ii, i);
+  xx[0] <<= ii[0];
+  xx[1] <<= ii[1];
+  xx[2] <<= ii[2];
+  xx[3] <<= ii[3];
+  return _mm_load_si128 ((__m128i *) xx);
+}
+
+static inline __m128i
+_mm_sllv_epi64 (__m128i x, __m128i i)
+{
+  long long int xx[2] JB_ALIGNED, ii[2] JB_ALIGNED;
+  _mm_store_si128 ((__m128i *) xx, x);
+  _mm_store_si128 ((__m128i *) ii, i);
+  xx[0] <<= ii[0];
+  xx[1] <<= ii[1];
+  return _mm_load_si128 ((__m128i *) xx);
 }
 
 #endif
@@ -14769,11 +14819,23 @@ jbm_exp2wc_2xf64 (const __m128d x)
 static inline __m128d
 jbm_exp2_2xf64 (const __m128d x)        ///< __m128d vector.
 {
-  __m128d y, f;
+  __m128d y, f, z;
+  __m128i i;
+print_m128d (stdout, "x", x);
   y = _mm_floor_pd (x);
   f = _mm_sub_pd (x, y);
-  y = jbm_exp2n_2xf64 (_mm_cvtpd_epi64 (y));
-  return _mm_mul_pd (y, jbm_exp2wc_2xf64 (f));
+#ifdef __AVX512F__
+  i = _mm_cvtpd_epi64 (y);
+#else
+  z = _mm_set1_pd (0x0018000000000000);
+  y = _mm_add_pd (y, z);
+  i = _mm_sub_epi64 (_mm_castpd_si128 (y), _mm_castpd_si128 (z));
+#endif
+print_m128i64 (stdout, "i", i);
+  z = jbm_exp2n_2xf64 (i);
+print_m128d (stdout, "z", z);
+print_m128d (stdout, "f", f);
+  return _mm_mul_pd (z, jbm_exp2wc_2xf64 (f));
 }
 
 /**
@@ -14854,8 +14916,15 @@ jbm_log2_2xf64 (const __m128d x)        ///< __m128d vector.
 {
   __m128d y, z;
   __m128i e;
-  y = jbm_frexp_2xf64 (x, &e);
-  y = _mm_add_pd (jbm_log2wc_2xf64 (y), _mm_cvtepi64_pd (e));
+  y = jbm_log2wc_2xf64 ( jbm_frexp_2xf64 (x, &e));
+#ifdef __AVX512F__
+  z = _mm_cvtepi64_pd (e);
+#else
+  z = _mm_set1_pd (0x0018000000000000);
+  e = _mm_add_epi64 (e, _mm_castpd_si128 (z));
+  z = _mm_sub_pd (_mm_castsi128_pd (e), z);
+#endif
+  y = _mm_add_pd (y, z);
   z = _mm_setzero_pd ();
   y = _mm_blendv_pd (y, _mm_set1_pd (-INFINITY), _mm_cmpgt_pd (x, z));
   return _mm_blendv_pd (_mm_set1_pd (NAN), y, _mm_cmplt_pd (x, z));

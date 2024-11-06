@@ -40,11 +40,8 @@
 #include <quadmath.h>
 #define exp10q(x) (expq(x * M_LN10q))
 #endif
-#ifdef __SSE4_2__
-#include <smmintrin.h>
-#endif
-#ifdef __AVX__
-#include <immintrin.h>
+#ifdef __amd64 
+#include <x86intrin.h>
 #endif
 
 /**
@@ -4699,13 +4696,8 @@ jbm_regression_linear (JBMFarray *fx,
           x2 = _mm_load_pd (x + i);
           sy2 = _mm_add_pd (sy2, y2);
           sx2 = _mm_add_pd (sx2, x2);
-#ifdef __FMA__
           syx2 = _mm_fmadd_pd (y2, x2, syx2);
           sxx2 = _mm_fmadd_pd (x2, x2, sxx2);
-#else
-          syx2 = _mm_add_pd (syx2, _mm_mul_pd (y2, x2));
-          sxx2 = _mm_add_pd (sxx2, _mm_mul_pd (x2, x2));
-#endif
         }
       _mm_store_pd (t2, sy2);
       sy = t2[0] + t2[1];
