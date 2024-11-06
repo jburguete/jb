@@ -376,11 +376,11 @@ typedef struct
 } JBWArrayEditor;               ///< widget to edit matrices.
 #endif
 
+///> macro to do after and swapped GSignal connections.
 #define jbw_signal_connect_swapped_after(instance, detailed_signal, c_handler, \
   data) \
       g_signal_connect_data((instance), (detailed_signal), (c_handler), \
       (data), 0, G_CONNECT_SWAPPED | G_CONNECT_AFTER)
-///< macro to do after and swapped GSignal connections.
 
 #if JBM_HIGH_PRECISION > 2
 #define jbw_float_entry_new (JBWFloatEntry*)gtk_entry_new

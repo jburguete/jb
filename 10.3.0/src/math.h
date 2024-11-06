@@ -722,7 +722,8 @@ typedef struct
   unsigned int alloc;           ///< 1 if x is allocated, 0 otherwise.
 } JBMFarray;
 
-void jbm_index_sort_flash (JBFLOAT * x, unsigned int *ni, unsigned int n);
+extern void jbm_index_sort_flash (JBFLOAT *restrict x, unsigned int *ni,
+                                  unsigned int n);
 
 #if JBM_HIGH_PRECISION == JBM_LOW_PRECISION
 
@@ -730,12 +731,10 @@ void jbm_index_sort_flash (JBFLOAT * x, unsigned int *ni, unsigned int n);
 
 #else
 
-void jbm_index_sort_flashl (JBDOUBLE * x, unsigned int *ni, unsigned int n);
+extern void jbm_index_sort_flashl (JBDOUBLE *restrict x, unsigned int *ni,
+                                   unsigned int n);
 
 #endif
-
-extern void matrix_print (JBFLOAT *, unsigned int, unsigned int);
-extern void farray_print (JBMFarray *);
 
 /**
  * Function to calculate the minimum of 2 int numbers.
@@ -7337,6 +7336,246 @@ jbm_file_root_mean_square_errorl (char *namea,
 {
   return SQRTL
     (jbm_file_mean_square_errorl (namea, ixa, ifa, na, namer, ixr, ifr, nr));
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of first order and
+ * one step over a first order differential scalar equation.
+ */
+void
+runge_kutta_step_1_1_1_1 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
+			            JBFLOAT *u1) __attribute__((unused)),
+		          ///< differential function.
+                          JBFLOAT *u0,    ///< variable.
+                          JBFLOAT *u1,    ///< 1st derivative.
+		     	  const JBFLOAT t,        ///< time.
+			  const JBFLOAT dt)       ///< step size.
+{
+  u0[0] += dt * u1[0];
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of first order and
+ * one step over a second order differential scalar equation.
+ */
+void
+runge_kutta_step_2_1_1_1 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
+			            const JBFLOAT u1, JBFLOAT *u2)
+                          __attribute__((unused)),
+		          ///< differential function.
+                          JBFLOAT *u0,    ///< variable.
+                          JBFLOAT *u1,    ///< 1st derivative.
+                          JBFLOAT *u2,    ///< 2nd derivative.
+		     	  const JBFLOAT t,        ///< time.
+			  const JBFLOAT dt)       ///< step size.
+{
+  u0[0] += dt * u1[0];
+  u1[0] += dt * u2[0];
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of second order and
+ * two steps over a first order differential scalar equation.
+ */
+void
+runge_kutta_step_1_1_2_2 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
+			            JBFLOAT *u1),
+		          ///< differential function.
+                          JBFLOAT *u0,    ///< variable.
+                          JBFLOAT *u1,    ///< 1st derivative.
+		     	  const JBFLOAT t,        ///< time.
+			  const JBFLOAT dt)       ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k = 0.5f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k = 0.5;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k = 0.5L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k = 0.5Q;
+#endif
+  JBFLOAT u0_2[1], u1_2[1];
+  u0_2[0] = u0[0] + dt * u1[0];
+  f (t + dt, u0_2[0], u1_2);
+  u0[0] += k * dt * (u1[0] + u1_2[0]);
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of second order and
+ * two steps over a second order differential scalar equation.
+ */
+void
+runge_kutta_step_2_1_2_2 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
+			            const JBFLOAT u1, JBFLOAT *u2),
+		          ///< differential function.
+                          JBFLOAT *u0,    ///< variable.
+                          JBFLOAT *u1,    ///< 1st derivative.
+                          JBFLOAT *u2,    ///< 2nd derivative.
+		     	  const JBFLOAT t,        ///< time.
+			  const JBFLOAT dt)       ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k = 0.5f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k = 0.5;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k = 0.5L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k = 0.5Q;
+#endif
+  JBFLOAT u0_2[1], u1_2[1], u2_2[1];
+  JBFLOAT kdt;
+  u0_2[0] = u0[0] + dt * u1[0];
+  u1_2[0] = u1[0] + dt * u2[0];
+  f (t + dt, u0_2[0], u1_2[0], u2_2);
+  kdt = k * dt;
+  u0[0] += kdt * (u1[0] + u1_2[0]);
+  u1[0] += kdt * (u2[0] + u2_2[0]);
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of third order and
+ * three steps over a first order differential scalar equation.
+ */
+void
+runge_kutta_step_1_1_3_3 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
+			            JBFLOAT *u1),
+		          ///< differential function.
+                          JBFLOAT *u0,    ///< variable.
+                          JBFLOAT *u1,    ///< 1st derivative.
+		     	  const JBFLOAT t,        ///< time.
+			  const JBFLOAT dt)       ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k12 = 0.5f, k14 = 0.25f, k16 = 1.f / 6.f, k4 = 4.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k12 = 0.5, k14 = 0.25, k16 = 1. / 6., k4 = 4.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k12 = 0.5L, k14 = 0.25L, k16 = 1.L / 6.L, k4 = 4.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k12 = 0.5Q, k14 = 0.25Q, k16 = 1.Q / 6.Q, k4 = 4.Q;
+#endif
+  JBFLOAT u0_2[1], u1_2[1], u0_3[1], u1_3[1];
+  u0_2[0] = u0[0] + dt * u1[0];
+  f (t + dt, u0_2[0], u1_2);
+  u0_3[0] = u0[0] + k14 * dt * (u1[0] + u1_2[0]);
+  f (t + k12 * dt, u0_3[0], u1_3);
+  u0[0] += k16 * dt * (u1[0] + u1_2[0] + k4 * u1_3[0]);
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of third order and
+ * three steps over a second order differential scalar equation.
+ */
+void
+runge_kutta_step_2_1_3_3 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
+			            const JBFLOAT u1, JBFLOAT *u2),
+		          ///< differential function.
+                          JBFLOAT *u0,    ///< variable.
+                          JBFLOAT *u1,    ///< 1st derivative.
+                          JBFLOAT *u2,    ///< 2nd derivative.
+		     	  const JBFLOAT t,        ///< time.
+			  const JBFLOAT dt)       ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k12 = 0.5f, k14 = 0.25f, k16 = 1.f / 6.f, k4 = 4.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k12 = 0.5, k14 = 0.25, k16 = 1. / 6., k4 = 4.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k12 = 0.5L, k14 = 0.25L, k16 = 1.L / 6.L, k4 = 4.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k12 = 0.5Q, k14 = 0.25Q, k16 = 1.Q / 6.Q, k4 = 4.Q;
+#endif
+  JBFLOAT u0_2[1], u1_2[1], u2_2[1], u0_3[1], u1_3[1], u2_3[1];
+  JBFLOAT kdt;
+  u0_2[0] = u0[0] + dt * u1[0];
+  u1_2[0] = u1[0] + dt * u2[0];
+  f (t + dt, u0_2[0], u1_2[0], u2_2);
+  kdt = k14 * dt;
+  u0_3[0] = u0[0] + kdt * (u1[0] + u1_2[0]);
+  u1_3[0] = u1[0] + kdt * (u2[0] + u2_2[0]);
+  f (t + k12 * dt, u0_3[0], u1_3[0], u2_3);
+  kdt = k16 * dt;
+  u0[0] += kdt * (u1[0] + u1_2[0] + k4 * u1_3[0]);
+  u1[0] += kdt * (u2[0] + u2_2[0] + k4 * u2_3[0]);
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of fourth order and
+ * four steps over a first order differential scalar equation.
+ */
+void
+runge_kutta_step_1_1_4_4 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
+			            JBFLOAT *u1),
+		          ///< differential function.
+                          JBFLOAT *u0,    ///< variable.
+                          JBFLOAT *u1,    ///< 1st derivative.
+		     	  const JBFLOAT t,        ///< time.
+			  const JBFLOAT dt)       ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k12 = 0.5f, k16 = 1.f / 6.f, k2 = 2.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k12 = 0.5, k16 = 1. / 6., k2 = 2.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k12 = 0.5L, k16 = 1.L / 6.L, k2 = 2.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k12 = 0.5Q, k16 = 1.Q / 6.Q, k2 = 2.Q;
+#endif
+  JBFLOAT u0_2[1], u1_2[1], u0_3[1], u1_3[1], u0_4[1], u1_4[1];
+  JBFLOAT kdt, tdt;
+  kdt = k12 * dt;
+  tdt = t + kdt;
+  u0_2[0] = u0[0] + kdt * u1[0];
+  f (tdt, u0_2[0], u1_2);
+  u0_3[0] = u0[0] + kdt * u1_2[0];
+  f (tdt, u0_3[0], u1_3);
+  u0_4[0] = u0[0] + dt * u1_3[0];
+  f (t + dt, u0_4[0], u1_4);
+  u0[0] += k16 * dt * (u1[0] + u1_4[0] + k2 * (u1_2[0] + u1_3[0]));
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of fourth order and
+ * four steps over a second order differential scalar equation.
+ */
+void
+runge_kutta_step_2_1_4_4 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
+			            const JBFLOAT u1, JBFLOAT *u2),
+		          ///< differential function.
+                          JBFLOAT *u0,    ///< variable.
+                          JBFLOAT *u1,    ///< 1st derivative.
+                          JBFLOAT *u2,    ///< 2nd derivative.
+		     	  const JBFLOAT t,        ///< time.
+			  const JBFLOAT dt)       ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k12 = 0.5f, k16 = 1.f / 6.f, k2 = 2.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k12 = 0.5, k16 = 1. / 6., k2 = 2.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k12 = 0.5L, k16 = 1.L / 6.L, k2 = 2.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k12 = 0.5Q, k16 = 1.Q / 6.Q, k2 = 2.Q;
+#endif
+  JBFLOAT u0_2[1], u1_2[1], u2_2[1], u0_3[1], u1_3[1], u2_3[1],
+    u0_4[1], u1_4[1], u2_4[1];
+  JBFLOAT kdt, tdt;
+  kdt = k12 * dt;
+  tdt = t + kdt;
+  u0_2[0] = u0[0] + kdt * u1[0];
+  u1_2[0] = u1[0] + kdt * u2[0];
+  f (tdt, u0_2[0], u1_2[0], u2_2);
+  u0_3[0] = u0[0] + kdt * u1_2[0];
+  u1_3[0] = u1[0] + kdt * u2_2[0];
+  f (tdt, u0_3[0], u1_3[0], u2_3);
+  u0_4[0] = u0[0] + dt * u1_3[0];
+  u1_4[0] = u1[0] + dt * u2_3[0];
+  f (t + dt, u0_4[0], u1_4[0], u2_4);
+  kdt = k16 * dt;
+  u0[0] += kdt * (u1[0] + u1_4[0] + k2 * (u1_2[0] + u1_3[0]));
+  u1[0] += kdt * (u2[0] + u2_4[0] + k2 * (u2_2[0] + u2_3[0]));
 }
 
 #endif

@@ -48,7 +48,7 @@ PROJECT_NAME           = JB
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 10.1.0
+PROJECT_NUMBER         = 10.3.0
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -990,8 +990,6 @@ RECURSIVE              = NO
 
 EXCLUDE                = src/fc2i.c \
                          src/fc2i.h \
-                         tests/test_math.c \
-                         tests/test_win.c
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -1007,7 +1005,7 @@ EXCLUDE_SYMLINKS       = NO
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       =
+EXCLUDE_PATTERNS       = tests/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -2376,13 +2374,13 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = __attribute__(x)= \
                          __FMA__=1 \
+                         GTK_MAJOR_VERSION=4 \
                          HAVE_ALIGNED_ALLOC=1 \
                          HAVE_EXP10=1 \
-                         GTK_MAJOR_VERSION=4 \
                          JBW=2 \
                          JBW_GTK=2 \
-                         JBM_HIGH_PRECISION=3 \
-                         JBM_LOW_PRECISION=2 \
+                         JBM_HIGH_PRECISION=2 \
+                         JBM_LOW_PRECISION=1 \
                          JBW_NO=1 \
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
