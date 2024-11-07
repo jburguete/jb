@@ -52,6 +52,7 @@ typedef union
 } JBM2xF64;
 
 // Debug functions
+/*
 
 static inline void
 print_m128i32 (FILE *file, const char *label, __m128i x)
@@ -92,6 +93,7 @@ print_m128d (FILE *file, const char *label, __m128d x)
   for (i = 0; i < 2; ++i)
     fprintf (file, "%s[%u]=%.17lg\n", label, i, y[i]);
 }
+*/
 
 #ifndef __FMA__
 
@@ -14821,7 +14823,6 @@ jbm_exp2_2xf64 (const __m128d x)        ///< __m128d vector.
 {
   __m128d y, f, z;
   __m128i i;
-print_m128d (stdout, "x", x);
   y = _mm_floor_pd (x);
   f = _mm_sub_pd (x, y);
 #ifdef __AVX512F__
@@ -14831,10 +14832,7 @@ print_m128d (stdout, "x", x);
   y = _mm_add_pd (y, z);
   i = _mm_sub_epi64 (_mm_castpd_si128 (y), _mm_castpd_si128 (z));
 #endif
-print_m128i64 (stdout, "i", i);
   z = jbm_exp2n_2xf64 (i);
-print_m128d (stdout, "z", z);
-print_m128d (stdout, "f", f);
   return _mm_mul_pd (z, jbm_exp2wc_2xf64 (f));
 }
 
@@ -14916,7 +14914,7 @@ jbm_log2_2xf64 (const __m128d x)        ///< __m128d vector.
 {
   __m128d y, z;
   __m128i e;
-  y = jbm_log2wc_2xf64 ( jbm_frexp_2xf64 (x, &e));
+  y = jbm_log2wc_2xf64 (jbm_frexp_2xf64 (x, &e));
 #ifdef __AVX512F__
   z = _mm_cvtepi64_pd (e);
 #else

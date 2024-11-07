@@ -15292,7 +15292,7 @@ jbm_log2_4xf64 (const __m256d x)        ///< __m256d vector.
 {
   __m256d y, z;
   __m256i e;
-  y = jbm_log2wc_4xf64 ( jbm_frexp_4xf64 (x, &e));
+  y = jbm_log2wc_4xf64 (jbm_frexp_4xf64 (x, &e));
 #ifdef __AVX512F__
   z = _mm256_cvtepi64_pd (e);
 #else

@@ -40,7 +40,7 @@
 #include <quadmath.h>
 #define exp10q(x) (expq(x * M_LN10q))
 #endif
-#ifdef __amd64 
+#ifdef __amd64
 #include <x86intrin.h>
 #endif
 
@@ -63,13 +63,13 @@
  */
 #if defined(__AVX512F__)
 #define JB_ALIGNED __attribute__((aligned(64)))
-#define MALLOC(size) (aligned_alloc (64, size)) 
+#define MALLOC(size) (aligned_alloc (64, size))
 #elif defined(__AVX__)
 #define JB_ALIGNED __attribute__((aligned(32)))
-#define MALLOC(size) (aligned_alloc (32, size)) 
+#define MALLOC(size) (aligned_alloc (32, size))
 #elif defined(__SSE4_2__)
 #define JB_ALIGNED __attribute__((aligned(16)))
-#define MALLOC(size) (aligned_alloc (16, size)) 
+#define MALLOC(size) (aligned_alloc (16, size))
 #else
 #define JB_ALIGNED
 #define MALLOC  malloc
@@ -78,82 +78,82 @@
 #define FREE aligned_free
 
 #ifndef M_Ef
-#define	M_Ef M_E                ///< single precision e number.
+#define M_Ef M_E                ///< single precision e number.
 #endif
 #ifndef M_LOG2Ef
-#define	M_LOG2Ef M_LOG2E        ///< single precision log2(e) number.
+#define M_LOG2Ef M_LOG2E        ///< single precision log2(e) number.
 #endif
 #ifndef M_LOG10Ef
-#define	M_LOG10Ef M_LOG10E      ///< single precision log10(e) number.
+#define M_LOG10Ef M_LOG10E      ///< single precision log10(e) number.
 #endif
 #ifndef M_LN2f
-#define	M_LN2f M_LN2            ///< single precision log(2) number.
+#define M_LN2f M_LN2            ///< single precision log(2) number.
 #endif
 #ifndef M_LN10f
-#define	M_LN10f M_LN10          ///< single precision log(10) number.
+#define M_LN10f M_LN10          ///< single precision log(10) number.
 #endif
 #ifndef M_PIf
-#define	M_PIf M_PI              ///< single precision pi number.
+#define M_PIf M_PI              ///< single precision pi number.
 #endif
 #ifndef M_PI_2f
-#define	M_PI_2f M_PI_2          ///< single precision pi/2 number.
+#define M_PI_2f M_PI_2          ///< single precision pi/2 number.
 #endif
 #ifndef M_PI_4f
-#define	M_PI_4f M_PI_4          ///< single precision pi/4 number.
+#define M_PI_4f M_PI_4          ///< single precision pi/4 number.
 #endif
 #ifndef M_1_PIf
-#define	M_1_PIf M_1_PI          ///< single precision 1/pi number.
+#define M_1_PIf M_1_PI          ///< single precision 1/pi number.
 #endif
 #ifndef M_2_PIf
-#define	M_2_PIf M_2_PI          ///< single precision 2/pi number.
+#define M_2_PIf M_2_PI          ///< single precision 2/pi number.
 #endif
 #ifndef M_2_SQRTPIf
-#define	M_2_SQRTPIf M_2_SQRTPI  ///< single precision 2/sqrt(pi) number.
+#define M_2_SQRTPIf M_2_SQRTPI  ///< single precision 2/sqrt(pi) number.
 #endif
 #ifndef M_SQRT2f
-#define	M_SQRT2f M_SQRT2        ///< single precision sqrt(2) number.
+#define M_SQRT2f M_SQRT2        ///< single precision sqrt(2) number.
 #endif
 #ifndef M_SQRT1_2f
-#define	M_SQRT1_2f M_SQRT1_2    ///< single precision sqrt(1/2) number.
+#define M_SQRT1_2f M_SQRT1_2    ///< single precision sqrt(1/2) number.
 #endif
 #ifndef M_El
-#define	M_El M_E                ///< double precision e number.
+#define M_El M_E                ///< double precision e number.
 #endif
 #ifndef M_LOG2El
-#define	M_LOG2El M_LOG2E        ///< double precision log2(e) number.
+#define M_LOG2El M_LOG2E        ///< double precision log2(e) number.
 #endif
 #ifndef M_LOG10El
-#define	M_LOG10El M_LOG10E      ///< double precision log10(e) number.
+#define M_LOG10El M_LOG10E      ///< double precision log10(e) number.
 #endif
 #ifndef M_LN2l
-#define	M_LN2l M_LN2            ///< double precision log(2) number.
+#define M_LN2l M_LN2            ///< double precision log(2) number.
 #endif
 #ifndef M_LN10l
-#define	M_LN10l M_LN10          ///< double precision log(10) number.
+#define M_LN10l M_LN10          ///< double precision log(10) number.
 #endif
 #ifndef M_PIl
-#define	M_PIl M_PI              ///< double precision pi number.
+#define M_PIl M_PI              ///< double precision pi number.
 #endif
 #ifndef M_PI_2l
-#define	M_PI_2l M_PI_2          ///< double precision pi/2 number.
+#define M_PI_2l M_PI_2          ///< double precision pi/2 number.
 #endif
 #ifndef M_PI_4l
-#define	M_PI_4l M_PI_4          ///< double precision pi/4 number.
+#define M_PI_4l M_PI_4          ///< double precision pi/4 number.
 #endif
 #ifndef M_1_PIl
-#define	M_1_PIl M_1_PI          ///< double precision 1/pi number.
+#define M_1_PIl M_1_PI          ///< double precision 1/pi number.
 #endif
 #ifndef M_2_PIl
-#define	M_2_PIl M_2_PI          ///< double precision 2/pi number.
+#define M_2_PIl M_2_PI          ///< double precision 2/pi number.
 #endif
 #ifndef M_2_SQRTPIl
-#define	M_2_SQRTPIl M_2_SQRTPI  ///< double precision 2/sqrt(pi) number.
+#define M_2_SQRTPIl M_2_SQRTPI  ///< double precision 2/sqrt(pi) number.
 #endif
 #ifndef M_SQRT2l
-#define	M_SQRT2l M_SQRT2        ///< double precision sqrt(2) number.
+#define M_SQRT2l M_SQRT2        ///< double precision sqrt(2) number.
 #endif
 #ifndef M_SQRT1_2l
-#define	M_SQRT1_2l M_SQRT1_2    ///< double precision sqrt(1/2) number.
+#define M_SQRT1_2l M_SQRT1_2    ///< double precision sqrt(1/2) number.
 #endif
 
 #define JBM_FLT_NORMAL_MIN FLT_MIN
@@ -172,21 +172,21 @@
 #if !HAVE_EXP10
 
 static inline float
-exp10f(float x)
+exp10f (float x)
 {
-  return expf(x * M_LN10f);
+  return expf (x * M_LN10f);
 }
 
 static inline double
-exp10(double x)
+exp10 (double x)
 {
-  return exp(x * M_LN10);
+  return exp (x * M_LN10);
 }
 
 static inline long double
-exp10l(long double x)
+exp10l (long double x)
 {
-  return expl(x * M_LN10l);
+  return expl (x * M_LN10l);
 }
 
 #endif
@@ -719,7 +719,7 @@ typedef struct
   unsigned int alloc;           ///< 1 if x is allocated, 0 otherwise.
 } JBMFarray;
 
-extern void jbm_index_sort_flash (JBFLOAT *restrict x, unsigned int *ni,
+extern void jbm_index_sort_flash (JBFLOAT * restrict x, unsigned int *ni,
                                   unsigned int n);
 
 #if JBM_HIGH_PRECISION == JBM_LOW_PRECISION
@@ -728,7 +728,7 @@ extern void jbm_index_sort_flash (JBFLOAT *restrict x, unsigned int *ni,
 
 #else
 
-extern void jbm_index_sort_flashl (JBDOUBLE *restrict x, unsigned int *ni,
+extern void jbm_index_sort_flashl (JBDOUBLE * restrict x, unsigned int *ni,
                                    unsigned int n);
 
 #endif
@@ -7334,49 +7334,298 @@ jbm_file_root_mean_square_errorl (char *namea,
  * Function to calculate an step of the Runge-Kutta method of first order and
  * one step over a first order differential scalar equation.
  */
-void
-runge_kutta_step_1_1_1_1 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
-			            JBFLOAT *u1) __attribute__((unused)),
-		          ///< differential function.
-                          JBFLOAT *u0,    ///< variable.
-                          JBFLOAT *u1,    ///< 1st derivative.
-		     	  const JBFLOAT t,        ///< time.
-			  const JBFLOAT dt)       ///< step size.
+static inline void
+jbm_rk_step_1_1_1_1 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                JBFLOAT *u1) __attribute__((unused)),
+                     ///< differential function.
+                     JBFLOAT *u0,       ///< variable.
+                     JBFLOAT *u1,       ///< 1st derivative.
+                     const JBFLOAT t __attribute__((unused)),   ///< time.
+                     const JBFLOAT dt)  ///< step size.
 {
   u0[0] += dt * u1[0];
 }
 
 /**
  * Function to calculate an step of the Runge-Kutta method of first order and
- * one step over a second order differential scalar equation.
+ * one step over a first order differential vectorial equation.
  */
-void
-runge_kutta_step_2_1_1_1 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
-			            const JBFLOAT u1, JBFLOAT *u2)
-                          __attribute__((unused)),
-		          ///< differential function.
-                          JBFLOAT *u0,    ///< variable.
-                          JBFLOAT *u1,    ///< 1st derivative.
-                          JBFLOAT *u2,    ///< 2nd derivative.
-		     	  const JBFLOAT t,        ///< time.
-			  const JBFLOAT dt)       ///< step size.
+static inline void
+jbm_rk_step_1_n_1_1 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                JBFLOAT *u1) __attribute__((unused)),
+                     ///< differential function.
+                     JBFLOAT *u0,       ///< variable vector.
+                     JBFLOAT *u1,       ///< 1st derivative vector.
+                     const unsigned int n,      ///< vector size.
+                     const JBFLOAT t __attribute__((unused)),   ///< time.
+                     const JBFLOAT dt)  ///< step size.
 {
-  u0[0] += dt * u1[0];
-  u1[0] += dt * u2[0];
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    u0[i] += dt * u1[i];
 }
 
 /**
  * Function to calculate an step of the Runge-Kutta method of second order and
  * two steps over a first order differential scalar equation.
  */
-void
-runge_kutta_step_1_1_2_2 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
-			            JBFLOAT *u1),
-		          ///< differential function.
-                          JBFLOAT *u0,    ///< variable.
-                          JBFLOAT *u1,    ///< 1st derivative.
-		     	  const JBFLOAT t,        ///< time.
-			  const JBFLOAT dt)       ///< step size.
+static inline void
+jbm_rk_step_1_1_2_2 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                JBFLOAT *u1),   ///< differential function.
+                     JBFLOAT *u0,       ///< variable.
+                     JBFLOAT *u1,       ///< 1st derivative.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k = 0.5f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k = 0.5;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k = 0.5L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k = 0.5Q;
+#endif
+  JBFLOAT u0_2[1];
+  JBFLOAT u1_2;
+  u0_2[0] = u0[0] + dt * u1[0];
+  f (t + dt, u0_2[0], &u1_2);
+  u0[0] += k * dt * (u1[0] + u1_2);
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of second order and
+ * two steps over a first order differential vectorial equation.
+ */
+static inline void
+jbm_rk_step_1_n_2_2 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                JBFLOAT *u1),   ///< differential function.
+                     JBFLOAT *u0,       ///< variable vector.
+                     JBFLOAT *u1,       ///< 1st derivative vector.
+                     const unsigned int n,      ///< vector size.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k = 0.5f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k = 0.5;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k = 0.5L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k = 0.5Q;
+#endif
+  JBFLOAT u0_2[n];
+  JBFLOAT kdt, tdt, u1_2;
+  unsigned int i;
+  kdt = k * dt;
+  tdt = t + dt;
+  for (i = 0; i < n; ++i)
+    {
+      u0_2[i] = u0[i] + dt * u1[i];
+      f (tdt, u0_2[i], &u1_2);
+      u0[i] += kdt * (u1[i] + u1_2);
+    }
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of third order and
+ * three steps over a first order differential scalar equation.
+ */
+static inline void
+jbm_rk_step_1_1_3_3 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                JBFLOAT *u1),   ///< differential function.
+                     JBFLOAT *u0,       ///< variable.
+                     JBFLOAT *u1,       ///< 1st derivative.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k12 = 0.5f, k14 = 0.25f, k16 = 1.f / 6.f, k4 = 4.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k12 = 0.5, k14 = 0.25, k16 = 1. / 6., k4 = 4.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k12 = 0.5L, k14 = 0.25L, k16 = 1.L / 6.L, k4 = 4.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k12 = 0.5Q, k14 = 0.25Q, k16 = 1.Q / 6.Q, k4 = 4.Q;
+#endif
+  JBFLOAT u0_2[1], u0_3[1];
+  JBFLOAT u1_2, u1_3;
+  u0_2[0] = u0[0] + dt * u1[0];
+  f (t + dt, u0_2[0], &u1_2);
+  u0_3[0] = u0[0] + k14 * dt * (u1[0] + u1_2);
+  f (t + k12 * dt, u0_3[0], &u1_3);
+  u0[0] += k16 * dt * (u1[0] + u1_2 + k4 * u1_3);
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of third order and
+ * three steps over a first order differential vectorial equation.
+ */
+static inline void
+jbm_rk_step_1_n_3_3 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                JBFLOAT *u1),   ///< differential function.
+                     JBFLOAT *u0,       ///< variable.
+                     JBFLOAT *u1,       ///< 1st derivative.
+                     const unsigned int n,      ///< vector size.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k12 = 0.5f, k14 = 0.25f, k16 = 1.f / 6.f, k4 = 4.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k12 = 0.5, k14 = 0.25, k16 = 1. / 6., k4 = 4.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k12 = 0.5L, k14 = 0.25L, k16 = 1.L / 6.L, k4 = 4.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k12 = 0.5Q, k14 = 0.25Q, k16 = 1.Q / 6.Q, k4 = 4.Q;
+#endif
+  JBFLOAT u0_2[n], u0_3[n];
+  JBFLOAT tdt, tdt12, kdt14, kdt16, u1_2, u1_3;
+  unsigned int i;
+  tdt = t + dt;
+  tdt12 = t + k12 * dt;
+  kdt14 = k14 * dt;
+  kdt16 = k16 * dt;
+  for (i = 0; i < n; ++i)
+    {
+      u0_2[i] = u0[i] + dt * u1[i];
+      f (tdt, u0_2[i], &u1_2);
+      u0_3[i] = u0[i] + kdt14 * (u1[i] + u1_2);
+      f (tdt12, u0_3[i], &u1_3);
+      u0[i] += kdt16 * (u1[i] + u1_2 + k4 * u1_3);
+    }
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of fourth order and
+ * four steps over a first order differential scalar equation.
+ */
+static inline void
+jbm_rk_step_1_1_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                JBFLOAT *u1),   ///< differential function.
+                     JBFLOAT *u0,       ///< variable.
+                     JBFLOAT *u1,       ///< 1st derivative.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k12 = 0.5f, k16 = 1.f / 6.f, k2 = 2.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k12 = 0.5, k16 = 1. / 6., k2 = 2.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k12 = 0.5L, k16 = 1.L / 6.L, k2 = 2.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k12 = 0.5Q, k16 = 1.Q / 6.Q, k2 = 2.Q;
+#endif
+  JBFLOAT u0_2[1], u0_3[1], u0_4[1];
+  JBFLOAT kdt, tdt, u1_2, u1_3, u1_4;
+  kdt = k12 * dt;
+  tdt = t + kdt;
+  u0_2[0] = u0[0] + kdt * u1[0];
+  f (tdt, u0_2[0], &u1_2);
+  u0_3[0] = u0[0] + kdt * u1_2;
+  f (tdt, u0_3[0], &u1_3);
+  u0_4[0] = u0[0] + dt * u1_3;
+  f (t + dt, u0_4[0], &u1_4);
+  u0[0] += k16 * dt * (u1[0] + u1_4 + k2 * (u1_2 + u1_3));
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of fourth order and
+ * four steps over a first order differential vectorial equation.
+ */
+static inline void
+jbm_rk_step_1_n_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                JBFLOAT *u1),   ///< differential function.
+                     JBFLOAT *u0,       ///< variable vector.
+                     JBFLOAT *u1,       ///< 1st derivative vector.
+                     const unsigned int n,      ///< vector size.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
+{
+#if JBM_HIGH_PRECISION == 1
+  const JBFLOAT k12 = 0.5f, k16 = 1.f / 6.f, k2 = 2.f;
+#elif JBM_HIGH_PRECISION == 2
+  const JBFLOAT k12 = 0.5, k16 = 1. / 6., k2 = 2.;
+#elif JBM_HIGH_PRECISION == 3
+  const JBFLOAT k12 = 0.5L, k16 = 1.L / 6.L, k2 = 2.L;
+#elif JBM_HIGH_PRECISION == 4
+  const JBFLOAT k12 = 0.5Q, k16 = 1.Q / 6.Q, k2 = 2.Q;
+#endif
+  JBFLOAT u0_2[n], u0_3[n], u0_4[n];
+  JBFLOAT kdt12, kdt16, tdt12, tdt, u1_2, u1_3, u1_4;
+  unsigned int i;
+  kdt12 = k12 * dt;
+  kdt16 = k16 * dt;
+  tdt12 = t + kdt12;
+  tdt = t + dt;
+  for (i = 0; i < n; ++i)
+    {
+      u0_2[i] = u0[i] + kdt12 * u1[i];
+      f (tdt12, u0_2[i], &u1_2);
+      u0_3[i] = u0[i] + kdt12 * u1_2;
+      f (tdt12, u0_3[i], &u1_3);
+      u0_4[i] = u0[i] + dt * u1_3;
+      f (tdt, u0_4[i], &u1_4);
+      u0[i] += kdt16 * (u1[i] + u1_4 + k2 * (u1_2 + u1_3));
+    }
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of first order and
+ * one step over a second order differential scalar equation.
+ */
+static inline void
+jbm_rk_step_2_1_1_1 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                const JBFLOAT u1, JBFLOAT *u2)
+                     __attribute__((unused)),   ///< differential function.
+                     JBFLOAT *u0,       ///< variable.
+                     JBFLOAT *u1,       ///< 1st derivative.
+                     JBFLOAT *u2,       ///< 2nd derivative.
+                     const JBFLOAT t __attribute__((unused)),   ///< time.
+                     const JBFLOAT dt)  ///< step size.
+{
+  u0[0] += dt * u1[0];
+  u1[0] += dt * u2[0];
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of first order and
+ * one step over a second order differential vectorial equation.
+ */
+static inline void
+jbm_rk_step_2_n_1_1 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                const JBFLOAT u1, JBFLOAT *u2)
+                     __attribute__((unused)),   ///< differential function.
+                     JBFLOAT *u0,       ///< variable vector.
+                     JBFLOAT *u1,       ///< 1st derivative vector.
+                     JBFLOAT *u2,       ///< 2nd derivative vector.
+                     const unsigned int n,      ///< vector size.
+                     const JBFLOAT t __attribute__((unused)),   ///< time.
+                     const JBFLOAT dt)  ///< step size.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    {
+      u0[i] += dt * u1[i];
+      u1[i] += dt * u2[i];
+    }
+}
+
+/**
+ * Function to calculate an step of the Runge-Kutta method of second order and
+ * two steps over a second order differential scalar equation.
+ */
+static inline void
+jbm_rk_step_2_1_2_2 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                const JBFLOAT u1, JBFLOAT *u2),
+                     ///< differential function.
+                     JBFLOAT *u0,       ///< variable.
+                     JBFLOAT *u1,       ///< 1st derivative.
+                     JBFLOAT *u2,       ///< 2nd derivative.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
 {
 #if JBM_HIGH_PRECISION == 1
   const JBFLOAT k = 0.5f;
@@ -7388,24 +7637,29 @@ runge_kutta_step_1_1_2_2 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
   const JBFLOAT k = 0.5Q;
 #endif
   JBFLOAT u0_2[1], u1_2[1];
+  JBFLOAT kdt, u2_2;
   u0_2[0] = u0[0] + dt * u1[0];
-  f (t + dt, u0_2[0], u1_2);
-  u0[0] += k * dt * (u1[0] + u1_2[0]);
+  u1_2[0] = u1[0] + dt * u2[0];
+  f (t + dt, u0_2[0], u1_2[0], &u2_2);
+  kdt = k * dt;
+  u0[0] += kdt * (u1[0] + u1_2[0]);
+  u1[0] += kdt * (u2[0] + u2_2);
 }
 
 /**
  * Function to calculate an step of the Runge-Kutta method of second order and
- * two steps over a second order differential scalar equation.
+ * two steps over a second order differential vectorial equation.
  */
-void
-runge_kutta_step_2_1_2_2 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
-			            const JBFLOAT u1, JBFLOAT *u2),
-		          ///< differential function.
-                          JBFLOAT *u0,    ///< variable.
-                          JBFLOAT *u1,    ///< 1st derivative.
-                          JBFLOAT *u2,    ///< 2nd derivative.
-		     	  const JBFLOAT t,        ///< time.
-			  const JBFLOAT dt)       ///< step size.
+static inline void
+jbm_rk_step_2_n_2_2 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                const JBFLOAT u1, JBFLOAT *u2),
+                     ///< differential function.
+                     JBFLOAT *u0,       ///< variable vector.
+                     JBFLOAT *u1,       ///< 1st derivative vector.
+                     JBFLOAT *u2,       ///< 2nd derivative vector.
+                     const unsigned int n,      ///< vector size.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
 {
 #if JBM_HIGH_PRECISION == 1
   const JBFLOAT k = 0.5f;
@@ -7416,28 +7670,34 @@ runge_kutta_step_2_1_2_2 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
 #elif JBM_HIGH_PRECISION == 4
   const JBFLOAT k = 0.5Q;
 #endif
-  JBFLOAT u0_2[1], u1_2[1], u2_2[1];
-  JBFLOAT kdt;
-  u0_2[0] = u0[0] + dt * u1[0];
-  u1_2[0] = u1[0] + dt * u2[0];
-  f (t + dt, u0_2[0], u1_2[0], u2_2);
+  JBFLOAT u0_2[n], u1_2[n];
+  JBFLOAT kdt, tdt, u2_2;
+  unsigned int i;
   kdt = k * dt;
-  u0[0] += kdt * (u1[0] + u1_2[0]);
-  u1[0] += kdt * (u2[0] + u2_2[0]);
+  tdt = t + dt;
+  for (i = 0; i < n; ++i)
+    {
+      u0_2[i] = u0[i] + dt * u1[i];
+      u1_2[i] = u1[i] + dt * u2[i];
+      f (tdt, u0_2[i], u1_2[i], &u2_2);
+      u0[i] += kdt * (u1[i] + u1_2[i]);
+      u1[i] += kdt * (u2[i] + u2_2);
+    }
 }
 
 /**
  * Function to calculate an step of the Runge-Kutta method of third order and
- * three steps over a first order differential scalar equation.
+ * three steps over a second order differential scalar equation.
  */
-void
-runge_kutta_step_1_1_3_3 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
-			            JBFLOAT *u1),
-		          ///< differential function.
-                          JBFLOAT *u0,    ///< variable.
-                          JBFLOAT *u1,    ///< 1st derivative.
-		     	  const JBFLOAT t,        ///< time.
-			  const JBFLOAT dt)       ///< step size.
+static inline void
+jbm_rk_step_2_1_3_3 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                const JBFLOAT u1, JBFLOAT *u2),
+                     ///< differential function.
+                     JBFLOAT *u0,       ///< variable.
+                     JBFLOAT *u1,       ///< 1st derivative.
+                     JBFLOAT *u2,       ///< 2nd derivative.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
 {
 #if JBM_HIGH_PRECISION == 1
   const JBFLOAT k12 = 0.5f, k14 = 0.25f, k16 = 1.f / 6.f, k4 = 4.f;
@@ -7449,26 +7709,33 @@ runge_kutta_step_1_1_3_3 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
   const JBFLOAT k12 = 0.5Q, k14 = 0.25Q, k16 = 1.Q / 6.Q, k4 = 4.Q;
 #endif
   JBFLOAT u0_2[1], u1_2[1], u0_3[1], u1_3[1];
+  JBFLOAT kdt, u2_2, u2_3;
   u0_2[0] = u0[0] + dt * u1[0];
-  f (t + dt, u0_2[0], u1_2);
-  u0_3[0] = u0[0] + k14 * dt * (u1[0] + u1_2[0]);
-  f (t + k12 * dt, u0_3[0], u1_3);
-  u0[0] += k16 * dt * (u1[0] + u1_2[0] + k4 * u1_3[0]);
+  u1_2[0] = u1[0] + dt * u2[0];
+  f (t + dt, u0_2[0], u1_2[0], &u2_2);
+  kdt = k14 * dt;
+  u0_3[0] = u0[0] + kdt * (u1[0] + u1_2[0]);
+  u1_3[0] = u1[0] + kdt * (u2[0] + u2_2);
+  f (t + k12 * dt, u0_3[0], u1_3[0], &u2_3);
+  kdt = k16 * dt;
+  u0[0] += kdt * (u1[0] + u1_2[0] + k4 * u1_3[0]);
+  u1[0] += kdt * (u2[0] + u2_2 + k4 * u2_3);
 }
 
 /**
  * Function to calculate an step of the Runge-Kutta method of third order and
- * three steps over a second order differential scalar equation.
+ * three steps over a second order differential vectorial equation.
  */
-void
-runge_kutta_step_2_1_3_3 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
-			            const JBFLOAT u1, JBFLOAT *u2),
-		          ///< differential function.
-                          JBFLOAT *u0,    ///< variable.
-                          JBFLOAT *u1,    ///< 1st derivative.
-                          JBFLOAT *u2,    ///< 2nd derivative.
-		     	  const JBFLOAT t,        ///< time.
-			  const JBFLOAT dt)       ///< step size.
+static inline void
+jbm_rk_step_2_n_3_3 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                const JBFLOAT u1, JBFLOAT *u2),
+                     ///< differential function.
+                     JBFLOAT *u0,       ///< variable vector.
+                     JBFLOAT *u1,       ///< 1st derivative vector.
+                     JBFLOAT *u2,       ///< 2nd derivative vector.
+                     const unsigned int n,      ///< vector size.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
 {
 #if JBM_HIGH_PRECISION == 1
   const JBFLOAT k12 = 0.5f, k14 = 0.25f, k16 = 1.f / 6.f, k4 = 4.f;
@@ -7479,32 +7746,39 @@ runge_kutta_step_2_1_3_3 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
 #elif JBM_HIGH_PRECISION == 4
   const JBFLOAT k12 = 0.5Q, k14 = 0.25Q, k16 = 1.Q / 6.Q, k4 = 4.Q;
 #endif
-  JBFLOAT u0_2[1], u1_2[1], u2_2[1], u0_3[1], u1_3[1], u2_3[1];
-  JBFLOAT kdt;
-  u0_2[0] = u0[0] + dt * u1[0];
-  u1_2[0] = u1[0] + dt * u2[0];
-  f (t + dt, u0_2[0], u1_2[0], u2_2);
-  kdt = k14 * dt;
-  u0_3[0] = u0[0] + kdt * (u1[0] + u1_2[0]);
-  u1_3[0] = u1[0] + kdt * (u2[0] + u2_2[0]);
-  f (t + k12 * dt, u0_3[0], u1_3[0], u2_3);
-  kdt = k16 * dt;
-  u0[0] += kdt * (u1[0] + u1_2[0] + k4 * u1_3[0]);
-  u1[0] += kdt * (u2[0] + u2_2[0] + k4 * u2_3[0]);
+  JBFLOAT u0_2[n], u1_2[n], u0_3[n], u1_3[n];
+  JBFLOAT kdt14, kdt16, tdt, tdt12, u2_2, u2_3;
+  unsigned int i;
+  kdt14 = k14 * dt;
+  kdt16 = k16 * dt;
+  tdt12 = t + k12 * dt;
+  tdt = t + dt;
+  for (i = 0; i < n; ++i)
+    {
+      u0_2[i] = u0[i] + dt * u1[i];
+      u1_2[i] = u1[i] + dt * u2[i];
+      f (tdt, u0_2[i], u1_2[i], &u2_2);
+      u0_3[i] = u0[i] + kdt14 * (u1[i] + u1_2[i]);
+      u1_3[i] = u1[i] + kdt14 * (u2[i] + u2_2);
+      f (tdt12, u0_3[i], u1_3[i], &u2_3);
+      u0[i] += kdt16 * (u1[i] + u1_2[i] + k4 * u1_3[i]);
+      u1[i] += kdt16 * (u2[i] + u2_2 + k4 * u2_3);
+    }
 }
 
 /**
  * Function to calculate an step of the Runge-Kutta method of fourth order and
- * four steps over a first order differential scalar equation.
+ * four steps over a second order differential scalar equation.
  */
-void
-runge_kutta_step_1_1_4_4 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
-			            JBFLOAT *u1),
-		          ///< differential function.
-                          JBFLOAT *u0,    ///< variable.
-                          JBFLOAT *u1,    ///< 1st derivative.
-		     	  const JBFLOAT t,        ///< time.
-			  const JBFLOAT dt)       ///< step size.
+static inline void
+jbm_rk_step_2_1_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                const JBFLOAT u1, JBFLOAT *u2),
+                     ///< differential function.
+                     JBFLOAT *u0,       ///< variable.
+                     JBFLOAT *u1,       ///< 1st derivative.
+                     JBFLOAT *u2,       ///< 2nd derivative.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
 {
 #if JBM_HIGH_PRECISION == 1
   const JBFLOAT k12 = 0.5f, k16 = 1.f / 6.f, k2 = 2.f;
@@ -7516,31 +7790,37 @@ runge_kutta_step_1_1_4_4 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
   const JBFLOAT k12 = 0.5Q, k16 = 1.Q / 6.Q, k2 = 2.Q;
 #endif
   JBFLOAT u0_2[1], u1_2[1], u0_3[1], u1_3[1], u0_4[1], u1_4[1];
-  JBFLOAT kdt, tdt;
+  JBFLOAT kdt, tdt, u2_2, u2_3, u2_4;
   kdt = k12 * dt;
   tdt = t + kdt;
   u0_2[0] = u0[0] + kdt * u1[0];
-  f (tdt, u0_2[0], u1_2);
+  u1_2[0] = u1[0] + kdt * u2[0];
+  f (tdt, u0_2[0], u1_2[0], &u2_2);
   u0_3[0] = u0[0] + kdt * u1_2[0];
-  f (tdt, u0_3[0], u1_3);
+  u1_3[0] = u1[0] + kdt * u2_2;
+  f (tdt, u0_3[0], u1_3[0], &u2_3);
   u0_4[0] = u0[0] + dt * u1_3[0];
-  f (t + dt, u0_4[0], u1_4);
-  u0[0] += k16 * dt * (u1[0] + u1_4[0] + k2 * (u1_2[0] + u1_3[0]));
+  u1_4[0] = u1[0] + dt * u2_3;
+  f (t + dt, u0_4[0], u1_4[0], &u2_4);
+  kdt = k16 * dt;
+  u0[0] += kdt * (u1[0] + u1_4[0] + k2 * (u1_2[0] + u1_3[0]));
+  u1[0] += kdt * (u2[0] + u2_4 + k2 * (u2_2 + u2_3));
 }
 
 /**
  * Function to calculate an step of the Runge-Kutta method of fourth order and
- * four steps over a second order differential scalar equation.
+ * four steps over a second order differential vectorial equation.
  */
-void
-runge_kutta_step_2_1_4_4 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
-			            const JBFLOAT u1, JBFLOAT *u2),
-		          ///< differential function.
-                          JBFLOAT *u0,    ///< variable.
-                          JBFLOAT *u1,    ///< 1st derivative.
-                          JBFLOAT *u2,    ///< 2nd derivative.
-		     	  const JBFLOAT t,        ///< time.
-			  const JBFLOAT dt)       ///< step size.
+static inline void
+jbm_rk_step_2_n_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
+                                const JBFLOAT u1, JBFLOAT *u2),
+                     ///< differential function.
+                     JBFLOAT *u0,       ///< variable vector.
+                     JBFLOAT *u1,       ///< 1st derivative vector.
+                     JBFLOAT *u2,       ///< 2nd derivative vector.
+                     const unsigned int n,      ///< vector size.
+                     const JBFLOAT t,   ///< time.
+                     const JBFLOAT dt)  ///< step size.
 {
 #if JBM_HIGH_PRECISION == 1
   const JBFLOAT k12 = 0.5f, k16 = 1.f / 6.f, k2 = 2.f;
@@ -7551,23 +7831,27 @@ runge_kutta_step_2_1_4_4 (void (*f)(const JBFLOAT t, const JBFLOAT u0,
 #elif JBM_HIGH_PRECISION == 4
   const JBFLOAT k12 = 0.5Q, k16 = 1.Q / 6.Q, k2 = 2.Q;
 #endif
-  JBFLOAT u0_2[1], u1_2[1], u2_2[1], u0_3[1], u1_3[1], u2_3[1],
-    u0_4[1], u1_4[1], u2_4[1];
-  JBFLOAT kdt, tdt;
-  kdt = k12 * dt;
-  tdt = t + kdt;
-  u0_2[0] = u0[0] + kdt * u1[0];
-  u1_2[0] = u1[0] + kdt * u2[0];
-  f (tdt, u0_2[0], u1_2[0], u2_2);
-  u0_3[0] = u0[0] + kdt * u1_2[0];
-  u1_3[0] = u1[0] + kdt * u2_2[0];
-  f (tdt, u0_3[0], u1_3[0], u2_3);
-  u0_4[0] = u0[0] + dt * u1_3[0];
-  u1_4[0] = u1[0] + dt * u2_3[0];
-  f (t + dt, u0_4[0], u1_4[0], u2_4);
-  kdt = k16 * dt;
-  u0[0] += kdt * (u1[0] + u1_4[0] + k2 * (u1_2[0] + u1_3[0]));
-  u1[0] += kdt * (u2[0] + u2_4[0] + k2 * (u2_2[0] + u2_3[0]));
+  JBFLOAT u0_2[n], u1_2[n], u0_3[n], u1_3[n], u0_4[n], u1_4[n];
+  JBFLOAT kdt12, kdt16, tdt, tdt12, u2_2, u2_3, u2_4;
+  unsigned int i;
+  kdt12 = k12 * dt;
+  kdt16 = k16 * dt;
+  tdt12 = t + kdt12;
+  tdt = t + dt;
+  for (i = 0; i < n; ++i)
+    {
+      u0_2[i] = u0[i] + kdt12 * u1[i];
+      u1_2[i] = u1[i] + kdt12 * u2[i];
+      f (tdt12, u0_2[i], u1_2[i], &u2_2);
+      u0_3[i] = u0[i] + kdt12 * u1_2[i];
+      u1_3[i] = u1[i] + kdt12 * u2_2;
+      f (tdt12, u0_3[i], u1_3[i], &u2_3);
+      u0_4[i] = u0[i] + dt * u1_3[i];
+      u1_4[i] = u1[i] + dt * u2_3;
+      f (tdt, u0_4[i], u1_4[i], &u2_4);
+      u0[i] += kdt16 * (u1[i] + u1_4[i] + k2 * (u1_2[i] + u1_3[i]));
+      u1[i] += kdt16 * (u2[i] + u2_4 + k2 * (u2_2 + u2_3));
+    }
 }
 
 #endif
