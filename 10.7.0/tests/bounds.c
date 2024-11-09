@@ -17,6 +17,11 @@
 #define FLD "%.19Le"
 #define LD_LENGTH 16
 #define L_LENGTH 8
+#elif __aarch64__
+#define ARCH "arm64"
+#define FLD "%.34Le"
+#define LD_LENGTH 16
+#define L_LENGTH 8
 #elif __riscv
 #define ARCH "riscv"
 #define FLD "%.34Le"
