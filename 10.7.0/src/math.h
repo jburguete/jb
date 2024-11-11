@@ -58,24 +58,24 @@
 /**
  * \def JB_ALIGNED
  * \brief macro to define the aligned size in vectorized arrays.
- * \def MALLOC
+ * \def JB_MALLOC
  * \brief macro to define the aligned malloc for vectorized arrays.
  */
 #if defined(__AVX512F__)
 #define JB_ALIGNED __attribute__((aligned(64)))
-#define MALLOC(size) (aligned_alloc (64, size))
+#define JB_MALLOC(size) (aligned_alloc (64, size))
 #elif defined(__AVX__)
 #define JB_ALIGNED __attribute__((aligned(32)))
-#define MALLOC(size) (aligned_alloc (32, size))
+#define JB_MALLOC(size) (aligned_alloc (32, size))
 #elif defined(__SSE4_2__)
 #define JB_ALIGNED __attribute__((aligned(16)))
-#define MALLOC(size) (aligned_alloc (16, size))
+#define JB_MALLOC(size) (aligned_alloc (16, size))
 #else
 #define JB_ALIGNED
-#define MALLOC  malloc
+#define JB_MALLOC  malloc
 #endif
 ///> macro to free the memory used in vectorized arrays. 
-#define FREE aligned_free
+#define JB_FREE aligned_free
 
 #ifndef M_Ef
 #define M_Ef M_E                ///< single precision e number.
@@ -3050,7 +3050,7 @@ jbm_farray_new (const unsigned int n)   ///< number of array elements.
   JBMFarray *fa;
   fa = (JBMFarray *) malloc (sizeof (JBMFarray));
   jbm_farray_init (fa, n);
-  fa->x = (JBFLOAT *) MALLOC (fa->size);
+  fa->x = (JBFLOAT *) JB_MALLOC (fa->size);
   if (!fa->x)
     {
       free (fa);
@@ -3147,7 +3147,7 @@ jbm_farray_store (JBMFarray *fa,        ///< pointer to the JBMFarray struct.
 static inline void
 jbm_farray_destroy (JBMFarray *fa)      ///< pointer to the JBWFarray struct.
 {
-  FREE (fa->x);
+  JB_FREE (fa->x);
   free (fa);
 }
 

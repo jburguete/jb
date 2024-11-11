@@ -18,7 +18,9 @@ LDFLAGS = @LDFLAGS@ @LIBS@ @SDL_LIBS@ @GLFW_LIBS@ @GLUT_LIBS@ @VULKAN_LIBS@ \
 	@GLEW_LIBS@ @GTK_LIBS@ @FREETYPE_LIBS@ @PNG_LIBS@ @GTOP_LIBS@ \
 	@JSON_LIBS@ @GLIB_LIBS@ @GTHREAD_LIBS@ @XML_LIBS@ @QUADMATH_LIBS@
 TESTS_CFLAGS = @GSL_CFLAGS@ $(CFLAGS) -c -DJBW=1
+EFFICIENCY_CFLAGS = @GTHREAD_CFLAGS@ @GLIB_CFLAGS@ $(TESTS_CFLAGS)
 TESTS_LDFLAGS = $(LDFLAGS) @GSL_LIBS@
+EFFICIENCY_LDFLAGS = $(TESTS_LDFLAGS) @GLIB_LIBS@ @GTHREAD_LIBS@
 EXEFLAGSPGO = $(LDFLAGS) -L$(BINPGO) -Wl,@RPATH@.
 EXEFLAGS = $(LDFLAGS) -L$(BIN) -Wl,@RPATH@.
 
@@ -234,8 +236,8 @@ $(check_sort_pgo): $(check_sort_dep)
 	$(CC) $(TESTS_CFLAGS) $(PGOGENERATE) $(check_sort_c) \
 		-o $(check_sort_pgo)
 $(efficiency_math_pgo): $(efficiency_math_dep)
-	$(CC) $(TESTS_CFLAGS) $(PGOGENERATE) -c -DJBW=1 $(efficiency_math_c) \
-		-o $(efficiency_math_pgo)
+	$(CC) $(EFFICIENCY_CFLAGS) $(PGOGENERATE) -c -DJBW=1 \
+		$(efficiency_math_c) -o $(efficiency_math_pgo)
 
 # PGO dynamic libraries
 $(libjbpgo): $(def_pgo)
@@ -293,9 +295,10 @@ $(check_sort_binpgo): $(check_sort_pgo) $(libjbmpgo)
 	cd $(BINPGO); ./check_sortpgo@SUFFIX@ 1000 4
 $(efficiency_math_binpgo): $(efficiency_math_pgo) $(libjbmpgo)
 	$(CC) $(PGOGENERATE) $(efficiency_math_pgo) \
-		-o $(efficiency_math_binpgo) $(TESTS_LDFLAGS) $(EXEFLAGSPGO) \
-		-ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
-	cd $(BINPGO); $(mathprefix) ./efficiency_mathpgo@SUFFIX@ 1000
+		-o $(efficiency_math_binpgo) $(EFFICIENCY_LDFLAGS) \
+		$(EXEFLAGSPGO) -ljbmpgo@SUFFIX@ -ljbpgo@SUFFIX@
+	cd $(BINPGO); $(mathprefix) ./efficiency_mathpgo@SUFFIX@ 1000 1; \
+		$(mathprefix) ./efficiency_mathpgo@SUFFIX@ 1000 2
 
 # Objects
 $(def_o): $(DEFDEP)
@@ -328,7 +331,7 @@ $(index_sort_o): $(INDEX_SORT_DEP)
 $(check_sort_o): $(CHECK_SORT_DEP)
 	$(CC) $(TESTS_CFLAGS) $(PGOUSE) $(check_sort_c) -o $(check_sort_o)
 $(efficiency_math_o): $(EFFICIENCY_MATH_DEP)
-	$(CC) $(TESTS_CFLAGS) $(PGOUSE) $(efficiency_math_c) \
+	$(CC) $(EFFICIENCY_CFLAGS) $(PGOUSE) $(efficiency_math_c) \
 		-o $(efficiency_math_o)
 
 # Dynamic libraries
@@ -371,7 +374,7 @@ $(check_sort_bin): $(check_sort_o) $(libjbm)
 		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm@SUFFIX@ -ljb@SUFFIX@
 $(efficiency_math_bin): $(efficiency_math_o) $(libjbm)
 	$(CC) $(PGOUSE) $(efficiency_math_o) -o $(efficiency_math_bin) \
-		$(TESTS_LDFLAGS) $(EXEFLAGS) -ljbm@SUFFIX@ -ljb@SUFFIX@
+		$(EFFICIENCY_LDFLAGS) $(EXEFLAGS) -ljbm@SUFFIX@ -ljb@SUFFIX@
 
 # Shaders
 shaders/2D.spv: shaders/2D.vert Makefile
