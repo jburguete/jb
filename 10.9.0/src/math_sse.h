@@ -71,7 +71,7 @@ print_m128i64 (FILE *file, const char *label, __m128i x)
   unsigned int i;
   _mm_store_si128 ((__m128i *) y, x);
   for (i = 0; i < 2; ++i)
-    fprintf (file, "%s[%u]=%llu\n", label, i, y[i]);
+    fprintf (file, "%s[%u]=%lld\n", label, i, y[i]);
 }
 
 static inline void
@@ -14821,18 +14821,20 @@ jbm_exp2wc_2xf64 (const __m128d x)
 static inline __m128d
 jbm_exp2_2xf64 (const __m128d x)        ///< __m128d vector.
 {
-  __m128d y, f, z;
+  __m128d y, f, z, k;
   __m128i i;
   y = _mm_floor_pd (x);
   f = _mm_sub_pd (x, y);
 #ifdef __AVX512F__
   i = _mm_cvtpd_epi64 (y);
+  z = jbm_exp2n_2xf64 (i);
 #else
   z = _mm_set1_pd (0x0018000000000000);
-  y = _mm_add_pd (y, z);
-  i = _mm_sub_epi64 (_mm_castpd_si128 (y), _mm_castpd_si128 (z));
+  k = _mm_add_pd (y, z);
+  i = _mm_sub_epi64 (_mm_castpd_si128 (k), _mm_castpd_si128 (z));
+  z = _mm_blendv_pd (jbm_exp2n_2xf64 (i), _mm_setzero_pd (),
+                     _mm_cmplt_pd (y, _mm_set1_pd (-1074.)));
 #endif
-  z = jbm_exp2n_2xf64 (i);
   return _mm_mul_pd (z, jbm_exp2wc_2xf64 (f));
 }
 

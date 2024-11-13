@@ -15204,12 +15204,14 @@ jbm_exp2_4xf64 (const __m256d x)        ///< __m256d vector.
   f = _mm256_sub_pd (x, y);
 #ifdef __AVX512F__
   i = _mm256_cvtpd_epi64 (y);
+  z = jbm_exp2n_4xf64 (i);
 #else
   z = _mm256_set1_pd (0x0018000000000000);
   y = _mm256_add_pd (y, z);
-  i = _mm267_sub_epi64 (_mm256_castpd_si256 (y), _mm_castpd_si256 (z));
+  i = _mm256_sub_epi64 (_mm256_castpd_si256 (y), _mm256_castpd_si256 (z));
+  z = _mm256_blendv_pd (jbm_exp2n_4xf64 (i), _mm256_setzero_pd (),
+                        _mm256_cmp_pd (y, _mm256_set1_pd (-1074.), _CMP_LT_OS));
 #endif
-  z = jbm_exp2n_4xf64 (i);
   return _mm256_mul_pd (z, jbm_exp2wc_4xf64 (f));
 }
 
@@ -15297,8 +15299,8 @@ jbm_log2_4xf64 (const __m256d x)        ///< __m256d vector.
   z = _mm256_cvtepi64_pd (e);
 #else
   z = _mm256_set1_pd (0x0018000000000000);
-  e = _mm256_add_epi64 (e, _mm256_castpd_si128 (z));
-  z = _mm256_sub_pd (_mm_castsi256_pd (e), z);
+  e = _mm256_add_epi64 (e, _mm256_castpd_si256 (z));
+  z = _mm256_sub_pd (_mm256_castsi256_pd (e), z);
 #endif
   y = _mm256_add_pd (y, z);
   z = _mm256_setzero_pd ();
