@@ -8034,7 +8034,7 @@ jbm_opposite_2xf64 (const __m128d x)    ///< __m128d vector.
  * \return reciprocal value vector (__m128d).
  */
 static inline __m128d
-jbm_reciprocal_2xf64 (const __m128d x)  ///< __m128 vector.
+jbm_reciprocal_2xf64 (const __m128d x)  ///< __m128d vector.
 {
   return _mm_div_pd (_mm_set1_pd (1.), x);
 }
@@ -15097,7 +15097,7 @@ jbm_sin_2xf64 (const __m128d x) ///< __m128d vector.
 
 /**
  * Function to calculate the function cos(x) from jbm_sinwc_2xf64 and
- * jbm_coswc_2xf64 approximations (__m128).
+ * jbm_coswc_2xf64 approximations (__m128d).
  *
  * \return function value (__m128d).
  */
