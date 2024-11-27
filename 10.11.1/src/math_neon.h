@@ -55,21 +55,21 @@ typedef union
 /*
 
 static inline void
-print_m128i32 (FILE *file, const char *label, __m128i x)
+print_m128i32 (FILE *file, const char *label, int32x4_t x)
 {
   int y[4] JB_ALIGNED;
   unsigned int i;
-  _mm_store_si128 ((__m128i *) y, x);
+  vst1q_s32 (y, x);
   for (i = 0; i < 4; ++i)
     fprintf (file, "%s[%u]=%d\n", label, i, y[i]);
 }
 
 static inline void
-print_m128i64 (FILE *file, const char *label, __m128i x)
+print_m128i64 (FILE *file, const char *label, int64x2_t x)
 {
   long long int y[2] JB_ALIGNED;
   unsigned int i;
-  _mm_store_si128 ((__m128i *) y, x);
+  vst1q_s64 (y, x);
   for (i = 0; i < 2; ++i)
     fprintf (file, "%s[%u]=%lld\n", label, i, y[i]);
 }
@@ -103,9 +103,8 @@ print_m128d (FILE *file, const char *label, float64x2_t x)
 static inline float32x4_t
 jbm_opposite_4xf32 (const float32x4_t x)     ///< float32x4_t vector.
 {
-  uint32x4_t i;
-  i = vld1q_u32 ((int) 0x80000000);
-  return vreinterpret_f32_u32 (veorq_u32 (vreinterpret_u32_f32 (x), i));
+  return vreinterpretq_f32_u32 (veorq_u32 (vreinterpretq_u32_f32 (x),
+                                          vld1q_u32 (0x80000000)));
 }
 
 /**
@@ -128,7 +127,7 @@ jbm_reciprocal_4xf32 (const float32x4_t x)   ///< float32x4_t vector.
 static inline float32x4_t
 jbm_abs_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
 {
-  return vbasq_f32 (x);
+  return vabsq_f32 (x);
 }
 
 /**
@@ -162,59 +161,52 @@ jbm_rest_4xf32 (const float32x4_t x, ///< dividend (float32x4_t).
  */
 static inline float32x4_t
 jbm_frexp_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
-                 __m128i *e)    ///< pointer to the extracted exponents vector.
+                 int32x4_t *e)    ///< pointer to the extracted exponents vector.
 {
   JBM4xF32 a, y, y2, z;
-  __m128i e4, b, m1, m2, m3, zi;
+  uint32x4_t e4, b, m1, m2, m3;
   a.x = x;
-  b = _mm_set1_epi32 (0x7f800000);
-  y.i = _mm_and_si128 (a.i, b);
-  m1 = _mm_cmpeq_epi32 (y.i, b);
-  zi = _mm_setzero_si128 ();
-  m2 = _mm_cmpeq_epi32 (y.i, zi);
+  b = vdupq_u32 (0x7f800000);
+  y.i = vandq_u32 (a.i, b);
+  m1 = vceqq_u32 (y.i, b);
+  m2 = vceqzq_u32 (y.i);
   y2.x = x;
-  y2.i = _mm_and_si128 (y2.i, _mm_set1_epi32 (0x007fffff));
-  m3 = _mm_cmpeq_epi32 (y2.i, zi);
-  y2.i = _mm_set1_epi32 (0x00400000);
+  y2.i = vandq_u32 (y2.i, vdupq_n_u32 (0x007fffff));
+  m3 = vceqzq_u32 (y2.i);
+  y2.i = vdupq_n_u32 (0x00400000);
   z.x = vdivq_f32 (x, y2.x);
-  z.i = _mm_and_si128 (z.i, b);
-  e4 = _mm_blendv_epi8 (_mm_sub_epi32 (_mm_srli_epi32 (y.i, 23),
-                                       _mm_set1_epi32 (126)),
-                        _mm_sub_epi32 (_mm_srli_epi32 (z.i, 23),
-                                       _mm_set1_epi32 (253)), m2);
-  y.x = _mm_blendv_ps (y.x, vmulq_f32 (y2.x, z.x), _mm_castsi128_ps (m2));
-  m1 = _mm_or_si128 (m1, _mm_and_si128 (m2, m3));
-  e4 = _mm_blendv_epi8 (e4, zi, m1);
+  z.i = vandq_u32 (z.i, b);
+  e4 = vbslq_s32 (m2,
+                  vsubq_s32 (vshlq_n_s32 (vreinterpretq_s32_u32 (y.i), 23),
+                             vdupq_n_s32 (126)),
+                  vsubq_s32 (vshlq_n_s32 (vreinterpretq_s32_u32 (z.i), 23),
+                             vdupq_n_s32 (253)));
+  y.x = vbslq_f32 (m2, y.x, vmulq_f32 (y2.x, z.x));
+  m1 = vorq_u32 (m1, vandq_u32 (m2, m3));
+  e4 = vbslq_s32 (m1, e4, vdupq_n_s32 (0));
   *e = e4;
-  return _mm_blendv_ps (vmulq_f32 (_mm_set1_ps (0.5f), vdivq_f32 (x, y.x)), x,
-                        _mm_castsi128_ps (m1));
+  return vbslq_f32 (m1, vmulq_f32 (vdupq_n_f32 (0.5f), vdivq_f32 (x, y.x)), x);
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (__m128i).
+ * (int32x4_t).
  *
  * \return function value (float32x4_t).
  */
 static inline float32x4_t
-jbm_exp2n_4xf32 (__m128i e)     ///< exponent vector (__m128i).
+jbm_exp2n_4xf32 (int32x4_t e)     ///< exponent vector (int32x4_t).
 {
   float32x4_t x;
-  x = _mm_blendv_ps
-    (_mm_castsi128_ps (_mm_sllv_epi32 (_mm_set1_epi32 (0x00400000),
-                                       _mm_sub_epi32 (_mm_set1_epi32 (-127),
-                                                      e))),
-     _mm_castsi128_ps (_mm_slli_epi32 (_mm_add_epi32 (e,
-                                                      _mm_set1_epi32 (127)),
-                                       23)),
-     _mm_castsi128_ps (_mm_cmpgt_epi32 (e, _mm_set1_epi32 (-127))));
-  x = _mm_blendv_ps (x, _mm_setzero_ps (),
-                     _mm_castsi128_ps (_mm_cmplt_epi32 (e,
-                                                        _mm_set1_epi32
-                                                        (-150))));
-  return _mm_blendv_ps (x, _mm_set1_ps (INFINITY),
-                        _mm_castsi128_ps (_mm_cmpgt_epi32
-                                          (e, _mm_set1_epi32 (127))));
+  x = vbslq_f32
+    (vcgtq_s32 (e, vdupq_n_s32 (-127)),
+     vreinterpretq_f32_s32 (vshlq_s32 (vdupq_n_s32 (0x00400000),
+                                       vsubq_s32 (vdupq_n_s32 (-127), e))),
+     vreinterpretq_f32_s32 (vshlq_n_s32 (vaddq_s32 (e, vdupq_n_s32 (127)),
+                                         23)));
+  x = vbslq_f32 (vcltq_s32 (e, vdupq_n_s32 (-150)), x, vdupq_n_f32 (0.f));
+  return vbslq_f32 (vcgtq_s32 (e, vdupq_n_s32 (127)),
+                    x, vdupq_n_f32 (INFINITY));
 }
 
 /**
@@ -224,7 +216,7 @@ jbm_exp2n_4xf32 (__m128i e)     ///< exponent vector (__m128i).
  */
 static inline float32x4_t
 jbm_ldexp_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
-                 __m128i e)     ///< exponent vector (__m128i).
+                 int32x4_t e)     ///< exponent vector (int32x4_t).
 {
   return vmulq_f32 (x, jbm_exp2n_4xf32 (e));
 }
@@ -234,10 +226,10 @@ jbm_ldexp_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline float32x4_t
+static inline uint32x4_t
 jbm_small_4xf32 (const float32x4_t x)        ///< float64x2_t vector.
 {
-  return _mm_cmplt_ps (jbm_abs_4xf32 (x), _mm_set1_ps (FLT_EPSILON));
+  return vcltq_f32 (jbm_abs_4xf32 (x), vdupq_n_f32 (FLT_EPSILON));
 }
 
 /**
@@ -256,20 +248,22 @@ jbm_modmin_4xf32 (const float32x4_t a,       ///< 1st float64x2_t vector.
                   const float32x4_t b)       ///< 2nd float64x2_t vector.
 {
   float32x4_t aa, ab, y, z;
-  z = _mm_setzero_ps ();
+  z = vdupq_n_f32 (0.f);
   ab = vmulq_f32 (a, b);
-  y = _mm_blendv_ps (a, z, _mm_cmple_ps (ab, z));
+  y = vbslq_f32 (vcleq_f32 (ab, z), a, z); 
   aa = jbm_abs_4xf32 (y);
   ab = jbm_abs_4xf32 (b);
-  return _mm_blendv_ps (y, b, _mm_cmpgt_ps (aa, ab));
+  return vbslq_f32 (vcgtq_f32 (aa, ab), y, b);
 }
 
 /**
  * Function to interchange 2 float32x4_t vectors.
  */
 static inline void
-jbm_change_4xf32 (float32x4_t *restrict a,   ///< 1st float32x4_t vector pointer.
-                  float32x4_t *restrict b)   ///< 2nd float32x4_t vector pointer.
+jbm_change_4xf32 (float32x4_t *restrict a,
+///< 1st float32x4_t vector pointer.
+                  float32x4_t *restrict b)
+///< 2nd float32x4_t vector pointer.
 {
   float32x4_t c;
   JB_CHANGE (*a, *b, c);
@@ -321,27 +315,27 @@ jbm_extrapolate_4xf32 (const float32x4_t x,
 }
 
 /**
- * Function to perform an interpolation between 2 float32x4_t vectors of 2D points.
+ * Function to perform an interpolation between 2 float32x4_t vectors of 2D
+ * points.
  *
  * \return float32x4_t vector of y-coordinates of the interpolated points.
  */
 static inline float32x4_t
 jbm_interpolate_4xf32 (const float32x4_t x,
-                       ///< float32x4_t vector of x-coordinates of the interpolated
-                       ///< points.
+///< float32x4_t vector of x-coordinates of the interpolated points.
                        const float32x4_t x1,
-                       ///< float32x4_t vector of x-coordinates of the 1st points.
+///< float32x4_t vector of x-coordinates of the 1st points.
                        const float32x4_t x2,
-                       ///< float32x4_t vector of x-coordinates of the 2nd points.
+///< float32x4_t vector of x-coordinates of the 2nd points.
                        const float32x4_t y1,
-                       ///< float32x4_t vector of y-coordinates of the 1st points.
+///< float32x4_t vector of y-coordinates of the 1st points.
                        const float32x4_t y2)
-                     ///< float32x4_t vector of y-coordinates of the 2nd points.
+///< float32x4_t vector of y-coordinates of the 2nd points.
 {
   float32x4_t k;
   k = jbm_extrapolate_4xf32 (x, x1, x2, y1, y2);
-  k = _mm_blendv_ps (y1, k, _mm_cmpgt_ps (x, x1));
-  return _mm_blendv_ps (y2, k, _mm_cmplt_ps (x, x2));
+  k = vbslq_f32 (vcgtq_f32 (x, x1), y1, k);
+  return vbslq_f32 (vcltq_f32 (x, x2), y2, k);
 }
 
 /**
@@ -369,17 +363,23 @@ jbm_v2_length_4xf32 (const float32x4_t x1,
  */
 static inline float32x4_t
 jbm_v3_length_4xf32 (const float32x4_t x1,
-///< float32x4_t vector of x-coordinates of the 1st points defining the segments.
+///< float32x4_t vector of x-coordinates of the 1st points defining the
+///< segments.
                      const float32x4_t y1,
-///< float32x4_t vector of y-coordinates of the 1st points defining the segments.
+///< float32x4_t vector of y-coordinates of the 1st points defining the
+///< segments.
                      const float32x4_t z1,
-///< float32x4_t vector of z-coordinates of the 1st points defining the segments.
+///< float32x4_t vector of z-coordinates of the 1st points defining the
+///< segments.
                      const float32x4_t x2,
-///< float32x4_t vector of x-coordinates of the 2nd points defining the segments.
+///< float32x4_t vector of x-coordinates of the 2nd points defining the
+///< segments.
                      const float32x4_t y2,
-///< float32x4_t vector of y-coordinates of the 2nd points defining the segments.
+///< float32x4_t vector of y-coordinates of the 2nd points defining the
+///< segments.
                      const float32x4_t z2)
-///< float32x4_t vector of z-coordinates of the 2nd points defining the segments.
+///< float32x4_t vector of z-coordinates of the 2nd points defining the
+///< segments.
 {
   float32x4_t dx, dy, dz;
   dx = vsqrtq_f32 (vsubq_f32 (x2, x1));
@@ -390,6440 +390,6412 @@ jbm_v3_length_4xf32 (const float32x4_t x1,
 }
 
 /**
- * Function to calculate a float32x4_t vector of 1st order polynomials.
+ * Function to calculate a 1st order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_1_4xf32 (const float32x4_t x, ///< variable.
+jbm_polynomial_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vmlaq_f32 (_mm_set1_ps (p[0]), x, _mm_set1_ps (p[1]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, vdupq_n_f32 (p[1]));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 2nd order polynomials.
+ * Function to calculate a 2nd order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_2_4xf32 (const float32x4_t x, ///< variable.
+jbm_polynomial_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_1_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 3rd order polynomials.
+ * Function to calculate a 3rd order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_3_4xf32 (const float32x4_t x, ///< variable.
+jbm_polynomial_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_2_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 4th order polynomials.
+ * Function to calculate a 4th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_4_4xf32 (const float32x4_t x, ///< variable.
+jbm_polynomial_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_3_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 5th order polynomials.
+ * Function to calculate a 5th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_5_4xf32 (const float32x4_t x, ///< variable.
+jbm_polynomial_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_4_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 6th order polynomials.
+ * Function to calculate a 6th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_6_4xf32 (const float32x4_t x, ///< variable.
+jbm_polynomial_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_5_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 7th order polynomials.
+ * Function to calculate a 7th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_7_4xf32 (const float32x4_t x, ///< variable.
+jbm_polynomial_7_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_6_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 8th order polynomials.
+ * Function to calculate a 8th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_8_4xf32 (const float32x4_t x, ///< variable.
+jbm_polynomial_8_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_7_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 9th order polynomials.
+ * Function to calculate a 9th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_9_4xf32 (const float32x4_t x, ///< variable.
+jbm_polynomial_9_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_8_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 10th order polynomials.
+ * Function to calculate a 10th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_10_4xf32 (const float32x4_t x,        ///< variable.
+jbm_polynomial_10_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_9_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 11th order polynomials.
+ * Function to calculate a 11th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_11_4xf32 (const float32x4_t x,        ///< variable.
+jbm_polynomial_11_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_10_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 12nd order polynomials.
+ * Function to calculate a 12th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_12_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
-{
-  return vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
-}
-
-/**
- * Function to calculate a float32x4_t vector of 13rd order polynomials.
- *
- * \return float32x4_t vector of polynomial values.
- */
-static inline float32x4_t
-jbm_polynomial_13_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
-{
-  return vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
-}
-
-/**
- * Function to calculate a float32x4_t vector of 14th order polynomials.
- *
- * \return float32x4_t vector of polynomial values.
- */
-static inline float32x4_t
-jbm_polynomial_14_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
-{
-  return vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
-}
-
-/**
- * Function to calculate a float32x4_t vector of 15th order polynomials.
- *
- * \return float32x4_t vector of polynomial values.
- */
-static inline float32x4_t
-jbm_polynomial_15_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
-{
-  return vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
-}
-
-/**
- * Function to calculate a float32x4_t vector of 16th order polynomials.
- *
- * \return float32x4_t vector of polynomial values.
- */
-static inline float32x4_t
-jbm_polynomial_16_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
-{
-  return vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
-}
-
-/**
- * Function to calculate a float32x4_t vector of 17th order polynomials.
- *
- * \return float32x4_t vector of polynomial values.
- */
-static inline float32x4_t
-jbm_polynomial_17_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
-{
-  return vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
-}
-
-/**
- * Function to calculate a float32x4_t vector of 18th order polynomials.
- *
- * \return float32x4_t vector of polynomial values.
- */
-static inline float32x4_t
-jbm_polynomial_18_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
-{
-  return vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
-}
-
-/**
- * Function to calculate a float32x4_t vector of 19th order polynomials.
- *
- * \return float32x4_t vector of polynomial values.
- */
-static inline float32x4_t
-jbm_polynomial_19_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
-{
-  return vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
-}
-
-/**
- * Function to calculate a float32x4_t vector of 10th order polynomials.
- *
- * \return float32x4_t vector of polynomial values.
- */
-static inline float32x4_t
-jbm_polynomial_20_4xf32 (const float32x4_t x,        ///< variable.
+jbm_polynomial_12_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_11_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 11th order polynomials.
+ * Function to calculate a 13th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_21_4xf32 (const float32x4_t x,        ///< variable.
+jbm_polynomial_13_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_20_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_12_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 12nd order polynomials.
+ * Function to calculate a 14th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_22_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_14_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_21_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_13_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 13rd order polynomials.
+ * Function to calculate a 15th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_23_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_15_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_22_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_14_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 14th order polynomials.
+ * Function to calculate a 16th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_24_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_16_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_23_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_15_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 15th order polynomials.
+ * Function to calculate a 17th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_25_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_17_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_24_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_16_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 16th order polynomials.
+ * Function to calculate a 18th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_26_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_18_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_25_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_17_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 17th order polynomials.
+ * Function to calculate a 19th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_27_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_19_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_26_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_18_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 18th order polynomials.
+ * Function to calculate a 20th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_28_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_20_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_27_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_19_4xf32 (x, p + 1));
 }
 
 /**
- * Function to calculate a float32x4_t vector of 19th order polynomials.
+ * Function to calculate a 21th order polynomial (float32x4_t).
  *
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_29_4xf32 (const float32x4_t x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_21_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
 {
-  return vmlaq_f32 (x, jbm_polynomial_28_4xf32 (x, p + 1),
-                       _mm_set1_ps (p[0]));
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_20_4xf32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 22th order polynomial (float32x4_t).
+ *
+ * \return float32x4_t vector of polynomial values.
+ */
+static inline float32x4_t
+jbm_polynomial_22_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_21_4xf32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 23th order polynomial (float32x4_t).
+ *
+ * \return float32x4_t vector of polynomial values.
+ */
+static inline float32x4_t
+jbm_polynomial_23_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_22_4xf32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 24th order polynomial (float32x4_t).
+ *
+ * \return float32x4_t vector of polynomial values.
+ */
+static inline float32x4_t
+jbm_polynomial_24_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_23_4xf32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 25th order polynomial (float32x4_t).
+ *
+ * \return float32x4_t vector of polynomial values.
+ */
+static inline float32x4_t
+jbm_polynomial_25_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_24_4xf32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 26th order polynomial (float32x4_t).
+ *
+ * \return float32x4_t vector of polynomial values.
+ */
+static inline float32x4_t
+jbm_polynomial_26_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_25_4xf32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 27th order polynomial (float32x4_t).
+ *
+ * \return float32x4_t vector of polynomial values.
+ */
+static inline float32x4_t
+jbm_polynomial_27_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_26_4xf32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 28th order polynomial (float32x4_t).
+ *
+ * \return float32x4_t vector of polynomial values.
+ */
+static inline float32x4_t
+jbm_polynomial_28_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_27_4xf32 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 29th order polynomial (float32x4_t).
+ *
+ * \return float32x4_t vector of polynomial values.
+ */
+static inline float32x4_t
+jbm_polynomial_29_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_28_4xf32 (x, p + 1));
 }
 
 /**
  * Function to calculate a 0th+1st order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_1_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_1_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, _mm_set1_ps (p[1]), _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[1])));
 }
 
 /**
  * Function to calculate a 0th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_2_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_2_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_1_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+1st order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_2_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_2_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[2]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[2])));
 }
 
 /**
  * Function to calculate a 0th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_3_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_3_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_2_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_3_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_3_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 1st+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_3_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_3_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[3]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[3])));
 }
 
 /**
  * Function to calculate a 0th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_4_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_4_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_3_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_4_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_4_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_4_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_4_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 1st+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_4_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_4_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[4]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[4])));
 }
 
 /**
  * Function to calculate a 0th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_5_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_5_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_4_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_5_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_5_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_5_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_5_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_5_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_5_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 1st+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_5_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_5_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[5]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[5])));
 }
 
 /**
  * Function to calculate a 0th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_6_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_5_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_6_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_6_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_6_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_6_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 1st+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_6_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[6]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[6])));
 }
 
 /**
  * Function to calculate a 0th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_7_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_6_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_7_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_7_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_7_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_7_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_7_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 1st+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_7_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[7]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[7])));
 }
 
 /**
  * Function to calculate a 0th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_8_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_7_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_8_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_8_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_8_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_8_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_8_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_8_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 1st+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_8_7_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[8]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[8])));
 }
 
 /**
  * Function to calculate a 0th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_9_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_8_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_9_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_9_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_9_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_9_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_9_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_9_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_9_7_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 1st+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+jbm_rational_9_8_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[9]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[9])));
 }
 
 /**
  * Function to calculate a 0th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_10_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_9_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_10_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_10_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_10_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_10_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_10_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_10_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_10_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_10_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 1st+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_10_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[10]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[10])));
 }
 
 /**
  * Function to calculate a 0th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_11_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_10_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_11_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_11_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_11_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_11_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_11_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_11_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_11_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_11_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_11_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 1st+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_11_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[11]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[11])));
 }
 
 /**
  * Function to calculate a 0th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_12_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_11_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_12_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_12_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_12_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_12_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_12_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_12_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_12_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_12_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_12_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_12_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 1st+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_12_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[12]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[12])));
 }
 
 /**
  * Function to calculate a 0th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_13_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_12_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_13_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_13_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_13_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_13_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_13_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_13_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_13_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_13_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_13_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_13_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_13_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 1st+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_13_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[13]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[13])));
 }
 
 /**
  * Function to calculate a 0th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_14_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_13_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_14_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_14_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_14_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_14_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_14_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_14_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_14_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_14_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_14_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_14_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_14_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_14_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 1st+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_14_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[14]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[14])));
 }
 
 /**
  * Function to calculate a 0th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_15_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_14_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_15_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_15_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_15_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_15_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_15_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_15_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_15_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_15_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_15_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_15_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_15_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_15_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_15_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 1st+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_15_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[15]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[15])));
 }
 
 /**
  * Function to calculate a 0th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_16_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_15_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_16_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_16_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_16_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_16_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_16_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_16_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_16_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_16_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_16_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_16_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_16_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_16_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_16_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_16_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 1st+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_16_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[16]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[16])));
 }
 
 /**
  * Function to calculate a 0th+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_17_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_16_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_17_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_17_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_17_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_17_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_17_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_17_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_17_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_17_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_17_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_17_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_17_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_17_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_17_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_17_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_17_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 1st+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_17_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[17]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[17])));
 }
 
 /**
  * Function to calculate a 0th+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_18_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_17_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_18_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_18_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_18_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_18_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_18_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_18_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_18_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_18_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_18_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_18_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_18_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_18_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_18_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_18_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_18_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_18_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 1st+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_18_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[18]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[18])));
 }
 
 /**
  * Function to calculate a 0th+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_19_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_18_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_19_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_19_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_19_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_19_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_19_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_19_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_19_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_19_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_19_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_19_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_19_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_19_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_19_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_19_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_19_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_19_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_19_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 1st+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_19_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[19]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[19])));
 }
 
 /**
  * Function to calculate a 0th+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_20_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_19_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_20_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_20_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_20_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_20_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_20_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_20_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_20_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_20_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_20_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_20_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_20_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_20_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_20_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_20_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_20_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_20_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_20_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_20_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 19),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 1st+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_19_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_20_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[20]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[20])));
 }
 
 /**
  * Function to calculate a 0th+21th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_21_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_20_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_20_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_21_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_19_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_21_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_21_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_21_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_21_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_21_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_21_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_21_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_21_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 19),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_19_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 20),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 1st+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_20_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_21_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[21]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[21])));
 }
 
 /**
  * Function to calculate a 0th+22th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_22_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_21_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_21_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+21th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_22_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_20_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_20_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_22_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_19_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_22_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_22_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_22_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_22_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_22_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_22_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_22_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 19),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_19_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 20),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_20_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 21),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 1st+21th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_21_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_22_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[22]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[22])));
 }
 
 /**
  * Function to calculate a 0th+23th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_23_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_22_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_22_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+22th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_23_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_21_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_21_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+21th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_23_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_20_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_20_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_23_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_19_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_23_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_23_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_23_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_23_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_23_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_23_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 19),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_19_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 20),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_20_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 21),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_21_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 22),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 1st+22th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_22_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_23_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[23]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[23])));
 }
 
 /**
  * Function to calculate a 0th+24th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_24_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_23_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_23_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+23th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_24_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_22_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_22_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+22th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_24_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_21_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_21_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+21th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_24_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_20_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_20_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_24_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_19_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_24_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_24_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_24_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_24_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_24_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 19),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_19_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 20),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_20_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 21),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_21_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 22),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_22_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 23),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 1st+23th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_23_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_24_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[24]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[24])));
 }
 
 /**
  * Function to calculate a 0th+25th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_25_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_24_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_24_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+24th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_25_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_23_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_23_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+23th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_25_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_22_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_22_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+22th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_25_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_21_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_21_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+21th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_25_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_20_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_20_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_25_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_19_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_25_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_25_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_25_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_25_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 19),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_19_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 20),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_20_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 21),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_21_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 22),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_22_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 23),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 23th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_23_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 24),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 24)));
 }
 
 /**
  * Function to calculate a 1st+24th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_24_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_25_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_24_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[25]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[25])));
 }
 
 /**
  * Function to calculate a 0th+26th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_26_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_25_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_25_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+25th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_26_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_24_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_24_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+24th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_26_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_23_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_23_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+23th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_26_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_22_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_22_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+22th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_26_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_21_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_21_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+21th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_26_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_20_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_20_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_26_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_19_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_26_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_26_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_26_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 19),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_19_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 20),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_20_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 21),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_21_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 22),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_22_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 23),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 23th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_23_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 24),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 24)));
 }
 
 /**
  * Function to calculate a 24th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_24_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_24_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 25),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 25)));
 }
 
 /**
  * Function to calculate a 1st+25th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_25_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_26_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_25_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[26]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[26])));
 }
 
 /**
  * Function to calculate a 0th+27th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_27_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_26_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_26_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+26th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_27_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_25_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_25_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+25th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_27_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_24_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_24_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+24th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_27_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_23_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_23_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+23th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_27_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_22_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_22_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+22th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_27_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_21_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_21_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+21th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_27_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_20_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_20_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_27_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_19_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_27_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_27_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 19),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_19_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 20),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_20_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 21),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_21_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 22),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_22_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 23),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 23th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_23_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 24),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 24)));
 }
 
 /**
  * Function to calculate a 24th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_24_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_24_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 25),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 25)));
 }
 
 /**
  * Function to calculate a 25th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_25_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_25_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 26),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 26)));
 }
 
 /**
  * Function to calculate a 1st+26th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_26_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_27_26_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_26_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[27]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[27])));
 }
 
 /**
  * Function to calculate a 0th+28th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_28_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_27_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_27_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+27th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_28_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_26_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_26_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+26th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_28_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_25_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_25_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+25th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_28_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_24_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_24_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+24th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_28_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_23_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_23_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+23th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_28_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_22_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_22_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+22th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_28_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_21_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_21_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+21th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_28_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_20_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_20_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_28_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_19_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_28_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 19),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_19_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 20),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_20_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 21),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_21_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 22),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_22_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 23),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 23th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_23_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 24),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 24)));
 }
 
 /**
  * Function to calculate a 24th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_24_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_24_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 25),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 25)));
 }
 
 /**
  * Function to calculate a 25th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_25_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_25_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 26),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 26)));
 }
 
 /**
  * Function to calculate a 26th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_26_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_26_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_26_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 27),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 27)));
 }
 
 /**
  * Function to calculate a 1st+27th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_27_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_28_27_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_27_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[28]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[28])));
 }
 
 /**
  * Function to calculate a 0th+29th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_0_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_29_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
-  return vdivq_f32 (_mm_set1_ps (p[0]),
-                     vmlaq_f32 (x, jbm_polynomial_28_4xf32 (x, p + 1),
-                                   _mm_set1_ps (1.f)));
+  return vdivq_f32 (vdupq_n_f32 (p[0]),
+                    vmlaq (vdupq_n_f32 (1.f), x,
+                           jbm_polynomial_28_4xf32 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+28th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_1_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_29_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_27_4xf32 (x, p + 2),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_27_4xf32 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+27th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_2_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_29_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_26_4xf32 (x, p + 3),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_26_4xf32 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+26th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_3_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_29_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_25_4xf32 (x, p + 4),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_25_4xf32 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+25th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_4_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_29_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_24_4xf32 (x, p + 5),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_24_4xf32 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+24th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_5_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_29_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_23_4xf32 (x, p + 6),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_23_4xf32 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+23th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_6_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_29_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_22_4xf32 (x, p + 7),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_22_4xf32 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+22th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_7_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_29_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_21_4xf32 (x, p + 8),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_21_4xf32 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+21th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_8_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_29_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_20_4xf32 (x, p + 9),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_20_4xf32 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+20th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_9_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
+jbm_rational_29_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
                          const float *p)        ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_19_4xf32 (x, p + 10),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_19_4xf32 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+19th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_10_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_18_4xf32 (x, p + 11),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+18th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_11_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_17_4xf32 (x, p + 12),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+17th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_12_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_16_4xf32 (x, p + 13),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+16th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_13_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_15_4xf32 (x, p + 14),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+15th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_14_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_14_4xf32 (x, p + 15),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+14th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_15_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_13_4xf32 (x, p + 16),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+13th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_16_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_12_4xf32 (x, p + 17),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+12th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_17_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_11_4xf32 (x, p + 18),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+11th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_18_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_10_4xf32 (x, p + 19),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+10th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_19_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_9_4xf32 (x, p + 20),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+9th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_20_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_8_4xf32 (x, p + 21),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+8th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_21_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_7_4xf32 (x, p + 22),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+7th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_22_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_6_4xf32 (x, p + 23),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 23th+6th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_23_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_5_4xf32 (x, p + 24),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 24)));
 }
 
 /**
  * Function to calculate a 24th+5th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_24_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_24_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_4_4xf32 (x, p + 25),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 25)));
 }
 
 /**
  * Function to calculate a 25th+4th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_25_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_25_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_3_4xf32 (x, p + 26),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 26)));
 }
 
 /**
  * Function to calculate a 26th+3rd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_26_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_26_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_26_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_2_4xf32 (x, p + 27),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 27)));
 }
 
 /**
  * Function to calculate a 27th+2nd order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_27_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_27_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_27_4xf32 (x, p),
-                     vmlaq_f32 (x, jbm_polynomial_1_4xf32 (x, p + 28),
-                                   _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 28)));
 }
 
 /**
  * Function to calculate a 1st+28th order rational (float32x4_t).
  *
- * \return rational value.
+ * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_28_4xf32 (const float32x4_t x,       ///< float32x4_t vector.
+jbm_rational_29_28_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
                           const float *p)       ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_28_4xf32 (x, p),
-                     vmlaq_f32 (x, _mm_set1_ps (p[29]), _mm_set1_ps (1.f)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[29])));
 }
 
 /**
@@ -6842,10 +6814,10 @@ jbm_expm1wc_4xf32 (const float32x4_t x)
   const float a5 = -1.3833464660905326042591440964123531e-03f;
   float32x4_t x2;
   x2 = jbm_sqr_4xf32 (x);
-  x2 = vmlaq_f32 (x2, _mm_set1_ps (a5), _mm_set1_ps (a3));
-  x2 = vmlaq_f32 (x2, x, _mm_set1_ps (a2));
-  x2 = vmlaq_f32 (x2, x, _mm_set1_ps (1.f));
-  return vmulq_f32 (x, vdivq_f32 (_mm_set1_ps (a1), x2));
+  x2 = vmlaq_f32 (x2, vdupq_n_f32 (a5), vdupq_n_f32 (a3));
+  x2 = vmlaq_f32 (x2, x, vdupq_n_f32 (a2));
+  x2 = vmlaq_f32 (x2, x, vdupq_n_f32 (1.f));
+  return vmulq_f32 (x, vdivq_f32 (vdupq_n_f32 (a1), x2));
 }
 
 /**
@@ -6895,7 +6867,7 @@ jbm_exp2_4xf32 (const float32x4_t x) ///< float32x4_t vector.
 static inline float32x4_t
 jbm_exp_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
 {
-  return jbm_exp2_4xf32 (vmulq_f32 (x, _mm_set1_ps (M_LOG2Ef)));
+  return jbm_exp2_4xf32 (vmulq_f32 (x, vdupq_n_f32 (M_LOG2Ef)));
 }
 
 /**
@@ -6907,7 +6879,7 @@ jbm_exp_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
 static inline float32x4_t
 jbm_exp10_4xf32 (const float32x4_t x)        ///< float32x4_t vector.
 {
-  return jbm_exp2_4xf32 (vmulq_f32 (x, _mm_set1_ps (M_LN10f / M_LN2f)));
+  return jbm_exp2_4xf32 (vmulq_f32 (x, vdupq_n_f32 (M_LN10f / M_LN2f)));
 }
 
 /**
@@ -6919,10 +6891,10 @@ jbm_exp10_4xf32 (const float32x4_t x)        ///< float32x4_t vector.
 static inline float32x4_t
 jbm_expm1_4xf32 (const float32x4_t x)        ///< float32x4_t vector.
 {
-  return _mm_blendv_ps (vsubq_f32 (jbm_exp_4xf32 (x), _mm_set1_ps (1.f)),
+  return vbslq_f32 (vsubq_f32 (jbm_exp_4xf32 (x), vdupq_n_f32 (1.f)),
                         jbm_expm1wc_4xf32 (x),
-                        _mm_cmplt_ps (jbm_abs_4xf32 (x),
-                                      _mm_set1_ps (M_LN2f / 2.f)));
+                        vcltq_f32 (jbm_abs_4xf32 (x),
+                                      vdupq_n_f32 (M_LN2f / 2.f)));
 }
 
 /**
@@ -6956,12 +6928,12 @@ static inline float32x4_t
 jbm_log2_4xf32 (const float32x4_t x) ///< float32x4_t vector.
 {
   float32x4_t y, z;
-  __m128i e;
+  int32x4_t e;
   y = jbm_frexp_4xf32 (x, &e);
   y = vaddq_f32 (jbm_log2wc_4xf32 (y), _mm_cvtepi32_ps (e));
-  z = _mm_setzero_ps ();
-  y = _mm_blendv_ps (_mm_set1_ps (-INFINITY), y, _mm_cmpgt_ps (x, z));
-  return _mm_blendv_ps (y, _mm_set1_ps (NAN), _mm_cmplt_ps (x, z));
+  z = vdupq_n_f32 (0.f);
+  y = vbslq_f32 (vdupq_n_f32 (-INFINITY), y, vcgtq_f32 (x, z));
+  return vbslq_f32 (y, vdupq_n_f32 (NAN), vcltq_f32 (x, z));
 }
 
 /**
@@ -6972,7 +6944,7 @@ jbm_log2_4xf32 (const float32x4_t x) ///< float32x4_t vector.
 static inline float32x4_t
 jbm_log_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
 {
-  return vmulq_f32 (jbm_log2_4xf32 (x), _mm_set1_ps (M_LN2f));
+  return vmulq_f32 (jbm_log2_4xf32 (x), vdupq_n_f32 (M_LN2f));
 }
 
 /**
@@ -6983,7 +6955,7 @@ jbm_log_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
 static inline float32x4_t
 jbm_log10_4xf32 (const float32x4_t x)        ///< float32x4_t vector.
 {
-  return vmulq_f32 (jbm_log2_4xf32 (x), _mm_set1_ps (M_LN2f / M_LN10f));
+  return vmulq_f32 (jbm_log2_4xf32 (x), vdupq_n_f32 (M_LN2f / M_LN10f));
 }
 
 /**
@@ -6997,7 +6969,7 @@ jbm_pown_4xf32 (const float32x4_t x, ///< float32x4_t vector.
 {
   float32x4_t f, xn;
   unsigned int i;
-  f = _mm_set1_ps (1.f);
+  f = vdupq_n_f32 (1.f);
   if (e < 0)
     xn = vdivq_f32 (f, x);
   else
@@ -7022,7 +6994,7 @@ jbm_pow_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
   f = floorf (e);
   if (f == e)
     return jbm_pown_4xf32 (x, (int) e);
-  return jbm_exp2_4xf32 (vmulq_f32 (_mm_set1_ps (e), jbm_log2_4xf32 (x)));
+  return jbm_exp2_4xf32 (vmulq_f32 (vdupq_n_f32 (e), jbm_log2_4xf32 (x)));
 }
 
 /**
@@ -7037,8 +7009,8 @@ jbm_cbrt_4xf32 (const float32x4_t x) ///< float32x4_t vector.
   float32x4_t f, z;
   f = jbm_abs_4xf32 (x);
   f = jbm_pow_4xf32 (x, 1.f / 3.f);
-  z = _mm_setzero_ps ();
-  return _mm_blendv_ps (vsubq_f32 (z, f), f, _mm_cmplt_ps (x, z));
+  z = vdupq_n_f32 (0.f);
+  return vbslq_f32 (vsubq_f32 (z, f), f, vcltq_f32 (x, z));
 }
 
 /**
@@ -7092,7 +7064,7 @@ jbm_sincoswc_4xf32 (const float32x4_t x,
 {
   float32x4_t s0;
   *s = s0 = jbm_sinwc_4xf32 (x);
-  *c = vsqrtq_f32 (_mm_fnmadd_ps (s0, s0, _mm_set1_ps (1.f)));
+  *c = vsqrtq_f32 (_mm_fnmadd_ps (s0, s0, vdupq_n_f32 (1.f)));
 }
 
 /**
@@ -7105,20 +7077,20 @@ static inline float32x4_t
 jbm_sin_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
 {
   float32x4_t y, s, pi2;
-  pi2 = _mm_set1_ps (2.f * M_PIf);
+  pi2 = vdupq_n_f32 (2.f * M_PIf);
   y = jbm_rest_4xf32 (x, pi2);
   s = jbm_sinwc_4xf32 (vsubq_f32 (y, pi2));
-  s = _mm_blendv_ps (s,
+  s = vbslq_f32 (s,
                      jbm_opposite_4xf32
                      (jbm_coswc_4xf32
-                      (vsubq_f32 (_mm_set1_ps (3.f * M_PI_2f), y))),
-                     _mm_cmplt_ps (y, _mm_set1_ps (7.f * M_PI_4f)));
-  s = _mm_blendv_ps (s, jbm_sinwc_4xf32 (vsubq_f32 (_mm_set1_ps (M_PIf), y)),
-                     _mm_cmplt_ps (y, _mm_set1_ps (5.f * M_PI_4f)));
-  s = _mm_blendv_ps (s, jbm_coswc_4xf32 (vsubq_f32 (_mm_set1_ps (M_PI_2f), y)),
-                     _mm_cmplt_ps (y, _mm_set1_ps (3.f * M_PI_4f)));
-  return _mm_blendv_ps (s, jbm_sinwc_4xf32 (y),
-                        _mm_cmplt_ps (y, _mm_set1_ps (M_PI_4f)));
+                      (vsubq_f32 (vdupq_n_f32 (3.f * M_PI_2f), y))),
+                     vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f)));
+  s = vbslq_f32 (s, jbm_sinwc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PIf), y)),
+                     vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f)));
+  s = vbslq_f32 (s, jbm_coswc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y)),
+                     vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f)));
+  return vbslq_f32 (s, jbm_sinwc_4xf32 (y),
+                        vcltq_f32 (y, vdupq_n_f32 (M_PI_4f)));
 }
 
 /**
@@ -7131,21 +7103,21 @@ static inline float32x4_t
 jbm_cos_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
 {
   float32x4_t y, c, pi2;
-  pi2 = _mm_set1_ps (2.f * M_PIf);
+  pi2 = vdupq_n_f32 (2.f * M_PIf);
   y = jbm_rest_4xf32 (x, pi2);
   c = jbm_coswc_4xf32 (vsubq_f32 (y, pi2));
-  c = _mm_blendv_ps (c,
+  c = vbslq_f32 (c,
                      jbm_sinwc_4xf32
-                     (vsubq_f32 (y, _mm_set1_ps (3.f * M_PI_2f))),
-                     _mm_cmplt_ps (y, _mm_set1_ps (7.f * M_PI_4f)));
-  c = _mm_blendv_ps (c,
+                     (vsubq_f32 (y, vdupq_n_f32 (3.f * M_PI_2f))),
+                     vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f)));
+  c = vbslq_f32 (c,
                      jbm_opposite_4xf32
-                     (jbm_coswc_4xf32 (vsubq_f32 (_mm_set1_ps (M_PIf), y))),
-                     _mm_cmplt_ps (y, _mm_set1_ps (5.f * M_PI_4f)));
-  c = _mm_blendv_ps (c, jbm_sinwc_4xf32 (vsubq_f32 (_mm_set1_ps (M_PI_2f), y)),
-                     _mm_cmplt_ps (y, _mm_set1_ps (3.f * M_PI_4f)));
-  return _mm_blendv_ps (c, jbm_coswc_4xf32 (y),
-                        _mm_cmplt_ps (y, _mm_set1_ps (M_PI_4f)));
+                     (jbm_coswc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PIf), y))),
+                     vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f)));
+  c = vbslq_f32 (c, jbm_sinwc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y)),
+                     vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f)));
+  return vbslq_f32 (c, jbm_coswc_4xf32 (y),
+                        vcltq_f32 (y, vdupq_n_f32 (M_PI_4f)));
 }
 
 /**
@@ -7159,26 +7131,26 @@ jbm_sincos_4xf32 (const float32x4_t x,
                   float32x4_t *c)    ///< pointer to the cos function value (float32x4_t).
 {
   float32x4_t y, pi2, z, m, s1, c1, s2, c2;
-  pi2 = _mm_set1_ps (2.f * M_PIf);
+  pi2 = vdupq_n_f32 (2.f * M_PIf);
   y = jbm_rest_4xf32 (x, pi2);
   jbm_sincoswc_4xf32 (vsubq_f32 (y, pi2), &s1, &c1);
-  jbm_sincoswc_4xf32 (vsubq_f32 (y, _mm_set1_ps (3.f * M_PI_2f)), &c2, &s2);
-  m = _mm_cmplt_ps (y, _mm_set1_ps (7.f * M_PI_4f));
-  z = _mm_setzero_ps ();
-  s1 = _mm_blendv_ps (s1, vsubq_f32 (z, s2), m);
-  c1 = _mm_blendv_ps (c1, c2, m);
-  jbm_sincoswc_4xf32 (vsubq_f32 (_mm_set1_ps (M_PIf), y), &s2, &c2);
-  m = _mm_cmplt_ps (y, _mm_set1_ps (5.f * M_PI_4f));
-  s1 = _mm_blendv_ps (s1, s2, m);
-  c1 = _mm_blendv_ps (c1, vsubq_f32 (z, c2), m);
-  jbm_sincoswc_4xf32 (vsubq_f32 (_mm_set1_ps (M_PI_2f), y), &c2, &s2);
-  m = _mm_cmplt_ps (y, _mm_set1_ps (3.f * M_PI_4f));
-  s1 = _mm_blendv_ps (s1, s2, m);
-  c1 = _mm_blendv_ps (c1, c2, m);
+  jbm_sincoswc_4xf32 (vsubq_f32 (y, vdupq_n_f32 (3.f * M_PI_2f)), &c2, &s2);
+  m = vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f));
+  z = vdupq_n_f32 (0.f);
+  s1 = vbslq_f32 (s1, vsubq_f32 (z, s2), m);
+  c1 = vbslq_f32 (c1, c2, m);
+  jbm_sincoswc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PIf), y), &s2, &c2);
+  m = vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f));
+  s1 = vbslq_f32 (s1, s2, m);
+  c1 = vbslq_f32 (c1, vsubq_f32 (z, c2), m);
+  jbm_sincoswc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y), &c2, &s2);
+  m = vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f));
+  s1 = vbslq_f32 (s1, s2, m);
+  c1 = vbslq_f32 (c1, c2, m);
   jbm_sincoswc_4xf32 (y, &s2, &c2);
-  m = _mm_cmplt_ps (y, _mm_set1_ps (M_PI_4f));
-  *s = _mm_blendv_ps (s1, s2, m);
-  *c = _mm_blendv_ps (c1, c2, m);
+  m = vcltq_f32 (y, vdupq_n_f32 (M_PI_4f));
+  *s = vbslq_f32 (s1, s2, m);
+  *c = vbslq_f32 (c1, c2, m);
 }
 
 /**
@@ -7234,7 +7206,7 @@ jbm_atanwc1_4xf32 (const float32x4_t x)
     1.6186088663013176341397431580496626e-01f,
     6.2512302543463204942783713123096548e-04f
   };
-  return jbm_rational_7_3_4xf32 (vsubq_f32 (x, _mm_set1_ps (1.f)), a);
+  return jbm_rational_7_3_4xf32 (vsubq_f32 (x, vdupq_n_f32 (1.f)), a);
 }
 
 /**
@@ -7248,13 +7220,13 @@ jbm_atan_4xf32 (const float32x4_t x) ///< float32x4_t vector.
 {
   float32x4_t f, ax, m, z;
   ax = jbm_abs_4xf32 (x);
-  m = _mm_cmpgt_ps (ax, _mm_set1_ps (1.5f));
-  ax = _mm_blendv_ps (ax, jbm_reciprocal_4xf32 (ax), m);
-  f = _mm_blendv_ps (jbm_atanwc0_4xf32 (ax), jbm_atanwc1_4xf32 (ax),
-                     _mm_cmpgt_ps (ax, _mm_set1_ps (0.5f)));
-  f = _mm_blendv_ps (f, vsubq_f32 (_mm_set1_ps (M_PI_2f), f), m);
-  z = _mm_setzero_ps ();
-  return _mm_blendv_ps (f, vsubq_f32 (z, f), _mm_cmplt_ps (x, z));
+  m = vcgtq_f32 (ax, vdupq_n_f32 (1.5f));
+  ax = vbslq_f32 (ax, jbm_reciprocal_4xf32 (ax), m);
+  f = vbslq_f32 (jbm_atanwc0_4xf32 (ax), jbm_atanwc1_4xf32 (ax),
+                     vcgtq_f32 (ax, vdupq_n_f32 (0.5f)));
+  f = vbslq_f32 (f, vsubq_f32 (vdupq_n_f32 (M_PI_2f), f), m);
+  z = vdupq_n_f32 (0.f);
+  return vbslq_f32 (f, vsubq_f32 (z, f), vcltq_f32 (x, z));
 }
 
 /**
@@ -7268,13 +7240,13 @@ jbm_atan2_4xf32 (const float32x4_t y,        ///< float32x4_t y component.
                  const float32x4_t x)        ///< float32x4_t x component.
 {
   float32x4_t f, mx, my, z, pi;
-  z = _mm_setzero_ps ();
-  pi = _mm_set1_ps (M_PIf);
+  z = vdupq_n_f32 (0.f);
+  pi = vdupq_n_f32 (M_PIf);
   f = jbm_atan_4xf32 (vdivq_f32 (y, x));
-  mx = _mm_cmplt_ps (x, z);
-  my = _mm_cmplt_ps (y, z);
-  f = _mm_blendv_ps (f, vsubq_f32 (f, pi), _mm_and_ps (my, mx));
-  return _mm_blendv_ps (f, vaddq_f32 (f, pi), _mm_andnot_ps (my, mx));
+  mx = vcltq_f32 (x, z);
+  my = vcltq_f32 (y, z);
+  f = vbslq_f32 (f, vsubq_f32 (f, pi), _mm_and_ps (my, mx));
+  return vbslq_f32 (f, vaddq_f32 (f, pi), _mm_andnot_ps (my, mx));
 }
 
 /**
@@ -7288,7 +7260,7 @@ jbm_asin_4xf32 (const float32x4_t x) ///< float32x4_t vector.
 {
   return
     jbm_atan_4xf32 (vdivq_f32
-                    (x, vsqrtq_f32 (_mm_fnmadd_ps (x, x, _mm_set1_ps (1.f)))));
+                    (x, vsqrtq_f32 (_mm_fnmadd_ps (x, x, vdupq_n_f32 (1.f)))));
 }
 
 /**
@@ -7303,9 +7275,9 @@ jbm_acos_4xf32 (const float32x4_t x) ///< float32x4_t vector.
   float32x4_t f;
   f =
     jbm_atan_4xf32 (vdivq_f32
-                    (vsqrtq_f32 (_mm_fnmadd_ps (x, x, _mm_set1_ps (1.f))), x));
-  return _mm_blendv_ps (f, vaddq_f32 (f, _mm_set1_ps (M_PIf)),
-                        _mm_cmplt_ps (x, _mm_setzero_ps ()));
+                    (vsqrtq_f32 (_mm_fnmadd_ps (x, x, vdupq_n_f32 (1.f))), x));
+  return vbslq_f32 (f, vaddq_f32 (f, vdupq_n_f32 (M_PIf)),
+                        vcltq_f32 (x, vdupq_n_f32 (0.f)));
 }
 
 /**
@@ -7318,7 +7290,7 @@ jbm_sinh_4xf32 (const float32x4_t x) ///< float32x4_t number.
 {
   float32x4_t f;
   f = jbm_exp_4xf32 (x);
-  return vmulq_f32 (_mm_set1_ps (0.5f),
+  return vmulq_f32 (vdupq_n_f32 (0.5f),
                      vsubq_f32 (f, jbm_reciprocal_4xf32 (f)));
 }
 
@@ -7332,7 +7304,7 @@ jbm_cosh_4xf32 (const float32x4_t x) ///< float32x4_t number.
 {
   float32x4_t f;
   f = jbm_exp_4xf32 (x);
-  return vmulq_f32 (_mm_set1_ps (0.5f),
+  return vmulq_f32 (vdupq_n_f32 (0.5f),
                      vaddq_f32 (f, jbm_reciprocal_4xf32 (f)));
 }
 
@@ -7348,10 +7320,10 @@ jbm_tanh_4xf32 (const float32x4_t x) ///< float32x4_t number.
   f = jbm_exp_4xf32 (x);
   fi = jbm_reciprocal_4xf32 (f);
   f = vdivq_f32 (vsubq_f32 (f, fi), vaddq_f32 (f, fi));
-  f = _mm_blendv_ps (f, _mm_set1_ps (1.f),
-                     _mm_cmpgt_ps (x, _mm_set1_ps (JBM_FLT_MAX_E_EXP)));
-  return _mm_blendv_ps (f, _mm_set1_ps (-1.f),
-                        _mm_cmplt_ps (x, _mm_set1_ps (-JBM_FLT_MAX_E_EXP)));
+  f = vbslq_f32 (f, vdupq_n_f32 (1.f),
+                     vcgtq_f32 (x, vdupq_n_f32 (JBM_FLT_MAX_E_EXP)));
+  return vbslq_f32 (f, vdupq_n_f32 (-1.f),
+                        vcltq_f32 (x, vdupq_n_f32 (-JBM_FLT_MAX_E_EXP)));
 }
 
 /**
@@ -7364,7 +7336,7 @@ jbm_asinh_4xf32 (const float32x4_t x)        ///< float32x4_t number.
 {
   return
     jbm_log_4xf32 (vaddq_f32
-                   (x, vsqrtq_f32 (vmlaq_f32 (x, x, _mm_set1_ps (1.f)))));
+                   (x, vsqrtq_f32 (vmlaq_f32 (x, x, vdupq_n_f32 (1.f)))));
 }
 
 /**
@@ -7377,7 +7349,7 @@ jbm_acosh_4xf32 (const float32x4_t x)        ///< float32x4_t number.
 {
   return
     jbm_log_4xf32 (vaddq_f32
-                   (x, vsqrtq_f32 (_mm_fmsub_ps (x, x, _mm_set1_ps (1.f)))));
+                   (x, vsqrtq_f32 (_mm_fmsub_ps (x, x, vdupq_n_f32 (1.f)))));
 }
 
 /**
@@ -7389,8 +7361,8 @@ static inline float32x4_t
 jbm_atanh_4xf32 (const float32x4_t x)        ///< float32x4_t number.
 {
   float32x4_t u;
-  u = _mm_set1_ps (1.f);
-  return vmulq_f32 (_mm_set1_ps (0.5f),
+  u = vdupq_n_f32 (1.f);
+  return vmulq_f32 (vdupq_n_f32 (0.5f),
                      jbm_log_4xf32 (vdivq_f32 (vaddq_f32 (u, x),
                                                 vsubq_f32 (u, x))));
 }
@@ -7440,8 +7412,8 @@ jbm_erfcwc_4xf32 (const float32x4_t x)
   x2 = jbm_sqr_4xf32 (x);
   f = vdivq_f32 (jbm_rational_6_3_4xf32 (jbm_reciprocal_4xf32 (x2), a),
                   vmulq_f32 (x, jbm_exp_4xf32 (x2)));
-  return _mm_blendv_ps (f, _mm_setzero_ps (),
-                        _mm_cmpgt_ps (x, _mm_set1_ps (m)));
+  return vbslq_f32 (f, vdupq_n_f32 (0.f),
+                        vcgtq_f32 (x, vdupq_n_f32 (m)));
 }
 
 /**
@@ -7455,9 +7427,9 @@ jbm_erf_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
 {
   float32x4_t ax, u, f;
   ax = jbm_abs_4xf32 (x);
-  u = _mm_set1_ps (1.f);
+  u = vdupq_n_f32 (1.f);
   f = vmulq_f32 (vdivq_f32 (x, ax), vsubq_f32 (u, jbm_erfcwc_4xf32 (ax)));
-  return _mm_blendv_ps (f, jbm_erfwc_4xf32 (x), _mm_cmplt_ps (ax, u));
+  return vbslq_f32 (f, jbm_erfwc_4xf32 (x), vcltq_f32 (ax, u));
 
 }
 
@@ -7472,11 +7444,11 @@ jbm_erfc_4xf32 (const float32x4_t x) ///< float32x4_t vector.
 {
   float32x4_t ax, u, f;
   ax = jbm_abs_4xf32 (x);
-  u = _mm_set1_ps (1.f);
+  u = vdupq_n_f32 (1.f);
   f = vsubq_f32 (u, vmulq_f32 (vdivq_f32 (x, ax),
                                  vsubq_f32 (u, jbm_erfcwc_4xf32 (ax))));
-  return _mm_blendv_ps (f, vsubq_f32 (u, jbm_erfwc_4xf32 (x)),
-                        _mm_cmplt_ps (ax, u));
+  return vbslq_f32 (f, vsubq_f32 (u, jbm_erfwc_4xf32 (x)),
+                        vcltq_f32 (ax, u));
 }
 
 /**
@@ -7497,13 +7469,13 @@ jbm_solve_quadratic_reduced_4xf32 (float32x4_t a,
 ///< float32x4_t vector of right limits of the solution intervals.
 {
   float32x4_t k1, k2;
-  k1 = _mm_set1_ps (-0.5f);
+  k1 = vdupq_n_f32 (-0.5f);
   a = vmulq_f32 (a, k1);
   b = vsqrtq_f32 (vsubq_f32 (jbm_sqr_4xf32 (a), b));
   k1 = vaddq_f32 (a, b);
   k2 = vsubq_f32 (a, b);
-  k1 = _mm_blendv_ps (k1, k2, _mm_cmplt_ps (k1, x1));
-  return _mm_blendv_ps (k1, k2, _mm_cmpgt_ps (k1, x2));
+  k1 = vbslq_f32 (k1, k2, vcltq_f32 (k1, x1));
+  return vbslq_f32 (k1, k2, vcgtq_f32 (k1, x2));
 }
 
 /**
@@ -7528,7 +7500,7 @@ jbm_solve_quadratic_4xf32 (const float32x4_t a,
   k1 = jbm_solve_quadratic_reduced_4xf32 (vdivq_f32 (b, a), vdivq_f32 (c, a),
                                           x1, x2);
   k2 = vdivq_f32 (jbm_opposite_4xf32 (c), b);
-  return _mm_blendv_ps (k1, k2, jbm_small_4xf32 (a));
+  return vbslq_f32 (k1, k2, jbm_small_4xf32 (a));
 }
 
 /**
@@ -7551,9 +7523,9 @@ jbm_solve_cubic_reduced_4xf32 (const float32x4_t a,
                                ///< right limit of the solution interval.
 {
   float32x4_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2, c_3;
-  c2p_3 = _mm_set1_ps (2.f * M_PIf / 3.f);
-  c_2 = _mm_set1_ps (0.5f);
-  c_3 = _mm_set1_ps (1.f / 3.f);
+  c2p_3 = vdupq_n_f32 (2.f * M_PIf / 3.f);
+  c_2 = vdupq_n_f32 (0.5f);
+  c_3 = vdupq_n_f32 (1.f / 3.f);
   a3 = vmulq_f32 (a, c_3);
   k0 = vmulq_f32 (a3, a3);
   k1 = _mm_fmsub_ps (b, c_3, k0);
@@ -7565,17 +7537,17 @@ jbm_solve_cubic_reduced_4xf32 (const float32x4_t a,
   l1 = vaddq_f32 (l1, l1);
   l2 = _mm_fmsub_ps (l1, jbm_cos_4xf32 (k0), a3);
   l3 = _mm_fmsub_ps (l1, jbm_cos_4xf32 (vaddq_f32 (l0, c2p_3)), a3);
-  l3 = _mm_blendv_ps (l3, l2,
-                      _mm_or_ps (_mm_cmplt_ps (l2, x1), _mm_cmpgt_ps (l2, x2)));
+  l3 = vbslq_f32 (l3, l2,
+                      _mm_or_ps (vcltq_f32 (l2, x1), vcgtq_f32 (l2, x2)));
   l4 = _mm_fmsub_ps (l1, jbm_cos_4xf32 (vsubq_f32 (l0, c2p_3)), a);
-  l4 = _mm_blendv_ps (l4, l3,
-                      _mm_or_ps (_mm_cmplt_ps (l3, x1), _mm_cmpgt_ps (l3, x2)));
+  l4 = vbslq_f32 (l4, l3,
+                      _mm_or_ps (vcltq_f32 (l3, x1), vcgtq_f32 (l3, x2)));
   k1 = vsqrtq_f32 (k2);
   l5 = vaddq_f32 (k0, k1);
   l5 = jbm_cbrt_4xf32 (k2);
   k0 = vsubq_f32 (k0, k1);
   l5 = vaddq_f32 (l5, vsubq_f32 (jbm_cbrt_4xf32 (k0), a3));
-  return _mm_blendv_ps (l4, l5, _mm_cmplt_ps (k2, _mm_setzero_ps ()));
+  return vbslq_f32 (l4, l5, vcltq_f32 (k2, vdupq_n_f32 (0.f)));
 }
 
 /**
@@ -7600,7 +7572,7 @@ jbm_solve_cubic_4xf32 (float32x4_t a,
 ///< float32x4_t vector of right limits of the solution intervals.
 {
   return
-    _mm_blendv_ps (jbm_solve_cubic_reduced_4xf32 (vdivq_f32 (b, a),
+    vbslq_f32 (jbm_solve_cubic_reduced_4xf32 (vdivq_f32 (b, a),
                                                   vdivq_f32 (c, a),
                                                   vdivq_f32 (d, a), x1, x2),
                    jbm_solve_quadratic_4xf32 (b, c, d, x1, x2),
@@ -7619,7 +7591,7 @@ jbm_flux_limiter_total_4xf32 (const float32x4_t d1 __attribute__((unused)),
                               const float32x4_t d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
-  return _mm_setzero_ps ();
+  return vdupq_n_f32 (0.f);
 }
 
 /**
@@ -7634,7 +7606,7 @@ jbm_flux_limiter_null_4xf32 (const float32x4_t d1 __attribute__((unused)),
                              const float32x4_t d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
-  return _mm_set1_ps (1.f);
+  return vdupq_n_f32 (1.f);
 }
 
 /**
@@ -7649,7 +7621,7 @@ jbm_flux_limiter_centred_4xf32 (const float32x4_t d1,
                                 const float32x4_t d2)
                               ///< 2nd flux limiter function parameter.
 {
-  return _mm_blendv_ps (vdivq_f32 (d1, d2), _mm_setzero_ps (),
+  return vbslq_f32 (vdivq_f32 (d1, d2), vdupq_n_f32 (0.f),
                         jbm_small_4xf32 (d2));
 }
 
@@ -7669,11 +7641,11 @@ jbm_flux_limiter_superbee_4xf32 (const float32x4_t d1,
 {
   float32x4_t r;
   r = vdivq_f32 (d1, d2);
-  r = _mm_max_ps (_mm_min_ps (jbm_dbl_4xf32 (r), _mm_set1_ps (1.f)),
-                  _mm_min_ps (r, _mm_set1_ps (2.f)));
-  return _mm_blendv_ps (_mm_setzero_ps (), r,
-                        _mm_cmpgt_ps (vmulq_f32 (d1, d2),
-                                      _mm_set1_ps (FLT_EPSILON)));
+  r = _mm_max_ps (_mm_min_ps (jbm_dbl_4xf32 (r), vdupq_n_f32 (1.f)),
+                  _mm_min_ps (r, vdupq_n_f32 (2.f)));
+  return vbslq_f32 (vdupq_n_f32 (0.f), r,
+                        vcgtq_f32 (vmulq_f32 (d1, d2),
+                                      vdupq_n_f32 (FLT_EPSILON)));
 }
 
 /**
@@ -7690,10 +7662,10 @@ jbm_flux_limiter_minmod_4xf32 (const float32x4_t d1,
                              ///< 2nd flux limiter function parameter.
 {
   float32x4_t r;
-  r = _mm_min_ps (vdivq_f32 (d1, d2), _mm_set1_ps (1.f));
-  return _mm_blendv_ps (_mm_setzero_ps (), r,
-                        _mm_cmpgt_ps (vmulq_f32 (d1, d2),
-                                      _mm_set1_ps (FLT_EPSILON)));
+  r = _mm_min_ps (vdivq_f32 (d1, d2), vdupq_n_f32 (1.f));
+  return vbslq_f32 (vdupq_n_f32 (0.f), r,
+                        vcgtq_f32 (vmulq_f32 (d1, d2),
+                                      vdupq_n_f32 (FLT_EPSILON)));
 }
 
 /**
@@ -7713,10 +7685,10 @@ jbm_flux_limiter_VanLeer_4xf32 (const float32x4_t d1,
   float32x4_t r, k;
   r = vdivq_f32 (d1, d2);
   k = jbm_abs_4xf32 (r);
-  r = vdivq_f32 (vaddq_f32 (r, k), vaddq_f32 (_mm_set1_ps (1.f), k));
-  return _mm_blendv_ps (_mm_setzero_ps (), r,
-                        _mm_cmpgt_ps (vmulq_f32 (d1, d2),
-                                      _mm_set1_ps (FLT_EPSILON)));
+  r = vdivq_f32 (vaddq_f32 (r, k), vaddq_f32 (vdupq_n_f32 (1.f), k));
+  return vbslq_f32 (vdupq_n_f32 (0.f), r,
+                        vcgtq_f32 (vmulq_f32 (d1, d2),
+                                      vdupq_n_f32 (FLT_EPSILON)));
 }
 
 /**
@@ -7735,10 +7707,10 @@ jbm_flux_limiter_VanAlbada_4xf32 (const float32x4_t d1,
   float32x4_t r, k;
   r = vdivq_f32 (d1, d2);
   k = jbm_sqr_4xf32 (r);
-  r = vdivq_f32 (vaddq_f32 (r, k), vaddq_f32 (_mm_set1_ps (1.f), k));
-  return _mm_blendv_ps (_mm_setzero_ps (), r,
-                        _mm_cmpgt_ps (vmulq_f32 (d1, d2),
-                                      _mm_set1_ps (FLT_EPSILON)));
+  r = vdivq_f32 (vaddq_f32 (r, k), vaddq_f32 (vdupq_n_f32 (1.f), k));
+  return vbslq_f32 (vdupq_n_f32 (0.f), r,
+                        vcgtq_f32 (vmulq_f32 (d1, d2),
+                                      vdupq_n_f32 (FLT_EPSILON)));
 }
 
 /**
@@ -7755,10 +7727,10 @@ jbm_flux_limiter_minsuper_4xf32 (const float32x4_t d1,
                                ///< 2nd flux limiter function parameter.
 {
   float32x4_t r;
-  r = _mm_min_ps (vdivq_f32 (d1, d2), _mm_set1_ps (2.f));
-  return _mm_blendv_ps (_mm_setzero_ps (), r,
-                        _mm_cmpgt_ps (vmulq_f32 (d1, d2),
-                                      _mm_set1_ps (FLT_EPSILON)));
+  r = _mm_min_ps (vdivq_f32 (d1, d2), vdupq_n_f32 (2.f));
+  return vbslq_f32 (vdupq_n_f32 (0.f), r,
+                        vcgtq_f32 (vmulq_f32 (d1, d2),
+                                      vdupq_n_f32 (FLT_EPSILON)));
 }
 
 /**
@@ -7776,10 +7748,10 @@ jbm_flux_limiter_supermin_4xf32 (const float32x4_t d1,
 {
   float32x4_t r;
   r = vdivq_f32 (d1, d2);
-  r = _mm_min_ps (jbm_dbl_4xf32 (r), _mm_set1_ps (1.f));
-  return _mm_blendv_ps (_mm_setzero_ps (), r,
-                        _mm_cmpgt_ps (vmulq_f32 (d1, d2),
-                                      _mm_set1_ps (FLT_EPSILON)));
+  r = _mm_min_ps (jbm_dbl_4xf32 (r), vdupq_n_f32 (1.f));
+  return vbslq_f32 (vdupq_n_f32 (0.f), r,
+                        vcgtq_f32 (vmulq_f32 (d1, d2),
+                                      vdupq_n_f32 (FLT_EPSILON)));
 }
 
 /**
@@ -7798,14 +7770,14 @@ jbm_flux_limiter_monotonized_central_4xf32 (const float32x4_t d1,
 {
   float32x4_t r, rm;
   r = vdivq_f32 (d1, d2);
-  rm = vmulq_f32 (_mm_set1_ps (0.5f), vaddq_f32 (r, _mm_set1_ps (1.f)));
-  rm = _mm_blendv_ps (_mm_set1_ps (2.f), rm,
-                      _mm_cmplt_ps (r, _mm_set1_ps (3.f)));
-  rm = _mm_blendv_ps (rm, jbm_dbl_4xf32 (r),
-                      _mm_cmpgt_ps (r, _mm_set1_ps (1.f / 3.f)));
-  return _mm_blendv_ps (_mm_setzero_ps (), rm,
-                        _mm_cmpgt_ps (vmulq_f32 (d1, d2),
-                                      _mm_set1_ps (FLT_EPSILON)));
+  rm = vmulq_f32 (vdupq_n_f32 (0.5f), vaddq_f32 (r, vdupq_n_f32 (1.f)));
+  rm = vbslq_f32 (vdupq_n_f32 (2.f), rm,
+                      vcltq_f32 (r, vdupq_n_f32 (3.f)));
+  rm = vbslq_f32 (rm, jbm_dbl_4xf32 (r),
+                      vcgtq_f32 (r, vdupq_n_f32 (1.f / 3.f)));
+  return vbslq_f32 (vdupq_n_f32 (0.f), rm,
+                        vcgtq_f32 (vmulq_f32 (d1, d2),
+                                      vdupq_n_f32 (FLT_EPSILON)));
 }
 
 /**
@@ -7822,11 +7794,11 @@ jbm_flux_limiter_mean_4xf32 (const float32x4_t d1,
                            ///< 2nd flux limiter function parameter.
 {
   float32x4_t r;
-  r = vmulq_f32 (_mm_set1_ps (0.5f),
-                  vaddq_f32 (_mm_set1_ps (1.f), vdivq_f32 (d1, d2)));
-  return _mm_blendv_ps (_mm_setzero_ps (), r,
-                        _mm_cmpgt_ps (vmulq_f32 (d1, d2),
-                                      _mm_set1_ps (FLT_EPSILON)));
+  r = vmulq_f32 (vdupq_n_f32 (0.5f),
+                  vaddq_f32 (vdupq_n_f32 (1.f), vdivq_f32 (d1, d2)));
+  return vbslq_f32 (vdupq_n_f32 (0.f), r,
+                        vcgtq_f32 (vmulq_f32 (d1, d2),
+                                      vdupq_n_f32 (FLT_EPSILON)));
 }
 
 /**
@@ -7913,19 +7885,19 @@ jbm_integral_4xf32 (float32x4_t (*f) (float32x4_t),
   float32x4_t k2, f1, f2;
 #endif
   unsigned int i;
-  h = _mm_set1_ps (0.5f);
+  h = vdupq_n_f32 (0.5f);
   dx = vmulq_f32 (h, vsubq_f32 (x2, x1));
   x = vmulq_f32 (h, vaddq_f32 (x2, x1));
-  k = _mm_set1_ps (a[0]);
+  k = vdupq_n_f32 (a[0]);
   k = vmulq_f32 (k, f (x));
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = _mm_set1_ps (b[i]);
+      k2 = vdupq_n_f32 (b[i]);
       k2 = vmulq_f32 (k2, dx);
       f1 = f (vsubq_f32 (x, k2));
       f2 = f (vaddq_f32 (x, k2));
-      h = _mm_set1_ps (a[i]);
+      h = vdupq_n_f32 (a[i]);
       k = vmlaq_f32 (h, vaddq_f32 (f1, f2), k);
     }
 #endif
@@ -7941,9 +7913,8 @@ jbm_integral_4xf32 (float32x4_t (*f) (float32x4_t),
 static inline float64x2_t
 jbm_opposite_2xf64 (const float64x2_t x)    ///< float64x2_t vector.
 {
-  uint64x2_t i;
-  i = vld1q_u64 (0x8000000000000000L);
-  return vreinterpret_f64_u64 (veorq_u64 (vreinterpret_u64_f64 (x), i));
+  return vreinterpretq_f64_u64 (veorq_u64 (vreinterpretq_u64_f64 (x),
+                                          vld1q_u64 (0x8000000000000000L)));
 }
 
 /**
@@ -7965,7 +7936,7 @@ jbm_reciprocal_2xf64 (const float64x2_t x)  ///< float64x2_t vector.
 static inline float64x2_t
 jbm_abs_2xf64 (const float64x2_t x)
 {
-  return vbasq_f64 (x);
+  return vabsq_f64 (x);
 }
 
 /**
@@ -7998,61 +7969,54 @@ jbm_rest_2xf64 (const float64x2_t x,        ///< dividend (float64x2_t).
  * \return normalized fraction value in [1/2,1).
  */
 static inline float64x2_t
-jbm_frexp_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
-                 __m128i *e)    ///< pointer to the extracted exponents vector.
+jbm_frexp_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                 int64x2_t *e)  ///< pointer to the extracted exponents vector.
 {
   JBM2xF64 a, y, y2, z;
-  __m128i e2, b, m1, m2, m3, zi;
+  uint64x2_t e2, b, m1, m2, m3;
   a.x = x;
-  b = _mm_set1_epi64 ((__m64) 0x7ff0000000000000L);
-  y.i = _mm_and_si128 (a.i, b);
-  m1 = _mm_cmpeq_epi64 (y.i, b);
-  zi = _mm_setzero_si128 ();
-  m2 = _mm_cmpeq_epi64 (y.i, zi);
+  b = vdupq_n_u64 (0x7ff0000000000000L);
+  y.i = vandq_u64 (a.i, b);
+  m1 = vceqq_u64 (y.i, b);
+  m2 = vceqzq_u64 (y.i);
   y2.x = x;
-  y2.i = _mm_and_si128 (y2.i, _mm_set1_epi64 ((__m64) 0x000fffffffffffffL));
-  m3 = _mm_cmpeq_epi64 (y2.i, zi);
-  y2.i = _mm_set1_epi64 ((__m64) 0x0010000000000000L);
+  y2.i = vandq_u64 (y2.i, vdupq_n_u64 (0x000fffffffffffffL));
+  m3 = vceqzq_u64 (y2.i);
+  y2.i = vdupq_n_u64 (0x0010000000000000L);
   z.x = vdivq_f64 (x, y2.x);
-  z.i = _mm_and_si128 (z.i, b);
-  e2 = _mm_blendv_epi8 (_mm_sub_epi64 (_mm_srli_epi64 (y.i, 52),
-                                       _mm_set1_epi64 ((__m64) 1022L)),
-                        _mm_sub_epi64 (_mm_srli_epi64 (z.i, 52),
-                                       _mm_set1_epi64 ((__m64) 2044L)), m2);
-  y.x = _mm_blendv_pd (y.x, vmulq_f64 (y2.x, z.x), _mm_castsi128_pd (m2));
-  m1 = _mm_or_si128 (m1, _mm_and_si128 (m2, m3));
-  e2 = _mm_blendv_epi8 (e2, zi, m1);
+  z.i = vandq_u64 (z.i, b);
+  e2 = vbslq_s64 (m2,
+                  vsubq_s64 (vshlq_n_s64 (vreinterpretq_s64_u64 (y.i), 52),
+                             vdupq_n_s64 (1022L)),
+                  vsubq_s64 (vshlq_n_u64 (vreinterpretq_s64_u64 (z.i), 52),
+                             vdupq_n_s64 (2044L)));
+  y.x = vbslq_f64 (m2, y.x, vmulq_f64 (y2.x, z.x));
+  m1 = vorq_u64 (m1, vandq_u64 (m2, m3));
+  e2 = vbslq_s64 (m1, e2, vdupq_n_u64 (0L);
   *e = e2;
-  return _mm_blendv_pd (vmulq_f64 (_mm_set1_pd (0.5), vdivq_f64 (x, y.x)), x,
-                        _mm_castsi128_pd (m1));
+  return vbslq_f64 (m1, vmulq_f64 (vdupq_n_f64 (0.5), vdivq_f64 (x, y.x)), x);
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (__m128i)
+ * (int64x2_t)
  *
  * \return function value (float64x2_t).
  */
 static inline float64x2_t
-jbm_exp2n_2xf64 (__m128i e)     ///< exponent vector (__m128i).
+jbm_exp2n_2xf64 (int64x2_t e)     ///< exponent vector (int64x2_t).
 {
   float64x2_t x;
-  x = _mm_blendv_pd
-    (_mm_castsi128_pd
-     (_mm_sllv_epi64
-      (_mm_set1_epi64 ((__m64) 0x0008000000000000L),
-       _mm_sub_epi64 (_mm_set1_epi64 ((__m64) - 1023L), e))),
-     _mm_castsi128_pd
-     (_mm_slli_epi64 (_mm_add_epi64 (e, _mm_set1_epi64 ((__m64) 1023L)), 52)),
-     _mm_castsi128_pd (_mm_cmpgt_epi64 (e, _mm_set1_epi64 ((__m64) - 1023L))));
-  x =
-    _mm_blendv_pd
-    (x, _mm_setzero_pd (),
-     _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64 ((__m64) - 1074L), e)));
+  x = vbslq_f64
+    (vcgtq_s64 (e, vdupq_n_s64 (-1023L)),
+     vreinterpretq_f64_s64
+     (vshlq_s64
+      (vdupq_n_u64 (0x0008000000000000L), vsubq_s64 (vdupq_n_s64 (-1023L), e))),
+     vreinterpretq_f64_s64
+     (vshlq_n_s64 (vaddq_s64 (e, vdupq_n_s64 (1023L)), 52)));
+  x = vbslq_f64 (vcgtq_s64 (vdupq_n_s64 (-1074L), e), x, vdupq_n_f64 (0.));
   return
-    _mm_blendv_pd
-    (x, _mm_set1_pd (INFINITY),
-     _mm_castsi128_pd (_mm_cmpgt_epi64 (e, _mm_set1_epi64 ((__m64) 1023L))));
+    vbslq_f64 (vcgtq_s64 (e, vdupq_n_s64 (1023L)), x, vdupq_n_f64 (INFINITY));
 }
 
 /**
@@ -8062,7 +8026,7 @@ jbm_exp2n_2xf64 (__m128i e)     ///< exponent vector (__m128i).
  */
 static inline float64x2_t
 jbm_ldexp_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
-                 __m128i e)     ///< exponent vector (__m128i).
+                 int64x2_t e)     ///< exponent vector (int64x2_t).
 {
   return vmulq_f64 (x, jbm_exp2n_2xf64 (e));
 }
@@ -8072,10 +8036,10 @@ jbm_ldexp_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline float64x2_t
+static inline uint64x2_t
 jbm_small_2xf64 (const float64x2_t x)       ///< float64x2_t vector.
 {
-  return _mm_cmplt_pd (jbm_abs_2xf64 (x), _mm_set1_pd (FLT_EPSILON));
+  return vcltq_f64 (jbm_abs_2xf64 (x), vdupq_n_f64 (FLT_EPSILON));
 }
 
 /**
@@ -8094,12 +8058,12 @@ jbm_modmin_2xf64 (const float64x2_t a,      ///< 1st float64x2_t vector.
                   const float64x2_t b)      ///< 2nd float64x2_t vector.
 {
   float64x2_t aa, ab, y, z;
-  z = _mm_setzero_pd ();
+  z = vdupq_n_f64 (0.);
   ab = vmulq_f64 (a, b);
-  y = _mm_blendv_pd (a, z, _mm_cmple_pd (ab, z));
+  y = vbslq_f64 (vcleq_f64 (ab, z), a, z); 
   aa = jbm_abs_2xf64 (y);
   ab = jbm_abs_2xf64 (b);
-  return _mm_blendv_pd (y, b, _mm_cmpgt_pd (aa, ab));
+  return vbslq_f64 (vcgtq_f64 (aa, ab), y, b);
 }
 
 /**
@@ -8178,8 +8142,8 @@ jbm_interpolate_2xf64 (const float64x2_t x,
 {
   float64x2_t k;
   k = jbm_extrapolate_2xf64 (x, x1, x2, y1, y2);
-  k = _mm_blendv_pd (y1, k, _mm_cmpgt_pd (x, x1));
-  return _mm_blendv_pd (y2, k, _mm_cmplt_pd (x, x2));
+  k = vbslq_f64 (y1, k, vcgtq_f64 (x, x1));
+  return vbslq_f64 (y2, k, vcltq_f64 (x, x2));
 }
 
 /**
@@ -8228,6440 +8192,6412 @@ jbm_v3_length_2xf64 (const float64x2_t x1,
 }
 
 /**
- * Function to calculate a float64x2_t vector of 1st order polynomials.
+ * Function to calculate a 1st order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_1_2xf64 (const float64x2_t x,        ///< variable.
+jbm_polynomial_1_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, _mm_set1_pd (p[1]), _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, vdupq_n_f64 (p[1]));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 2nd order polynomials.
+ * Function to calculate a 2nd order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_2_2xf64 (const float64x2_t x,        ///< variable.
+jbm_polynomial_2_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_1_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 3rd order polynomials.
+ * Function to calculate a 3rd order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_3_2xf64 (const float64x2_t x,        ///< variable.
+jbm_polynomial_3_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_2_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 4th order polynomials.
+ * Function to calculate a 4th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_4_2xf64 (const float64x2_t x,        ///< variable.
+jbm_polynomial_4_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_3_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 5th order polynomials.
+ * Function to calculate a 5th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_5_2xf64 (const float64x2_t x,        ///< variable.
+jbm_polynomial_5_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_4_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 6th order polynomials.
+ * Function to calculate a 6th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_6_2xf64 (const float64x2_t x,        ///< variable.
+jbm_polynomial_6_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_5_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 7th order polynomials.
+ * Function to calculate a 7th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_7_2xf64 (const float64x2_t x,        ///< variable.
+jbm_polynomial_7_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_6_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 8th order polynomials.
+ * Function to calculate a 8th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_8_2xf64 (const float64x2_t x,        ///< variable.
+jbm_polynomial_8_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_7_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 9th order polynomials.
+ * Function to calculate a 9th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_9_2xf64 (const float64x2_t x,        ///< variable.
+jbm_polynomial_9_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_8_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 10th order polynomials.
+ * Function to calculate a 10th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_10_2xf64 (const float64x2_t x,       ///< variable.
+jbm_polynomial_10_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_9_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 11th order polynomials.
+ * Function to calculate a 11th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_11_2xf64 (const float64x2_t x,       ///< variable.
+jbm_polynomial_11_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_10_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 12nd order polynomials.
+ * Function to calculate a 12th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_12_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
-{
-  return _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
-}
-
-/**
- * Function to calculate a float64x2_t vector of 13rd order polynomials.
- *
- * \return float64x2_t vector of polynomial values.
- */
-static inline float64x2_t
-jbm_polynomial_13_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
-{
-  return _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
-}
-
-/**
- * Function to calculate a float64x2_t vector of 14th order polynomials.
- *
- * \return float64x2_t vector of polynomial values.
- */
-static inline float64x2_t
-jbm_polynomial_14_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
-{
-  return _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
-}
-
-/**
- * Function to calculate a float64x2_t vector of 15th order polynomials.
- *
- * \return float64x2_t vector of polynomial values.
- */
-static inline float64x2_t
-jbm_polynomial_15_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
-{
-  return _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
-}
-
-/**
- * Function to calculate a float64x2_t vector of 16th order polynomials.
- *
- * \return float64x2_t vector of polynomial values.
- */
-static inline float64x2_t
-jbm_polynomial_16_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
-{
-  return _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
-}
-
-/**
- * Function to calculate a float64x2_t vector of 17th order polynomials.
- *
- * \return float64x2_t vector of polynomial values.
- */
-static inline float64x2_t
-jbm_polynomial_17_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
-{
-  return _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
-}
-
-/**
- * Function to calculate a float64x2_t vector of 18th order polynomials.
- *
- * \return float64x2_t vector of polynomial values.
- */
-static inline float64x2_t
-jbm_polynomial_18_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
-{
-  return _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
-}
-
-/**
- * Function to calculate a float64x2_t vector of 19th order polynomials.
- *
- * \return float64x2_t vector of polynomial values.
- */
-static inline float64x2_t
-jbm_polynomial_19_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
-{
-  return _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
-}
-
-/**
- * Function to calculate a float64x2_t vector of 10th order polynomials.
- *
- * \return float64x2_t vector of polynomial values.
- */
-static inline float64x2_t
-jbm_polynomial_20_2xf64 (const float64x2_t x,       ///< variable.
+jbm_polynomial_12_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_11_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 11th order polynomials.
+ * Function to calculate a 13th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_21_2xf64 (const float64x2_t x,       ///< variable.
+jbm_polynomial_13_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_12_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 12nd order polynomials.
+ * Function to calculate a 14th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_22_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_14_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_13_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 13rd order polynomials.
+ * Function to calculate a 15th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_23_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_15_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_14_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 14th order polynomials.
+ * Function to calculate a 16th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_24_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_16_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_15_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 15th order polynomials.
+ * Function to calculate a 17th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_25_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_17_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_16_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 16th order polynomials.
+ * Function to calculate a 18th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_26_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_18_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_17_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 17th order polynomials.
+ * Function to calculate a 19th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_27_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_19_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_26_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_18_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 18th order polynomials.
+ * Function to calculate a 20th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_28_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_20_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_27_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_19_2xf64 (x, p + 1));
 }
 
 /**
- * Function to calculate a float64x2_t vector of 19th order polynomials.
+ * Function to calculate a 21th order polynomial (float64x2_t).
  *
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_29_2xf64 (const float64x2_t x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_21_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_28_2xf64 (x, p + 1),
-                       _mm_set1_pd (p[0]));
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_20_2xf64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 22th order polynomial (float64x2_t).
+ *
+ * \return float64x2_t vector of polynomial values.
+ */
+static inline float64x2_t
+jbm_polynomial_22_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_21_2xf64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 23th order polynomial (float64x2_t).
+ *
+ * \return float64x2_t vector of polynomial values.
+ */
+static inline float64x2_t
+jbm_polynomial_23_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_22_2xf64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 24th order polynomial (float64x2_t).
+ *
+ * \return float64x2_t vector of polynomial values.
+ */
+static inline float64x2_t
+jbm_polynomial_24_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_23_2xf64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 25th order polynomial (float64x2_t).
+ *
+ * \return float64x2_t vector of polynomial values.
+ */
+static inline float64x2_t
+jbm_polynomial_25_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_24_2xf64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 26th order polynomial (float64x2_t).
+ *
+ * \return float64x2_t vector of polynomial values.
+ */
+static inline float64x2_t
+jbm_polynomial_26_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_25_2xf64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 27th order polynomial (float64x2_t).
+ *
+ * \return float64x2_t vector of polynomial values.
+ */
+static inline float64x2_t
+jbm_polynomial_27_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_26_2xf64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 28th order polynomial (float64x2_t).
+ *
+ * \return float64x2_t vector of polynomial values.
+ */
+static inline float64x2_t
+jbm_polynomial_28_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_27_2xf64 (x, p + 1));
+}
+
+/**
+ * Function to calculate a 29th order polynomial (float64x2_t).
+ *
+ * \return float64x2_t vector of polynomial values.
+ */
+static inline float64x2_t
+jbm_polynomial_29_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_28_2xf64 (x, p + 1));
 }
 
 /**
  * Function to calculate a 0th+1st order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_1_0_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_1_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[1]), _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[1])));
 }
 
 /**
  * Function to calculate a 0th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_2_0_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_2_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_1_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+1st order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_2_1_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_2_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[2]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[2])));
 }
 
 /**
  * Function to calculate a 0th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_3_0_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_3_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_2_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_3_1_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_3_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 1st+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_3_2_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_3_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[3]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[3])));
 }
 
 /**
  * Function to calculate a 0th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_4_0_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_4_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_3_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_4_1_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_4_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_4_2_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_4_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 1st+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_4_3_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_4_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[4]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[4])));
 }
 
 /**
  * Function to calculate a 0th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_5_0_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_5_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_4_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_5_1_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_5_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_5_2_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_5_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_5_3_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_5_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 1st+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_5_4_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_5_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[5]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[5])));
 }
 
 /**
  * Function to calculate a 0th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_0_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_6_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_5_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_1_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_6_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_2_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_6_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_3_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_6_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_4_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_6_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 1st+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_5_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_6_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[6]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[6])));
 }
 
 /**
  * Function to calculate a 0th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_0_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_7_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_6_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_1_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_7_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_2_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_7_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_3_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_7_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_4_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_7_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_5_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_7_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 1st+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_6_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_7_6_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[7]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[7])));
 }
 
 /**
  * Function to calculate a 0th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_0_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_8_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_7_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_1_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_8_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_2_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_8_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_3_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_8_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_4_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_8_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_5_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_8_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_6_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_8_6_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 1st+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_7_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_8_7_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[8]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[8])));
 }
 
 /**
  * Function to calculate a 0th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_0_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_9_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_8_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_1_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_9_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_2_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_9_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_3_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_9_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_4_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_9_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_5_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_9_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_6_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_9_6_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_7_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_9_7_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 1st+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_8_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
+jbm_rational_9_8_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
                         const double *p)        ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[9]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[9])));
 }
 
 /**
  * Function to calculate a 0th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_10_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_9_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_10_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_10_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_10_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_10_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_10_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_10_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_10_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_10_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 1st+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_10_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[10]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[10])));
 }
 
 /**
  * Function to calculate a 0th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_11_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_10_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_11_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_11_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_11_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_11_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_11_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_11_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_11_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_11_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_11_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 1st+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_11_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[11]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[11])));
 }
 
 /**
  * Function to calculate a 0th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_12_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_11_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_12_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_12_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_12_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_12_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_12_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_12_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_12_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_12_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_12_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_12_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 1st+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_12_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[12]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[12])));
 }
 
 /**
  * Function to calculate a 0th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_13_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_12_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_13_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_13_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_13_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_13_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_13_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_13_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_13_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_13_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_13_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_13_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_13_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 1st+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_13_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[13]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[13])));
 }
 
 /**
  * Function to calculate a 0th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_14_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_13_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_14_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_14_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_14_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_14_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_14_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_14_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_14_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_14_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_14_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_14_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_14_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_14_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 1st+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_14_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[14]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[14])));
 }
 
 /**
  * Function to calculate a 0th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_15_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_14_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_15_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_15_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_15_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_15_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_15_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_15_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_15_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_15_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_15_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_15_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_15_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_15_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_15_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 1st+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_15_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[15]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[15])));
 }
 
 /**
  * Function to calculate a 0th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_16_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_15_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_16_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_16_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_16_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_16_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_16_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_16_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_16_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_16_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_16_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_16_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_16_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_16_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_16_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_16_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 1st+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_16_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[16]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[16])));
 }
 
 /**
  * Function to calculate a 0th+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_17_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_16_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_17_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_17_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_17_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_17_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_17_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_17_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_17_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_17_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_17_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_17_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_17_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_17_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_17_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_17_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_17_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 1st+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_17_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[17]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[17])));
 }
 
 /**
  * Function to calculate a 0th+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_18_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_17_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_18_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_18_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_18_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_18_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_18_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_18_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_18_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_18_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_18_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_18_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_18_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_18_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_18_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_18_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_18_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_18_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 1st+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_18_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[18]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[18])));
 }
 
 /**
  * Function to calculate a 0th+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_19_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_18_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_19_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_19_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_19_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_19_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_19_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_19_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_19_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_19_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_19_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_19_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_19_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_19_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_19_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_19_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_19_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_19_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_19_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 1st+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_19_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[19]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[19])));
 }
 
 /**
  * Function to calculate a 0th+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_20_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_19_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_20_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_20_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_20_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_20_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_20_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_20_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_20_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_20_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_20_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_20_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_20_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_20_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_20_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_20_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_20_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_20_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_20_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_20_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 19),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 1st+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_19_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_20_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[20]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[20])));
 }
 
 /**
  * Function to calculate a 0th+21th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_21_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_20_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_21_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_19_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_21_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_21_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_21_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_21_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_21_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_21_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_21_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_21_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 19),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_19_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 20),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 1st+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_20_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_21_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[21]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[21])));
 }
 
 /**
  * Function to calculate a 0th+22th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_22_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_21_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+21th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_22_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_20_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_22_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_19_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_22_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_22_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_22_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_22_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_22_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_22_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_22_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 19),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_19_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 20),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_20_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 21),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 1st+21th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_21_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_22_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[22]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[22])));
 }
 
 /**
  * Function to calculate a 0th+23th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_23_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_22_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+22th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_23_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_21_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+21th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_23_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_20_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_23_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_19_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_23_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_23_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_23_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_23_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_23_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_23_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 19),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_19_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 20),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_20_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 21),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_21_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 22),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 1st+22th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_22_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_23_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[23]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[23])));
 }
 
 /**
  * Function to calculate a 0th+24th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_24_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_23_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+23th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_24_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_22_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+22th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_24_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_21_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+21th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_24_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_20_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_24_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_19_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_24_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_24_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_24_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_24_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_24_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 19),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_19_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 20),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_20_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 21),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_21_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 22),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_22_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 23),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 1st+23th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_23_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_24_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[24]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[24])));
 }
 
 /**
  * Function to calculate a 0th+25th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_25_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_24_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+24th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_25_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_23_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+23th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_25_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_22_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+22th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_25_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_21_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+21th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_25_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_20_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_25_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_19_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_25_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_25_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_25_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_25_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 19),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_19_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 20),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_20_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 21),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_21_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 22),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_22_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 23),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 23th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_23_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 24),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 24)));
 }
 
 /**
  * Function to calculate a 1st+24th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_24_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_25_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_24_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[25]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[25])));
 }
 
 /**
  * Function to calculate a 0th+26th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_26_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_25_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+25th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_26_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_24_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+24th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_26_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_23_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+23th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_26_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_22_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+22th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_26_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_21_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+21th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_26_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_20_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_26_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_19_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_26_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_26_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_26_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 19),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_19_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 20),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_20_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 21),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_21_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 22),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_22_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 23),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 23th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_23_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 24),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 24)));
 }
 
 /**
  * Function to calculate a 24th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_24_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_24_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 25),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 25)));
 }
 
 /**
  * Function to calculate a 1st+25th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_25_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_26_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_25_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[26]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[26])));
 }
 
 /**
  * Function to calculate a 0th+27th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_27_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_26_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_26_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+26th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_27_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_25_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+25th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_27_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_24_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+24th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_27_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_23_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+23th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_27_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_22_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+22th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_27_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_21_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+21th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_27_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_20_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_27_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_19_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_27_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_27_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 19),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_19_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 20),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_20_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 21),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_21_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 22),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_22_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 23),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 23th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_23_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 24),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 24)));
 }
 
 /**
  * Function to calculate a 24th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_24_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_24_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 25),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 25)));
 }
 
 /**
  * Function to calculate a 25th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_25_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_25_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 26),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 26)));
 }
 
 /**
  * Function to calculate a 1st+26th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_26_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_27_26_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_26_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[27]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[27])));
 }
 
 /**
  * Function to calculate a 0th+28th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_28_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_27_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_27_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+27th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_28_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_26_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_26_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+26th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_28_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_25_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+25th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_28_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_24_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+24th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_28_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_23_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+23th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_28_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_22_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+22th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_28_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_21_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+21th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_28_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_20_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_28_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_19_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_28_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 19),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_19_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 20),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_20_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 21),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_21_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 22),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_22_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 23),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 23th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_23_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 24),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 24)));
 }
 
 /**
  * Function to calculate a 24th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_24_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_24_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 25),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 25)));
 }
 
 /**
  * Function to calculate a 25th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_25_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_25_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 26),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 26)));
 }
 
 /**
  * Function to calculate a 26th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_26_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_26_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_26_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 27),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 27)));
 }
 
 /**
  * Function to calculate a 1st+27th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_27_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_28_27_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_27_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[28]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[28])));
 }
 
 /**
  * Function to calculate a 0th+29th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_0_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_29_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
-  return vdivq_f64 (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_28_2xf64 (x, p + 1),
-                                   _mm_set1_pd (1.)));
+  return vdivq_f64 (vdupq_n_f64 (p[0]),
+                    vmlaq (vdupq_n_f64 (1.), x,
+                           jbm_polynomial_28_2xf64 (x, p + 1)));
 }
 
 /**
  * Function to calculate a 1st+28th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_1_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_29_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_27_2xf64 (x, p + 2),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_27_2xf64 (x, p + 2)));
 }
 
 /**
  * Function to calculate a 2nd+27th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_2_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_29_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_26_2xf64 (x, p + 3),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_26_2xf64 (x, p + 3)));
 }
 
 /**
  * Function to calculate a 3rd+26th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_3_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_29_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 4),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_25_2xf64 (x, p + 4)));
 }
 
 /**
  * Function to calculate a 4th+25th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_4_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_29_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 5),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_24_2xf64 (x, p + 5)));
 }
 
 /**
  * Function to calculate a 5th+24th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_5_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_29_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 6),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_23_2xf64 (x, p + 6)));
 }
 
 /**
  * Function to calculate a 6th+23th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_6_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_29_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 7),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_22_2xf64 (x, p + 7)));
 }
 
 /**
  * Function to calculate a 7th+22th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_7_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_29_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 8),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_21_2xf64 (x, p + 8)));
 }
 
 /**
  * Function to calculate a 8th+21th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_8_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_29_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 9),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_20_2xf64 (x, p + 9)));
 }
 
 /**
  * Function to calculate a 9th+20th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_9_2xf64 (const float64x2_t x,       ///< float64x2_t vector.
+jbm_rational_29_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
                          const double *p)       ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 10),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_19_2xf64 (x, p + 10)));
 }
 
 /**
  * Function to calculate a 10th+19th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_10_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 11),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 11)));
 }
 
 /**
  * Function to calculate a 11th+18th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_11_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 12),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 12)));
 }
 
 /**
  * Function to calculate a 12th+17th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_12_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 13),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 13)));
 }
 
 /**
  * Function to calculate a 13th+16th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_13_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 14),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 14)));
 }
 
 /**
  * Function to calculate a 14th+15th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_14_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 15),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 15)));
 }
 
 /**
  * Function to calculate a 15th+14th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_15_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 16),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 16)));
 }
 
 /**
  * Function to calculate a 16th+13th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_16_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 17),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 17)));
 }
 
 /**
  * Function to calculate a 17th+12th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_17_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 18),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 18)));
 }
 
 /**
  * Function to calculate a 18th+11th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_18_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 19),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 19)));
 }
 
 /**
  * Function to calculate a 19th+10th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_19_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 20),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 20)));
 }
 
 /**
  * Function to calculate a 20th+9th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_20_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 21),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 21)));
 }
 
 /**
  * Function to calculate a 21th+8th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_21_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 22),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 22)));
 }
 
 /**
  * Function to calculate a 22th+7th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_22_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 23),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 23)));
 }
 
 /**
  * Function to calculate a 23th+6th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_23_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 24),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 24)));
 }
 
 /**
  * Function to calculate a 24th+5th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_24_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_24_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 25),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 25)));
 }
 
 /**
  * Function to calculate a 25th+4th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_25_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_25_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 26),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 26)));
 }
 
 /**
  * Function to calculate a 26th+3rd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_26_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_26_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_26_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 27),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 27)));
 }
 
 /**
  * Function to calculate a 27th+2nd order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_27_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_27_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_27_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 28),
-                                   _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 28)));
 }
 
 /**
  * Function to calculate a 1st+28th order rational (float64x2_t).
  *
- * \return rational value.
+ * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_28_2xf64 (const float64x2_t x,      ///< float64x2_t vector.
+jbm_rational_29_28_2xf64 (const double64x2_t x, ///< float64x2_t vector.
                           const double *p)      ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_28_2xf64 (x, p),
-                     _mm_fmadd_pd (x, _mm_set1_pd (p[29]), _mm_set1_pd (1.)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[29])));
 }
 
 /**
@@ -14684,8 +14620,8 @@ jbm_expm1wc_2xf64 (const float64x2_t x)
   float64x2_t x2;
   x2 = jbm_sqr_2xf64 (x);
   return
-    vdivq_f64 (vmulq_f64 (x, _mm_fmadd_pd (x2, _mm_set1_pd (a3),
-                                             _mm_set1_pd (a1))),
+    vdivq_f64 (vmulq_f64 (x, _mm_fmadd_pd (x2, vdupq_n_f64 (a3),
+                                             vdupq_n_f64 (a1))),
                 _mm_fmadd_pd
                 (x,
                  _mm_fmadd_pd
@@ -14696,9 +14632,9 @@ jbm_expm1wc_2xf64 (const float64x2_t x)
                    (x,
                     _mm_fmadd_pd
                     (x2,
-                     _mm_set1_pd (a9), _mm_set1_pd (a7)),
-                    _mm_set1_pd (a6)),
-                   _mm_set1_pd (a5)), _mm_set1_pd (a4)), _mm_set1_pd (1.)));
+                     vdupq_n_f64 (a9), vdupq_n_f64 (a7)),
+                    vdupq_n_f64 (a6)),
+                   vdupq_n_f64 (a5)), vdupq_n_f64 (a4)), vdupq_n_f64 (1.)));
 }
 
 /**
@@ -14737,19 +14673,11 @@ static inline float64x2_t
 jbm_exp2_2xf64 (const float64x2_t x)        ///< float64x2_t vector.
 {
   float64x2_t y, f, z, k;
-  __m128i i;
+  int64x2_t i;
   y = vrndmq_f64 (x);
   f = vsubq_f64 (x, y);
-#ifdef __AVX512F__
   i = _mm_cvtpd_epi64 (y);
   z = jbm_exp2n_2xf64 (i);
-#else
-  z = _mm_set1_pd (0x0018000000000000);
-  k = vaddq_f64 (y, z);
-  i = _mm_sub_epi64 (_mm_castpd_si128 (k), _mm_castpd_si128 (z));
-  z = _mm_blendv_pd (jbm_exp2n_2xf64 (i), _mm_setzero_pd (),
-                     _mm_cmplt_pd (y, _mm_set1_pd (-1074.)));
-#endif
   return vmulq_f64 (z, jbm_exp2wc_2xf64 (f));
 }
 
@@ -14761,7 +14689,7 @@ jbm_exp2_2xf64 (const float64x2_t x)        ///< float64x2_t vector.
 static inline float64x2_t
 jbm_exp_2xf64 (const float64x2_t x) ///< float64x2_t vector.
 {
-  return jbm_exp2_2xf64 (vmulq_f64 (x, _mm_set1_pd (M_LOG2E)));
+  return jbm_exp2_2xf64 (vmulq_f64 (x, vdupq_n_f64 (M_LOG2E)));
 }
 
 /**
@@ -14773,7 +14701,7 @@ jbm_exp_2xf64 (const float64x2_t x) ///< float64x2_t vector.
 static inline float64x2_t
 jbm_exp10_2xf64 (const float64x2_t x)       ///< float64x2_t vector.
 {
-  return jbm_exp2_2xf64 (vmulq_f64 (x, _mm_set1_pd (M_LN10 / M_LN2)));
+  return jbm_exp2_2xf64 (vmulq_f64 (x, vdupq_n_f64 (M_LN10 / M_LN2)));
 }
 
 /**
@@ -14785,10 +14713,10 @@ jbm_exp10_2xf64 (const float64x2_t x)       ///< float64x2_t vector.
 static inline float64x2_t
 jbm_expm1_2xf64 (const float64x2_t x)       ///< float64x2_t vector.
 {
-  return _mm_blendv_pd (vsubq_f64 (jbm_exp_2xf64 (x), _mm_set1_pd (1.)),
+  return vbslq_f64 (vsubq_f64 (jbm_exp_2xf64 (x), vdupq_n_f64 (1.)),
                         jbm_expm1wc_2xf64 (x),
-                        _mm_cmplt_pd (jbm_abs_2xf64 (x),
-                                      _mm_set1_pd (M_LN2 / 2.)));
+                        vcltq_f64 (jbm_abs_2xf64 (x),
+                                      vdupq_n_f64 (M_LN2 / 2.)));
 }
 
 /**
@@ -14830,19 +14758,13 @@ static inline float64x2_t
 jbm_log2_2xf64 (const float64x2_t x)        ///< float64x2_t vector.
 {
   float64x2_t y, z;
-  __m128i e;
+  int64x2_t e;
   y = jbm_log2wc_2xf64 (jbm_frexp_2xf64 (x, &e));
-#ifdef __AVX512F__
   z = _mm_cvtepi64_pd (e);
-#else
-  z = _mm_set1_pd (0x0018000000000000);
-  e = _mm_add_epi64 (e, _mm_castpd_si128 (z));
-  z = vsubq_f64 (_mm_castsi128_pd (e), z);
-#endif
   y = vaddq_f64 (y, z);
-  z = _mm_setzero_pd ();
-  y = _mm_blendv_pd (y, _mm_set1_pd (-INFINITY), _mm_cmpgt_pd (x, z));
-  return _mm_blendv_pd (_mm_set1_pd (NAN), y, _mm_cmplt_pd (x, z));
+  z = vdupq_n_f64 (0.);
+  y = vbslq_f64 (y, vdupq_n_f64 (-INFINITY), vcgtq_f64 (x, z));
+  return vbslq_f64 (vdupq_n_f64 (NAN), y, vcltq_f64 (x, z));
 }
 
 /**
@@ -14853,7 +14775,7 @@ jbm_log2_2xf64 (const float64x2_t x)        ///< float64x2_t vector.
 static inline float64x2_t
 jbm_log_2xf64 (const float64x2_t x) ///< float64x2_t vector.
 {
-  return vmulq_f64 (jbm_log2_2xf64 (x), _mm_set1_pd (M_LN2));
+  return vmulq_f64 (jbm_log2_2xf64 (x), vdupq_n_f64 (M_LN2));
 }
 
 /**
@@ -14864,7 +14786,7 @@ jbm_log_2xf64 (const float64x2_t x) ///< float64x2_t vector.
 static inline float64x2_t
 jbm_log10_2xf64 (const float64x2_t x)       ///< float64x2_t vector.
 {
-  return vmulq_f64 (jbm_log2_2xf64 (x), _mm_set1_pd (M_LN2 / M_LN10));
+  return vmulq_f64 (jbm_log2_2xf64 (x), vdupq_n_f64 (M_LN2 / M_LN10));
 }
 
 /**
@@ -14878,7 +14800,7 @@ jbm_pown_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
 {
   float64x2_t f, xn;
   unsigned int i;
-  f = _mm_set1_pd (1.);
+  f = vdupq_n_f64 (1.);
   if (e < 0)
     xn = vdivq_f64 (f, x);
   else
@@ -14903,7 +14825,7 @@ jbm_pow_2xf64 (const float64x2_t x, ///< float64x2_t vector.
   f = floor (e);
   if (f == e)
     return jbm_pown_2xf64 (x, (int) e);
-  return jbm_exp2_2xf64 (vmulq_f64 (_mm_set1_pd (e), jbm_log2_2xf64 (x)));
+  return jbm_exp2_2xf64 (vmulq_f64 (vdupq_n_f64 (e), jbm_log2_2xf64 (x)));
 }
 
 /**
@@ -14918,8 +14840,8 @@ jbm_cbrt_2xf64 (const float64x2_t x)        ///< float64x2_t vector.
   float64x2_t f, z;
   f = jbm_abs_2xf64 (x);
   f = jbm_pow_2xf64 (x, 1. / 3.);
-  z = _mm_setzero_pd ();
-  return _mm_blendv_pd (f, vsubq_f64 (z, f), _mm_cmplt_pd (x, z));
+  z = vdupq_n_f64 (0.);
+  return vbslq_f64 (f, vsubq_f64 (z, f), vcltq_f64 (x, z));
 }
 
 /**
@@ -14981,7 +14903,7 @@ jbm_sincoswc_2xf64 (const float64x2_t x,
 {
   float64x2_t s0;
   *s = s0 = jbm_sinwc_2xf64 (x);
-  *c = vsqrtq_f64 (_mm_fnmadd_pd (x, x, _mm_set1_pd (1.)));
+  *c = vsqrtq_f64 (_mm_fnmadd_pd (x, x, vdupq_n_f64 (1.)));
 }
 
 /**
@@ -14994,20 +14916,20 @@ static inline float64x2_t
 jbm_sin_2xf64 (const float64x2_t x) ///< float64x2_t vector.
 {
   float64x2_t y, s, pi2;
-  pi2 = _mm_set1_pd (2. * M_PI);
+  pi2 = vdupq_n_f64 (2. * M_PI);
   y = jbm_rest_2xf64 (x, pi2);
   s = jbm_sinwc_2xf64 (vsubq_f64 (y, pi2));
-  s = _mm_blendv_pd (s,
+  s = vbslq_f64 (s,
                      jbm_opposite_2xf64
                      (jbm_coswc_2xf64
-                      (vsubq_f64 (_mm_set1_pd (3. * M_PI_2), y))),
-                     _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4)));
-  s = _mm_blendv_pd (s, jbm_sinwc_2xf64 (vsubq_f64 (_mm_set1_pd (M_PI), y)),
-                     _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4)));
-  s = _mm_blendv_pd (s, jbm_coswc_2xf64 (vsubq_f64 (_mm_set1_pd (M_PI_2), y)),
-                     _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4)));
-  return _mm_blendv_pd (s, jbm_sinwc_2xf64 (y),
-                        _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4)));
+                      (vsubq_f64 (vdupq_n_f64 (3. * M_PI_2), y))),
+                     vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4)));
+  s = vbslq_f64 (s, jbm_sinwc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI), y)),
+                     vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4)));
+  s = vbslq_f64 (s, jbm_coswc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI_2), y)),
+                     vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4)));
+  return vbslq_f64 (s, jbm_sinwc_2xf64 (y),
+                        vcltq_f64 (y, vdupq_n_f64 (M_PI_4)));
 }
 
 /**
@@ -15020,21 +14942,21 @@ static inline float64x2_t
 jbm_cos_2xf64 (const float64x2_t x) ///< float64x2_t vector.
 {
   float64x2_t y, c, pi2;
-  pi2 = _mm_set1_pd (2. * M_PI);
+  pi2 = vdupq_n_f64 (2. * M_PI);
   y = jbm_rest_2xf64 (x, pi2);
   c = jbm_coswc_2xf64 (vsubq_f64 (y, pi2));
-  c = _mm_blendv_pd (c,
+  c = vbslq_f64 (c,
                      jbm_sinwc_2xf64
-                     (vsubq_f64 (y, _mm_set1_pd (3. * M_PI_2))),
-                     _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4)));
-  c = _mm_blendv_pd (c,
+                     (vsubq_f64 (y, vdupq_n_f64 (3. * M_PI_2))),
+                     vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4)));
+  c = vbslq_f64 (c,
                      jbm_opposite_2xf64
-                     (jbm_coswc_2xf64 (vsubq_f64 (_mm_set1_pd (M_PI), y))),
-                     _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4)));
-  c = _mm_blendv_pd (c, jbm_sinwc_2xf64 (vsubq_f64 (_mm_set1_pd (M_PI_2), y)),
-                     _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4)));
-  return _mm_blendv_pd (c, jbm_coswc_2xf64 (y),
-                        _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4)));
+                     (jbm_coswc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI), y))),
+                     vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4)));
+  c = vbslq_f64 (c, jbm_sinwc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI_2), y)),
+                     vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4)));
+  return vbslq_f64 (c, jbm_coswc_2xf64 (y),
+                        vcltq_f64 (y, vdupq_n_f64 (M_PI_4)));
 }
 
 /**
@@ -15048,26 +14970,26 @@ jbm_sincos_2xf64 (const float64x2_t x,
                   float64x2_t *c)   ///< pointer to the f32 function value (float64x2_t).
 {
   float64x2_t y, pi2, z, m, s1, c1, s2, c2;
-  pi2 = _mm_set1_pd (2. * M_PI);
+  pi2 = vdupq_n_f64 (2. * M_PI);
   y = jbm_rest_2xf64 (x, pi2);
   jbm_sincoswc_2xf64 (vsubq_f64 (y, pi2), &s1, &c1);
-  jbm_sincoswc_2xf64 (vsubq_f64 (y, _mm_set1_pd (3. * M_PI_2)), &c2, &s2);
-  m = _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4));
-  z = _mm_setzero_pd ();
-  s1 = _mm_blendv_pd (s1, vsubq_f64 (z, s2), m);
-  c1 = _mm_blendv_pd (c1, c2, m);
-  jbm_sincoswc_2xf64 (vsubq_f64 (_mm_set1_pd (M_PI), y), &s2, &c2);
-  m = _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4));
-  s1 = _mm_blendv_pd (s1, s2, m);
-  c1 = _mm_blendv_pd (c1, vsubq_f64 (z, c2), m);
-  jbm_sincoswc_2xf64 (vsubq_f64 (_mm_set1_pd (M_PI_2), y), &c2, &s2);
-  m = _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4));
-  s1 = _mm_blendv_pd (s1, s2, m);
-  c1 = _mm_blendv_pd (c1, c2, m);
+  jbm_sincoswc_2xf64 (vsubq_f64 (y, vdupq_n_f64 (3. * M_PI_2)), &c2, &s2);
+  m = vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4));
+  z = vdupq_n_f64 (0.);
+  s1 = vbslq_f64 (s1, vsubq_f64 (z, s2), m);
+  c1 = vbslq_f64 (c1, c2, m);
+  jbm_sincoswc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI), y), &s2, &c2);
+  m = vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4));
+  s1 = vbslq_f64 (s1, s2, m);
+  c1 = vbslq_f64 (c1, vsubq_f64 (z, c2), m);
+  jbm_sincoswc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI_2), y), &c2, &s2);
+  m = vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4));
+  s1 = vbslq_f64 (s1, s2, m);
+  c1 = vbslq_f64 (c1, c2, m);
   jbm_sincoswc_2xf64 (y, &s2, &c2);
-  m = _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4));
-  *s = _mm_blendv_pd (s1, s2, m);
-  *c = _mm_blendv_pd (c1, c2, m);
+  m = vcltq_f64 (y, vdupq_n_f64 (M_PI_4));
+  *s = vbslq_f64 (s1, s2, m);
+  *c = vbslq_f64 (c1, c2, m);
 }
 
 /**
@@ -15138,7 +15060,7 @@ jbm_atanwc1_2xf64 (const float64x2_t x)
     1.7224818123175960988680742148655125e-01,
     1.4750226980146190425631669160362206e-02
   };
-  return jbm_rational_16_8_2xf64 (vsubq_f64 (x, _mm_set1_pd (1.)), a);
+  return jbm_rational_16_8_2xf64 (vsubq_f64 (x, vdupq_n_f64 (1.)), a);
 }
 
 /**
@@ -15152,13 +15074,13 @@ jbm_atan_2xf64 (const float64x2_t x)        ///< double number.
 {
   float64x2_t f, ax, m, z;
   ax = jbm_abs_2xf64 (x);
-  m = _mm_cmpgt_pd (ax, _mm_set1_pd (1.5));
-  ax = _mm_blendv_pd (ax, jbm_reciprocal_2xf64 (ax), m);
-  f = _mm_blendv_pd (jbm_atanwc0_2xf64 (ax), jbm_atanwc1_2xf64 (ax),
-                     _mm_cmpgt_pd (ax, _mm_set1_pd (0.5)));
-  f = _mm_blendv_pd (f, vsubq_f64 (_mm_set1_pd (M_PI_2), f), m);
-  z = _mm_setzero_pd ();
-  return _mm_blendv_pd (f, vsubq_f64 (z, f), _mm_cmplt_pd (x, z));
+  m = vcgtq_f64 (ax, vdupq_n_f64 (1.5));
+  ax = vbslq_f64 (ax, jbm_reciprocal_2xf64 (ax), m);
+  f = vbslq_f64 (jbm_atanwc0_2xf64 (ax), jbm_atanwc1_2xf64 (ax),
+                     vcgtq_f64 (ax, vdupq_n_f64 (0.5)));
+  f = vbslq_f64 (f, vsubq_f64 (vdupq_n_f64 (M_PI_2), f), m);
+  z = vdupq_n_f64 (0.);
+  return vbslq_f64 (f, vsubq_f64 (z, f), vcltq_f64 (x, z));
 }
 
 /**
@@ -15172,13 +15094,13 @@ jbm_atan2_2xf64 (const float64x2_t y,       ///< float64x2_t y component.
                  const float64x2_t x)       ///< float64x2_t x component.
 {
   float64x2_t f, mx, my, z, pi;
-  z = _mm_setzero_pd ();
-  pi = _mm_set1_pd (M_PI);
+  z = vdupq_n_f64 (0.);
+  pi = vdupq_n_f64 (M_PI);
   f = jbm_atan_2xf64 (vdivq_f64 (y, x));
-  mx = _mm_cmplt_pd (x, z);
-  my = _mm_cmplt_pd (y, z);
-  f = _mm_blendv_pd (f, vsubq_f64 (f, pi), _mm_and_pd (my, mx));
-  return _mm_blendv_pd (f, vaddq_f64 (f, pi), _mm_andnot_pd (my, mx));
+  mx = vcltq_f64 (x, z);
+  my = vcltq_f64 (y, z);
+  f = vbslq_f64 (f, vsubq_f64 (f, pi), _mm_and_pd (my, mx));
+  return vbslq_f64 (f, vaddq_f64 (f, pi), _mm_andnot_pd (my, mx));
 }
 
 /**
@@ -15192,7 +15114,7 @@ jbm_asin_2xf64 (const float64x2_t x)        ///< float64x2_t number.
 {
   return
     jbm_atan_2xf64 (vdivq_f64
-                    (x, vsqrtq_f64 (_mm_fnmadd_pd (x, x, _mm_set1_pd (1.)))));
+                    (x, vsqrtq_f64 (_mm_fnmadd_pd (x, x, vdupq_n_f64 (1.)))));
 }
 
 /**
@@ -15207,9 +15129,9 @@ jbm_acos_2xf64 (const float64x2_t x)        ///< float64x2_t number.
   float64x2_t f;
   f =
     jbm_atan_2xf64 (vdivq_f64
-                    (vsqrtq_f64 (_mm_fnmadd_pd (x, x, _mm_set1_pd (1.))), x));
-  return _mm_blendv_pd (f, vaddq_f64 (f, _mm_set1_pd (M_PI)),
-                        _mm_cmplt_pd (x, _mm_setzero_pd ()));
+                    (vsqrtq_f64 (_mm_fnmadd_pd (x, x, vdupq_n_f64 (1.))), x));
+  return vbslq_f64 (f, vaddq_f64 (f, vdupq_n_f64 (M_PI)),
+                        vcltq_f64 (x, vdupq_n_f64 (0.)));
 }
 
 /**
@@ -15222,7 +15144,7 @@ jbm_sinh_2xf64 (const float64x2_t x)        ///< float64x2_t number.
 {
   float64x2_t f;
   f = jbm_exp_2xf64 (x);
-  return vmulq_f64 (_mm_set1_pd (0.5),
+  return vmulq_f64 (vdupq_n_f64 (0.5),
                      vsubq_f64 (f, jbm_reciprocal_2xf64 (f)));
 }
 
@@ -15236,7 +15158,7 @@ jbm_cosh_2xf64 (const float64x2_t x)        ///< float64x2_t number.
 {
   float64x2_t f;
   f = jbm_exp_2xf64 (x);
-  return vmulq_f64 (_mm_set1_pd (0.5),
+  return vmulq_f64 (vdupq_n_f64 (0.5),
                      vaddq_f64 (f, jbm_reciprocal_2xf64 (f)));
 }
 
@@ -15252,10 +15174,10 @@ jbm_tanh_2xf64 (const float64x2_t x)        ///< float64x2_t number.
   f = jbm_exp_2xf64 (x);
   fi = jbm_reciprocal_2xf64 (f);
   f = vdivq_f64 (vsubq_f64 (f, fi), vaddq_f64 (f, fi));
-  f = _mm_blendv_pd (f, _mm_set1_pd (1.),
-                     _mm_cmpgt_pd (x, _mm_set1_pd (JBM_DBL_MAX_E_EXP)));
-  return _mm_blendv_pd (f, _mm_set1_pd (-1.),
-                        _mm_cmplt_pd (x, _mm_set1_pd (-JBM_DBL_MAX_E_EXP)));
+  f = vbslq_f64 (f, vdupq_n_f64 (1.),
+                     vcgtq_f64 (x, vdupq_n_f64 (JBM_DBL_MAX_E_EXP)));
+  return vbslq_f64 (f, vdupq_n_f64 (-1.),
+                        vcltq_f64 (x, vdupq_n_f64 (-JBM_DBL_MAX_E_EXP)));
 }
 
 /**
@@ -15268,7 +15190,7 @@ jbm_asinh_2xf64 (const float64x2_t x)       ///< float64x2_t number.
 {
   return
     jbm_log_2xf64 (vaddq_f64
-                   (x, vsqrtq_f64 (_mm_fmadd_pd (x, x, _mm_set1_pd (1.)))));
+                   (x, vsqrtq_f64 (_mm_fmadd_pd (x, x, vdupq_n_f64 (1.)))));
 }
 
 /**
@@ -15281,7 +15203,7 @@ jbm_acosh_2xf64 (const float64x2_t x)       ///< float64x2_t number.
 {
   return
     jbm_log_2xf64 (vaddq_f64
-                   (x, vsqrtq_f64 (_mm_fmsub_pd (x, x, _mm_set1_pd (1.)))));
+                   (x, vsqrtq_f64 (_mm_fmsub_pd (x, x, vdupq_n_f64 (1.)))));
 }
 
 /**
@@ -15293,8 +15215,8 @@ static inline float64x2_t
 jbm_atanh_2xf64 (const float64x2_t x)       ///< float64x2_t number.
 {
   float64x2_t u;
-  u = _mm_set1_pd (1.);
-  return vmulq_f64 (_mm_set1_pd (0.5),
+  u = vdupq_n_f64 (1.);
+  return vmulq_f64 (vdupq_n_f64 (0.5),
                      jbm_log_2xf64 (vdivq_f64 (vaddq_f64 (u, x),
                                                 vsubq_f64 (u, x))));
 }
@@ -15361,8 +15283,8 @@ jbm_erfcwc_2xf64 (const float64x2_t x)
   x2 = jbm_sqr_2xf64 (x);
   f = vdivq_f64 (jbm_rational_19_9_2xf64 (jbm_reciprocal_2xf64 (x2), a),
                   vmulq_f64 (x, jbm_exp_2xf64 (x2)));
-  return _mm_blendv_pd (f, _mm_setzero_pd (),
-                        _mm_cmpgt_pd (x, _mm_set1_pd (m)));
+  return vbslq_f64 (f, vdupq_n_f64 (0.),
+                        vcgtq_f64 (x, vdupq_n_f64 (m)));
 }
 
 /**
@@ -15376,9 +15298,9 @@ jbm_erf_2xf64 (const float64x2_t x) ///< float64x2_t vector.
 {
   float64x2_t ax, u, f;
   ax = jbm_abs_2xf64 (x);
-  u = _mm_set1_pd (1.);
+  u = vdupq_n_f64 (1.);
   f = vmulq_f64 (vdivq_f64 (x, ax), vsubq_f64 (u, jbm_erfcwc_2xf64 (ax)));
-  return _mm_blendv_pd (f, jbm_erfwc_2xf64 (x), _mm_cmplt_pd (ax, u));
+  return vbslq_f64 (f, jbm_erfwc_2xf64 (x), vcltq_f64 (ax, u));
 
 }
 
@@ -15393,11 +15315,11 @@ jbm_erfc_2xf64 (const float64x2_t x)        ///< float64x2_t vector.
 {
   float64x2_t ax, u, f;
   ax = jbm_abs_2xf64 (x);
-  u = _mm_set1_pd (1.);
+  u = vdupq_n_f64 (1.);
   f = vsubq_f64 (u, vmulq_f64 (vdivq_f64 (x, ax),
                                  vsubq_f64 (u, jbm_erfcwc_2xf64 (ax))));
-  return _mm_blendv_pd (f, vsubq_f64 (u, jbm_erfwc_2xf64 (x)),
-                        _mm_cmplt_pd (ax, u));
+  return vbslq_f64 (f, vsubq_f64 (u, jbm_erfwc_2xf64 (x)),
+                        vcltq_f64 (ax, u));
 }
 
 /**
@@ -15418,13 +15340,13 @@ jbm_solve_quadratic_reduced_2xf64 (float64x2_t a,
 ///< float64x2_t vector of right limits of the solution intervals.
 {
   float64x2_t k1, k2;
-  k1 = _mm_set1_pd (-0.5);
+  k1 = vdupq_n_f64 (-0.5);
   a = vmulq_f64 (a, k1);
   b = vsqrtq_f64 (vsubq_f64 (jbm_sqr_2xf64 (a), b));
   k1 = vaddq_f64 (a, b);
   k2 = vsubq_f64 (a, b);
-  k1 = _mm_blendv_pd (k1, k2, _mm_cmplt_pd (k1, x1));
-  return _mm_blendv_pd (k1, k2, _mm_cmpgt_pd (k1, x2));
+  k1 = vbslq_f64 (k1, k2, vcltq_f64 (k1, x1));
+  return vbslq_f64 (k1, k2, vcgtq_f64 (k1, x2));
 }
 
 /**
@@ -15449,7 +15371,7 @@ jbm_solve_quadratic_2xf64 (const float64x2_t a,
   k1 = jbm_solve_quadratic_reduced_2xf64 (vdivq_f64 (b, a), vdivq_f64 (c, a),
                                           x1, x2);
   k2 = vdivq_f64 (jbm_opposite_2xf64 (c), b);
-  return _mm_blendv_pd (k1, k2, jbm_small_2xf64 (a));
+  return vbslq_f64 (k1, k2, jbm_small_2xf64 (a));
 }
 
 /**
@@ -15472,9 +15394,9 @@ jbm_solve_cubic_reduced_2xf64 (const float64x2_t a,
                                ///< right limit of the solution interval.
 {
   float64x2_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2, c_3;
-  c2p_3 = _mm_set1_pd (2. * M_PI / 3.);
-  c_2 = _mm_set1_pd (0.5);
-  c_3 = _mm_set1_pd (1. / 3.);
+  c2p_3 = vdupq_n_f64 (2. * M_PI / 3.);
+  c_2 = vdupq_n_f64 (0.5);
+  c_3 = vdupq_n_f64 (1. / 3.);
   a3 = vmulq_f64 (a, c_3);
   k0 = vmulq_f64 (a3, a3);
   k1 = _mm_fmsub_pd (b, c_3, k0);
@@ -15486,17 +15408,17 @@ jbm_solve_cubic_reduced_2xf64 (const float64x2_t a,
   l1 = vaddq_f64 (l1, l1);
   l2 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (k0), a3);
   l3 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (vaddq_f64 (l0, c2p_3)), a3);
-  l3 = _mm_blendv_pd (l3, l2,
-                      _mm_or_pd (_mm_cmplt_pd (l2, x1), _mm_cmpgt_pd (l2, x2)));
+  l3 = vbslq_f64 (l3, l2,
+                      _mm_or_pd (vcltq_f64 (l2, x1), vcgtq_f64 (l2, x2)));
   l4 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (vsubq_f64 (l0, c2p_3)), a);
-  l4 = _mm_blendv_pd (l4, l3,
-                      _mm_or_pd (_mm_cmplt_pd (l3, x1), _mm_cmpgt_pd (l3, x2)));
+  l4 = vbslq_f64 (l4, l3,
+                      _mm_or_pd (vcltq_f64 (l3, x1), vcgtq_f64 (l3, x2)));
   k1 = vsqrtq_f64 (k2);
   l5 = vaddq_f64 (k0, k1);
   l5 = jbm_cbrt_2xf64 (k2);
   k0 = vsubq_f64 (k0, k1);
   l5 = vaddq_f64 (l5, vsubq_f64 (jbm_cbrt_2xf64 (k0), a3));
-  return _mm_blendv_pd (l4, l5, _mm_cmplt_pd (k2, _mm_setzero_pd ()));
+  return vbslq_f64 (l4, l5, vcltq_f64 (k2, vdupq_n_f64 (0.)));
 }
 
 /**
@@ -15521,7 +15443,7 @@ jbm_solve_cubic_2xf64 (float64x2_t a,
 ///< float64x2_t vector of right limits of the solution intervals.
 {
   return
-    _mm_blendv_pd (jbm_solve_cubic_reduced_2xf64 (vdivq_f64 (b, a),
+    vbslq_f64 (jbm_solve_cubic_reduced_2xf64 (vdivq_f64 (b, a),
                                                   vdivq_f64 (c, a),
                                                   vdivq_f64 (d, a), x1, x2),
                    jbm_solve_quadratic_2xf64 (b, c, d, x1, x2),
@@ -15540,7 +15462,7 @@ jbm_flux_limiter_total_2xf64 (const float64x2_t d1 __attribute__((unused)),
                               const float64x2_t d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
-  return _mm_setzero_pd ();
+  return vdupq_n_f64 (0.);
 }
 
 /**
@@ -15555,7 +15477,7 @@ jbm_flux_limiter_null_2xf64 (const float64x2_t d1 __attribute__((unused)),
                              const float64x2_t d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
-  return _mm_set1_pd (1.);
+  return vdupq_n_f64 (1.);
 }
 
 /**
@@ -15570,7 +15492,7 @@ jbm_flux_limiter_centred_2xf64 (const float64x2_t d1,
                                 const float64x2_t d2)
                               ///< 2nd flux limiter function parameter.
 {
-  return _mm_blendv_pd (vdivq_f64 (d1, d2), _mm_setzero_pd (),
+  return vbslq_f64 (vdivq_f64 (d1, d2), vdupq_n_f64 (0.),
                         jbm_small_2xf64 (d2));
 }
 
@@ -15590,11 +15512,11 @@ jbm_flux_limiter_superbee_2xf64 (const float64x2_t d1,
 {
   float64x2_t r;
   r = vdivq_f64 (d1, d2);
-  r = _mm_max_pd (_mm_min_pd (jbm_dbl_2xf64 (r), _mm_set1_pd (1.)),
-                  _mm_min_pd (r, _mm_set1_pd (2.)));
-  return _mm_blendv_pd (_mm_setzero_pd (), r,
-                        _mm_cmpgt_pd (vmulq_f64 (d1, d2),
-                                      _mm_set1_pd (DBL_EPSILON)));
+  r = _mm_max_pd (_mm_min_pd (jbm_dbl_2xf64 (r), vdupq_n_f64 (1.)),
+                  _mm_min_pd (r, vdupq_n_f64 (2.)));
+  return vbslq_f64 (vdupq_n_f64 (0.), r,
+                        vcgtq_f64 (vmulq_f64 (d1, d2),
+                                      vdupq_n_f64 (DBL_EPSILON)));
 }
 
 /**
@@ -15611,10 +15533,10 @@ jbm_flux_limiter_minmod_2xf64 (const float64x2_t d1,
                              ///< 2nd flux limiter function parameter.
 {
   float64x2_t r;
-  r = _mm_min_pd (vdivq_f64 (d1, d2), _mm_set1_pd (1.));
-  return _mm_blendv_pd (_mm_setzero_pd (), r,
-                        _mm_cmpgt_pd (vmulq_f64 (d1, d2),
-                                      _mm_set1_pd (DBL_EPSILON)));
+  r = _mm_min_pd (vdivq_f64 (d1, d2), vdupq_n_f64 (1.));
+  return vbslq_f64 (vdupq_n_f64 (0.), r,
+                        vcgtq_f64 (vmulq_f64 (d1, d2),
+                                      vdupq_n_f64 (DBL_EPSILON)));
 }
 
 /**
@@ -15634,10 +15556,10 @@ jbm_flux_limiter_VanLeer_2xf64 (const float64x2_t d1,
   float64x2_t r, k;
   r = vdivq_f64 (d1, d2);
   k = jbm_abs_2xf64 (r);
-  r = vdivq_f64 (vaddq_f64 (r, k), vaddq_f64 (_mm_set1_pd (1.), k));
-  return _mm_blendv_pd (_mm_setzero_pd (), r,
-                        _mm_cmpgt_pd (vmulq_f64 (d1, d2),
-                                      _mm_set1_pd (DBL_EPSILON)));
+  r = vdivq_f64 (vaddq_f64 (r, k), vaddq_f64 (vdupq_n_f64 (1.), k));
+  return vbslq_f64 (vdupq_n_f64 (0.), r,
+                        vcgtq_f64 (vmulq_f64 (d1, d2),
+                                      vdupq_n_f64 (DBL_EPSILON)));
 }
 
 /**
@@ -15656,10 +15578,10 @@ jbm_flux_limiter_VanAlbada_2xf64 (const float64x2_t d1,
   float64x2_t r, k;
   r = vdivq_f64 (d1, d2);
   k = jbm_sqr_2xf64 (r);
-  r = vdivq_f64 (vaddq_f64 (r, k), vaddq_f64 (_mm_set1_pd (1.), k));
-  return _mm_blendv_pd (_mm_setzero_pd (), r,
-                        _mm_cmpgt_pd (vmulq_f64 (d1, d2),
-                                      _mm_set1_pd (DBL_EPSILON)));
+  r = vdivq_f64 (vaddq_f64 (r, k), vaddq_f64 (vdupq_n_f64 (1.), k));
+  return vbslq_f64 (vdupq_n_f64 (0.), r,
+                        vcgtq_f64 (vmulq_f64 (d1, d2),
+                                      vdupq_n_f64 (DBL_EPSILON)));
 }
 
 /**
@@ -15676,10 +15598,10 @@ jbm_flux_limiter_minsuper_2xf64 (const float64x2_t d1,
                                ///< 2nd flux limiter function parameter.
 {
   float64x2_t r;
-  r = _mm_min_pd (vdivq_f64 (d1, d2), _mm_set1_pd (2.));
-  return _mm_blendv_pd (_mm_setzero_pd (), r,
-                        _mm_cmpgt_pd (vmulq_f64 (d1, d2),
-                                      _mm_set1_pd (DBL_EPSILON)));
+  r = _mm_min_pd (vdivq_f64 (d1, d2), vdupq_n_f64 (2.));
+  return vbslq_f64 (vdupq_n_f64 (0.), r,
+                        vcgtq_f64 (vmulq_f64 (d1, d2),
+                                      vdupq_n_f64 (DBL_EPSILON)));
 }
 
 /**
@@ -15697,10 +15619,10 @@ jbm_flux_limiter_supermin_2xf64 (const float64x2_t d1,
 {
   float64x2_t r;
   r = vdivq_f64 (d1, d2);
-  r = _mm_min_pd (jbm_dbl_2xf64 (r), _mm_set1_pd (1.));
-  return _mm_blendv_pd (_mm_setzero_pd (), r,
-                        _mm_cmpgt_pd (vmulq_f64 (d1, d2),
-                                      _mm_set1_pd (DBL_EPSILON)));
+  r = _mm_min_pd (jbm_dbl_2xf64 (r), vdupq_n_f64 (1.));
+  return vbslq_f64 (vdupq_n_f64 (0.), r,
+                        vcgtq_f64 (vmulq_f64 (d1, d2),
+                                      vdupq_n_f64 (DBL_EPSILON)));
 }
 
 /**
@@ -15719,13 +15641,13 @@ jbm_flux_limiter_monotonized_central_2xf64 (const float64x2_t d1,
 {
   float64x2_t r, rm;
   r = vdivq_f64 (d1, d2);
-  rm = vmulq_f64 (_mm_set1_pd (0.5), vaddq_f64 (r, _mm_set1_pd (1.)));
-  rm = _mm_blendv_pd (_mm_set1_pd (2.), rm, _mm_cmplt_pd (r, _mm_set1_pd (3.)));
-  rm = _mm_blendv_pd (rm, jbm_dbl_2xf64 (r),
-                      _mm_cmpgt_pd (r, _mm_set1_pd (1. / 3.)));
-  return _mm_blendv_pd (_mm_setzero_pd (), rm,
-                        _mm_cmpgt_pd (vmulq_f64 (d1, d2),
-                                      _mm_set1_pd (DBL_EPSILON)));
+  rm = vmulq_f64 (vdupq_n_f64 (0.5), vaddq_f64 (r, vdupq_n_f64 (1.)));
+  rm = vbslq_f64 (vdupq_n_f64 (2.), rm, vcltq_f64 (r, vdupq_n_f64 (3.)));
+  rm = vbslq_f64 (rm, jbm_dbl_2xf64 (r),
+                      vcgtq_f64 (r, vdupq_n_f64 (1. / 3.)));
+  return vbslq_f64 (vdupq_n_f64 (0.), rm,
+                        vcgtq_f64 (vmulq_f64 (d1, d2),
+                                      vdupq_n_f64 (DBL_EPSILON)));
 }
 
 /**
@@ -15742,11 +15664,11 @@ jbm_flux_limiter_mean_2xf64 (const float64x2_t d1,
                            ///< 2nd flux limiter function parameter.
 {
   float64x2_t r;
-  r = vmulq_f64 (_mm_set1_pd (0.5),
-                  vaddq_f64 (_mm_set1_pd (1.), vdivq_f64 (d1, d2)));
-  return _mm_blendv_pd (_mm_setzero_pd (), r,
-                        _mm_cmpgt_pd (vmulq_f64 (d1, d2),
-                                      _mm_set1_pd (DBL_EPSILON)));
+  r = vmulq_f64 (vdupq_n_f64 (0.5),
+                  vaddq_f64 (vdupq_n_f64 (1.), vdivq_f64 (d1, d2)));
+  return vbslq_f64 (vdupq_n_f64 (0.), r,
+                        vcgtq_f64 (vmulq_f64 (d1, d2),
+                                      vdupq_n_f64 (DBL_EPSILON)));
 }
 
 /**
@@ -15833,19 +15755,19 @@ jbm_integral_2xf64 (float64x2_t (*f) (float64x2_t),
   float64x2_t k2, f1, f2;
 #endif
   unsigned int i;
-  h = _mm_set1_pd (0.5);
+  h = vdupq_n_f64 (0.5);
   dx = vmulq_f64 (h, vsubq_f64 (x2, x1));
   x = vmulq_f64 (h, vaddq_f64 (x2, x1));
-  k = _mm_set1_pd (a[0]);
+  k = vdupq_n_f64 (a[0]);
   k = vmulq_f64 (k, f (x));
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = _mm_set1_pd (b[i]);
+      k2 = vdupq_n_f64 (b[i]);
       k2 = vmulq_f64 (k2, dx);
       f1 = f (vsubq_f64 (x, k2));
       f2 = f (vaddq_f64 (x, k2));
-      h = _mm_set1_pd (a[i]);
+      h = vdupq_n_f64 (a[i]);
       k = _mm_fmadd_pd (h, vaddq_f64 (f1, f2), k);
     }
 #endif

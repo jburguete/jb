@@ -396,24 +396,24 @@ jbm_v3_length_8xf32 (const __m256 x1,
 }
 
 /**
- * Function to calculate a __m256 vector of 1st order polynomials.
+ * Function to calculate a 1st order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_1_8xf32 (const __m256 x, ///< variable.
+jbm_polynomial_1_8xf32 (const __m256 x, ///< __m256 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, _mm256_set1_ps (p[1]), _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 2nd order polynomials.
+ * Function to calculate a 2nd order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_2_8xf32 (const __m256 x, ///< variable.
+jbm_polynomial_2_8xf32 (const __m256 x, ///< __m256 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_1_8xf32 (x, p + 1),
@@ -421,12 +421,12 @@ jbm_polynomial_2_8xf32 (const __m256 x, ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 3rd order polynomials.
+ * Function to calculate a 3rd order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_3_8xf32 (const __m256 x, ///< variable.
+jbm_polynomial_3_8xf32 (const __m256 x, ///< __m256 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_2_8xf32 (x, p + 1),
@@ -434,12 +434,12 @@ jbm_polynomial_3_8xf32 (const __m256 x, ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 4th order polynomials.
+ * Function to calculate a 4th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_4_8xf32 (const __m256 x, ///< variable.
+jbm_polynomial_4_8xf32 (const __m256 x, ///< __m256 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_3_8xf32 (x, p + 1),
@@ -447,12 +447,12 @@ jbm_polynomial_4_8xf32 (const __m256 x, ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 5th order polynomials.
+ * Function to calculate a 5th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_5_8xf32 (const __m256 x, ///< variable.
+jbm_polynomial_5_8xf32 (const __m256 x, ///< __m256 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_4_8xf32 (x, p + 1),
@@ -460,12 +460,12 @@ jbm_polynomial_5_8xf32 (const __m256 x, ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 6th order polynomials.
+ * Function to calculate a 6th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_6_8xf32 (const __m256 x, ///< variable.
+jbm_polynomial_6_8xf32 (const __m256 x, ///< __m256 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_5_8xf32 (x, p + 1),
@@ -473,12 +473,12 @@ jbm_polynomial_6_8xf32 (const __m256 x, ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 7th order polynomials.
+ * Function to calculate a 7th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_7_8xf32 (const __m256 x, ///< variable.
+jbm_polynomial_7_8xf32 (const __m256 x, ///< __m256 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_6_8xf32 (x, p + 1),
@@ -486,12 +486,12 @@ jbm_polynomial_7_8xf32 (const __m256 x, ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 8th order polynomials.
+ * Function to calculate a 8th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_8_8xf32 (const __m256 x, ///< variable.
+jbm_polynomial_8_8xf32 (const __m256 x, ///< __m256 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_7_8xf32 (x, p + 1),
@@ -499,12 +499,12 @@ jbm_polynomial_8_8xf32 (const __m256 x, ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 9th order polynomials.
+ * Function to calculate a 9th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_9_8xf32 (const __m256 x, ///< variable.
+jbm_polynomial_9_8xf32 (const __m256 x, ///< __m256 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_8_8xf32 (x, p + 1),
@@ -512,12 +512,12 @@ jbm_polynomial_9_8xf32 (const __m256 x, ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 10th order polynomials.
+ * Function to calculate a 10th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_10_8xf32 (const __m256 x,        ///< variable.
+jbm_polynomial_10_8xf32 (const __m256 x,        ///< __m256 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_9_8xf32 (x, p + 1),
@@ -525,12 +525,12 @@ jbm_polynomial_10_8xf32 (const __m256 x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 11th order polynomials.
+ * Function to calculate a 11th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_11_8xf32 (const __m256 x,        ///< variable.
+jbm_polynomial_11_8xf32 (const __m256 x,        ///< __m256 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_10_8xf32 (x, p + 1),
@@ -538,116 +538,116 @@ jbm_polynomial_11_8xf32 (const __m256 x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 12nd order polynomials.
+ * Function to calculate a 12th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_12_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_12_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_11_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 13rd order polynomials.
+ * Function to calculate a 13th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_13_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_13_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_12_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 14th order polynomials.
+ * Function to calculate a 14th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_14_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_14_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_13_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 15th order polynomials.
+ * Function to calculate a 15th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_15_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_15_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_14_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 16th order polynomials.
+ * Function to calculate a 16th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_16_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_16_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_15_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 17th order polynomials.
+ * Function to calculate a 17th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_17_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_17_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_16_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 18th order polynomials.
+ * Function to calculate a 18th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_18_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_18_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_17_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 19th order polynomials.
+ * Function to calculate a 19th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_19_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_19_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_18_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 10th order polynomials.
+ * Function to calculate a 20th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_20_8xf32 (const __m256 x,        ///< variable.
+jbm_polynomial_20_8xf32 (const __m256 x,        ///< __m256 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_19_8xf32 (x, p + 1),
@@ -655,12 +655,12 @@ jbm_polynomial_20_8xf32 (const __m256 x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 11th order polynomials.
+ * Function to calculate a 21th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_21_8xf32 (const __m256 x,        ///< variable.
+jbm_polynomial_21_8xf32 (const __m256 x,        ///< __m256 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_20_8xf32 (x, p + 1),
@@ -668,104 +668,104 @@ jbm_polynomial_21_8xf32 (const __m256 x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256 vector of 12nd order polynomials.
+ * Function to calculate a 22th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_22_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_22_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_21_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 13rd order polynomials.
+ * Function to calculate a 23th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_23_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_23_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_22_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 14th order polynomials.
+ * Function to calculate a 24th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_24_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_24_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_23_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 15th order polynomials.
+ * Function to calculate a 25th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_25_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_25_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_24_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 16th order polynomials.
+ * Function to calculate a 26th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_26_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_26_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_25_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 17th order polynomials.
+ * Function to calculate a 27th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_27_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_27_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_26_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 18th order polynomials.
+ * Function to calculate a 28th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_28_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_28_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_27_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
 }
 
 /**
- * Function to calculate a __m256 vector of 19th order polynomials.
+ * Function to calculate a 29th order polynomial (__m256).
  *
  * \return __m256 vector of polynomial values.
  */
 static inline __m256
-jbm_polynomial_29_8xf32 (const __m256 x,        ///< variable.
-                         const float *p)        ///< array of 1coefficients.
+jbm_polynomial_29_8xf32 (const __m256 x,        ///< __m256 vector.
+                         const float *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_ps (x, jbm_polynomial_28_8xf32 (x, p + 1),
                           _mm256_set1_ps (p[0]));
@@ -774,7 +774,7 @@ jbm_polynomial_29_8xf32 (const __m256 x,        ///< variable.
 /**
  * Function to calculate a 0th+1st order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_1_0_8xf32 (const __m256 x, ///< __m256 vector.
@@ -788,7 +788,7 @@ jbm_rational_1_0_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 0th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_2_0_8xf32 (const __m256 x, ///< __m256 vector.
@@ -802,7 +802,7 @@ jbm_rational_2_0_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+1st order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_2_1_8xf32 (const __m256 x, ///< __m256 vector.
@@ -816,7 +816,7 @@ jbm_rational_2_1_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 0th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_3_0_8xf32 (const __m256 x, ///< __m256 vector.
@@ -830,7 +830,7 @@ jbm_rational_3_0_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_3_1_8xf32 (const __m256 x, ///< __m256 vector.
@@ -844,7 +844,7 @@ jbm_rational_3_1_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_3_2_8xf32 (const __m256 x, ///< __m256 vector.
@@ -858,7 +858,7 @@ jbm_rational_3_2_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 0th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_4_0_8xf32 (const __m256 x, ///< __m256 vector.
@@ -872,7 +872,7 @@ jbm_rational_4_0_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_4_1_8xf32 (const __m256 x, ///< __m256 vector.
@@ -886,7 +886,7 @@ jbm_rational_4_1_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 2nd+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_4_2_8xf32 (const __m256 x, ///< __m256 vector.
@@ -900,7 +900,7 @@ jbm_rational_4_2_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_4_3_8xf32 (const __m256 x, ///< __m256 vector.
@@ -914,7 +914,7 @@ jbm_rational_4_3_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 0th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_5_0_8xf32 (const __m256 x, ///< __m256 vector.
@@ -928,7 +928,7 @@ jbm_rational_5_0_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_5_1_8xf32 (const __m256 x, ///< __m256 vector.
@@ -942,7 +942,7 @@ jbm_rational_5_1_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 2nd+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_5_2_8xf32 (const __m256 x, ///< __m256 vector.
@@ -956,7 +956,7 @@ jbm_rational_5_2_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 3rd+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_5_3_8xf32 (const __m256 x, ///< __m256 vector.
@@ -970,7 +970,7 @@ jbm_rational_5_3_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_5_4_8xf32 (const __m256 x, ///< __m256 vector.
@@ -984,7 +984,7 @@ jbm_rational_5_4_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 0th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_6_0_8xf32 (const __m256 x, ///< __m256 vector.
@@ -998,7 +998,7 @@ jbm_rational_6_0_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_6_1_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1012,7 +1012,7 @@ jbm_rational_6_1_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 2nd+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_6_2_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1026,7 +1026,7 @@ jbm_rational_6_2_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 3rd+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_6_3_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1040,7 +1040,7 @@ jbm_rational_6_3_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 4th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_6_4_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1054,7 +1054,7 @@ jbm_rational_6_4_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_6_5_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1068,7 +1068,7 @@ jbm_rational_6_5_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 0th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_7_0_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1082,7 +1082,7 @@ jbm_rational_7_0_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_7_1_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1096,7 +1096,7 @@ jbm_rational_7_1_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 2nd+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_7_2_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1110,7 +1110,7 @@ jbm_rational_7_2_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 3rd+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_7_3_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1124,7 +1124,7 @@ jbm_rational_7_3_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 4th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_7_4_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1138,7 +1138,7 @@ jbm_rational_7_4_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 5th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_7_5_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1152,7 +1152,7 @@ jbm_rational_7_5_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_7_6_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1166,7 +1166,7 @@ jbm_rational_7_6_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 0th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_8_0_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1180,7 +1180,7 @@ jbm_rational_8_0_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_8_1_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1194,7 +1194,7 @@ jbm_rational_8_1_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 2nd+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_8_2_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1208,7 +1208,7 @@ jbm_rational_8_2_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 3rd+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_8_3_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1222,7 +1222,7 @@ jbm_rational_8_3_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 4th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_8_4_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1236,7 +1236,7 @@ jbm_rational_8_4_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 5th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_8_5_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1250,7 +1250,7 @@ jbm_rational_8_5_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 6th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_8_6_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1264,7 +1264,7 @@ jbm_rational_8_6_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_8_7_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1278,7 +1278,7 @@ jbm_rational_8_7_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 0th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_9_0_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1292,7 +1292,7 @@ jbm_rational_9_0_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_9_1_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1306,7 +1306,7 @@ jbm_rational_9_1_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 2nd+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_9_2_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1320,7 +1320,7 @@ jbm_rational_9_2_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 3rd+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_9_3_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1334,7 +1334,7 @@ jbm_rational_9_3_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 4th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_9_4_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1348,7 +1348,7 @@ jbm_rational_9_4_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 5th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_9_5_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1362,7 +1362,7 @@ jbm_rational_9_5_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 6th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_9_6_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1376,7 +1376,7 @@ jbm_rational_9_6_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 7th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_9_7_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1390,7 +1390,7 @@ jbm_rational_9_7_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 1st+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_9_8_8xf32 (const __m256 x, ///< __m256 vector.
@@ -1404,7 +1404,7 @@ jbm_rational_9_8_8xf32 (const __m256 x, ///< __m256 vector.
 /**
  * Function to calculate a 0th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_10_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1418,7 +1418,7 @@ jbm_rational_10_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_10_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1432,7 +1432,7 @@ jbm_rational_10_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_10_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1446,7 +1446,7 @@ jbm_rational_10_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_10_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1460,7 +1460,7 @@ jbm_rational_10_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_10_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1474,7 +1474,7 @@ jbm_rational_10_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_10_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1488,7 +1488,7 @@ jbm_rational_10_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_10_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1502,7 +1502,7 @@ jbm_rational_10_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_10_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1516,7 +1516,7 @@ jbm_rational_10_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_10_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1530,7 +1530,7 @@ jbm_rational_10_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_10_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1544,7 +1544,7 @@ jbm_rational_10_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 0th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1558,7 +1558,7 @@ jbm_rational_11_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1572,7 +1572,7 @@ jbm_rational_11_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1586,7 +1586,7 @@ jbm_rational_11_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1600,7 +1600,7 @@ jbm_rational_11_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1614,7 +1614,7 @@ jbm_rational_11_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1628,7 +1628,7 @@ jbm_rational_11_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1642,7 +1642,7 @@ jbm_rational_11_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1656,7 +1656,7 @@ jbm_rational_11_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1670,7 +1670,7 @@ jbm_rational_11_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1684,7 +1684,7 @@ jbm_rational_11_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_11_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -1698,7 +1698,7 @@ jbm_rational_11_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1712,7 +1712,7 @@ jbm_rational_12_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1726,7 +1726,7 @@ jbm_rational_12_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1740,7 +1740,7 @@ jbm_rational_12_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1754,7 +1754,7 @@ jbm_rational_12_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1768,7 +1768,7 @@ jbm_rational_12_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1782,7 +1782,7 @@ jbm_rational_12_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1796,7 +1796,7 @@ jbm_rational_12_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1810,7 +1810,7 @@ jbm_rational_12_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1824,7 +1824,7 @@ jbm_rational_12_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1838,7 +1838,7 @@ jbm_rational_12_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -1852,7 +1852,7 @@ jbm_rational_12_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_12_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -1866,7 +1866,7 @@ jbm_rational_12_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1880,7 +1880,7 @@ jbm_rational_13_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1894,7 +1894,7 @@ jbm_rational_13_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1908,7 +1908,7 @@ jbm_rational_13_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1922,7 +1922,7 @@ jbm_rational_13_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1936,7 +1936,7 @@ jbm_rational_13_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1950,7 +1950,7 @@ jbm_rational_13_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1964,7 +1964,7 @@ jbm_rational_13_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1978,7 +1978,7 @@ jbm_rational_13_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -1992,7 +1992,7 @@ jbm_rational_13_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2006,7 +2006,7 @@ jbm_rational_13_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2020,7 +2020,7 @@ jbm_rational_13_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2034,7 +2034,7 @@ jbm_rational_13_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_13_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2048,7 +2048,7 @@ jbm_rational_13_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2062,7 +2062,7 @@ jbm_rational_14_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2076,7 +2076,7 @@ jbm_rational_14_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2090,7 +2090,7 @@ jbm_rational_14_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2104,7 +2104,7 @@ jbm_rational_14_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2118,7 +2118,7 @@ jbm_rational_14_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2132,7 +2132,7 @@ jbm_rational_14_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2146,7 +2146,7 @@ jbm_rational_14_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2160,7 +2160,7 @@ jbm_rational_14_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2174,7 +2174,7 @@ jbm_rational_14_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2188,7 +2188,7 @@ jbm_rational_14_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2202,7 +2202,7 @@ jbm_rational_14_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2216,7 +2216,7 @@ jbm_rational_14_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2230,7 +2230,7 @@ jbm_rational_14_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_14_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2244,7 +2244,7 @@ jbm_rational_14_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2258,7 +2258,7 @@ jbm_rational_15_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2272,7 +2272,7 @@ jbm_rational_15_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2286,7 +2286,7 @@ jbm_rational_15_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2300,7 +2300,7 @@ jbm_rational_15_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2314,7 +2314,7 @@ jbm_rational_15_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2328,7 +2328,7 @@ jbm_rational_15_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2342,7 +2342,7 @@ jbm_rational_15_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2356,7 +2356,7 @@ jbm_rational_15_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2370,7 +2370,7 @@ jbm_rational_15_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2384,7 +2384,7 @@ jbm_rational_15_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2398,7 +2398,7 @@ jbm_rational_15_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2412,7 +2412,7 @@ jbm_rational_15_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2426,7 +2426,7 @@ jbm_rational_15_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2440,7 +2440,7 @@ jbm_rational_15_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_15_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2454,7 +2454,7 @@ jbm_rational_15_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2468,7 +2468,7 @@ jbm_rational_16_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2482,7 +2482,7 @@ jbm_rational_16_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2496,7 +2496,7 @@ jbm_rational_16_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2510,7 +2510,7 @@ jbm_rational_16_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2524,7 +2524,7 @@ jbm_rational_16_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2538,7 +2538,7 @@ jbm_rational_16_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2552,7 +2552,7 @@ jbm_rational_16_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2566,7 +2566,7 @@ jbm_rational_16_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2580,7 +2580,7 @@ jbm_rational_16_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2594,7 +2594,7 @@ jbm_rational_16_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2608,7 +2608,7 @@ jbm_rational_16_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2622,7 +2622,7 @@ jbm_rational_16_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2636,7 +2636,7 @@ jbm_rational_16_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2650,7 +2650,7 @@ jbm_rational_16_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2664,7 +2664,7 @@ jbm_rational_16_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_16_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2678,7 +2678,7 @@ jbm_rational_16_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2692,7 +2692,7 @@ jbm_rational_17_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2706,7 +2706,7 @@ jbm_rational_17_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2720,7 +2720,7 @@ jbm_rational_17_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2734,7 +2734,7 @@ jbm_rational_17_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2748,7 +2748,7 @@ jbm_rational_17_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2762,7 +2762,7 @@ jbm_rational_17_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2776,7 +2776,7 @@ jbm_rational_17_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2790,7 +2790,7 @@ jbm_rational_17_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2804,7 +2804,7 @@ jbm_rational_17_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2818,7 +2818,7 @@ jbm_rational_17_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2832,7 +2832,7 @@ jbm_rational_17_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2846,7 +2846,7 @@ jbm_rational_17_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2860,7 +2860,7 @@ jbm_rational_17_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2874,7 +2874,7 @@ jbm_rational_17_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2888,7 +2888,7 @@ jbm_rational_17_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2902,7 +2902,7 @@ jbm_rational_17_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_17_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -2916,7 +2916,7 @@ jbm_rational_17_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2930,7 +2930,7 @@ jbm_rational_18_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2944,7 +2944,7 @@ jbm_rational_18_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2958,7 +2958,7 @@ jbm_rational_18_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2972,7 +2972,7 @@ jbm_rational_18_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -2986,7 +2986,7 @@ jbm_rational_18_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3000,7 +3000,7 @@ jbm_rational_18_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3014,7 +3014,7 @@ jbm_rational_18_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3028,7 +3028,7 @@ jbm_rational_18_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3042,7 +3042,7 @@ jbm_rational_18_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3056,7 +3056,7 @@ jbm_rational_18_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3070,7 +3070,7 @@ jbm_rational_18_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3084,7 +3084,7 @@ jbm_rational_18_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3098,7 +3098,7 @@ jbm_rational_18_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3112,7 +3112,7 @@ jbm_rational_18_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3126,7 +3126,7 @@ jbm_rational_18_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3140,7 +3140,7 @@ jbm_rational_18_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3154,7 +3154,7 @@ jbm_rational_18_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_18_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3168,7 +3168,7 @@ jbm_rational_18_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3182,7 +3182,7 @@ jbm_rational_19_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3196,7 +3196,7 @@ jbm_rational_19_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3210,7 +3210,7 @@ jbm_rational_19_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3224,7 +3224,7 @@ jbm_rational_19_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3238,7 +3238,7 @@ jbm_rational_19_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3252,7 +3252,7 @@ jbm_rational_19_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3266,7 +3266,7 @@ jbm_rational_19_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3280,7 +3280,7 @@ jbm_rational_19_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3294,7 +3294,7 @@ jbm_rational_19_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3308,7 +3308,7 @@ jbm_rational_19_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3322,7 +3322,7 @@ jbm_rational_19_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3336,7 +3336,7 @@ jbm_rational_19_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3350,7 +3350,7 @@ jbm_rational_19_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3364,7 +3364,7 @@ jbm_rational_19_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3378,7 +3378,7 @@ jbm_rational_19_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3392,7 +3392,7 @@ jbm_rational_19_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3406,7 +3406,7 @@ jbm_rational_19_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3420,7 +3420,7 @@ jbm_rational_19_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_19_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3434,7 +3434,7 @@ jbm_rational_19_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3448,7 +3448,7 @@ jbm_rational_20_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3462,7 +3462,7 @@ jbm_rational_20_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3476,7 +3476,7 @@ jbm_rational_20_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3490,7 +3490,7 @@ jbm_rational_20_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3504,7 +3504,7 @@ jbm_rational_20_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3518,7 +3518,7 @@ jbm_rational_20_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3532,7 +3532,7 @@ jbm_rational_20_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3546,7 +3546,7 @@ jbm_rational_20_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3560,7 +3560,7 @@ jbm_rational_20_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3574,7 +3574,7 @@ jbm_rational_20_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3588,7 +3588,7 @@ jbm_rational_20_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3602,7 +3602,7 @@ jbm_rational_20_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3616,7 +3616,7 @@ jbm_rational_20_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3630,7 +3630,7 @@ jbm_rational_20_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3644,7 +3644,7 @@ jbm_rational_20_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3658,7 +3658,7 @@ jbm_rational_20_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3672,7 +3672,7 @@ jbm_rational_20_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3686,7 +3686,7 @@ jbm_rational_20_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 18th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3700,7 +3700,7 @@ jbm_rational_20_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_20_19_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3714,7 +3714,7 @@ jbm_rational_20_19_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+21th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3728,7 +3728,7 @@ jbm_rational_21_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3742,7 +3742,7 @@ jbm_rational_21_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3756,7 +3756,7 @@ jbm_rational_21_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3770,7 +3770,7 @@ jbm_rational_21_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3784,7 +3784,7 @@ jbm_rational_21_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3798,7 +3798,7 @@ jbm_rational_21_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3812,7 +3812,7 @@ jbm_rational_21_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3826,7 +3826,7 @@ jbm_rational_21_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3840,7 +3840,7 @@ jbm_rational_21_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -3854,7 +3854,7 @@ jbm_rational_21_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3868,7 +3868,7 @@ jbm_rational_21_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3882,7 +3882,7 @@ jbm_rational_21_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3896,7 +3896,7 @@ jbm_rational_21_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3910,7 +3910,7 @@ jbm_rational_21_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3924,7 +3924,7 @@ jbm_rational_21_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3938,7 +3938,7 @@ jbm_rational_21_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3952,7 +3952,7 @@ jbm_rational_21_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3966,7 +3966,7 @@ jbm_rational_21_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 18th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3980,7 +3980,7 @@ jbm_rational_21_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 19th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_19_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -3994,7 +3994,7 @@ jbm_rational_21_19_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_21_20_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4008,7 +4008,7 @@ jbm_rational_21_20_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+22th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4022,7 +4022,7 @@ jbm_rational_22_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+21th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4036,7 +4036,7 @@ jbm_rational_22_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4050,7 +4050,7 @@ jbm_rational_22_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4064,7 +4064,7 @@ jbm_rational_22_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4078,7 +4078,7 @@ jbm_rational_22_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4092,7 +4092,7 @@ jbm_rational_22_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4106,7 +4106,7 @@ jbm_rational_22_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4120,7 +4120,7 @@ jbm_rational_22_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4134,7 +4134,7 @@ jbm_rational_22_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4148,7 +4148,7 @@ jbm_rational_22_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4162,7 +4162,7 @@ jbm_rational_22_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4176,7 +4176,7 @@ jbm_rational_22_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4190,7 +4190,7 @@ jbm_rational_22_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4204,7 +4204,7 @@ jbm_rational_22_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4218,7 +4218,7 @@ jbm_rational_22_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4232,7 +4232,7 @@ jbm_rational_22_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4246,7 +4246,7 @@ jbm_rational_22_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4260,7 +4260,7 @@ jbm_rational_22_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 18th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4274,7 +4274,7 @@ jbm_rational_22_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 19th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_19_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4288,7 +4288,7 @@ jbm_rational_22_19_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 20th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_20_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4302,7 +4302,7 @@ jbm_rational_22_20_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+21th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_22_21_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4316,7 +4316,7 @@ jbm_rational_22_21_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+23th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4330,7 +4330,7 @@ jbm_rational_23_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+22th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4344,7 +4344,7 @@ jbm_rational_23_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+21th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4358,7 +4358,7 @@ jbm_rational_23_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4372,7 +4372,7 @@ jbm_rational_23_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4386,7 +4386,7 @@ jbm_rational_23_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4400,7 +4400,7 @@ jbm_rational_23_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4414,7 +4414,7 @@ jbm_rational_23_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4428,7 +4428,7 @@ jbm_rational_23_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4442,7 +4442,7 @@ jbm_rational_23_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4456,7 +4456,7 @@ jbm_rational_23_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4470,7 +4470,7 @@ jbm_rational_23_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4484,7 +4484,7 @@ jbm_rational_23_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4498,7 +4498,7 @@ jbm_rational_23_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4512,7 +4512,7 @@ jbm_rational_23_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4526,7 +4526,7 @@ jbm_rational_23_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4540,7 +4540,7 @@ jbm_rational_23_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4554,7 +4554,7 @@ jbm_rational_23_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4568,7 +4568,7 @@ jbm_rational_23_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 18th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4582,7 +4582,7 @@ jbm_rational_23_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 19th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_19_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4596,7 +4596,7 @@ jbm_rational_23_19_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 20th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_20_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4610,7 +4610,7 @@ jbm_rational_23_20_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 21th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_21_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4624,7 +4624,7 @@ jbm_rational_23_21_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+22th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_23_22_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4638,7 +4638,7 @@ jbm_rational_23_22_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+24th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4652,7 +4652,7 @@ jbm_rational_24_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+23th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4666,7 +4666,7 @@ jbm_rational_24_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+22th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4680,7 +4680,7 @@ jbm_rational_24_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+21th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4694,7 +4694,7 @@ jbm_rational_24_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4708,7 +4708,7 @@ jbm_rational_24_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4722,7 +4722,7 @@ jbm_rational_24_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4736,7 +4736,7 @@ jbm_rational_24_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4750,7 +4750,7 @@ jbm_rational_24_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4764,7 +4764,7 @@ jbm_rational_24_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4778,7 +4778,7 @@ jbm_rational_24_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4792,7 +4792,7 @@ jbm_rational_24_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4806,7 +4806,7 @@ jbm_rational_24_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4820,7 +4820,7 @@ jbm_rational_24_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4834,7 +4834,7 @@ jbm_rational_24_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4848,7 +4848,7 @@ jbm_rational_24_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4862,7 +4862,7 @@ jbm_rational_24_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4876,7 +4876,7 @@ jbm_rational_24_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4890,7 +4890,7 @@ jbm_rational_24_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 18th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4904,7 +4904,7 @@ jbm_rational_24_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 19th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_19_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4918,7 +4918,7 @@ jbm_rational_24_19_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 20th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_20_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4932,7 +4932,7 @@ jbm_rational_24_20_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 21th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_21_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4946,7 +4946,7 @@ jbm_rational_24_21_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 22th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_22_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4960,7 +4960,7 @@ jbm_rational_24_22_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+23th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_24_23_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -4974,7 +4974,7 @@ jbm_rational_24_23_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+25th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -4988,7 +4988,7 @@ jbm_rational_25_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+24th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5002,7 +5002,7 @@ jbm_rational_25_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+23th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5016,7 +5016,7 @@ jbm_rational_25_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+22th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5030,7 +5030,7 @@ jbm_rational_25_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+21th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5044,7 +5044,7 @@ jbm_rational_25_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5058,7 +5058,7 @@ jbm_rational_25_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5072,7 +5072,7 @@ jbm_rational_25_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5086,7 +5086,7 @@ jbm_rational_25_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5100,7 +5100,7 @@ jbm_rational_25_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5114,7 +5114,7 @@ jbm_rational_25_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5128,7 +5128,7 @@ jbm_rational_25_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5142,7 +5142,7 @@ jbm_rational_25_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5156,7 +5156,7 @@ jbm_rational_25_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5170,7 +5170,7 @@ jbm_rational_25_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5184,7 +5184,7 @@ jbm_rational_25_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5198,7 +5198,7 @@ jbm_rational_25_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5212,7 +5212,7 @@ jbm_rational_25_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5226,7 +5226,7 @@ jbm_rational_25_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 18th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5240,7 +5240,7 @@ jbm_rational_25_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 19th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_19_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5254,7 +5254,7 @@ jbm_rational_25_19_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 20th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_20_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5268,7 +5268,7 @@ jbm_rational_25_20_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 21th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_21_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5282,7 +5282,7 @@ jbm_rational_25_21_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 22th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_22_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5296,7 +5296,7 @@ jbm_rational_25_22_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 23th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_23_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5310,7 +5310,7 @@ jbm_rational_25_23_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+24th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_25_24_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5324,7 +5324,7 @@ jbm_rational_25_24_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+26th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5338,7 +5338,7 @@ jbm_rational_26_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+25th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5352,7 +5352,7 @@ jbm_rational_26_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+24th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5366,7 +5366,7 @@ jbm_rational_26_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+23th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5380,7 +5380,7 @@ jbm_rational_26_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+22th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5394,7 +5394,7 @@ jbm_rational_26_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+21th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5408,7 +5408,7 @@ jbm_rational_26_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5422,7 +5422,7 @@ jbm_rational_26_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5436,7 +5436,7 @@ jbm_rational_26_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5450,7 +5450,7 @@ jbm_rational_26_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5464,7 +5464,7 @@ jbm_rational_26_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5478,7 +5478,7 @@ jbm_rational_26_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5492,7 +5492,7 @@ jbm_rational_26_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5506,7 +5506,7 @@ jbm_rational_26_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5520,7 +5520,7 @@ jbm_rational_26_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5534,7 +5534,7 @@ jbm_rational_26_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5548,7 +5548,7 @@ jbm_rational_26_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5562,7 +5562,7 @@ jbm_rational_26_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5576,7 +5576,7 @@ jbm_rational_26_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 18th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5590,7 +5590,7 @@ jbm_rational_26_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 19th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_19_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5604,7 +5604,7 @@ jbm_rational_26_19_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 20th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_20_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5618,7 +5618,7 @@ jbm_rational_26_20_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 21th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_21_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5632,7 +5632,7 @@ jbm_rational_26_21_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 22th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_22_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5646,7 +5646,7 @@ jbm_rational_26_22_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 23th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_23_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5660,7 +5660,7 @@ jbm_rational_26_23_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 24th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_24_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5674,7 +5674,7 @@ jbm_rational_26_24_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+25th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_26_25_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5688,7 +5688,7 @@ jbm_rational_26_25_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+27th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5702,7 +5702,7 @@ jbm_rational_27_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+26th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5716,7 +5716,7 @@ jbm_rational_27_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+25th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5730,7 +5730,7 @@ jbm_rational_27_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+24th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5744,7 +5744,7 @@ jbm_rational_27_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+23th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5758,7 +5758,7 @@ jbm_rational_27_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+22th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5772,7 +5772,7 @@ jbm_rational_27_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+21th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5786,7 +5786,7 @@ jbm_rational_27_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5800,7 +5800,7 @@ jbm_rational_27_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5814,7 +5814,7 @@ jbm_rational_27_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -5828,7 +5828,7 @@ jbm_rational_27_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5842,7 +5842,7 @@ jbm_rational_27_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5856,7 +5856,7 @@ jbm_rational_27_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5870,7 +5870,7 @@ jbm_rational_27_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5884,7 +5884,7 @@ jbm_rational_27_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5898,7 +5898,7 @@ jbm_rational_27_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5912,7 +5912,7 @@ jbm_rational_27_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5926,7 +5926,7 @@ jbm_rational_27_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5940,7 +5940,7 @@ jbm_rational_27_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 18th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5954,7 +5954,7 @@ jbm_rational_27_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 19th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_19_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5968,7 +5968,7 @@ jbm_rational_27_19_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 20th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_20_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5982,7 +5982,7 @@ jbm_rational_27_20_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 21th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_21_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -5996,7 +5996,7 @@ jbm_rational_27_21_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 22th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_22_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6010,7 +6010,7 @@ jbm_rational_27_22_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 23th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_23_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6024,7 +6024,7 @@ jbm_rational_27_23_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 24th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_24_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6038,7 +6038,7 @@ jbm_rational_27_24_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 25th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_25_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6052,7 +6052,7 @@ jbm_rational_27_25_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+26th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_27_26_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6066,7 +6066,7 @@ jbm_rational_27_26_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+28th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6080,7 +6080,7 @@ jbm_rational_28_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+27th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6094,7 +6094,7 @@ jbm_rational_28_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+26th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6108,7 +6108,7 @@ jbm_rational_28_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+25th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6122,7 +6122,7 @@ jbm_rational_28_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+24th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6136,7 +6136,7 @@ jbm_rational_28_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+23th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6150,7 +6150,7 @@ jbm_rational_28_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+22th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6164,7 +6164,7 @@ jbm_rational_28_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+21th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6178,7 +6178,7 @@ jbm_rational_28_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6192,7 +6192,7 @@ jbm_rational_28_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6206,7 +6206,7 @@ jbm_rational_28_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6220,7 +6220,7 @@ jbm_rational_28_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6234,7 +6234,7 @@ jbm_rational_28_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6248,7 +6248,7 @@ jbm_rational_28_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6262,7 +6262,7 @@ jbm_rational_28_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6276,7 +6276,7 @@ jbm_rational_28_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6290,7 +6290,7 @@ jbm_rational_28_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6304,7 +6304,7 @@ jbm_rational_28_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6318,7 +6318,7 @@ jbm_rational_28_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 18th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6332,7 +6332,7 @@ jbm_rational_28_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 19th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_19_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6346,7 +6346,7 @@ jbm_rational_28_19_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 20th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_20_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6360,7 +6360,7 @@ jbm_rational_28_20_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 21th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_21_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6374,7 +6374,7 @@ jbm_rational_28_21_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 22th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_22_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6388,7 +6388,7 @@ jbm_rational_28_22_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 23th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_23_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6402,7 +6402,7 @@ jbm_rational_28_23_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 24th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_24_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6416,7 +6416,7 @@ jbm_rational_28_24_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 25th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_25_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6430,7 +6430,7 @@ jbm_rational_28_25_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 26th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_26_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6444,7 +6444,7 @@ jbm_rational_28_26_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+27th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_28_27_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6458,7 +6458,7 @@ jbm_rational_28_27_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 0th+29th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_0_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6472,7 +6472,7 @@ jbm_rational_29_0_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 1st+28th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_1_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6486,7 +6486,7 @@ jbm_rational_29_1_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 2nd+27th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_2_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6500,7 +6500,7 @@ jbm_rational_29_2_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 3rd+26th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_3_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6514,7 +6514,7 @@ jbm_rational_29_3_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 4th+25th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_4_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6528,7 +6528,7 @@ jbm_rational_29_4_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 5th+24th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_5_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6542,7 +6542,7 @@ jbm_rational_29_5_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 6th+23th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_6_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6556,7 +6556,7 @@ jbm_rational_29_6_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 7th+22th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_7_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6570,7 +6570,7 @@ jbm_rational_29_7_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 8th+21th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_8_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6584,7 +6584,7 @@ jbm_rational_29_8_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 9th+20th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_9_8xf32 (const __m256 x,        ///< __m256 vector.
@@ -6598,7 +6598,7 @@ jbm_rational_29_9_8xf32 (const __m256 x,        ///< __m256 vector.
 /**
  * Function to calculate a 10th+19th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_10_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6612,7 +6612,7 @@ jbm_rational_29_10_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 11th+18th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_11_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6626,7 +6626,7 @@ jbm_rational_29_11_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 12th+17th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_12_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6640,7 +6640,7 @@ jbm_rational_29_12_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 13th+16th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_13_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6654,7 +6654,7 @@ jbm_rational_29_13_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 14th+15th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_14_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6668,7 +6668,7 @@ jbm_rational_29_14_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 15th+14th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_15_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6682,7 +6682,7 @@ jbm_rational_29_15_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 16th+13th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_16_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6696,7 +6696,7 @@ jbm_rational_29_16_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 17th+12th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_17_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6710,7 +6710,7 @@ jbm_rational_29_17_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 18th+11th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_18_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6724,7 +6724,7 @@ jbm_rational_29_18_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 19th+10th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_19_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6738,7 +6738,7 @@ jbm_rational_29_19_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 20th+9th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_20_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6752,7 +6752,7 @@ jbm_rational_29_20_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 21th+8th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_21_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6766,7 +6766,7 @@ jbm_rational_29_21_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 22th+7th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_22_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6780,7 +6780,7 @@ jbm_rational_29_22_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 23th+6th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_23_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6794,7 +6794,7 @@ jbm_rational_29_23_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 24th+5th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_24_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6808,7 +6808,7 @@ jbm_rational_29_24_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 25th+4th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_25_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6822,7 +6822,7 @@ jbm_rational_29_25_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 26th+3rd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_26_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6836,7 +6836,7 @@ jbm_rational_29_26_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 27th+2nd order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_27_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -6850,7 +6850,7 @@ jbm_rational_29_27_8xf32 (const __m256 x,       ///< __m256 vector.
 /**
  * Function to calculate a 1st+28th order rational (__m256).
  *
- * \return rational value.
+ * \return __m256 vector of rational values.
  */
 static inline __m256
 jbm_rational_29_28_8xf32 (const __m256 x,       ///< __m256 vector.
@@ -8335,24 +8335,24 @@ jbm_v3_length_4xf64 (const __m256d x1,
 }
 
 /**
- * Function to calculate a __m256d vector of 1st order polynomials.
+ * Function to calculate a 1st order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_1_4xf64 (const __m256d x,        ///< variable.
+jbm_polynomial_1_4xf64 (const __m256d x,        ///< __m256d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, _mm256_set1_pd (p[1]), _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 2nd order polynomials.
+ * Function to calculate a 2nd order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_2_4xf64 (const __m256d x,        ///< variable.
+jbm_polynomial_2_4xf64 (const __m256d x,        ///< __m256d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 1),
@@ -8360,12 +8360,12 @@ jbm_polynomial_2_4xf64 (const __m256d x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 3rd order polynomials.
+ * Function to calculate a 3rd order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_3_4xf64 (const __m256d x,        ///< variable.
+jbm_polynomial_3_4xf64 (const __m256d x,        ///< __m256d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 1),
@@ -8373,12 +8373,12 @@ jbm_polynomial_3_4xf64 (const __m256d x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 4th order polynomials.
+ * Function to calculate a 4th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_4_4xf64 (const __m256d x,        ///< variable.
+jbm_polynomial_4_4xf64 (const __m256d x,        ///< __m256d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 1),
@@ -8386,12 +8386,12 @@ jbm_polynomial_4_4xf64 (const __m256d x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 5th order polynomials.
+ * Function to calculate a 5th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_5_4xf64 (const __m256d x,        ///< variable.
+jbm_polynomial_5_4xf64 (const __m256d x,        ///< __m256d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 1),
@@ -8399,12 +8399,12 @@ jbm_polynomial_5_4xf64 (const __m256d x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 6th order polynomials.
+ * Function to calculate a 6th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_6_4xf64 (const __m256d x,        ///< variable.
+jbm_polynomial_6_4xf64 (const __m256d x,        ///< __m256d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 1),
@@ -8412,12 +8412,12 @@ jbm_polynomial_6_4xf64 (const __m256d x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 7th order polynomials.
+ * Function to calculate a 7th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_7_4xf64 (const __m256d x,        ///< variable.
+jbm_polynomial_7_4xf64 (const __m256d x,        ///< __m256d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 1),
@@ -8425,12 +8425,12 @@ jbm_polynomial_7_4xf64 (const __m256d x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 8th order polynomials.
+ * Function to calculate a 8th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_8_4xf64 (const __m256d x,        ///< variable.
+jbm_polynomial_8_4xf64 (const __m256d x,        ///< __m256d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 1),
@@ -8438,12 +8438,12 @@ jbm_polynomial_8_4xf64 (const __m256d x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 9th order polynomials.
+ * Function to calculate a 9th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_9_4xf64 (const __m256d x,        ///< variable.
+jbm_polynomial_9_4xf64 (const __m256d x,        ///< __m256d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 1),
@@ -8451,12 +8451,12 @@ jbm_polynomial_9_4xf64 (const __m256d x,        ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 10th order polynomials.
+ * Function to calculate a 10th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_10_4xf64 (const __m256d x,       ///< variable.
+jbm_polynomial_10_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 1),
@@ -8464,12 +8464,12 @@ jbm_polynomial_10_4xf64 (const __m256d x,       ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 11th order polynomials.
+ * Function to calculate a 11th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_11_4xf64 (const __m256d x,       ///< variable.
+jbm_polynomial_11_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 1),
@@ -8477,116 +8477,116 @@ jbm_polynomial_11_4xf64 (const __m256d x,       ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 12nd order polynomials.
+ * Function to calculate a 12th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_12_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_12_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 13rd order polynomials.
+ * Function to calculate a 13th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_13_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_13_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 14th order polynomials.
+ * Function to calculate a 14th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_14_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_14_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 15th order polynomials.
+ * Function to calculate a 15th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_15_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_15_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 16th order polynomials.
+ * Function to calculate a 16th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_16_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_16_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 17th order polynomials.
+ * Function to calculate a 17th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_17_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_17_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 18th order polynomials.
+ * Function to calculate a 18th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_18_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_18_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 19th order polynomials.
+ * Function to calculate a 19th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_19_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_19_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 10th order polynomials.
+ * Function to calculate a 20th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_20_4xf64 (const __m256d x,       ///< variable.
+jbm_polynomial_20_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 1),
@@ -8594,12 +8594,12 @@ jbm_polynomial_20_4xf64 (const __m256d x,       ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 11th order polynomials.
+ * Function to calculate a 21th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_21_4xf64 (const __m256d x,       ///< variable.
+jbm_polynomial_21_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_20_4xf64 (x, p + 1),
@@ -8607,104 +8607,104 @@ jbm_polynomial_21_4xf64 (const __m256d x,       ///< variable.
 }
 
 /**
- * Function to calculate a __m256d vector of 12nd order polynomials.
+ * Function to calculate a 22th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_22_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_22_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_21_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 13rd order polynomials.
+ * Function to calculate a 23th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_23_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_23_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_22_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 14th order polynomials.
+ * Function to calculate a 24th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_24_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_24_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_23_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 15th order polynomials.
+ * Function to calculate a 25th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_25_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_25_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_24_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 16th order polynomials.
+ * Function to calculate a 26th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_26_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_26_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_25_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 17th order polynomials.
+ * Function to calculate a 27th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_27_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_27_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_26_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 18th order polynomials.
+ * Function to calculate a 28th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_28_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_28_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_27_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
 }
 
 /**
- * Function to calculate a __m256d vector of 19th order polynomials.
+ * Function to calculate a 29th order polynomial (__m256d).
  *
  * \return __m256d vector of polynomial values.
  */
 static inline __m256d
-jbm_polynomial_29_4xf64 (const __m256d x,       ///< variable.
-                         const double *p)       ///< array of 1coefficients.
+jbm_polynomial_29_4xf64 (const __m256d x,       ///< __m256d vector.
+                         const double *p)       ///< array of coefficients.
 {
   return _mm256_fmadd_pd (x, jbm_polynomial_28_4xf64 (x, p + 1),
                           _mm256_set1_pd (p[0]));
@@ -8713,7 +8713,7 @@ jbm_polynomial_29_4xf64 (const __m256d x,       ///< variable.
 /**
  * Function to calculate a 0th+1st order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_1_0_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8727,7 +8727,7 @@ jbm_rational_1_0_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 0th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_2_0_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8741,7 +8741,7 @@ jbm_rational_2_0_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+1st order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_2_1_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8755,7 +8755,7 @@ jbm_rational_2_1_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 0th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_3_0_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8769,7 +8769,7 @@ jbm_rational_3_0_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_3_1_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8783,7 +8783,7 @@ jbm_rational_3_1_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_3_2_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8797,7 +8797,7 @@ jbm_rational_3_2_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 0th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_4_0_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8811,7 +8811,7 @@ jbm_rational_4_0_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_4_1_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8825,7 +8825,7 @@ jbm_rational_4_1_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 2nd+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_4_2_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8839,7 +8839,7 @@ jbm_rational_4_2_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_4_3_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8853,7 +8853,7 @@ jbm_rational_4_3_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 0th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_5_0_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8867,7 +8867,7 @@ jbm_rational_5_0_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_5_1_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8881,7 +8881,7 @@ jbm_rational_5_1_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 2nd+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_5_2_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8895,7 +8895,7 @@ jbm_rational_5_2_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 3rd+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_5_3_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8909,7 +8909,7 @@ jbm_rational_5_3_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_5_4_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8923,7 +8923,7 @@ jbm_rational_5_4_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 0th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_6_0_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8937,7 +8937,7 @@ jbm_rational_6_0_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_6_1_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8951,7 +8951,7 @@ jbm_rational_6_1_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 2nd+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_6_2_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8965,7 +8965,7 @@ jbm_rational_6_2_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 3rd+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_6_3_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8979,7 +8979,7 @@ jbm_rational_6_3_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 4th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_6_4_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -8993,7 +8993,7 @@ jbm_rational_6_4_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_6_5_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9007,7 +9007,7 @@ jbm_rational_6_5_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 0th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_7_0_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9021,7 +9021,7 @@ jbm_rational_7_0_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_7_1_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9035,7 +9035,7 @@ jbm_rational_7_1_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 2nd+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_7_2_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9049,7 +9049,7 @@ jbm_rational_7_2_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 3rd+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_7_3_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9063,7 +9063,7 @@ jbm_rational_7_3_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 4th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_7_4_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9077,7 +9077,7 @@ jbm_rational_7_4_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 5th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_7_5_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9091,7 +9091,7 @@ jbm_rational_7_5_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_7_6_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9105,7 +9105,7 @@ jbm_rational_7_6_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 0th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_8_0_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9119,7 +9119,7 @@ jbm_rational_8_0_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_8_1_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9133,7 +9133,7 @@ jbm_rational_8_1_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 2nd+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_8_2_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9147,7 +9147,7 @@ jbm_rational_8_2_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 3rd+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_8_3_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9161,7 +9161,7 @@ jbm_rational_8_3_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 4th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_8_4_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9175,7 +9175,7 @@ jbm_rational_8_4_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 5th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_8_5_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9189,7 +9189,7 @@ jbm_rational_8_5_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 6th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_8_6_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9203,7 +9203,7 @@ jbm_rational_8_6_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_8_7_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9217,7 +9217,7 @@ jbm_rational_8_7_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 0th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_9_0_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9231,7 +9231,7 @@ jbm_rational_9_0_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_9_1_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9245,7 +9245,7 @@ jbm_rational_9_1_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 2nd+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_9_2_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9259,7 +9259,7 @@ jbm_rational_9_2_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 3rd+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_9_3_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9273,7 +9273,7 @@ jbm_rational_9_3_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 4th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_9_4_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9287,7 +9287,7 @@ jbm_rational_9_4_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 5th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_9_5_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9301,7 +9301,7 @@ jbm_rational_9_5_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 6th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_9_6_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9315,7 +9315,7 @@ jbm_rational_9_6_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 7th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_9_7_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9329,7 +9329,7 @@ jbm_rational_9_7_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 1st+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_9_8_4xf64 (const __m256d x,        ///< __m256d vector.
@@ -9343,7 +9343,7 @@ jbm_rational_9_8_4xf64 (const __m256d x,        ///< __m256d vector.
 /**
  * Function to calculate a 0th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_10_0_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9357,7 +9357,7 @@ jbm_rational_10_0_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 1st+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_10_1_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9371,7 +9371,7 @@ jbm_rational_10_1_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 2nd+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_10_2_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9385,7 +9385,7 @@ jbm_rational_10_2_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 3rd+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_10_3_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9399,7 +9399,7 @@ jbm_rational_10_3_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 4th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_10_4_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9413,7 +9413,7 @@ jbm_rational_10_4_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 5th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_10_5_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9427,7 +9427,7 @@ jbm_rational_10_5_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 6th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_10_6_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9441,7 +9441,7 @@ jbm_rational_10_6_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 7th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_10_7_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9455,7 +9455,7 @@ jbm_rational_10_7_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 8th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_10_8_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9469,7 +9469,7 @@ jbm_rational_10_8_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 1st+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_10_9_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9483,22 +9483,21 @@ jbm_rational_10_9_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 0th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_1_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9512,7 +9511,7 @@ jbm_rational_11_1_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 2nd+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_2_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9526,7 +9525,7 @@ jbm_rational_11_2_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 3rd+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_3_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9540,7 +9539,7 @@ jbm_rational_11_3_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 4th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_4_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9554,7 +9553,7 @@ jbm_rational_11_4_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 5th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_5_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9568,7 +9567,7 @@ jbm_rational_11_5_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 6th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_6_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9582,7 +9581,7 @@ jbm_rational_11_6_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 7th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_7_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9596,7 +9595,7 @@ jbm_rational_11_7_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 8th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_8_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9610,22 +9609,21 @@ jbm_rational_11_8_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 9th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_11_10_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -9639,37 +9637,35 @@ jbm_rational_11_10_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_2_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9683,7 +9679,7 @@ jbm_rational_12_2_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 3rd+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_3_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9697,7 +9693,7 @@ jbm_rational_12_3_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 4th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_4_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9711,7 +9707,7 @@ jbm_rational_12_4_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 5th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_5_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9725,7 +9721,7 @@ jbm_rational_12_5_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 6th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_6_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9739,7 +9735,7 @@ jbm_rational_12_6_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 7th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_7_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9753,7 +9749,7 @@ jbm_rational_12_7_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 8th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_8_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9767,37 +9763,35 @@ jbm_rational_12_8_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 9th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_12_11_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -9811,52 +9805,49 @@ jbm_rational_12_11_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_3_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9870,7 +9861,7 @@ jbm_rational_13_3_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 4th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_4_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9884,7 +9875,7 @@ jbm_rational_13_4_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 5th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_5_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9898,7 +9889,7 @@ jbm_rational_13_5_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 6th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_6_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9912,7 +9903,7 @@ jbm_rational_13_6_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 7th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_7_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9926,7 +9917,7 @@ jbm_rational_13_7_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 8th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_8_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -9940,52 +9931,49 @@ jbm_rational_13_8_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 9th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_13_12_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -9999,67 +9987,63 @@ jbm_rational_13_12_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_4_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10073,7 +10057,7 @@ jbm_rational_14_4_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 5th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_5_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10087,7 +10071,7 @@ jbm_rational_14_5_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 6th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_6_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10101,7 +10085,7 @@ jbm_rational_14_6_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 7th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_7_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10115,7 +10099,7 @@ jbm_rational_14_7_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 8th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_8_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10129,67 +10113,63 @@ jbm_rational_14_8_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 9th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_14_13_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -10203,82 +10183,77 @@ jbm_rational_14_13_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_5_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10292,7 +10267,7 @@ jbm_rational_15_5_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 6th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_6_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10306,7 +10281,7 @@ jbm_rational_15_6_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 7th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_7_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10320,7 +10295,7 @@ jbm_rational_15_7_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 8th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_8_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10334,82 +10309,77 @@ jbm_rational_15_8_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 9th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_15_14_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -10423,97 +10393,91 @@ jbm_rational_15_14_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_6_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10527,7 +10491,7 @@ jbm_rational_16_6_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 7th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_7_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10541,7 +10505,7 @@ jbm_rational_16_7_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 8th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_8_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10555,97 +10519,91 @@ jbm_rational_16_8_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 9th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_16_15_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -10659,112 +10617,105 @@ jbm_rational_16_15_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_7_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10778,7 +10729,7 @@ jbm_rational_17_7_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 8th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_8_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -10792,112 +10743,105 @@ jbm_rational_17_8_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 9th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_17_16_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -10911,127 +10855,119 @@ jbm_rational_17_16_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_8_4xf64 (const __m256d x,       ///< __m256d vector.
@@ -11045,127 +10981,119 @@ jbm_rational_18_8_4xf64 (const __m256d x,       ///< __m256d vector.
 /**
  * Function to calculate a 9th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_18_17_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -11179,277 +11107,259 @@ jbm_rational_18_17_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_19_18_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -11463,292 +11373,273 @@ jbm_rational_19_18_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_19_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 18th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_18_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_18_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 19),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 19),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_20_19_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -11762,307 +11653,287 @@ jbm_rational_20_19_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+21th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_20_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_20_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_19_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 18th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_18_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_18_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 19),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 19),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 19th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_19_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_19_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 20),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 20),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_21_20_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -12076,322 +11947,301 @@ jbm_rational_21_20_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+22th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_21_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_21_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+21th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_20_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_20_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_19_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 18th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_18_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_18_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 19),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 19),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 19th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_19_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_19_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 20),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 20),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 20th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_20_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_20_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 21),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 21),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+21th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_22_21_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -12405,337 +12255,315 @@ jbm_rational_22_21_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+23th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_22_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_22_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+22th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_21_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_21_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+21th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_20_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_20_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_19_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 18th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_18_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_18_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 19),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 19),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 19th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_19_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_19_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 20),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 20),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 20th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_20_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_20_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 21),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 21),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 21th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_21_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_21_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 22),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 22),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+22th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_23_22_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -12749,352 +12577,329 @@ jbm_rational_23_22_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+24th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_23_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_23_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+23th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_22_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_22_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+22th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_21_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_21_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+21th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_20_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_20_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_19_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 18th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_18_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_18_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 19),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 19),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 19th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_19_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_19_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 20),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 20),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 20th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_20_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_20_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 21),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 21),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 21th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_21_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_21_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 22),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 22),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 22th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_22_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_22_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 23),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 23),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+23th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_24_23_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -13108,367 +12913,343 @@ jbm_rational_24_23_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+25th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_24_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_24_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+24th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_23_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_23_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+23th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_22_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_22_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+22th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_21_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_21_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+21th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_20_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_20_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_19_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 18th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_18_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_18_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 19),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 19),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 19th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_19_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_19_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 20),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 20),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 20th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_20_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_20_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 21),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 21),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 21th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_21_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_21_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 22),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 22),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 22th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_22_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_22_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 23),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 23),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 23th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_23_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_23_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 24),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 24),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+24th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_25_24_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -13482,382 +13263,357 @@ jbm_rational_25_24_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+26th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_25_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_25_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+25th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_24_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_24_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+24th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_23_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_23_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+23th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_22_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_22_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+22th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_21_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_21_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+21th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_20_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_20_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_19_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 18th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_18_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_18_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 19),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 19),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 19th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_19_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_19_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 20),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 20),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 20th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_20_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_20_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 21),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 21),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 21th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_21_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_21_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 22),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 22),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 22th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_22_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_22_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 23),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 23),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 23th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_23_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_23_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 24),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 24),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 24th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_24_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_24_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 25),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 25),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+25th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_26_25_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -13871,397 +13627,371 @@ jbm_rational_26_25_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+27th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_26_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_26_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+26th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_25_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_25_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+25th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_24_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_24_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+24th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_23_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_23_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+23th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_22_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_22_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+22th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_21_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_21_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+21th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_20_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_20_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_19_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 18th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_18_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_18_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 19),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 19),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 19th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_19_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_19_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 20),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 20),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 20th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_20_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_20_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 21),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 21),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 21th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_21_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_21_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 22),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 22),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 22th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_22_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_22_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 23),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 23),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 23th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_23_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_23_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 24),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 24),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 24th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_24_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_24_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 25),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 25),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 25th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_25_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_25_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 26),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 26),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+26th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_27_26_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -14275,412 +14005,385 @@ jbm_rational_27_26_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+28th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_27_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_27_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+27th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_26_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_26_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+26th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_25_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_25_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+25th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_24_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_24_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+24th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_23_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_23_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+23th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_22_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_22_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+22th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_21_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_21_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+21th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_20_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_20_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_19_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 18th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_18_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_18_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 19),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 19),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 19th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_19_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_19_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 20),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 20),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 20th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_20_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_20_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 21),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 21),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 21th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_21_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_21_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 22),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 22),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 22th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_22_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_22_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 23),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 23),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 23th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_23_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_23_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 24),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 24),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 24th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_24_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_24_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 25),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 25),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 25th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_25_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_25_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 26),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 26),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 26th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_26_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_26_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 27),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 27),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+27th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_28_27_4xf64 (const __m256d x,      ///< __m256d vector.
@@ -14694,427 +14397,399 @@ jbm_rational_28_27_4xf64 (const __m256d x,      ///< __m256d vector.
 /**
  * Function to calculate a 0th+29th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_0_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (_mm256_set1_pd (p[0]),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_28_4xf64 (x, p + 1),
+                        _mm256_fmadd_pd (x, jbm_polynomial_28_4xf64 (x, p + 1),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+28th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_1_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_1_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_27_4xf64 (x, p + 2),
+                        _mm256_fmadd_pd (x, jbm_polynomial_27_4xf64 (x, p + 2),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 2nd+27th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_2_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_2_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_26_4xf64 (x, p + 3),
+                        _mm256_fmadd_pd (x, jbm_polynomial_26_4xf64 (x, p + 3),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 3rd+26th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_3_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_3_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_25_4xf64 (x, p + 4),
+                        _mm256_fmadd_pd (x, jbm_polynomial_25_4xf64 (x, p + 4),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 4th+25th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_4_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_4_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_24_4xf64 (x, p + 5),
+                        _mm256_fmadd_pd (x, jbm_polynomial_24_4xf64 (x, p + 5),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 5th+24th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_5_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_5_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_23_4xf64 (x, p + 6),
+                        _mm256_fmadd_pd (x, jbm_polynomial_23_4xf64 (x, p + 6),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 6th+23th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_6_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_6_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_22_4xf64 (x, p + 7),
+                        _mm256_fmadd_pd (x, jbm_polynomial_22_4xf64 (x, p + 7),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 7th+22th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_7_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_7_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_21_4xf64 (x, p + 8),
+                        _mm256_fmadd_pd (x, jbm_polynomial_21_4xf64 (x, p + 8),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 8th+21th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_8_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_8_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_20_4xf64 (x, p + 9),
+                        _mm256_fmadd_pd (x, jbm_polynomial_20_4xf64 (x, p + 9),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 9th+20th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_9_4xf64 (const __m256d x,       ///< __m256d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_9_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_19_4xf64 (x, p + 10),
+                        _mm256_fmadd_pd (x, jbm_polynomial_19_4xf64 (x, p + 10),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 10th+19th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_10_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_10_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_18_4xf64 (x, p + 11),
+                        _mm256_fmadd_pd (x, jbm_polynomial_18_4xf64 (x, p + 11),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 11th+18th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_11_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_11_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_17_4xf64 (x, p + 12),
+                        _mm256_fmadd_pd (x, jbm_polynomial_17_4xf64 (x, p + 12),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 12th+17th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_12_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_12_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_16_4xf64 (x, p + 13),
+                        _mm256_fmadd_pd (x, jbm_polynomial_16_4xf64 (x, p + 13),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 13th+16th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_13_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_13_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_15_4xf64 (x, p + 14),
+                        _mm256_fmadd_pd (x, jbm_polynomial_15_4xf64 (x, p + 14),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 14th+15th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_14_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_14_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_14_4xf64 (x, p + 15),
+                        _mm256_fmadd_pd (x, jbm_polynomial_14_4xf64 (x, p + 15),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 15th+14th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_15_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_15_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_13_4xf64 (x, p + 16),
+                        _mm256_fmadd_pd (x, jbm_polynomial_13_4xf64 (x, p + 16),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 16th+13th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_16_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_16_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_12_4xf64 (x, p + 17),
+                        _mm256_fmadd_pd (x, jbm_polynomial_12_4xf64 (x, p + 17),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 17th+12th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_17_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_17_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_11_4xf64 (x, p + 18),
+                        _mm256_fmadd_pd (x, jbm_polynomial_11_4xf64 (x, p + 18),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 18th+11th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_18_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_18_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_10_4xf64 (x, p + 19),
+                        _mm256_fmadd_pd (x, jbm_polynomial_10_4xf64 (x, p + 19),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 19th+10th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_19_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_19_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_9_4xf64 (x, p + 20),
+                        _mm256_fmadd_pd (x, jbm_polynomial_9_4xf64 (x, p + 20),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 20th+9th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_20_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_20_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_8_4xf64 (x, p + 21),
+                        _mm256_fmadd_pd (x, jbm_polynomial_8_4xf64 (x, p + 21),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 21th+8th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_21_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_21_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_7_4xf64 (x, p + 22),
+                        _mm256_fmadd_pd (x, jbm_polynomial_7_4xf64 (x, p + 22),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 22th+7th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_22_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_22_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_6_4xf64 (x, p + 23),
+                        _mm256_fmadd_pd (x, jbm_polynomial_6_4xf64 (x, p + 23),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 23th+6th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_23_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_23_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_5_4xf64 (x, p + 24),
+                        _mm256_fmadd_pd (x, jbm_polynomial_5_4xf64 (x, p + 24),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 24th+5th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_24_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_24_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_4_4xf64 (x, p + 25),
+                        _mm256_fmadd_pd (x, jbm_polynomial_4_4xf64 (x, p + 25),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 25th+4th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_25_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_25_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_3_4xf64 (x, p + 26),
+                        _mm256_fmadd_pd (x, jbm_polynomial_3_4xf64 (x, p + 26),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 26th+3rd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_26_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_26_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_2_4xf64 (x, p + 27),
+                        _mm256_fmadd_pd (x, jbm_polynomial_2_4xf64 (x, p + 27),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 27th+2nd order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_27_4xf64 (const __m256d x,      ///< __m256d vector.
                           const double *p)      ///< array of coefficients.
 {
   return _mm256_div_pd (jbm_polynomial_27_4xf64 (x, p),
-                        _mm256_fmadd_pd (x,
-                                         jbm_polynomial_1_4xf64 (x, p + 28),
+                        _mm256_fmadd_pd (x, jbm_polynomial_1_4xf64 (x, p + 28),
                                          _mm256_set1_pd (1.)));
 }
 
 /**
  * Function to calculate a 1st+28th order rational (__m256d).
  *
- * \return rational value.
+ * \return __m256d vector of rational values.
  */
 static inline __m256d
 jbm_rational_29_28_4xf64 (const __m256d x,      ///< __m256d vector.
