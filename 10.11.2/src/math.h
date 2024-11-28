@@ -706,6 +706,9 @@ enum JBMFluxLimiterType
 #ifdef __AVX512F__
 #include "math_avx512.h"
 #endif
+#ifdef __ARM_NEON
+#include "math_neon.h"
+#endif
 
 /**
  * struct to define arrays of JBFLOAT numbers.

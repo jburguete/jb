@@ -14821,7 +14821,10 @@ jbm_exp2wc_2xf64 (const __m128d x)
 static inline __m128d
 jbm_exp2_2xf64 (const __m128d x)        ///< __m128d vector.
 {
-  __m128d y, f, z, k;
+  __m128d y, f, z;
+#ifndef __AVX512F__
+  __m128d k;
+#endif
   __m128i i;
   y = _mm_floor_pd (x);
   f = _mm_sub_pd (x, y);
