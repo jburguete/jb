@@ -43,6 +43,10 @@
 #ifdef __amd64
 #include <x86intrin.h>
 #endif
+#ifdef __ARM_NEON
+#include <arm_neon.h>
+#endif
+
 
 /**
  * \def aligned_free
