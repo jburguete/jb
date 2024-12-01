@@ -384,7 +384,7 @@ jbm_v3_length_16xf32 (const __m512 x1,
 ///< __m512 vector of z-coordinates of the 2nd points defining the segments.
 {
   __m512 dx, dy, dz;
-  dx = _mm512_sqrt_ps (_mm512_sub_ps (x2, x1));
+  dx = jbm_sqr_16xf32 (_mm512_sub_ps (x2, x1));
   dy = _mm512_sub_ps (y2, y1);
   dy = _mm512_fmadd_ps (dy, dy, dx);
   dz = _mm512_sub_ps (z2, z1);

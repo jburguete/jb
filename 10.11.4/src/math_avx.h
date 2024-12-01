@@ -388,7 +388,7 @@ jbm_v3_length_8xf32 (const __m256 x1,
 ///< __m256 vector of z-coordinates of the 2nd points defining the segments.
 {
   __m256 dx, dy, dz;
-  dx = _mm256_sqrt_ps (_mm256_sub_ps (x2, x1));
+  dx = jbm_sqr_8xf32 (_mm256_sub_ps (x2, x1));
   dy = _mm256_sub_ps (y2, y1);
   dy = _mm256_fmadd_ps (dy, dy, dx);
   dz = _mm256_sub_ps (z2, z1);

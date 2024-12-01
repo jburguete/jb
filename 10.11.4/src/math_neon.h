@@ -103,8 +103,7 @@ print_m128d (FILE *file, const char *label, float64x2_t x)
 static inline float32x4_t
 jbm_opposite_4xf32 (const float32x4_t x)     ///< float32x4_t vector.
 {
-  return vreinterpretq_f32_u32 (veorq_u32 (vreinterpretq_u32_f32 (x),
-                                          vld1q_u32 (0x80000000)));
+  return vnegq_f32 (x);
 }
 
 /**
@@ -166,7 +165,7 @@ jbm_frexp_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
   JBM4xF32 a, y, y2, z;
   uint32x4_t e4, b, m1, m2, m3;
   a.x = x;
-  b = vdupq_u32 (0x7f800000);
+  b = vdupq_n_u32 (0x7f800000);
   y.i = vandq_u32 (a.i, b);
   m1 = vceqq_u32 (y.i, b);
   m2 = vceqzq_u32 (y.i);
@@ -250,7 +249,7 @@ jbm_modmin_4xf32 (const float32x4_t a,       ///< 1st float64x2_t vector.
   float32x4_t aa, ab, y, z;
   z = vdupq_n_f32 (0.f);
   ab = vmulq_f32 (a, b);
-  y = vbslq_f32 (vcleq_f32 (ab, z), a, z); 
+  y = vbslq_f32 (vclezq_f32 (ab), a, z); 
   aa = jbm_abs_4xf32 (y);
   ab = jbm_abs_4xf32 (b);
   return vbslq_f32 (vcgtq_f32 (aa, ab), y, b);
@@ -308,10 +307,8 @@ jbm_extrapolate_4xf32 (const float32x4_t x,
                        const float32x4_t y2)
 ///< float32x4_t vector of y-coordinates of the 2nd points.
 {
-  float32x4_t d;
-  d = vsubq_f32 (x, x1);
-  return vmlaq_f32 (y1, d, vdivq_f32 (vsubq_f32 (y2, y1),
-                                      vsubq_f32 (x2, x1)));
+  return vmlaq_f32 (y1, dvsubq_f32 (x, x1), vdivq_f32 (vsubq_f32 (y2, y1),
+                                                       vsubq_f32 (x2, x1)));
 }
 
 /**
@@ -382,7 +379,7 @@ jbm_v3_length_4xf32 (const float32x4_t x1,
 ///< segments.
 {
   float32x4_t dx, dy, dz;
-  dx = vsqrtq_f32 (vsubq_f32 (x2, x1));
+  dx = jbm_sqr_4xf32 (vsubq_f32 (x2, x1));
   dy = vsubq_f32 (y2, y1);
   dy = vmlaq_f32 (dx, dy, dy);
   dz = vsubq_f32 (z2, z1);
@@ -6814,9 +6811,9 @@ jbm_expm1wc_4xf32 (const float32x4_t x)
   const float a5 = -1.3833464660905326042591440964123531e-03f;
   float32x4_t x2;
   x2 = jbm_sqr_4xf32 (x);
-  x2 = vmlaq_f32 (x2, vdupq_n_f32 (a5), vdupq_n_f32 (a3));
-  x2 = vmlaq_f32 (x2, x, vdupq_n_f32 (a2));
-  x2 = vmlaq_f32 (x2, x, vdupq_n_f32 (1.f));
+  x2 = vmlaq_f32 (vdupq_n_f32 (a3), x2, vdupq_n_f32 (a5));
+  x2 = vmlaq_f32 (vdupq_n_f32 (a2), x2, x);
+  x2 = vmlaq_f32 (vdupq_n_f32 (1.f), x2, x);
   return vmulq_f32 (x, vdivq_f32 (vdupq_n_f32 (a1), x2));
 }
 
@@ -6854,7 +6851,7 @@ jbm_exp2_4xf32 (const float32x4_t x) ///< float32x4_t vector.
   float32x4_t y, f;
   y = vrndmq_f32 (x);
   f = vsubq_f32 (x, y);
-  y = jbm_exp2n_4xf32 (_mm_cvtps_epi32 (y));
+  y = jbm_exp2n_4xf32 (vcvtq_s32_f32 (y));
   return vmulq_f32 (y, jbm_exp2wc_4xf32 (f));
 }
 
@@ -6891,10 +6888,10 @@ jbm_exp10_4xf32 (const float32x4_t x)        ///< float32x4_t vector.
 static inline float32x4_t
 jbm_expm1_4xf32 (const float32x4_t x)        ///< float32x4_t vector.
 {
-  return vbslq_f32 (vsubq_f32 (jbm_exp_4xf32 (x), vdupq_n_f32 (1.f)),
-                        jbm_expm1wc_4xf32 (x),
-                        vcltq_f32 (jbm_abs_4xf32 (x),
-                                      vdupq_n_f32 (M_LN2f / 2.f)));
+  return vbslq_f32 (vcltq_f32 (jbm_abs_4xf32 (x),
+                               vdupq_n_f32 (M_LN2f / 2.f)),
+                    vsubq_f32 (jbm_exp_4xf32 (x), vdupq_n_f32 (1.f)),
+                    jbm_expm1wc_4xf32 (x));
 }
 
 /**
@@ -6904,7 +6901,8 @@ jbm_expm1_4xf32 (const float32x4_t x)        ///< float32x4_t vector.
  * \return function value (float32x4_t).
  */
 static inline float32x4_t
-jbm_log2wc_4xf32 (const float32x4_t x)       ///< float32x4_t vector.
+jbm_log2wc_4xf32 (const float32x4_t x)
+///< float32x4_t vector \f$\in[0.5,1]\f$.
 {
   const float a[7] JB_ALIGNED = {
     -5.7614734502501607747654602917594776e+00,
@@ -6927,13 +6925,12 @@ jbm_log2wc_4xf32 (const float32x4_t x)       ///< float32x4_t vector.
 static inline float32x4_t
 jbm_log2_4xf32 (const float32x4_t x) ///< float32x4_t vector.
 {
-  float32x4_t y, z;
+  float32x4_t y;
   int32x4_t e;
   y = jbm_frexp_4xf32 (x, &e);
-  y = vaddq_f32 (jbm_log2wc_4xf32 (y), _mm_cvtepi32_ps (e));
-  z = vdupq_n_f32 (0.f);
-  y = vbslq_f32 (vdupq_n_f32 (-INFINITY), y, vcgtq_f32 (x, z));
-  return vbslq_f32 (y, vdupq_n_f32 (NAN), vcltq_f32 (x, z));
+  y = vaddq_f32 (jbm_log2wc_4xf32 (y), vcvtq_f32_s32 (e));
+  y = vbslq_f32 (vcgtzq_f32 (x), vdupq_n_f32 (-INFINITY), y);
+  return vbslq_f32 (vcltzq_f32 (x), y, vdupq_n_f32 (NAN));
 }
 
 /**
@@ -6971,7 +6968,7 @@ jbm_pown_4xf32 (const float32x4_t x, ///< float32x4_t vector.
   unsigned int i;
   f = vdupq_n_f32 (1.f);
   if (e < 0)
-    xn = vdivq_f32 (f, x);
+    xn = jbm_reciprocal_4xf32 (x);
   else
     xn = x;
   for (i = (unsigned int) abs (e); i; i >>= 1, xn = jbm_sqr_4xf32 (xn))
@@ -7006,11 +7003,10 @@ jbm_pow_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
 static inline float32x4_t
 jbm_cbrt_4xf32 (const float32x4_t x) ///< float32x4_t vector.
 {
-  float32x4_t f, z;
+  float32x4_t f;
   f = jbm_abs_4xf32 (x);
   f = jbm_pow_4xf32 (x, 1.f / 3.f);
-  z = vdupq_n_f32 (0.f);
-  return vbslq_f32 (vsubq_f32 (z, f), f, vcltq_f32 (x, z));
+  return vbslq_f32 (vcltzq_f32 (x), jbm_opposite_4xf32 (f), f);
 }
 
 /**
@@ -7064,7 +7060,7 @@ jbm_sincoswc_4xf32 (const float32x4_t x,
 {
   float32x4_t s0;
   *s = s0 = jbm_sinwc_4xf32 (x);
-  *c = vsqrtq_f32 (_mm_fnmadd_ps (s0, s0, vdupq_n_f32 (1.f)));
+  *c = vsqrtq_f32 (vmlsq_f32 (vdupq_n_f32 (1.f), s0, s0));
 }
 
 /**
@@ -7080,17 +7076,16 @@ jbm_sin_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
   pi2 = vdupq_n_f32 (2.f * M_PIf);
   y = jbm_rest_4xf32 (x, pi2);
   s = jbm_sinwc_4xf32 (vsubq_f32 (y, pi2));
-  s = vbslq_f32 (s,
-                     jbm_opposite_4xf32
-                     (jbm_coswc_4xf32
-                      (vsubq_f32 (vdupq_n_f32 (3.f * M_PI_2f), y))),
-                     vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f)));
-  s = vbslq_f32 (s, jbm_sinwc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PIf), y)),
-                     vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f)));
-  s = vbslq_f32 (s, jbm_coswc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y)),
-                     vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f)));
-  return vbslq_f32 (s, jbm_sinwc_4xf32 (y),
-                        vcltq_f32 (y, vdupq_n_f32 (M_PI_4f)));
+  s = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f)), s,
+                 jbm_opposite_4xf32
+                 (jbm_coswc_4xf32 (vsubq_f32 (vdupq_n_f32 (3.f * M_PI_2f),
+                                              y))));
+  s = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f)),
+                 s, jbm_sinwc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PIf), y)));
+  s = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f)),
+                 s, jbm_coswc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y)));
+  return vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (M_PI_4f)),
+                    s, jbm_sinwc_4xf32 (y));
 }
 
 /**
@@ -7106,18 +7101,16 @@ jbm_cos_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
   pi2 = vdupq_n_f32 (2.f * M_PIf);
   y = jbm_rest_4xf32 (x, pi2);
   c = jbm_coswc_4xf32 (vsubq_f32 (y, pi2));
-  c = vbslq_f32 (c,
-                     jbm_sinwc_4xf32
-                     (vsubq_f32 (y, vdupq_n_f32 (3.f * M_PI_2f))),
-                     vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f)));
-  c = vbslq_f32 (c,
-                     jbm_opposite_4xf32
-                     (jbm_coswc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PIf), y))),
-                     vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f)));
-  c = vbslq_f32 (c, jbm_sinwc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y)),
-                     vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f)));
-  return vbslq_f32 (c, jbm_coswc_4xf32 (y),
-                        vcltq_f32 (y, vdupq_n_f32 (M_PI_4f)));
+  c = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f)), c,
+                 jbm_sinwc_4xf32 (vsubq_f32 (y, vdupq_n_f32 (3.f * M_PI_2f))));
+  c = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f)), c,
+                 jbm_opposite_4xf32
+                 (jbm_coswc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PIf), y))));
+  c = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f)), c,
+                 jbm_sinwc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y)));
+  return vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (M_PI_4f)), c,
+                    jbm_coswc_4xf32 (y));
+                        
 }
 
 /**
@@ -7130,27 +7123,26 @@ jbm_sincos_4xf32 (const float32x4_t x,
                   float32x4_t *s,    ///< pointer to the sin function value (float32x4_t).
                   float32x4_t *c)    ///< pointer to the cos function value (float32x4_t).
 {
-  float32x4_t y, pi2, z, m, s1, c1, s2, c2;
+  float32x4_t y, pi2, m, s1, c1, s2, c2;
   pi2 = vdupq_n_f32 (2.f * M_PIf);
   y = jbm_rest_4xf32 (x, pi2);
   jbm_sincoswc_4xf32 (vsubq_f32 (y, pi2), &s1, &c1);
   jbm_sincoswc_4xf32 (vsubq_f32 (y, vdupq_n_f32 (3.f * M_PI_2f)), &c2, &s2);
   m = vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f));
-  z = vdupq_n_f32 (0.f);
-  s1 = vbslq_f32 (s1, vsubq_f32 (z, s2), m);
-  c1 = vbslq_f32 (c1, c2, m);
+  s1 = vbslq_f32 (m, s1, jbm_opposite_4xf32 (s2));
+  c1 = vbslq_f32 (m, c1, c2);
   jbm_sincoswc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PIf), y), &s2, &c2);
   m = vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f));
-  s1 = vbslq_f32 (s1, s2, m);
-  c1 = vbslq_f32 (c1, vsubq_f32 (z, c2), m);
+  s1 = vbslq_f32 (m, s1, s2);
+  c1 = vbslq_f32 (m, c1, jbm_opposite_4xf32 (c2));
   jbm_sincoswc_4xf32 (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y), &c2, &s2);
   m = vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f));
-  s1 = vbslq_f32 (s1, s2, m);
-  c1 = vbslq_f32 (c1, c2, m);
+  s1 = vbslq_f32 (m, s1, s2);
+  c1 = vbslq_f32 (m, c1, c2);
   jbm_sincoswc_4xf32 (y, &s2, &c2);
   m = vcltq_f32 (y, vdupq_n_f32 (M_PI_4f));
-  *s = vbslq_f32 (s1, s2, m);
-  *c = vbslq_f32 (c1, c2, m);
+  *s = vbslq_f32 (m, s1, s2);
+  *c = vbslq_f32 (m, c1, c2);
 }
 
 /**
@@ -7221,12 +7213,12 @@ jbm_atan_4xf32 (const float32x4_t x) ///< float32x4_t vector.
   float32x4_t f, ax, m, z;
   ax = jbm_abs_4xf32 (x);
   m = vcgtq_f32 (ax, vdupq_n_f32 (1.5f));
-  ax = vbslq_f32 (ax, jbm_reciprocal_4xf32 (ax), m);
-  f = vbslq_f32 (jbm_atanwc0_4xf32 (ax), jbm_atanwc1_4xf32 (ax),
-                     vcgtq_f32 (ax, vdupq_n_f32 (0.5f)));
-  f = vbslq_f32 (f, vsubq_f32 (vdupq_n_f32 (M_PI_2f), f), m);
+  ax = vbslq_f32 (m, ax, jbm_reciprocal_4xf32 (ax));
+  f = vbslq_f32 (vcgtq_f32 (ax, vdupq_n_f32 (0.5f)),
+                 jbm_atanwc0_4xf32 (ax), jbm_atanwc1_4xf32 (ax));
+  f = vbslq_f32 (m, f, vsubq_f32 (vdupq_n_f32 (M_PI_2f), f));
   z = vdupq_n_f32 (0.f);
-  return vbslq_f32 (f, vsubq_f32 (z, f), vcltq_f32 (x, z));
+  return vbslq_f32 (vcltzq_f32 (x), f, jbm_opposite_4xf32 (f)); 
 }
 
 /**
@@ -7239,14 +7231,14 @@ static inline float32x4_t
 jbm_atan2_4xf32 (const float32x4_t y,        ///< float32x4_t y component.
                  const float32x4_t x)        ///< float32x4_t x component.
 {
-  float32x4_t f, mx, my, z, pi;
-  z = vdupq_n_f32 (0.f);
+  float32x4_t f, pi;
+  uint32x4t mx, my;
   pi = vdupq_n_f32 (M_PIf);
   f = jbm_atan_4xf32 (vdivq_f32 (y, x));
-  mx = vcltq_f32 (x, z);
-  my = vcltq_f32 (y, z);
-  f = vbslq_f32 (f, vsubq_f32 (f, pi), _mm_and_ps (my, mx));
-  return vbslq_f32 (f, vaddq_f32 (f, pi), _mm_andnot_ps (my, mx));
+  mx = vcltzq_f32 (x);
+  my = vcltzq_f32 (y);
+  f = vbslq_f32 (vandq_u32 (my, mx), f, vsubq_f32 (f, pi));
+  return vbslq_f32 (vbicq_u32 (my, mx), f, vaddq_f32 (f, pi));
 }
 
 /**
@@ -7260,7 +7252,7 @@ jbm_asin_4xf32 (const float32x4_t x) ///< float32x4_t vector.
 {
   return
     jbm_atan_4xf32 (vdivq_f32
-                    (x, vsqrtq_f32 (_mm_fnmadd_ps (x, x, vdupq_n_f32 (1.f)))));
+                    (x, vsqrtq_f32 (vfmsq_f32 (vdupq_n_f32 (1.f), x, x))));
 }
 
 /**
@@ -7275,9 +7267,10 @@ jbm_acos_4xf32 (const float32x4_t x) ///< float32x4_t vector.
   float32x4_t f;
   f =
     jbm_atan_4xf32 (vdivq_f32
-                    (vsqrtq_f32 (_mm_fnmadd_ps (x, x, vdupq_n_f32 (1.f))), x));
-  return vbslq_f32 (f, vaddq_f32 (f, vdupq_n_f32 (M_PIf)),
-                        vcltq_f32 (x, vdupq_n_f32 (0.f)));
+                    (vsqrtq_f32 (vfmsq_f32 (vdupq_n_f32 (1.f), x, x)), x));
+  return vbslq_f32 (vcltq_f32 (x, vdupq_n_f32 (0.f)),
+                    f, vaddq_f32 (f, vdupq_n_f32 (M_PIf)));
+                        
 }
 
 /**
@@ -7320,10 +7313,10 @@ jbm_tanh_4xf32 (const float32x4_t x) ///< float32x4_t number.
   f = jbm_exp_4xf32 (x);
   fi = jbm_reciprocal_4xf32 (f);
   f = vdivq_f32 (vsubq_f32 (f, fi), vaddq_f32 (f, fi));
-  f = vbslq_f32 (f, vdupq_n_f32 (1.f),
-                     vcgtq_f32 (x, vdupq_n_f32 (JBM_FLT_MAX_E_EXP)));
-  return vbslq_f32 (f, vdupq_n_f32 (-1.f),
-                        vcltq_f32 (x, vdupq_n_f32 (-JBM_FLT_MAX_E_EXP)));
+  f = vbslq_f32 (vcgtq_f32 (x, vdupq_n_f32 (JBM_FLT_MAX_E_EXP)),
+                 f, vdupq_n_f32 (1.f));
+  return vbslq_f32 (vcltq_f32 (x, vdupq_n_f32 (-JBM_FLT_MAX_E_EXP)),
+                    f, vdupq_n_f32 (-1.f));
 }
 
 /**
@@ -7336,7 +7329,7 @@ jbm_asinh_4xf32 (const float32x4_t x)        ///< float32x4_t number.
 {
   return
     jbm_log_4xf32 (vaddq_f32
-                   (x, vsqrtq_f32 (vmlaq_f32 (x, x, vdupq_n_f32 (1.f)))));
+                   (x, vsqrtq_f32 (vmlaq_f32 (vdupq_n_f32 (1.f), x, x))));
 }
 
 /**
@@ -7348,8 +7341,8 @@ static inline float32x4_t
 jbm_acosh_4xf32 (const float32x4_t x)        ///< float32x4_t number.
 {
   return
-    jbm_log_4xf32 (vaddq_f32
-                   (x, vsqrtq_f32 (_mm_fmsub_ps (x, x, vdupq_n_f32 (1.f)))));
+    jbm_log_4xf32 (vaddq_f32 (x, vsqrtq_f32 (vmlsq_f32 (vdupq_n_f32 (1.f),
+                                                        x, x))));
 }
 
 /**
@@ -7412,8 +7405,8 @@ jbm_erfcwc_4xf32 (const float32x4_t x)
   x2 = jbm_sqr_4xf32 (x);
   f = vdivq_f32 (jbm_rational_6_3_4xf32 (jbm_reciprocal_4xf32 (x2), a),
                   vmulq_f32 (x, jbm_exp_4xf32 (x2)));
-  return vbslq_f32 (f, vdupq_n_f32 (0.f),
-                        vcgtq_f32 (x, vdupq_n_f32 (m)));
+  return vbslq_f32 (vcgtq_f32 (x, vdupq_n_f32 (m)), f, vdupq_n_f32 (0.f));
+                        
 }
 
 /**
@@ -7429,7 +7422,7 @@ jbm_erf_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
   ax = jbm_abs_4xf32 (x);
   u = vdupq_n_f32 (1.f);
   f = vmulq_f32 (vdivq_f32 (x, ax), vsubq_f32 (u, jbm_erfcwc_4xf32 (ax)));
-  return vbslq_f32 (f, jbm_erfwc_4xf32 (x), vcltq_f32 (ax, u));
+  return vbslq_f32 (vcltq_f32 (ax, u), f, jbm_erfwc_4xf32 (x));
 
 }
 
@@ -7447,8 +7440,8 @@ jbm_erfc_4xf32 (const float32x4_t x) ///< float32x4_t vector.
   u = vdupq_n_f32 (1.f);
   f = vsubq_f32 (u, vmulq_f32 (vdivq_f32 (x, ax),
                                  vsubq_f32 (u, jbm_erfcwc_4xf32 (ax))));
-  return vbslq_f32 (f, vsubq_f32 (u, jbm_erfwc_4xf32 (x)),
-                        vcltq_f32 (ax, u));
+  return vbslq_f32 (vcltq_f32 (ax, u), f, vsubq_f32 (u, jbm_erfwc_4xf32 (x)));
+                        
 }
 
 /**
@@ -7474,8 +7467,8 @@ jbm_solve_quadratic_reduced_4xf32 (float32x4_t a,
   b = vsqrtq_f32 (vsubq_f32 (jbm_sqr_4xf32 (a), b));
   k1 = vaddq_f32 (a, b);
   k2 = vsubq_f32 (a, b);
-  k1 = vbslq_f32 (k1, k2, vcltq_f32 (k1, x1));
-  return vbslq_f32 (k1, k2, vcgtq_f32 (k1, x2));
+  k1 = vbslq_f32 (vcltq_f32 (k1, x1), k1, k2);
+  return vbslq_f32 (vcgtq_f32 (k1, x2), k1, k2);
 }
 
 /**
@@ -7500,7 +7493,7 @@ jbm_solve_quadratic_4xf32 (const float32x4_t a,
   k1 = jbm_solve_quadratic_reduced_4xf32 (vdivq_f32 (b, a), vdivq_f32 (c, a),
                                           x1, x2);
   k2 = vdivq_f32 (jbm_opposite_4xf32 (c), b);
-  return vbslq_f32 (k1, k2, jbm_small_4xf32 (a));
+  return vbslq_f32 (jbm_small_4xf32 (a), k1, k2);
 }
 
 /**
@@ -7528,26 +7521,24 @@ jbm_solve_cubic_reduced_4xf32 (const float32x4_t a,
   c_3 = vdupq_n_f32 (1.f / 3.f);
   a3 = vmulq_f32 (a, c_3);
   k0 = vmulq_f32 (a3, a3);
-  k1 = _mm_fmsub_ps (b, c_3, k0);
-  k0 = _mm_fmsub_ps (_mm_fmsub_ps (b, a3, c), c_2, vmulq_f32 (a3, k0));
+  k1 = vmlsq_f32 (k0, b, c_3);
+  k0 = vmlsq_f32 (vmulq_f32 (a3, k0), vmlsq_f32 (b, a3, c), c_2);
   k3 = vmulq_f32 (k1, vmulq_f32 (k1, k1));
-  k2 = vmlaq_f32 (k0, k0, k3);
+  k2 = vmlaq_f32 (k3, k0, k0);
   l1 = vsqrtq_f32 (jbm_opposite_4xf32 (k1));
   l0 = vmulq_f32 (jbm_acos_4xf32 (vdivq_f32 (k0, k3)), c_3);
   l1 = vaddq_f32 (l1, l1);
-  l2 = _mm_fmsub_ps (l1, jbm_cos_4xf32 (k0), a3);
-  l3 = _mm_fmsub_ps (l1, jbm_cos_4xf32 (vaddq_f32 (l0, c2p_3)), a3);
-  l3 = vbslq_f32 (l3, l2,
-                      _mm_or_ps (vcltq_f32 (l2, x1), vcgtq_f32 (l2, x2)));
-  l4 = _mm_fmsub_ps (l1, jbm_cos_4xf32 (vsubq_f32 (l0, c2p_3)), a);
-  l4 = vbslq_f32 (l4, l3,
-                      _mm_or_ps (vcltq_f32 (l3, x1), vcgtq_f32 (l3, x2)));
+  l2 = vmlsq_f32 (a3, l1, jbm_cos_4xf32 (k0));
+  l3 = vmlsq_f32 (a3, l1, jbm_cos_4xf32 (vaddq_f32 (l0, c2p_3)));
+  l3 = vbslq_f32 (vorq_f32 (vcltq_f32 (l2, x1), vcgtq_f32 (l2, x2)), l3, l2);
+  l4 = vmlsq_f32 (a, l1, jbm_cos_4xf32 (vsubq_f32 (l0, c2p_3)));
+  l4 = vbslq_f32 (vorq_f32 (vcltq_f32 (l3, x1), vcgtq_f32 (l3, x2)), l4, l3);
   k1 = vsqrtq_f32 (k2);
   l5 = vaddq_f32 (k0, k1);
   l5 = jbm_cbrt_4xf32 (k2);
   k0 = vsubq_f32 (k0, k1);
   l5 = vaddq_f32 (l5, vsubq_f32 (jbm_cbrt_4xf32 (k0), a3));
-  return vbslq_f32 (l4, l5, vcltq_f32 (k2, vdupq_n_f32 (0.f)));
+  return vbslq_f32 (vcltzq_f32 (k2), l4, l5);
 }
 
 /**
@@ -7572,11 +7563,12 @@ jbm_solve_cubic_4xf32 (float32x4_t a,
 ///< float32x4_t vector of right limits of the solution intervals.
 {
   return
-    vbslq_f32 (jbm_solve_cubic_reduced_4xf32 (vdivq_f32 (b, a),
-                                                  vdivq_f32 (c, a),
-                                                  vdivq_f32 (d, a), x1, x2),
-                   jbm_solve_quadratic_4xf32 (b, c, d, x1, x2),
-                   jbm_small_4xf32 (a));
+    vbslq_f32 (jbm_small_4xf32 (a),
+               jbm_solve_cubic_reduced_4xf32 (vdivq_f32 (b, a),
+                                              vdivq_f32 (c, a),
+                                              vdivq_f32 (d, a), x1, x2),
+               jbm_solve_quadratic_4xf32 (b, c, d, x1, x2));
+                   
 }
 
 /**
@@ -7621,8 +7613,9 @@ jbm_flux_limiter_centred_4xf32 (const float32x4_t d1,
                                 const float32x4_t d2)
                               ///< 2nd flux limiter function parameter.
 {
-  return vbslq_f32 (vdivq_f32 (d1, d2), vdupq_n_f32 (0.f),
-                        jbm_small_4xf32 (d2));
+  return vbslq_f32 (jbm_small_4xf32 (d2),
+                    vdivq_f32 (d1, d2), vdupq_n_f32 (0.f));
+                       
 }
 
 /**
@@ -7641,11 +7634,10 @@ jbm_flux_limiter_superbee_4xf32 (const float32x4_t d1,
 {
   float32x4_t r;
   r = vdivq_f32 (d1, d2);
-  r = _mm_max_ps (_mm_min_ps (jbm_dbl_4xf32 (r), vdupq_n_f32 (1.f)),
-                  _mm_min_ps (r, vdupq_n_f32 (2.f)));
-  return vbslq_f32 (vdupq_n_f32 (0.f), r,
-                        vcgtq_f32 (vmulq_f32 (d1, d2),
-                                      vdupq_n_f32 (FLT_EPSILON)));
+  r = vmaxq_f32 (vminq_f32 (jbm_dbl_4xf32 (r), vdupq_n_f32 (1.f)),
+                  vminq_f32 (r, vdupq_n_f32 (2.f)));
+  return vbslq_f32 (vcgtq_f32 (vmulq_f32 (d1, d2), vdupq_n_f32 (FLT_EPSILON)),
+                    vdupq_n_f32 (0.f), r);
 }
 
 /**
@@ -7662,10 +7654,9 @@ jbm_flux_limiter_minmod_4xf32 (const float32x4_t d1,
                              ///< 2nd flux limiter function parameter.
 {
   float32x4_t r;
-  r = _mm_min_ps (vdivq_f32 (d1, d2), vdupq_n_f32 (1.f));
-  return vbslq_f32 (vdupq_n_f32 (0.f), r,
-                        vcgtq_f32 (vmulq_f32 (d1, d2),
-                                      vdupq_n_f32 (FLT_EPSILON)));
+  r = vminq_f32 (vdivq_f32 (d1, d2), vdupq_n_f32 (1.f));
+  return vbslq_f32 (vcgtq_f32 (vmulq_f32 (d1, d2), vdupq_n_f32 (FLT_EPSILON)),
+                    vdupq_n_f32 (0.f), r);
 }
 
 /**
@@ -7686,9 +7677,8 @@ jbm_flux_limiter_VanLeer_4xf32 (const float32x4_t d1,
   r = vdivq_f32 (d1, d2);
   k = jbm_abs_4xf32 (r);
   r = vdivq_f32 (vaddq_f32 (r, k), vaddq_f32 (vdupq_n_f32 (1.f), k));
-  return vbslq_f32 (vdupq_n_f32 (0.f), r,
-                        vcgtq_f32 (vmulq_f32 (d1, d2),
-                                      vdupq_n_f32 (FLT_EPSILON)));
+  return vbslq_f32 (vcgtq_f32 (vmulq_f32 (d1, d2), vdupq_n_f32 (FLT_EPSILON)),
+                    vdupq_n_f32 (0.f), r);
 }
 
 /**
@@ -7708,9 +7698,8 @@ jbm_flux_limiter_VanAlbada_4xf32 (const float32x4_t d1,
   r = vdivq_f32 (d1, d2);
   k = jbm_sqr_4xf32 (r);
   r = vdivq_f32 (vaddq_f32 (r, k), vaddq_f32 (vdupq_n_f32 (1.f), k));
-  return vbslq_f32 (vdupq_n_f32 (0.f), r,
-                        vcgtq_f32 (vmulq_f32 (d1, d2),
-                                      vdupq_n_f32 (FLT_EPSILON)));
+  return vbslq_f32 (vcgtq_f32 (vmulq_f32 (d1, d2), vdupq_n_f32 (FLT_EPSILON)),
+                    vdupq_n_f32 (0.f), r);
 }
 
 /**
@@ -7727,10 +7716,9 @@ jbm_flux_limiter_minsuper_4xf32 (const float32x4_t d1,
                                ///< 2nd flux limiter function parameter.
 {
   float32x4_t r;
-  r = _mm_min_ps (vdivq_f32 (d1, d2), vdupq_n_f32 (2.f));
-  return vbslq_f32 (vdupq_n_f32 (0.f), r,
-                        vcgtq_f32 (vmulq_f32 (d1, d2),
-                                      vdupq_n_f32 (FLT_EPSILON)));
+  r = vminq_f32 (vdivq_f32 (d1, d2), vdupq_n_f32 (2.f));
+  return vbslq_f32 (vcgtq_f32 (vmulq_f32 (d1, d2), vdupq_n_f32 (FLT_EPSILON)),
+                    vdupq_n_f32 (0.f), r);
 }
 
 /**
@@ -7748,10 +7736,9 @@ jbm_flux_limiter_supermin_4xf32 (const float32x4_t d1,
 {
   float32x4_t r;
   r = vdivq_f32 (d1, d2);
-  r = _mm_min_ps (jbm_dbl_4xf32 (r), vdupq_n_f32 (1.f));
-  return vbslq_f32 (vdupq_n_f32 (0.f), r,
-                        vcgtq_f32 (vmulq_f32 (d1, d2),
-                                      vdupq_n_f32 (FLT_EPSILON)));
+  r = vminq_f32 (jbm_dbl_4xf32 (r), vdupq_n_f32 (1.f));
+  return vbslq_f32 (vcgtq_f32 (vmulq_f32 (d1, d2), vdupq_n_f32 (FLT_EPSILON)),
+                    vdupq_n_f32 (0.f), r);
 }
 
 /**
@@ -7771,13 +7758,11 @@ jbm_flux_limiter_monotonized_central_4xf32 (const float32x4_t d1,
   float32x4_t r, rm;
   r = vdivq_f32 (d1, d2);
   rm = vmulq_f32 (vdupq_n_f32 (0.5f), vaddq_f32 (r, vdupq_n_f32 (1.f)));
-  rm = vbslq_f32 (vdupq_n_f32 (2.f), rm,
-                      vcltq_f32 (r, vdupq_n_f32 (3.f)));
-  rm = vbslq_f32 (rm, jbm_dbl_4xf32 (r),
-                      vcgtq_f32 (r, vdupq_n_f32 (1.f / 3.f)));
-  return vbslq_f32 (vdupq_n_f32 (0.f), rm,
-                        vcgtq_f32 (vmulq_f32 (d1, d2),
-                                      vdupq_n_f32 (FLT_EPSILON)));
+  rm = vbslq_f32 (vcltq_f32 (r, vdupq_n_f32 (3.f)), vdupq_n_f32 (2.f), rm);
+  rm = vbslq_f32 (vcgtq_f32 (r, vdupq_n_f32 (1.f / 3.f)),
+                  rm, jbm_dbl_4xf32 (r));
+  return vbslq_f32 (vcgtq_f32 (vmulq_f32 (d1, d2), vdupq_n_f32 (FLT_EPSILON)),
+                    vdupq_n_f32 (0.f), r);
 }
 
 /**
@@ -7796,9 +7781,8 @@ jbm_flux_limiter_mean_4xf32 (const float32x4_t d1,
   float32x4_t r;
   r = vmulq_f32 (vdupq_n_f32 (0.5f),
                   vaddq_f32 (vdupq_n_f32 (1.f), vdivq_f32 (d1, d2)));
-  return vbslq_f32 (vdupq_n_f32 (0.f), r,
-                        vcgtq_f32 (vmulq_f32 (d1, d2),
-                                      vdupq_n_f32 (FLT_EPSILON)));
+  return vbslq_f32 (vcgtq_f32 (vmulq_f32 (d1, d2), vdupq_n_f32 (FLT_EPSILON)),
+                    vdupq_n_f32 (0.f), r);
 }
 
 /**
@@ -7898,7 +7882,7 @@ jbm_integral_4xf32 (float32x4_t (*f) (float32x4_t),
       f1 = f (vsubq_f32 (x, k2));
       f2 = f (vaddq_f32 (x, k2));
       h = vdupq_n_f32 (a[i]);
-      k = vmlaq_f32 (h, vaddq_f32 (f1, f2), k);
+      k = vmlaq_f32 (k, h, vaddq_f32 (f1, f2));
     }
 #endif
   k = vmulq_f32 (k, dx);
@@ -7913,8 +7897,7 @@ jbm_integral_4xf32 (float32x4_t (*f) (float32x4_t),
 static inline float64x2_t
 jbm_opposite_2xf64 (const float64x2_t x)    ///< float64x2_t vector.
 {
-  return vreinterpretq_f64_u64 (veorq_u64 (vreinterpretq_u64_f64 (x),
-                                          vld1q_u64 (0x8000000000000000L)));
+  return vnegq_f64(x);
 }
 
 /**
@@ -8011,7 +7994,7 @@ jbm_exp2n_2xf64 (int64x2_t e)     ///< exponent vector (int64x2_t).
     (vcgtq_s64 (e, vdupq_n_s64 (-1023L)),
      vreinterpretq_f64_s64
      (vshlq_s64
-      (vdupq_n_u64 (0x0008000000000000L), vsubq_s64 (vdupq_n_s64 (-1023L), e))),
+      (vdupq_n_s64 (0x0008000000000000L), vsubq_s64 (vdupq_n_s64 (-1023L), e))),
      vreinterpretq_f64_s64
      (vshlq_n_s64 (vaddq_s64 (e, vdupq_n_s64 (1023L)), 52)));
   x = vbslq_f64 (vcgtq_s64 (vdupq_n_s64 (-1074L), e), x, vdupq_n_f64 (0.));
@@ -8142,8 +8125,8 @@ jbm_interpolate_2xf64 (const float64x2_t x,
 {
   float64x2_t k;
   k = jbm_extrapolate_2xf64 (x, x1, x2, y1, y2);
-  k = vbslq_f64 (y1, k, vcgtq_f64 (x, x1));
-  return vbslq_f64 (y2, k, vcltq_f64 (x, x2));
+  k = vbslq_f64 (vcgtq_f64 (x, x1), y1, k);
+  return vbslq_f64 (vcltq_f64 (x, x2), y2, k);
 }
 
 /**
@@ -8186,9 +8169,9 @@ jbm_v3_length_2xf64 (const float64x2_t x1,
   float64x2_t dx, dy, dz;
   dx = jbm_sqr_2xf64 (vsubq_f64 (x2, x1));
   dy = vsubq_f64 (y2, y1);
-  dy = _mm_fmadd_pd (dy, dy, dx);
+  dy = vmlaq_f64 (dx, dy, dy);
   dz = vsubq_f64 (z2, z1);
-  return vsqrtq_f64 (_mm_fmadd_pd (dz, dz, dy));
+  return vsqrtq_f64 (vmlaq_f64 (dy, dz, dz));
 }
 
 /**
@@ -14620,21 +14603,17 @@ jbm_expm1wc_2xf64 (const float64x2_t x)
   float64x2_t x2;
   x2 = jbm_sqr_2xf64 (x);
   return
-    vdivq_f64 (vmulq_f64 (x, _mm_fmadd_pd (x2, vdupq_n_f64 (a3),
-                                             vdupq_n_f64 (a1))),
-                _mm_fmadd_pd
-                (x,
-                 _mm_fmadd_pd
-                 (x,
-                  _mm_fmadd_pd
-                  (x,
-                   _mm_fmadd_pd
-                   (x,
-                    _mm_fmadd_pd
-                    (x2,
-                     vdupq_n_f64 (a9), vdupq_n_f64 (a7)),
-                    vdupq_n_f64 (a6)),
-                   vdupq_n_f64 (a5)), vdupq_n_f64 (a4)), vdupq_n_f64 (1.)));
+    vdivq_f64 (vmulq_f64 (x,
+                          vmlaq_f64 (vdupq_n_f64 (a1), x2, vdupq_n_f64 (a3))),
+               vmlaq_f64
+               (vdupq_n_f64 (1.), x,
+                vmlaq_f64
+                (vdupq_n_f64 (a4), x,
+                 vmlaq_f64
+                 (vdupq_n_f64 (a5), x,
+                  vmlaq_f64
+                  (vdupq_n_f64 (a6), x,
+                   vmlaq_f64 (vdupq_n_f64 (a7), x2, vdupq_n_f64 (a9)))))));
 }
 
 /**
@@ -14676,7 +14655,7 @@ jbm_exp2_2xf64 (const float64x2_t x)        ///< float64x2_t vector.
   int64x2_t i;
   y = vrndmq_f64 (x);
   f = vsubq_f64 (x, y);
-  i = _mm_cvtpd_epi64 (y);
+  i = vcvtq_s64_f64 (y);
   z = jbm_exp2n_2xf64 (i);
   return vmulq_f64 (z, jbm_exp2wc_2xf64 (f));
 }
@@ -14713,10 +14692,10 @@ jbm_exp10_2xf64 (const float64x2_t x)       ///< float64x2_t vector.
 static inline float64x2_t
 jbm_expm1_2xf64 (const float64x2_t x)       ///< float64x2_t vector.
 {
-  return vbslq_f64 (vsubq_f64 (jbm_exp_2xf64 (x), vdupq_n_f64 (1.)),
-                        jbm_expm1wc_2xf64 (x),
-                        vcltq_f64 (jbm_abs_2xf64 (x),
-                                      vdupq_n_f64 (M_LN2 / 2.)));
+  return vbslq_f64 (vcltq_f64 (jbm_abs_2xf64 (x),
+                               vdupq_n_f64 (M_LN2 / 2.)),
+                    vsubq_f64 (jbm_exp_2xf64 (x), vdupq_n_f64 (1.)),
+                    jbm_expm1wc_2xf64 (x));
 }
 
 /**
@@ -14726,7 +14705,8 @@ jbm_expm1_2xf64 (const float64x2_t x)       ///< float64x2_t vector.
  * \return function value (float64x2_t).
  */
 static inline float64x2_t
-jbm_log2wc_2xf64 (const float64x2_t x)      ///< float64x2_t vector \f$\in[0.5,1]\f$.
+jbm_log2wc_2xf64 (const float64x2_t x)
+///< float64x2_t vector \f$\in[0.5,1]\f$.
 {
   const double a[15] JB_ALIGNED = {
     -7.9445725043339633009093277936943052e+00,
@@ -14757,14 +14737,12 @@ jbm_log2wc_2xf64 (const float64x2_t x)      ///< float64x2_t vector \f$\in[0.5,1
 static inline float64x2_t
 jbm_log2_2xf64 (const float64x2_t x)        ///< float64x2_t vector.
 {
-  float64x2_t y, z;
+  float64x2_t y;
   int64x2_t e;
   y = jbm_log2wc_2xf64 (jbm_frexp_2xf64 (x, &e));
-  z = _mm_cvtepi64_pd (e);
-  y = vaddq_f64 (y, z);
-  z = vdupq_n_f64 (0.);
-  y = vbslq_f64 (y, vdupq_n_f64 (-INFINITY), vcgtq_f64 (x, z));
-  return vbslq_f64 (vdupq_n_f64 (NAN), y, vcltq_f64 (x, z));
+  y = vaddq_f64 (y, vcvtq_f64_s64 (e));
+  y = vbslq_f64 (vcgtzq_f64 (x), y, vdupq_n_f64 (-INFINITY));
+  return vbslq_f64 (vcltzq_f64 (x), vdupq_n_f64 (NAN), y);
 }
 
 /**
@@ -14802,7 +14780,7 @@ jbm_pown_2xf64 (const float64x2_t x,        ///< float64x2_t vector.
   unsigned int i;
   f = vdupq_n_f64 (1.);
   if (e < 0)
-    xn = vdivq_f64 (f, x);
+    xn = jbm_reciprocal_2xf64 (x);
   else
     xn = x;
   for (i = (unsigned int) abs (e); i; i >>= 1, xn = jbm_sqr_2xf64 (xn))
@@ -14837,11 +14815,10 @@ jbm_pow_2xf64 (const float64x2_t x, ///< float64x2_t vector.
 static inline float64x2_t
 jbm_cbrt_2xf64 (const float64x2_t x)        ///< float64x2_t vector.
 {
-  float64x2_t f, z;
+  float64x2_t f;
   f = jbm_abs_2xf64 (x);
   f = jbm_pow_2xf64 (x, 1. / 3.);
-  z = vdupq_n_f64 (0.);
-  return vbslq_f64 (f, vsubq_f64 (z, f), vcltq_f64 (x, z));
+  return vbslq_f64 (vcltzq_f64 (x), jbm_opposite_2xf64 (f), f);
 }
 
 /**
@@ -14903,7 +14880,7 @@ jbm_sincoswc_2xf64 (const float64x2_t x,
 {
   float64x2_t s0;
   *s = s0 = jbm_sinwc_2xf64 (x);
-  *c = vsqrtq_f64 (_mm_fnmadd_pd (x, x, vdupq_n_f64 (1.)));
+  *c = vsqrtq_f64 (vmlsq_f64 (vdupq_n_f64 (1.), x, x)); 
 }
 
 /**
@@ -14919,17 +14896,17 @@ jbm_sin_2xf64 (const float64x2_t x) ///< float64x2_t vector.
   pi2 = vdupq_n_f64 (2. * M_PI);
   y = jbm_rest_2xf64 (x, pi2);
   s = jbm_sinwc_2xf64 (vsubq_f64 (y, pi2));
-  s = vbslq_f64 (s,
-                     jbm_opposite_2xf64
-                     (jbm_coswc_2xf64
-                      (vsubq_f64 (vdupq_n_f64 (3. * M_PI_2), y))),
-                     vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4)));
-  s = vbslq_f64 (s, jbm_sinwc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI), y)),
-                     vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4)));
-  s = vbslq_f64 (s, jbm_coswc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI_2), y)),
-                     vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4)));
-  return vbslq_f64 (s, jbm_sinwc_2xf64 (y),
-                        vcltq_f64 (y, vdupq_n_f64 (M_PI_4)));
+  s = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4)), s,
+                 jbm_opposite_2xf64
+                 (jbm_coswc_2xf64
+                  (vsubq_f64 (vdupq_n_f64 (3. * M_PI_2), y))));
+  s = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4)), s,
+                 jbm_sinwc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI), y)));
+  s = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4)), s,
+                 jbm_coswc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI_2), y)),
+  return vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (M_PI_4)), s,
+                    jbm_sinwc_2xf64 (y));
+                        
 }
 
 /**
@@ -14945,18 +14922,16 @@ jbm_cos_2xf64 (const float64x2_t x) ///< float64x2_t vector.
   pi2 = vdupq_n_f64 (2. * M_PI);
   y = jbm_rest_2xf64 (x, pi2);
   c = jbm_coswc_2xf64 (vsubq_f64 (y, pi2));
-  c = vbslq_f64 (c,
-                     jbm_sinwc_2xf64
-                     (vsubq_f64 (y, vdupq_n_f64 (3. * M_PI_2))),
-                     vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4)));
-  c = vbslq_f64 (c,
-                     jbm_opposite_2xf64
-                     (jbm_coswc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI), y))),
-                     vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4)));
-  c = vbslq_f64 (c, jbm_sinwc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI_2), y)),
-                     vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4)));
-  return vbslq_f64 (c, jbm_coswc_2xf64 (y),
-                        vcltq_f64 (y, vdupq_n_f64 (M_PI_4)));
+  c = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4)), c,
+                 jbm_sinwc_2xf64 (vsubq_f64 (y, vdupq_n_f64 (3. * M_PI_2))));
+  c = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4)), c,
+                 jbm_opposite_2xf64
+                 (jbm_coswc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI), y))));
+  c = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4)), c,
+                 jbm_sinwc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI_2), y)));
+  return vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (M_PI_4)), c,
+                    jbm_coswc_2xf64 (y));
+                        
 }
 
 /**
@@ -14969,27 +14944,26 @@ jbm_sincos_2xf64 (const float64x2_t x,
                   float64x2_t *s,   ///< pointer to the f32 function value (float64x2_t).
                   float64x2_t *c)   ///< pointer to the f32 function value (float64x2_t).
 {
-  float64x2_t y, pi2, z, m, s1, c1, s2, c2;
+  float64x2_t y, pi2, m, s1, c1, s2, c2;
   pi2 = vdupq_n_f64 (2. * M_PI);
   y = jbm_rest_2xf64 (x, pi2);
   jbm_sincoswc_2xf64 (vsubq_f64 (y, pi2), &s1, &c1);
   jbm_sincoswc_2xf64 (vsubq_f64 (y, vdupq_n_f64 (3. * M_PI_2)), &c2, &s2);
   m = vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4));
-  z = vdupq_n_f64 (0.);
-  s1 = vbslq_f64 (s1, vsubq_f64 (z, s2), m);
-  c1 = vbslq_f64 (c1, c2, m);
+  s1 = vbslq_f64 (m, s1, jbm_opposite_2xf64 (s2));
+  c1 = vbslq_f64 (m, c1, c2);
   jbm_sincoswc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI), y), &s2, &c2);
   m = vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4));
-  s1 = vbslq_f64 (s1, s2, m);
-  c1 = vbslq_f64 (c1, vsubq_f64 (z, c2), m);
+  s1 = vbslq_f64 (m, s1, s2);
+  c1 = vbslq_f64 (m, c1, jbm_opposite_2xf64 (c2));
   jbm_sincoswc_2xf64 (vsubq_f64 (vdupq_n_f64 (M_PI_2), y), &c2, &s2);
   m = vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4));
-  s1 = vbslq_f64 (s1, s2, m);
-  c1 = vbslq_f64 (c1, c2, m);
+  s1 = vbslq_f64 (m, s1, s2);
+  c1 = vbslq_f64 (m, c1, c2);
   jbm_sincoswc_2xf64 (y, &s2, &c2);
   m = vcltq_f64 (y, vdupq_n_f64 (M_PI_4));
-  *s = vbslq_f64 (s1, s2, m);
-  *c = vbslq_f64 (c1, c2, m);
+  *s = vbslq_f64 (m, s1, s2);
+  *c = vbslq_f64 (m, c1, c2);
 }
 
 /**
@@ -15072,15 +15046,14 @@ jbm_atanwc1_2xf64 (const float64x2_t x)
 static inline float64x2_t
 jbm_atan_2xf64 (const float64x2_t x)        ///< double number.
 {
-  float64x2_t f, ax, m, z;
+  float64x2_t f, ax, m;
   ax = jbm_abs_2xf64 (x);
   m = vcgtq_f64 (ax, vdupq_n_f64 (1.5));
-  ax = vbslq_f64 (ax, jbm_reciprocal_2xf64 (ax), m);
-  f = vbslq_f64 (jbm_atanwc0_2xf64 (ax), jbm_atanwc1_2xf64 (ax),
-                     vcgtq_f64 (ax, vdupq_n_f64 (0.5)));
-  f = vbslq_f64 (f, vsubq_f64 (vdupq_n_f64 (M_PI_2), f), m);
-  z = vdupq_n_f64 (0.);
-  return vbslq_f64 (f, vsubq_f64 (z, f), vcltq_f64 (x, z));
+  ax = vbslq_f64 (m, ax, jbm_reciprocal_2xf64 (ax));
+  f = vbslq_f64 (vcgtq_f64 (ax, vdupq_n_f64 (0.5)),
+                 jbm_atanwc0_2xf64 (ax), jbm_atanwc1_2xf64 (ax),
+  f = vbslq_f64 (m, f, vsubq_f64 (vdupq_n_f64 (M_PI_2), f));
+  return vbslq_f64 (vcltzq_f64 (x), f, jbm_opposite_2xf64 (f));
 }
 
 /**
@@ -15093,14 +15066,14 @@ static inline float64x2_t
 jbm_atan2_2xf64 (const float64x2_t y,       ///< float64x2_t y component.
                  const float64x2_t x)       ///< float64x2_t x component.
 {
-  float64x2_t f, mx, my, z, pi;
-  z = vdupq_n_f64 (0.);
+  float64x2_t f, pi;
+  uint64x2_t mx, my;
   pi = vdupq_n_f64 (M_PI);
   f = jbm_atan_2xf64 (vdivq_f64 (y, x));
-  mx = vcltq_f64 (x, z);
-  my = vcltq_f64 (y, z);
-  f = vbslq_f64 (f, vsubq_f64 (f, pi), _mm_and_pd (my, mx));
-  return vbslq_f64 (f, vaddq_f64 (f, pi), _mm_andnot_pd (my, mx));
+  mx = vcltzq_f64 (x);
+  my = vcltzq_f64 (y);
+  f = vbslq_f64 (vandq_u64 (my, mx), f, vsubq_f64 (f, pi));
+  return vbslq_f64 (vbicq_u64 (my, mx), f, vaddq_f64 (f, pi));
 }
 
 /**
@@ -15113,8 +15086,8 @@ static inline float64x2_t
 jbm_asin_2xf64 (const float64x2_t x)        ///< float64x2_t number.
 {
   return
-    jbm_atan_2xf64 (vdivq_f64
-                    (x, vsqrtq_f64 (_mm_fnmadd_pd (x, x, vdupq_n_f64 (1.)))));
+    jbm_atan_2xf64 (vdivq_f64(x, vsqrtq_f64 (vfmsq_f64 (vdupq_n_f64 (1.),
+                                                        x, x)))); 
 }
 
 /**
@@ -15129,9 +15102,10 @@ jbm_acos_2xf64 (const float64x2_t x)        ///< float64x2_t number.
   float64x2_t f;
   f =
     jbm_atan_2xf64 (vdivq_f64
-                    (vsqrtq_f64 (_mm_fnmadd_pd (x, x, vdupq_n_f64 (1.))), x));
-  return vbslq_f64 (f, vaddq_f64 (f, vdupq_n_f64 (M_PI)),
-                        vcltq_f64 (x, vdupq_n_f64 (0.)));
+                    (vsqrtq_f64 (vfmsq_f64 (vdupq_n_f64 (1.), x, x)), x));
+  return vbslq_f64 (vcltq_f64 (x, vdupq_n_f64 (0.)),
+                    f, vaddq_f64 (f, vdupq_n_f64 (M_PI)));
+                        
 }
 
 /**
@@ -15174,10 +15148,11 @@ jbm_tanh_2xf64 (const float64x2_t x)        ///< float64x2_t number.
   f = jbm_exp_2xf64 (x);
   fi = jbm_reciprocal_2xf64 (f);
   f = vdivq_f64 (vsubq_f64 (f, fi), vaddq_f64 (f, fi));
-  f = vbslq_f64 (f, vdupq_n_f64 (1.),
-                     vcgtq_f64 (x, vdupq_n_f64 (JBM_DBL_MAX_E_EXP)));
-  return vbslq_f64 (f, vdupq_n_f64 (-1.),
-                        vcltq_f64 (x, vdupq_n_f64 (-JBM_DBL_MAX_E_EXP)));
+  f = vbslq_f64 (vcgtq_f64 (x, vdupq_n_f64 (JBM_DBL_MAX_E_EXP)),
+                 f, vdupq_n_f64 (1.));
+  return vbslq_f64 (vcltq_f64 (x, vdupq_n_f64 (-JBM_DBL_MAX_E_EXP)),
+                    f, vdupq_n_f64 (-1.));
+                        
 }
 
 /**
@@ -15190,7 +15165,7 @@ jbm_asinh_2xf64 (const float64x2_t x)       ///< float64x2_t number.
 {
   return
     jbm_log_2xf64 (vaddq_f64
-                   (x, vsqrtq_f64 (_mm_fmadd_pd (x, x, vdupq_n_f64 (1.)))));
+                   (x, vsqrtq_f64 (vmlaq_f64 (x, x, vdupq_n_f64 (1.)))));
 }
 
 /**
@@ -15203,7 +15178,7 @@ jbm_acosh_2xf64 (const float64x2_t x)       ///< float64x2_t number.
 {
   return
     jbm_log_2xf64 (vaddq_f64
-                   (x, vsqrtq_f64 (_mm_fmsub_pd (x, x, vdupq_n_f64 (1.)))));
+                   (x, vsqrtq_f64 (vmlsq_f64 (vdupq_n_f64 (1.)), x, x))); 
 }
 
 /**
@@ -15283,8 +15258,8 @@ jbm_erfcwc_2xf64 (const float64x2_t x)
   x2 = jbm_sqr_2xf64 (x);
   f = vdivq_f64 (jbm_rational_19_9_2xf64 (jbm_reciprocal_2xf64 (x2), a),
                   vmulq_f64 (x, jbm_exp_2xf64 (x2)));
-  return vbslq_f64 (f, vdupq_n_f64 (0.),
-                        vcgtq_f64 (x, vdupq_n_f64 (m)));
+  return vbslq_f64 (vcgtq_f64 (x, vdupq_n_f64 (m)), f, vdupq_n_f64 (0.));
+                        
 }
 
 /**
@@ -15300,8 +15275,7 @@ jbm_erf_2xf64 (const float64x2_t x) ///< float64x2_t vector.
   ax = jbm_abs_2xf64 (x);
   u = vdupq_n_f64 (1.);
   f = vmulq_f64 (vdivq_f64 (x, ax), vsubq_f64 (u, jbm_erfcwc_2xf64 (ax)));
-  return vbslq_f64 (f, jbm_erfwc_2xf64 (x), vcltq_f64 (ax, u));
-
+  return vbslq_f64 (vcltq_f64 (ax, u), f, jbm_erfwc_2xf64 (x));
 }
 
 /**
@@ -15318,8 +15292,8 @@ jbm_erfc_2xf64 (const float64x2_t x)        ///< float64x2_t vector.
   u = vdupq_n_f64 (1.);
   f = vsubq_f64 (u, vmulq_f64 (vdivq_f64 (x, ax),
                                  vsubq_f64 (u, jbm_erfcwc_2xf64 (ax))));
-  return vbslq_f64 (f, vsubq_f64 (u, jbm_erfwc_2xf64 (x)),
-                        vcltq_f64 (ax, u));
+  return vbslq_f64 (vcltq_f64 (ax, u), f, vsubq_f64 (u, jbm_erfwc_2xf64 (x)));
+                        
 }
 
 /**
@@ -15345,8 +15319,8 @@ jbm_solve_quadratic_reduced_2xf64 (float64x2_t a,
   b = vsqrtq_f64 (vsubq_f64 (jbm_sqr_2xf64 (a), b));
   k1 = vaddq_f64 (a, b);
   k2 = vsubq_f64 (a, b);
-  k1 = vbslq_f64 (k1, k2, vcltq_f64 (k1, x1));
-  return vbslq_f64 (k1, k2, vcgtq_f64 (k1, x2));
+  k1 = vbslq_f64 (vcltq_f64 (k1, x1), k1, k2);
+  return vbslq_f64 (vcgtq_f64 (k1, x2), k1, k2);
 }
 
 /**
@@ -15371,7 +15345,7 @@ jbm_solve_quadratic_2xf64 (const float64x2_t a,
   k1 = jbm_solve_quadratic_reduced_2xf64 (vdivq_f64 (b, a), vdivq_f64 (c, a),
                                           x1, x2);
   k2 = vdivq_f64 (jbm_opposite_2xf64 (c), b);
-  return vbslq_f64 (k1, k2, jbm_small_2xf64 (a));
+  return vbslq_f64 (jbm_small_2xf64 (a), k1, k2);
 }
 
 /**
@@ -15399,26 +15373,24 @@ jbm_solve_cubic_reduced_2xf64 (const float64x2_t a,
   c_3 = vdupq_n_f64 (1. / 3.);
   a3 = vmulq_f64 (a, c_3);
   k0 = vmulq_f64 (a3, a3);
-  k1 = _mm_fmsub_pd (b, c_3, k0);
-  k0 = _mm_fmsub_pd (_mm_fmsub_pd (b, a3, c), c_2, vmulq_f64 (a3, k0));
+  k1 = vmlsq_f64 (k0, b, c_3);
+  k0 = vmlsq_f64 (vmulq_f64 (a3, k0), vmlsq_f64 (c, b, a3), c_2);
   k3 = vmulq_f64 (k1, vmulq_f64 (k1, k1));
-  k2 = _mm_fmadd_pd (k0, k0, k3);
+  k2 = vmlaq_f64 (k0, k0, k3);
   l1 = vsqrtq_f64 (jbm_opposite_2xf64 (k1));
   l0 = vmulq_f64 (jbm_acos_2xf64 (vdivq_f64 (k0, k3)), c_3);
   l1 = vaddq_f64 (l1, l1);
-  l2 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (k0), a3);
-  l3 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (vaddq_f64 (l0, c2p_3)), a3);
-  l3 = vbslq_f64 (l3, l2,
-                      _mm_or_pd (vcltq_f64 (l2, x1), vcgtq_f64 (l2, x2)));
-  l4 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (vsubq_f64 (l0, c2p_3)), a);
-  l4 = vbslq_f64 (l4, l3,
-                      _mm_or_pd (vcltq_f64 (l3, x1), vcgtq_f64 (l3, x2)));
+  l2 = vmlsq_f64 (a3, l1, jbm_cos_2xf64 (k0));
+  l3 = vmlsq_f64 (a3, l1, jbm_cos_2xf64 (vaddq_f64 (l0, c2p_3)));
+  l3 = vbslq_f64 (vorq_f64 (vcltq_f64 (l2, x1), vcgtq_f64 (l2, x2)), l3, l2);
+  l4 = vmlsq_f64 (a, l1, jbm_cos_2xf64 (vsubq_f64 (l0, c2p_3)));
+  l4 = vbslq_f64 (vorq_f64 (vcltq_f64 (l3, x1), vcgtq_f64 (l3, x2)), l4, l3);
   k1 = vsqrtq_f64 (k2);
   l5 = vaddq_f64 (k0, k1);
   l5 = jbm_cbrt_2xf64 (k2);
   k0 = vsubq_f64 (k0, k1);
   l5 = vaddq_f64 (l5, vsubq_f64 (jbm_cbrt_2xf64 (k0), a3));
-  return vbslq_f64 (l4, l5, vcltq_f64 (k2, vdupq_n_f64 (0.)));
+  return vbslq_f64 (vcltzq_f64 (k2), l4, l5); 
 }
 
 /**
@@ -15443,11 +15415,12 @@ jbm_solve_cubic_2xf64 (float64x2_t a,
 ///< float64x2_t vector of right limits of the solution intervals.
 {
   return
-    vbslq_f64 (jbm_solve_cubic_reduced_2xf64 (vdivq_f64 (b, a),
-                                                  vdivq_f64 (c, a),
-                                                  vdivq_f64 (d, a), x1, x2),
-                   jbm_solve_quadratic_2xf64 (b, c, d, x1, x2),
-                   jbm_small_2xf64 (a));
+    vbslq_f64 (jbm_small_2xf64 (a),
+               jbm_solve_cubic_reduced_2xf64 (vdivq_f64 (b, a),
+                                              vdivq_f64 (c, a),
+                                              vdivq_f64 (d, a), x1, x2),
+               jbm_solve_quadratic_2xf64 (b, c, d, x1, x2));
+                   
 }
 
 /**
@@ -15492,8 +15465,8 @@ jbm_flux_limiter_centred_2xf64 (const float64x2_t d1,
                                 const float64x2_t d2)
                               ///< 2nd flux limiter function parameter.
 {
-  return vbslq_f64 (vdivq_f64 (d1, d2), vdupq_n_f64 (0.),
-                        jbm_small_2xf64 (d2));
+  return vbslq_f64 (jbm_small_2xf64 (d2), vdivq_f64 (d1, d2), vdupq_n_f64 (0.));
+                        
 }
 
 /**
@@ -15512,11 +15485,10 @@ jbm_flux_limiter_superbee_2xf64 (const float64x2_t d1,
 {
   float64x2_t r;
   r = vdivq_f64 (d1, d2);
-  r = _mm_max_pd (_mm_min_pd (jbm_dbl_2xf64 (r), vdupq_n_f64 (1.)),
-                  _mm_min_pd (r, vdupq_n_f64 (2.)));
-  return vbslq_f64 (vdupq_n_f64 (0.), r,
-                        vcgtq_f64 (vmulq_f64 (d1, d2),
-                                      vdupq_n_f64 (DBL_EPSILON)));
+  r = vmaxq_f64 (vminq_f64 (jbm_dbl_2xf64 (r), vdupq_n_f64 (1.)),
+                 vminq_f64 (r, vdupq_n_f64 (2.)));
+  return vbslq_f64 (vcgtq_f64 (vmulq_f64 (d1, d2), vdupq_n_f64 (DBL_EPSILON)),
+                    vdupq_n_f64 (0.), r);
 }
 
 /**
@@ -15533,10 +15505,9 @@ jbm_flux_limiter_minmod_2xf64 (const float64x2_t d1,
                              ///< 2nd flux limiter function parameter.
 {
   float64x2_t r;
-  r = _mm_min_pd (vdivq_f64 (d1, d2), vdupq_n_f64 (1.));
-  return vbslq_f64 (vdupq_n_f64 (0.), r,
-                        vcgtq_f64 (vmulq_f64 (d1, d2),
-                                      vdupq_n_f64 (DBL_EPSILON)));
+  r = vminq_f64 (vdivq_f64 (d1, d2), vdupq_n_f64 (1.));
+  return vbslq_f64 (vcgtq_f64 (vmulq_f64 (d1, d2), vdupq_n_f64 (DBL_EPSILON)),
+                    vdupq_n_f64 (0.), r);
 }
 
 /**
@@ -15557,9 +15528,8 @@ jbm_flux_limiter_VanLeer_2xf64 (const float64x2_t d1,
   r = vdivq_f64 (d1, d2);
   k = jbm_abs_2xf64 (r);
   r = vdivq_f64 (vaddq_f64 (r, k), vaddq_f64 (vdupq_n_f64 (1.), k));
-  return vbslq_f64 (vdupq_n_f64 (0.), r,
-                        vcgtq_f64 (vmulq_f64 (d1, d2),
-                                      vdupq_n_f64 (DBL_EPSILON)));
+  return vbslq_f64 (vcgtq_f64 (vmulq_f64 (d1, d2), vdupq_n_f64 (DBL_EPSILON)),
+                    vdupq_n_f64 (0.), r);
 }
 
 /**
@@ -15579,9 +15549,8 @@ jbm_flux_limiter_VanAlbada_2xf64 (const float64x2_t d1,
   r = vdivq_f64 (d1, d2);
   k = jbm_sqr_2xf64 (r);
   r = vdivq_f64 (vaddq_f64 (r, k), vaddq_f64 (vdupq_n_f64 (1.), k));
-  return vbslq_f64 (vdupq_n_f64 (0.), r,
-                        vcgtq_f64 (vmulq_f64 (d1, d2),
-                                      vdupq_n_f64 (DBL_EPSILON)));
+  return vbslq_f64 (vcgtq_f64 (vmulq_f64 (d1, d2), vdupq_n_f64 (DBL_EPSILON)),
+                    vdupq_n_f64 (0.), r);
 }
 
 /**
@@ -15598,10 +15567,9 @@ jbm_flux_limiter_minsuper_2xf64 (const float64x2_t d1,
                                ///< 2nd flux limiter function parameter.
 {
   float64x2_t r;
-  r = _mm_min_pd (vdivq_f64 (d1, d2), vdupq_n_f64 (2.));
-  return vbslq_f64 (vdupq_n_f64 (0.), r,
-                        vcgtq_f64 (vmulq_f64 (d1, d2),
-                                      vdupq_n_f64 (DBL_EPSILON)));
+  r = vminq_f64 (vdivq_f64 (d1, d2), vdupq_n_f64 (2.));
+  return vbslq_f64 (vcgtq_f64 (vmulq_f64 (d1, d2), vdupq_n_f64 (DBL_EPSILON)),
+                    vdupq_n_f64 (0.), r);
 }
 
 /**
@@ -15619,10 +15587,9 @@ jbm_flux_limiter_supermin_2xf64 (const float64x2_t d1,
 {
   float64x2_t r;
   r = vdivq_f64 (d1, d2);
-  r = _mm_min_pd (jbm_dbl_2xf64 (r), vdupq_n_f64 (1.));
-  return vbslq_f64 (vdupq_n_f64 (0.), r,
-                        vcgtq_f64 (vmulq_f64 (d1, d2),
-                                      vdupq_n_f64 (DBL_EPSILON)));
+  r = vminq_f64 (jbm_dbl_2xf64 (r), vdupq_n_f64 (1.));
+  return vbslq_f64 (vcgtq_f64 (vmulq_f64 (d1, d2), vdupq_n_f64 (DBL_EPSILON)),
+                    vdupq_n_f64 (0.), r);
 }
 
 /**
@@ -15642,12 +15609,10 @@ jbm_flux_limiter_monotonized_central_2xf64 (const float64x2_t d1,
   float64x2_t r, rm;
   r = vdivq_f64 (d1, d2);
   rm = vmulq_f64 (vdupq_n_f64 (0.5), vaddq_f64 (r, vdupq_n_f64 (1.)));
-  rm = vbslq_f64 (vdupq_n_f64 (2.), rm, vcltq_f64 (r, vdupq_n_f64 (3.)));
-  rm = vbslq_f64 (rm, jbm_dbl_2xf64 (r),
-                      vcgtq_f64 (r, vdupq_n_f64 (1. / 3.)));
-  return vbslq_f64 (vdupq_n_f64 (0.), rm,
-                        vcgtq_f64 (vmulq_f64 (d1, d2),
-                                      vdupq_n_f64 (DBL_EPSILON)));
+  rm = vbslq_f64 (vcltq_f64 (r, vdupq_n_f64 (3.)), vdupq_n_f64 (2.), rm);
+  rm = vbslq_f64 (vcgtq_f64 (r, vdupq_n_f64 (1. / 3.)), rm, jbm_dbl_2xf64 (r));
+  return vbslq_f64 (vcgtq_f64 (vmulq_f64 (d1, d2), vdupq_n_f64 (DBL_EPSILON)),
+		    vdupq_n_f64 (0.), rm);
 }
 
 /**
@@ -15666,9 +15631,8 @@ jbm_flux_limiter_mean_2xf64 (const float64x2_t d1,
   float64x2_t r;
   r = vmulq_f64 (vdupq_n_f64 (0.5),
                   vaddq_f64 (vdupq_n_f64 (1.), vdivq_f64 (d1, d2)));
-  return vbslq_f64 (vdupq_n_f64 (0.), r,
-                        vcgtq_f64 (vmulq_f64 (d1, d2),
-                                      vdupq_n_f64 (DBL_EPSILON)));
+  return vbslq_f64 (vcgtq_f64 (vmulq_f64 (d1, d2), vdupq_n_f64 (DBL_EPSILON)),
+		    vdupq_n_f64 (0.), r);
 }
 
 /**
@@ -15768,7 +15732,7 @@ jbm_integral_2xf64 (float64x2_t (*f) (float64x2_t),
       f1 = f (vsubq_f64 (x, k2));
       f2 = f (vaddq_f64 (x, k2));
       h = vdupq_n_f64 (a[i]);
-      k = _mm_fmadd_pd (h, vaddq_f64 (f1, f2), k);
+      k = vmlaq_f64 (k, h, vaddq_f64 (f1, f2));
     }
 #endif
   k = vmulq_f64 (k, dx);

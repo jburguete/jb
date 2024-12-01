@@ -6833,10 +6833,9 @@ jbm_extrapolate_4xf32 (const __m128 x,
                        const __m128 y2)
                      ///< __m128 vector of y-coordinates of the 2nd points.
 {
-  __m128 d;
-  d = _mm_sub_ps (x, x1);
-  return _mm_fmadd_ps (d, _mm_div_ps (_mm_sub_ps (y2, y1),
-                                      _mm_sub_ps (x2, x1)), y1);
+  return _mm_fmadd_ps (_mm_sub_ps (x, x1),
+		       _mm_div_ps (_mm_sub_ps (y2, y1),
+                                   _mm_sub_ps (x2, x1)), y1);
 }
 
 /**
@@ -6901,7 +6900,7 @@ jbm_v3_length_4xf32 (const __m128 x1,
 ///< __m128 vector of z-coordinates of the 2nd points defining the segments.
 {
   __m128 dx, dy, dz;
-  dx = _mm_sqrt_ps (_mm_sub_ps (x2, x1));
+  dx = jbm_sqr_4xf32 (_mm_sub_ps (x2, x1));
   dy = _mm_sub_ps (y2, y1);
   dy = _mm_fmadd_ps (dy, dy, dx);
   dz = _mm_sub_ps (z2, z1);
