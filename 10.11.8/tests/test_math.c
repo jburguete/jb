@@ -12,6 +12,22 @@ typedef struct
   JBDOUBLE A, B, C, D, E, F, G, H;
 } MatrixDouble;
 
+#ifdef __ARM_NEON
+
+float32x4_t
+set_float32x4 (float x3, float x2, float x1, float x0)
+{
+  return (float32x4_t) { x0, x1, x2, x3 };
+}
+
+float64x2_t
+set_float64x2 (double x1, double x0)
+{
+  return (float64x2_t) { x0, x1 };
+}
+
+#endif
+
 #if JBM_LOW_PRECISION == 1
 
 const JBFLOAT pf[15] = { 1.f, 2.f, 4.f, 8.f, 16.f, 32.f, 64.f, 128.f, 256.f,
@@ -729,6 +745,382 @@ fn14d (JBDOUBLE x)
 
 #ifdef __SSE4_2__
 
+__m128
+fn0_4xf32 (__m128 x)
+{
+  return _mm_set1_ps (1.f);
+}
+
+__m128
+fn1_4xf32 (__m128 x)
+{
+  return x;
+}
+
+__m128
+fn2_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn1_4xf32 (x));
+}
+
+__m128
+fn3_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn2_4xf32 (x));
+}
+
+__m128
+fn4_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn3_4xf32 (x));
+}
+
+__m128
+fn5_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn4_4xf32 (x));
+}
+
+__m128
+fn6_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn5_4xf32 (x));
+}
+
+__m128
+fn7_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn6_4xf32 (x));
+}
+
+__m128
+fn8_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn7_4xf32 (x));
+}
+
+__m128
+fn9_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn8_4xf32 (x));
+}
+
+__m128
+fn10_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn9_4xf32 (x));
+}
+
+__m128
+fn11_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn10_4xf32 (x));
+}
+
+__m128
+fn12_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn11_4xf32 (x));
+}
+
+__m128
+fn13_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn12_4xf32 (x));
+}
+
+__m128
+fn14_4xf32 (__m128 x)
+{
+  return _mm_mul_ps (x,  fn13_4xf32 (x));
+}
+
+#endif
+
+#ifdef __AVX__
+
+__m256
+fn0_8xf32 (__m256 x)
+{
+  return _mm256_set1_ps (1.f);
+}
+
+__m256
+fn1_8xf32 (__m256 x)
+{
+  return x;
+}
+
+__m256
+fn2_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn1_8xf32 (x));
+}
+
+__m256
+fn3_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn2_8xf32 (x));
+}
+
+__m256
+fn4_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn3_8xf32 (x));
+}
+
+__m256
+fn5_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn4_8xf32 (x));
+}
+
+__m256
+fn6_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn5_8xf32 (x));
+}
+
+__m256
+fn7_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn6_8xf32 (x));
+}
+
+__m256
+fn8_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn7_8xf32 (x));
+}
+
+__m256
+fn9_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn8_8xf32 (x));
+}
+
+__m256
+fn10_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn9_8xf32 (x));
+}
+
+__m256
+fn11_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn10_8xf32 (x));
+}
+
+__m256
+fn12_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn11_8xf32 (x));
+}
+
+__m256
+fn13_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn12_8xf32 (x));
+}
+
+__m256
+fn14_8xf32 (__m256 x)
+{
+  return _mm256_mul_ps (x, fn13_8xf32 (x));
+}
+
+#endif
+
+#ifdef __AVX512F__
+
+__m512
+fn0_16xf32 (__m512 x)
+{
+  return _mm512_set1_ps (1.f);
+}
+
+__m512
+fn1_16xf32 (__m512 x)
+{
+  return x;
+}
+
+__m512
+fn2_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn1_16xf32 (x));
+}
+
+__m512
+fn3_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn2_16xf32 (x));
+}
+
+__m512
+fn4_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn3_16xf32 (x));
+}
+
+__m512
+fn5_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn4_16xf32 (x));
+}
+
+__m512
+fn6_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn5_16xf32 (x));
+}
+
+__m512
+fn7_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn6_16xf32 (x));
+}
+
+__m512
+fn8_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn7_16xf32 (x));
+}
+
+__m512
+fn9_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn8_16xf32 (x));
+}
+
+__m512
+fn10_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn9_16xf32 (x));
+}
+
+__m512
+fn11_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn10_16xf32 (x));
+}
+
+__m512
+fn12_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn11_16xf32 (x));
+}
+
+__m512
+fn13_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn12_16xf32 (x));
+}
+
+__m512
+fn14_16xf32 (__m512 x)
+{
+  return _mm512_mul_ps (x, fn13_16xf32 (x));
+}
+
+#endif
+
+#ifdef __ARM_NEON
+
+float32x2_t
+fn0_4xf32 (float32x2_t x)
+{
+  return vdupq_n_f32 (1.f);
+}
+
+float32x2_t
+fn1_4xf32 (float32x2_t x)
+{
+  return x;
+}
+
+float32x2_t
+fn2_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn1_4xf32 (x));
+}
+
+float32x2_t
+fn3_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn2_4xf32 (x));
+}
+
+float32x2_t
+fn4_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn3_4xf32 (x));
+}
+
+float32x2_t
+fn5_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn4_4xf32 (x));
+}
+
+float32x2_t
+fn6_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn5_4xf32 (x));
+}
+
+float32x2_t
+fn7_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn6_4xf32 (x));
+}
+
+float32x2_t
+fn8_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn7_4xf32 (x));
+}
+
+float32x2_t
+fn9_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn8_4xf32 (x));
+}
+
+float32x2_t
+fn10_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn9_4xf32 (x));
+}
+
+float32x2_t
+fn11_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn10_4xf32 (x));
+}
+
+float32x2_t
+fn12_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn11_4xf32 (x));
+}
+
+float32x2_t
+fn13_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn12_4xf32 (x));
+}
+
+float32x2_t
+fn14_4xf32 (float32x2_t x)
+{
+  return vmulq_f32 (x,  fn13_4xf32 (x));
+}
+
+#endif
+
+#ifdef __SSE4_2__
+
 __m128d
 fn0_2xf64 (__m128d x)
 {
@@ -744,79 +1136,79 @@ fn1_2xf64 (__m128d x)
 __m128d
 fn2_2xf64 (__m128d x)
 {
-  return x * fn1_2xf64 (x);
+  return _mm_mul_pd (x,  fn1_2xf64 (x));
 }
 
 __m128d
 fn3_2xf64 (__m128d x)
 {
-  return x * fn2_2xf64 (x);
+  return _mm_mul_pd (x,  fn2_2xf64 (x));
 }
 
 __m128d
 fn4_2xf64 (__m128d x)
 {
-  return x * fn3_2xf64 (x);
+  return _mm_mul_pd (x,  fn3_2xf64 (x));
 }
 
 __m128d
 fn5_2xf64 (__m128d x)
 {
-  return x * fn4_2xf64 (x);
+  return _mm_mul_pd (x,  fn4_2xf64 (x));
 }
 
 __m128d
 fn6_2xf64 (__m128d x)
 {
-  return x * fn5_2xf64 (x);
+  return _mm_mul_pd (x,  fn5_2xf64 (x));
 }
 
 __m128d
 fn7_2xf64 (__m128d x)
 {
-  return x * fn6_2xf64 (x);
+  return _mm_mul_pd (x,  fn6_2xf64 (x));
 }
 
 __m128d
 fn8_2xf64 (__m128d x)
 {
-  return x * fn7_2xf64 (x);
+  return _mm_mul_pd (x,  fn7_2xf64 (x));
 }
 
 __m128d
 fn9_2xf64 (__m128d x)
 {
-  return x * fn8_2xf64 (x);
+  return _mm_mul_pd (x,  fn8_2xf64 (x));
 }
 
 __m128d
 fn10_2xf64 (__m128d x)
 {
-  return x * fn9_2xf64 (x);
+  return _mm_mul_pd (x,  fn9_2xf64 (x));
 }
 
 __m128d
 fn11_2xf64 (__m128d x)
 {
-  return x * fn10_2xf64 (x);
+  return _mm_mul_pd (x,  fn10_2xf64 (x));
 }
 
 __m128d
 fn12_2xf64 (__m128d x)
 {
-  return x * fn11_2xf64 (x);
+  return _mm_mul_pd (x,  fn11_2xf64 (x));
 }
 
 __m128d
 fn13_2xf64 (__m128d x)
 {
-  return x * fn12_2xf64 (x);
+  return _mm_mul_pd (x,  fn12_2xf64 (x));
 }
 
 __m128d
 fn14_2xf64 (__m128d x)
 {
-  return x * fn13_2xf64 (x);
+  return _mm_mul_pd (x,  fn13_2xf64 (x));
 }
 
 #endif
@@ -838,79 +1230,267 @@ fn1_4xf64 (__m256d x)
 __m256d
 fn2_4xf64 (__m256d x)
 {
-  return x * fn1_4xf64 (x);
+  return _mm256_mul_pd (x, fn1_4xf64 (x));
 }
 
 __m256d
 fn3_4xf64 (__m256d x)
 {
-  return x * fn2_4xf64 (x);
+  return _mm256_mul_pd (x, fn2_4xf64 (x));
 }
 
 __m256d
 fn4_4xf64 (__m256d x)
 {
-  return x * fn3_4xf64 (x);
+  return _mm256_mul_pd (x, fn3_4xf64 (x));
 }
 
 __m256d
 fn5_4xf64 (__m256d x)
 {
-  return x * fn4_4xf64 (x);
+  return _mm256_mul_pd (x, fn4_4xf64 (x));
 }
 
 __m256d
 fn6_4xf64 (__m256d x)
 {
-  return x * fn5_4xf64 (x);
+  return _mm256_mul_pd (x, fn5_4xf64 (x));
 }
 
 __m256d
 fn7_4xf64 (__m256d x)
 {
-  return x * fn6_4xf64 (x);
+  return _mm256_mul_pd (x, fn6_4xf64 (x));
 }
 
 __m256d
 fn8_4xf64 (__m256d x)
 {
-  return x * fn7_4xf64 (x);
+  return _mm256_mul_pd (x, fn7_4xf64 (x));
 }
 
 __m256d
 fn9_4xf64 (__m256d x)
 {
-  return x * fn8_4xf64 (x);
+  return _mm256_mul_pd (x, fn8_4xf64 (x));
 }
 
 __m256d
 fn10_4xf64 (__m256d x)
 {
-  return x * fn9_4xf64 (x);
+  return _mm256_mul_pd (x, fn9_4xf64 (x));
 }
 
 __m256d
 fn11_4xf64 (__m256d x)
 {
-  return x * fn10_4xf64 (x);
+  return _mm256_mul_pd (x, fn10_4xf64 (x));
 }
 
 __m256d
 fn12_4xf64 (__m256d x)
 {
-  return x * fn11_4xf64 (x);
+  return _mm256_mul_pd (x, fn11_4xf64 (x));
 }
 
 __m256d
 fn13_4xf64 (__m256d x)
 {
-  return x * fn12_4xf64 (x);
+  return _mm256_mul_pd (x, fn12_4xf64 (x));
 }
 
 __m256d
 fn14_4xf64 (__m256d x)
 {
-  return x * fn13_4xf64 (x);
+  return _mm256_mul_pd (x, fn13_4xf64 (x));
+}
+
+#endif
+
+#ifdef __AVX512F__
+
+__m512d
+fn0_8xf64 (__m512d x)
+{
+  return _mm512_set1_pd (1.);
+}
+
+__m512d
+fn1_8xf64 (__m512d x)
+{
+  return x;
+}
+
+__m512d
+fn2_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn1_8xf64 (x));
+}
+
+__m512d
+fn3_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn2_8xf64 (x));
+}
+
+__m512d
+fn4_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn3_8xf64 (x));
+}
+
+__m512d
+fn5_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn4_8xf64 (x));
+}
+
+__m512d
+fn6_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn5_8xf64 (x));
+}
+
+__m512d
+fn7_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn6_8xf64 (x));
+}
+
+__m512d
+fn8_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn7_8xf64 (x));
+}
+
+__m512d
+fn9_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn8_8xf64 (x));
+}
+
+__m512d
+fn10_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn9_8xf64 (x));
+}
+
+__m512d
+fn11_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn10_8xf64 (x));
+}
+
+__m512d
+fn12_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn11_8xf64 (x));
+}
+
+__m512d
+fn13_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn12_8xf64 (x));
+}
+
+__m512d
+fn14_8xf64 (__m512d x)
+{
+  return _mm512_mul_pd (x, fn13_8xf64 (x));
+}
+
+#endif
+
+#ifdef __ARM_NEON
+
+float64x2_t
+fn0_2xf64 (float64x2_t x)
+{
+  return vdupq_n_f64 (1.);
+}
+
+float64x2_t
+fn1_2xf64 (float64x2_t x)
+{
+  return x;
+}
+
+float64x2_t
+fn2_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn1_2xf64 (x));
+}
+
+float64x2_t
+fn3_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn2_2xf64 (x));
+}
+
+float64x2_t
+fn4_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn3_2xf64 (x));
+}
+
+float64x2_t
+fn5_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn4_2xf64 (x));
+}
+
+float64x2_t
+fn6_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn5_2xf64 (x));
+}
+
+float64x2_t
+fn7_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn6_2xf64 (x));
+}
+
+float64x2_t
+fn8_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn7_2xf64 (x));
+}
+
+float64x2_t
+fn9_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn8_2xf64 (x));
+}
+
+float64x2_t
+fn10_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn9_2xf64 (x));
+}
+
+float64x2_t
+fn11_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn10_2xf64 (x));
+}
+
+float64x2_t
+fn12_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn11_2xf64 (x));
+}
+
+float64x2_t
+fn13_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn12_2xf64 (x));
+}
+
+float64x2_t
+fn14_2xf64 (float64x2_t x)
+{
+  return vmulq_f64 (x,  fn13_2xf64 (x));
 }
 
 #endif
@@ -2324,9 +2904,15 @@ main (void)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
 
-#ifdef __SSE4_2__
+#if defined (__SSE4_2__) || defined (__ARM_NEON)
 
+#ifdef __SSE4_2__
   printf ("checking __m128 functions\n");
+#endif
+#ifdef __ARM_NEON
+  printf ("checking float32x4_t functions\n");
+#endif
+
   n = test_log_4xf32 (jbm_exp2_4xf32, exp2f);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -2399,7 +2985,13 @@ main (void)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
 
+#ifdef __SSE4_2__
   printf ("checking __m128d functions\n");
+#endif
+#ifdef __ARM_NEON
+  printf ("checking float64x2_t functions\n");
+#endif
+
   n = test_log_2xf64 (jbm_exp2_2xf64, exp2);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4322,21 +4914,23 @@ main (void)
   printf ("check NEON functions\n");
   d_1 = aligned_alloc (16, 2 * sizeof (double));
   d_2 = aligned_alloc (16, 2 * sizeof (double));
-  d_2xf64 = jbm_abs_2xf64 (_mm_set_pd (-1., 1));
+  d_2xf64 = jbm_abs_2xf64 (set_float64x2_t (-1., 1));
   vst1q_f64 (d_1, d_2xf64);
   printf ("abs_2xf64([1,-1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_small_2xf64 (_mm_set_pd (1., 0.));
+  d_2xf64 = jbm_small_2xf64 (set_float64x2_t (1., 0.));
   vst1q_f64 (d_1, d_2xf64);
   L_1 = (unsigned long long int *) d_1;
   printf ("small_2xf64([0,1])=[%16llx,%16llx]\n", L_1[0], L_1[1]);
-  d_2xf64 = jbm_modmin_2xf64 (_mm_set_pd (-1., 1.), _mm_set_pd (-2., 0.5));
+  d_2xf64
+    = jbm_modmin_2xf64 (set_float64x2_t (-1., 1.), set_float64x2_t (-2., 0.5));
   vst1q_f64 (d_1, d_2xf64);
   printf ("modmin_2xf64([1,-1],[0.5,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_modmin_2xf64 (_mm_set_pd (1.0, 0.), _mm_set_pd (-2., 1.));
+  d_2xf64
+    = jbm_modmin_2xf64 (set_float64x2_t (1.0, 0.), set_float64x2_t (-2., 1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("modmin_2xf64([0,1],[1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = _mm_set_pd (1., 0.);
-  d2_2xf64 = _mm_set_pd (-2., 1.);
+  d_2xf64 = set_float64x2_t (1., 0.);
+  d2_2xf64 = set_float64x2_t (-2., 1.);
   jbm_change_2xf64 (&d_2xf64, &d2_2xf64);
   vst1q_f64 (d_1, d_2xf64);
   vst1q_f64 (d_2, d2_2xf64);
@@ -4348,50 +4942,53 @@ main (void)
   d_2xf64 = jbm_sqr_2xf64 (d_2xf64);
   vst1q_f64 (d_1, d_2xf64);
   printf ("sqr_2xf64([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_extrapolate_2xf64 (_mm_set_pd (-1., 1.),
-                                   vdupq_n_f64 (0.),
-                                   vdupq_n_f64 (2.),
+  d_2xf64 = jbm_extrapolate_2xf64 (set_float64x2_t (-1., 1.),
+                                   vdupq_n_f64 (0.), vdupq_n_f64 (2.),
                                    vdupq_n_f64 (1.), vdupq_n_f64 (4.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("extrapolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_interpolate_2xf64 (_mm_set_pd (-1., 1.),
-                                   vdupq_n_f64 (0.),
-                                   vdupq_n_f64 (2.),
+  d_2xf64 = jbm_interpolate_2xf64 (set_float64x2_t (-1., 1.),
+                                   vdupq_n_f64 (0.), vdupq_n_f64 (2.),
                                    vdupq_n_f64 (1.), vdupq_n_f64 (4.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("interpolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_interpolate_2xf64 (_mm_set_pd (3., 1.),
-                                   _mm_set_pd (0., 0.),
-                                   _mm_set_pd (2., 2.),
-                                   _mm_set_pd (1., 1.), _mm_set_pd (4., 4.));
+  d_2xf64 = jbm_interpolate_2xf64 (set_float64x2_t (3., 1.),
+                                   set_float64x2_t (0., 0.),
+                                   set_float64x2_t (2., 2.),
+                                   set_float64x2_t (1., 1.),
+                                   set_float64x2_t (4., 4.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("interpolate_2xf64([1,3],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_v2_length_2xf64 (_mm_set_pd (2., 1.),
-                                 _mm_set_pd (-1., 4.),
-                                 _mm_set_pd (5., -3.), _mm_set_pd (3., 1.));
+  d_2xf64 = jbm_v2_length_2xf64 (set_float64x2_t (2., 1.),
+                                 set_float64x2_t (-1., 4.),
+                                 set_float64x2_t (5., -3.),
+                                 set_float64x2_t (3., 1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("v2_length_2xf64([1,2],[4,-1],[-3,5],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_v3_length_2xf64 (_mm_set_pd (2., 1.),
-                                 _mm_set_pd (-1., 4.),
-                                 _mm_set_pd (1., 3.),
-                                 _mm_set_pd (4., -1.),
-                                 _mm_set_pd (2., 1.), _mm_set_pd (-5., 9.));
+  d_2xf64 = jbm_v3_length_2xf64 (set_float64x2_t (2., 1.),
+                                 set_float64x2_t (-1., 4.),
+                                 set_float64x2_t (1., 3.),
+                                 set_float64x2_t (4., -1.),
+                                 set_float64x2_t (2., 1.),
+                                 set_float64x2_t (-5., 9.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("v3_length_2xf64([1,2],[4,-1],[3,1],[-1,4],[1,2],[9,-5])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_polynomial_11_2xf64 (_mm_set_pd (1., 0.5), p_1);
+  d_2xf64 = jbm_polynomial_11_2xf64 (set_float64x2_t (1., 0.5), p_1);
   vst1q_f64 (d_1, d_2xf64);
   printf
     ("polynomial_11_2xf64([0.5,1],[1,2,4,8,16,32,64,128,256,512,1024,2048])"
      "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_solve_quadratic_2xf64 (_mm_set_pd (0., 2.), _mm_set_pd (-2., -1.),
-                               _mm_set_pd (1., -1.), _mm_set_pd (0., 0.),
-                               _mm_set_pd (2., 2.));
+    jbm_solve_quadratic_2xf64 (set_float64x2_t (0., 2.),
+                               set_float64x2_t (-2., -1.),
+                               set_float64x2_t (1., -1.),
+                               set_float64x2_t (0., 0.),
+                               set_float64x2_t (2., 2.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("solve_quadratic_2xf64([2,0],[-1,-2][-1,1],[0,0],[2,2])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
@@ -4407,158 +5004,163 @@ main (void)
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_null_2xf64([0,0],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 1.),
-                                    _mm_set_pd (0., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (3., 1.),
+                                    set_float64x2_t (0., 1.),
                                     JBM_FLUX_LIMITER_TYPE_CENTRED);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_centred_2xf64([1,3],[1,0])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., -1.),
-                                    _mm_set_pd (3., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., -1.),
+                                    set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_superbee_2xf64([-1,1],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 2.),
-                                    _mm_set_pd (2., 3.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (3., 2.),
+                                    set_float64x2_t (2., 3.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_superbee_2xf64([2,3],[3,2])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
-                                    _mm_set_pd (1., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., 3.),
+                                    set_float64x2_t (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_superbee_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
-                                    _mm_set_pd (3., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (2., -1.),
+                                    set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_minmod_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
-                                    _mm_set_pd (1., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., 3.),
+                                    set_float64x2_t (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_minmod_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
-                                    _mm_set_pd (3., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (2., -1.),
+                                    set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_LEER);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_VanLeer_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
-                                    _mm_set_pd (3., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (2., -1.),
+                                    set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_ALBADA);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_VanAlbada_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
-                                    _mm_set_pd (3., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (2., -1.),
+                                    set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINSUPER);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_minsuper_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
-                                    _mm_set_pd (1., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., 3.),
+                                    set_float64x2_t (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINSUPER);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_minsuper_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., -1.),
-                                    _mm_set_pd (3., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., -1.),
+                                    set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERMIN);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_supermin_2xf64([-1,1],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
-                                    _mm_set_pd (1., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., 3.),
+                                    set_float64x2_t (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERMIN);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_supermin_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (0.5, -1.),
-                                    _mm_set_pd (3., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (0.5, -1.),
+                                    set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_monotonized_central_2xf64([-1,0.5],[1,3])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 2.),
-                                    _mm_set_pd (0.5, 3.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (3., 2.),
+                                    set_float64x2_t (0.5, 3.),
                                     JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_monotonized_central_2xf64([2,3],[3,0.5])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
-                                    _mm_set_pd (3., 1.),
+  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (2., -1.),
+                                    set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MEAN);
   vst1q_f64 (d_1, d_2xf64);
   printf ("flux_limiter_mean_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn0_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn0_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(1,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn1_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn1_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn2_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn2_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^2,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn3_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn3_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^3,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn4_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn4_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^4,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn5_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn5_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^5,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn6_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn6_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^6,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn7_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn7_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^7,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn8_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn8_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^8,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn9_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn9_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^9,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn10_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn10_2xf64, set_float64x2_t (-1., 0.),
+                        vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^10,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn11_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn11_2xf64, set_float64x2_t (-1., 0.),
+                        vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^11,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn12_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn12_2xf64, set_float64x2_t (-1., 0.),
+                        vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^12,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn13_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn13_2xf64, set_float64x2_t (-1., 0.),
+                        vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^13,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn14_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+    jbm_integral_2xf64 (fn14_2xf64, set_float64x2_t (-1., 0.),
+                        vdupq_n_f64 (1.));
   vst1q_f64 (d_1, d_2xf64);
   printf ("integral_2xf64(x^14,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
