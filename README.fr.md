@@ -98,7 +98,7 @@ d'exploitation:
 * FreeBSD 14.1
 * Gentoo Linux
 * Linux Mint DE 6
-* MacOS Ventura + Homebrew
+* MacOS Sequoia + Homebrew
 * Manjaro Linux
 * Microsoft Windows 11 + MSYS2
 * NetBSD 10.0
