@@ -163,7 +163,8 @@ jbm_frexp_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
                  int32x4_t *e)    ///< pointer to the extracted exponents vector.
 {
   JBM4xF32 a, y, y2, z;
-  uint32x4_t e4, b, m1, m2, m3;
+  uint32x4_t b, m1, m2, m3;
+  int32x4_t e4;
   a.x = x;
   b = vdupq_n_u32 (0x7f800000);
   y.i = vandq_u32 (a.i, b);
@@ -181,7 +182,7 @@ jbm_frexp_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
                   vsubq_s32 (vshlq_n_s32 (vreinterpretq_s32_u32 (z.i), 23),
                              vdupq_n_s32 (253)));
   y.x = vbslq_f32 (m2, y.x, vmulq_f32 (y2.x, z.x));
-  m1 = vorq_u32 (m1, vandq_u32 (m2, m3));
+  m1 = vorrq_u32 (m1, vandq_u32 (m2, m3));
   e4 = vbslq_s32 (m1, e4, vdupq_n_s32 (0));
   *e = e4;
   return vbslq_f32 (m1, vmulq_f32 (vdupq_n_f32 (0.5f), vdivq_f32 (x, y.x)), x);
@@ -307,8 +308,8 @@ jbm_extrapolate_4xf32 (const float32x4_t x,
                        const float32x4_t y2)
 ///< float32x4_t vector of y-coordinates of the 2nd points.
 {
-  return vmlaq_f32 (y1, dvsubq_f32 (x, x1), vdivq_f32 (vsubq_f32 (y2, y1),
-                                                       vsubq_f32 (x2, x1)));
+  return vmlaq_f32 (y1, vsubq_f32 (x, x1), vdivq_f32 (vsubq_f32 (y2, y1),
+                                                      vsubq_f32 (x2, x1)));
 }
 
 /**
@@ -757,8 +758,8 @@ jbm_rational_2_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_1_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_1_4xf32 (x, p + 1)));
 }
 
 /**
@@ -7123,7 +7124,8 @@ jbm_sincos_4xf32 (const float32x4_t x,
                   float32x4_t *s,    ///< pointer to the sin function value (float32x4_t).
                   float32x4_t *c)    ///< pointer to the cos function value (float32x4_t).
 {
-  float32x4_t y, pi2, m, s1, c1, s2, c2;
+  float32x4_t y, pi2, s1, c1, s2, c2;
+  uint32x4_t m;
   pi2 = vdupq_n_f32 (2.f * M_PIf);
   y = jbm_rest_4xf32 (x, pi2);
   jbm_sincoswc_4xf32 (vsubq_f32 (y, pi2), &s1, &c1);
@@ -7530,9 +7532,9 @@ jbm_solve_cubic_reduced_4xf32 (const float32x4_t a,
   l1 = vaddq_f32 (l1, l1);
   l2 = vmlsq_f32 (a3, l1, jbm_cos_4xf32 (k0));
   l3 = vmlsq_f32 (a3, l1, jbm_cos_4xf32 (vaddq_f32 (l0, c2p_3)));
-  l3 = vbslq_f32 (vorq_f32 (vcltq_f32 (l2, x1), vcgtq_f32 (l2, x2)), l3, l2);
+  l3 = vbslq_f32 (vorrq_f32 (vcltq_f32 (l2, x1), vcgtq_f32 (l2, x2)), l3, l2);
   l4 = vmlsq_f32 (a, l1, jbm_cos_4xf32 (vsubq_f32 (l0, c2p_3)));
-  l4 = vbslq_f32 (vorq_f32 (vcltq_f32 (l3, x1), vcgtq_f32 (l3, x2)), l4, l3);
+  l4 = vbslq_f32 (vorrq_f32 (vcltq_f32 (l3, x1), vcgtq_f32 (l3, x2)), l4, l3);
   k1 = vsqrtq_f32 (k2);
   l5 = vaddq_f32 (k0, k1);
   l5 = jbm_cbrt_4xf32 (k2);
@@ -7974,7 +7976,7 @@ jbm_frexp_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
                   vsubq_s64 (vshlq_n_u64 (vreinterpretq_s64_u64 (z.i), 52),
                              vdupq_n_s64 (2044L)));
   y.x = vbslq_f64 (m2, y.x, vmulq_f64 (y2.x, z.x));
-  m1 = vorq_u64 (m1, vandq_u64 (m2, m3));
+  m1 = vorrq_u64 (m1, vandq_u64 (m2, m3));
   e2 = vbslq_s64 (m1, e2, vdupq_n_u64 (0L);
   *e = e2;
   return vbslq_f64 (m1, vmulq_f64 (vdupq_n_f64 (0.5), vdivq_f64 (x, y.x)), x);
@@ -15382,9 +15384,9 @@ jbm_solve_cubic_reduced_2xf64 (const float64x2_t a,
   l1 = vaddq_f64 (l1, l1);
   l2 = vmlsq_f64 (a3, l1, jbm_cos_2xf64 (k0));
   l3 = vmlsq_f64 (a3, l1, jbm_cos_2xf64 (vaddq_f64 (l0, c2p_3)));
-  l3 = vbslq_f64 (vorq_f64 (vcltq_f64 (l2, x1), vcgtq_f64 (l2, x2)), l3, l2);
+  l3 = vbslq_f64 (vorrq_f64 (vcltq_f64 (l2, x1), vcgtq_f64 (l2, x2)), l3, l2);
   l4 = vmlsq_f64 (a, l1, jbm_cos_2xf64 (vsubq_f64 (l0, c2p_3)));
-  l4 = vbslq_f64 (vorq_f64 (vcltq_f64 (l3, x1), vcgtq_f64 (l3, x2)), l4, l3);
+  l4 = vbslq_f64 (vorrq_f64 (vcltq_f64 (l3, x1), vcgtq_f64 (l3, x2)), l4, l3);
   k1 = vsqrtq_f64 (k2);
   l5 = vaddq_f64 (k0, k1);
   l5 = jbm_cbrt_2xf64 (k2);
