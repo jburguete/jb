@@ -244,8 +244,8 @@ print_rat_0 (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f, "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f, "  return vdivq_f32 (vdupq_n_f32 (p[0]),\n");
-      fprintf (f, "                    vmlaq (vdupq_n_f32 (1.f), x,\n");
-      fprintf (f, "                           jbm_polynomial_%u_4xf32 (x, p + 1)));\n",
+      fprintf (f, "                    vmlaq_f32 (vdupq_n_f32 (1.f), x,\n");
+      fprintf (f, "                               jbm_polynomial_%u_4xf32 (x, p + 1)));\n",
                i - 1);
       break;
     }
@@ -623,8 +623,8 @@ print_rat_0_d (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f, "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f, "  return vdivq_f64 (vdupq_n_f64 (p[0]),\n");
-      fprintf (f, "                    vmlaq (vdupq_n_f64 (1.), x,\n");
-      fprintf (f, "                           jbm_polynomial_%u_2xf64 (x, p + 1)));\n",
+      fprintf (f, "                    vmlaq_f64 (vdupq_n_f64 (1.), x,\n");
+      fprintf (f, "                               jbm_polynomial_%u_2xf64 (x, p + 1)));\n",
                i - 1);
       break;
     }

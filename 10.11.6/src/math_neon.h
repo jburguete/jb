@@ -393,7 +393,7 @@ jbm_v3_length_4xf32 (const float32x4_t x1,
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_polynomial_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, vdupq_n_f32 (p[1]));
@@ -405,7 +405,7 @@ jbm_polynomial_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_polynomial_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_1_4xf32 (x, p + 1));
@@ -417,7 +417,7 @@ jbm_polynomial_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_polynomial_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_2_4xf32 (x, p + 1));
@@ -429,7 +429,7 @@ jbm_polynomial_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_polynomial_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_3_4xf32 (x, p + 1));
@@ -441,7 +441,7 @@ jbm_polynomial_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_polynomial_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_4_4xf32 (x, p + 1));
@@ -453,7 +453,7 @@ jbm_polynomial_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_polynomial_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_5_4xf32 (x, p + 1));
@@ -465,7 +465,7 @@ jbm_polynomial_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_7_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_polynomial_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_6_4xf32 (x, p + 1));
@@ -477,7 +477,7 @@ jbm_polynomial_7_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_8_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_polynomial_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_7_4xf32 (x, p + 1));
@@ -489,7 +489,7 @@ jbm_polynomial_8_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_9_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_polynomial_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_8_4xf32 (x, p + 1));
@@ -501,8 +501,8 @@ jbm_polynomial_9_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_10_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_9_4xf32 (x, p + 1));
 }
@@ -513,8 +513,8 @@ jbm_polynomial_10_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_11_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_10_4xf32 (x, p + 1));
 }
@@ -525,8 +525,8 @@ jbm_polynomial_11_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_12_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_11_4xf32 (x, p + 1));
 }
@@ -537,8 +537,8 @@ jbm_polynomial_12_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_13_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_12_4xf32 (x, p + 1));
 }
@@ -549,8 +549,8 @@ jbm_polynomial_13_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_14_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_13_4xf32 (x, p + 1));
 }
@@ -561,8 +561,8 @@ jbm_polynomial_14_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_15_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_14_4xf32 (x, p + 1));
 }
@@ -573,8 +573,8 @@ jbm_polynomial_15_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_16_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_15_4xf32 (x, p + 1));
 }
@@ -585,8 +585,8 @@ jbm_polynomial_16_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_17_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_16_4xf32 (x, p + 1));
 }
@@ -597,8 +597,8 @@ jbm_polynomial_17_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_18_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_17_4xf32 (x, p + 1));
 }
@@ -609,8 +609,8 @@ jbm_polynomial_18_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_19_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_18_4xf32 (x, p + 1));
 }
@@ -621,8 +621,8 @@ jbm_polynomial_19_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_20_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_20_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_19_4xf32 (x, p + 1));
 }
@@ -633,8 +633,8 @@ jbm_polynomial_20_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_21_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_21_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_20_4xf32 (x, p + 1));
 }
@@ -645,8 +645,8 @@ jbm_polynomial_21_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_22_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_22_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_21_4xf32 (x, p + 1));
 }
@@ -657,8 +657,8 @@ jbm_polynomial_22_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_23_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_23_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_22_4xf32 (x, p + 1));
 }
@@ -669,8 +669,8 @@ jbm_polynomial_23_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_24_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_24_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_23_4xf32 (x, p + 1));
 }
@@ -681,8 +681,8 @@ jbm_polynomial_24_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_25_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_25_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_24_4xf32 (x, p + 1));
 }
@@ -693,8 +693,8 @@ jbm_polynomial_25_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_26_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_26_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_25_4xf32 (x, p + 1));
 }
@@ -705,8 +705,8 @@ jbm_polynomial_26_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_27_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_27_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_26_4xf32 (x, p + 1));
 }
@@ -717,8 +717,8 @@ jbm_polynomial_27_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_28_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_28_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_27_4xf32 (x, p + 1));
 }
@@ -729,8 +729,8 @@ jbm_polynomial_28_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of polynomial values.
  */
 static inline float32x4_t
-jbm_polynomial_29_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_polynomial_29_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_polynomial_28_4xf32 (x, p + 1));
 }
@@ -741,7 +741,7 @@ jbm_polynomial_29_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_1_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_1_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
@@ -754,7 +754,7 @@ jbm_rational_1_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_2_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_2_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
@@ -768,7 +768,7 @@ jbm_rational_2_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_2_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_2_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
@@ -781,12 +781,12 @@ jbm_rational_2_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_3_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_3_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_2_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_2_4xf32 (x, p + 1)));
 }
 
 /**
@@ -795,7 +795,7 @@ jbm_rational_3_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_3_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_3_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
@@ -809,7 +809,7 @@ jbm_rational_3_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_3_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_3_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
@@ -822,12 +822,12 @@ jbm_rational_3_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_4_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_4_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_3_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_3_4xf32 (x, p + 1)));
 }
 
 /**
@@ -836,7 +836,7 @@ jbm_rational_4_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_4_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_4_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
@@ -850,7 +850,7 @@ jbm_rational_4_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_4_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_4_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
@@ -864,7 +864,7 @@ jbm_rational_4_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_4_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_4_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
@@ -877,12 +877,12 @@ jbm_rational_4_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_5_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_5_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_4_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_4_4xf32 (x, p + 1)));
 }
 
 /**
@@ -891,7 +891,7 @@ jbm_rational_5_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_5_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_5_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
@@ -905,7 +905,7 @@ jbm_rational_5_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_5_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_5_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
@@ -919,7 +919,7 @@ jbm_rational_5_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_5_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_5_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
@@ -933,7 +933,7 @@ jbm_rational_5_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_5_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_5_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
@@ -946,12 +946,12 @@ jbm_rational_5_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_6_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_5_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_5_4xf32 (x, p + 1)));
 }
 
 /**
@@ -960,7 +960,7 @@ jbm_rational_6_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_6_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
@@ -974,7 +974,7 @@ jbm_rational_6_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_6_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
@@ -988,7 +988,7 @@ jbm_rational_6_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_6_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
@@ -1002,7 +1002,7 @@ jbm_rational_6_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_6_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
@@ -1016,7 +1016,7 @@ jbm_rational_6_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_6_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_6_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
@@ -1029,12 +1029,12 @@ jbm_rational_6_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_7_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_6_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_6_4xf32 (x, p + 1)));
 }
 
 /**
@@ -1043,7 +1043,7 @@ jbm_rational_7_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_7_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
@@ -1057,7 +1057,7 @@ jbm_rational_7_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_7_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
@@ -1071,7 +1071,7 @@ jbm_rational_7_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_7_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
@@ -1085,7 +1085,7 @@ jbm_rational_7_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_7_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
@@ -1099,7 +1099,7 @@ jbm_rational_7_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_7_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
@@ -1113,7 +1113,7 @@ jbm_rational_7_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_7_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_7_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
@@ -1126,12 +1126,12 @@ jbm_rational_7_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_8_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_7_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_7_4xf32 (x, p + 1)));
 }
 
 /**
@@ -1140,7 +1140,7 @@ jbm_rational_8_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_8_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
@@ -1154,7 +1154,7 @@ jbm_rational_8_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_8_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
@@ -1168,7 +1168,7 @@ jbm_rational_8_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_8_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
@@ -1182,7 +1182,7 @@ jbm_rational_8_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_8_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
@@ -1196,7 +1196,7 @@ jbm_rational_8_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_8_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
@@ -1210,7 +1210,7 @@ jbm_rational_8_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_8_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
@@ -1224,7 +1224,7 @@ jbm_rational_8_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_8_7_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_8_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
@@ -1237,12 +1237,12 @@ jbm_rational_8_7_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_9_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_8_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_8_4xf32 (x, p + 1)));
 }
 
 /**
@@ -1251,7 +1251,7 @@ jbm_rational_9_0_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_9_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
@@ -1265,7 +1265,7 @@ jbm_rational_9_1_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_9_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
@@ -1279,7 +1279,7 @@ jbm_rational_9_2_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_9_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
@@ -1293,7 +1293,7 @@ jbm_rational_9_3_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_9_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
@@ -1307,7 +1307,7 @@ jbm_rational_9_4_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_9_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
@@ -1321,7 +1321,7 @@ jbm_rational_9_5_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_9_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
@@ -1335,7 +1335,7 @@ jbm_rational_9_6_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_7_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_9_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
@@ -1349,7 +1349,7 @@ jbm_rational_9_7_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_9_8_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
+jbm_rational_9_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
@@ -1362,12 +1362,12 @@ jbm_rational_9_8_4xf32 (const float32x4_t x,    ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_10_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_9_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_9_4xf32 (x, p + 1)));
 }
 
 /**
@@ -1376,8 +1376,8 @@ jbm_rational_10_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_10_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1390,8 +1390,8 @@ jbm_rational_10_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_10_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1404,8 +1404,8 @@ jbm_rational_10_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_10_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1418,8 +1418,8 @@ jbm_rational_10_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_10_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1432,8 +1432,8 @@ jbm_rational_10_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_10_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1446,8 +1446,8 @@ jbm_rational_10_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_10_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1460,8 +1460,8 @@ jbm_rational_10_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_10_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1474,8 +1474,8 @@ jbm_rational_10_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_10_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1488,8 +1488,8 @@ jbm_rational_10_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_10_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_10_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[10])));
@@ -1501,12 +1501,12 @@ jbm_rational_10_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_11_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_10_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_10_4xf32 (x, p + 1)));
 }
 
 /**
@@ -1515,8 +1515,8 @@ jbm_rational_11_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_11_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1529,8 +1529,8 @@ jbm_rational_11_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_11_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1543,8 +1543,8 @@ jbm_rational_11_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_11_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1557,8 +1557,8 @@ jbm_rational_11_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_11_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1571,8 +1571,8 @@ jbm_rational_11_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_11_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1585,8 +1585,8 @@ jbm_rational_11_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_11_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1599,8 +1599,8 @@ jbm_rational_11_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_11_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1613,8 +1613,8 @@ jbm_rational_11_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_11_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1627,8 +1627,8 @@ jbm_rational_11_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_11_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1641,8 +1641,8 @@ jbm_rational_11_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_11_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_11_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[11])));
@@ -1654,12 +1654,12 @@ jbm_rational_11_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_12_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_11_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_11_4xf32 (x, p + 1)));
 }
 
 /**
@@ -1668,8 +1668,8 @@ jbm_rational_12_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_12_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1682,8 +1682,8 @@ jbm_rational_12_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_12_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1696,8 +1696,8 @@ jbm_rational_12_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_12_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1710,8 +1710,8 @@ jbm_rational_12_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_12_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1724,8 +1724,8 @@ jbm_rational_12_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_12_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1738,8 +1738,8 @@ jbm_rational_12_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_12_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1752,8 +1752,8 @@ jbm_rational_12_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_12_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1766,8 +1766,8 @@ jbm_rational_12_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_12_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1780,8 +1780,8 @@ jbm_rational_12_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_12_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1794,8 +1794,8 @@ jbm_rational_12_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_12_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1808,8 +1808,8 @@ jbm_rational_12_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_12_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_12_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[12])));
@@ -1821,12 +1821,12 @@ jbm_rational_12_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_13_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_12_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_12_4xf32 (x, p + 1)));
 }
 
 /**
@@ -1835,8 +1835,8 @@ jbm_rational_13_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_13_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1849,8 +1849,8 @@ jbm_rational_13_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_13_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1863,8 +1863,8 @@ jbm_rational_13_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_13_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1877,8 +1877,8 @@ jbm_rational_13_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_13_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1891,8 +1891,8 @@ jbm_rational_13_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_13_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1905,8 +1905,8 @@ jbm_rational_13_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_13_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1919,8 +1919,8 @@ jbm_rational_13_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_13_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1933,8 +1933,8 @@ jbm_rational_13_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_13_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1947,8 +1947,8 @@ jbm_rational_13_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_13_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1961,8 +1961,8 @@ jbm_rational_13_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_13_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1975,8 +1975,8 @@ jbm_rational_13_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_13_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -1989,8 +1989,8 @@ jbm_rational_13_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_13_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_13_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[13])));
@@ -2002,12 +2002,12 @@ jbm_rational_13_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_14_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_13_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_13_4xf32 (x, p + 1)));
 }
 
 /**
@@ -2016,8 +2016,8 @@ jbm_rational_14_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_14_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2030,8 +2030,8 @@ jbm_rational_14_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_14_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2044,8 +2044,8 @@ jbm_rational_14_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_14_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2058,8 +2058,8 @@ jbm_rational_14_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_14_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2072,8 +2072,8 @@ jbm_rational_14_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_14_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2086,8 +2086,8 @@ jbm_rational_14_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_14_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2100,8 +2100,8 @@ jbm_rational_14_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_14_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2114,8 +2114,8 @@ jbm_rational_14_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_14_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2128,8 +2128,8 @@ jbm_rational_14_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_14_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2142,8 +2142,8 @@ jbm_rational_14_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_14_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2156,8 +2156,8 @@ jbm_rational_14_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_14_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2170,8 +2170,8 @@ jbm_rational_14_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_14_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2184,8 +2184,8 @@ jbm_rational_14_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_14_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_14_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[14])));
@@ -2197,12 +2197,12 @@ jbm_rational_14_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_15_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_14_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_14_4xf32 (x, p + 1)));
 }
 
 /**
@@ -2211,8 +2211,8 @@ jbm_rational_15_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_15_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2225,8 +2225,8 @@ jbm_rational_15_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_15_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2239,8 +2239,8 @@ jbm_rational_15_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_15_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2253,8 +2253,8 @@ jbm_rational_15_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_15_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2267,8 +2267,8 @@ jbm_rational_15_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_15_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2281,8 +2281,8 @@ jbm_rational_15_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_15_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2295,8 +2295,8 @@ jbm_rational_15_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_15_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2309,8 +2309,8 @@ jbm_rational_15_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_15_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2323,8 +2323,8 @@ jbm_rational_15_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_15_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2337,8 +2337,8 @@ jbm_rational_15_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_15_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2351,8 +2351,8 @@ jbm_rational_15_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_15_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2365,8 +2365,8 @@ jbm_rational_15_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_15_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2379,8 +2379,8 @@ jbm_rational_15_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_15_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2393,8 +2393,8 @@ jbm_rational_15_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_15_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_15_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[15])));
@@ -2406,12 +2406,12 @@ jbm_rational_15_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_16_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_15_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_15_4xf32 (x, p + 1)));
 }
 
 /**
@@ -2420,8 +2420,8 @@ jbm_rational_16_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_16_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2434,8 +2434,8 @@ jbm_rational_16_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_16_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2448,8 +2448,8 @@ jbm_rational_16_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_16_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2462,8 +2462,8 @@ jbm_rational_16_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_16_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2476,8 +2476,8 @@ jbm_rational_16_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_16_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2490,8 +2490,8 @@ jbm_rational_16_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_16_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2504,8 +2504,8 @@ jbm_rational_16_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_16_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2518,8 +2518,8 @@ jbm_rational_16_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_16_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2532,8 +2532,8 @@ jbm_rational_16_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_16_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2546,8 +2546,8 @@ jbm_rational_16_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_16_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2560,8 +2560,8 @@ jbm_rational_16_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_16_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2574,8 +2574,8 @@ jbm_rational_16_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_16_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2588,8 +2588,8 @@ jbm_rational_16_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_16_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2602,8 +2602,8 @@ jbm_rational_16_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_16_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2616,8 +2616,8 @@ jbm_rational_16_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_16_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_16_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[16])));
@@ -2629,12 +2629,12 @@ jbm_rational_16_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_17_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_16_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_16_4xf32 (x, p + 1)));
 }
 
 /**
@@ -2643,8 +2643,8 @@ jbm_rational_17_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_17_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2657,8 +2657,8 @@ jbm_rational_17_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_17_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2671,8 +2671,8 @@ jbm_rational_17_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_17_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2685,8 +2685,8 @@ jbm_rational_17_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_17_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2699,8 +2699,8 @@ jbm_rational_17_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_17_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2713,8 +2713,8 @@ jbm_rational_17_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_17_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2727,8 +2727,8 @@ jbm_rational_17_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_17_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2741,8 +2741,8 @@ jbm_rational_17_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_17_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2755,8 +2755,8 @@ jbm_rational_17_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_17_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2769,8 +2769,8 @@ jbm_rational_17_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_17_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2783,8 +2783,8 @@ jbm_rational_17_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_17_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2797,8 +2797,8 @@ jbm_rational_17_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_17_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2811,8 +2811,8 @@ jbm_rational_17_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_17_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2825,8 +2825,8 @@ jbm_rational_17_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_17_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2839,8 +2839,8 @@ jbm_rational_17_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_17_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2853,8 +2853,8 @@ jbm_rational_17_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_17_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_17_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[17])));
@@ -2866,12 +2866,12 @@ jbm_rational_17_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_18_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_17_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_17_4xf32 (x, p + 1)));
 }
 
 /**
@@ -2880,8 +2880,8 @@ jbm_rational_18_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_18_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2894,8 +2894,8 @@ jbm_rational_18_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_18_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2908,8 +2908,8 @@ jbm_rational_18_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_18_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2922,8 +2922,8 @@ jbm_rational_18_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_18_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2936,8 +2936,8 @@ jbm_rational_18_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_18_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2950,8 +2950,8 @@ jbm_rational_18_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_18_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2964,8 +2964,8 @@ jbm_rational_18_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_18_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2978,8 +2978,8 @@ jbm_rational_18_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_18_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -2992,8 +2992,8 @@ jbm_rational_18_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_18_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3006,8 +3006,8 @@ jbm_rational_18_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_18_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3020,8 +3020,8 @@ jbm_rational_18_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_18_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3034,8 +3034,8 @@ jbm_rational_18_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_18_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3048,8 +3048,8 @@ jbm_rational_18_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_18_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3062,8 +3062,8 @@ jbm_rational_18_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_18_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3076,8 +3076,8 @@ jbm_rational_18_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_18_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3090,8 +3090,8 @@ jbm_rational_18_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_18_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3104,8 +3104,8 @@ jbm_rational_18_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_18_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_18_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[18])));
@@ -3117,12 +3117,12 @@ jbm_rational_18_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_19_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_18_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_18_4xf32 (x, p + 1)));
 }
 
 /**
@@ -3131,8 +3131,8 @@ jbm_rational_19_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_19_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3145,8 +3145,8 @@ jbm_rational_19_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_19_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3159,8 +3159,8 @@ jbm_rational_19_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_19_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3173,8 +3173,8 @@ jbm_rational_19_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_19_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3187,8 +3187,8 @@ jbm_rational_19_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_19_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3201,8 +3201,8 @@ jbm_rational_19_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_19_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3215,8 +3215,8 @@ jbm_rational_19_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_19_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3229,8 +3229,8 @@ jbm_rational_19_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_19_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3243,8 +3243,8 @@ jbm_rational_19_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_19_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3257,8 +3257,8 @@ jbm_rational_19_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_19_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3271,8 +3271,8 @@ jbm_rational_19_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_19_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3285,8 +3285,8 @@ jbm_rational_19_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_19_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3299,8 +3299,8 @@ jbm_rational_19_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_19_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3313,8 +3313,8 @@ jbm_rational_19_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_19_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3327,8 +3327,8 @@ jbm_rational_19_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_19_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3341,8 +3341,8 @@ jbm_rational_19_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_19_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3355,8 +3355,8 @@ jbm_rational_19_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_19_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3369,8 +3369,8 @@ jbm_rational_19_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_19_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_19_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[19])));
@@ -3382,12 +3382,12 @@ jbm_rational_19_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_20_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_19_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_19_4xf32 (x, p + 1)));
 }
 
 /**
@@ -3396,8 +3396,8 @@ jbm_rational_20_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_20_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3410,8 +3410,8 @@ jbm_rational_20_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_20_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3424,8 +3424,8 @@ jbm_rational_20_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_20_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3438,8 +3438,8 @@ jbm_rational_20_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_20_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3452,8 +3452,8 @@ jbm_rational_20_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_20_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3466,8 +3466,8 @@ jbm_rational_20_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_20_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3480,8 +3480,8 @@ jbm_rational_20_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_20_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3494,8 +3494,8 @@ jbm_rational_20_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_20_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3508,8 +3508,8 @@ jbm_rational_20_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_20_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3522,8 +3522,8 @@ jbm_rational_20_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_20_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3536,8 +3536,8 @@ jbm_rational_20_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_20_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3550,8 +3550,8 @@ jbm_rational_20_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_20_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3564,8 +3564,8 @@ jbm_rational_20_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_20_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3578,8 +3578,8 @@ jbm_rational_20_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_20_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3592,8 +3592,8 @@ jbm_rational_20_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_20_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3606,8 +3606,8 @@ jbm_rational_20_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_20_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3620,8 +3620,8 @@ jbm_rational_20_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_20_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3634,8 +3634,8 @@ jbm_rational_20_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_20_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3648,8 +3648,8 @@ jbm_rational_20_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_20_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_20_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[20])));
@@ -3661,12 +3661,12 @@ jbm_rational_20_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_21_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_20_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_20_4xf32 (x, p + 1)));
 }
 
 /**
@@ -3675,8 +3675,8 @@ jbm_rational_21_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_21_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3689,8 +3689,8 @@ jbm_rational_21_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_21_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3703,8 +3703,8 @@ jbm_rational_21_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_21_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3717,8 +3717,8 @@ jbm_rational_21_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_21_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3731,8 +3731,8 @@ jbm_rational_21_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_21_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3745,8 +3745,8 @@ jbm_rational_21_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_21_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3759,8 +3759,8 @@ jbm_rational_21_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_21_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3773,8 +3773,8 @@ jbm_rational_21_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_21_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3787,8 +3787,8 @@ jbm_rational_21_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_21_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3801,8 +3801,8 @@ jbm_rational_21_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3815,8 +3815,8 @@ jbm_rational_21_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3829,8 +3829,8 @@ jbm_rational_21_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3843,8 +3843,8 @@ jbm_rational_21_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3857,8 +3857,8 @@ jbm_rational_21_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3871,8 +3871,8 @@ jbm_rational_21_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3885,8 +3885,8 @@ jbm_rational_21_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3899,8 +3899,8 @@ jbm_rational_21_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3913,8 +3913,8 @@ jbm_rational_21_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3927,8 +3927,8 @@ jbm_rational_21_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3941,8 +3941,8 @@ jbm_rational_21_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_21_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_21_20_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[21])));
@@ -3954,12 +3954,12 @@ jbm_rational_21_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_22_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_21_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_21_4xf32 (x, p + 1)));
 }
 
 /**
@@ -3968,8 +3968,8 @@ jbm_rational_22_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_22_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3982,8 +3982,8 @@ jbm_rational_22_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_22_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -3996,8 +3996,8 @@ jbm_rational_22_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_22_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4010,8 +4010,8 @@ jbm_rational_22_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_22_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4024,8 +4024,8 @@ jbm_rational_22_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_22_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4038,8 +4038,8 @@ jbm_rational_22_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_22_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4052,8 +4052,8 @@ jbm_rational_22_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_22_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4066,8 +4066,8 @@ jbm_rational_22_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_22_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4080,8 +4080,8 @@ jbm_rational_22_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_22_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4094,8 +4094,8 @@ jbm_rational_22_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4108,8 +4108,8 @@ jbm_rational_22_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4122,8 +4122,8 @@ jbm_rational_22_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4136,8 +4136,8 @@ jbm_rational_22_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4150,8 +4150,8 @@ jbm_rational_22_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4164,8 +4164,8 @@ jbm_rational_22_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4178,8 +4178,8 @@ jbm_rational_22_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4192,8 +4192,8 @@ jbm_rational_22_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4206,8 +4206,8 @@ jbm_rational_22_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4220,8 +4220,8 @@ jbm_rational_22_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4234,8 +4234,8 @@ jbm_rational_22_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_20_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4248,8 +4248,8 @@ jbm_rational_22_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_22_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_22_21_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[22])));
@@ -4261,12 +4261,12 @@ jbm_rational_22_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_23_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_22_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_22_4xf32 (x, p + 1)));
 }
 
 /**
@@ -4275,8 +4275,8 @@ jbm_rational_23_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_23_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4289,8 +4289,8 @@ jbm_rational_23_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_23_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4303,8 +4303,8 @@ jbm_rational_23_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_23_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4317,8 +4317,8 @@ jbm_rational_23_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_23_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4331,8 +4331,8 @@ jbm_rational_23_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_23_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4345,8 +4345,8 @@ jbm_rational_23_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_23_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4359,8 +4359,8 @@ jbm_rational_23_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_23_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4373,8 +4373,8 @@ jbm_rational_23_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_23_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4387,8 +4387,8 @@ jbm_rational_23_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_23_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4401,8 +4401,8 @@ jbm_rational_23_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4415,8 +4415,8 @@ jbm_rational_23_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4429,8 +4429,8 @@ jbm_rational_23_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4443,8 +4443,8 @@ jbm_rational_23_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4457,8 +4457,8 @@ jbm_rational_23_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4471,8 +4471,8 @@ jbm_rational_23_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4485,8 +4485,8 @@ jbm_rational_23_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4499,8 +4499,8 @@ jbm_rational_23_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4513,8 +4513,8 @@ jbm_rational_23_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4527,8 +4527,8 @@ jbm_rational_23_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4541,8 +4541,8 @@ jbm_rational_23_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_20_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4555,8 +4555,8 @@ jbm_rational_23_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_21_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4569,8 +4569,8 @@ jbm_rational_23_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_23_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_23_22_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[23])));
@@ -4582,12 +4582,12 @@ jbm_rational_23_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_24_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_23_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_23_4xf32 (x, p + 1)));
 }
 
 /**
@@ -4596,8 +4596,8 @@ jbm_rational_24_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_24_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4610,8 +4610,8 @@ jbm_rational_24_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_24_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4624,8 +4624,8 @@ jbm_rational_24_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_24_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4638,8 +4638,8 @@ jbm_rational_24_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_24_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4652,8 +4652,8 @@ jbm_rational_24_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_24_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4666,8 +4666,8 @@ jbm_rational_24_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_24_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4680,8 +4680,8 @@ jbm_rational_24_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_24_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4694,8 +4694,8 @@ jbm_rational_24_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_24_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4708,8 +4708,8 @@ jbm_rational_24_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_24_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4722,8 +4722,8 @@ jbm_rational_24_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4736,8 +4736,8 @@ jbm_rational_24_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4750,8 +4750,8 @@ jbm_rational_24_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4764,8 +4764,8 @@ jbm_rational_24_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4778,8 +4778,8 @@ jbm_rational_24_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4792,8 +4792,8 @@ jbm_rational_24_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4806,8 +4806,8 @@ jbm_rational_24_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4820,8 +4820,8 @@ jbm_rational_24_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4834,8 +4834,8 @@ jbm_rational_24_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4848,8 +4848,8 @@ jbm_rational_24_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4862,8 +4862,8 @@ jbm_rational_24_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_20_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4876,8 +4876,8 @@ jbm_rational_24_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_21_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4890,8 +4890,8 @@ jbm_rational_24_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_22_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4904,8 +4904,8 @@ jbm_rational_24_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_24_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_24_23_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[24])));
@@ -4917,12 +4917,12 @@ jbm_rational_24_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_25_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_24_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_24_4xf32 (x, p + 1)));
 }
 
 /**
@@ -4931,8 +4931,8 @@ jbm_rational_25_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_25_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4945,8 +4945,8 @@ jbm_rational_25_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_25_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4959,8 +4959,8 @@ jbm_rational_25_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_25_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4973,8 +4973,8 @@ jbm_rational_25_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_25_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -4987,8 +4987,8 @@ jbm_rational_25_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_25_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5001,8 +5001,8 @@ jbm_rational_25_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_25_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5015,8 +5015,8 @@ jbm_rational_25_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_25_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5029,8 +5029,8 @@ jbm_rational_25_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_25_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5043,8 +5043,8 @@ jbm_rational_25_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_25_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5057,8 +5057,8 @@ jbm_rational_25_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5071,8 +5071,8 @@ jbm_rational_25_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5085,8 +5085,8 @@ jbm_rational_25_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5099,8 +5099,8 @@ jbm_rational_25_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5113,8 +5113,8 @@ jbm_rational_25_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5127,8 +5127,8 @@ jbm_rational_25_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5141,8 +5141,8 @@ jbm_rational_25_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5155,8 +5155,8 @@ jbm_rational_25_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5169,8 +5169,8 @@ jbm_rational_25_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5183,8 +5183,8 @@ jbm_rational_25_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5197,8 +5197,8 @@ jbm_rational_25_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_20_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5211,8 +5211,8 @@ jbm_rational_25_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_21_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5225,8 +5225,8 @@ jbm_rational_25_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_22_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5239,8 +5239,8 @@ jbm_rational_25_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_23_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5253,8 +5253,8 @@ jbm_rational_25_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_25_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_25_24_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_24_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[25])));
@@ -5266,12 +5266,12 @@ jbm_rational_25_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_26_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_25_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_25_4xf32 (x, p + 1)));
 }
 
 /**
@@ -5280,8 +5280,8 @@ jbm_rational_26_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_26_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5294,8 +5294,8 @@ jbm_rational_26_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_26_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5308,8 +5308,8 @@ jbm_rational_26_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_26_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5322,8 +5322,8 @@ jbm_rational_26_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_26_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5336,8 +5336,8 @@ jbm_rational_26_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_26_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5350,8 +5350,8 @@ jbm_rational_26_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_26_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5364,8 +5364,8 @@ jbm_rational_26_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_26_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5378,8 +5378,8 @@ jbm_rational_26_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_26_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5392,8 +5392,8 @@ jbm_rational_26_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_26_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5406,8 +5406,8 @@ jbm_rational_26_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5420,8 +5420,8 @@ jbm_rational_26_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5434,8 +5434,8 @@ jbm_rational_26_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5448,8 +5448,8 @@ jbm_rational_26_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5462,8 +5462,8 @@ jbm_rational_26_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5476,8 +5476,8 @@ jbm_rational_26_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5490,8 +5490,8 @@ jbm_rational_26_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5504,8 +5504,8 @@ jbm_rational_26_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5518,8 +5518,8 @@ jbm_rational_26_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5532,8 +5532,8 @@ jbm_rational_26_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5546,8 +5546,8 @@ jbm_rational_26_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_20_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5560,8 +5560,8 @@ jbm_rational_26_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_21_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5574,8 +5574,8 @@ jbm_rational_26_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_22_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5588,8 +5588,8 @@ jbm_rational_26_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_23_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5602,8 +5602,8 @@ jbm_rational_26_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_24_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_24_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5616,8 +5616,8 @@ jbm_rational_26_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_26_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_26_25_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_25_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[26])));
@@ -5629,12 +5629,12 @@ jbm_rational_26_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_27_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_26_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_26_4xf32 (x, p + 1)));
 }
 
 /**
@@ -5643,8 +5643,8 @@ jbm_rational_27_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_27_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5657,8 +5657,8 @@ jbm_rational_27_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_27_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5671,8 +5671,8 @@ jbm_rational_27_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_27_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5685,8 +5685,8 @@ jbm_rational_27_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_27_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5699,8 +5699,8 @@ jbm_rational_27_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_27_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5713,8 +5713,8 @@ jbm_rational_27_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_27_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5727,8 +5727,8 @@ jbm_rational_27_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_27_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5741,8 +5741,8 @@ jbm_rational_27_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_27_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5755,8 +5755,8 @@ jbm_rational_27_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_27_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5769,8 +5769,8 @@ jbm_rational_27_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5783,8 +5783,8 @@ jbm_rational_27_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5797,8 +5797,8 @@ jbm_rational_27_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5811,8 +5811,8 @@ jbm_rational_27_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5825,8 +5825,8 @@ jbm_rational_27_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5839,8 +5839,8 @@ jbm_rational_27_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5853,8 +5853,8 @@ jbm_rational_27_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5867,8 +5867,8 @@ jbm_rational_27_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5881,8 +5881,8 @@ jbm_rational_27_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5895,8 +5895,8 @@ jbm_rational_27_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5909,8 +5909,8 @@ jbm_rational_27_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_20_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5923,8 +5923,8 @@ jbm_rational_27_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_21_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5937,8 +5937,8 @@ jbm_rational_27_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_22_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5951,8 +5951,8 @@ jbm_rational_27_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_23_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5965,8 +5965,8 @@ jbm_rational_27_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_24_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_24_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5979,8 +5979,8 @@ jbm_rational_27_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_25_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_25_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -5993,8 +5993,8 @@ jbm_rational_27_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_27_26_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_27_26_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_26_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[27])));
@@ -6006,12 +6006,12 @@ jbm_rational_27_26_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_28_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_27_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_27_4xf32 (x, p + 1)));
 }
 
 /**
@@ -6020,8 +6020,8 @@ jbm_rational_28_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_28_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6034,8 +6034,8 @@ jbm_rational_28_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_28_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6048,8 +6048,8 @@ jbm_rational_28_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_28_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6062,8 +6062,8 @@ jbm_rational_28_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_28_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6076,8 +6076,8 @@ jbm_rational_28_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_28_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6090,8 +6090,8 @@ jbm_rational_28_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_28_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6104,8 +6104,8 @@ jbm_rational_28_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_28_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6118,8 +6118,8 @@ jbm_rational_28_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_28_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6132,8 +6132,8 @@ jbm_rational_28_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_28_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6146,8 +6146,8 @@ jbm_rational_28_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6160,8 +6160,8 @@ jbm_rational_28_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6174,8 +6174,8 @@ jbm_rational_28_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6188,8 +6188,8 @@ jbm_rational_28_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6202,8 +6202,8 @@ jbm_rational_28_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6216,8 +6216,8 @@ jbm_rational_28_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6230,8 +6230,8 @@ jbm_rational_28_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6244,8 +6244,8 @@ jbm_rational_28_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6258,8 +6258,8 @@ jbm_rational_28_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6272,8 +6272,8 @@ jbm_rational_28_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6286,8 +6286,8 @@ jbm_rational_28_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_20_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6300,8 +6300,8 @@ jbm_rational_28_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_21_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6314,8 +6314,8 @@ jbm_rational_28_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_22_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6328,8 +6328,8 @@ jbm_rational_28_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_23_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6342,8 +6342,8 @@ jbm_rational_28_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_24_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_24_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6356,8 +6356,8 @@ jbm_rational_28_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_25_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_25_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6370,8 +6370,8 @@ jbm_rational_28_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_26_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_26_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_26_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6384,8 +6384,8 @@ jbm_rational_28_26_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_28_27_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_28_27_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_27_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[28])));
@@ -6397,12 +6397,12 @@ jbm_rational_28_27_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_29_0_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (vdupq_n_f32 (p[0]),
-                    vmlaq (vdupq_n_f32 (1.f), x,
-                           jbm_polynomial_28_4xf32 (x, p + 1)));
+                    vmlaq_f32 (vdupq_n_f32 (1.f), x,
+                               jbm_polynomial_28_4xf32 (x, p + 1)));
 }
 
 /**
@@ -6411,8 +6411,8 @@ jbm_rational_29_0_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_29_1_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_1_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6425,8 +6425,8 @@ jbm_rational_29_1_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_29_2_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_2_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6439,8 +6439,8 @@ jbm_rational_29_2_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_29_3_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_3_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6453,8 +6453,8 @@ jbm_rational_29_3_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_29_4_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_4_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6467,8 +6467,8 @@ jbm_rational_29_4_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_29_5_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_5_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6481,8 +6481,8 @@ jbm_rational_29_5_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_29_6_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_6_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6495,8 +6495,8 @@ jbm_rational_29_6_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_29_7_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_7_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6509,8 +6509,8 @@ jbm_rational_29_7_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_29_8_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_8_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6523,8 +6523,8 @@ jbm_rational_29_8_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                         const float *p)        ///< array of coefficients.
+jbm_rational_29_9_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                         const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_9_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6537,8 +6537,8 @@ jbm_rational_29_9_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_10_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_10_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6551,8 +6551,8 @@ jbm_rational_29_10_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_11_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_11_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6565,8 +6565,8 @@ jbm_rational_29_11_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_12_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_12_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6579,8 +6579,8 @@ jbm_rational_29_12_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_13_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_13_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6593,8 +6593,8 @@ jbm_rational_29_13_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_14_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_14_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6607,8 +6607,8 @@ jbm_rational_29_14_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_15_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_15_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6621,8 +6621,8 @@ jbm_rational_29_15_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_16_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_16_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6635,8 +6635,8 @@ jbm_rational_29_16_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_17_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_17_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6649,8 +6649,8 @@ jbm_rational_29_17_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_18_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_18_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6663,8 +6663,8 @@ jbm_rational_29_18_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_19_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_19_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6677,8 +6677,8 @@ jbm_rational_29_19_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_20_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_20_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6691,8 +6691,8 @@ jbm_rational_29_20_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_21_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_21_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6705,8 +6705,8 @@ jbm_rational_29_21_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_22_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_22_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6719,8 +6719,8 @@ jbm_rational_29_22_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_23_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_23_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6733,8 +6733,8 @@ jbm_rational_29_23_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_24_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_24_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6747,8 +6747,8 @@ jbm_rational_29_24_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_25_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_25_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6761,8 +6761,8 @@ jbm_rational_29_25_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_26_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_26_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_26_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6775,8 +6775,8 @@ jbm_rational_29_26_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_27_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_27_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_27_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x,
@@ -6789,8 +6789,8 @@ jbm_rational_29_27_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
  * \return float32x4_t vector of rational values.
  */
 static inline float32x4_t
-jbm_rational_29_28_4xf32 (const float32x4_t x,  ///< float32x4_t vector.
-                          const float *p)       ///< array of coefficients.
+jbm_rational_29_28_4xf32 (const float32x4_t x, ///< float32x4_t vector.
+                          const float *p) ///< array of coefficients.
 {
   return vdivq_f32 (jbm_polynomial_28_4xf32 (x, p),
                     vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[29])));
@@ -8182,8 +8182,8 @@ jbm_v3_length_2xf64 (const float64x2_t x1,
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_1_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_polynomial_1_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, vdupq_n_f64 (p[1]));
 }
@@ -8194,8 +8194,8 @@ jbm_polynomial_1_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_2_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_polynomial_2_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_1_2xf64 (x, p + 1));
 }
@@ -8206,8 +8206,8 @@ jbm_polynomial_2_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_3_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_polynomial_3_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_2_2xf64 (x, p + 1));
 }
@@ -8218,8 +8218,8 @@ jbm_polynomial_3_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_4_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_polynomial_4_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_3_2xf64 (x, p + 1));
 }
@@ -8230,8 +8230,8 @@ jbm_polynomial_4_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_5_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_polynomial_5_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_4_2xf64 (x, p + 1));
 }
@@ -8242,8 +8242,8 @@ jbm_polynomial_5_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_6_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_polynomial_6_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_5_2xf64 (x, p + 1));
 }
@@ -8254,8 +8254,8 @@ jbm_polynomial_6_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_7_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_polynomial_7_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_6_2xf64 (x, p + 1));
 }
@@ -8266,8 +8266,8 @@ jbm_polynomial_7_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_8_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_polynomial_8_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_7_2xf64 (x, p + 1));
 }
@@ -8278,8 +8278,8 @@ jbm_polynomial_8_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_9_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_polynomial_9_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_8_2xf64 (x, p + 1));
 }
@@ -8290,8 +8290,8 @@ jbm_polynomial_9_2xf64 (const float64x2_t x,    ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_10_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_10_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_9_2xf64 (x, p + 1));
 }
@@ -8302,8 +8302,8 @@ jbm_polynomial_10_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_11_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_11_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_10_2xf64 (x, p + 1));
 }
@@ -8314,8 +8314,8 @@ jbm_polynomial_11_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_12_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_12_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_11_2xf64 (x, p + 1));
 }
@@ -8326,8 +8326,8 @@ jbm_polynomial_12_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_13_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_13_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_12_2xf64 (x, p + 1));
 }
@@ -8338,8 +8338,8 @@ jbm_polynomial_13_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_14_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_14_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_13_2xf64 (x, p + 1));
 }
@@ -8350,8 +8350,8 @@ jbm_polynomial_14_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_15_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_15_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_14_2xf64 (x, p + 1));
 }
@@ -8362,8 +8362,8 @@ jbm_polynomial_15_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_16_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_16_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_15_2xf64 (x, p + 1));
 }
@@ -8374,8 +8374,8 @@ jbm_polynomial_16_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_17_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_17_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_16_2xf64 (x, p + 1));
 }
@@ -8386,8 +8386,8 @@ jbm_polynomial_17_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_18_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_18_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_17_2xf64 (x, p + 1));
 }
@@ -8398,8 +8398,8 @@ jbm_polynomial_18_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_19_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_19_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_18_2xf64 (x, p + 1));
 }
@@ -8410,8 +8410,8 @@ jbm_polynomial_19_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_20_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_20_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_19_2xf64 (x, p + 1));
 }
@@ -8422,8 +8422,8 @@ jbm_polynomial_20_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_21_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_21_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_20_2xf64 (x, p + 1));
 }
@@ -8434,8 +8434,8 @@ jbm_polynomial_21_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_22_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_22_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_21_2xf64 (x, p + 1));
 }
@@ -8446,8 +8446,8 @@ jbm_polynomial_22_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_23_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_23_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_22_2xf64 (x, p + 1));
 }
@@ -8458,8 +8458,8 @@ jbm_polynomial_23_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_24_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_24_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_23_2xf64 (x, p + 1));
 }
@@ -8470,8 +8470,8 @@ jbm_polynomial_24_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_25_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_25_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_24_2xf64 (x, p + 1));
 }
@@ -8482,8 +8482,8 @@ jbm_polynomial_25_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_26_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_26_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_25_2xf64 (x, p + 1));
 }
@@ -8494,8 +8494,8 @@ jbm_polynomial_26_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_27_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_27_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_26_2xf64 (x, p + 1));
 }
@@ -8506,8 +8506,8 @@ jbm_polynomial_27_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_28_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_28_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_27_2xf64 (x, p + 1));
 }
@@ -8518,8 +8518,8 @@ jbm_polynomial_28_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of polynomial values.
  */
 static inline float64x2_t
-jbm_polynomial_29_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_polynomial_29_2xf64 (const float64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_polynomial_28_2xf64 (x, p + 1));
 }
@@ -8530,8 +8530,8 @@ jbm_polynomial_29_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_1_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_1_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[1])));
@@ -8543,12 +8543,12 @@ jbm_rational_1_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_2_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_2_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_1_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_1_2xf64 (x, p + 1)));
 }
 
 /**
@@ -8557,8 +8557,8 @@ jbm_rational_2_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_2_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_2_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[2])));
@@ -8570,12 +8570,12 @@ jbm_rational_2_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_3_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_3_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_2_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_2_2xf64 (x, p + 1)));
 }
 
 /**
@@ -8584,8 +8584,8 @@ jbm_rational_3_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_3_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_3_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8598,8 +8598,8 @@ jbm_rational_3_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_3_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_3_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[3])));
@@ -8611,12 +8611,12 @@ jbm_rational_3_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_4_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_4_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_3_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_3_2xf64 (x, p + 1)));
 }
 
 /**
@@ -8625,8 +8625,8 @@ jbm_rational_4_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_4_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_4_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8639,8 +8639,8 @@ jbm_rational_4_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_4_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_4_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8653,8 +8653,8 @@ jbm_rational_4_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_4_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_4_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[4])));
@@ -8666,12 +8666,12 @@ jbm_rational_4_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_5_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_5_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_4_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_4_2xf64 (x, p + 1)));
 }
 
 /**
@@ -8680,8 +8680,8 @@ jbm_rational_5_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_5_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_5_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8694,8 +8694,8 @@ jbm_rational_5_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_5_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_5_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8708,8 +8708,8 @@ jbm_rational_5_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_5_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_5_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8722,8 +8722,8 @@ jbm_rational_5_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_5_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_5_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[5])));
@@ -8735,12 +8735,12 @@ jbm_rational_5_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_6_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_5_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_5_2xf64 (x, p + 1)));
 }
 
 /**
@@ -8749,8 +8749,8 @@ jbm_rational_6_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_6_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8763,8 +8763,8 @@ jbm_rational_6_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_6_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8777,8 +8777,8 @@ jbm_rational_6_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_6_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8791,8 +8791,8 @@ jbm_rational_6_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_6_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8805,8 +8805,8 @@ jbm_rational_6_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_6_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_6_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[6])));
@@ -8818,12 +8818,12 @@ jbm_rational_6_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_7_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_6_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_6_2xf64 (x, p + 1)));
 }
 
 /**
@@ -8832,8 +8832,8 @@ jbm_rational_7_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_7_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8846,8 +8846,8 @@ jbm_rational_7_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_7_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8860,8 +8860,8 @@ jbm_rational_7_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_7_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8874,8 +8874,8 @@ jbm_rational_7_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_7_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8888,8 +8888,8 @@ jbm_rational_7_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_7_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8902,8 +8902,8 @@ jbm_rational_7_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_7_6_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_7_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[7])));
@@ -8915,12 +8915,12 @@ jbm_rational_7_6_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_8_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_7_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_7_2xf64 (x, p + 1)));
 }
 
 /**
@@ -8929,8 +8929,8 @@ jbm_rational_8_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_8_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8943,8 +8943,8 @@ jbm_rational_8_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_8_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8957,8 +8957,8 @@ jbm_rational_8_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_8_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8971,8 +8971,8 @@ jbm_rational_8_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_8_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8985,8 +8985,8 @@ jbm_rational_8_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_8_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -8999,8 +8999,8 @@ jbm_rational_8_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_6_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_8_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9013,8 +9013,8 @@ jbm_rational_8_6_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_8_7_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_8_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[8])));
@@ -9026,12 +9026,12 @@ jbm_rational_8_7_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_9_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_8_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_8_2xf64 (x, p + 1)));
 }
 
 /**
@@ -9040,8 +9040,8 @@ jbm_rational_9_0_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_9_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9054,8 +9054,8 @@ jbm_rational_9_1_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_9_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9068,8 +9068,8 @@ jbm_rational_9_2_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_9_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9082,8 +9082,8 @@ jbm_rational_9_3_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_9_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9096,8 +9096,8 @@ jbm_rational_9_4_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_9_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9110,8 +9110,8 @@ jbm_rational_9_5_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_6_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_9_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9124,8 +9124,8 @@ jbm_rational_9_6_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_7_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_9_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9138,8 +9138,8 @@ jbm_rational_9_7_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_9_8_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
-                        const double *p)        ///< array of coefficients.
+jbm_rational_9_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                        const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[9])));
@@ -9151,12 +9151,12 @@ jbm_rational_9_8_2xf64 (const double64x2_t x,   ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_10_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_9_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_9_2xf64 (x, p + 1)));
 }
 
 /**
@@ -9165,8 +9165,8 @@ jbm_rational_10_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_10_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9179,8 +9179,8 @@ jbm_rational_10_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_10_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9193,8 +9193,8 @@ jbm_rational_10_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_10_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9207,8 +9207,8 @@ jbm_rational_10_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_10_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9221,8 +9221,8 @@ jbm_rational_10_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_10_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9235,8 +9235,8 @@ jbm_rational_10_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_10_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9249,8 +9249,8 @@ jbm_rational_10_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_10_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9263,8 +9263,8 @@ jbm_rational_10_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_10_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9277,8 +9277,8 @@ jbm_rational_10_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_10_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_10_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[10])));
@@ -9290,12 +9290,12 @@ jbm_rational_10_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_11_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_10_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_10_2xf64 (x, p + 1)));
 }
 
 /**
@@ -9304,8 +9304,8 @@ jbm_rational_11_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_11_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9318,8 +9318,8 @@ jbm_rational_11_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_11_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9332,8 +9332,8 @@ jbm_rational_11_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_11_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9346,8 +9346,8 @@ jbm_rational_11_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_11_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9360,8 +9360,8 @@ jbm_rational_11_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_11_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9374,8 +9374,8 @@ jbm_rational_11_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_11_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9388,8 +9388,8 @@ jbm_rational_11_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_11_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9402,8 +9402,8 @@ jbm_rational_11_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_11_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9416,8 +9416,8 @@ jbm_rational_11_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_11_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_11_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9431,7 +9431,7 @@ jbm_rational_11_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_11_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[11])));
@@ -9443,12 +9443,12 @@ jbm_rational_11_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_12_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_11_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_11_2xf64 (x, p + 1)));
 }
 
 /**
@@ -9457,8 +9457,8 @@ jbm_rational_12_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_12_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9471,8 +9471,8 @@ jbm_rational_12_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_12_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9485,8 +9485,8 @@ jbm_rational_12_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_12_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9499,8 +9499,8 @@ jbm_rational_12_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_12_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9513,8 +9513,8 @@ jbm_rational_12_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_12_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9527,8 +9527,8 @@ jbm_rational_12_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_12_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9541,8 +9541,8 @@ jbm_rational_12_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_12_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9555,8 +9555,8 @@ jbm_rational_12_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_12_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9569,8 +9569,8 @@ jbm_rational_12_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_12_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_12_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9584,7 +9584,7 @@ jbm_rational_12_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_12_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9598,7 +9598,7 @@ jbm_rational_12_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_12_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[12])));
@@ -9610,12 +9610,12 @@ jbm_rational_12_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_13_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_12_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_12_2xf64 (x, p + 1)));
 }
 
 /**
@@ -9624,8 +9624,8 @@ jbm_rational_13_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_13_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9638,8 +9638,8 @@ jbm_rational_13_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_13_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9652,8 +9652,8 @@ jbm_rational_13_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_13_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9666,8 +9666,8 @@ jbm_rational_13_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_13_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9680,8 +9680,8 @@ jbm_rational_13_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_13_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9694,8 +9694,8 @@ jbm_rational_13_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_13_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9708,8 +9708,8 @@ jbm_rational_13_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_13_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9722,8 +9722,8 @@ jbm_rational_13_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_13_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9736,8 +9736,8 @@ jbm_rational_13_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_13_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_13_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9751,7 +9751,7 @@ jbm_rational_13_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_13_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9765,7 +9765,7 @@ jbm_rational_13_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_13_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9779,7 +9779,7 @@ jbm_rational_13_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_13_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[13])));
@@ -9791,12 +9791,12 @@ jbm_rational_13_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_14_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_13_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_13_2xf64 (x, p + 1)));
 }
 
 /**
@@ -9805,8 +9805,8 @@ jbm_rational_14_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_14_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9819,8 +9819,8 @@ jbm_rational_14_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_14_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9833,8 +9833,8 @@ jbm_rational_14_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_14_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9847,8 +9847,8 @@ jbm_rational_14_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_14_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9861,8 +9861,8 @@ jbm_rational_14_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_14_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9875,8 +9875,8 @@ jbm_rational_14_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_14_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9889,8 +9889,8 @@ jbm_rational_14_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_14_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9903,8 +9903,8 @@ jbm_rational_14_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_14_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9917,8 +9917,8 @@ jbm_rational_14_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_14_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_14_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9932,7 +9932,7 @@ jbm_rational_14_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_14_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9946,7 +9946,7 @@ jbm_rational_14_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_14_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9960,7 +9960,7 @@ jbm_rational_14_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_14_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -9974,7 +9974,7 @@ jbm_rational_14_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_14_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[14])));
@@ -9986,12 +9986,12 @@ jbm_rational_14_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_15_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_14_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_14_2xf64 (x, p + 1)));
 }
 
 /**
@@ -10000,8 +10000,8 @@ jbm_rational_15_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_15_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10014,8 +10014,8 @@ jbm_rational_15_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_15_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10028,8 +10028,8 @@ jbm_rational_15_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_15_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10042,8 +10042,8 @@ jbm_rational_15_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_15_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10056,8 +10056,8 @@ jbm_rational_15_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_15_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10070,8 +10070,8 @@ jbm_rational_15_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_15_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10084,8 +10084,8 @@ jbm_rational_15_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_15_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10098,8 +10098,8 @@ jbm_rational_15_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_15_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10112,8 +10112,8 @@ jbm_rational_15_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_15_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_15_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10127,7 +10127,7 @@ jbm_rational_15_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_15_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10141,7 +10141,7 @@ jbm_rational_15_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_15_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10155,7 +10155,7 @@ jbm_rational_15_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_15_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10169,7 +10169,7 @@ jbm_rational_15_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_15_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10183,7 +10183,7 @@ jbm_rational_15_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_15_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[15])));
@@ -10195,12 +10195,12 @@ jbm_rational_15_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_16_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_15_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_15_2xf64 (x, p + 1)));
 }
 
 /**
@@ -10209,8 +10209,8 @@ jbm_rational_16_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_16_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10223,8 +10223,8 @@ jbm_rational_16_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_16_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10237,8 +10237,8 @@ jbm_rational_16_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_16_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10251,8 +10251,8 @@ jbm_rational_16_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_16_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10265,8 +10265,8 @@ jbm_rational_16_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_16_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10279,8 +10279,8 @@ jbm_rational_16_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_16_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10293,8 +10293,8 @@ jbm_rational_16_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_16_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10307,8 +10307,8 @@ jbm_rational_16_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_16_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10321,8 +10321,8 @@ jbm_rational_16_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_16_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_16_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10336,7 +10336,7 @@ jbm_rational_16_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_16_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10350,7 +10350,7 @@ jbm_rational_16_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_16_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10364,7 +10364,7 @@ jbm_rational_16_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_16_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10378,7 +10378,7 @@ jbm_rational_16_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_16_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10392,7 +10392,7 @@ jbm_rational_16_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_16_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10406,7 +10406,7 @@ jbm_rational_16_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_16_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[16])));
@@ -10418,12 +10418,12 @@ jbm_rational_16_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_17_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_16_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_16_2xf64 (x, p + 1)));
 }
 
 /**
@@ -10432,8 +10432,8 @@ jbm_rational_17_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_17_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10446,8 +10446,8 @@ jbm_rational_17_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_17_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10460,8 +10460,8 @@ jbm_rational_17_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_17_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10474,8 +10474,8 @@ jbm_rational_17_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_17_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10488,8 +10488,8 @@ jbm_rational_17_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_17_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10502,8 +10502,8 @@ jbm_rational_17_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_17_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10516,8 +10516,8 @@ jbm_rational_17_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_17_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10530,8 +10530,8 @@ jbm_rational_17_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_17_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10544,8 +10544,8 @@ jbm_rational_17_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_17_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_17_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10559,7 +10559,7 @@ jbm_rational_17_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_17_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10573,7 +10573,7 @@ jbm_rational_17_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_17_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10587,7 +10587,7 @@ jbm_rational_17_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_17_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10601,7 +10601,7 @@ jbm_rational_17_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_17_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10615,7 +10615,7 @@ jbm_rational_17_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_17_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10629,7 +10629,7 @@ jbm_rational_17_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_17_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10643,7 +10643,7 @@ jbm_rational_17_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_17_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[17])));
@@ -10655,12 +10655,12 @@ jbm_rational_17_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_18_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_17_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_17_2xf64 (x, p + 1)));
 }
 
 /**
@@ -10669,8 +10669,8 @@ jbm_rational_18_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_18_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10683,8 +10683,8 @@ jbm_rational_18_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_18_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10697,8 +10697,8 @@ jbm_rational_18_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_18_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10711,8 +10711,8 @@ jbm_rational_18_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_18_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10725,8 +10725,8 @@ jbm_rational_18_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_18_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10739,8 +10739,8 @@ jbm_rational_18_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_18_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10753,8 +10753,8 @@ jbm_rational_18_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_18_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10767,8 +10767,8 @@ jbm_rational_18_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_18_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10781,8 +10781,8 @@ jbm_rational_18_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_18_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_18_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10796,7 +10796,7 @@ jbm_rational_18_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_18_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10810,7 +10810,7 @@ jbm_rational_18_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_18_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10824,7 +10824,7 @@ jbm_rational_18_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_18_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10838,7 +10838,7 @@ jbm_rational_18_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_18_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10852,7 +10852,7 @@ jbm_rational_18_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_18_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10866,7 +10866,7 @@ jbm_rational_18_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_18_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10880,7 +10880,7 @@ jbm_rational_18_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_18_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10894,7 +10894,7 @@ jbm_rational_18_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_18_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[18])));
@@ -10906,12 +10906,12 @@ jbm_rational_18_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_19_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_18_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_18_2xf64 (x, p + 1)));
 }
 
 /**
@@ -10920,8 +10920,8 @@ jbm_rational_19_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_19_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10934,8 +10934,8 @@ jbm_rational_19_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_19_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10948,8 +10948,8 @@ jbm_rational_19_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_19_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10962,8 +10962,8 @@ jbm_rational_19_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_19_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10976,8 +10976,8 @@ jbm_rational_19_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_19_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -10990,8 +10990,8 @@ jbm_rational_19_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_19_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11004,8 +11004,8 @@ jbm_rational_19_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_19_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11018,8 +11018,8 @@ jbm_rational_19_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_19_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11032,8 +11032,8 @@ jbm_rational_19_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_19_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_19_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11047,7 +11047,7 @@ jbm_rational_19_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_19_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11061,7 +11061,7 @@ jbm_rational_19_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_19_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11075,7 +11075,7 @@ jbm_rational_19_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_19_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11089,7 +11089,7 @@ jbm_rational_19_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_19_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11103,7 +11103,7 @@ jbm_rational_19_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_19_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11117,7 +11117,7 @@ jbm_rational_19_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_19_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11131,7 +11131,7 @@ jbm_rational_19_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_19_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11145,7 +11145,7 @@ jbm_rational_19_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_19_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11159,7 +11159,7 @@ jbm_rational_19_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_19_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[19])));
@@ -11171,12 +11171,12 @@ jbm_rational_19_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_20_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_19_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_19_2xf64 (x, p + 1)));
 }
 
 /**
@@ -11185,8 +11185,8 @@ jbm_rational_20_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_20_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11199,8 +11199,8 @@ jbm_rational_20_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_20_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11213,8 +11213,8 @@ jbm_rational_20_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_20_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11227,8 +11227,8 @@ jbm_rational_20_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_20_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11241,8 +11241,8 @@ jbm_rational_20_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_20_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11255,8 +11255,8 @@ jbm_rational_20_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_20_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11269,8 +11269,8 @@ jbm_rational_20_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_20_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11283,8 +11283,8 @@ jbm_rational_20_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_20_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11297,8 +11297,8 @@ jbm_rational_20_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_20_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_20_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11312,7 +11312,7 @@ jbm_rational_20_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_20_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11326,7 +11326,7 @@ jbm_rational_20_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_20_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11340,7 +11340,7 @@ jbm_rational_20_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_20_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11354,7 +11354,7 @@ jbm_rational_20_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_20_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11368,7 +11368,7 @@ jbm_rational_20_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_20_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11382,7 +11382,7 @@ jbm_rational_20_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_20_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11396,7 +11396,7 @@ jbm_rational_20_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_20_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11410,7 +11410,7 @@ jbm_rational_20_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_20_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11424,7 +11424,7 @@ jbm_rational_20_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_20_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11438,7 +11438,7 @@ jbm_rational_20_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_20_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[20])));
@@ -11450,12 +11450,12 @@ jbm_rational_20_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_21_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_20_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_20_2xf64 (x, p + 1)));
 }
 
 /**
@@ -11464,8 +11464,8 @@ jbm_rational_21_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_21_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11478,8 +11478,8 @@ jbm_rational_21_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_21_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11492,8 +11492,8 @@ jbm_rational_21_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_21_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11506,8 +11506,8 @@ jbm_rational_21_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_21_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11520,8 +11520,8 @@ jbm_rational_21_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_21_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11534,8 +11534,8 @@ jbm_rational_21_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_21_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11548,8 +11548,8 @@ jbm_rational_21_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_21_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11562,8 +11562,8 @@ jbm_rational_21_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_21_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11576,8 +11576,8 @@ jbm_rational_21_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_21_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_21_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11591,7 +11591,7 @@ jbm_rational_21_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11605,7 +11605,7 @@ jbm_rational_21_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11619,7 +11619,7 @@ jbm_rational_21_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11633,7 +11633,7 @@ jbm_rational_21_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11647,7 +11647,7 @@ jbm_rational_21_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11661,7 +11661,7 @@ jbm_rational_21_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11675,7 +11675,7 @@ jbm_rational_21_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11689,7 +11689,7 @@ jbm_rational_21_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11703,7 +11703,7 @@ jbm_rational_21_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11717,7 +11717,7 @@ jbm_rational_21_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11731,7 +11731,7 @@ jbm_rational_21_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_21_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[21])));
@@ -11743,12 +11743,12 @@ jbm_rational_21_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_22_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_21_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_21_2xf64 (x, p + 1)));
 }
 
 /**
@@ -11757,8 +11757,8 @@ jbm_rational_22_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_22_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11771,8 +11771,8 @@ jbm_rational_22_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_22_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11785,8 +11785,8 @@ jbm_rational_22_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_22_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11799,8 +11799,8 @@ jbm_rational_22_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_22_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11813,8 +11813,8 @@ jbm_rational_22_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_22_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11827,8 +11827,8 @@ jbm_rational_22_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_22_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11841,8 +11841,8 @@ jbm_rational_22_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_22_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11855,8 +11855,8 @@ jbm_rational_22_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_22_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11869,8 +11869,8 @@ jbm_rational_22_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_22_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_22_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11884,7 +11884,7 @@ jbm_rational_22_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11898,7 +11898,7 @@ jbm_rational_22_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11912,7 +11912,7 @@ jbm_rational_22_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11926,7 +11926,7 @@ jbm_rational_22_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11940,7 +11940,7 @@ jbm_rational_22_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11954,7 +11954,7 @@ jbm_rational_22_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11968,7 +11968,7 @@ jbm_rational_22_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11982,7 +11982,7 @@ jbm_rational_22_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -11996,7 +11996,7 @@ jbm_rational_22_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12010,7 +12010,7 @@ jbm_rational_22_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12024,7 +12024,7 @@ jbm_rational_22_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12038,7 +12038,7 @@ jbm_rational_22_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_22_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[22])));
@@ -12050,12 +12050,12 @@ jbm_rational_22_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_23_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_22_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_22_2xf64 (x, p + 1)));
 }
 
 /**
@@ -12064,8 +12064,8 @@ jbm_rational_23_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_23_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12078,8 +12078,8 @@ jbm_rational_23_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_23_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12092,8 +12092,8 @@ jbm_rational_23_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_23_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12106,8 +12106,8 @@ jbm_rational_23_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_23_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12120,8 +12120,8 @@ jbm_rational_23_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_23_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12134,8 +12134,8 @@ jbm_rational_23_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_23_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12148,8 +12148,8 @@ jbm_rational_23_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_23_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12162,8 +12162,8 @@ jbm_rational_23_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_23_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12176,8 +12176,8 @@ jbm_rational_23_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_23_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_23_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12191,7 +12191,7 @@ jbm_rational_23_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12205,7 +12205,7 @@ jbm_rational_23_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12219,7 +12219,7 @@ jbm_rational_23_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12233,7 +12233,7 @@ jbm_rational_23_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12247,7 +12247,7 @@ jbm_rational_23_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12261,7 +12261,7 @@ jbm_rational_23_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12275,7 +12275,7 @@ jbm_rational_23_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12289,7 +12289,7 @@ jbm_rational_23_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12303,7 +12303,7 @@ jbm_rational_23_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12317,7 +12317,7 @@ jbm_rational_23_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12331,7 +12331,7 @@ jbm_rational_23_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12345,7 +12345,7 @@ jbm_rational_23_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12359,7 +12359,7 @@ jbm_rational_23_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_23_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[23])));
@@ -12371,12 +12371,12 @@ jbm_rational_23_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_24_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_23_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_23_2xf64 (x, p + 1)));
 }
 
 /**
@@ -12385,8 +12385,8 @@ jbm_rational_24_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_24_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12399,8 +12399,8 @@ jbm_rational_24_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_24_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12413,8 +12413,8 @@ jbm_rational_24_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_24_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12427,8 +12427,8 @@ jbm_rational_24_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_24_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12441,8 +12441,8 @@ jbm_rational_24_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_24_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12455,8 +12455,8 @@ jbm_rational_24_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_24_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12469,8 +12469,8 @@ jbm_rational_24_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_24_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12483,8 +12483,8 @@ jbm_rational_24_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_24_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12497,8 +12497,8 @@ jbm_rational_24_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_24_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_24_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12512,7 +12512,7 @@ jbm_rational_24_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12526,7 +12526,7 @@ jbm_rational_24_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12540,7 +12540,7 @@ jbm_rational_24_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12554,7 +12554,7 @@ jbm_rational_24_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12568,7 +12568,7 @@ jbm_rational_24_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12582,7 +12582,7 @@ jbm_rational_24_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12596,7 +12596,7 @@ jbm_rational_24_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12610,7 +12610,7 @@ jbm_rational_24_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12624,7 +12624,7 @@ jbm_rational_24_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12638,7 +12638,7 @@ jbm_rational_24_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12652,7 +12652,7 @@ jbm_rational_24_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12666,7 +12666,7 @@ jbm_rational_24_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12680,7 +12680,7 @@ jbm_rational_24_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12694,7 +12694,7 @@ jbm_rational_24_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_24_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[24])));
@@ -12706,12 +12706,12 @@ jbm_rational_24_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_25_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_24_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_24_2xf64 (x, p + 1)));
 }
 
 /**
@@ -12720,8 +12720,8 @@ jbm_rational_25_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_25_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12734,8 +12734,8 @@ jbm_rational_25_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_25_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12748,8 +12748,8 @@ jbm_rational_25_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_25_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12762,8 +12762,8 @@ jbm_rational_25_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_25_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12776,8 +12776,8 @@ jbm_rational_25_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_25_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12790,8 +12790,8 @@ jbm_rational_25_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_25_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12804,8 +12804,8 @@ jbm_rational_25_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_25_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12818,8 +12818,8 @@ jbm_rational_25_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_25_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12832,8 +12832,8 @@ jbm_rational_25_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_25_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_25_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12847,7 +12847,7 @@ jbm_rational_25_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12861,7 +12861,7 @@ jbm_rational_25_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12875,7 +12875,7 @@ jbm_rational_25_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12889,7 +12889,7 @@ jbm_rational_25_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12903,7 +12903,7 @@ jbm_rational_25_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12917,7 +12917,7 @@ jbm_rational_25_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12931,7 +12931,7 @@ jbm_rational_25_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12945,7 +12945,7 @@ jbm_rational_25_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12959,7 +12959,7 @@ jbm_rational_25_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12973,7 +12973,7 @@ jbm_rational_25_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -12987,7 +12987,7 @@ jbm_rational_25_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13001,7 +13001,7 @@ jbm_rational_25_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13015,7 +13015,7 @@ jbm_rational_25_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13029,7 +13029,7 @@ jbm_rational_25_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13043,7 +13043,7 @@ jbm_rational_25_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_25_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_24_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[25])));
@@ -13055,12 +13055,12 @@ jbm_rational_25_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_26_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_25_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_25_2xf64 (x, p + 1)));
 }
 
 /**
@@ -13069,8 +13069,8 @@ jbm_rational_26_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_26_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13083,8 +13083,8 @@ jbm_rational_26_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_26_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13097,8 +13097,8 @@ jbm_rational_26_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_26_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13111,8 +13111,8 @@ jbm_rational_26_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_26_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13125,8 +13125,8 @@ jbm_rational_26_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_26_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13139,8 +13139,8 @@ jbm_rational_26_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_26_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13153,8 +13153,8 @@ jbm_rational_26_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_26_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13167,8 +13167,8 @@ jbm_rational_26_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_26_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13181,8 +13181,8 @@ jbm_rational_26_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_26_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_26_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13196,7 +13196,7 @@ jbm_rational_26_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13210,7 +13210,7 @@ jbm_rational_26_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13224,7 +13224,7 @@ jbm_rational_26_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13238,7 +13238,7 @@ jbm_rational_26_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13252,7 +13252,7 @@ jbm_rational_26_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13266,7 +13266,7 @@ jbm_rational_26_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13280,7 +13280,7 @@ jbm_rational_26_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13294,7 +13294,7 @@ jbm_rational_26_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13308,7 +13308,7 @@ jbm_rational_26_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13322,7 +13322,7 @@ jbm_rational_26_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13336,7 +13336,7 @@ jbm_rational_26_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13350,7 +13350,7 @@ jbm_rational_26_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13364,7 +13364,7 @@ jbm_rational_26_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13378,7 +13378,7 @@ jbm_rational_26_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13392,7 +13392,7 @@ jbm_rational_26_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_24_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13406,7 +13406,7 @@ jbm_rational_26_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_26_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_25_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[26])));
@@ -13418,12 +13418,12 @@ jbm_rational_26_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_27_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_26_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_26_2xf64 (x, p + 1)));
 }
 
 /**
@@ -13432,8 +13432,8 @@ jbm_rational_27_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_27_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13446,8 +13446,8 @@ jbm_rational_27_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_27_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13460,8 +13460,8 @@ jbm_rational_27_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_27_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13474,8 +13474,8 @@ jbm_rational_27_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_27_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13488,8 +13488,8 @@ jbm_rational_27_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_27_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13502,8 +13502,8 @@ jbm_rational_27_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_27_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13516,8 +13516,8 @@ jbm_rational_27_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_27_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13530,8 +13530,8 @@ jbm_rational_27_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_27_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13544,8 +13544,8 @@ jbm_rational_27_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_27_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_27_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13559,7 +13559,7 @@ jbm_rational_27_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13573,7 +13573,7 @@ jbm_rational_27_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13587,7 +13587,7 @@ jbm_rational_27_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13601,7 +13601,7 @@ jbm_rational_27_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13615,7 +13615,7 @@ jbm_rational_27_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13629,7 +13629,7 @@ jbm_rational_27_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13643,7 +13643,7 @@ jbm_rational_27_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13657,7 +13657,7 @@ jbm_rational_27_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13671,7 +13671,7 @@ jbm_rational_27_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13685,7 +13685,7 @@ jbm_rational_27_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13699,7 +13699,7 @@ jbm_rational_27_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13713,7 +13713,7 @@ jbm_rational_27_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13727,7 +13727,7 @@ jbm_rational_27_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13741,7 +13741,7 @@ jbm_rational_27_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13755,7 +13755,7 @@ jbm_rational_27_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_24_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13769,7 +13769,7 @@ jbm_rational_27_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_25_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13783,7 +13783,7 @@ jbm_rational_27_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_27_26_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_26_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[27])));
@@ -13795,12 +13795,12 @@ jbm_rational_27_26_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_28_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_27_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_27_2xf64 (x, p + 1)));
 }
 
 /**
@@ -13809,8 +13809,8 @@ jbm_rational_28_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_28_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13823,8 +13823,8 @@ jbm_rational_28_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_28_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13837,8 +13837,8 @@ jbm_rational_28_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_28_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13851,8 +13851,8 @@ jbm_rational_28_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_28_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13865,8 +13865,8 @@ jbm_rational_28_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_28_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13879,8 +13879,8 @@ jbm_rational_28_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_28_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13893,8 +13893,8 @@ jbm_rational_28_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_28_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13907,8 +13907,8 @@ jbm_rational_28_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_28_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13921,8 +13921,8 @@ jbm_rational_28_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_28_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_28_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13936,7 +13936,7 @@ jbm_rational_28_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13950,7 +13950,7 @@ jbm_rational_28_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13964,7 +13964,7 @@ jbm_rational_28_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13978,7 +13978,7 @@ jbm_rational_28_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -13992,7 +13992,7 @@ jbm_rational_28_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14006,7 +14006,7 @@ jbm_rational_28_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14020,7 +14020,7 @@ jbm_rational_28_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14034,7 +14034,7 @@ jbm_rational_28_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14048,7 +14048,7 @@ jbm_rational_28_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14062,7 +14062,7 @@ jbm_rational_28_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14076,7 +14076,7 @@ jbm_rational_28_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14090,7 +14090,7 @@ jbm_rational_28_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14104,7 +14104,7 @@ jbm_rational_28_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14118,7 +14118,7 @@ jbm_rational_28_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14132,7 +14132,7 @@ jbm_rational_28_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_24_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14146,7 +14146,7 @@ jbm_rational_28_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_25_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14160,7 +14160,7 @@ jbm_rational_28_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_26_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_26_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14174,7 +14174,7 @@ jbm_rational_28_26_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_28_27_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_27_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[28])));
@@ -14186,12 +14186,12 @@ jbm_rational_28_27_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_29_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (vdupq_n_f64 (p[0]),
-                    vmlaq (vdupq_n_f64 (1.), x,
-                           jbm_polynomial_28_2xf64 (x, p + 1)));
+                    vmlaq_f64 (vdupq_n_f64 (1.), x,
+                               jbm_polynomial_28_2xf64 (x, p + 1)));
 }
 
 /**
@@ -14200,8 +14200,8 @@ jbm_rational_29_0_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_29_1_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_1_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14214,8 +14214,8 @@ jbm_rational_29_1_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_29_2_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_2_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14228,8 +14228,8 @@ jbm_rational_29_2_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_29_3_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_3_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14242,8 +14242,8 @@ jbm_rational_29_3_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_29_4_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_4_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14256,8 +14256,8 @@ jbm_rational_29_4_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_29_5_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_5_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14270,8 +14270,8 @@ jbm_rational_29_5_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_29_6_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_6_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14284,8 +14284,8 @@ jbm_rational_29_6_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_29_7_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_7_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14298,8 +14298,8 @@ jbm_rational_29_7_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_29_8_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_8_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14312,8 +14312,8 @@ jbm_rational_29_8_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  * \return float64x2_t vector of rational values.
  */
 static inline float64x2_t
-jbm_rational_29_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
-                         const double *p)       ///< array of coefficients.
+jbm_rational_29_9_2xf64 (const double64x2_t x, ///< float64x2_t vector.
+                         const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_9_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14327,7 +14327,7 @@ jbm_rational_29_9_2xf64 (const double64x2_t x,  ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_10_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14341,7 +14341,7 @@ jbm_rational_29_10_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_11_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14355,7 +14355,7 @@ jbm_rational_29_11_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_12_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14369,7 +14369,7 @@ jbm_rational_29_12_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_13_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14383,7 +14383,7 @@ jbm_rational_29_13_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_14_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14397,7 +14397,7 @@ jbm_rational_29_14_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_15_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14411,7 +14411,7 @@ jbm_rational_29_15_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_16_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14425,7 +14425,7 @@ jbm_rational_29_16_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_17_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14439,7 +14439,7 @@ jbm_rational_29_17_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_18_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14453,7 +14453,7 @@ jbm_rational_29_18_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_19_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14467,7 +14467,7 @@ jbm_rational_29_19_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_20_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14481,7 +14481,7 @@ jbm_rational_29_20_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_21_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14495,7 +14495,7 @@ jbm_rational_29_21_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_22_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14509,7 +14509,7 @@ jbm_rational_29_22_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_23_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14523,7 +14523,7 @@ jbm_rational_29_23_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_24_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14537,7 +14537,7 @@ jbm_rational_29_24_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_25_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14551,7 +14551,7 @@ jbm_rational_29_25_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_26_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_26_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14565,7 +14565,7 @@ jbm_rational_29_26_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_27_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_27_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x,
@@ -14579,7 +14579,7 @@ jbm_rational_29_27_2xf64 (const double64x2_t x, ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_rational_29_28_2xf64 (const double64x2_t x, ///< float64x2_t vector.
-                          const double *p)      ///< array of coefficients.
+                          const double *p) ///< array of coefficients.
 {
   return vdivq_f64 (jbm_polynomial_28_2xf64 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[29])));
