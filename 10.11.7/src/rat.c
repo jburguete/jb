@@ -559,7 +559,7 @@ print_rat_1_0_d (FILE *f, const unsigned int type)
       break;
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float64x2_t\n");
-      fprintf (f, "jbm_rational_1_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.\n");
+      fprintf (f, "jbm_rational_1_0_2xf64 (const float64x2_t x, ///< float64x2_t vector.\n");
       fprintf (f, "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f, "  return vdivq_f64 (vdupq_n_f64 (p[0]),\n");
@@ -616,7 +616,7 @@ print_rat_0_d (FILE *f, const unsigned int i, const unsigned int type)
       break;
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float64x2_t\n");
-      fprintf (f, "jbm_rational_%u_0_2xf64 (const double64x2_t x, ///< float64x2_t vector.\n",
+      fprintf (f, "jbm_rational_%u_0_2xf64 (const float64x2_t x, ///< float64x2_t vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -685,7 +685,7 @@ print_rat_i_d (FILE *f, const unsigned int i, const unsigned int j,
       break;
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float64x2_t\n");
-      fprintf (f, "jbm_rational_%u_%u_2xf64 (const double64x2_t x, ///< float64x2_t vector.\n",
+      fprintf (f, "jbm_rational_%u_%u_2xf64 (const float64x2_t x, ///< float64x2_t vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -757,7 +757,7 @@ print_rat_n_d (FILE *f, const unsigned int i, const unsigned int type)
       break;
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float64x2_t\n");
-      fprintf (f, "jbm_rational_%u_%u_2xf64 (const double64x2_t x, ///< float64x2_t vector.\n",
+      fprintf (f, "jbm_rational_%u_%u_2xf64 (const float64x2_t x, ///< float64x2_t vector.\n",
                i, i - 1);
       if (i > 9)
         {

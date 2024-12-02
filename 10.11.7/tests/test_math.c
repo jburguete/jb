@@ -4318,6 +4318,254 @@ main (void)
   aligned_free (d_2);
   aligned_free (d_1);
 #endif
+#ifdef __ARM_NEON
+  printf ("check NEON functions\n");
+  d_1 = aligned_alloc (16, 2 * sizeof (double));
+  d_2 = aligned_alloc (16, 2 * sizeof (double));
+  d_2xf64 = jbm_abs_2xf64 (_mm_set_pd (-1., 1));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("abs_2xf64([1,-1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_small_2xf64 (_mm_set_pd (1., 0.));
+  vst1q_f64 (d_1, d_2xf64);
+  L_1 = (unsigned long long int *) d_1;
+  printf ("small_2xf64([0,1])=[%16llx,%16llx]\n", L_1[0], L_1[1]);
+  d_2xf64 = jbm_modmin_2xf64 (_mm_set_pd (-1., 1.), _mm_set_pd (-2., 0.5));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("modmin_2xf64([1,-1],[0.5,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_modmin_2xf64 (_mm_set_pd (1.0, 0.), _mm_set_pd (-2., 1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("modmin_2xf64([0,1],[1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = _mm_set_pd (1., 0.);
+  d2_2xf64 = _mm_set_pd (-2., 1.);
+  jbm_change_2xf64 (&d_2xf64, &d2_2xf64);
+  vst1q_f64 (d_1, d_2xf64);
+  vst1q_f64 (d_2, d2_2xf64);
+  printf ("change_2xf64([0,1],[1,-2])=([%.17lg,%.17lg],[%.17lg,%.17lg])\n",
+          d_1[0], d_1[1], d_2[0], d_2[1]);
+  d2_2xf64 = jbm_dbl_2xf64 (d_2xf64);
+  vst1q_f64 (d_1, d2_2xf64);
+  printf ("dbl_2xf64([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_sqr_2xf64 (d_2xf64);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("sqr_2xf64([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_extrapolate_2xf64 (_mm_set_pd (-1., 1.),
+                                   vdupq_n_f64 (0.),
+                                   vdupq_n_f64 (2.),
+                                   vdupq_n_f64 (1.), vdupq_n_f64 (4.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("extrapolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_interpolate_2xf64 (_mm_set_pd (-1., 1.),
+                                   vdupq_n_f64 (0.),
+                                   vdupq_n_f64 (2.),
+                                   vdupq_n_f64 (1.), vdupq_n_f64 (4.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("interpolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_interpolate_2xf64 (_mm_set_pd (3., 1.),
+                                   _mm_set_pd (0., 0.),
+                                   _mm_set_pd (2., 2.),
+                                   _mm_set_pd (1., 1.), _mm_set_pd (4., 4.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("interpolate_2xf64([1,3],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_v2_length_2xf64 (_mm_set_pd (2., 1.),
+                                 _mm_set_pd (-1., 4.),
+                                 _mm_set_pd (5., -3.), _mm_set_pd (3., 1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("v2_length_2xf64([1,2],[4,-1],[-3,5],[1,3])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_v3_length_2xf64 (_mm_set_pd (2., 1.),
+                                 _mm_set_pd (-1., 4.),
+                                 _mm_set_pd (1., 3.),
+                                 _mm_set_pd (4., -1.),
+                                 _mm_set_pd (2., 1.), _mm_set_pd (-5., 9.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("v3_length_2xf64([1,2],[4,-1],[3,1],[-1,4],[1,2],[9,-5])"
+          "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_polynomial_11_2xf64 (_mm_set_pd (1., 0.5), p_1);
+  vst1q_f64 (d_1, d_2xf64);
+  printf
+    ("polynomial_11_2xf64([0.5,1],[1,2,4,8,16,32,64,128,256,512,1024,2048])"
+     "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_solve_quadratic_2xf64 (_mm_set_pd (0., 2.), _mm_set_pd (-2., -1.),
+                               _mm_set_pd (1., -1.), _mm_set_pd (0., 0.),
+                               _mm_set_pd (2., 2.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("solve_quadratic_2xf64([2,0],[-1,-2][-1,1],[0,0],[2,2])"
+          "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_setzero_pd (),
+                                    vdupq_n_f64 (1.),
+                                    JBM_FLUX_LIMITER_TYPE_TOTAL);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_total_2xf64([0,0],[1,1])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_setzero_pd (),
+                                    vdupq_n_f64 (1.),
+                                    JBM_FLUX_LIMITER_TYPE_NULL);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_null_2xf64([0,0],[1,1])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 1.),
+                                    _mm_set_pd (0., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_CENTRED);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_centred_2xf64([1,3],[1,0])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., -1.),
+                                    _mm_set_pd (3., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_SUPERBEE);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_superbee_2xf64([-1,1],[1,3])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 2.),
+                                    _mm_set_pd (2., 3.),
+                                    JBM_FLUX_LIMITER_TYPE_SUPERBEE);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_superbee_2xf64([2,3],[3,2])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
+                                    _mm_set_pd (1., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_SUPERBEE);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_superbee_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
+                                    _mm_set_pd (3., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_MINMOD);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_minmod_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
+                                    _mm_set_pd (1., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_MINMOD);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_minmod_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
+                                    _mm_set_pd (3., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_VAN_LEER);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_VanLeer_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
+                                    _mm_set_pd (3., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_VAN_ALBADA);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_VanAlbada_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
+                                    _mm_set_pd (3., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_MINSUPER);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_minsuper_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
+                                    _mm_set_pd (1., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_MINSUPER);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_minsuper_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., -1.),
+                                    _mm_set_pd (3., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_SUPERMIN);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_supermin_2xf64([-1,1],[1,3])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
+                                    _mm_set_pd (1., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_SUPERMIN);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_supermin_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (0.5, -1.),
+                                    _mm_set_pd (3., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_monotonized_central_2xf64([-1,0.5],[1,3])"
+          "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 2.),
+                                    _mm_set_pd (0.5, 3.),
+                                    JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_monotonized_central_2xf64([2,3],[3,0.5])"
+          "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
+                                    _mm_set_pd (3., 1.),
+                                    JBM_FLUX_LIMITER_TYPE_MEAN);
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("flux_limiter_mean_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+          d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn0_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(1,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn1_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn2_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^2,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn3_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^3,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn4_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^4,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn5_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^5,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn6_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^6,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn7_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^7,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn8_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^8,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn9_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^9,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn10_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^10,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+          d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn11_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^11,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+          d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn12_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^12,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+          d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn13_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^13,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+          d_1[1]);
+  d_2xf64 =
+    jbm_integral_2xf64 (fn14_2xf64, _mm_set_pd (-1., 0.), vdupq_n_f64 (1.));
+  vst1q_f64 (d_1, d_2xf64);
+  printf ("integral_2xf64(x^14,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+          d_1[1]);
+  aligned_free (d_2);
+  aligned_free (d_1);
+#endif
+
   printf ("check farray functions\n");
   printf ("0\n");
   fa = jbm_farray_create (pf, 11);
