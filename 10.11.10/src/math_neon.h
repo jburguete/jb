@@ -202,7 +202,7 @@ jbm_exp2n_4xf32 (int32x4_t e)     ///< exponent vector (int32x4_t).
   k127 = vdupq_n_s32(127);
   kn127 = vdupq_n_s32(-127);
   x = vbslq_f32 (vcgtq_s32 (e, kn127),
-                 vreinterpretq_f32_s32 (vshlq_n_s32 (vaddq_s32 (e, k127)), 23),
+                 vreinterpretq_f32_s32 (vshlq_n_s32 (vaddq_s32 (e, k127), 23)),
                  vreinterpretq_f32_s32 (vshlq_s32 (vdupq_n_s32 (0x00400000),
                                                    vsubq_s32 (kn127, e))));
   x = vbslq_f32 (vcltq_s32 (e, vdupq_n_s32 (-150)), vdupq_n_f32 (0.f), x);
@@ -7981,7 +7981,7 @@ jbm_frexp_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
   m1 = vorrq_u64 (m1, vandq_u64 (m2, m3));
   e2 = vbslq_s64 (m1, vdupq_n_s64 (0L), e2);
   *e = e2;
-  return vbslq_f64 (m1, vmulq_f64 (vdupq_n_f64 (0.5), x, vdivq_f64 (x, y.x)));
+  return vbslq_f64 (m1, x, vmulq_f64 (vdupq_n_f64 (0.5), vdivq_f64 (x, y.x)));
 }
 
 /**
