@@ -52,10 +52,30 @@ typedef union
 } JBM2xF64;
 
 // Debug functions
+
 /*
+static inline void
+print_uint32x4_t (FILE *file, const char *label, uint32x4_t x)
+{
+  unsigned int y[4] JB_ALIGNED;
+  unsigned int i;
+  vst1q_u32 (y, x);
+  for (i = 0; i < 4; ++i)
+    fprintf (file, "%s[%u]=%u\n", label, i, y[i]);
+}
 
 static inline void
-print_m128i32 (FILE *file, const char *label, int32x4_t x)
+print_uint64x2_t (FILE *file, const char *label, uint64x2_t x)
+{
+  unsigned long long int y[2] JB_ALIGNED;
+  unsigned int i;
+  vst1q_u64 (y, x);
+  for (i = 0; i < 2; ++i)
+    fprintf (file, "%s[%u]=%llu\n", label, i, y[i]);
+}
+
+static inline void
+print_int32x4_t (FILE *file, const char *label, int32x4_t x)
 {
   int y[4] JB_ALIGNED;
   unsigned int i;
@@ -65,7 +85,7 @@ print_m128i32 (FILE *file, const char *label, int32x4_t x)
 }
 
 static inline void
-print_m128i64 (FILE *file, const char *label, int64x2_t x)
+print_int64x2_t (FILE *file, const char *label, int64x2_t x)
 {
   long long int y[2] JB_ALIGNED;
   unsigned int i;
@@ -75,7 +95,7 @@ print_m128i64 (FILE *file, const char *label, int64x2_t x)
 }
 
 static inline void
-print_m128 (FILE *file, const char *label, float32x4_t x)
+print_float32x4_t (FILE *file, const char *label, float32x4_t x)
 {
   float y[4] JB_ALIGNED;
   unsigned int i;
@@ -85,7 +105,7 @@ print_m128 (FILE *file, const char *label, float32x4_t x)
 }
 
 static inline void
-print_m128d (FILE *file, const char *label, float64x2_t x)
+print_float64x2_t (FILE *file, const char *label, float64x2_t x)
 {
   double y[2] JB_ALIGNED;
   unsigned int i;
@@ -115,7 +135,7 @@ jbm_opposite_4xf32 (const float32x4_t x)     ///< float32x4_t vector.
 static inline float32x4_t
 jbm_reciprocal_4xf32 (const float32x4_t x)   ///< float32x4_t vector.
 {
-  return vrecpeq_f32 (x);
+  return vdivq_f32 (vdupq_n_f32 (1.f), x);
 }
 
 /**
@@ -177,13 +197,12 @@ jbm_frexp_4xf32 (const float32x4_t x,        ///< float32x4_t vector.
   z.x = vdivq_f32 (x, y2.x);
   z.i = vandq_u32 (z.i, b);
   e4 = vbslq_s32 (m2,
-                  vsubq_s32 (vshlq_n_s32 (vreinterpretq_s32_u32 (z.i), 23),
+                  vsubq_s32 (vshrq_n_s32 (vreinterpretq_s32_u32 (z.i), 23),
                              vdupq_n_s32 (253)),
-                  vsubq_s32 (vshlq_n_s32 (vreinterpretq_s32_u32 (y.i), 23),
+                  vsubq_s32 (vshrq_n_s32 (vreinterpretq_s32_u32 (y.i), 23),
                              vdupq_n_s32 (126)));
   y.x = vbslq_f32 (m2, vmulq_f32 (y2.x, z.x), y.x);
-  m1 = vorrq_u32 (m1, vandq_u32 (m2, m3));
-  e4 = vbslq_s32 (m1, e4, vdupq_n_s32 (0));
+  e4 = vbslq_s32 (vorrq_u32 (m1, vandq_u32 (m2, m3)), vdupq_n_s32 (0), e4);
   *e = e4;
   return vbslq_f32 (m1, x, vmulq_f32 (vdupq_n_f32 (0.5f), vdivq_f32 (x, y.x)));
 }
@@ -7122,8 +7141,10 @@ jbm_cos_4xf32 (const float32x4_t x)  ///< float32x4_t vector.
 static inline void
 jbm_sincos_4xf32 (const float32x4_t x,
                   ///< float32x4_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  float32x4_t *s,    ///< pointer to the sin function value (float32x4_t).
-                  float32x4_t *c)    ///< pointer to the cos function value (float32x4_t).
+                  float32x4_t *s,
+		  ///< pointer to the sin function value (float32x4_t).
+                  float32x4_t *c)
+                  ///< pointer to the cos function value (float32x4_t).
 {
   float32x4_t y, pi2, s1, c1, s2, c2;
   uint32x4_t m;
@@ -7911,7 +7932,7 @@ jbm_opposite_2xf64 (const float64x2_t x)    ///< float64x2_t vector.
 static inline float64x2_t
 jbm_reciprocal_2xf64 (const float64x2_t x)  ///< float64x2_t vector.
 {
-  return vrecpeq_f64 (x);
+  return vdivq_f64 (vdupq_n_f64 (1.), x);
 }
 
 /**
@@ -7973,13 +7994,12 @@ jbm_frexp_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
   z.x = vdivq_f64 (x, y2.x);
   z.i = vandq_u64 (z.i, b);
   e2 = vbslq_s64 (m2,
-                  vsubq_s64 (vshlq_n_s64 (vreinterpretq_s64_u64 (z.i), 52),
+                  vsubq_s64 (vshrq_n_s64 (vreinterpretq_s64_u64 (z.i), 52),
                              vdupq_n_s64 (2044L)),
-                  vsubq_s64 (vshlq_n_s64 (vreinterpretq_s64_u64 (y.i), 52),
+                  vsubq_s64 (vshrq_n_s64 (vreinterpretq_s64_u64 (y.i), 52),
                              vdupq_n_s64 (1022L)));
   y.x = vbslq_f64 (m2, vmulq_f64 (y2.x, z.x), y.x);
-  m1 = vorrq_u64 (m1, vandq_u64 (m2, m3));
-  e2 = vbslq_s64 (m1, vdupq_n_s64 (0L), e2);
+  e2 = vbslq_s64 (vorrq_u64 (m1, vandq_u64 (m2, m3)), vdupq_n_s64 (0L), e2);
   *e = e2;
   return vbslq_f64 (m1, x, vmulq_f64 (vdupq_n_f64 (0.5), vdivq_f64 (x, y.x)));
 }

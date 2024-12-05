@@ -2939,7 +2939,7 @@ main (void)
 #endif
 #ifdef __ARM_NEON
   double *d_1, *d_2;
-  unsigned long long int *L_1, *L_2;
+  unsigned long long int *L_1;
   float64x2_t d_2xf64, d2_2xf64;
   uint64x2_t m_2xf64, m2_2xf64;
 #endif
@@ -4411,13 +4411,13 @@ main (void)
 #ifdef __SSE4_2__
   printf ("check SSE 4.2 functions\n");
   d_1 = aligned_alloc (16, 2 * sizeof (double));
+  L_1 = (unsigned long long int *) d_1;
   d_2 = aligned_alloc (16, 2 * sizeof (double));
   d_2xf64 = jbm_abs_2xf64 (_mm_set_pd (-1., 1));
   _mm_store_pd (d_1, d_2xf64);
   printf ("abs_2xf64([1,-1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_small_2xf64 (_mm_set_pd (1., 0.));
   _mm_store_pd (d_1, d_2xf64);
-  L_1 = (unsigned long long int *) d_1;
   printf ("small_2xf64([0,1])=[%16llx,%16llx]\n", L_1[0], L_1[1]);
   d_2xf64 = jbm_modmin_2xf64 (_mm_set_pd (-1., 1.), _mm_set_pd (-2., 0.5));
   _mm_store_pd (d_1, d_2xf64);
@@ -4658,6 +4658,7 @@ main (void)
 #ifdef __AVX__
   printf ("check AVX functions\n");
   d_1 = aligned_alloc (32, 4 * sizeof (double));
+  L_1 = (unsigned long long int *) d_1;
   d_2 = aligned_alloc (32, 4 * sizeof (double));
   d_4xf64 = jbm_abs_4xf64 (_mm256_set_pd (2., 0., -1., 1));
   _mm256_store_pd (d_1, d_4xf64);
@@ -4665,7 +4666,6 @@ main (void)
           d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_small_4xf64 (_mm256_set_pd (-1., 1., -0., 0.));
   _mm256_store_pd (d_1, d_4xf64);
-  L_1 = (unsigned long long int *) d_1;
   printf ("small_4xf64([0,-0,1,-1])=[%16llx,%16llx,%16llx,%16llx]\n",
           L_1[0], L_1[1], L_1[2], L_1[3]);
   d_4xf64 = jbm_modmin_4xf64 (_mm256_set_pd (1., 0., -1., 1.),
@@ -5143,6 +5143,7 @@ main (void)
 #ifdef __ARM_NEON
   printf ("check NEON functions\n");
   d_1 = aligned_alloc (16, 2 * sizeof (double));
+  L_1 = (unsigned long long int *) d_1;
   d_2 = aligned_alloc (16, 2 * sizeof (double));
   d_2xf64 = jbm_abs_2xf64 (set_float64x2_t (-1., 1));
   vst1q_f64 (d_1, d_2xf64);
