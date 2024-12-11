@@ -3635,7 +3635,7 @@ jbm_log10_f32 (const float x)   ///< float number.
  */
 static inline float
 jbm_pown_f32 (const float x,    ///< float number.
-              int e)            ///< exponent (int).
+              const int e)      ///< exponent (int).
 {
   float f, xn;
   unsigned int i;
@@ -3644,13 +3644,11 @@ jbm_pown_f32 (const float x,    ///< float number.
     xn = 1.f / x;
   else
     xn = x;
-  i = (unsigned int) abs (e);
-  while (i)
+  for (i = (unsigned int) abs (e); i; i >>= 1)
     {
       if (i & 1)
         f *= xn;
       xn *= xn;
-      i >>= 1;
     }
   return f;
 }
@@ -3682,8 +3680,7 @@ static inline float
 jbm_cbrt_f32 (const float x)    ///< float number.
 {
   float f;
-  f = jbm_abs_f32 (x);
-  f = jbm_pow_f32 (x, 1.f / 3.f);
+  f = jbm_pow_f32 (jbm_abs_f32 (x), 1.f / 3.f);
   if (x < 0.f)
     f = -f;
   return f;

@@ -1,4 +1,4 @@
-JB (10.11.11 version)
+JB (10.13.0 version)
 ==================
 
 :uk:[english](README.md) :es:[español](README.es.md)
@@ -125,11 +125,11 @@ _____________________
 > $ git clone https://github.com/jburguete/jb
 
 2. If only terminal applications are required compile the source codes with:
-> $ cd 10.11.11
+> $ cd 10.13.0
 > $ ./build\_wihtout_\gui.sh
 
 2. Or, if graphic interfaces are required, compile the source codes with:
-> $ cd 10.11.11
+> $ cd 10.13.0
 > $ ./build.sh
 
 LINKING THIS LIBRARY ON OTHER PROGRAMS
@@ -138,7 +138,7 @@ LINKING THIS LIBRARY ON OTHER PROGRAMS
 1. Link the latest version on a jb directory, i.e.:
 > $ cd YOUR\_PROGRAM\_PATH
 >
-> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/10.11.11 jb
+> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/10.13.0 jb
 
 2. Include the config and the used utility headers on your source code i.e.:
 > \#include "jb/src/math.h"

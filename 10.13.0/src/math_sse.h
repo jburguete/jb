@@ -7074,7 +7074,7 @@ jbm_log10_4xf32 (const __m128 x)        ///< __m128 vector.
  */
 static inline __m128
 jbm_pown_4xf32 (const __m128 x, ///< __m128 vector.
-                int e)          ///< exponent (int).
+                const int e)    ///< exponent (int).
 {
   __m128 f, xn;
   unsigned int i;
@@ -7116,8 +7116,7 @@ static inline __m128
 jbm_cbrt_4xf32 (const __m128 x) ///< __m128 vector.
 {
   __m128 f, z;
-  f = jbm_abs_4xf32 (x);
-  f = jbm_pow_4xf32 (x, 1.f / 3.f);
+  f = jbm_pow_4xf32 (jbm_abs_4xf32 (x), 1.f / 3.f);
   z = _mm_setzero_ps ();
   return _mm_blendv_ps (_mm_sub_ps (z, f), f, _mm_cmplt_ps (x, z));
 }
@@ -14961,7 +14960,7 @@ jbm_log10_2xf64 (const __m128d x)       ///< __m128d vector.
  */
 static inline __m128d
 jbm_pown_2xf64 (const __m128d x,        ///< __m128d vector.
-                int e)          ///< exponent (int).
+                const int e)    ///< exponent (int).
 {
   __m128d f, xn;
   unsigned int i;
@@ -15003,8 +15002,7 @@ static inline __m128d
 jbm_cbrt_2xf64 (const __m128d x)        ///< __m128d vector.
 {
   __m128d f, z;
-  f = jbm_abs_2xf64 (x);
-  f = jbm_pow_2xf64 (x, 1. / 3.);
+  f = jbm_pow_2xf64 (jbm_abs_2xf64 (x), 1. / 3.);
   z = _mm_setzero_pd ();
   return _mm_blendv_pd (f, _mm_sub_pd (z, f), _mm_cmplt_pd (x, z));
 }

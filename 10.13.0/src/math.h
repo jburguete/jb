@@ -713,6 +713,9 @@ enum JBMFluxLimiterType
 #ifdef __ARM_NEON
 #include "math_neon.h"
 #endif
+#ifdef __RISCV
+#include "math_riscv.h"
+#endif
 
 /**
  * struct to define arrays of JBFLOAT numbers.

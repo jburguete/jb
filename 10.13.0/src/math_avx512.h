@@ -7085,7 +7085,7 @@ jbm_log10_16xf32 (const __m512 x)       ///< __m512 vector.
  */
 static inline __m512
 jbm_pown_16xf32 (const __m512 x,        ///< __m512 vector.
-                 int e)         ///< exponent (int).
+                 const int e)   ///< exponent (int).
 {
   __m512 f, xn;
   unsigned int i;
@@ -7128,8 +7128,7 @@ static inline __m512
 jbm_cbrt_16xf32 (const __m512 x)        ///< __m512 vector.
 {
   __m512 f, z;
-  f = jbm_abs_16xf32 (x);
-  f = jbm_pow_16xf32 (x, 1.f / 3.f);
+  f = jbm_pow_16xf32 (jbm_abs_16xf32 (x), 1.f / 3.f);
   z = _mm512_setzero_ps ();
   return _mm512_mask_blend_ps (_mm512_cmp_ps_mask (x, z, _CMP_LT_OS),
                                _mm512_sub_ps (z, f), f);
@@ -15056,7 +15055,7 @@ jbm_log10_8xf64 (const __m512d x)       ///< __m512d vector.
  */
 static inline __m512d
 jbm_pown_8xf64 (const __m512d x,        ///< __m512d vector.
-                int e)          ///< exponent (int).
+                const int e)    ///< exponent (int).
 {
   __m512d f, xn;
   unsigned int i;
@@ -15099,8 +15098,7 @@ static inline __m512d
 jbm_cbrt_8xf64 (const __m512d x)        ///< __m512d vector.
 {
   __m512d f, z;
-  f = jbm_abs_8xf64 (x);
-  f = jbm_pow_8xf64 (x, 1. / 3.);
+  f = jbm_pow_8xf64 (jbm_abs_8xf64 (x), 1. / 3.);
   z = _mm512_setzero_pd ();
   return _mm512_mask_blend_pd (_mm512_cmp_pd_mask (x, z, _CMP_LT_OS),
                                f, _mm512_sub_pd (z, f));

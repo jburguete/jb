@@ -7032,7 +7032,7 @@ jbm_log10_8xf32 (const __m256 x)        ///< __m256 vector.
  */
 static inline __m256
 jbm_pown_8xf32 (const __m256 x, ///< __m256 vector.
-                int e)          ///< exponent (int).
+                const int e)    ///< exponent (int).
 {
   __m256 f, xn;
   unsigned int i;
@@ -7075,8 +7075,7 @@ static inline __m256
 jbm_cbrt_8xf32 (const __m256 x) ///< __m256 vector.
 {
   __m256 f, z;
-  f = jbm_abs_8xf32 (x);
-  f = jbm_pow_8xf32 (x, 1.f / 3.f);
+  f = jbm_pow_8xf32 (jbm_abs_8xf32 (x), 1.f / 3.f);
   z = _mm256_setzero_ps ();
   return _mm256_blendv_ps (_mm256_sub_ps (z, f), f,
                            _mm256_cmp_ps (x, z, _CMP_LT_OS));
@@ -15014,7 +15013,7 @@ jbm_log10_4xf64 (const __m256d x)       ///< __m256d vector.
  */
 static inline __m256d
 jbm_pown_4xf64 (const __m256d x,        ///< __m256d vector.
-                int e)          ///< exponent (int).
+                const int e)    ///< exponent (int).
 {
   __m256d f, xn;
   unsigned int i;
@@ -15057,8 +15056,7 @@ static inline __m256d
 jbm_cbrt_4xf64 (const __m256d x)        ///< __m256d vector.
 {
   __m256d f, z;
-  f = jbm_abs_4xf64 (x);
-  f = jbm_pow_4xf64 (x, 1. / 3.);
+  f = jbm_pow_4xf64 (jbm_abs_4xf64 (x), 1. / 3.);
   z = _mm256_setzero_pd ();
   return _mm256_blendv_pd (f, _mm256_sub_pd (z, f),
                            _mm256_cmp_pd (x, z, _CMP_LT_OS));

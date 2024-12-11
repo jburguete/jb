@@ -3654,7 +3654,7 @@ jbm_log10_f64 (const double x)  ///< double number.
  */
 static inline double
 jbm_pown_f64 (const double x,   ///< double number.
-              int e)            ///< exponent (int).
+              const int e)      ///< exponent (int).
 {
   double f, xn;
   unsigned int i;
@@ -3663,13 +3663,11 @@ jbm_pown_f64 (const double x,   ///< double number.
     xn = 1. / x;
   else
     xn = x;
-  i = (unsigned int) abs (e);
-  while (i)
+  for (i = (unsigned int) abs (e); i; i >>= 1)
     {
       if (i & 1)
         f *= xn;
       xn *= xn;
-      i >>= 1;
     }
   return f;
 }
@@ -3701,8 +3699,7 @@ static inline double
 jbm_cbrt_f64 (const double x)   ///< double number.
 {
   double f;
-  f = jbm_abs_f64 (x);
-  f = jbm_pow_f64 (x, 1. / 3.);
+  f = jbm_pow_f64 (jbm_abs_f64 (x), 1. / 3.);
   if (x < 0.)
     f = -f;
   return f;
