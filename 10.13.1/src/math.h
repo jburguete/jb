@@ -46,7 +46,9 @@
 #ifdef __ARM_NEON
 #include <arm_neon.h>
 #endif
-
+#ifdef __riscv_vector
+#include <riscv_vector.h>
+#endif
 
 /**
  * \def aligned_free
@@ -713,7 +715,7 @@ enum JBMFluxLimiterType
 #ifdef __ARM_NEON
 #include "math_neon.h"
 #endif
-#ifdef __RISCV
+#ifdef __riscv_vector
 #include "math_riscv.h"
 #endif
 
