@@ -3343,7 +3343,7 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
   __m256d a4;
   unsigned int n4;
 #endif
-#ifdef __AVX__
+#ifdef __AVX512F__
   __m512d a8;
   unsigned int n8;
 #endif
