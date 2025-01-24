@@ -2285,7 +2285,7 @@ init:
       goto end;
     }
   graphic->face = (FT_Face *) g_try_malloc (sizeof (FT_Face));
-  if (!graphic->ft)
+  if (!graphic->face)
     {
       error_msg = _("not enough memory to open the font");
       goto end;
