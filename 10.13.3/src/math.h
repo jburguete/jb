@@ -5996,7 +5996,7 @@ exit1:
 }
 
 /**
- * Function to get a JBFLOAT number on a string.
+ * Function to get a JBDOUBLE number on a string.
  *
  * \return 1 on success, 0 on error.
  */
