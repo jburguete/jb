@@ -5399,13 +5399,10 @@ main (void)
 #endif
 
   printf ("check farray functions\n");
-  printf ("0\n");
   fa = jbm_farray_create (pf, 11);
-  printf ("1\n");
+  printf ("fa=%llu fa->x=%llu\n", (size_t) fa, (size_t) fa->x);
   fa2 = jbm_farray_new (11);
-  printf ("2\n");
   fa3 = jbm_farray_new (11);
-  printf ("3\n");
   for (i = 0; i < 11; ++i)
     fa2->x[i] = pf[11 - i];
   printf ("farray_add([1,2,4,...],[2048,1024,512,...],11)\n");

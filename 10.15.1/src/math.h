@@ -66,22 +66,26 @@
  * \brief macro to define the aligned size in vectorized arrays.
  * \def JB_MALLOC
  * \brief macro to define the aligned malloc for vectorized arrays.
+ * \def JB_FREE
+ * \brief macro to free the memory used in vectorized arrays. 
  */
 #if defined(__AVX512F__)
 #define JB_ALIGNED __attribute__((aligned(64)))
 #define JB_MALLOC(size) (aligned_alloc (64, size))
+#define JB_FREE aligned_free
 #elif defined(__AVX__)
 #define JB_ALIGNED __attribute__((aligned(32)))
 #define JB_MALLOC(size) (aligned_alloc (32, size))
+#define JB_FREE aligned_free
 #elif defined(__SSE4_2__)
 #define JB_ALIGNED __attribute__((aligned(16)))
 #define JB_MALLOC(size) (aligned_alloc (16, size))
+#define JB_FREE aligned_free
 #else
 #define JB_ALIGNED
-#define JB_MALLOC  malloc
+#define JB_MALLOC malloc
+#define JB_FREE free
 #endif
-///> macro to free the memory used in vectorized arrays. 
-#define JB_FREE aligned_free
 
 #ifndef M_Ef
 #define M_Ef M_E                ///< single precision e number.
@@ -195,6 +199,10 @@ exp10l (long double x)
   return expl (x * M_LN10l);
 }
 
+#endif
+
+#if !HAVE_FINITEF
+#define finitef finite
 #endif
 
 // Selecting the precision of the JBFLOAT and JBDOUBLE types and reading and
@@ -615,75 +623,75 @@ exp10l (long double x)
 #define JBM_EXTRAPOLATE(x, x1, x2, y1, y2) \
   ((y1) + (x - (x1)) * ((y2) - (y1)) / ((x2) - (x1)))
 
-#define JBM_FACT0f 1.f          ///< 0!
-#define JBM_FACT1f 1.f          ///< 1!
-#define JBM_FACT2f 2.f          ///< 2!
-#define JBM_FACT3f 6.f          ///< 3!
-#define JBM_FACT4f 24.f         ///< 4!
-#define JBM_FACT5f 120.f        ///< 5!
-#define JBM_FACT6f 720.f        ///< 6!
-#define JBM_FACT7f 5040.f       ///< 7!
-#define JBM_FACT8f 40320.f      ///< 8!
-#define JBM_FACT9f 362880.f     ///< 9!
-#define JBM_FACT10f 3628800.f   ///< 10!
-#define JBM_FACT11f 39916800.f  ///< 11!
-#define JBM_FACT12f 479001600.f ///< 12!
-#define JBM_FACT13f 6227020800.f        ///< 13!
-#define JBM_FACT14f 87178291200.f       ///< 14!
-#define JBM_FACT15f 1307674368000.f     ///< 15!
-#define JBM_FACT16f 20922789888000.f    ///< 16!
-#define JBM_1_FACT0f (1.f / JBM_FACT0f) ///< 1/0!
-#define JBM_1_FACT1f (1.f / JBM_FACT1f) ///< 1/1!
-#define JBM_1_FACT2f (1.f / JBM_FACT2f) ///< 1/2!
-#define JBM_1_FACT3f (1.f / JBM_FACT3f) ///< 1/3!
-#define JBM_1_FACT4f (1.f / JBM_FACT4f) ///< 1/4!
-#define JBM_1_FACT5f (1.f / JBM_FACT5f) ///< 1/5!
-#define JBM_1_FACT6f (1.f / JBM_FACT6f) ///< 1/6!
-#define JBM_1_FACT7f (1.f / JBM_FACT7f) ///< 1/7!
-#define JBM_1_FACT8f (1.f / JBM_FACT8f) ///< 1/8!
-#define JBM_1_FACT9f (1.f / JBM_FACT9f) ///< 1/9!
-#define JBM_1_FACT10f (1.f / JBM_FACT10f)       ///< 1/10!
-#define JBM_1_FACT11f (1.f / JBM_FACT11f)       ///< 1/11!
-#define JBM_1_FACT12f (1.f / JBM_FACT12f)       ///< 1/12!
-#define JBM_1_FACT13f (1.f / JBM_FACT13f)       ///< 1/13!
-#define JBM_1_FACT14f (1.f / JBM_FACT14f)       ///< 1/14!
-#define JBM_1_FACT15f (1.f / JBM_FACT15f)       ///< 1/15!
-#define JBM_1_FACT16f (1.f / JBM_FACT16f)       ///< 1/16!
+#define JBM_FACT0f 1.f          ///< 0!.
+#define JBM_FACT1f 1.f          ///< 1!.
+#define JBM_FACT2f 2.f          ///< 2!.
+#define JBM_FACT3f 6.f          ///< 3!.
+#define JBM_FACT4f 24.f         ///< 4!.
+#define JBM_FACT5f 120.f        ///< 5!.
+#define JBM_FACT6f 720.f        ///< 6!.
+#define JBM_FACT7f 5040.f       ///< 7!.
+#define JBM_FACT8f 40320.f      ///< 8!.
+#define JBM_FACT9f 362880.f     ///< 9!.
+#define JBM_FACT10f 3628800.f   ///< 10!.
+#define JBM_FACT11f 39916800.f  ///< 11!.
+#define JBM_FACT12f 479001600.f ///< 12!.
+#define JBM_FACT13f 6227020800.f        ///< 13!.
+#define JBM_FACT14f 87178291200.f       ///< 14!.
+#define JBM_FACT15f 1307674368000.f     ///< 15!.
+#define JBM_FACT16f 20922789888000.f    ///< 16!.
+#define JBM_1_FACT0f (1.f / JBM_FACT0f) ///< 1/0!.
+#define JBM_1_FACT1f (1.f / JBM_FACT1f) ///< 1/1!.
+#define JBM_1_FACT2f (1.f / JBM_FACT2f) ///< 1/2!.
+#define JBM_1_FACT3f (1.f / JBM_FACT3f) ///< 1/3!.
+#define JBM_1_FACT4f (1.f / JBM_FACT4f) ///< 1/4!.
+#define JBM_1_FACT5f (1.f / JBM_FACT5f) ///< 1/5!.
+#define JBM_1_FACT6f (1.f / JBM_FACT6f) ///< 1/6!.
+#define JBM_1_FACT7f (1.f / JBM_FACT7f) ///< 1/7!.
+#define JBM_1_FACT8f (1.f / JBM_FACT8f) ///< 1/8!.
+#define JBM_1_FACT9f (1.f / JBM_FACT9f) ///< 1/9!.
+#define JBM_1_FACT10f (1.f / JBM_FACT10f)       ///< 1/10!.
+#define JBM_1_FACT11f (1.f / JBM_FACT11f)       ///< 1/11!.
+#define JBM_1_FACT12f (1.f / JBM_FACT12f)       ///< 1/12!.
+#define JBM_1_FACT13f (1.f / JBM_FACT13f)       ///< 1/13!.
+#define JBM_1_FACT14f (1.f / JBM_FACT14f)       ///< 1/14!.
+#define JBM_1_FACT15f (1.f / JBM_FACT15f)       ///< 1/15!.
+#define JBM_1_FACT16f (1.f / JBM_FACT16f)       ///< 1/16!.
 
-#define JBM_FACT0 1.            ///< 0!
-#define JBM_FACT1 1.            ///< 1!
-#define JBM_FACT2 2.            ///< 2!
-#define JBM_FACT3 6.            ///< 3!
-#define JBM_FACT4 24.           ///< 4!
-#define JBM_FACT5 120.          ///< 5!
-#define JBM_FACT6 720.          ///< 6!
-#define JBM_FACT7 5040.         ///< 7!
-#define JBM_FACT8 40320.        ///< 8!
-#define JBM_FACT9 362880.       ///< 9!
-#define JBM_FACT10 3628800.     ///< 10!
-#define JBM_FACT11 39916800.    ///< 11!
-#define JBM_FACT12 479001600.   ///< 12!
-#define JBM_FACT13 6227020800.  ///< 13!
-#define JBM_FACT14 87178291200. ///< 14!
-#define JBM_FACT15 1307674368000.       ///< 15!
-#define JBM_FACT16 20922789888000.      ///< 16!
-#define JBM_1_FACT0 (1. / JBM_FACT0)    ///< 1/0!
-#define JBM_1_FACT1 (1. / JBM_FACT1)    ///< 1/1!
-#define JBM_1_FACT2 (1. / JBM_FACT2)    ///< 1/2!
-#define JBM_1_FACT3 (1. / JBM_FACT3)    ///< 1/3!
-#define JBM_1_FACT4 (1. / JBM_FACT4)    ///< 1/4!
-#define JBM_1_FACT5 (1. / JBM_FACT5)    ///< 1/5!
-#define JBM_1_FACT6 (1. / JBM_FACT6)    ///< 1/6!
-#define JBM_1_FACT7 (1. / JBM_FACT7)    ///< 1/7!
-#define JBM_1_FACT8 (1. / JBM_FACT8)    ///< 1/8!
-#define JBM_1_FACT9 (1. / JBM_FACT9)    ///< 1/9!
-#define JBM_1_FACT10 (1. / JBM_FACT10)  ///< 1/10!
-#define JBM_1_FACT11 (1. / JBM_FACT11)  ///< 1/11!
-#define JBM_1_FACT12 (1. / JBM_FACT12)  ///< 1/12!
-#define JBM_1_FACT13 (1. / JBM_FACT13)  ///< 1/13!
-#define JBM_1_FACT14 (1. / JBM_FACT14)  ///< 1/14!
-#define JBM_1_FACT15 (1. / JBM_FACT15)  ///< 1/15!
-#define JBM_1_FACT16 (1. / JBM_FACT16)  ///< 1/16!
+#define JBM_FACT0 1.            ///< 0!.
+#define JBM_FACT1 1.            ///< 1!.
+#define JBM_FACT2 2.            ///< 2!.
+#define JBM_FACT3 6.            ///< 3!.
+#define JBM_FACT4 24.           ///< 4!.
+#define JBM_FACT5 120.          ///< 5!.
+#define JBM_FACT6 720.          ///< 6!.
+#define JBM_FACT7 5040.         ///< 7!.
+#define JBM_FACT8 40320.        ///< 8!.
+#define JBM_FACT9 362880.       ///< 9!.
+#define JBM_FACT10 3628800.     ///< 10!.
+#define JBM_FACT11 39916800.    ///< 11!.
+#define JBM_FACT12 479001600.   ///< 12!.
+#define JBM_FACT13 6227020800.  ///< 13!.
+#define JBM_FACT14 87178291200. ///< 14!.
+#define JBM_FACT15 1307674368000.       ///< 15!.
+#define JBM_FACT16 20922789888000.      ///< 16!.
+#define JBM_1_FACT0 (1. / JBM_FACT0)    ///< 1/0!.
+#define JBM_1_FACT1 (1. / JBM_FACT1)    ///< 1/1!.
+#define JBM_1_FACT2 (1. / JBM_FACT2)    ///< 1/2!.
+#define JBM_1_FACT3 (1. / JBM_FACT3)    ///< 1/3!.
+#define JBM_1_FACT4 (1. / JBM_FACT4)    ///< 1/4!.
+#define JBM_1_FACT5 (1. / JBM_FACT5)    ///< 1/5!.
+#define JBM_1_FACT6 (1. / JBM_FACT6)    ///< 1/6!.
+#define JBM_1_FACT7 (1. / JBM_FACT7)    ///< 1/7!.
+#define JBM_1_FACT8 (1. / JBM_FACT8)    ///< 1/8!.
+#define JBM_1_FACT9 (1. / JBM_FACT9)    ///< 1/9!.
+#define JBM_1_FACT10 (1. / JBM_FACT10)  ///< 1/10!.
+#define JBM_1_FACT11 (1. / JBM_FACT11)  ///< 1/11!.
+#define JBM_1_FACT12 (1. / JBM_FACT12)  ///< 1/12!.
+#define JBM_1_FACT13 (1. / JBM_FACT13)  ///< 1/13!.
+#define JBM_1_FACT14 (1. / JBM_FACT14)  ///< 1/14!.
+#define JBM_1_FACT15 (1. / JBM_FACT15)  ///< 1/15!.
+#define JBM_1_FACT16 (1. / JBM_FACT16)  ///< 1/16!.
 
 ///> enum to select the flux limiter type.
 enum JBMFluxLimiterType
