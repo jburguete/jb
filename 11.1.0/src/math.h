@@ -580,19 +580,8 @@ exp10l (long double x)
  * b, & a,b\ne 0,\;|a|\ge|b|;
  * \end{array}\right.\f$.
  */
-#if JBM_LOW_PRECISION == 1
-#define JBM_FMODMIN(a, b) (((a) * (b) <= 0.f)? 0.f: \
+#define JBM_FMODMIN(a, b) (((a) * (b) <= (JBFLOAT) 0.)? (JBFLOAT) 0.: \
     (FABS(a) < FABS(b))? (a): (b))
-#elif JBM_LOW_PRECISION == 2
-#define JBM_FMODMIN(a, b) (((a) * (b) <= 0.)? 0.: \
-    (FABS(a) < FABS(b))? (a): (b))
-#elif JBM_LOW_PRECISION == 3
-#define JBM_FMODMIN(a, b) (((a) * (b) <= 0.L)? 0.L: \
-    (FABS(a) < FABS(b))? (a): (b))
-#elif JBM_LOW_PRECISION == 4
-#define JBM_FMODMIN(a, b) (((a) * (b) <= 0.Q)? 0.Q: \
-    (FABS(a) < FABS(b))? (a): (b))
-#endif
 
 /**
  * macro calculating the number with the lower module in the [a, b] interval 
@@ -603,60 +592,14 @@ exp10l (long double x)
  * b, & a,b\ne 0,\;|a|\ge|b|;
  * \end{array}\right.\f$.
  */
-#if JBM_HIGH_PRECISION == 1
-#define JBM_FMODMINL(a, b) (((a) * (b) <= 0.f)? 0.f: \
+#define JBM_FMODMINL(a, b) (((a) * (b) <= (JBDOUBLE) 0.)? (JBDOUBLE) 0.: \
     (FABSL(a) < FABSL(b))? (a): (b))
-#elif JBM_HIGH_PRECISION == 2
-#define JBM_FMODMINL(a, b) (((a) * (b) <= 0.)? 0.: \
-    (FABSL(a) < FABSL(b))? (a): (b))
-#elif JBM_HIGH_PRECISION == 3
-#define JBM_FMODMINL(a, b) (((a) * (b) <= 0.L)? 0.L: \
-    (FABSL(a) < FABSL(b))? (a): (b))
-#elif JBM_HIGH_PRECISION == 4
-#define JBM_FMODMINL(a, b) (((a) * (b) <= 0.Q)? 0.Q: \
-    (FABSL(a) < FABSL(b))? (a): (b))
-#endif
 
 #define JBM_SQR(x) ((x) * (x))  ///< macro calculating the square of a number.
 #define JBM_DBL(x) ((x) + (x))  ///< macro calculating the double of a number.
 ///> macro calculating a linear extrapolation.
 #define JBM_EXTRAPOLATE(x, x1, x2, y1, y2) \
   ((y1) + (x - (x1)) * ((y2) - (y1)) / ((x2) - (x1)))
-
-#define JBM_FACT0f 1.f          ///< 0!.
-#define JBM_FACT1f 1.f          ///< 1!.
-#define JBM_FACT2f 2.f          ///< 2!.
-#define JBM_FACT3f 6.f          ///< 3!.
-#define JBM_FACT4f 24.f         ///< 4!.
-#define JBM_FACT5f 120.f        ///< 5!.
-#define JBM_FACT6f 720.f        ///< 6!.
-#define JBM_FACT7f 5040.f       ///< 7!.
-#define JBM_FACT8f 40320.f      ///< 8!.
-#define JBM_FACT9f 362880.f     ///< 9!.
-#define JBM_FACT10f 3628800.f   ///< 10!.
-#define JBM_FACT11f 39916800.f  ///< 11!.
-#define JBM_FACT12f 479001600.f ///< 12!.
-#define JBM_FACT13f 6227020800.f        ///< 13!.
-#define JBM_FACT14f 87178291200.f       ///< 14!.
-#define JBM_FACT15f 1307674368000.f     ///< 15!.
-#define JBM_FACT16f 20922789888000.f    ///< 16!.
-#define JBM_1_FACT0f (1.f / JBM_FACT0f) ///< 1/0!.
-#define JBM_1_FACT1f (1.f / JBM_FACT1f) ///< 1/1!.
-#define JBM_1_FACT2f (1.f / JBM_FACT2f) ///< 1/2!.
-#define JBM_1_FACT3f (1.f / JBM_FACT3f) ///< 1/3!.
-#define JBM_1_FACT4f (1.f / JBM_FACT4f) ///< 1/4!.
-#define JBM_1_FACT5f (1.f / JBM_FACT5f) ///< 1/5!.
-#define JBM_1_FACT6f (1.f / JBM_FACT6f) ///< 1/6!.
-#define JBM_1_FACT7f (1.f / JBM_FACT7f) ///< 1/7!.
-#define JBM_1_FACT8f (1.f / JBM_FACT8f) ///< 1/8!.
-#define JBM_1_FACT9f (1.f / JBM_FACT9f) ///< 1/9!.
-#define JBM_1_FACT10f (1.f / JBM_FACT10f)       ///< 1/10!.
-#define JBM_1_FACT11f (1.f / JBM_FACT11f)       ///< 1/11!.
-#define JBM_1_FACT12f (1.f / JBM_FACT12f)       ///< 1/12!.
-#define JBM_1_FACT13f (1.f / JBM_FACT13f)       ///< 1/13!.
-#define JBM_1_FACT14f (1.f / JBM_FACT14f)       ///< 1/14!.
-#define JBM_1_FACT15f (1.f / JBM_FACT15f)       ///< 1/15!.
-#define JBM_1_FACT16f (1.f / JBM_FACT16f)       ///< 1/16!.
 
 #define JBM_FACT0 1.            ///< 0!.
 #define JBM_FACT1 1.            ///< 1!.
@@ -1454,15 +1397,7 @@ jbm_solve_quadratic_reduced (JBFLOAT a,
                              ///< right limit of the solution interval.
 {
   JBFLOAT k;
-#if JBM_LOW_PRECISION == 1
-  a *= -0.5f;
-#elif JBM_LOW_PRECISION == 2
-  a *= -0.5;
-#elif JBM_LOW_PRECISION == 3
-  a *= -0.5L;
-#elif JBM_LOW_PRECISION == 4
-  a *= -0.5Q;
-#endif
+  a *= (JBFLOAT) -0.5;
   b = SQRT (a * a - b);
   k = a + b;
   if (k < x1 || k > x2)
@@ -1513,32 +1448,23 @@ jbm_solve_cubic_reduced (JBFLOAT a,
                          const JBFLOAT x2)
                          ///< right limit of the solution interval.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c2 = 2.f, c3 = 3.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c2 = 2., c3 = 3.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c2 = 2.L, c3 = 3.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c2 = 2.Q, c3 = 3.Q;
-#endif
   JBFLOAT k0, k1, k2;
-  a /= c3;
+  a /= (JBFLOAT) 3.;
   k0 = a * a;
-  k1 = b / c3 - k0;
-  k0 = (b * a - c) / c2 - a * k0;
+  k1 = b / (JBFLOAT) 3. - k0;
+  k0 = (b * a - c) / (JBFLOAT) 2. - a * k0;
   k2 = k1 * k1 * k1 + k0 * k0;
-  if (k2 < c0)
+  if (k2 < (JBFLOAT) 0.)
     {
       k1 = SQRT (-k1);
-      k0 = ACOS (k0 / (k1 * k1 * k1)) / c3;
-      k1 *= c2;
+      k0 = ACOS (k0 / (k1 * k1 * k1)) / (JBFLOAT) 3.;
+      k1 *= (JBFLOAT) 2.;
       k2 = k1 * COS (k0) - a;
       if (k2 < x1 || k2 > x2)
         {
-          k2 = k1 * COS (k0 + c2 * JB_PI / c3) - a;
+          k2 = k1 * COS (k0 + (JBFLOAT) 2. * JB_PI / (JBFLOAT) 3.) - a;
           if (k2 < x1 || k2 > x2)
-            k2 = k1 * COS (k0 - c2 * JB_PI / c3) - a;
+            k2 = k1 * COS (k0 - (JBFLOAT) 2. * JB_PI / (JBFLOAT) 3.) - a;
         }
     }
   else
@@ -1590,16 +1516,7 @@ jbm_flux_limiter_total (const JBFLOAT d1 __attribute__((unused)),
                         const JBFLOAT d2 __attribute__((unused)))
 ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q;
-#endif
-  return c0;
+  return (JBFLOAT) 0.;
 }
 
 /**
@@ -1614,16 +1531,7 @@ jbm_flux_limiter_null (const JBFLOAT d1 __attribute__((unused)),
                        const JBFLOAT d2 __attribute__((unused)))
 ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c1 = 1.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c1 = 1.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c1 = 1.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c1 = 1.Q;
-#endif
-  return c1;
+  return (JBFLOAT) 1.;
 }
 
 /**
@@ -1638,17 +1546,8 @@ jbm_flux_limiter_centred (const JBFLOAT d1,
                           const JBFLOAT d2)
                           ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q;
-#endif
   if (jbm_small (d2))
-    return c0;
+    return (JBFLOAT) 0.;
   return d1 / d2;
 }
 
@@ -1666,20 +1565,11 @@ jbm_flux_limiter_superbee (const JBFLOAT d1,
                            const JBFLOAT d2)
                            ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c1 = 1.f, c2 = 2.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c1 = 1., c2 = 2.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c1 = 1.L, c2 = 2.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c1 = 1.Q, c2 = 2.Q;
-#endif
   JBFLOAT r;
   if (d1 * d2 <= JBM_EPSILON)
-    return c0;
+    return (JBFLOAT) 0.;
   r = d1 / d2;
-  return FMAX (FMIN (r + r, c1), FMIN (r, c2));
+  return FMAX (FMIN (r + r, (JBFLOAT) 1.), FMIN (r, (JBFLOAT) 2.));
 }
 
 /**
@@ -1695,18 +1585,9 @@ jbm_flux_limiter_minmod (const JBFLOAT d1,
                          const JBFLOAT d2)
                          ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c1 = 1.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c1 = 1.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c1 = 1.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
-#endif
   if (d1 * d2 <= JBM_EPSILON)
-    return c0;
-  return FMIN (d1 / d2, c1);
+    return (JBFLOAT) 0.;
+  return FMIN (d1 / d2, (JBFLOAT) 1.);
 }
 
 /**
@@ -1723,21 +1604,12 @@ jbm_flux_limiter_VanLeer (const JBFLOAT d1,
                           const JBFLOAT d2)
                           ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c1 = 1.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c1 = 1.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c1 = 1.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
-#endif
   JBFLOAT r, k;
   if (d1 * d2 <= JBM_EPSILON)
-    return c0;
+    return (JBFLOAT) 0.;
   r = d1 / d2;
   k = FABS (r);
-  return (r + k) / (c1 + k);
+  return (r + k) / ((JBFLOAT) 1. + k);
 }
 
 /**
@@ -1753,21 +1625,12 @@ jbm_flux_limiter_VanAlbada (const JBFLOAT d1,
                             const JBFLOAT d2)
                             ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c1 = 1.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c1 = 1.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c1 = 1.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
-#endif
   JBFLOAT r, k;
   if (d1 * d2 <= JBM_EPSILON)
-    return c0;
+    return (JBFLOAT) 0.;
   r = d1 / d2;
   k = r * r;
-  return (r + k) / (c1 + k);
+  return (r + k) / ((JBFLOAT) 1. + k);
 }
 
 /**
@@ -1783,18 +1646,9 @@ jbm_flux_limiter_minsuper (const JBFLOAT d1,
                            const JBFLOAT d2)
                            ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c2 = 2.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c2 = 2.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c2 = 2.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c2 = 2.Q;
-#endif
   if (d1 * d2 <= JBM_EPSILON)
-    return c0;
-  return FMIN (d1 / d2, c2);
+    return (JBFLOAT) 0.;
+  return FMIN (d1 / d2, (JBFLOAT) 2.);
 }
 
 /**
@@ -1810,18 +1664,9 @@ jbm_flux_limiter_supermin (const JBFLOAT d1,
                            const JBFLOAT d2)
                            ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c1 = 1.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c1 = 1.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c1 = 1.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
-#endif
   if (d1 * d2 <= JBM_EPSILON)
-    return c0;
-  return FMIN (jbm_fdbl (d1 / d2), c1);
+    return (JBFLOAT) 0.;
+  return FMIN (jbm_fdbl (d1 / d2), (JBFLOAT) 1.);
 }
 
 /**
@@ -1838,24 +1683,15 @@ jbm_flux_limiter_monotonized_central (const JBFLOAT d1,
                                       const JBFLOAT d2)
                                       ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c1 = 1.f, c2 = 2.f, c3 = 3.f, c05 = 0.5f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c1 = 1., c2 = 2., c3 = 3., c05 = 0.5;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c1 = 1.L, c2 = 2.L, c3 = 3.L, c05 = 0.5L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c1 = 1.Q, c2 = 2.Q, c3 = 3.Q, c05 = 0.5Q;
-#endif
   JBFLOAT k;
   if (d1 * d2 <= JBM_EPSILON)
-    return c0;
+    return (JBFLOAT) 0.;
   k = d1 / d2;
-  if (k >= c3)
-    return c2;
-  if (k <= c1 / c3)
+  if (k >= (JBFLOAT) 3.)
+    return (JBFLOAT) 2.;
+  if (k <= (JBFLOAT) 1. / (JBFLOAT) 3.)
     return k + k;
-  return c05 * (k + c1);
+  return (JBFLOAT) 0.5 * (k + (JBFLOAT) 1.);
 }
 
 /**
@@ -1871,18 +1707,9 @@ jbm_flux_limiter_mean (const JBFLOAT d1,
                        const JBFLOAT d2)
                        ///< 2nd flux limiter function parameter.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c1 = 1.f, c05 = 0.5f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c1 = 1., c05 = 0.5;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c1 = 1.L, c05 = 0.5L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c1 = 1.Q, c05 = 0.5Q;
-#endif
   if (jbm_small (d2))
-    return c0;
-  return c05 * (d1 / d2 + c1);
+    return (JBFLOAT) 0.;
+  return (JBFLOAT) 0.5 * (d1 / d2 + (JBFLOAT) 1.);
 }
 
 /**
@@ -1966,133 +1793,41 @@ jbm_integral (JBFLOAT (*f) (JBFLOAT),
               const JBFLOAT x1, ///< left limit of the interval.
               const JBFLOAT x2) ///< right limit of the interval.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c05 = 0.5f;
 #if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] = { 2.f };
+  const JBFLOAT a[1] = { (JBFLOAT) 2. };
 #elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] = { 8.f / 9.f, 5.f / 9.f }, b[2] = { 0.f, 7.7459667e-1f };
+  const JBFLOAT a[2] = { (JBFLOAT) 8. / 9., (JBFLOAT) 5. / 9. },
+    b[2] = { (JBFLOAT) 0., (JBFLOAT) 7.7459666924148340427791481488384306e-1 };
 #elif JBM_INTEGRAL_GAUSS_N == 3
   const JBFLOAT a[3] = {
-    128.f / 225.f,
-    4.7862867e-1f,
-    2.3692689e-1f
+    (JBFLOAT) 128. / 225.,
+    (JBFLOAT) 4.7862867049936646804129151483563819e-1,
+    (JBFLOAT) 2.3692688505618908751426404071991736e-1
   }, b[3] = {
-    0.f,
-    5.3846931e-1f,
-    9.0617985e-1f
+    (JBFLOAT) 0.,
+    (JBFLOAT) 5.3846931010568309103631442070020880e-1,
+    (JBFLOAT) 9.0617984593866399279762687829939297e-1
   };
 #elif JBM_INTEGRAL_GAUSS_N == 4
   const JBFLOAT a[4] = {
-    4.1795918e-1f,
-    3.8183005e-1f,
-    2.7970539e-1f,
-    1.2948497e-1f
+    (JBFLOAT) 4.1795918367346938775510204081632653e-1,
+    (JBFLOAT) 3.8183005050511894495036977548897513e-1,
+    (JBFLOAT) 2.7970539148927666790146777142377958e-1,
+    (JBFLOAT) 1.2948496616886969327061143267908202e-1
   }, b[4] = {
-    0.f,
-    4.0584515e-1f,
-    7.4153119e-1f,
-    9.4910791e-1f
+    (JBFLOAT) 0.,
+    (JBFLOAT) 4.0584515137739716690660641207696146e-1,
+    (JBFLOAT) 7.4153118559939443986386477328078841e-1,
+    (JBFLOAT) 9.4910791234275852452618968404785126e-1
   };
-#endif
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c05 = 0.5;
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] = { 2. };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] = { 8. / 9., 5. / 9. },
-    b[2] = { 0., 7.745966692414834e-1 };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] = {
-    128. / 225.,
-    4.786286704993665e-1,
-    2.369268850561891e-1
-  }, b[3] = {
-    0.,
-    5.384693101056831e-1,
-    9.061798459386640e-1
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] = {
-    4.179591836734694e-1,
-    3.818300505051189e-1,
-    2.797053914892767e-1,
-    1.294849661688697e-1
-  }, b[4] = {
-    0.,
-    4.058451513773972e-1,
-    7.415311855993944e-1,
-    9.491079123427585e-1
-  };
-#endif
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c05 = 0.5L;
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] = { 2.L };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] = { 8.L / 9.L, 5.L / 9.L },
-    b[2] = { 0.L, 7.7459666924148340428e-1L };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] = {
-    128.L / 225.L,
-    4.7862867049936646804e-1L,
-    2.3692688505618908751e-1L
-  }, b[3] = {
-    0.L,
-    5.3846931010568309104e-1L,
-    9.0617984593866399280e-1L
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] = {
-    4.1795918367346938776e-1L,
-    3.8183005050511894495e-1L,
-    2.7970539148927666790e-1L,
-    1.2948496616886969327e-1L
-  }, b[4] = {
-    0.L,
-    4.0584515137739716691e-1L,
-    7.4153118559939443986e-1L,
-    9.4910791234275852453e-1L
-  };
-#endif
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c05 = 0.5Q;
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] = { 2.Q };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] = { 8.Q / 9.Q, 5.Q / 9.Q },
-    b[2] = { 0.Q, 7.7459666924148340427791481488384306e-1Q };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] = {
-    128.Q / 225.Q,
-    4.7862867049936646804129151483563819e-1Q,
-    2.3692688505618908751426404071991736e-1Q
-  }, b[3] = {
-    0.Q,
-    5.3846931010568309103631442070020880e-1Q,
-    9.0617984593866399279762687829939297e-1Q
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] = {
-    4.1795918367346938775510204081632653e-1Q,
-    3.8183005050511894495036977548897513e-1Q,
-    2.7970539148927666790146777142377958e-1Q,
-    1.2948496616886969327061143267908202e-1Q
-  }, b[4] = {
-    0.Q,
-    4.0584515137739716690660641207696146e-1Q,
-    7.4153118559939443986386477328078841e-1Q,
-    9.4910791234275852452618968404785126e-1Q
-  };
-#endif
 #endif
   JBFLOAT k, x, dx;
 #if JBM_INTEGRAL_GAUSS_N > 1
   JBFLOAT k2;
   unsigned int i;
 #endif
-  dx = c05 * (x2 - x1);
-  x = c05 * (x1 + x2);
+  dx = (JBFLOAT) 0.5 * (x2 - x1);
+  x = (JBFLOAT) 0.5 * (x1 + x2);
   k = a[0] * f (x);
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
@@ -2396,15 +2131,7 @@ jbm_solve_quadratic_reducedl (JBDOUBLE a,
                               ///< right limit of the solution interval.
 {
   JBDOUBLE k;
-#if JBM_HIGH_PRECISION == 1
-  a *= -0.5f;
-#elif JBM_HIGH_PRECISION == 2
-  a *= -0.5;
-#elif JBM_HIGH_PRECISION == 3
-  a *= -0.5L;
-#elif JBM_HIGH_PRECISION == 4
-  a *= -0.5Q;
-#endif
+  a *= (JBDOUBLE) -0.5;
   b = SQRTL (a * a - b);
   k = a + b;
   if (k < x1 || k > x2)
@@ -2455,32 +2182,23 @@ jbm_solve_cubic_reducedl (JBDOUBLE a,
                           const JBDOUBLE x2)
                           ///< right limit of the solution interval.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c2 = 2.f, c3 = 3.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c2 = 2., c3 = 3.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c2 = 2.L, c3 = 3.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c2 = 2.Q, c3 = 3.Q;
-#endif
   JBDOUBLE k0, k1, k2;
-  a /= c3;
+  a /= (JBDOUBLE) 3.;
   k0 = a * a;
-  k1 = b / c3 - k0;
-  k0 = (b * a - c) / c2 - a * k0;
+  k1 = b / (JBDOUBLE) 3. - k0;
+  k0 = (b * a - c) / (JBDOUBLE) 2. - a * k0;
   k2 = k1 * k1 * k1 + k0 * k0;
-  if (k2 < c0)
+  if (k2 < (JBDOUBLE) 0.)
     {
       k1 = SQRTL (-k1);
-      k0 = ACOSL (k0 / (k1 * k1 * k1)) / c3;
-      k1 *= c2;
+      k0 = ACOSL (k0 / (k1 * k1 * k1)) / (JBDOUBLE) 3.;
+      k1 *= (JBDOUBLE) 2.;
       k2 = k1 * COSL (k0) - a;
       if (k2 < x1 || k2 > x2)
         {
-          k2 = k1 * COSL (k0 + c2 * JB_PI / c3) - a;
+          k2 = k1 * COSL (k0 + (JBDOUBLE) 2. * JB_PI / (JBDOUBLE) 3.) - a;
           if (k2 < x1 || k2 > x2)
-            k2 = k1 * COSL (k0 - c2 * JB_PI / c3) - a;
+            k2 = k1 * COSL (k0 - (JBDOUBLE) 2. * JB_PI / (JBDOUBLE) 3.) - a;
         }
     }
   else
@@ -2532,16 +2250,7 @@ jbm_flux_limiter_totall (const JBDOUBLE d1 __attribute__((unused)),
                          const JBDOUBLE d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q;
-#endif
-  return c0;
+  return (JBDOUBLE) 0.;
 }
 
 /**
@@ -2556,16 +2265,7 @@ jbm_flux_limiter_nulll (const JBDOUBLE d1 __attribute__((unused)),
                         const JBDOUBLE d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c1 = 1.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c1 = 1.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c1 = 1.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c1 = 1.Q;
-#endif
-  return c1;
+  return (JBDOUBLE) 1.;
 }
 
 /**
@@ -2580,17 +2280,8 @@ jbm_flux_limiter_centredl (const JBDOUBLE d1,
                            const JBDOUBLE d2)
                            ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q;
-#endif
   if (jbm_smalll (d2))
-    return c0;
+    return (JBDOUBLE) 0.;
   return d1 / d2;
 }
 
@@ -2608,20 +2299,11 @@ jbm_flux_limiter_superbeel (const JBDOUBLE d1,
                             const JBDOUBLE d2)
                             ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c1 = 1.f, c2 = 2.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c1 = 1., c2 = 2.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c1 = 1.L, c2 = 2.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c1 = 1.Q, c2 = 2.Q;
-#endif
   JBDOUBLE r;
   if (d1 * d2 <= JBM_EPSILONL)
-    return c0;
+    return (JBDOUBLE) 0.;
   r = d1 / d2;
-  return FMAXL (FMINL (r + r, c1), FMINL (r, c2));
+  return FMAXL (FMINL (r + r, (JBDOUBLE) 1.), FMINL (r, (JBDOUBLE) 2.));
 }
 
 /**
@@ -2637,18 +2319,9 @@ jbm_flux_limiter_minmodl (const JBDOUBLE d1,
                           const JBDOUBLE d2)
                           ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c1 = 1.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c1 = 1.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c1 = 1.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c1 = 1.Q;
-#endif
   if (d1 * d2 <= JBM_EPSILONL)
-    return c0;
-  return FMINL (d1 / d2, c1);
+    return (JBDOUBLE) 0.;
+  return FMINL (d1 / d2, (JBDOUBLE) 1.);
 }
 
 /**
@@ -2665,21 +2338,12 @@ jbm_flux_limiter_VanLeerl (const JBDOUBLE d1,
                            const JBDOUBLE d2)
                            ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c1 = 1.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c1 = 1.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c1 = 1.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c1 = 1.Q;
-#endif
   JBDOUBLE r, k;
   if (d1 * d2 <= JBM_EPSILONL)
-    return c0;
+    return (JBDOUBLE) 0.;
   r = d1 / d2;
   k = FABSL (r);
-  return (r + k) / (c1 + k);
+  return (r + k) / ((JBDOUBLE) 1. + k);
 }
 
 /**
@@ -2695,21 +2359,12 @@ jbm_flux_limiter_VanAlbadal (const JBDOUBLE d1,
                              const JBDOUBLE d2)
                              ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c1 = 1.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c1 = 1.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c1 = 1.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c1 = 1.Q;
-#endif
   JBDOUBLE r, k;
   if (d1 * d2 <= JBM_EPSILONL)
-    return c0;
+    return (JBDOUBLE) 0.;
   r = d1 / d2;
   k = r * r;
-  return (r + k) / (c1 + k);
+  return (r + k) / ((JBDOUBLE) 1. + k);
 }
 
 /**
@@ -2725,18 +2380,9 @@ jbm_flux_limiter_minsuperl (const JBDOUBLE d1,
                             const JBDOUBLE d2)
                             ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c2 = 2.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c2 = 2.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c2 = 2.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c2 = 2.Q;
-#endif
   if (d1 * d2 <= JBM_EPSILONL)
-    return c0;
-  return FMINL (d1 / d2, c2);
+    return (JBDOUBLE) 0.;
+  return FMINL (d1 / d2, (JBDOUBLE) 2.);
 }
 
 /**
@@ -2752,18 +2398,9 @@ jbm_flux_limiter_superminl (const JBDOUBLE d1,
                             const JBDOUBLE d2)
                             ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c1 = 1.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c1 = 1.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c1 = 1.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c1 = 1.Q;
-#endif
   if (d1 * d2 <= JBM_EPSILONL)
-    return c0;
-  return FMINL (jbm_fdbll (d1 / d2), c1);
+    return (JBDOUBLE) 0.;
+  return FMINL (jbm_fdbll (d1 / d2), (JBDOUBLE) 1.);
 }
 
 /**
@@ -2780,24 +2417,15 @@ jbm_flux_limiter_monotonized_centrall (const JBDOUBLE d1,
                                        const JBDOUBLE d2)
                                        ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c1 = 1.f, c2 = 2.f, c3 = 3.f, c05 = 0.5f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c1 = 1., c2 = 2., c3 = 3., c05 = 0.5;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c1 = 1.L, c2 = 2.L, c3 = 3.L, c05 = 0.5L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c1 = 1.Q, c2 = 2.Q, c3 = 3.Q, c05 = 0.5Q;
-#endif
   JBDOUBLE k;
   if (d1 * d2 <= JBM_EPSILONL)
-    return c0;
+    return (JBDOUBLE) 0.;
   k = d1 / d2;
-  if (k >= c3)
-    return c2;
-  if (k <= c1 / c3)
+  if (k >= (JBDOUBLE) 3.)
+    return (JBDOUBLE) 2.;
+  if (k <= (JBDOUBLE) 1. / (JBDOUBLE) 3.)
     return k + k;
-  return c05 * (k + c1);
+  return (JBDOUBLE) 0.5 * (k + (JBDOUBLE) 1.);
 }
 
 /**
@@ -2813,18 +2441,9 @@ jbm_flux_limiter_meanl (const JBDOUBLE d1,
                         const JBDOUBLE d2)
                         ///< 2nd flux limiter function parameter.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c1 = 1.f, c05 = 0.5f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c1 = 1., c05 = 0.5;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c1 = 1.L, c05 = 0.5L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c1 = 1.Q, c05 = 0.5Q;
-#endif
   if (jbm_smalll (d2))
-    return c0;
-  return c05 * (d1 / d2 + c1);
+    return (JBDOUBLE) 0.;
+  return (JBDOUBLE) 0.5 * (d1 / d2 + (JBDOUBLE) 1.);
 }
 
 /**
@@ -2908,133 +2527,44 @@ jbm_integrall (JBDOUBLE (*f) (JBDOUBLE),
                const JBDOUBLE x1,       ///< left limit of the interval.
                const JBDOUBLE x2)       ///< right limit of the interval.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c05 = 0.5f;
 #if JBM_INTEGRAL_GAUSS_N == 1
-  const JBDOUBLE a[1] = { 2.f };
+  const JBDOUBLE a[1] = { (JBDOUBLE) 2. };
 #elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBDOUBLE a[2] = { 8.f / 9.f, 5.f / 9.f }, b[2] = { 0.f, 7.7459667e-1f };
+  const JBDOUBLE a[2] = { (JBDOUBLE) 8. / 9., (JBDOUBLE) 5. / 9. },
+    b[2] = {
+      (JBDOUBLE) 0.,
+      (JBDOUBLE) 7.7459666924148340427791481488384306e-1
+  };
 #elif JBM_INTEGRAL_GAUSS_N == 3
   const JBDOUBLE a[3] = {
-    128.f / 225.f,
-    4.7862867e-1f,
-    2.3692689e-1f
+    (JBDOUBLE) 128. / 225.,
+    (JBDOUBLE) 4.7862867049936646804129151483563819e-1,
+    (JBDOUBLE) 2.3692688505618908751426404071991736e-1
   }, b[3] = {
-    0.f,
-    5.3846931e-1f,
-    9.0617985e-1f
+    (JBDOUBLE) 0.,
+    (JBDOUBLE) 5.3846931010568309103631442070020880e-1,
+    (JBDOUBLE) 9.0617984593866399279762687829939297e-1
   };
 #elif JBM_INTEGRAL_GAUSS_N == 4
   const JBDOUBLE a[4] = {
-    4.1795918e-1f,
-    3.8183005e-1f,
-    2.7970539e-1f,
-    1.2948497e-1f
+    (JBDOUBLE) 4.1795918367346938775510204081632653e-1,
+    (JBDOUBLE) 3.8183005050511894495036977548897513e-1,
+    (JBDOUBLE) 2.7970539148927666790146777142377958e-1,
+    (JBDOUBLE) 1.2948496616886969327061143267908202e-1
   }, b[4] = {
-    0.f,
-    4.0584515e-1f,
-    7.4153119e-1f,
-    9.4910791e-1f
+    (JBDOUBLE) 0.,
+    (JBDOUBLE) 4.0584515137739716690660641207696146e-1,
+    (JBDOUBLE) 7.4153118559939443986386477328078841e-1,
+    (JBDOUBLE) 9.4910791234275852452618968404785126e-1
   };
-#endif
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c05 = 0.5;
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBDOUBLE a[1] = { 2. };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBDOUBLE a[2] = { 8. / 9., 5. / 9. },
-    b[2] = { 0., 7.745966692414834e-1 };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBDOUBLE a[3] = {
-    128. / 225.,
-    4.786286704993665e-1,
-    2.369268850561891e-1
-  }, b[3] = {
-    0.,
-    5.384693101056831e-1,
-    9.061798459386640e-1
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBDOUBLE a[4] = {
-    4.179591836734694e-1,
-    3.818300505051189e-1,
-    2.797053914892767e-1,
-    1.294849661688697e-1
-  }, b[4] = {
-    0.,
-    4.058451513773972e-1,
-    7.415311855993944e-1,
-    9.491079123427585e-1
-  };
-#endif
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c05 = 0.5L;
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBDOUBLE a[1] = { 2.L };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBDOUBLE a[2] = { 8.L / 9.L, 5.L / 9.L },
-    b[2] = { 0.L, 7.7459666924148340428e-1L };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBDOUBLE a[3] = {
-    128.L / 225.L,
-    4.7862867049936646804e-1L,
-    2.3692688505618908751e-1L
-  }, b[3] = {
-    0.L,
-    5.3846931010568309104e-1L,
-    9.0617984593866399280e-1L
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBDOUBLE a[4] = {
-    4.1795918367346938776e-1L,
-    3.8183005050511894495e-1L,
-    2.7970539148927666790e-1L,
-    1.2948496616886969327e-1L
-  }, b[4] = {
-    0.L,
-    4.0584515137739716691e-1L,
-    7.4153118559939443986e-1L,
-    9.4910791234275852453e-1L
-  };
-#endif
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c05 = 0.5Q;
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBDOUBLE a[1] = { 2.Q };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBDOUBLE a[2] = { 8.Q / 9.Q, 5.Q / 9.Q },
-    b[2] = { 0.Q, 7.7459666924148340427791481488384306e-1Q };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBDOUBLE a[3] = {
-    128.Q / 225.Q,
-    4.7862867049936646804129151483563819e-1Q,
-    2.3692688505618908751426404071991736e-1Q
-  }, b[3] = {
-    0.Q,
-    5.3846931010568309103631442070020880e-1Q,
-    9.0617984593866399279762687829939297e-1Q
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBDOUBLE a[4] = {
-    4.1795918367346938775510204081632653e-1Q,
-    3.8183005050511894495036977548897513e-1Q,
-    2.7970539148927666790146777142377958e-1Q,
-    1.2948496616886969327061143267908202e-1Q
-  }, b[4] = {
-    0.Q,
-    4.0584515137739716690660641207696146e-1Q,
-    7.4153118559939443986386477328078841e-1Q,
-    9.4910791234275852452618968404785126e-1Q
-  };
-#endif
 #endif
   JBDOUBLE k, x, dx;
 #if JBM_INTEGRAL_GAUSS_N > 1
   JBDOUBLE k2;
   unsigned int i;
 #endif
-  dx = c05 * (x2 - x1);
-  x = c05 * (x1 + x2);
+  dx = (JBDOUBLE) 0.5 * (x2 - x1);
+  x = (JBDOUBLE) 0.5 * (x1 + x2);
   k = a[0] * f (x);
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
@@ -4000,15 +3530,6 @@ jbm_farray_integral (JBMFarray *restrict fx,
                      JBFLOAT x2)
                      ///< right limit of the integration interval.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c05 = 0.5f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c05 = 0.5;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c05 = 0.5L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c05 = 0.5Q;
-#endif
   JBFLOAT *x, *y, *yy, *xx;
   JBFLOAT I, y1;
   int i;
@@ -4044,18 +3565,18 @@ jbm_farray_integral (JBMFarray *restrict fx,
     }
   else
     {
-      I = c0;
+      I = (JBFLOAT) 0.;
       xx = x + i;
       yy = y + i;
       y1 = jbm_extrapolate (x1, xx[0], xx[1], yy[0], yy[1]);
     }
   if (x2 < xx[1])
     {
-      I += c05 * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1]))
-        * (x2 - x1);
+      I += (JBFLOAT) 0.5
+        * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1])) * (x2 - x1);
       goto exit1;
     }
-  I += c05 * (y1 + yy[1]) * (xx[1] - x1);
+  I += (JBFLOAT) 0.5 * (y1 + yy[1]) * (xx[1] - x1);
   if (++i == (int) last)
     {
       I += yy[1] * (x2 - xx[1]);
@@ -4064,12 +3585,13 @@ jbm_farray_integral (JBMFarray *restrict fx,
   while (++i < (int) last && x2 > xx[2])
     {
       ++xx, ++yy;
-      I += c05 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
+      I += (JBFLOAT) 0.5 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
     }
   if (i == (int) last)
     I += yy[2] * (x2 - xx[1]);
   else if (x2 < xx[2])
-    I += c05 * (yy[1] + jbm_extrapolate (x2, xx[1], xx[2], yy[1], yy[2]))
+    I += (JBFLOAT) 0.5
+      * (yy[1] + jbm_extrapolate (x2, xx[1], xx[2], yy[1], yy[2]))
       * (x2 - xx[1]);
 exit1:
   return I;
@@ -4093,15 +3615,7 @@ jbm_farray_mean_square_error (JBMFarray *fxa,
                               JBMFarray *fyr)
 ///< JBMFarray struct defining the y-coordinates of the 2nd tabular function.
 {
-#if JBM_LOW_PRECISION == 1
-  JBFLOAT k = 0.f;
-#elif JBM_LOW_PRECISION == 2
-  JBFLOAT k = 0.;
-#elif JBM_LOW_PRECISION == 3
-  JBFLOAT k = 0.L;
-#elif JBM_LOW_PRECISION == 4
-  JBFLOAT k = 0.Q;
-#endif
+  JBFLOAT k = (JBFLOAT) 0.;
   JBFLOAT *xa, *ya, *xr, *yr;
   unsigned int i, j, lastr, na;
   lastr = fxr->last;
@@ -4474,15 +3988,6 @@ jbm_matrix_solve_tridiagonal_zero (JBFLOAT *restrict C,
                                    unsigned int n)
                                    ///< number of matrix rows.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q;
-#endif
   JBFLOAT k;
   unsigned int i;
   --n;
@@ -4494,12 +3999,12 @@ jbm_matrix_solve_tridiagonal_zero (JBFLOAT *restrict C,
         H[i + 1] -= k * H[i];
       }
   if (jbm_small (D[i]))
-    H[i] = c0;
+    H[i] = (JBFLOAT) 0.;
   else
     H[i] /= D[i];
   while (i--)
     if (jbm_small (D[i]))
-      H[i] = c0;
+      H[i] = (JBFLOAT) 0.;
     else
       H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
 }
@@ -4581,15 +4086,6 @@ jbm_matrix_solve_pentadiagonal_zero (JBFLOAT *restrict B,
                                      unsigned int n)
                                      ///< number of matrix rows.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q;
-#endif
   JBFLOAT k;
   unsigned int i;
   --n;
@@ -4612,16 +4108,16 @@ jbm_matrix_solve_pentadiagonal_zero (JBFLOAT *restrict B,
       H[i + 1] -= k * H[i];
     }
   if (jbm_small (D[i + 1]))
-    H[i + 1] = c0;
+    H[i + 1] = (JBFLOAT) 0.;
   else
     H[i + 1] /= D[i + 1];
   if (jbm_small (D[i]))
-    H[i] = c0;
+    H[i] = (JBFLOAT) 0.;
   else
     H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
   while (i--)
     if (jbm_small (D[i]))
-      H[i] = c0;
+      H[i] = (JBFLOAT) 0.;
     else
       H[i] = (H[i] - E[i] * H[i + 1] - F[i] * H[i + 2]) / D[i];
 }
@@ -4640,15 +4136,6 @@ jbm_regression_linear (JBMFarray *fx,
                        JBFLOAT *b)
                        ///< pointer to the 1st order regression coefficient.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q;
-#endif
   JBFLOAT *x, *y;
   JBFLOAT syx, sy, sxx, sx;
   unsigned int i, n;
@@ -4668,7 +4155,7 @@ jbm_regression_linear (JBMFarray *fx,
   y = fy->x;
   n = fx->n;
   i = 0;
-  syx = sy = sxx = sx = c0;
+  syx = sy = sxx = sx = (JBFLOAT) 0.;
 #ifdef __SSE4_2__
   sy2 = _mm_setzero_pd ();
   sx2 = _mm_setzero_pd ();
@@ -4780,15 +4267,6 @@ jbm_regression_polynomial (JBMFarray *fx,
                            unsigned int m)
                            ///< order of the polynomial regression.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c1 = 1.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c1 = 1.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c1 = 1.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
-#endif
   JBMFarray *fxx, *fyx;
   JBFLOAT B[(m + 1) * (m + 2)];
   JBFLOAT *k, *x, *y, *xx, *yx;
@@ -4808,10 +4286,10 @@ jbm_regression_polynomial (JBMFarray *fx,
 #endif
   n = m + 1;
   fyx = jbm_farray_new (n);
-  jbm_farray_set1 (fyx, c0, n);
+  jbm_farray_set1 (fyx, (JBFLOAT) 0., n);
   n += m;
   fxx = jbm_farray_new (n);
-  jbm_farray_set1 (fxx, c0, n);
+  jbm_farray_set1 (fxx, (JBFLOAT) 0., n);
   i = 0;
   n = fx->n;
   x = fx->x;
@@ -4836,7 +4314,7 @@ jbm_regression_polynomial (JBMFarray *fx,
     {
       for (; n4; --n4, i += 4)
         {
-          zx4 = _mm256_set1_pd ((double) c1);
+          zx4 = _mm256_set1_pd ((double) (JBFLOAT) 1.);
           x4 = _mm256_load_pd (x + i);
           zy4 = y4 = _mm256_load_pd (y + i);
           for (j = 0; j <= m; ++j)
@@ -4872,7 +4350,7 @@ jbm_regression_polynomial (JBMFarray *fx,
     {
       for (; n2; --n2, i += 2)
         {
-          zx2 = _mm_set1_pd ((double) c1);
+          zx2 = _mm_set1_pd ((double) (JBFLOAT) 1.);
           x2 = _mm_load_pd (x + i);
           zy2 = y2 = _mm_load_pd (y + i);
           for (j = 0; j <= m; ++j)
@@ -4904,7 +4382,7 @@ jbm_regression_polynomial (JBMFarray *fx,
 #endif
   for (; i < n; ++i)
     {
-      for (j = 0, zx = c1, zy = y[i]; j <= m; ++j)
+      for (j = 0, zx = (JBFLOAT) 1., zy = y[i]; j <= m; ++j)
         {
           xx[j] += zx;
           yx[j] += zy;
@@ -4945,15 +4423,6 @@ jbm_regression_multilinear (JBFLOAT **restrict x,
                             ///< array of regression coefficients.
                             unsigned int m)     ///< number of variables.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q;
-#endif
   JBFLOAT c[(m + 1) * (m + 2)];
   JBFLOAT *d, *xj, *xk;
   int i, j, k;
@@ -4965,25 +4434,25 @@ jbm_regression_multilinear (JBFLOAT **restrict x,
           d = c + (m + 1) * j + k;
           xj = x[j];
           xk = x[k];
-          for (*d = c0, i = (int) n; --i >= 0;)
+          for (*d = (JBFLOAT) 0., i = (int) n; --i >= 0;)
             *d += xj[i] * xk[i];
         }
       d = c + (m + 1) * j + m;
       xj = x[j];
       xk = x[0];
-      for (*d = c0, i = (int) n; --i >= 0;)
+      for (*d = (JBFLOAT) 0., i = (int) n; --i >= 0;)
         *d += xj[i] * xk[i];
     }
   for (k = (int) m; --k > 0;)
     {
       d = c + k;
       xk = x[k];
-      for (*d = c0, i = (int) n; --i >= 0;)
+      for (*d = (JBFLOAT) 0., i = (int) n; --i >= 0;)
         *d += xk[i];
     }
   d = c + m;
   xk = x[0];
-  for (*d = c0, i = (int) n; --i >= 0;)
+  for (*d = (JBFLOAT) 0., i = (int) n; --i >= 0;)
     *d += xk[i];
   c[0] = n;
   for (j = (int) m; --j > 0;)
@@ -5035,15 +4504,6 @@ jbm_spline_cubic (JBFLOAT *restrict x,
                   JBFLOAT **restrict d)
 ///< pointer to the array of 3rd order spline coefficients.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c1 = 1.f, c3 = 3.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c1 = 1., c3 = 3.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c1 = 1.L, c3 = 3.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c1 = 1.Q, c3 = 3.Q;
-#endif
   JBFLOAT *B, *C, *D, *E, *F, *H;
   JBFLOAT dx;
   unsigned int i, j, m;
@@ -5056,14 +4516,14 @@ jbm_spline_cubic (JBFLOAT *restrict x,
   F = E + m - 1;
   H = F + m - 2;
   dx = x[1] - x[0];
-  B[0] = B[1] = D[3] = E[2] = E[3] = F[3] = H[1] = H[2] = H[3] = c0;
-  C[0] = C[1] = C[2] = c1;
-  F[1] = F[2] = -c1;
+  B[0] = B[1] = D[3] = E[2] = E[3] = F[3] = H[1] = H[2] = H[3] = (JBFLOAT) 0.;
+  C[0] = C[1] = C[2] = (JBFLOAT) 1.;
+  F[1] = F[2] = -(JBFLOAT) 1.;
   D[0] = dx;
   D[1] = D[0] + dx;
   D[2] = D[1] + dx;
   E[0] = D[0] * dx;
-  E[1] = c3 * E[0];
+  E[1] = (JBFLOAT) 3. * E[0];
   F[0] = E[0] * dx;
   H[0] = y[1] - y[0];
   for (i = n - 1; --i > 0;)
@@ -5071,21 +4531,21 @@ jbm_spline_cubic (JBFLOAT *restrict x,
       j = 3 * i + 1;
       dx = x[i + 1] - x[i];
       B[j - 2] = D[j + 2] = F[j] = F[j + 1] = F[j + 2] = H[j + 1] = H[j + 2]
-        = c0;
-      B[j - 1] = B[j] = c1;
-      E[j + 1] = E[j + 2] = -c1;
+        = (JBFLOAT) 0.;
+      B[j - 1] = B[j] = (JBFLOAT) 1.;
+      E[j + 1] = E[j + 2] = -(JBFLOAT) 1.;
       C[j - 1] = dx;
       C[j] = C[j - 1] + dx;
       C[j + 1] = C[j] + dx;
       D[j] = C[j - 1] * dx;
-      D[j + 1] = c3 * D[j];
+      D[j + 1] = (JBFLOAT) 3. * D[j];
       E[j] = D[j] * dx;
       H[j] = y[i + 1] - y[i];
     }
   j = 3 * n - 2;
   dx = x[n] - x[n - 1];
-  B[j - 2] = B[j - 1] = C[j] = H[j + 1] = c0;
-  D[j + 1] = c1;
+  B[j - 2] = B[j - 1] = C[j] = H[j + 1] = (JBFLOAT) 0.;
+  D[j + 1] = (JBFLOAT) 1.;
   C[j - 1] = dx;
   D[j] = dx * dx;
   E[j] = D[j] * dx;
@@ -5119,20 +4579,11 @@ jbm_transversal_section_regions_sort (unsigned int i,   ///< level index.
                                       JBFLOAT *restrict zz)
                                       ///< array of levels.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c05 = 0.5f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c05 = 0.5;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c05 = 0.5L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c05 = 0.5Q;
-#endif
   JBFLOAT x[nj];
   unsigned int nx[nj], na[nj];
   JBFLOAT t;
   int j, k;
-  t = c05 * (zz[i] + zz[i + 1]);
+  t = (JBFLOAT) 0.5 * (zz[i] + zz[i + 1]);
   for (j = nj; --j >= 0;)
     {
       na[j] = k = nk[j];
@@ -5346,18 +4797,9 @@ jbm_varray_mean_square_error (void *restrict xa,
                               int nr)
 ///< the highest point number tabulating the 2nd function.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q;
-#endif
   JBFLOAT k, k2;
   int i, j;
-  k = c0;
+  k = (JBFLOAT) 0.;
   for (i = 0; i <= na && *(JBFLOAT *) xa < *(JBFLOAT *) xr;
        ++i, xa = (char *) xa + sizea, fa = (char *) fa + sizea)
     k += jbm_fsqr (*(JBFLOAT *) fa - *(JBFLOAT *) fr);
@@ -5503,15 +4945,6 @@ jbm_varray_solve_tridiagonal_zero (void *restrict C,
                                    unsigned int n)
                                    ///< the latest struct array element.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q;
-#endif
   JBFLOAT *CC, *DD, *EE, *HH;
   JBFLOAT k;
   unsigned int i;
@@ -5541,7 +4974,7 @@ jbm_varray_solve_tridiagonal_zero (void *restrict C,
         }
     }
   if (jbm_small (*DD))
-    *HH = c0;
+    *HH = (JBFLOAT) 0.;
   else
     *HH /= *DD;
   while (--i > 0)
@@ -5554,7 +4987,7 @@ jbm_varray_solve_tridiagonal_zero (void *restrict C,
       H = (char *) H - size;
       HH = (JBFLOAT *) H;
       if (jbm_small (*DD))
-        *HH = c0;
+        *HH = (JBFLOAT) 0.;
       else
         *HH = (*HH - k) / *DD;
     }
@@ -5624,21 +5057,12 @@ jbm_file_mean_square_error (char *namea,
                             int nr)
 ///< columns number of file tabulating the 2nd function.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q;
-#endif
   JBFLOAT aa[na], ar[nr];
   FILE *filea, *filer;
   JBFLOAT k, xa, fa, xr1, fr1, xr2, fr2;
   int i, j, endr;
   endr = i = 0;
-  k = c0;
+  k = (JBFLOAT) 0.;
   filea = fopen (namea, "r");
   if (!filea)
     goto exit_mse;
@@ -5692,7 +5116,7 @@ jbm_file_mean_square_error (char *namea,
     }
 exit_mse:
   if (i == 0)
-    return c0;
+    return (JBFLOAT) 0.;
   return k / i;
 }
 
@@ -5933,15 +5357,6 @@ jbm_darray_integral (JBDOUBLE *restrict x,
                      JBDOUBLE x2)
                      ///< right limit of the integration interval.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c05 = 0.5f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c05 = 0.5;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c05 = 0.5L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c05 = 0.5Q;
-#endif
   JBDOUBLE *yy, *xx;
   JBDOUBLE I, y1;
   int i;
@@ -5972,18 +5387,18 @@ jbm_darray_integral (JBDOUBLE *restrict x,
     }
   else
     {
-      I = c0;
+      I = (JBDOUBLE) 0.;
       xx = x + i;
       yy = y + i;
       y1 = jbm_extrapolatel (x1, xx[0], xx[1], yy[0], yy[1]);
     }
   if (x2 < xx[1])
     {
-      I += c05 * (y1 + jbm_extrapolatel (x2, xx[0], xx[1], yy[0], yy[1]))
+      I += (JBDOUBLE) 0.5 * (y1 + jbm_extrapolatel (x2, xx[0], xx[1], yy[0], yy[1]))
         * (x2 - x1);
       goto exit1;
     }
-  I += c05 * (y1 + yy[1]) * (xx[1] - x1);
+  I += (JBDOUBLE) 0.5 * (y1 + yy[1]) * (xx[1] - x1);
   if (++i == (int) n)
     {
       I += yy[1] * (x2 - xx[1]);
@@ -5992,12 +5407,12 @@ jbm_darray_integral (JBDOUBLE *restrict x,
   while (++i < (int) n && x2 > xx[2])
     {
       ++xx, ++yy;
-      I += c05 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
+      I += (JBDOUBLE) 0.5 * (yy[0] + yy[1]) * (xx[1] - xx[0]);
     }
   if (i == (int) n)
     I += yy[2] * (x2 - xx[1]);
   else if (x2 < xx[2])
-    I += c05 * (yy[1] + jbm_extrapolatel (x2, xx[1], xx[2], yy[1], yy[2]))
+    I += (JBDOUBLE) 0.5 * (yy[1] + jbm_extrapolatel (x2, xx[1], xx[2], yy[1], yy[2]))
       * (x2 - xx[1]);
 exit1:
   return I;
@@ -6069,15 +5484,7 @@ jbm_darray_mean_square_error (JBDOUBLE *restrict xa,
 ///< the highest element number of the arrays defining the 2nd tabular
 ///< function.
 {
-#if JBM_HIGH_PRECISION == 1
-  JBDOUBLE k = 0.f;
-#elif JBM_HIGH_PRECISION == 2
-  JBDOUBLE k = 0.;
-#elif JBM_HIGH_PRECISION == 3
-  JBDOUBLE k = 0.L;
-#elif JBM_HIGH_PRECISION == 4
-  JBDOUBLE k = 0.Q;
-#endif
+  JBDOUBLE k = (JBDOUBLE) 0.;
   unsigned int i, j;
   for (i = 0; i <= na && xa[i] < xr[0]; ++i)
     k += jbm_fsqrl (fa[i] - fr[0]);
@@ -6437,15 +5844,6 @@ jbm_matrix_solve_tridiagonal_zerol (JBDOUBLE *restrict C,
                                     ///< final column array.
                                     int n)      ///< number of matrix rows.
 {
-#if JBM_HIGH_PRECISION == 1
-  JBDOUBLE c0 = 0.f;
-#elif JBM_HIGH_PRECISION == 2
-  JBDOUBLE c0 = 0.;
-#elif JBM_HIGH_PRECISION == 3
-  JBDOUBLE c0 = 0.L;
-#elif JBM_HIGH_PRECISION == 4
-  JBDOUBLE c0 = 0.Q;
-#endif
   JBDOUBLE k;
   int i;
   for (i = 0; i < n; ++i)
@@ -6456,12 +5854,12 @@ jbm_matrix_solve_tridiagonal_zerol (JBDOUBLE *restrict C,
         H[i + 1] -= k * H[i];
       }
   if (jbm_smalll (D[i]))
-    H[i] = c0;
+    H[i] = (JBDOUBLE) 0.;
   else
     H[i] /= D[i];
   while (i--)
     if (jbm_smalll (D[i]))
-      H[i] = c0;
+      H[i] = (JBDOUBLE) 0.;
     else
       H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
 }
@@ -6542,15 +5940,6 @@ jbm_matrix_solve_pentadiagonal_zerol (JBDOUBLE *restrict B,
                                       ///< final column array.
                                       int n)    ///< number of matrix rows.
 {
-#if JBM_HIGH_PRECISION == 1
-  JBDOUBLE c0 = 0.f;
-#elif JBM_HIGH_PRECISION == 2
-  JBDOUBLE c0 = 0.;
-#elif JBM_HIGH_PRECISION == 3
-  JBDOUBLE c0 = 0.L;
-#elif JBM_HIGH_PRECISION == 4
-  JBDOUBLE c0 = 0.Q;
-#endif
   JBDOUBLE k;
   int i;
   for (i = 0; i < n - 1; ++i)
@@ -6572,16 +5961,16 @@ jbm_matrix_solve_pentadiagonal_zerol (JBDOUBLE *restrict B,
       H[i + 1] -= k * H[i];
     }
   if (jbm_smalll (D[i + 1]))
-    H[i + 1] = c0;
+    H[i + 1] = (JBDOUBLE) 0.;
   else
     H[i + 1] /= D[i + 1];
   if (jbm_smalll (D[i]))
-    H[i] = c0;
+    H[i] = (JBDOUBLE) 0.;
   else
     H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
   while (i--)
     if (jbm_smalll (D[i]))
-      H[i] = c0;
+      H[i] = (JBDOUBLE) 0.;
     else
       H[i] = (H[i] - E[i] * H[i + 1] - F[i] * H[i + 2]) / D[i];
 }
@@ -6601,19 +5990,10 @@ jbm_regression_linearl (JBDOUBLE *restrict x,
                         JBDOUBLE *b)
                         ///< pointer to the 1st order regression coefficient.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q;
-#endif
   JBDOUBLE syx, sy, sxx, sx;
   unsigned int i;
   ++n;
-  syx = sy = sxx = sx = c0;
+  syx = sy = sxx = sx = (JBDOUBLE) 0.;
   for (i = 0; i < n; ++i)
     {
       sy += y[i];
@@ -6640,27 +6020,18 @@ jbm_regression_polynomiall (JBDOUBLE *restrict x,
 ///< calling to malloc.
                             int m)      ///< order of the polynomial regression.
 {
-#if JBM_LOW_PRECISION == 1
-  const JBFLOAT c0 = 0.f, c1 = 1.f;
-#elif JBM_LOW_PRECISION == 2
-  const JBFLOAT c0 = 0., c1 = 1.;
-#elif JBM_LOW_PRECISION == 3
-  const JBFLOAT c0 = 0.L, c1 = 1.L;
-#elif JBM_LOW_PRECISION == 4
-  const JBFLOAT c0 = 0.Q, c1 = 1.Q;
-#endif
   JBDOUBLE xx[m + m + 1], yx[m + 1], B[(m + 1) * (m + 2)];
   JBDOUBLE *k;
   JBDOUBLE zx, zy;
   int i, j;
   *A = (JBDOUBLE *) malloc ((m + 1) * sizeof (JBDOUBLE));
   for (j = m + m; --j > m;)
-    xx[j] = c0;
+    xx[j] = (JBDOUBLE) 0.;
   for (; j >= 0; --j)
-    xx[j] = yx[j] = c0;
+    xx[j] = yx[j] = (JBDOUBLE) 0.;
   for (i = n; --i >= 0;)
     {
-      for (j = 0, zx = c1, zy = y[i]; j <= m; ++j)
+      for (j = 0, zx = (JBDOUBLE) 1., zy = y[i]; j <= m; ++j)
         {
           yx[j] += zy;
           xx[j] += zx;
@@ -6719,15 +6090,6 @@ jbm_regression_multilinearl (JBDOUBLE **restrict x,
 ///< array of regression coefficients.
                              int m)     ///< number of variables.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q;
-#endif
   JBDOUBLE c[(m + 1) * (m + 2)];
   JBDOUBLE *d, *xj, *xk;
   int i, j, k;
@@ -6739,25 +6101,25 @@ jbm_regression_multilinearl (JBDOUBLE **restrict x,
           d = c + (m + 1) * j + k;
           xj = x[j];
           xk = x[k];
-          for (*d = c0, i = n + 1; --i >= 0;)
+          for (*d = (JBDOUBLE) 0., i = n + 1; --i >= 0;)
             *d += *(xj++) ** (xk++);
         }
       d = c + (m + 1) * j + m;
       xj = x[j];
       xk = x[0];
-      for (*d = c0, i = n + 1; --i >= 0;)
+      for (*d = (JBDOUBLE) 0., i = n + 1; --i >= 0;)
         *d += *(xj++) ** (xk++);
     }
   for (k = m; --k > 0;)
     {
       d = c + k;
       xk = x[k];
-      for (*d = c0, i = n + 1; --i >= 0;)
+      for (*d = (JBDOUBLE) 0., i = n + 1; --i >= 0;)
         *d += *(xk++);
     }
   d = c + m;
   xk = x[0];
-  for (*d = c0, i = n + 1; --i >= 0;)
+  for (*d = (JBDOUBLE) 0., i = n + 1; --i >= 0;)
     *d += *(xk++);
   c[0] = n + 1;
   for (j = m; --j > 0;)
@@ -6808,15 +6170,6 @@ jbm_spline_cubicl (JBDOUBLE *restrict x,
                    JBDOUBLE **restrict d)
 ///< pointer to the array of 3rd order spline coefficients.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f, c1 = 1.f, c3 = 3.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0., c1 = 1., c3 = 3.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L, c1 = 1.L, c3 = 3.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q, c1 = 1.Q, c3 = 3.Q;
-#endif
   JBDOUBLE *B, *C, *D, *E, *F, *H;
   JBDOUBLE dx;
   int i, j, m;
@@ -6829,14 +6182,14 @@ jbm_spline_cubicl (JBDOUBLE *restrict x,
   F = E + m - 1;
   H = F + m - 2;
   dx = x[1] - x[0];
-  B[0] = B[1] = D[3] = E[2] = E[3] = F[3] = H[1] = H[2] = H[3] = c0;
-  C[0] = C[1] = C[2] = c1;
-  F[1] = F[2] = -c1;
+  B[0] = B[1] = D[3] = E[2] = E[3] = F[3] = H[1] = H[2] = H[3] = (JBDOUBLE) 0.;
+  C[0] = C[1] = C[2] = (JBDOUBLE) 1.;
+  F[1] = F[2] = -(JBDOUBLE) 1.;
   D[0] = dx;
   D[1] = D[0] + dx;
   D[2] = D[1] + dx;
   E[0] = D[0] * dx;
-  E[1] = c3 * E[0];
+  E[1] = (JBDOUBLE) 3. * E[0];
   F[0] = E[0] * dx;
   H[0] = y[1] - y[0];
   for (i = n - 1; --i > 0;)
@@ -6844,21 +6197,21 @@ jbm_spline_cubicl (JBDOUBLE *restrict x,
       j = 3 * i + 1;
       dx = x[i + 1] - x[i];
       B[j - 2] = D[j + 2] = F[j] = F[j + 1] = F[j + 2] = H[j + 1] = H[j + 2]
-        = c0;
-      B[j - 1] = B[j] = c1;
-      E[j + 1] = E[j + 2] = -c1;
+        = (JBDOUBLE) 0.;
+      B[j - 1] = B[j] = (JBDOUBLE) 1.;
+      E[j + 1] = E[j + 2] = -(JBDOUBLE) 1.;
       C[j - 1] = dx;
       C[j] = C[j - 1] + dx;
       C[j + 1] = C[j] + dx;
       D[j] = C[j - 1] * dx;
-      D[j + 1] = c3 * D[j];
+      D[j + 1] = (JBDOUBLE) 3. * D[j];
       E[j] = D[j] * dx;
       H[j] = y[i + 1] - y[i];
     }
   j = 3 * n - 2;
   dx = x[n] - x[n - 1];
-  B[j - 2] = B[j - 1] = C[j] = H[j + 1] = c0;
-  D[j + 1] = c1;
+  B[j - 2] = B[j - 1] = C[j] = H[j + 1] = (JBDOUBLE) 0.;
+  D[j + 1] = (JBDOUBLE) 1.;
   C[j - 1] = dx;
   D[j] = dx * dx;
   E[j] = D[j] * dx;
@@ -7018,18 +6371,9 @@ jbm_varray_mean_square_errorl (void *restrict xa,
                                int nr)
 ///< the highest point number tabulating the 2nd function.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q;
-#endif
   JBDOUBLE k, k2;
   int i, j;
-  k = c0;
+  k = (JBDOUBLE) 0.;
   for (i = 0; i <= na && *(JBDOUBLE *) xa < *(JBDOUBLE *) xr;
        ++i, xa = (char *) xa + sizea, fa = (char *) fa + sizea)
     k += jbm_fsqr (*(JBDOUBLE *) fa - *(JBDOUBLE *) fr);
@@ -7174,15 +6518,6 @@ jbm_varray_solve_tridiagonal_zerol (void *restrict C,
                                     int n)
                                     ///< the latest struct array element.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q;
-#endif
   JBDOUBLE *CC, *DD, *EE, *HH;
   JBDOUBLE k;
   int i;
@@ -7207,7 +6542,7 @@ jbm_varray_solve_tridiagonal_zerol (void *restrict C,
         }
     }
   if (jbm_small (*DD))
-    *HH = c0;
+    *HH = (JBDOUBLE) 0.;
   else
     *HH /= *DD;
   while (--i > 0)
@@ -7220,7 +6555,7 @@ jbm_varray_solve_tridiagonal_zerol (void *restrict C,
       H = (char *) H - size;
       HH = (JBDOUBLE *) H;
       if (jbm_smalll (*DD))
-        *HH = c0;
+        *HH = (JBDOUBLE) 0.;
       else
         *HH = (*HH - k) / *DD;
     }
@@ -7250,21 +6585,12 @@ jbm_file_mean_square_errorl (char *namea,
                              int nr)
 ///< columns number of file tabulating the 2nd function.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBDOUBLE c0 = 0.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBDOUBLE c0 = 0.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBDOUBLE c0 = 0.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBDOUBLE c0 = 0.Q;
-#endif
   JBDOUBLE aa[na], ar[nr];
   FILE *filea, *filer;
   JBDOUBLE k, xa, fa, xr1, fr1, xr2, fr2;
   int i, j, endr;
   endr = i = 0;
-  k = c0;
+  k = (JBDOUBLE) 0.;
   filea = fopen (namea, "r");
   if (!filea)
     goto exit_mse;
@@ -7318,7 +6644,7 @@ jbm_file_mean_square_errorl (char *namea,
     }
 exit_mse:
   if (i == 0)
-    return c0;
+    return (JBDOUBLE) 0.;
   return k / i;
 }
 
@@ -7397,15 +6723,7 @@ jbm_rk_step_1_1_1_2_2 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k = 0.5f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k = 0.5;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k = 0.5L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k = 0.5Q;
-#endif
+  const JBFLOAT k = (JBFLOAT) 0.5;
   JBFLOAT u0_2[1];
   JBFLOAT u1_2;
   u0_2[0] = u0[0] + dt * u1;
@@ -7426,15 +6744,7 @@ jbm_rk_step_1_1_n_2_2 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k = 0.5f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k = 0.5;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k = 0.5L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k = 0.5Q;
-#endif
+  const JBFLOAT k = (JBFLOAT) 0.5;
   JBFLOAT u0_2[n];
   JBFLOAT kdt, tdt, u1_2;
   unsigned int i;
@@ -7460,22 +6770,13 @@ jbm_rk_step_1_1_1_3_3 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k12 = 0.5f, k14 = 0.25f, k16 = 1.f / 6.f, k4 = 4.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k12 = 0.5, k14 = 0.25, k16 = 1. / 6., k4 = 4.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k12 = 0.5L, k14 = 0.25L, k16 = 1.L / 6.L, k4 = 4.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k12 = 0.5Q, k14 = 0.25Q, k16 = 1.Q / 6.Q, k4 = 4.Q;
-#endif
   JBFLOAT u0_2[1], u0_3[1];
   JBFLOAT u1_2, u1_3;
   u0_2[0] = u0[0] + dt * u1;
   f (t + dt, u0_2[0], &u1_2);
-  u0_3[0] = u0[0] + k14 * dt * (u1 + u1_2);
-  f (t + k12 * dt, u0_3[0], &u1_3);
-  u0[0] += k16 * dt * (u1 + u1_2 + k4 * u1_3);
+  u0_3[0] = u0[0] + (JBFLOAT) 0.25 * dt * (u1 + u1_2);
+  f (t + (JBFLOAT) 0.5 * dt, u0_3[0], &u1_3);
+  u0[0] += (JBFLOAT) 1. / 6. * dt * (u1 + u1_2 + (JBFLOAT) 4. * u1_3);
 }
 
 /**
@@ -7492,29 +6793,20 @@ jbm_rk_step_1_1_n_3_3 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k12 = 0.5f, k14 = 0.25f, k16 = 1.f / 6.f, k4 = 4.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k12 = 0.5, k14 = 0.25, k16 = 1. / 6., k4 = 4.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k12 = 0.5L, k14 = 0.25L, k16 = 1.L / 6.L, k4 = 4.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k12 = 0.5Q, k14 = 0.25Q, k16 = 1.Q / 6.Q, k4 = 4.Q;
-#endif
   JBFLOAT u0_2[n], u0_3[n];
   JBFLOAT tdt, tdt12, kdt14, kdt16, u1_2, u1_3;
   unsigned int i;
   tdt = t + dt;
-  tdt12 = t + k12 * dt;
-  kdt14 = k14 * dt;
-  kdt16 = k16 * dt;
+  tdt12 = t + (JBFLOAT) 0.5 * dt;
+  kdt14 = (JBFLOAT) 0.25 * dt;
+  kdt16 = (JBFLOAT) 1. / 6. * dt;
   for (i = 0; i < n; ++i)
     {
       u0_2[i] = u0[i] + dt * u1[i];
       f (tdt, u0_2[i], &u1_2);
       u0_3[i] = u0[i] + kdt14 * (u1[i] + u1_2);
       f (tdt12, u0_3[i], &u1_3);
-      u0[i] += kdt16 * (u1[i] + u1_2 + k4 * u1_3);
+      u0[i] += kdt16 * (u1[i] + u1_2 + (JBFLOAT) 4. * u1_3);
     }
 }
 
@@ -7530,18 +6822,9 @@ jbm_rk_step_1_1_1_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k12 = 0.5f, k16 = 1.f / 6.f, k2 = 2.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k12 = 0.5, k16 = 1. / 6., k2 = 2.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k12 = 0.5L, k16 = 1.L / 6.L, k2 = 2.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k12 = 0.5Q, k16 = 1.Q / 6.Q, k2 = 2.Q;
-#endif
   JBFLOAT u0_2[1], u0_3[1], u0_4[1];
   JBFLOAT kdt, tdt, u1_2, u1_3, u1_4;
-  kdt = k12 * dt;
+  kdt = (JBFLOAT) 0.5 * dt;
   tdt = t + kdt;
   u0_2[0] = u0[0] + kdt * u1;
   f (tdt, u0_2[0], &u1_2);
@@ -7549,7 +6832,7 @@ jbm_rk_step_1_1_1_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
   f (tdt, u0_3[0], &u1_3);
   u0_4[0] = u0[0] + dt * u1_3;
   f (t + dt, u0_4[0], &u1_4);
-  u0[0] += k16 * dt * (u1 + u1_4 + k2 * (u1_2 + u1_3));
+  u0[0] += (JBFLOAT) 1. / 6. * dt * (u1 + u1_4 + (JBFLOAT) 2. * (u1_2 + u1_3));
 }
 
 /**
@@ -7566,20 +6849,11 @@ jbm_rk_step_1_1_n_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k12 = 0.5f, k16 = 1.f / 6.f, k2 = 2.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k12 = 0.5, k16 = 1. / 6., k2 = 2.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k12 = 0.5L, k16 = 1.L / 6.L, k2 = 2.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k12 = 0.5Q, k16 = 1.Q / 6.Q, k2 = 2.Q;
-#endif
   JBFLOAT u0_2[n], u0_3[n], u0_4[n];
   JBFLOAT kdt12, kdt16, tdt12, tdt, u1_2, u1_3, u1_4;
   unsigned int i;
-  kdt12 = k12 * dt;
-  kdt16 = k16 * dt;
+  kdt12 = (JBFLOAT) 0.5 * dt;
+  kdt16 = (JBFLOAT) 1. / 6. * dt;
   tdt12 = t + kdt12;
   tdt = t + dt;
   for (i = 0; i < n; ++i)
@@ -7590,7 +6864,7 @@ jbm_rk_step_1_1_n_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
       f (tdt12, u0_3[i], &u1_3);
       u0_4[i] = u0[i] + dt * u1_3;
       f (tdt, u0_4[i], &u1_4);
-      u0[i] += kdt16 * (u1[i] + u1_4 + k2 * (u1_2 + u1_3));
+      u0[i] += kdt16 * (u1[i] + u1_4 + (JBFLOAT) 2. * (u1_2 + u1_3));
     }
 }
 
@@ -7649,21 +6923,12 @@ jbm_rk_step_1_2_1_2_2 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k = 0.5f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k = 0.5;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k = 0.5L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k = 0.5Q;
-#endif
   JBFLOAT u0_2[1], u1_2[1];
   JBFLOAT kdt, u2_2;
   u0_2[0] = u0[0] + dt * u1[0];
   u1_2[0] = u1[0] + dt * u2;
   f (t + dt, u0_2[0], u1_2[0], &u2_2);
-  kdt = k * dt;
+  kdt = (JBFLOAT) 0.5 * dt;
   u0[0] += kdt * (u1[0] + u1_2[0]);
   u1[0] += kdt * (u2 + u2_2);
 }
@@ -7684,19 +6949,10 @@ jbm_rk_step_1_2_n_2_2 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k = 0.5f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k = 0.5;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k = 0.5L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k = 0.5Q;
-#endif
   JBFLOAT u0_2[n], u1_2[n];
   JBFLOAT kdt, tdt, u2_2;
   unsigned int i;
-  kdt = k * dt;
+  kdt = (JBFLOAT) 0.5 * dt;
   tdt = t + dt;
   for (i = 0; i < n; ++i)
     {
@@ -7722,27 +6978,18 @@ jbm_rk_step_1_2_1_3_3 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k12 = 0.5f, k14 = 0.25f, k16 = 1.f / 6.f, k4 = 4.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k12 = 0.5, k14 = 0.25, k16 = 1. / 6., k4 = 4.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k12 = 0.5L, k14 = 0.25L, k16 = 1.L / 6.L, k4 = 4.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k12 = 0.5Q, k14 = 0.25Q, k16 = 1.Q / 6.Q, k4 = 4.Q;
-#endif
   JBFLOAT u0_2[1], u1_2[1], u0_3[1], u1_3[1];
   JBFLOAT kdt, u2_2, u2_3;
   u0_2[0] = u0[0] + dt * u1[0];
   u1_2[0] = u1[0] + dt * u2;
   f (t + dt, u0_2[0], u1_2[0], &u2_2);
-  kdt = k14 * dt;
+  kdt = (JBFLOAT) 0.25 * dt;
   u0_3[0] = u0[0] + kdt * (u1[0] + u1_2[0]);
   u1_3[0] = u1[0] + kdt * (u2 + u2_2);
-  f (t + k12 * dt, u0_3[0], u1_3[0], &u2_3);
-  kdt = k16 * dt;
-  u0[0] += kdt * (u1[0] + u1_2[0] + k4 * u1_3[0]);
-  u1[0] += kdt * (u2 + u2_2 + k4 * u2_3);
+  f (t + (JBFLOAT) 0.5 * dt, u0_3[0], u1_3[0], &u2_3);
+  kdt = (JBFLOAT) 1. / 6. * dt;
+  u0[0] += kdt * (u1[0] + u1_2[0] + (JBFLOAT) 4. * u1_3[0]);
+  u1[0] += kdt * (u2 + u2_2 + (JBFLOAT) 4. * u2_3);
 }
 
 /**
@@ -7761,21 +7008,12 @@ jbm_rk_step_1_2_n_3_3 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k12 = 0.5f, k14 = 0.25f, k16 = 1.f / 6.f, k4 = 4.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k12 = 0.5, k14 = 0.25, k16 = 1. / 6., k4 = 4.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k12 = 0.5L, k14 = 0.25L, k16 = 1.L / 6.L, k4 = 4.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k12 = 0.5Q, k14 = 0.25Q, k16 = 1.Q / 6.Q, k4 = 4.Q;
-#endif
   JBFLOAT u0_2[n], u1_2[n], u0_3[n], u1_3[n];
   JBFLOAT kdt14, kdt16, tdt, tdt12, u2_2, u2_3;
   unsigned int i;
-  kdt14 = k14 * dt;
-  kdt16 = k16 * dt;
-  tdt12 = t + k12 * dt;
+  kdt14 = (JBFLOAT) 0.25 * dt;
+  kdt16 = (JBFLOAT) 1. / 6. * dt;
+  tdt12 = t + (JBFLOAT) 0.5 * dt;
   tdt = t + dt;
   for (i = 0; i < n; ++i)
     {
@@ -7785,8 +7023,8 @@ jbm_rk_step_1_2_n_3_3 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
       u0_3[i] = u0[i] + kdt14 * (u1[i] + u1_2[i]);
       u1_3[i] = u1[i] + kdt14 * (u2[i] + u2_2);
       f (tdt12, u0_3[i], u1_3[i], &u2_3);
-      u0[i] += kdt16 * (u1[i] + u1_2[i] + k4 * u1_3[i]);
-      u1[i] += kdt16 * (u2[i] + u2_2 + k4 * u2_3);
+      u0[i] += kdt16 * (u1[i] + u1_2[i] + (JBFLOAT) 4. * u1_3[i]);
+      u1[i] += kdt16 * (u2[i] + u2_2 + (JBFLOAT) 4. * u2_3);
     }
 }
 
@@ -7804,18 +7042,9 @@ jbm_rk_step_1_2_1_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k12 = 0.5f, k16 = 1.f / 6.f, k2 = 2.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k12 = 0.5, k16 = 1. / 6., k2 = 2.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k12 = 0.5L, k16 = 1.L / 6.L, k2 = 2.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k12 = 0.5Q, k16 = 1.Q / 6.Q, k2 = 2.Q;
-#endif
   JBFLOAT u0_2[1], u1_2[1], u0_3[1], u1_3[1], u0_4[1], u1_4[1];
   JBFLOAT kdt, tdt, u2_2, u2_3, u2_4;
-  kdt = k12 * dt;
+  kdt = (JBFLOAT) 0.5 * dt;
   tdt = t + kdt;
   u0_2[0] = u0[0] + kdt * u1[0];
   u1_2[0] = u1[0] + kdt * u2;
@@ -7826,9 +7055,9 @@ jbm_rk_step_1_2_1_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
   u0_4[0] = u0[0] + dt * u1_3[0];
   u1_4[0] = u1[0] + dt * u2_3;
   f (t + dt, u0_4[0], u1_4[0], &u2_4);
-  kdt = k16 * dt;
-  u0[0] += kdt * (u1[0] + u1_4[0] + k2 * (u1_2[0] + u1_3[0]));
-  u1[0] += kdt * (u2 + u2_4 + k2 * (u2_2 + u2_3));
+  kdt = (JBFLOAT) 1. / 6. * dt;
+  u0[0] += kdt * (u1[0] + u1_4[0] + (JBFLOAT) 2. * (u1_2[0] + u1_3[0]));
+  u1[0] += kdt * (u2 + u2_4 + (JBFLOAT) 2. * (u2_2 + u2_3));
 }
 
 /**
@@ -7847,20 +7076,11 @@ jbm_rk_step_1_2_n_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
                        const JBFLOAT t, ///< time.
                        const JBFLOAT dt)        ///< step size.
 {
-#if JBM_HIGH_PRECISION == 1
-  const JBFLOAT k12 = 0.5f, k16 = 1.f / 6.f, k2 = 2.f;
-#elif JBM_HIGH_PRECISION == 2
-  const JBFLOAT k12 = 0.5, k16 = 1. / 6., k2 = 2.;
-#elif JBM_HIGH_PRECISION == 3
-  const JBFLOAT k12 = 0.5L, k16 = 1.L / 6.L, k2 = 2.L;
-#elif JBM_HIGH_PRECISION == 4
-  const JBFLOAT k12 = 0.5Q, k16 = 1.Q / 6.Q, k2 = 2.Q;
-#endif
   JBFLOAT u0_2[n], u1_2[n], u0_3[n], u1_3[n], u0_4[n], u1_4[n];
   JBFLOAT kdt12, kdt16, tdt, tdt12, u2_2, u2_3, u2_4;
   unsigned int i;
-  kdt12 = k12 * dt;
-  kdt16 = k16 * dt;
+  kdt12 = (JBFLOAT) 0.5 * dt;
+  kdt16 = (JBFLOAT) 1. / 6. * dt;
   tdt12 = t + kdt12;
   tdt = t + dt;
   for (i = 0; i < n; ++i)
@@ -7874,8 +7094,8 @@ jbm_rk_step_1_2_n_4_4 (void (*f) (const JBFLOAT t, const JBFLOAT u0,
       u0_4[i] = u0[i] + dt * u1_3[i];
       u1_4[i] = u1[i] + dt * u2_3;
       f (tdt, u0_4[i], u1_4[i], &u2_4);
-      u0[i] += kdt16 * (u1[i] + u1_4[i] + k2 * (u1_2[i] + u1_3[i]));
-      u1[i] += kdt16 * (u2[i] + u2_4 + k2 * (u2_2 + u2_3));
+      u0[i] += kdt16 * (u1[i] + u1_4[i] + (JBFLOAT) 2. * (u1_2[i] + u1_3[i]));
+      u1[i] += kdt16 * (u2[i] + u2_4 + (JBFLOAT) 2. * (u2_2 + u2_3));
     }
 }
 

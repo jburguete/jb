@@ -41,15 +41,15 @@ jbw_show_message (const char *title, const char *message)
 }
 
 void
-jbw_show_error_terminal (const char *message)
+jbw_error_show_terminal ()
 {
-  jbw_show_message (_("Error!"), message);
+  jbw_show_message (_("Error!"), jb_error_message);
 }
 
 void
-jbw_show_warning_terminal (const char *message)
+jbw_warning_show_terminal ()
 {
-  jbw_show_message (_("Warning!"), message);
+  jbw_show_message (_("Warning!"), jb_warning_message);
 }
 
 #elif JBW == JBW_GTK
@@ -247,18 +247,18 @@ jbw_show_message_gtk (const char *title,        ///< message title.
  * Function to display an error message.
  */
 void
-jbw_show_error_gtk (const char *message)        ///< error message.
+jbw_error_show_gtk ()
 {
-  jbw_show_message_gtk (_("Error!"), message, GTK_MESSAGE_ERROR);
+  jbw_show_message_gtk (_("Error!"), jb_error_message, GTK_MESSAGE_ERROR);
 }
 
 /**
  * Function to display a warning message.
  */
 void
-jbw_show_warning_gtk (const char *message)      ///< warning message.
+jbw_warning_show_gtk ()
 {
-  jbw_show_message_gtk (_("Warning!"), message, GTK_MESSAGE_WARNING);
+  jbw_show_message_gtk (_("Warning!"), jb_warning_message, GTK_MESSAGE_WARNING);
 }
 
 /**
@@ -543,7 +543,9 @@ jbw_draw_orthogonal_matrixl (GLint uniform_matrix,
 static void
 jbw_image_error (const char *msg)
 {
-  jb_show_error2 ("JBWImage", msg);
+  jb_error_add ("JBWImage", msg, NULL);
+  jb_error_show ();
+  jb_error_destroy ();
 }
 
 /**
@@ -731,7 +733,7 @@ jbw_image_init (JBWImage *image,        ///< JBWImage widget.
 end:
   if (error_msg)
     {
-      jb_show_error2 ("JBWImage", error_msg);
+      jbw_image_error (error_msg);
       exit (0);
     }
 }
@@ -2320,7 +2322,9 @@ end:
       goto init;
     }
 end2:
-  jb_show_error2 ("JBWGraphic", error_msg);
+  jb_error_add ("JBWGraphic", error_msg, NULL);
+  jb_error_show ();
+  jb_error_destroy ();
   return;
 }
 
@@ -2632,7 +2636,9 @@ error2:
 #endif
   jbw_graphic_destroy ();
 error1:
-  jb_show_error (error_msg);
+  jb_error_add (error_msg, NULL);
+  jb_error_show ();
+  jb_error_destroy ();
   return NULL;
 }
 
@@ -3800,7 +3806,9 @@ jbw_array_editor_check_column (JBWArrayEditor *editor,
         default:
           error_msg = _("no a date editor type");
         }
-      jb_show_error (error_msg);
+      jb_error_add (error_msg);
+      jb_error_show ();
+      jb_error_destroy ();
       exit (0);
     }
 }
@@ -4482,7 +4490,9 @@ jbw_array_editor_new (int ncolumns,     ///< number of columns.
   return editor;
 
 error1:
-  jb_show_error (error_msg);
+  jb_error_add (error_msg, NULL);
+  jb_error_show ();
+  jb_error_destroy ();
   return NULL;
 }
 #endif

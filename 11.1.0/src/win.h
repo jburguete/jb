@@ -38,8 +38,8 @@
 
 #if JBW == JBW_NO
 
-void jbw_show_error_terminal (const char *message);
-void jbw_show_warning_terminal (const char *message);
+void jbw_error_show_terminal ();
+void jbw_warning_show_terminal ();
 
 static inline int
 jbw_init (int *argn __attribute__((unused)),
@@ -47,8 +47,8 @@ jbw_init (int *argn __attribute__((unused)),
           char ***argc __attribute__((unused)))
   ///< pointer to the command line arguments.
 {
-  jb_show_error = jbw_show_error_terminal;
-  jb_show_warning = jbw_show_warning_terminal;
+  jb_error_show = jbw_error_show_terminal;
+  jb_warning_show = jbw_warning_show_terminal;
   return 0;
 }
 
@@ -436,8 +436,8 @@ void jbw_process_pending ();
 
 void jbw_show_message_gtk (const char *title, const char *message,
                            GtkMessageType type);
-void jbw_show_error_gtk (const char *message);
-void jbw_show_warning_gtk (const char *message);
+void jbw_error_show_gtk ();
+void jbw_warning_show_gtk ();
 void jbw_combo_box_set_strings (GtkComboBoxText * combo, char **strings, int n);
 GtkComboBoxText *jbw_combo_box_new_with_strings (char **strings, int n);
 
@@ -575,8 +575,8 @@ jbw_init (int *argn __attribute__((unused)),
           char ***argc __attribute__((unused)))
   ///< pointer to the command line arguments.
 {
-  jb_show_error = jbw_show_error_gtk;
-  jb_show_warning = jbw_show_warning_gtk;
+  jb_error_show = jbw_error_show_gtk;
+  jb_warning_show = jbw_warning_show_gtk;
   return jbw_init_gtk (argn, argc);
 }
 

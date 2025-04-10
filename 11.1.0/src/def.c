@@ -33,9 +33,11 @@
  */
 #include "def.h"
 
-void (*jb_show_error) (const char *message) = NULL;
+char *jb_error_message = NULL;  ///< Error message string.
+char *jb_warning_message = NULL;        ///< Warning message string.
+void (*jb_error_show) () = NULL;
 ///< Pointer to the function to show error messages.
-void (*jb_show_warning) (const char *message) = NULL;
+void (*jb_warning_show) () = NULL;
 ///< Pointer to the function to show warning messages.
 
 /**
@@ -239,28 +241,95 @@ jb_get_ncores (void)
 }
 
 /**
- * Function to display two error messages.
+ * Function to add messages to a string.
+ *
+ * \return new string pointer, it has to be freed with g_free.
  */
-void
-jb_show_error2 (const char *message1,   ///< 1st error message.
-                const char *message2)   ///< 2nd error message.
+static char *
+jb_string_add (char *string,    ///< string.
+               const char *first_message,       ///< first message,
+               ...)             ///< additional messages (NULL-terminated).
 {
-  char buffer[1024];
-  snprintf (buffer, 1024, "%s:\n%s", message1, message2);
-  jb_show_error (buffer);
+  va_list args;
+  char **msg;
+  char *buffer;
+  unsigned int i, n;
+
+  // arguments number
+  va_start (args, first_message);
+  for (n = 1; va_arg (args, const char*);) ++n;
+  va_end (args);
+
+  // array of arguments
+  msg = (char**) malloc ((n + 2) * sizeof (char*));
+  msg[0] = first_message;
+  va_start (args, first_message);
+  for (i = 1; i < n; ++i)
+    msg[i] = (char*) va_arg (args, const char*);
+  va_end (args);
+  if (string)
+    msg[i++] = string;
+  msg[i] = NULL;
+
+  // concatenation
+  buffer = (char*) g_strjoinv ("", (gchar**) msg);
+
+  // free memory and exit
+  free (msg);
+  g_free (string);
+  return buffer;
 }
 
 /**
- * Function to display three error messages.
+ * Function to add error messages.
  */
 void
-jb_show_error3 (const char *message1,   ///< 1st error message.
-                const char *message2,   ///< 2nd error message.
-                const char *message3)   ///< 3rd error message.
+jb_error_add (const char *first_message,        ///< first message,
+              ...)              ///< additional messages (NULL-terminated).
 {
-  char buffer[1024];
-  snprintf (buffer, 1024, "%s: %s\n%s", message1, message2, message3);
-  jb_show_error (buffer);
+  va_list args;
+  char *buffer;
+  buffer = jb_error_message;
+  va_start (args, first_message);
+  jb_error_message = jb_string_add (jb_error_message, first_message, args);
+  va_end (args);
+  g_free (buffer);
+}
+
+/**
+ * Function to free the memory used by error messages.
+ */
+void
+jb_error_destroy ()
+{
+  g_free (jb_error_message);
+  jb_error_message = NULL;
+}
+
+/**
+ * Function to add warning messages.
+ */
+void
+jb_warning_add (const char *first_message,      ///< first message,
+                ...)            ///< additional messages (NULL-terminated).
+{
+  va_list args;
+  char *buffer;
+  buffer = jb_warning_message;
+  va_start (args, first_message);
+  jb_warning_message = jb_string_add (jb_warning_message, first_message, args);
+  va_end (args);
+  g_free (buffer);
+}
+
+/**
+ * Function to free the memory used by warning messages.
+ */
+void
+jb_warning_destroy ()
+{
+  g_free (jb_warning_message);
+  jb_warning_message = NULL;
 }
 
 /**
@@ -301,6 +370,6 @@ jb_read_file (const char *name, ///< file name string.
   return buffer;
 
 exit_on_error:
-  jb_show_error (error_msg);
+  jb_error_show ();
   return NULL;
 }
