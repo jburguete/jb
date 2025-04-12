@@ -34,7 +34,9 @@
 #ifndef JB_DEF__H
 #define JB_DEF__H 1
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
