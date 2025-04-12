@@ -539,7 +539,6 @@ exp10l (long double x)
 ///< macro calculating the maximum number.
 #define JBM_MIN(a, b) (((a) < (b))? (a): (b))
 ///< macro calculating the minimum number.
-
 /**
  * macro calculating the number with the lower module in the [a, b] interval
  * (int arguments).
@@ -582,7 +581,6 @@ exp10l (long double x)
  */
 #define JBM_FMODMIN(a, b) (((a) * (b) <= (JBFLOAT) 0.)? (JBFLOAT) 0.: \
     (FABS(a) < FABS(b))? (a): (b))
-
 /**
  * macro calculating the number with the lower module in the [a, b] interval 
  * (JBDOUBLE arguments).
@@ -594,7 +592,6 @@ exp10l (long double x)
  */
 #define JBM_FMODMINL(a, b) (((a) * (b) <= (JBDOUBLE) 0.)? (JBDOUBLE) 0.: \
     (FABSL(a) < FABSL(b))? (a): (b))
-
 #define JBM_SQR(x) ((x) * (x))  ///< macro calculating the square of a number.
 #define JBM_DBL(x) ((x) + (x))  ///< macro calculating the double of a number.
 ///> macro calculating a linear extrapolation.
