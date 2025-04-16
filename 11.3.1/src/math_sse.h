@@ -16093,7 +16093,7 @@ static inline float
 jbm_array_max_f32 (const float *xx,    ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  float ax[4];
+  float ax[4] JB_ALIGNED;
   __m128 s4;
   float k;
   unsigned int i, j;
@@ -16129,7 +16129,7 @@ static inline float
 jbm_array_min_f32 (const float *xx,    ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  float ax[4];
+  float ax[4] JB_ALIGNED;
   __m128 s4;
   float k;
   unsigned int i, j;
@@ -16165,7 +16165,7 @@ jbm_array_maxmin_f32 (const float *xx, ///< float array.
                       float *min,      ///< the lowest value.
                       const unsigned int n)     ///< number of array elements.
 {
-  float ax[4];
+  float ax[4] JB_ALIGNED;
   __m128 s4, smax4, smin4;
   float kmax, kmin;
   unsigned int i, j;
@@ -16349,7 +16349,7 @@ static inline double
 jbm_array_max_f64 (const double *xx,    ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  double ax[2];
+  double ax[2] JB_ALIGNED;
   __m128d s2;
   double k;
   unsigned int i, j;
@@ -16385,7 +16385,7 @@ static inline double
 jbm_array_min_f64 (const double *xx,    ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  double ax[2];
+  double ax[2] JB_ALIGNED;
   __m128d s2;
   double k;
   unsigned int i, j;
@@ -16421,7 +16421,7 @@ jbm_array_maxmin_f64 (const double *xx, ///< double array.
                       double *min,      ///< the lowest value.
                       const unsigned int n)     ///< number of array elements.
 {
-  double ax[2];
+  double ax[2] JB_ALIGNED;
   __m128d s2, smax2, smin2;
   double kmax, kmin;
   unsigned int i, j;

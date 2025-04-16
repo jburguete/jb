@@ -15762,4 +15762,508 @@ jbm_integral_2xf64 (float64x2_t (*f) (float64x2_t),
   return k;
 }
 
+/**
+ * Function to add 2 float arrays.
+ */
+static inline void
+jbm_array_add_f32 (float *xr,  ///< result float array.
+                   const float *x1,    ///< 1st addend float array.
+                   const float *x2,    ///< 1st addend float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
+    vst1q_f32 (xr + i, vaddq_f32 (vld1q_f32 (x1 + i), vld1q_f32 (x2 + i)));
+  for (; i < n; ++i)
+    xr[i] = x1[i] + x2[i];
+}
+
+/**
+ * Function to subtract 2 float arrays.
+ */
+static inline void
+jbm_array_sub_f32 (float *xr,  ///< result float array.
+                   const float *x1,    ///< minuend float array.
+                   const float *x2,    ///< subtrahend float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
+    vst1q_f32 (xr + i, vsubq_f32 (vld1q_f32 (x1 + i), vld1q_f32 (x2 + i)));
+  for (; i < n; ++i)
+    xr[i] = x1[i] - x2[i];
+}
+
+/**
+ * Function to multiply a float array by a float number.
+ */
+static inline void
+jbm_array_mul1_f32 (float *xr, ///< result float array.
+                    const float *x1,   ///< multiplier float array.
+                    const float x2,    ///< multiplicand float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  float32x4_t s4;
+  unsigned int i, j;
+  i = 0;
+  j = n >> 2;
+  if (j)
+    {
+      s4 = vdupq_n_f32 (x2);
+      for (; j > 0; --j, i += 4)
+        vst1q_f32 (xr + i, vmulq_f32 (vld1q_f32 (x1 + i), s4));
+    }
+  for (; i < n; ++i)
+    xr[i] = x1[i] * x2;
+}
+
+/**
+ * Function to divide a float array by a float number.
+ */
+static inline void
+jbm_array_div1_f32 (float *xr, ///< result float array.
+                    const float *x1,   ///< dividend float array.
+                    const float x2,    ///< divisor float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  float32x4_t s4;
+  unsigned int i, j;
+  i = 0;
+  j = n >> 2;
+  if (j)
+    {
+      s4 = vdupq_n_f32 (x2);
+      for (; j > 0; --j, i += 2)
+        vst1q_f32 (xr + i, vdivq_f32 (vld1q_f32 (x1 + i), s4));
+    }
+  for (; i < n; ++i)
+    xr[i] = x1[i] / x2;
+}
+
+/**
+ * Function to multiply 2 float arrays.
+ */
+static inline void
+jbm_array_mul_f32 (float *xr,  ///< result float array.
+                   const float *x1,    ///< multiplier float array.
+                   const float *x2,    ///< multiplicand float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
+    vst1q_f32 (xr + i, vmulq_f32 (vld1q_f32 (x1 + i), vld1q_f32 (x2 + i)));
+  for (; i < n; ++i)
+    xr[i] = x1[i] * x2[i];
+}
+
+/**
+ * Function to divide 2 float arrays.
+ */
+static inline void
+jbm_array_div_f32 (float *xr,  ///< result float array.
+                   const float *x1,    ///< dividend float array.
+                   const float *x2,    ///< divisor float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
+    vst1q_f32 (xr + i, vdivq_f32 (vld1q_f32 (x1 + i), vld1q_f32 (x2 + i)));
+  for (; i < n; ++i)
+    xr[i] = x1[i] / x2[i];
+}
+
+/**
+ * Function to calculate the float of a float array.
+ */
+static inline void
+jbm_array_dbl_f32 (float *xr,  ///< result float array.
+                   const float *xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
+    vst1q_f32 (xr + i, jbm_dbl_4xf32 (vld1q_f32 (xd + i)));
+  for (; i < n; ++i)
+    xr[i] = jbm_dbl_f32 (xd[i]);
+}
+
+/**
+ * Function to calculate the square of a float array.
+ */
+static inline void
+jbm_array_sqr_f32 (float *xr,  ///< result float array.
+                   const float *xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
+    vst1q_f32 (xr + i, jbm_sqr_4xf32 (vld1q_f32 (xd + i)));
+  for (; i < n; ++i)
+    xr[i] = jbm_sqr_f32 (xd[i]);
+}
+
+/**
+ * Function to find the highest element of a float array.
+ *
+ * \return the highest value.
+ */
+static inline float
+jbm_array_max_f32 (const float *xx,    ///< float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  float ax[4] JB_ALIGNED;
+  float32x4_t s4;
+  float k;
+  unsigned int i, j;
+  j = n >> 1;
+  if (j)
+    {
+      s4 = vld1q_f32 (xx);
+      i = 4;
+      while (--j > 0)
+        {
+          s4 = vmaxq_f32 (s4, vld1q_f32 (xx + i));
+          i += 4;
+        }
+      vst1q_f32 (ax, s4);
+      k = fmaxf (fmaxf (ax[0], ax[1]), fmaxf (ax[2], ax[3]));
+    }
+  else
+    {
+      k = xx[0];
+      i = 1;
+    }
+  while (i < n)
+    k = fmaxf (k, xx[i++]);
+  return k;
+}
+
+/**
+ * Function to find the lowest element of a float array.
+ *
+ * \return the lowest value.
+ */
+static inline float
+jbm_array_min_f32 (const float *xx,    ///< float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  float ax[4] JB_ALIGNED;
+  float32x4_t s4;
+  float k;
+  unsigned int i, j;
+  j = n >> 2;
+  if (j)
+    {
+      s4 = vld1q_f32 (xx);
+      i = 4;
+      while (--j > 0)
+        {
+          s4 = vminq_f32 (s4, vld1q_f32 (xx + i));
+          i += 4;
+        }
+      vst1q_f32 (ax, s4);
+      k = fminf (fminf (ax[0], ax[1]), fminf (ax[2], ax[3]));
+    }
+  else
+    {
+      k = xx[0];
+      i = 1;
+    }
+  while (i < n)
+    k = fminf (k, xx[i++]);
+  return k;
+}
+
+/**
+ * Function to find the highest and the lowest elements of a float array.
+ */
+static inline void
+jbm_array_maxmin_f32 (const float *xx, ///< float array.
+                      float *max,      ///< the highest value.
+                      float *min,      ///< the lowest value.
+                      const unsigned int n)     ///< number of array elements.
+{
+  float ax[4] JB_ALIGNED;
+  float32x4_t s4, smax4, smin4;
+  float kmax, kmin;
+  unsigned int i, j;
+  j = n >> 2;
+  if (j)
+    {
+      smax4 = smin4 = vld1q_f32 (xx);
+      i = 4;
+      while (--j > 0)
+        {
+          s4 = vld1q_f32 (xx + i);
+          smax4 = vmaxq_f32 (smax4, s4);
+          smin4 = vminq_f32 (smin4, s4);
+          i += 4;
+        }
+      vst1q_f32 (ax, smax4);
+      kmax = fmaxf (fmaxf (ax[0], ax[1]), fmaxf (ax[2], ax[3]));
+      vst1q_f32 (ax, smin4);
+      kmin = fminf (fminf (ax[0], ax[1]), fminf (ax[2], ax[3]));
+    }
+  else
+    {
+      kmax = kmin = xx[0];
+      i = 1;
+    }
+  while (i < n)
+    kmax = fmaxf (kmax, xx[i]), kmin = fminf (kmin, xx[i++]);
+  *max = kmax, *min = kmin;
+}
+
+/**
+ * Function to add 2 double arrays.
+ */
+static inline void
+jbm_array_add_f64 (double *xr,  ///< result double array.
+                   const double *x1,    ///< 1st addend double array.
+                   const double *x2,    ///< 1st addend double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
+    vst1q_f64 (xr + i, vaddq_f64 (vld1q_f64 (x1 + i), vld1q_f64 (x2 + i)));
+  for (; i < n; ++i)
+    xr[i] = x1[i] + x2[i];
+}
+
+/**
+ * Function to subtract 2 double arrays.
+ */
+static inline void
+jbm_array_sub_f64 (double *xr,  ///< result double array.
+                   const double *x1,    ///< minuend double array.
+                   const double *x2,    ///< subtrahend double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
+    vst1q_f64 (xr + i, vsubq_f64 (vld1q_f64 (x1 + i), vld1q_f64 (x2 + i)));
+  for (; i < n; ++i)
+    xr[i] = x1[i] - x2[i];
+}
+
+/**
+ * Function to multiply a double array by a double number.
+ */
+static inline void
+jbm_array_mul1_f64 (double *xr, ///< result double array.
+                    const double *x1,   ///< multiplier double array.
+                    const double x2,    ///< multiplicand double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  float64x2_t s2;
+  unsigned int i, j;
+  i = 0;
+  j = n >> 1;
+  if (j)
+    {
+      s2 = vdupq_n_f64 (x2);
+      for (; j > 0; --j, i += 2)
+        vst1q_f64 (xr + i, vmulq_f64 (vld1q_f64 (x1 + i), s2));
+    }
+  for (; i < n; ++i)
+    xr[i] = x1[i] * x2;
+}
+
+/**
+ * Function to divide a double array by a double number.
+ */
+static inline void
+jbm_array_div1_f64 (double *xr, ///< result double array.
+                    const double *x1,   ///< dividend double array.
+                    const double x2,    ///< divisor double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  float64x2_t s2;
+  unsigned int i, j;
+  i = 0;
+  j = n >> 1;
+  if (j)
+    {
+      s2 = vdupq_n_f64 (x2);
+      for (; j > 0; --j, i += 2)
+        vst1q_f64 (xr + i, vdivq_f64 (vld1q_f64 (x1 + i), s2));
+    }
+  for (; i < n; ++i)
+    xr[i] = x1[i] / x2;
+}
+
+/**
+ * Function to multiply 2 double arrays.
+ */
+static inline void
+jbm_array_mul_f64 (double *xr,  ///< result double array.
+                   const double *x1,    ///< multiplier double array.
+                   const double *x2,    ///< multiplicand double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
+    vst1q_f64 (xr + i, vmulq_f64 (vld1q_f64 (x1 + i), vld1q_f64 (x2 + i)));
+  for (; i < n; ++i)
+    xr[i] = x1[i] * x2[i];
+}
+
+/**
+ * Function to divide 2 double arrays.
+ */
+static inline void
+jbm_array_div_f64 (double *xr,  ///< result double array.
+                   const double *x1,    ///< dividend double array.
+                   const double *x2,    ///< divisor double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
+    vst1q_f64 (xr + i, vdivq_f64 (vld1q_f64 (x1 + i), vld1q_f64 (x2 + i)));
+  for (; i < n; ++i)
+    xr[i] = x1[i] / x2[i];
+}
+
+/**
+ * Function to calculate the double of a double array.
+ */
+static inline void
+jbm_array_dbl_f64 (double *xr,  ///< result double array.
+                   const double *xd,    ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
+    vst1q_f64 (xr + i, jbm_dbl_2xf64 (vld1q_f64 (xd + i)));
+  for (; i < n; ++i)
+    xr[i] = jbm_dbl_f64 (xd[i]);
+}
+
+/**
+ * Function to calculate the square of a double array.
+ */
+static inline void
+jbm_array_sqr_f64 (double *xr,  ///< result double array.
+                   const double *xd,    ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i, j;
+  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
+    vst1q_f64 (xr + i, jbm_sqr_2xf64 (vld1q_f64 (xd + i)));
+  for (; i < n; ++i)
+    xr[i] = jbm_sqr_f64 (xd[i]);
+}
+
+/**
+ * Function to find the highest element of a double array.
+ *
+ * \return the highest value.
+ */
+static inline double
+jbm_array_max_f64 (const double *xx,    ///< double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  double ax[2] JB_ALIGNED;
+  float64x2_t s2;
+  double k;
+  unsigned int i, j;
+  j = n >> 1;
+  if (j)
+    {
+      s2 = vld1q_f64 (xx);
+      i = 2;
+      while (--j > 0)
+        {
+          s2 = vmaxq_f64 (s2, vld1q_f64 (xx + i));
+          i += 2;
+        }
+      vst1q_f64 (ax, s2);
+      k = fmax (ax[0], ax[1]);
+    }
+  else
+    {
+      k = xx[0];
+      i = 1;
+    }
+  while (i < n)
+    k = fmax (k, xx[i++]);
+  return k;
+}
+
+/**
+ * Function to find the lowest element of a double array.
+ *
+ * \return the lowest value.
+ */
+static inline double
+jbm_array_min_f64 (const double *xx,    ///< double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  double ax[2] JB_ALIGNED;
+  float64x2_t s2;
+  double k;
+  unsigned int i, j;
+  j = n >> 1;
+  if (j)
+    {
+      s2 = vld1q_f64 (xx);
+      i = 2;
+      while (--j > 0)
+        {
+          s2 = vminq_f64 (s2, vld1q_f64 (xx + i));
+          i += 2;
+        }
+      vst1q_f64 (ax, s2);
+      k = fmin (ax[0], ax[1]);
+    }
+  else
+    {
+      k = xx[0];
+      i = 1;
+    }
+  while (i < n)
+    k = fmin (k, xx[i++]);
+  return k;
+}
+
+/**
+ * Function to find the highest and the lowest elements of a double array.
+ */
+static inline void
+jbm_array_maxmin_f64 (const double *xx, ///< double array.
+                      double *max,      ///< the highest value.
+                      double *min,      ///< the lowest value.
+                      const unsigned int n)     ///< number of array elements.
+{
+  double ax[2] JB_ALIGNED;
+  float64x2_t s2, smax2, smin2;
+  double kmax, kmin;
+  unsigned int i, j;
+  j = n >> 1;
+  if (j)
+    {
+      smax2 = smin2 = vld1q_f64 (xx);
+      i = 2;
+      while (--j > 0)
+        {
+          s2 = vld1q_f64 (xx + i);
+          smax2 = vmaxq_f64 (smax2, s2);
+          smin2 = vminq_f64 (smin2, s2);
+          i += 2;
+        }
+      vst1q_f64 (ax, smax2);
+      kmax = fmax (ax[0], ax[1]);
+      vst1q_f64 (ax, smin2);
+      kmin = fmin (ax[0], ax[1]);
+    }
+  else
+    {
+      kmax = kmin = xx[0];
+      i = 1;
+    }
+  while (i < n)
+    kmax = fmax (kmax, xx[i]), kmin = fmin (kmin, xx[i++]);
+  *max = kmax, *min = kmin;
+}
+
 #endif
