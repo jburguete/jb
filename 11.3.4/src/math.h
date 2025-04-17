@@ -40,7 +40,7 @@
 #include <quadmath.h>
 #define exp10q(x) (expq(x * M_LN10q))
 #endif
-#ifdef __amd64
+#if defined(__amd64) || defined(__x86_64) || defined(__i386)
 #include <x86intrin.h>
 #endif
 #ifdef __ARM_NEON
