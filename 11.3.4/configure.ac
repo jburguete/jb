@@ -275,9 +275,9 @@ if test $gtk = 1; then
 	else
 		dir="/usr"
 	fi
-	font=`find $dir -type f -iname freemono.otf`
+	font=`find $dir -type f -iname freemono.otf | head -1`
 	if test "x$font" = "x"; then
-		font=`find $dir -type f -iname freemono.ttf`
+		font=`find $dir -type f -iname freemono.ttf | head -1`
 		if test "x$font" = "x"; then
 			font=`find $dir -type f -iname NotoSansMono-Regular.ttf`
 			if test "x$font" = "x"; then
