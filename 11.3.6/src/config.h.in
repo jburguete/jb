@@ -8,6 +8,5 @@
 #undef HAVE_FMEMOPEN
 #undef HAVE_GET_NPROCS
 #undef HAVE_ALIGNED_ALLOC
-#undef HAVE_FINITEF
 
 #endif

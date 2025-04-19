@@ -2766,12 +2766,12 @@ number_max_f32 (float (*f) (const float))
   float x0, x1, x2;
   unsigned int i;
   x2 = x1 = 1.f;
-  while (finitef (x2) && finitef (f (x2)))
+  while (isfinite (x2) && isfinite (f (x2)))
     {
       x1 = x2;
       x2 += x2;
     }
-  while (!finitef (x1) && !finitef (f (x1)))
+  while (!isfinite (x1) && !isfinite (f (x1)))
     {
       x2 = x1;
       x1 *= 0.5f;
@@ -2779,7 +2779,7 @@ number_max_f32 (float (*f) (const float))
   for (i = 0; i < 128; ++i)
     {
       x0 = 0.5f * (x1 + x2);
-      if (finitef (x0) && finitef (f (x0)))
+      if (isfinite (x0) && isfinite (f (x0)))
         x1 = x0;
       else
         x2 = x0;
@@ -2793,12 +2793,12 @@ number_min_f32 (float (*f) (const float))
   float x0, x1, x2;
   unsigned int i;
   x2 = x1 = 1.f;
-  while (x1 > 0.f && finitef (f (x1)))
+  while (x1 > 0.f && isfinite (f (x1)))
     {
       x2 = x1;
       x1 *= 0.5f;
     }
-  while (finitef (x2) && !finitef (f (x2)))
+  while (isfinite (x2) && !isfinite (f (x2)))
     {
       x1 = x2;
       x2 += x2;
@@ -2806,7 +2806,7 @@ number_min_f32 (float (*f) (const float))
   for (i = 0; i < 128; ++i)
     {
       x0 = 0.5f * (x1 + x2);
-      if (x0 > 0.f && finitef (x0) && finitef (f (x0)))
+      if (x0 > 0.f && isfinite (x0) && isfinite (f (x0)))
         x2 = x0;
       else
         x1 = x0;
@@ -2862,12 +2862,12 @@ number_max_f64 (double (*f) (const double))
   double x0, x1, x2;
   unsigned int i;
   x2 = x1 = 1.;
-  while (finite (x2) && finite (f (x2)))
+  while (isfinite (x2) && isfinite (f (x2)))
     {
       x1 = x2;
       x2 += x2;
     }
-  while (!finite (x1) && !finite (f (x1)))
+  while (!isfinite (x1) && !isfinite (f (x1)))
     {
       x2 = x1;
       x1 *= 0.5;
@@ -2875,7 +2875,7 @@ number_max_f64 (double (*f) (const double))
   for (i = 0; i < 128; ++i)
     {
       x0 = 0.5 * (x1 + x2);
-      if (finite (x0) && finite (f (x0)))
+      if (isfinite (x0) && isfinite (f (x0)))
         x1 = x0;
       else
         x2 = x0;
@@ -2889,12 +2889,12 @@ number_min_f64 (double (*f) (const double))
   double x0, x1, x2;
   unsigned int i;
   x2 = x1 = 1.;
-  while (x1 > 0. && finite (f (x1)))
+  while (x1 > 0. && isfinite (f (x1)))
     {
       x2 = x1;
       x1 *= 0.5;
     }
-  while (finite (x2) && !finite (f (x2)))
+  while (isfinite (x2) && !isfinite (f (x2)))
     {
       x1 = x2;
       x2 += x2;
@@ -2902,7 +2902,7 @@ number_min_f64 (double (*f) (const double))
   for (i = 0; i < 128; ++i)
     {
       x0 = 0.5 * (x1 + x2);
-      if (x0 > 0. && finite (x0) && finite (f (x0)))
+      if (x0 > 0. && isfinite (x0) && isfinite (f (x0)))
         x2 = x0;
       else
         x1 = x0;

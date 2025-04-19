@@ -29,7 +29,6 @@
 #define EXP2 exp2f
 #define EXPM1 expm1f
 #define FABS fabsf
-#define FINITE finitef
 #define FLOAT float
 #define FORMAT "%.7e"
 #define K0 0.f
@@ -71,7 +70,6 @@
 #define EXP2 exp2
 #define EXPM1 expm1
 #define FABS fabs
-#define FINITE finite
 #define FLOAT double
 #define FORMAT "%.16le"
 #define K0 0.
@@ -113,7 +111,6 @@
 #define EXP2 exp2l
 #define EXPM1 expm1l
 #define FABS fabsl
-#define FINITE finitel
 #define FLOAT long double
 #define FORMAT "%.19Le"
 #define K0 0.L
@@ -155,7 +152,6 @@
 #define EXP2 exp2q
 #define EXPM1 expm1q
 #define FABS fabsq
-#define FINITE finiteq
 #define FLOAT __float128
 #define FORMAT "%.34Qe"
 #define K0 0.Q
@@ -269,7 +265,7 @@ number_max (FLOAT (*f) (const FLOAT))
   FLOAT x0, x1, x2;
   unsigned int i;
   x2 = x1 = K1;
-  while (FINITE (x2) && FINITE (f (x2)))
+  while (isfinite (x2) && isfinite (f (x2)))
     {
       x1 = x2;
       x2 += x2;
@@ -278,7 +274,7 @@ number_max (FLOAT (*f) (const FLOAT))
       number_print (stderr, "x2", x2);
 #endif
     }
-  while (!FINITE (x1) && !FINITE (f (x1)))
+  while (!isfinite (x1) && !isfinite (f (x1)))
     {
       x2 = x1;
       x1 *= K0_5;
@@ -290,7 +286,7 @@ number_max (FLOAT (*f) (const FLOAT))
   for (i = 0; i < 128; ++i)
     {
       x0 = K0_5 * (x1 + x2);
-      if (FINITE (x0) && FINITE (f (x0)))
+      if (isfinite (x0) && isfinite (f (x0)))
         x1 = x0;
       else
         x2 = x0;
@@ -308,7 +304,7 @@ number_min (FLOAT (*f) (const FLOAT))
   FLOAT x0, x1, x2;
   unsigned int i;
   x2 = x1 = K1;
-  while (x1 > K0 && FINITE (f (x1)))
+  while (x1 > K0 && isfinite (f (x1)))
     {
       x2 = x1;
       x1 *= K0_5;
@@ -317,7 +313,7 @@ number_min (FLOAT (*f) (const FLOAT))
       number_print (stderr, "x2", x2);
 #endif
     }
-  while (FINITE (x2) && !FINITE (f (x2)))
+  while (isfinite (x2) && !isfinite (f (x2)))
     {
       x1 = x2;
       x2 += x2;
@@ -329,7 +325,7 @@ number_min (FLOAT (*f) (const FLOAT))
   for (i = 0; i < 128; ++i)
     {
       x0 = K0_5 * (x1 + x2);
-      if (x0 > K0 && FINITE (x0) && FINITE (f (x0)))
+      if (x0 > K0 && isfinite (x0) && isfinite (f (x0)))
         x2 = x0;
       else
         x1 = x0;

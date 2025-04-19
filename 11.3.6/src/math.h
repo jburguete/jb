@@ -201,10 +201,6 @@ exp10l (long double x)
 
 #endif
 
-#if !HAVE_FINITEF
-#define finitef finite
-#endif
-
 // Selecting the precision of the JBFLOAT and JBDOUBLE types and reading and
 // writting formats
 /**
