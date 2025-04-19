@@ -541,9 +541,9 @@ jbw_draw_orthogonal_matrixl (GLint uniform_matrix,
  * Function to show an error opening the JBWImage widget.
  */
 static void
-jbw_image_error (const char *msg)
+jbw_image_error ()
 {
-  jb_error_add ("JBWImage", msg, NULL);
+  jb_error_add ("JBWImage", "\n", NULL);
   jb_error_show ();
   jb_error_destroy ();
 }
@@ -615,7 +615,6 @@ jbw_image_init (JBWImage *image,        ///< JBWImage widget.
     0, 1, 2,
     2, 3, 0
   };
-  const char *error_msg;
   GLint error_code;
   GLuint fs, vs;
 
@@ -634,7 +633,7 @@ jbw_image_init (JBWImage *image,        ///< JBWImage widget.
   if (!error_code)
     {
       glDeleteShader (fs);
-      error_msg = _("unable to compile the texture fragment shader");
+      jb_error_add (_("unable to compile the texture fragment shader"), NULL);
       goto end;
     }
 
@@ -647,7 +646,7 @@ jbw_image_init (JBWImage *image,        ///< JBWImage widget.
     {
       glDeleteShader (fs);
       glDeleteShader (vs);
-      error_msg = _("unable to compile the texture vertex shader");
+      jb_error_add (_("unable to compile the texture vertex shader"), NULL);
       goto end;
     }
 
@@ -663,7 +662,7 @@ jbw_image_init (JBWImage *image,        ///< JBWImage widget.
   glGetProgramiv (image->program_texture, GL_LINK_STATUS, &error_code);
   if (!error_code)
     {
-      error_msg = _("unable to link the texture program");
+      jb_error_add (_("unable to link the texture program"), NULL);
       goto end;
     }
 
@@ -687,28 +686,28 @@ jbw_image_init (JBWImage *image,        ///< JBWImage widget.
     = glGetAttribLocation (image->program_texture, vertex_name);
   if (image->attribute_texture == -1)
     {
-      error_msg = _("could not bind texture attribute");
+      jb_error_add (_("could not bind texture attribute"), NULL);
       goto end;
     }
   image->attribute_texture_position
     = glGetAttribLocation (image->program_texture, texture_position_name);
   if (image->attribute_texture_position == -1)
     {
-      error_msg = _("could not bind texture position attribute");
+      jb_error_add (_("could not bind texture position attribute"), NULL);
       goto end;
     }
   image->uniform_texture
     = glGetUniformLocation (image->program_texture, texture_name);
   if (image->uniform_texture == -1)
     {
-      error_msg = _("could not bind texture uniform");
+      jb_error_add (_("could not bind texture uniform"), NULL);
       goto end;
     }
   image->uniform_matrix
     = glGetUniformLocation (image->program_texture, matrix_name);
   if (image->uniform_matrix == -1)
     {
-      error_msg = _("could not bind matrix uniform");
+      jb_error_add (_("could not bind matrix uniform"), NULL);
       goto end;
     }
 
@@ -731,9 +730,9 @@ jbw_image_init (JBWImage *image,        ///< JBWImage widget.
 
   // ending on error
 end:
-  if (error_msg)
+  if (jb_error_message)
     {
-      jbw_image_error (error_msg);
+      jbw_image_error ();
       exit (0);
     }
 }
@@ -749,7 +748,6 @@ jbw_image_new (const char *name)        ///< PNG file name.
   png_info *info;
   png_byte **row_pointers;
   FILE *file;
-  const char *error_msg;
   unsigned int i, row_bytes;
 
   // starting png structs
@@ -760,20 +758,20 @@ jbw_image_new (const char *name)        ///< PNG file name.
   file = fopen (name, "rb");
   if (!file)
     {
-      error_msg = _("unable to open the file");
+      jb_error_add (_("unable to open the file"), NULL);
       goto error1;
     }
 
   // reading file and transforming to 8 bits RGBA format
   if (setjmp (png_jmpbuf (png)))
     {
-      error_msg = _("unable to open the PNG file");
+      jb_error_add (_("unable to open the PNG file"), NULL);
       goto error2;
     }
   png_init_io (png, file);
   if (setjmp (png_jmpbuf (png)))
     {
-      error_msg = _("unable to open the PNG file");
+      jb_error_add (_("unable to open the PNG file"), NULL);
       goto error2;
     }
   png_read_png (png,
@@ -785,7 +783,7 @@ jbw_image_new (const char *name)        ///< PNG file name.
   image = (JBWImage *) g_try_malloc (sizeof (JBWImage));
   if (!image)
     {
-      error_msg = _("not enough memory to open the widget");
+      jb_error_add (_("not enough memory to open the widget"), NULL);
       goto error2;
     }
 
@@ -799,7 +797,7 @@ jbw_image_new (const char *name)        ///< PNG file name.
     {
       g_free (image);
       image = NULL;
-      error_msg = _("not enough memory to open the image");
+      jb_error_add (_("not enough memory to open the image"), NULL);
       goto error2;
     }
   row_pointers = png_get_rows (png, info);
@@ -817,7 +815,7 @@ error1:
 
   // showing error message
   if (!image)
-    jbw_image_error (error_msg);
+    jbw_image_error ();
 
   return image;
 }

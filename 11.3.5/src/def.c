@@ -263,7 +263,7 @@ jb_string_add (char *string,    ///< string.
 
   // array of arguments
   msg = (char **) malloc ((n + 2) * sizeof (char *));
-  msg[0] = first_message;
+  msg[0] = (char *) first_message;
   va_start (args, first_message);
   for (i = 1; i < n; ++i)
     msg[i] = (char *) va_arg (args, const char *);
@@ -345,11 +345,10 @@ jb_read_file (const char *name, ///< file name string.
 {
   FILE *file;
   char *buffer;
-  const char *error_msg;
   file = fopen (name, "rb");
   if (!file)
     {
-      error_msg = _("unable to open the file");
+      jb_error_add (_("unable to open the file"), NULL);
       goto exit_on_error;
     }
   fseek (file, 0l, SEEK_END);
@@ -357,13 +356,13 @@ jb_read_file (const char *name, ///< file name string.
   buffer = (char *) malloc (*size);
   if (!buffer)
     {
-      error_msg = _("not enough memory to open the file");
+      jb_error_add (_("not enough memory to open the file"), NULL);
       goto exit_on_error;
     }
   rewind (file);
   if (!fread (buffer, *size, 1, file))
     {
-      error_msg = _("unable to read the file");
+      jb_error_add (_("unable to read the file"), NULL);
       free (buffer);
       goto exit_on_error;
     }
@@ -371,6 +370,5 @@ jb_read_file (const char *name, ///< file name string.
   return buffer;
 
 exit_on_error:
-  jb_error_show ();
   return NULL;
 }

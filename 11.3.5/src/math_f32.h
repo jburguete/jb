@@ -4285,7 +4285,7 @@ jbm_array_dbl_f32 (float *xr,  ///< result float array.
                    const float *xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int j;
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = jbm_dbl_f32 (xd[i]);
 }

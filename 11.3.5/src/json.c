@@ -312,18 +312,19 @@ jb_json_object_get_time (JsonObject *object,    ///< JSON object struct.
 {
   JsonNode *node;
   const char *buffer;
-  JBDOUBLE t;
+  JBDOUBLE t = 0.;
   *error = 0;
   node = json_object_get_member (object, prop);
   if (json_node_get_node_type (node) == JSON_NODE_VALUE
       && json_node_get_value_type (node) == G_TYPE_STRING)
     {
       buffer = (const char *) json_node_get_string (node);
-      if (!buffer)
-        return 0.;
-      t = jbm_get_time (buffer, error);
-      if (*error != 1)
-        *error = 0;
+      if (buffer)
+        {
+          t = jbm_get_time (buffer, error);
+          if (*error != 1)
+            *error = 0;
+        }
     }
   return t;
 }

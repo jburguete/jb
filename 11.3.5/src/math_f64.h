@@ -4520,7 +4520,7 @@ jbm_array_maxmin_f64 (const double *xx, ///< double array.
                       const unsigned int n)     ///< number of array elements.
 {
   double kmax, kmin;
-  unsigned int i, j;
+  unsigned int i;
   kmax = kmin = xx[0];
   for (i = 0; ++i < n;)
     kmax = fmax (kmax, xx[i]), kmin = fmin (kmin, xx[i]);
