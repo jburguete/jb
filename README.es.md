@@ -1,4 +1,4 @@
-JB (versión 9.11.1)
+JB (versión 11.3.5)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -96,7 +96,7 @@ operativos:
 * FreeBSD 14.1
 * Gentoo Linux
 * Linux Mint DE 6
-* MacOS Ventura + Homebrew
+* MacOS Sequoia + Homebrew
 * Manjaro Linux
 * Microsoft Windows 11 + MSYS2
 * NetBSD 10.0
@@ -129,11 +129,11 @@ _____________________________
 
 2. Si sólo se requiere para aplicaciones de terminal compile los códigos fuente
    con el script:
-> $ cd 9.11.1
+> $ cd 11.3.5
 > $ ./build\_wihtout_\gui.sh
 
 2. O si se quiere interfaz gráfica compile los códigos fuente con el script:
-> $ cd 9.11.1
+> $ cd 11.3.5
 > $ ./build.sh
 
 ENLAZANDO LA BIBLIOTECA EN OTROS PROGRAMAS
@@ -142,7 +142,7 @@ ENLAZANDO LA BIBLIOTECA EN OTROS PROGRAMAS
 1. Enlácese la última versión en una carpeta jb p.ej.:
 > $ cd CARPETA\_DE\_SU\_PROGRAMA
 >
-> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/9.11.1 jb
+> $ ln -s RUTA\_DE\_LA\_BIBLIOTECA\_JB/11.3.5 jb
 
 2. Incluya el fichero de configuración y las utilidades requeridas en su código
    fuente p.ej.:

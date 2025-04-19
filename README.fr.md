@@ -1,4 +1,4 @@
-JB (version 9.11.1)
+JB (version 11.3.5)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -98,7 +98,7 @@ d'exploitation:
 * FreeBSD 14.1
 * Gentoo Linux
 * Linux Mint DE 6
-* MacOS Ventura + Homebrew
+* MacOS Sequoia + Homebrew
 * Manjaro Linux
 * Microsoft Windows 11 + MSYS2
 * NetBSD 10.0
@@ -131,11 +131,11 @@ ____________________________
 > $ git clone https://github.com/jburguete/jb
 
 2. Pour applications de terminal compilez les codes source avec:
-> $ cd 9.11.1
+> $ cd 11.3.5
 > $ ./build\_wihtout_\gui.sh
 
 2. Pour applications graphiques compilez les codes source avec:
-> $ cd 9.11.1
+> $ cd 11.3.5
 > $ ./build.sh
 
 LIEN LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
@@ -144,7 +144,7 @@ LIEN LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
 1. Liez la dernière version dans une répertoire jb, p.ex.:
 > $ cd RÉPERTOIRE\_DE\_VÔTRE\_PROGRAMME
 >
-> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/9.11.1 jb
+> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/11.3.5 jb
 
 2. Incluez le fichier de configuration et les outils requis dans votre code
    source, p.ex.:

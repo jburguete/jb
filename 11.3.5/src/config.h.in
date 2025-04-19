@@ -1,0 +1,13 @@
+#ifndef JB__CONFIG__H
+#define JB__CONFIG__H 1
+
+#undef HAVE_GTOP
+#undef HAVE_VULKAN
+#undef HAVE_EXP10
+#undef HAVE_SYSINFO
+#undef HAVE_FMEMOPEN
+#undef HAVE_GET_NPROCS
+#undef HAVE_ALIGNED_ALLOC
+#undef HAVE_FINITEF
+
+#endif

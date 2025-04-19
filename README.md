@@ -1,4 +1,4 @@
-JB (9.11.1 version)
+JB (11.3.5 version)
 ==================
 
 :uk:[english](README.md) :es:[español](README.es.md)
@@ -92,7 +92,7 @@ This software has been built and tested in the following operative systems:
 * FreeBSD 14.1
 * Gentoo Linux
 * Linux Mint DE 6
-* MacOS Ventura + Homebrew
+* MacOS Sequoia + Homebrew
 * Manjaro Linux
 * Microsoft Windows 11 + MSYS2
 * NetBSD 10.0
@@ -125,11 +125,11 @@ _____________________
 > $ git clone https://github.com/jburguete/jb
 
 2. If only terminal applications are required compile the source codes with:
-> $ cd 9.11.1
+> $ cd 11.3.5
 > $ ./build\_wihtout_\gui.sh
 
 2. Or, if graphic interfaces are required, compile the source codes with:
-> $ cd 9.11.1
+> $ cd 11.3.5
 > $ ./build.sh
 
 LINKING THIS LIBRARY ON OTHER PROGRAMS
@@ -138,7 +138,7 @@ LINKING THIS LIBRARY ON OTHER PROGRAMS
 1. Link the latest version on a jb directory, i.e.:
 > $ cd YOUR\_PROGRAM\_PATH
 >
-> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/9.11.1 jb
+> $ ln -s PATH\_TO\_THE\_JB\_LIBRARY/11.3.5 jb
 
 2. Include the config and the used utility headers on your source code i.e.:
 > \#include "jb/src/math.h"
