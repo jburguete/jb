@@ -38,8 +38,8 @@
 
 #if JBW == JBW_NO
 
-void jbw_error_show_terminal ();
-void jbw_warning_show_terminal ();
+void jbw_error_show_terminal (void);
+void jbw_warning_show_terminal (void);
 
 static inline int
 jbw_init (int *argn __attribute__((unused)),
@@ -432,12 +432,12 @@ extern unsigned int jbw_graphic_loop_exit;
 #endif
 
 int jbw_init_gtk (int *argn, char ***argc);
-void jbw_process_pending ();
+void jbw_process_pending (void);
 
 void jbw_show_message_gtk (const char *title, const char *message,
                            GtkMessageType type);
-void jbw_error_show_gtk ();
-void jbw_warning_show_gtk ();
+void jbw_error_show_gtk (void);
+void jbw_warning_show_gtk (void);
 void jbw_combo_box_set_strings (GtkComboBoxText * combo, char **strings, int n);
 GtkComboBoxText *jbw_combo_box_new_with_strings (char **strings, int n);
 

@@ -35,9 +35,9 @@
 
 char *jb_error_message = NULL;  ///< Error message string.
 char *jb_warning_message = NULL;        ///< Warning message string.
-void (*jb_error_show) () = NULL;
+void (*jb_error_show) (void) = NULL;
 ///< Pointer to the function to show error messages.
-void (*jb_warning_show) () = NULL;
+void (*jb_warning_show) (void) = NULL;
 ///< Pointer to the function to show warning messages.
 
 /**
@@ -301,7 +301,7 @@ jb_error_add (const char *first_message,        ///< first message,
  * Function to free the memory used by error messages.
  */
 void
-jb_error_destroy ()
+jb_error_destroy (void)
 {
   g_free (jb_error_message);
   jb_error_message = NULL;
@@ -327,7 +327,7 @@ jb_warning_add (const char *first_message,      ///< first message,
  * Function to free the memory used by warning messages.
  */
 void
-jb_warning_destroy ()
+jb_warning_destroy (void)
 {
   g_free (jb_warning_message);
   jb_warning_message = NULL;

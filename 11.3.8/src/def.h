@@ -114,8 +114,8 @@ JBChange (void **restrict a,    ///< a pointer to interchange.
 
 extern char *jb_error_message;
 extern char *jb_warning_message;
-extern void (*jb_error_show) ();
-extern void (*jb_warning_show) ();
+extern void (*jb_error_show) (void);
+extern void (*jb_warning_show) (void);
 
 void jb_set_locales (const char *program_name, const char *locale_dir,
                      const char *locale_all, const char *locale_numeric);
@@ -130,9 +130,9 @@ int jb_bin_read (FILE * file, char *buffer);
 void jb_bin_write (FILE * file, char *buffer);
 int jb_get_ncores (void);
 void jb_error_add (const char *first_message, ...);
-void jb_error_destroy ();
+void jb_error_destroy (void);
 void jb_warning_add (const char *first_message, ...);
-void jb_warning_destroy ();
+void jb_warning_destroy (void);
 char *jb_read_file (const char *name, long int *size);
 
 /**

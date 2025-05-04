@@ -41,13 +41,13 @@ jbw_show_message (const char *title, const char *message)
 }
 
 void
-jbw_error_show_terminal ()
+jbw_error_show_terminal (void)
 {
   jbw_show_message (_("Error!"), jb_error_message);
 }
 
 void
-jbw_warning_show_terminal ()
+jbw_warning_show_terminal (void)
 {
   jbw_show_message (_("Warning!"), jb_warning_message);
 }
@@ -207,7 +207,7 @@ jbw_init_gtk (int *argn __attribute__((unused)),
  * Function to process events on long computation.
  */
 void
-jbw_process_pending ()
+jbw_process_pending (void)
 {
   GMainContext *context = g_main_context_default ();
   while (g_main_context_pending (context))
@@ -247,7 +247,7 @@ jbw_show_message_gtk (const char *title,        ///< message title.
  * Function to display an error message.
  */
 void
-jbw_error_show_gtk ()
+jbw_error_show_gtk (void)
 {
   jbw_show_message_gtk (_("Error!"), jb_error_message, GTK_MESSAGE_ERROR);
 }
@@ -256,7 +256,7 @@ jbw_error_show_gtk ()
  * Function to display a warning message.
  */
 void
-jbw_warning_show_gtk ()
+jbw_warning_show_gtk (void)
 {
   jbw_show_message_gtk (_("Warning!"), jb_warning_message, GTK_MESSAGE_WARNING);
 }
@@ -541,7 +541,7 @@ jbw_draw_orthogonal_matrixl (GLint uniform_matrix,
  * Function to show an error opening the JBWImage widget.
  */
 static void
-jbw_image_error ()
+jbw_image_error (void)
 {
   jb_error_add ("JBWImage", "\n", NULL);
   jb_error_show ();
