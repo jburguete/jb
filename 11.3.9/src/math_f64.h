@@ -4360,7 +4360,7 @@ jbm_array_merge_f64 (const double *xa,
         xc[k] = xa[i++], j++;
     }
   xc = (double *) realloc (xc, k * sizeof (double));
-  *nc = k; 
+  *nc = k;
   return xc;
 }
 
