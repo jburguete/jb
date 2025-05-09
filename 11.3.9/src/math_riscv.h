@@ -33,27 +33,8 @@
 #ifndef JB_MATH_RISCV__H
 #define JB_MATH_RISCV__H 1
 
-/**
- * union to work with bits in 4 packed float numbers.
- */
-typedef union
-{
-  vfloat32m1_t x;               ///< floating point.
-  vuint32m1_t i;                ///< bits.
-} JBMNxF32;
-
-/**
- * union to work with bits in 2 packed double numbers.
- */
-typedef union
-{
-  vfloat64m1_t x;               ///< floating point.
-  vuint64m1_t i;                ///< bits.
-} JBMNxF64;
-
 // Debug functions
 
-/*
 static inline void
 print_vuint32m1_t (FILE *file, const char *label, vuint32m1_t x,
                    const size_t vl)
@@ -69,11 +50,11 @@ static inline void
 print_vuint64m1_t (FILE *file, const char *label, vuint64m1_t x,
                    const size_t vl)
 {
-  unsigned long long int y[vl] JB_ALIGNED;
+  unsigned long int y[vl] JB_ALIGNED;
   unsigned int i;
   __riscv_vse64_v_u64m1 (y, x, vl);
   for (i = 0; i < vl; ++i)
-    fprintf (file, "%s[%u]=%llu\n", label, i, y[i]);
+    fprintf (file, "%s[%u]=%lu\n", label, i, y[i]);
 }
 
 static inline void
@@ -89,11 +70,11 @@ print_vint32m1_t (FILE *file, const char *label, vint32m1_t x, const size_t vl)
 static inline void
 print_vint64m1_t (FILE *file, const char *label, vint64m1_t x, const size_t vl)
 {
-  long long int y[vl] JB_ALIGNED;
+  long int y[vl] JB_ALIGNED;
   unsigned int i;
   __riscv_vse64_v_i64m1 (y, x, vl);
   for (i = 0; i < vl; ++i)
-    fprintf (file, "%s[%u]=%lld\n", label, i, y[i]);
+    fprintf (file, "%s[%u]=%ld\n", label, i, y[i]);
 }
 
 static inline void
@@ -117,7 +98,6 @@ print_vfloat64m1_t (FILE *file, const char *label, vfloat64m1_t x,
   for (i = 0; i < vl; ++i)
     fprintf (file, "%s[%u]=%.17lg\n", label, i, y[i]);
 }
-*/
 
 /**
  * Function to calculate the additive inverse value of a vfloat32m1_t vector.
@@ -166,8 +146,9 @@ jbm_hypot_nxf32 (const vfloat32m1_t x,  ///< 1st vfloat32m1_t vector.
                  const vfloat32m1_t y,  ///< 2nd vfloat32m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  return __riscv_vfsqrt_v_f32m1 (__riscv_vfmacc_vv_f32m1 (__riscv_vfmul_vv_f32m1 (x, x, vl), y, y, vl),
-                         vl);
+  return
+    __riscv_vfsqrt_v_f32m1 (__riscv_vfmacc_vv_f32m1
+                            (__riscv_vfmul_vv_f32m1 (x, x, vl), y, y, vl), vl);
 }
 
 /**
@@ -179,12 +160,7 @@ static inline vint32m1_t
 jbm_floor_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  vint32m1_t i, i1;
-  vbool32_t m;
-  i = __riscv_vfcvt_rtz_x_f32m1 (x, vl);
-  i1 = __riscv_vadd_vx_i32m1 (i, -1, vl);
-  m = __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl);
-  return __riscv_vmerge_vvm_i32m1 (i1, i, m, vl);
+  return __riscv_vfcvt_x_f_v_i32m1 (x, vl);
 }
 
 /**
@@ -198,9 +174,11 @@ jbm_rest_nxf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
                 const size_t vl)        ///< vector size.
 {
   return
-    __riscv_vfsub_vv_f32m1 (x,
-                    __riscv_vfmul_vv_f32m1 (jbm_floor_nxf32 (__riscv_vfdiv_vv_f32m1 (x, d, vl),
-                                                     vl), d, vl), vl);
+    __riscv_vfmsac_vv_f32m1 (x,
+                             __riscv_vfcvt_f_x_v_f32m1 (jbm_floor_nxf32
+                                                        (__riscv_vfdiv_vv_f32m1
+                                                         (x, d, vl), vl), vl),
+                             d, vl);
 }
 
 /**
@@ -210,32 +188,45 @@ jbm_rest_nxf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
  */
 static inline vfloat32m1_t
 jbm_frexp_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
-                 vint32m1_t * e,        ///< pointer to the extracted exponents vector.
+                 vint32m1_t *e, ///< pointer to the extracted exponents vector.
                  const size_t vl)       ///< vector size.
 {
-  JBMNxF32 a, y, y2, z;
+  vfloat32m1_t ax, yx, y2x, zx;
+  vuint32m1_t ai, yi, y2i, zi;
   vint32m1_t en;
   vbool32_t m1, m2, m3;
-  a.x = x;
-  y.i = __riscv_vand_vx_u32m1 (a.i, 0x7f800000, vl);
-  m1 = __riscv_vmfeq_vx_u32m1_b32 (y.i, 0x7f800000, vl);
-  m2 = __riscv_vmfeq_vx_u32m1_b32 (y.i, 0, vl);
-  y2.x = x;
-  y2.i = __riscv_vand_vx_u32m1 (y2.i, 0x007fffff, vl);
-  m3 = __riscv_vmfeq_vx_u32m1_b32 (y2.i, 0, vl);
-  y2.i = __riscv_vmv_v_x_u32m1 (0x00400000, vl);
-  z.x = __riscv_vfdiv_vv_f32m1 (x, y2.x, vl);
-  z.i = __riscv_vand_vx_u32m1 (z.i, 0x7f800000, vl);
-  en = __riscv_vmerge_vvm_i32m1 (__riscv_vsub_vx_i32m1 (__riscv_vshra_vi_i32m1 ((vint32m1_t) z.i, 23,
-                                                        vl), 253, vl),
-                         __riscv_vsub_vx_i32m1 (__riscv_vshra_vi_i32m1 ((vint32m1_t) y.i, 23,
-                                                        vl), 126, vl), m2, vl);
-  y.x = __riscv_vfmerge_vvm_f32m1 (__riscv_vfmul_vv_f32m1 (y2.x, z.x, vl), y.x, m2, vl);
-  en = __riscv_vmerge_vvm_i32m1 (__riscv_vmv_v_x_i32m1 (0, vl), en,
-                         __riscv_vmor_mm (m1, __riscv_vmand_mm (m2, m3, vl), vl), vl);
+  ai = __riscv_vreinterpret_v_f32m1_u32m1 (x);
+  yi = __riscv_vand_vx_u32m1 (ai, 0x7f800000, vl);
+  m1 = __riscv_vmseq_vx_u32m1_b32 (yi, 0x7f800000, vl);
+  m2 = __riscv_vmseq_vx_u32m1_b32 (yi, 0, vl);
+  y2i = ai;
+  y2i = __riscv_vand_vx_u32m1 (y2i, 0x007fffff, vl);
+  m3 = __riscv_vmseq_vx_u32m1_b32 (y2i, 0, vl);
+  y2i = __riscv_vmv_v_x_u32m1 (0x00400000, vl);
+  y2x = __riscv_vreinterpret_v_u32m1_f32m1 (y2i);
+  zx = __riscv_vfdiv_vv_f32m1 (x, y2x, vl);
+  zi = __riscv_vreinterpret_v_f32m1_u32m1 (zx);
+  zi = __riscv_vand_vx_u32m1 (zi, 0x7f800000, vl);
+  en =
+    __riscv_vmerge_vvm_i32m1 (__riscv_vsub_vx_i32m1
+                              (__riscv_vshra_vi_i32m1 ((vint32m1_t) zi, 23, vl),
+                               253, vl),
+                              __riscv_vsub_vx_i32m1 (__riscv_vshra_vi_i32m1
+                                                     ((vint32m1_t) yi, 23, vl),
+                                                     126, vl), m2, vl);
+  yx =
+    __riscv_vfmerge_vvm_f32m1 (__riscv_vfmul_vv_f32m1 (y2x, zx, vl), yx, m2,
+                               vl);
+  en =
+    __riscv_vmerge_vvm_i32m1 (__riscv_vmv_v_x_i32m1 (0, vl), en,
+                              __riscv_vmor_mm (m1,
+                                               __riscv_vmand_mm (m2, m3, vl),
+                                               vl), vl);
   *e = en;
-  return __riscv_vfmerge_vvm_f32m1 (x, __riscv_vfmul_vf_f32m1 (__riscv_vfdiv_vv_f32m1 (x, y.x, vl), 0.5f,
-                                              vl), m1, vl);
+  return __riscv_vfmerge_vvm_f32m1 (x,
+                                    __riscv_vfmul_vf_f32m1
+                                    (__riscv_vfdiv_vv_f32m1 (x, yx, vl), 0.5f,
+                                     vl), m1, vl);
 }
 
 /**
@@ -250,14 +241,17 @@ jbm_exp2n_nxf32 (vint32m1_t e,  ///< exponent vector (vint32m1_t).
 {
   vfloat32m1_t x;
   x = __riscv_vfmerge_vvm_f32m1
-    ((vfloat32m1_t) __riscv_vshla_vi_i32m1 (__riscv_vadd_vx_i32m1 (e, 127, vl), 23, vl),
-     (vfloat32m1_t) __riscv_vshra_vv_i32m1 (__riscv_vmv_v_x_i32m1 (0x00400000, vl),
-                                    __riscv_vsub_vx_i32m1 (e, 127, vl)),
+    ((vfloat32m1_t)
+     __riscv_vshla_vi_i32m1 (__riscv_vadd_vx_i32m1 (e, 127, vl), 23, vl),
+     (vfloat32m1_t)
+     __riscv_vshra_vv_i32m1 (__riscv_vmv_v_x_i32m1 (0x00400000, vl),
+                             __riscv_vsub_vx_i32m1 (e, 127, vl)),
      __riscv_vmgt_vx_i32m1_b32 (e, 127, vl));
-  x = __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f, vl), x,
-                        __riscv_vmlt_vx_i32m1_b32 (e, -150, vl), vl);
+  x =
+    __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f, vl), x,
+                               __riscv_vmlt_vx_i32m1_b32 (e, -150, vl), vl);
   return __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (INFINITY, vl), x,
-                           __riscv_vmgt_vx_i32m1_b32 (e, 127, vl), vl);
+                                    __riscv_vmgt_vx_i32m1_b32 (e, 127, vl), vl);
 }
 
 /**
@@ -303,19 +297,23 @@ jbm_modmin_nxf32 (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
 {
   vfloat32m1_t aa, ab, y;
   ab = __riscv_vfmul_vv_f32m1 (a, b, vl);
-  y = __riscv_vfmerge_vfm_f32m1 (a, 0.f, __riscv_vmfgt_vf_f32m1_b32 (ab, 0.f, vl), vl);
+  y =
+    __riscv_vfmerge_vfm_f32m1 (a, 0.f, __riscv_vmfgt_vf_f32m1_b32 (ab, 0.f, vl),
+                               vl);
   aa = jbm_abs_nxf32 (y, vl);
   ab = jbm_abs_nxf32 (b, vl);
-  return __riscv_vfmerge_vvm_f32m1 (b, y, __riscv_vmfgt_vv_f32m1_b32 (aa, ab, vl), vl);
+  return __riscv_vfmerge_vvm_f32m1 (b, y,
+                                    __riscv_vmfgt_vv_f32m1_b32 (aa, ab, vl),
+                                    vl);
 }
 
 /**
  * Function to interchange 2 vfloat32m1_t vectors.
  */
 static inline void
-jbm_change_nxf32 (vfloat32m1_t * restrict a,
+jbm_change_nxf32 (vfloat32m1_t *restrict a,
 ///< 1st vfloat32m1_t vector pointer.
-                  vfloat32m1_t * restrict b)
+                  vfloat32m1_t *restrict b)
 ///< 2nd vfloat32m1_t vector pointer.
 {
   vfloat32m1_t c;
@@ -366,8 +364,11 @@ jbm_extrapolate_nxf32 (const vfloat32m1_t x,
                        const size_t vl) ///< vector size.
 {
   return __riscv_vfmacc_vv_f32m1 (y1, __riscv_vfsub_vv_f32m1 (x, x1, vl),
-                          __riscv_vfdiv_vv_f32m1 (__riscv_vfsub_vv_f32m1 (y2, y1, vl),
-                                          __riscv_vfsub_vv_f32m1 (x2, x1, vl), vl), vl);
+                                  __riscv_vfdiv_vv_f32m1 (__riscv_vfsub_vv_f32m1
+                                                          (y2, y1, vl),
+                                                          __riscv_vfsub_vv_f32m1
+                                                          (x2, x1, vl), vl),
+                                  vl);
 }
 
 /**
@@ -391,8 +392,11 @@ jbm_interpolate_nxf32 (const vfloat32m1_t x,
 {
   vfloat32m1_t k;
   k = jbm_extrapolate_nxf32 (x, x1, x2, y1, y2, vl);
-  k = __riscv_vfmerge_vvm_f32m1 (k, y1, __riscv_vmfgt_vv_f32m1_b32 (x, x1, vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (k, y2, __riscv_vmflt_vv_f32m1_b32 (x, x2, vl), vl);
+  k =
+    __riscv_vfmerge_vvm_f32m1 (k, y1, __riscv_vmfgt_vv_f32m1_b32 (x, x1, vl),
+                               vl);
+  return __riscv_vfmerge_vvm_f32m1 (k, y2,
+                                    __riscv_vmflt_vv_f32m1_b32 (x, x2, vl), vl);
 }
 
 /**
@@ -459,7 +463,8 @@ jbm_polynomial_1_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                         const float *p, ///< array of coefficients.
                         const size_t vl)        ///< array size.
 {
-  return __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), p[1], x, vl);
+  return __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), p[1], x,
+                                  vl);
 }
 
 /**
@@ -473,7 +478,7 @@ jbm_polynomial_2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_1_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_1_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -487,7 +492,7 @@ jbm_polynomial_3_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_2_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_2_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -501,7 +506,7 @@ jbm_polynomial_4_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_3_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_3_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -515,7 +520,7 @@ jbm_polynomial_5_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_4_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_4_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -529,7 +534,7 @@ jbm_polynomial_6_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_5_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_5_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -543,7 +548,7 @@ jbm_polynomial_7_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_6_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_6_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -557,7 +562,7 @@ jbm_polynomial_8_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_7_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_7_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -571,7 +576,7 @@ jbm_polynomial_9_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_8_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_8_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -585,7 +590,7 @@ jbm_polynomial_10_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_9_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_9_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -599,7 +604,7 @@ jbm_polynomial_11_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_10_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_10_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -613,7 +618,7 @@ jbm_polynomial_12_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_11_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_11_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -627,7 +632,7 @@ jbm_polynomial_13_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_12_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_12_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -641,7 +646,7 @@ jbm_polynomial_14_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_13_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_13_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -655,7 +660,7 @@ jbm_polynomial_15_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_14_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_14_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -669,7 +674,7 @@ jbm_polynomial_16_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_15_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_15_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -683,7 +688,7 @@ jbm_polynomial_17_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_16_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_16_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -697,7 +702,7 @@ jbm_polynomial_18_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_17_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_17_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -711,7 +716,7 @@ jbm_polynomial_19_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_18_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_18_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -725,7 +730,7 @@ jbm_polynomial_20_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_19_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_19_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -739,7 +744,7 @@ jbm_polynomial_21_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_20_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_20_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -753,7 +758,7 @@ jbm_polynomial_22_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_21_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_21_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -767,7 +772,7 @@ jbm_polynomial_23_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_22_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_22_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -781,7 +786,7 @@ jbm_polynomial_24_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_23_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_23_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -795,7 +800,7 @@ jbm_polynomial_25_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_24_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_24_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -809,7 +814,7 @@ jbm_polynomial_26_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_25_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_25_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -823,7 +828,7 @@ jbm_polynomial_27_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_26_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_26_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -837,7 +842,7 @@ jbm_polynomial_28_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_27_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_27_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -851,7 +856,7 @@ jbm_polynomial_29_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,
-                          jbm_polynomial_28_nxf32 (x, p + 1, vl), vl);
+                                  jbm_polynomial_28_nxf32 (x, p + 1, vl), vl);
 }
 
 /**
@@ -865,7 +870,9 @@ jbm_rational_1_0_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                         __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[1], x, vl), vl);
+                                 __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                          (1.f, vl), p[1], x,
+                                                          vl), vl);
 }
 
 /**
@@ -880,9 +887,13 @@ jbm_rational_2_0_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -897,8 +908,9 @@ jbm_rational_2_1_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[2], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[2], x, vl),
+                            vl);
 }
 
 /**
@@ -913,9 +925,13 @@ jbm_rational_3_0_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -930,9 +946,13 @@ jbm_rational_3_1_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -947,8 +967,9 @@ jbm_rational_3_2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[3], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[3], x, vl),
+                            vl);
 }
 
 /**
@@ -963,9 +984,13 @@ jbm_rational_4_0_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -980,9 +1005,13 @@ jbm_rational_4_1_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -997,9 +1026,13 @@ jbm_rational_4_2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1014,8 +1047,9 @@ jbm_rational_4_3_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[4], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[4], x, vl),
+                            vl);
 }
 
 /**
@@ -1030,9 +1064,13 @@ jbm_rational_5_0_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1047,9 +1085,13 @@ jbm_rational_5_1_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1064,9 +1106,13 @@ jbm_rational_5_2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1081,9 +1127,13 @@ jbm_rational_5_3_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1098,8 +1148,9 @@ jbm_rational_5_4_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[5], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[5], x, vl),
+                            vl);
 }
 
 /**
@@ -1114,9 +1165,13 @@ jbm_rational_6_0_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1131,9 +1186,13 @@ jbm_rational_6_1_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1148,9 +1207,13 @@ jbm_rational_6_2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1165,9 +1228,13 @@ jbm_rational_6_3_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1182,9 +1249,13 @@ jbm_rational_6_4_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1199,8 +1270,9 @@ jbm_rational_6_5_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[6], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[6], x, vl),
+                            vl);
 }
 
 /**
@@ -1215,9 +1287,13 @@ jbm_rational_7_0_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1232,9 +1308,13 @@ jbm_rational_7_1_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1249,9 +1329,13 @@ jbm_rational_7_2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1266,9 +1350,13 @@ jbm_rational_7_3_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1283,9 +1371,13 @@ jbm_rational_7_4_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1300,9 +1392,13 @@ jbm_rational_7_5_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1317,8 +1413,9 @@ jbm_rational_7_6_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[7], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[7], x, vl),
+                            vl);
 }
 
 /**
@@ -1333,9 +1430,13 @@ jbm_rational_8_0_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1350,9 +1451,13 @@ jbm_rational_8_1_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1367,9 +1472,13 @@ jbm_rational_8_2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1384,9 +1493,13 @@ jbm_rational_8_3_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1401,9 +1514,13 @@ jbm_rational_8_4_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1418,9 +1535,13 @@ jbm_rational_8_5_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1435,9 +1556,13 @@ jbm_rational_8_6_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1452,8 +1577,9 @@ jbm_rational_8_7_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[8], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[8], x, vl),
+                            vl);
 }
 
 /**
@@ -1468,9 +1594,13 @@ jbm_rational_9_0_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1485,9 +1615,13 @@ jbm_rational_9_1_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1502,9 +1636,13 @@ jbm_rational_9_2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1519,9 +1657,13 @@ jbm_rational_9_3_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1536,9 +1678,13 @@ jbm_rational_9_4_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1553,9 +1699,13 @@ jbm_rational_9_5_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1570,9 +1720,13 @@ jbm_rational_9_6_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1587,9 +1741,13 @@ jbm_rational_9_7_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1604,8 +1762,9 @@ jbm_rational_9_8_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[9], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[9], x, vl),
+                            vl);
 }
 
 /**
@@ -1620,9 +1779,13 @@ jbm_rational_10_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1637,9 +1800,13 @@ jbm_rational_10_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1654,9 +1821,13 @@ jbm_rational_10_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1671,9 +1842,13 @@ jbm_rational_10_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1688,9 +1863,13 @@ jbm_rational_10_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1705,9 +1884,13 @@ jbm_rational_10_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1722,9 +1905,13 @@ jbm_rational_10_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1739,9 +1926,13 @@ jbm_rational_10_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1756,9 +1947,13 @@ jbm_rational_10_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1773,8 +1968,9 @@ jbm_rational_10_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[10], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[10], x, vl),
+                            vl);
 }
 
 /**
@@ -1789,9 +1985,14 @@ jbm_rational_11_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1806,9 +2007,13 @@ jbm_rational_11_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1823,9 +2028,13 @@ jbm_rational_11_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1840,9 +2049,13 @@ jbm_rational_11_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1857,9 +2070,13 @@ jbm_rational_11_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1874,9 +2091,13 @@ jbm_rational_11_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1891,9 +2112,13 @@ jbm_rational_11_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1908,9 +2133,13 @@ jbm_rational_11_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1925,9 +2154,13 @@ jbm_rational_11_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1942,9 +2175,13 @@ jbm_rational_11_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1959,8 +2196,9 @@ jbm_rational_11_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[11], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[11], x, vl),
+                            vl);
 }
 
 /**
@@ -1975,9 +2213,14 @@ jbm_rational_12_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -1992,9 +2235,14 @@ jbm_rational_12_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2009,9 +2257,13 @@ jbm_rational_12_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2026,9 +2278,13 @@ jbm_rational_12_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2043,9 +2299,13 @@ jbm_rational_12_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2060,9 +2320,13 @@ jbm_rational_12_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2077,9 +2341,13 @@ jbm_rational_12_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2094,9 +2362,13 @@ jbm_rational_12_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2111,9 +2383,13 @@ jbm_rational_12_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2128,9 +2404,13 @@ jbm_rational_12_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2145,9 +2425,13 @@ jbm_rational_12_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2162,8 +2446,9 @@ jbm_rational_12_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[12], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[12], x, vl),
+                            vl);
 }
 
 /**
@@ -2178,9 +2463,14 @@ jbm_rational_13_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2195,9 +2485,14 @@ jbm_rational_13_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2212,9 +2507,14 @@ jbm_rational_13_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2229,9 +2529,13 @@ jbm_rational_13_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2246,9 +2550,13 @@ jbm_rational_13_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2263,9 +2571,13 @@ jbm_rational_13_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2280,9 +2592,13 @@ jbm_rational_13_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2297,9 +2613,13 @@ jbm_rational_13_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2314,9 +2634,13 @@ jbm_rational_13_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2331,9 +2655,13 @@ jbm_rational_13_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2348,9 +2676,13 @@ jbm_rational_13_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2365,9 +2697,13 @@ jbm_rational_13_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2382,8 +2718,9 @@ jbm_rational_13_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[13], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[13], x, vl),
+                            vl);
 }
 
 /**
@@ -2398,9 +2735,14 @@ jbm_rational_14_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2415,9 +2757,14 @@ jbm_rational_14_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2432,9 +2779,14 @@ jbm_rational_14_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2449,9 +2801,14 @@ jbm_rational_14_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2466,9 +2823,13 @@ jbm_rational_14_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2483,9 +2844,13 @@ jbm_rational_14_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2500,9 +2865,13 @@ jbm_rational_14_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2517,9 +2886,13 @@ jbm_rational_14_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2534,9 +2907,13 @@ jbm_rational_14_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2551,9 +2928,13 @@ jbm_rational_14_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2568,9 +2949,13 @@ jbm_rational_14_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2585,9 +2970,13 @@ jbm_rational_14_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2602,9 +2991,13 @@ jbm_rational_14_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2619,8 +3012,9 @@ jbm_rational_14_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[14], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[14], x, vl),
+                            vl);
 }
 
 /**
@@ -2635,9 +3029,14 @@ jbm_rational_15_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2652,9 +3051,14 @@ jbm_rational_15_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2669,9 +3073,14 @@ jbm_rational_15_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2686,9 +3095,14 @@ jbm_rational_15_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2703,9 +3117,14 @@ jbm_rational_15_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2720,9 +3139,13 @@ jbm_rational_15_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2737,9 +3160,13 @@ jbm_rational_15_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2754,9 +3181,13 @@ jbm_rational_15_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2771,9 +3202,13 @@ jbm_rational_15_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2788,9 +3223,13 @@ jbm_rational_15_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2805,9 +3244,13 @@ jbm_rational_15_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2822,9 +3265,13 @@ jbm_rational_15_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2839,9 +3286,13 @@ jbm_rational_15_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2856,9 +3307,13 @@ jbm_rational_15_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2873,8 +3328,9 @@ jbm_rational_15_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[15], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[15], x, vl),
+                            vl);
 }
 
 /**
@@ -2889,9 +3345,14 @@ jbm_rational_16_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2906,9 +3367,14 @@ jbm_rational_16_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2923,9 +3389,14 @@ jbm_rational_16_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2940,9 +3411,14 @@ jbm_rational_16_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2957,9 +3433,14 @@ jbm_rational_16_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2974,9 +3455,14 @@ jbm_rational_16_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -2991,9 +3477,13 @@ jbm_rational_16_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3008,9 +3498,13 @@ jbm_rational_16_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3025,9 +3519,13 @@ jbm_rational_16_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3042,9 +3540,13 @@ jbm_rational_16_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3059,9 +3561,13 @@ jbm_rational_16_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3076,9 +3582,13 @@ jbm_rational_16_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3093,9 +3603,13 @@ jbm_rational_16_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3110,9 +3624,13 @@ jbm_rational_16_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3127,9 +3645,13 @@ jbm_rational_16_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3144,8 +3666,9 @@ jbm_rational_16_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[16], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[16], x, vl),
+                            vl);
 }
 
 /**
@@ -3160,9 +3683,14 @@ jbm_rational_17_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3177,9 +3705,14 @@ jbm_rational_17_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3194,9 +3727,14 @@ jbm_rational_17_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3211,9 +3749,14 @@ jbm_rational_17_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3228,9 +3771,14 @@ jbm_rational_17_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3245,9 +3793,14 @@ jbm_rational_17_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3262,9 +3815,14 @@ jbm_rational_17_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3279,9 +3837,13 @@ jbm_rational_17_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3296,9 +3858,13 @@ jbm_rational_17_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3313,9 +3879,13 @@ jbm_rational_17_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3330,9 +3900,13 @@ jbm_rational_17_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3347,9 +3921,13 @@ jbm_rational_17_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3364,9 +3942,13 @@ jbm_rational_17_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3381,9 +3963,13 @@ jbm_rational_17_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3398,9 +3984,13 @@ jbm_rational_17_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3415,9 +4005,13 @@ jbm_rational_17_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3432,8 +4026,9 @@ jbm_rational_17_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[17], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[17], x, vl),
+                            vl);
 }
 
 /**
@@ -3448,9 +4043,14 @@ jbm_rational_18_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3465,9 +4065,14 @@ jbm_rational_18_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3482,9 +4087,14 @@ jbm_rational_18_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3499,9 +4109,14 @@ jbm_rational_18_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3516,9 +4131,14 @@ jbm_rational_18_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3533,9 +4153,14 @@ jbm_rational_18_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3550,9 +4175,14 @@ jbm_rational_18_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3567,9 +4197,14 @@ jbm_rational_18_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3584,9 +4219,13 @@ jbm_rational_18_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3601,9 +4240,13 @@ jbm_rational_18_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3618,9 +4261,13 @@ jbm_rational_18_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3635,9 +4282,13 @@ jbm_rational_18_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3652,9 +4303,13 @@ jbm_rational_18_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3669,9 +4324,13 @@ jbm_rational_18_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3686,9 +4345,13 @@ jbm_rational_18_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3703,9 +4366,13 @@ jbm_rational_18_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3720,9 +4387,13 @@ jbm_rational_18_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3737,8 +4408,9 @@ jbm_rational_18_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[18], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[18], x, vl),
+                            vl);
 }
 
 /**
@@ -3753,9 +4425,14 @@ jbm_rational_19_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3770,9 +4447,14 @@ jbm_rational_19_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3787,9 +4469,14 @@ jbm_rational_19_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3804,9 +4491,14 @@ jbm_rational_19_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3821,9 +4513,14 @@ jbm_rational_19_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3838,9 +4535,14 @@ jbm_rational_19_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3855,9 +4557,14 @@ jbm_rational_19_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3872,9 +4579,14 @@ jbm_rational_19_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3889,9 +4601,14 @@ jbm_rational_19_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3906,9 +4623,13 @@ jbm_rational_19_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3923,9 +4644,13 @@ jbm_rational_19_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3940,9 +4665,13 @@ jbm_rational_19_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3957,9 +4686,13 @@ jbm_rational_19_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3974,9 +4707,13 @@ jbm_rational_19_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -3991,9 +4728,13 @@ jbm_rational_19_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4008,9 +4749,13 @@ jbm_rational_19_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4025,9 +4770,13 @@ jbm_rational_19_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4042,9 +4791,13 @@ jbm_rational_19_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4059,8 +4812,9 @@ jbm_rational_19_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[19], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[19], x, vl),
+                            vl);
 }
 
 /**
@@ -4075,9 +4829,14 @@ jbm_rational_20_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_19_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_19_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4092,9 +4851,14 @@ jbm_rational_20_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4109,9 +4873,14 @@ jbm_rational_20_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4126,9 +4895,14 @@ jbm_rational_20_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4143,9 +4917,14 @@ jbm_rational_20_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4160,9 +4939,14 @@ jbm_rational_20_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4177,9 +4961,14 @@ jbm_rational_20_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4194,9 +4983,14 @@ jbm_rational_20_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4211,9 +5005,14 @@ jbm_rational_20_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4228,9 +5027,14 @@ jbm_rational_20_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4245,9 +5049,13 @@ jbm_rational_20_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4262,9 +5070,13 @@ jbm_rational_20_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4279,9 +5091,13 @@ jbm_rational_20_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4296,9 +5112,13 @@ jbm_rational_20_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4313,9 +5133,13 @@ jbm_rational_20_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4330,9 +5154,13 @@ jbm_rational_20_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4347,9 +5175,13 @@ jbm_rational_20_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4364,9 +5196,13 @@ jbm_rational_20_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4381,9 +5217,13 @@ jbm_rational_20_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4398,8 +5238,9 @@ jbm_rational_20_19_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_19_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[20], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[20], x, vl),
+                            vl);
 }
 
 /**
@@ -4414,9 +5255,14 @@ jbm_rational_21_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_20_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_20_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4431,9 +5277,14 @@ jbm_rational_21_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_19_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_19_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4448,9 +5299,14 @@ jbm_rational_21_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4465,9 +5321,14 @@ jbm_rational_21_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4482,9 +5343,14 @@ jbm_rational_21_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4499,9 +5365,14 @@ jbm_rational_21_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4516,9 +5387,14 @@ jbm_rational_21_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4533,9 +5409,14 @@ jbm_rational_21_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4550,9 +5431,14 @@ jbm_rational_21_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4567,9 +5453,14 @@ jbm_rational_21_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4584,9 +5475,14 @@ jbm_rational_21_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4601,9 +5497,13 @@ jbm_rational_21_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4618,9 +5518,13 @@ jbm_rational_21_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4635,9 +5539,13 @@ jbm_rational_21_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4652,9 +5560,13 @@ jbm_rational_21_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4669,9 +5581,13 @@ jbm_rational_21_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4686,9 +5602,13 @@ jbm_rational_21_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4703,9 +5623,13 @@ jbm_rational_21_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4720,9 +5644,13 @@ jbm_rational_21_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4737,9 +5665,13 @@ jbm_rational_21_19_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_19_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4754,8 +5686,9 @@ jbm_rational_21_20_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_20_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[21], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[21], x, vl),
+                            vl);
 }
 
 /**
@@ -4770,9 +5703,14 @@ jbm_rational_22_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_21_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_21_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4787,9 +5725,14 @@ jbm_rational_22_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_20_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_20_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4804,9 +5747,14 @@ jbm_rational_22_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_19_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_19_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4821,9 +5769,14 @@ jbm_rational_22_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4838,9 +5791,14 @@ jbm_rational_22_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4855,9 +5813,14 @@ jbm_rational_22_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4872,9 +5835,14 @@ jbm_rational_22_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4889,9 +5857,14 @@ jbm_rational_22_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4906,9 +5879,14 @@ jbm_rational_22_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4923,9 +5901,14 @@ jbm_rational_22_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4940,9 +5923,14 @@ jbm_rational_22_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4957,9 +5945,14 @@ jbm_rational_22_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4974,9 +5967,13 @@ jbm_rational_22_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -4991,9 +5988,13 @@ jbm_rational_22_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5008,9 +6009,13 @@ jbm_rational_22_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5025,9 +6030,13 @@ jbm_rational_22_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5042,9 +6051,13 @@ jbm_rational_22_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5059,9 +6072,13 @@ jbm_rational_22_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5076,9 +6093,13 @@ jbm_rational_22_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5093,9 +6114,13 @@ jbm_rational_22_19_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_19_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5110,9 +6135,13 @@ jbm_rational_22_20_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_20_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5127,8 +6156,9 @@ jbm_rational_22_21_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_21_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[22], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[22], x, vl),
+                            vl);
 }
 
 /**
@@ -5143,9 +6173,14 @@ jbm_rational_23_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_22_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_22_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5160,9 +6195,14 @@ jbm_rational_23_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_21_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_21_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5177,9 +6217,14 @@ jbm_rational_23_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_20_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_20_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5194,9 +6239,14 @@ jbm_rational_23_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_19_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_19_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5211,9 +6261,14 @@ jbm_rational_23_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5228,9 +6283,14 @@ jbm_rational_23_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5245,9 +6305,14 @@ jbm_rational_23_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5262,9 +6327,14 @@ jbm_rational_23_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5279,9 +6349,14 @@ jbm_rational_23_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5296,9 +6371,14 @@ jbm_rational_23_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5313,9 +6393,14 @@ jbm_rational_23_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5330,9 +6415,14 @@ jbm_rational_23_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5347,9 +6437,14 @@ jbm_rational_23_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5364,9 +6459,13 @@ jbm_rational_23_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5381,9 +6480,13 @@ jbm_rational_23_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5398,9 +6501,13 @@ jbm_rational_23_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5415,9 +6522,13 @@ jbm_rational_23_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5432,9 +6543,13 @@ jbm_rational_23_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5449,9 +6564,13 @@ jbm_rational_23_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5466,9 +6585,13 @@ jbm_rational_23_19_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_19_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5483,9 +6606,13 @@ jbm_rational_23_20_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_20_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5500,9 +6627,13 @@ jbm_rational_23_21_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_21_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5517,8 +6648,9 @@ jbm_rational_23_22_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_22_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[23], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[23], x, vl),
+                            vl);
 }
 
 /**
@@ -5533,9 +6665,14 @@ jbm_rational_24_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_23_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_23_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5550,9 +6687,14 @@ jbm_rational_24_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_22_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_22_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5567,9 +6709,14 @@ jbm_rational_24_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_21_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_21_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5584,9 +6731,14 @@ jbm_rational_24_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_20_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_20_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5601,9 +6753,14 @@ jbm_rational_24_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_19_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_19_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5618,9 +6775,14 @@ jbm_rational_24_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5635,9 +6797,14 @@ jbm_rational_24_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5652,9 +6819,14 @@ jbm_rational_24_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5669,9 +6841,14 @@ jbm_rational_24_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5686,9 +6863,14 @@ jbm_rational_24_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5703,9 +6885,14 @@ jbm_rational_24_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5720,9 +6907,14 @@ jbm_rational_24_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5737,9 +6929,14 @@ jbm_rational_24_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5754,9 +6951,14 @@ jbm_rational_24_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5771,9 +6973,13 @@ jbm_rational_24_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5788,9 +6994,13 @@ jbm_rational_24_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5805,9 +7015,13 @@ jbm_rational_24_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5822,9 +7036,13 @@ jbm_rational_24_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5839,9 +7057,13 @@ jbm_rational_24_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5856,9 +7078,13 @@ jbm_rational_24_19_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_19_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5873,9 +7099,13 @@ jbm_rational_24_20_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_20_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5890,9 +7120,13 @@ jbm_rational_24_21_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_21_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5907,9 +7141,13 @@ jbm_rational_24_22_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_22_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5924,8 +7162,9 @@ jbm_rational_24_23_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_23_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[24], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[24], x, vl),
+                            vl);
 }
 
 /**
@@ -5940,9 +7179,14 @@ jbm_rational_25_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_24_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_24_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5957,9 +7201,14 @@ jbm_rational_25_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_23_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_23_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5974,9 +7223,14 @@ jbm_rational_25_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_22_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_22_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -5991,9 +7245,14 @@ jbm_rational_25_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_21_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_21_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6008,9 +7267,14 @@ jbm_rational_25_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_20_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_20_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6025,9 +7289,14 @@ jbm_rational_25_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_19_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_19_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6042,9 +7311,14 @@ jbm_rational_25_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6059,9 +7333,14 @@ jbm_rational_25_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6076,9 +7355,14 @@ jbm_rational_25_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6093,9 +7377,14 @@ jbm_rational_25_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6110,9 +7399,14 @@ jbm_rational_25_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6127,9 +7421,14 @@ jbm_rational_25_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6144,9 +7443,14 @@ jbm_rational_25_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6161,9 +7465,14 @@ jbm_rational_25_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6178,9 +7487,14 @@ jbm_rational_25_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              15,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6195,9 +7509,13 @@ jbm_rational_25_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6212,9 +7530,13 @@ jbm_rational_25_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6229,9 +7551,13 @@ jbm_rational_25_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6246,9 +7572,13 @@ jbm_rational_25_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6263,9 +7593,13 @@ jbm_rational_25_19_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_19_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6280,9 +7614,13 @@ jbm_rational_25_20_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_20_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6297,9 +7635,13 @@ jbm_rational_25_21_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_21_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6314,9 +7656,13 @@ jbm_rational_25_22_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_22_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6331,9 +7677,13 @@ jbm_rational_25_23_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_23_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 24, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             24,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6348,8 +7698,9 @@ jbm_rational_25_24_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_24_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[25], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[25], x, vl),
+                            vl);
 }
 
 /**
@@ -6364,9 +7715,14 @@ jbm_rational_26_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_25_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_25_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6381,9 +7737,14 @@ jbm_rational_26_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_24_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_24_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6398,9 +7759,14 @@ jbm_rational_26_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_23_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_23_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6415,9 +7781,14 @@ jbm_rational_26_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_22_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_22_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6432,9 +7803,14 @@ jbm_rational_26_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_21_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_21_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6449,9 +7825,14 @@ jbm_rational_26_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_20_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_20_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6466,9 +7847,14 @@ jbm_rational_26_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_19_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_19_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6483,9 +7869,14 @@ jbm_rational_26_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6500,9 +7891,14 @@ jbm_rational_26_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6517,9 +7913,14 @@ jbm_rational_26_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6534,9 +7935,14 @@ jbm_rational_26_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6551,9 +7957,14 @@ jbm_rational_26_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6568,9 +7979,14 @@ jbm_rational_26_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6585,9 +8001,14 @@ jbm_rational_26_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6602,9 +8023,14 @@ jbm_rational_26_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              15,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6619,9 +8045,14 @@ jbm_rational_26_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              16,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6636,9 +8067,13 @@ jbm_rational_26_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6653,9 +8088,13 @@ jbm_rational_26_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6670,9 +8109,13 @@ jbm_rational_26_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6687,9 +8130,13 @@ jbm_rational_26_19_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_19_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6704,9 +8151,13 @@ jbm_rational_26_20_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_20_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6721,9 +8172,13 @@ jbm_rational_26_21_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_21_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6738,9 +8193,13 @@ jbm_rational_26_22_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_22_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6755,9 +8214,13 @@ jbm_rational_26_23_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_23_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 24, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             24,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6772,9 +8235,13 @@ jbm_rational_26_24_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_24_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 25, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             25,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6789,8 +8256,9 @@ jbm_rational_26_25_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_25_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[26], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[26], x, vl),
+                            vl);
 }
 
 /**
@@ -6805,9 +8273,14 @@ jbm_rational_27_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_26_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_26_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6822,9 +8295,14 @@ jbm_rational_27_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_25_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_25_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6839,9 +8317,14 @@ jbm_rational_27_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_24_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_24_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6856,9 +8339,14 @@ jbm_rational_27_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_23_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_23_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6873,9 +8361,14 @@ jbm_rational_27_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_22_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_22_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6890,9 +8383,14 @@ jbm_rational_27_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_21_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_21_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6907,9 +8405,14 @@ jbm_rational_27_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_20_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_20_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6924,9 +8427,14 @@ jbm_rational_27_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_19_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_19_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6941,9 +8449,14 @@ jbm_rational_27_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6958,9 +8471,14 @@ jbm_rational_27_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6975,9 +8493,14 @@ jbm_rational_27_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -6992,9 +8515,14 @@ jbm_rational_27_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7009,9 +8537,14 @@ jbm_rational_27_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7026,9 +8559,14 @@ jbm_rational_27_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7043,9 +8581,14 @@ jbm_rational_27_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              15,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7060,9 +8603,14 @@ jbm_rational_27_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              16,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7077,9 +8625,14 @@ jbm_rational_27_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              17,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7094,9 +8647,13 @@ jbm_rational_27_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7111,9 +8668,13 @@ jbm_rational_27_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7128,9 +8689,13 @@ jbm_rational_27_19_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_19_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7145,9 +8710,13 @@ jbm_rational_27_20_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_20_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7162,9 +8731,13 @@ jbm_rational_27_21_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_21_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7179,9 +8752,13 @@ jbm_rational_27_22_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_22_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7196,9 +8773,13 @@ jbm_rational_27_23_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_23_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 24, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             24,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7213,9 +8794,13 @@ jbm_rational_27_24_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_24_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 25, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             25,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7230,9 +8815,13 @@ jbm_rational_27_25_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_25_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 26, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             26,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7247,8 +8836,9 @@ jbm_rational_27_26_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_26_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[27], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[27], x, vl),
+                            vl);
 }
 
 /**
@@ -7263,9 +8853,14 @@ jbm_rational_28_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_27_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_27_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7280,9 +8875,14 @@ jbm_rational_28_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_26_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_26_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7297,9 +8897,14 @@ jbm_rational_28_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_25_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_25_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7314,9 +8919,14 @@ jbm_rational_28_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_24_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_24_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7331,9 +8941,14 @@ jbm_rational_28_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_23_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_23_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7348,9 +8963,14 @@ jbm_rational_28_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_22_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_22_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7365,9 +8985,14 @@ jbm_rational_28_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_21_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_21_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7382,9 +9007,14 @@ jbm_rational_28_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_20_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_20_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7399,9 +9029,14 @@ jbm_rational_28_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_19_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_19_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7416,9 +9051,14 @@ jbm_rational_28_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7433,9 +9073,14 @@ jbm_rational_28_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7450,9 +9095,14 @@ jbm_rational_28_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7467,9 +9117,14 @@ jbm_rational_28_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7484,9 +9139,14 @@ jbm_rational_28_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7501,9 +9161,14 @@ jbm_rational_28_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              15,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7518,9 +9183,14 @@ jbm_rational_28_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              16,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7535,9 +9205,14 @@ jbm_rational_28_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              17,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7552,9 +9227,14 @@ jbm_rational_28_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              18,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7569,9 +9249,13 @@ jbm_rational_28_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7586,9 +9270,13 @@ jbm_rational_28_19_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_19_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7603,9 +9291,13 @@ jbm_rational_28_20_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_20_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7620,9 +9312,13 @@ jbm_rational_28_21_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_21_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7637,9 +9333,13 @@ jbm_rational_28_22_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_22_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7654,9 +9354,13 @@ jbm_rational_28_23_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_23_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 24, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             24,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7671,9 +9375,13 @@ jbm_rational_28_24_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_24_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 25, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             25,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7688,9 +9396,13 @@ jbm_rational_28_25_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_25_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 26, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             26,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7705,9 +9417,13 @@ jbm_rational_28_26_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_26_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 27, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             27,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7722,8 +9438,9 @@ jbm_rational_28_27_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_27_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[28], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[28], x, vl),
+                            vl);
 }
 
 /**
@@ -7738,9 +9455,14 @@ jbm_rational_29_0_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_28_nxf32 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_28_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7755,9 +9477,14 @@ jbm_rational_29_1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_1_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_27_nxf32 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_27_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7772,9 +9499,14 @@ jbm_rational_29_2_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_2_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_26_nxf32 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_26_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7789,9 +9521,14 @@ jbm_rational_29_3_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_3_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_25_nxf32 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_25_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7806,9 +9543,14 @@ jbm_rational_29_4_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_4_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_24_nxf32 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_24_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7823,9 +9565,14 @@ jbm_rational_29_5_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_5_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_23_nxf32 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_23_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7840,9 +9587,14 @@ jbm_rational_29_6_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_6_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_22_nxf32 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_22_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7857,9 +9609,14 @@ jbm_rational_29_7_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_7_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_21_nxf32 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_21_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7874,9 +9631,14 @@ jbm_rational_29_8_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_8_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_20_nxf32 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_20_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7891,9 +9653,14 @@ jbm_rational_29_9_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_9_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_19_nxf32 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_19_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7908,9 +9675,14 @@ jbm_rational_29_10_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_10_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_18_nxf32 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_18_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7925,9 +9697,14 @@ jbm_rational_29_11_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_11_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_17_nxf32 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_17_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7942,9 +9719,14 @@ jbm_rational_29_12_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_12_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_16_nxf32 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_16_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7959,9 +9741,14 @@ jbm_rational_29_13_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_13_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_15_nxf32 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_15_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7976,9 +9763,14 @@ jbm_rational_29_14_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_14_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_14_nxf32 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_14_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              15,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -7993,9 +9785,14 @@ jbm_rational_29_15_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_15_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_13_nxf32 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_13_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              16,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8010,9 +9807,14 @@ jbm_rational_29_16_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_16_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_12_nxf32 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_12_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              17,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8027,9 +9829,14 @@ jbm_rational_29_17_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_17_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_11_nxf32 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_11_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              18,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8044,9 +9851,14 @@ jbm_rational_29_18_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_18_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_10_nxf32 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_10_nxf32 (x,
+                                                                              p
+                                                                              +
+                                                                              19,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8061,9 +9873,13 @@ jbm_rational_29_19_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_19_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_9_nxf32 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_9_nxf32 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8078,9 +9894,13 @@ jbm_rational_29_20_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_20_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_8_nxf32 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_8_nxf32 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8095,9 +9915,13 @@ jbm_rational_29_21_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_21_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_7_nxf32 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_7_nxf32 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8112,9 +9936,13 @@ jbm_rational_29_22_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_22_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_6_nxf32 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_6_nxf32 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8129,9 +9957,13 @@ jbm_rational_29_23_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_23_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_5_nxf32 (x, p + 24, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_5_nxf32 (x,
+                                                                             p +
+                                                                             24,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8146,9 +9978,13 @@ jbm_rational_29_24_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_24_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_4_nxf32 (x, p + 25, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_4_nxf32 (x,
+                                                                             p +
+                                                                             25,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8163,9 +9999,13 @@ jbm_rational_29_25_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_25_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_3_nxf32 (x, p + 26, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_3_nxf32 (x,
+                                                                             p +
+                                                                             26,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8180,9 +10020,13 @@ jbm_rational_29_26_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_26_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_2_nxf32 (x, p + 27, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_2_nxf32 (x,
+                                                                             p +
+                                                                             27,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8197,9 +10041,13 @@ jbm_rational_29_27_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_27_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,
-                                     jbm_polynomial_1_nxf32 (x, p + 28, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), x,
+                                                     jbm_polynomial_1_nxf32 (x,
+                                                                             p +
+                                                                             28,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -8214,8 +10062,9 @@ jbm_rational_29_28_nxf32 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f32m1 (jbm_polynomial_28_nxf32 (x, p, vl),
-                    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[29], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                     (1.f, vl), p[29], x, vl),
+                            vl);
 }
 
 /**
@@ -8239,7 +10088,9 @@ jbm_expm1wc_nxf32 (const vfloat32m1_t x,
   x2 = __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (a2, vl), x2, x, vl);
   x2 = __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x2, x, vl);
   return
-    __riscv_vfmul_vv_f32m1 (x, __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (a1, vl), x2, vl), vl);
+    __riscv_vfmul_vv_f32m1 (x,
+                            __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1
+                                                    (a1, vl), x2, vl), vl);
 }
 
 /**
@@ -8320,9 +10171,12 @@ jbm_expm1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< array size.
 {
   return __riscv_vfmerge_vvm_f32m1 (jbm_expm1wc_nxf32 (x, vl),
-                           __riscv_vfsub_vf_f32m1 (jbm_exp_nxf32 (x, vl), 1.f, vl),
-                           __riscv_vmflt_vf_f32m1 (jbm_abs_nxf32 (x, vl), M_LN2f / 2.f,
-                                           vl), vl);
+                                    __riscv_vfsub_vf_f32m1 (jbm_exp_nxf32
+                                                            (x, vl), 1.f, vl),
+                                    __riscv_vmflt_vf_f32m1 (jbm_abs_nxf32
+                                                            (x, vl),
+                                                            M_LN2f / 2.f, vl),
+                                    vl);
 }
 
 /**
@@ -8361,9 +10215,15 @@ jbm_log2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   vfloat32m1_t y;
   vint32m1_t e;
   y = jbm_frexp_nxf32 (x, &e, vl);
-  y = __riscv_vfadd_vv_f32m1 (jbm_log2wc_nxf32 (y, vl), __riscv_vfcvt_v_x_v_i32m1 (e, vl), vl);
-  y = __riscv_vfmerge_vfm_f32m1 (y, -INFINITY, __riscv_vmfgt_vf_f32m1_b32 (x, 0.f, vl), vl);
-  return __riscv_vfmerge_vfm_f32m1 (y, NAN, vmfge_vf_f32m1_b32 (x, 0.f, vl), vl);
+  y =
+    __riscv_vfadd_vv_f32m1 (jbm_log2wc_nxf32 (y, vl),
+                            __riscv_vfcvt_v_x_v_i32m1 (e, vl), vl);
+  y =
+    __riscv_vfmerge_vfm_f32m1 (y, -INFINITY,
+                               __riscv_vmfgt_vf_f32m1_b32 (x, 0.f, vl), vl);
+  return __riscv_vfmerge_vfm_f32m1 (y, NAN,
+                                    __riscv_vmfge_vf_f32m1_b32 (x, 0.f, vl),
+                                    vl);
 }
 
 /**
@@ -8430,7 +10290,8 @@ jbm_pow_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
   f = floorf (e);
   if (f == e)
     return jbm_pown_nxf32 (x, (int) e, vl);
-  return jbm_exp2_nxf32 (__riscv_vfmul_vf_f32m1 (jbm_log2_nxf32 (x, vl), e, vl), vl);
+  return jbm_exp2_nxf32 (__riscv_vfmul_vf_f32m1 (jbm_log2_nxf32 (x, vl), e, vl),
+                         vl);
 }
 
 /**
@@ -8447,7 +10308,8 @@ jbm_cbrt_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   f = jbm_abs_nxf32 (x, vl);
   f = jbm_pow_nxf32 (x, 1.f / 3.f, vl);
   return __riscv_vfmerge_vvm_f32m1 (f, jbm_opposite_nxf32 (f, vl),
-                           vmfltz_vf_f32m1_b32 (x, 0.f, vl), vl);
+                                    __riscv_vmfltz_vf_f32m1_b32 (x, 0.f, vl),
+                                    vl);
 }
 
 /**
@@ -8467,8 +10329,9 @@ jbm_sinwc_nxf32 (const vfloat32m1_t x,
     8.3322256622392457162205759786691734e-03f,
     -1.9524867674489682553254582414001857e-04f
   };
-  return __riscv_vfmul_vv_f32m1 (x, jbm_polynomial_3_nxf32 (jbm_sqr_nxf32 (x, vl),
-                                                    a, vl), vl);
+  return __riscv_vfmul_vv_f32m1 (x,
+                                 jbm_polynomial_3_nxf32 (jbm_sqr_nxf32 (x, vl),
+                                                         a, vl), vl);
 }
 
 /**
@@ -8499,16 +10362,18 @@ jbm_coswc_nxf32 (const vfloat32m1_t x,
 static inline void
 jbm_sincoswc_nxf32 (const vfloat32m1_t x,
                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat32m1_t * s,
+                    vfloat32m1_t *s,
                     ///< pointer to the sin function value (vfloat32m1_t).
-                    vfloat32m1_t * c,
+                    vfloat32m1_t *c,
                     ///< pointer to the cos function value (vfloat32m1_t).
                     const size_t vl)    ///< array size.
 {
   vfloat32m1_t s0;
   *s = s0 = jbm_sinwc_nxf32 (x, vl);
-  *c = __riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl),
-                                       jbm_sqr_nxf32 (s0, vl), vl), vl);
+  *c =
+    __riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vv_f32m1
+                            (__riscv_vfmv_v_f_f32m1 (1.f, vl),
+                             jbm_sqr_nxf32 (s0, vl), vl), vl);
 }
 
 /**
@@ -8527,17 +10392,29 @@ jbm_sin_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
   s = jbm_sinwc_nxf32 (__riscv_vfsub_vv_f32m1 (y, pi2, vl), vl);
   s = __riscv_vfmerge_vvm_f32m1
     (jbm_opposite_nxf32
-     (jbm_coswc_nxf32 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (3.f * M_PI_2f, vl),
-                                       y, vl), vl), vl),
-     s, __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl), vl);
-  s = __riscv_vfmerge_vvm_f32m1
-    (jbm_sinwc_nxf32 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl)),
-     s, __riscv_vmflt_vf_f32m1_b32 (y, 5.f * M_PI_4f, vl));
-  s = __riscv_vfmerge_vvm_f32m1
-    (jbm_coswc_nxf32 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl)),
-     s, __riscv_vmflt_vf_f32m1_b32 (y, 3.f * M_PI_4f, vl), vl);
+     (jbm_coswc_nxf32
+      (__riscv_vfsub_vv_f32m1
+       (__riscv_vfmv_v_f_f32m1 (3.f * M_PI_2f, vl), y, vl), vl), vl), s,
+     __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl), vl);
+  s =
+    __riscv_vfmerge_vvm_f32m1 (jbm_sinwc_nxf32
+                               (__riscv_vfsub_vv_f32m1
+                                (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl),
+                                vl), s, __riscv_vmflt_vf_f32m1_b32 (y,
+                                                                    5.f *
+                                                                    M_PI_4f,
+                                                                    vl));
+  s =
+    __riscv_vfmerge_vvm_f32m1 (jbm_coswc_nxf32
+                               (__riscv_vfsub_vv_f32m1
+                                (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl),
+                                vl), s, __riscv_vmflt_vf_f32m1_b32 (y,
+                                                                    3.f *
+                                                                    M_PI_4f,
+                                                                    vl), vl);
   return __riscv_vfmerge_vvm_f32m1 (jbm_sinwc_nxf32 (y, vl), s,
-                           __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl), vl);
+                                    __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl),
+                                    vl);
 }
 
 /**
@@ -8554,19 +10431,34 @@ jbm_cos_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
   pi2 = __riscv_vfmv_v_f_f32m1 (2.f * M_PIf, vl);
   y = jbm_rest_nxf32 (x, pi2, vl);
   c = jbm_coswc_nxf32 (__riscv_vfsub_vv_f32m1 (y, pi2, vl), vl);
-  c = __riscv_vfmerge_vvm_f32m1 (jbm_sinwc_nxf32 (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl),
-                                         vl),
-                        c, __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl), vl);
-  c = __riscv_vfmerge_vvm_f32m1
-    (jbm_opposite_nxf32
-     (jbm_coswc_nxf32 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl),
-                       vl), vl),
-     c, __riscv_vmflt_vf_f32m1_b32 (y, 5.f * M_PI_4f, vl), vl);
-  c = __riscv_vfmerge_vvm_f32m1
-    (jbm_sinwc_nxf32 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (M_PI_2f), vl), y, vl),
-     c, __riscv_vmflt_vf_f32m1_b32 (y, 3.f * M_PI_4f, vl), vl);
+  c =
+    __riscv_vfmerge_vvm_f32m1 (jbm_sinwc_nxf32
+                               (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl),
+                                vl), c, __riscv_vmflt_vf_f32m1_b32 (y,
+                                                                    7.f *
+                                                                    M_PI_4f,
+                                                                    vl), vl);
+  c =
+    __riscv_vfmerge_vvm_f32m1 (jbm_opposite_nxf32
+                               (jbm_coswc_nxf32
+                                (__riscv_vfsub_vv_f32m1
+                                 (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl),
+                                 vl), vl), c, __riscv_vmflt_vf_f32m1_b32 (y,
+                                                                          5.f *
+                                                                          M_PI_4f,
+                                                                          vl),
+                               vl);
+  c =
+    __riscv_vfmerge_vvm_f32m1 (jbm_sinwc_nxf32
+                               (__riscv_vfsub_vv_f32m1
+                                (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl),
+                                vl), c, __riscv_vmflt_vf_f32m1_b32 (y,
+                                                                    3.f *
+                                                                    M_PI_4f,
+                                                                    vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (jbm_coswc_nxf32 (y, vl), c,
-                           __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl), vl);
+                                    __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl),
+                                    vl);
 }
 
 /**
@@ -8576,9 +10468,9 @@ jbm_cos_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
 static inline void
 jbm_sincos_nxf32 (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat32m1_t * s,
+                  vfloat32m1_t *s,
                   ///< pointer to the sin function value (vfloat32m1_t).
-                  vfloat32m1_t * c,
+                  vfloat32m1_t *c,
                   ///< pointer to the cos function value (vfloat32m1_t).
                   const size_t vl)      ///< array size.
 {
@@ -8587,17 +10479,20 @@ jbm_sincos_nxf32 (const vfloat32m1_t x,
   pi2 = __riscv_vfmv_v_f_f32m1 (2.f * M_PIf, vl);
   y = jbm_rest_nxf32 (x, pi2, vl);
   jbm_sincoswc_nxf32 (__riscv_vfsub_vv_f32m1 (y, pi2, vl), &s1, &c1, vl);
-  jbm_sincoswc_nxf32 (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl), &c2, &s2, vl);
+  jbm_sincoswc_nxf32 (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl), &c2, &s2,
+                      vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl);
   s1 = __riscv_vfmerge_vvm_f32m1 (jbm_opposite_nxf32 (s2, vl), s1, m, vl);
   c1 = __riscv_vfmerge_vvm_f32m1 (c2, c1, m, vl);
-  jbm_sincoswc_nxf32 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (M_PIf), y, vl),
-                      &s2, &c2, vl);
+  jbm_sincoswc_nxf32 (__riscv_vfsub_vv_f32m1
+                      (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), &s2, &c2,
+                      vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, 5.f * M_PI_4f, vl);
   s1 = __riscv_vfmerge_vvm_f32m1 (s2, s1, m, vl);
   c1 = __riscv_vfmerge_vvm_f32m1 (jbm_opposite_nxf32 (c2, vl), c1, m, vl);
-  jbm_sincoswc_nxf32 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (M_PI_2f), y, vl),
-                      &c2, &s2, vl);
+  jbm_sincoswc_nxf32 (__riscv_vfsub_vv_f32m1
+                      (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl), &c2, &s2,
+                      vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, 3.f * M_PI_4f, vl);
   s1 = __riscv_vfmerge_vvm_f32m1 (s2, s1, m, vl);
   c1 = __riscv_vfmerge_vvm_f32m1 (c2, c1, m, vl);
@@ -8639,8 +10534,9 @@ jbm_atanwc0_nxf32 (const vfloat32m1_t x,
     8.2898705878810240458099950004542931e-01f,
     7.6658333542753920209846592962853791e-02f
   };
-  return __riscv_vfmul_vv_f32m1 (x, jbm_rational_3_1_nxf32 (jbm_sqr_nxf32 (x, vl),
-                                                    a, vl), vl);
+  return __riscv_vfmul_vv_f32m1 (x,
+                                 jbm_rational_3_1_nxf32 (jbm_sqr_nxf32 (x, vl),
+                                                         a, vl), vl);
 }
 
 /**
@@ -8682,12 +10578,17 @@ jbm_atan_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   ax = jbm_abs_nxf32 (x, vl);
   m = __riscv_vmfgt_vf_f32m1_b32 (ax, 1.5f, vl);
   ax = __riscv_vfmerge_vvm_f32m1 (jbm_reciprocal_nxf32 (ax, vl), ax, m, vl);
-  f = __riscv_vfmerge_vvm_f32m1 (jbm_atanwc1_nxf32 (ax, vl), jbm_atanwc0_nxf32 (ax, vl),
-                        __riscv_vmfgt_vf_f32m1_b32 (ax, 0.5f, vl), vl);
-  f = __riscv_vfmerge_vvm_f32m1 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), f, vl), f,
-                        m, f);
-  return __riscv_vfmerge_vvm_f32m1 (jbm_opposite_nxf32 (f), f,
-                           __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl), vl);
+  f =
+    __riscv_vfmerge_vvm_f32m1 (jbm_atanwc1_nxf32 (ax, vl),
+                               jbm_atanwc0_nxf32 (ax, vl),
+                               __riscv_vmfgt_vf_f32m1_b32 (ax, 0.5f, vl), vl);
+  f =
+    __riscv_vfmerge_vvm_f32m1 (__riscv_vfsub_vv_f32m1
+                               (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), f, vl), f,
+                               m, f);
+  return __riscv_vfmerge_vvm_f32m1 (jbm_opposite_nxf32 (f, vl), f,
+                                    __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl),
+                                    vl);
 }
 
 /**
@@ -8705,11 +10606,13 @@ jbm_atan2_nxf32 (const vfloat32m1_t y,  ///< vfloat32m1_t y component.
   vbool32_t mx, my;
   f = jbm_atan_nxf32 (__riscv_vfdiv_vv_f32m1 (y, x, vl), vl);
   mx = __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl);
-  my = vmvlt_vf_f32m1_b32 (y, 0.f, vl);
+  my = __riscv_vmflt_vf_f32m1_b32 (y, 0.f, vl);
   f = __riscv_vfmerge_vvm_f32m1 (__riscv_vfsub_vf_f32m1 (f, M_PIf, vl), f,
-                        __riscv_vmand_mm (my, mx, vl), vl);
+                                 __riscv_vmand_mm (my, mx, vl), vl);
   return __riscv_vfmerge_vvm_f32m1 (__riscv_vfadd_vf_f32m1 (f, M_PIf, vl), f,
-                           __riscv_vmand_mm (my, vmnot_m (mx, vl), vl), vl);
+                                    __riscv_vmand_mm (my,
+                                                      __riscv_vmnot_m (mx, vl),
+                                                      vl), vl);
 }
 
 /**
@@ -8725,9 +10628,11 @@ jbm_asin_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   return
     jbm_atan_nxf32
     (__riscv_vfdiv_vv_f32m1 (x,
-                     __riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl),
-                                                     jbm_sqr_nxf32 (x, vl), vl),
-                                     vl), vl), vl);
+                             __riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vv_f32m1
+                                                     (__riscv_vfmv_v_f_f32m1
+                                                      (1.f, vl),
+                                                      jbm_sqr_nxf32 (x, vl),
+                                                      vl), vl), vl), vl);
 }
 
 /**
@@ -8743,11 +10648,12 @@ jbm_acos_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   vfloat32m1_t f;
   f =
     jbm_atan_nxf32 (__riscv_vfdiv_vv_f32m1
-                    (__riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl),
-                                                     jbm_sqr_nxf32 (x, vl), vl),
-                                     x), vl), vl);
+                    (__riscv_vfsqrt_v_f32m1
+                     (__riscv_vfsub_vv_f32m1
+                      (__riscv_vfmv_v_f_f32m1 (1.f, vl), jbm_sqr_nxf32 (x, vl),
+                       vl), x, vl), vl), vl);
   return __riscv_vfmerge_vvm_f32m1 (__riscv_vfadd_vf_f32m1 (f, M_PIf, vl), f,
-                           __riscv_vmflt_vf_f32m1 (x, 0.f, vl), vl);
+                                    __riscv_vmflt_vf_f32m1 (x, 0.f, vl), vl);
 }
 
 /**
@@ -8761,8 +10667,9 @@ jbm_sinh_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t number.
 {
   vfloat32m1_t f;
   f = jbm_exp_nxf32 (x, vl);
-  return __riscv_vfmul_vf_f32m1 (__riscv_vfsub_vv_f32m1 (f, jbm_reciprocal_nxf32 (f, vl), vl),
-                         0.5f, vl);
+  return
+    __riscv_vfmul_vf_f32m1 (__riscv_vfsub_vv_f32m1
+                            (f, jbm_reciprocal_nxf32 (f, vl), vl), 0.5f, vl);
 }
 
 /**
@@ -8776,8 +10683,9 @@ jbm_cosh_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t number.
 {
   vfloat32m1_t f;
   f = jbm_exp_nxf32 (x, vl);
-  return __riscv_vfmul_vf_f32m1 (__riscv_vfadd_vv_f32m1 (f, jbm_reciprocal_nxf32 (f, vl), vl),
-                         0.5f, vl);
+  return
+    __riscv_vfmul_vf_f32m1 (__riscv_vfadd_vv_f32m1
+                            (f, jbm_reciprocal_nxf32 (f, vl), vl), 0.5f, vl);
 }
 
 /**
@@ -8792,12 +10700,17 @@ jbm_tanh_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t number.
   vfloat32m1_t f, fi;
   f = jbm_exp_nxf32 (x, vl);
   fi = jbm_reciprocal_nxf32 (f, vl);
-  f = __riscv_vfdiv_vv_f32m1 (__riscv_vfsub_vv_f32m1 (f, fi, vl), __riscv_vfadd_vv_f32m1 (f, fi, vl),
-                      vl);
-  f = __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), f,
-                        __riscv_vmfgt_vf_f32m1_b32 (x, JBM_FLT_MAX_E_EXP, vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (-1.f), f,
-                           __riscv_vmflt_vf_f32m1_b32 (x, -JBM_FLT_MAX_E_EXP, vl), vl);
+  f =
+    __riscv_vfdiv_vv_f32m1 (__riscv_vfsub_vv_f32m1 (f, fi, vl),
+                            __riscv_vfadd_vv_f32m1 (f, fi, vl), vl);
+  f =
+    __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), f,
+                               __riscv_vmfgt_vf_f32m1_b32 (x, JBM_FLT_MAX_E_EXP,
+                                                           vl), vl);
+  return __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (-1.f, vl), f,
+                                    __riscv_vmflt_vf_f32m1_b32 (x,
+                                                                -JBM_FLT_MAX_E_EXP,
+                                                                vl), vl);
 }
 
 /**
@@ -8812,8 +10725,10 @@ jbm_asinh_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t number.
   return
     jbm_log_nxf32
     (__riscv_vfadd_vv_f32m1
-     (x, __riscv_vfsqrt_v_f32m1 (__riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x, x, vl),
-                         vl), vl), vl);
+     (x,
+      __riscv_vfsqrt_v_f32m1 (__riscv_vfmacc_vv_f32m1
+                              (__riscv_vfmv_v_f_f32m1 (1.f, vl), x, x, vl), vl),
+      vl), vl);
 }
 
 /**
@@ -8827,8 +10742,10 @@ jbm_acosh_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t number.
 {
   return
     jbm_log_nxf32
-    (__riscv_vfadd_vv_f32m1 (x, __riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vf_f32m1 (jbm_sqr_nxf32 (x, vl),
-                                                        1.f, vl), vl), vl), vl);
+    (__riscv_vfadd_vv_f32m1
+     (x,
+      __riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vf_f32m1
+                              (jbm_sqr_nxf32 (x, vl), 1.f, vl), vl), vl), vl);
 }
 
 /**
@@ -8841,11 +10758,13 @@ jbm_atanh_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t number.
                  const size_t vl)       ///< array size.
 {
   vfloat32m1_t u;
-  u = __riscv_vfmv_v_f_f32m1 (1.f);
+  u = __riscv_vfmv_v_f_f32m1 (1.f, vl);
   return
-    __riscv_vfmul_vf_f32m1 (jbm_log_nxf32 (__riscv_vfdiv_vv_f32m1 (__riscv_vfadd_vv_f32m1 (u, x, vl),
-                                                   __riscv_vfsub_vv_f32m1 (u, x, vl),
-                                                   vl), 0.5f, vl), vl);
+    __riscv_vfmul_vf_f32m1 (jbm_log_nxf32
+                            (__riscv_vfdiv_vv_f32m1
+                             (__riscv_vfadd_vv_f32m1 (u, x, vl),
+                              __riscv_vfsub_vv_f32m1 (u, x, vl), vl), 0.5f, vl),
+                            vl);
 }
 
 /**
@@ -8867,8 +10786,9 @@ jbm_erfwc_nxf32 (const vfloat32m1_t x,
     7.4441296041206635020857929305718177e-02f,
     5.2260592856163505486272407800095742e-03f
   };
-  return __riscv_vfmul_vv_f32m1 (x, jbm_rational_5_2_nxf32 (jbm_sqr_nxf32 (x, vl),
-                                                    a, vl), vl);
+  return __riscv_vfmul_vv_f32m1 (x,
+                                 jbm_rational_5_2_nxf32 (jbm_sqr_nxf32 (x, vl),
+                                                         a, vl), vl);
 }
 
 /**
@@ -8894,11 +10814,13 @@ jbm_erfcwc_nxf32 (const vfloat32m1_t x,
   const float m = 1.0019834265884623367967105586324901e+01;
   vfloat32m1_t f, x2;
   x2 = jbm_sqr_nxf32 (x, vl);
-  f = __riscv_vfdiv_vv_f32m1 (jbm_rational_6_3_nxf32 (jbm_reciprocal_nxf32 (x2, vl), a,
-                                              vl),
-                      __riscv_vfmul_vv_f32m1 (x, jbm_exp_nxf32 (x2, vl), vl), vl);
+  f =
+    __riscv_vfdiv_vv_f32m1 (jbm_rational_6_3_nxf32
+                            (jbm_reciprocal_nxf32 (x2, vl), a, vl),
+                            __riscv_vfmul_vv_f32m1 (x, jbm_exp_nxf32 (x2, vl),
+                                                    vl), vl);
   return __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f), f,
-                           __riscv_vmfgt_vf_f32m1_b32 (x, m, vl), vl);
+                                    __riscv_vmfgt_vf_f32m1_b32 (x, m, vl), vl);
 
 }
 
@@ -8916,9 +10838,11 @@ jbm_erf_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
   ax = jbm_abs_nxf32 (x, vl);
   u = __riscv_vfmv_v_f_f32m1 (1.f, vl);
   f = __riscv_vfmul_vv_f32m1 (__riscv_vfdiv_vv_f32m1 (x, ax, vl),
-                      __riscv_vfsub_vv_f32m1 (u, jbm_erfcwc_nxf32 (ax, vl), vl), vl);
+                              __riscv_vfsub_vv_f32m1 (u,
+                                                      jbm_erfcwc_nxf32 (ax, vl),
+                                                      vl), vl);
   return __riscv_vfmerge_vvm_f32m1 (jbm_erfwc_nxf32 (x, vl), f,
-                           __riscv_vmflt_vv_f32m1_b32 (ax, u, vl), vl);
+                                    __riscv_vmflt_vv_f32m1_b32 (ax, u, vl), vl);
 }
 
 /**
@@ -8935,12 +10859,18 @@ jbm_erfc_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   ax = jbm_abs_nxf32 (x, vl);
   u = __riscv_vfmv_v_f_f32m1 (1.f, vl);
   f = __riscv_vfsub_vv_f32m1 (u,
-                      __riscv_vfmul_vv_f32m1 (__riscv_vfdiv_vv_f32m1 (x, ax, vl),
-                                      __riscv_vfsub_vv_f32m1 (u,
-                                                      jbm_erfcwc_nxf32 (ax, vl),
-                                                      vl), vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (__riscv_vfsub_vv_f32m1 (u, jbm_erfwc_nxf32 (x, vl), vl), f,
-                           __riscv_vmflt_vv_f32m1_b32 (ax, u, vl), vl);
+                              __riscv_vfmul_vv_f32m1 (__riscv_vfdiv_vv_f32m1
+                                                      (x, ax, vl),
+                                                      __riscv_vfsub_vv_f32m1 (u,
+                                                                              jbm_erfcwc_nxf32
+                                                                              (ax,
+                                                                               vl),
+                                                                              vl),
+                                                      vl), vl);
+  return
+    __riscv_vfmerge_vvm_f32m1 (__riscv_vfsub_vv_f32m1
+                               (u, jbm_erfwc_nxf32 (x, vl), vl), f,
+                               __riscv_vmflt_vv_f32m1_b32 (ax, u, vl), vl);
 }
 
 /**
@@ -8963,11 +10893,17 @@ jbm_solve_quadratic_reduced_nxf32 (vfloat32m1_t a,
 {
   vfloat32m1_t k1, k2;
   a = __riscv_vfmul_vf_f32m1 (a, -0.5f, vl);
-  b = __riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vv_f32m1 (jbm_sqr_nxf32 (a, vl), b, vl), vl);
+  b =
+    __riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vv_f32m1
+                            (jbm_sqr_nxf32 (a, vl), b, vl), vl);
   k1 = __riscv_vfadd_vv_f32m1 (a, b, vl);
   k2 = __riscv_vfsub_vv_f32m1 (a, b, vl);
-  k1 = __riscv_vfmerge_vvm_f32m1 (k2, k1, __riscv_vmflt_vv_f32m1_b32 (k1, x1, vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (k2, k1, __riscv_vmfgt_vv_f32m1_b32 (k1, x2, vl), vl);
+  k1 =
+    __riscv_vfmerge_vvm_f32m1 (k2, k1, __riscv_vmflt_vv_f32m1_b32 (k1, x1, vl),
+                               vl);
+  return __riscv_vfmerge_vvm_f32m1 (k2, k1,
+                                    __riscv_vmfgt_vv_f32m1_b32 (k1, x2, vl),
+                                    vl);
 }
 
 /**
@@ -9021,40 +10957,69 @@ jbm_solve_cubic_reduced_nxf32 (const vfloat32m1_t a,
   vfloat32m1_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2;
   a3 = __riscv_vfmul_vf_f32m1 (a, 1.f / 3.f, vl);
   k0 = jbm_sqr_nxf32 (a3, vl);
-  k1 = __riscv_vfsub_vv_f32m1 (k0, __riscv_vfmul_vf_f32m1 (b, 1.f / 3.f, vl), vl);
-  k0 = __riscv_vfsub_vv_f32n1
-    (__riscv_vfmul_vv_f32m1 (a3, k0, vl),
-     __riscv_vfmul_vf_f32m1 (__riscv_vfsub_vv_f32m1 (b,
-                                     __riscv_vfmul_vv_f32m1 (a3, c, vl), 0.5f, vl),
-                     vl), vl);
+  k1 =
+    __riscv_vfsub_vv_f32m1 (k0, __riscv_vfmul_vf_f32m1 (b, 1.f / 3.f, vl), vl);
+  k0 =
+    __riscv_vfsub_vv_f32n1 (__riscv_vfmul_vv_f32m1 (a3, k0, vl),
+                            __riscv_vfmul_vf_f32m1 (__riscv_vfsub_vv_f32m1
+                                                    (b,
+                                                     __riscv_vfmul_vv_f32m1 (a3,
+                                                                             c,
+                                                                             vl),
+                                                     0.5f, vl), vl), vl);
   k3 = __riscv_vfmul_vv_f32m1 (k1, jbm_sqr_nxf32 (k1, vl), vl);
   k2 = __riscv_vfmacc_vv_f32m1 (k3, k0, k0, vl);
   l1 = __riscv_vfsqrt_v_f32m1 (jbm_opposite_nxf32 (k1, vl), vl);
-  l0 = __riscv_vfmul_vf_f32m1 (jbm_acos_nxf32 (__riscv_vfdiv_vv_f32m1 (k0, k3, vl), vl),
-                       1.f / 3.f, vl);
-  l1 = jbm_dbl_nxf32 (l1);
-  l2 = __riscv_vfsub_vv_f32m1 (a3, __riscv_vfmul_vv_f32m1 (l1, jbm_cos_nxf32 (k0, vl), vl), vl);
-  l3 = __riscv_vfsub_vv_f32m1
-    (a3, __riscv_vfmul_vv_f32m1
-     (l1, jbm_cos_nxf32 (__riscv_vfadd_vf_f32m1 (l0, 2.f * M_PIf / 3.f, vl), vl),
-      vl), vl);
-  l3 = __riscv_vfmerge_vvm_f32m1 (l2, l3,
-                         __riscv_vmor_mm (__riscv_vmflt_vv_f32m1_b32 (l2, x1, vl),
-                                  __riscv_vmfgt_vv_f32m1_b32 (l2, x2, vl), vl), vl);
-  l4 = __riscv_vfsub_vv_f32m1
-    (a, __riscv_vfmul_vv_f32m1
-     (l1, jbm_cos_nxf32 (__riscv_vfsub_vf_f32m1 (l0, 2.f * M_PIf / 3.f, vl), vl),
-      vl), vl);
-  l4 = __riscv_vfmerge_vvm_f32m1 (l3, l4,
-                         __riscv_vmor_mm (__riscv_vmflt_vv_f32m1_b32 (l3, x1, vl),
-                                  __riscv_vmfgt_vv_f32m1_b32 (l3, x2, vl), vl), vl);
+  l0 =
+    __riscv_vfmul_vf_f32m1 (jbm_acos_nxf32
+                            (__riscv_vfdiv_vv_f32m1 (k0, k3, vl), vl),
+                            1.f / 3.f, vl);
+  l1 = jbm_dbl_nxf32 (l1, vl);
+  l2 =
+    __riscv_vfsub_vv_f32m1 (a3,
+                            __riscv_vfmul_vv_f32m1 (l1, jbm_cos_nxf32 (k0, vl),
+                                                    vl), vl);
+  l3 =
+    __riscv_vfsub_vv_f32m1 (a3,
+                            __riscv_vfmul_vv_f32m1 (l1,
+                                                    jbm_cos_nxf32
+                                                    (__riscv_vfadd_vf_f32m1
+                                                     (l0, 2.f * M_PIf / 3.f,
+                                                      vl), vl), vl), vl);
+  l3 =
+    __riscv_vfmerge_vvm_f32m1 (l2, l3,
+                               __riscv_vmor_mm (__riscv_vmflt_vv_f32m1_b32
+                                                (l2, x1, vl),
+                                                __riscv_vmfgt_vv_f32m1_b32 (l2,
+                                                                            x2,
+                                                                            vl),
+                                                vl), vl);
+  l4 =
+    __riscv_vfsub_vv_f32m1 (a,
+                            __riscv_vfmul_vv_f32m1 (l1,
+                                                    jbm_cos_nxf32
+                                                    (__riscv_vfsub_vf_f32m1
+                                                     (l0, 2.f * M_PIf / 3.f,
+                                                      vl), vl), vl), vl);
+  l4 =
+    __riscv_vfmerge_vvm_f32m1 (l3, l4,
+                               __riscv_vmor_mm (__riscv_vmflt_vv_f32m1_b32
+                                                (l3, x1, vl),
+                                                __riscv_vmfgt_vv_f32m1_b32 (l3,
+                                                                            x2,
+                                                                            vl),
+                                                vl), vl);
   k1 = __riscv_vfsqrt_v_f32m1 (k2, vl);
   l5 = __riscv_vfadd_vv_f32m1 (k0, k1, vl);
   l5 = jbm_cbrt_nxf32 (k2, vl);
   k0 = __riscv_vfsub_vv_f32m1 (k0, k1, vl);
-  l5 = __riscv_vfadd_vv_f32m1 (l5, __riscv_vfsub_vv_f32m1 (jbm_cbrt_nxf32 (k0, vl), a3, vl),
-                       vl);
-  return __riscv_vfmerge_vvm_f32m1 (l5, l4, __riscv_vmflt_vf_f32m1_b32 (k2, 0.f, vl), vl);
+  l5 =
+    __riscv_vfadd_vv_f32m1 (l5,
+                            __riscv_vfsub_vv_f32m1 (jbm_cbrt_nxf32 (k0, vl), a3,
+                                                    vl), vl);
+  return __riscv_vfmerge_vvm_f32m1 (l5, l4,
+                                    __riscv_vmflt_vf_f32m1_b32 (k2, 0.f, vl),
+                                    vl);
 }
 
 /**
@@ -9084,8 +11049,8 @@ jbm_solve_cubic_nxf32 (vfloat32m1_t a,
     (jbm_solve_quadratic_nxf32 (b, c, d, x1, x2, vl),
      jbm_solve_cubic_reduced_nxf32 (__riscv_vfdiv_vv_f32m1 (b, a, vl),
                                     __riscv_vfdiv_vv_f32m1 (c, a, vl),
-                                    __riscv_vfdiv_vv_f32m1 (d, a, vl), x1, x2, vl),
-     jbm_small_nxf32 (a, vl), vl);
+                                    __riscv_vfdiv_vv_f32m1 (d, a, vl), x1, x2,
+                                    vl), jbm_small_nxf32 (a, vl), vl);
 
 }
 
@@ -9135,8 +11100,8 @@ jbm_flux_limiter_centred_nxf32 (const vfloat32m1_t d1,
                                 const size_t vl)        ///< array size.
 {
   return __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f, vl),
-                           __riscv_vfdiv_vv_f32m1 (d1, d2, vl),
-                           jbm_small_nxf32 (d2, vl), vl);
+                                    __riscv_vfdiv_vv_f32m1 (d1, d2, vl),
+                                    jbm_small_nxf32 (d2, vl), vl);
 }
 
 /**
@@ -9156,11 +11121,14 @@ jbm_flux_limiter_superbee_nxf32 (const vfloat32m1_t d1,
 {
   vfloat32m1_t r;
   r = __riscv_vfdiv_vv_f32m1 (d1, d2, vl);
-  r = __riscv_vfmax_vv_f32m1 (__riscv_vfmin_vf_f32m1 (jbm_dbl_nxf32 (r), 1.f, vl),
-                      __riscv_vfmin_vf_f32m1 (r, 2.f, vl), vl);
+  r =
+    __riscv_vfmax_vv_f32m1 (__riscv_vfmin_vf_f32m1
+                            (jbm_dbl_nxf32 (r, vl), 1.f, vl),
+                            __riscv_vfmin_vf_f32m1 (r, 2.f, vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                           __riscv_vmfgt_vf_f32m1 (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
-                                           FLT_EPSILON, vl), vl);
+                                    __riscv_vmfgt_vf_f32m1
+                                    (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
+                                     FLT_EPSILON, vl), vl);
 }
 
 /**
@@ -9180,8 +11148,9 @@ jbm_flux_limiter_minmod_nxf32 (const vfloat32m1_t d1,
   vfloat32m1_t r;
   r = __riscv_vfmin_vf_f32m1 (__riscv_vfdiv_vv_f32m1 (d1, d2, vl), 1.f, vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                           __riscv_vmfgt_vf_f32m1 (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
-                                           FLT_EPSILON, vl), vl);
+                                    __riscv_vmfgt_vf_f32m1
+                                    (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
+                                     FLT_EPSILON, vl), vl);
 }
 
 /**
@@ -9202,11 +11171,13 @@ jbm_flux_limiter_VanLeer_nxf32 (const vfloat32m1_t d1,
   vfloat32m1_t r, k;
   r = __riscv_vfdiv_vv_f32m1 (d1, d2, vl);
   k = jbm_abs_nxf32 (r, vl);
-  r = __riscv_vfdiv_vv_f32m1 (__riscv_vfadd_vv_f32m1 (r, k, vl), __riscv_vfadd_vf_f32m1 (k, 1.f, vl),
-                      vl);
+  r =
+    __riscv_vfdiv_vv_f32m1 (__riscv_vfadd_vv_f32m1 (r, k, vl),
+                            __riscv_vfadd_vf_f32m1 (k, 1.f, vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                           __riscv_vmfgt_vf_f32m1 (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
-                                           FLT_EPSILON, vl), vl);
+                                    __riscv_vmfgt_vf_f32m1
+                                    (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
+                                     FLT_EPSILON, vl), vl);
 }
 
 /**
@@ -9226,11 +11197,13 @@ jbm_flux_limiter_VanAlbada_nxf32 (const vfloat32m1_t d1,
   vfloat32m1_t r, k;
   r = __riscv_vfdiv_vv_f32m1 (d1, d2, vl);
   k = jbm_sqr_nxf32 (r, vl);
-  r = __riscv_vfdiv_vv_f32m1 (__riscv_vfadd_vv_f32m1 (r, k, vl), __riscv_vfadd_vf_f32m1 (k, 1.f, vl),
-                      vl);
+  r =
+    __riscv_vfdiv_vv_f32m1 (__riscv_vfadd_vv_f32m1 (r, k, vl),
+                            __riscv_vfadd_vf_f32m1 (k, 1.f, vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                           __riscv_vmfgt_vf_f32m1 (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
-                                           FLT_EPSILON, vl), vl);
+                                    __riscv_vmfgt_vf_f32m1
+                                    (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
+                                     FLT_EPSILON, vl), vl);
 }
 
 /**
@@ -9248,10 +11221,13 @@ jbm_flux_limiter_minsuper_nxf32 (const vfloat32m1_t d1,
                                  const size_t vl)       ///< array size.
 {
   vfloat32m1_t r;
-  r = __riscv_vfmin_vv_f32m1 (__riscv_vfdiv_vv_f32m1 (d1, d2), __riscv_vfmv_v_f_f32m1 (2.f));
+  r =
+    __riscv_vfmin_vv_f32m1 (__riscv_vfdiv_vv_f32m1 (d1, d2, vl),
+                            __riscv_vfmv_v_f_f32m1 (2.f, vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                           __riscv_vmfgt_vf_f32m1 (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
-                                           FLT_EPSILON, vl), vl);
+                                    __riscv_vmfgt_vf_f32m1
+                                    (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
+                                     FLT_EPSILON, vl), vl);
 }
 
 /**
@@ -9272,8 +11248,9 @@ jbm_flux_limiter_supermin_nxf32 (const vfloat32m1_t d1,
   r = __riscv_vfdiv_vv_f32m1 (d1, d2, vl);
   r = __riscv_vfmin_vf_f32m1 (jbm_dbl_nxf32 (r, vl), 1.f, vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                           __riscv_vmfgt_vf_f32m1 (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
-                                           FLT_EPSILON, vl), vl);
+                                    __riscv_vmfgt_vf_f32m1
+                                    (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
+                                     FLT_EPSILON, vl), vl);
 }
 
 /**
@@ -9294,12 +11271,16 @@ jbm_flux_limiter_monotonized_central_nxf32 (const vfloat32m1_t d1,
   vfloat32m1_t r, rm;
   r = __riscv_vfdiv_vv_f32m1 (d1, d2, vl);
   rm = __riscv_vfmul_vf_f32m1 (__riscv_vfadd_vf_f32m1 (r, 1.f, vl), 0.5f, vl);
-  rm = __riscv_vfmerge_vfm_f32m1 (rm, 2.f, __riscv_vmflt_vf_f32m1_b32 (r, 3.f, vl), vl);
-  rm = __riscv_vfmerge_vfm_f32m1 (jbm_dbl_nxf32 (r, vl), rm,
-                         __riscv_vmfgt_vf_f32m1 (r, 1.f / 3.f, vl), vl);
+  rm =
+    __riscv_vfmerge_vfm_f32m1 (rm, 2.f, __riscv_vmflt_vf_f32m1_b32 (r, 3.f, vl),
+                               vl);
+  rm =
+    __riscv_vfmerge_vfm_f32m1 (jbm_dbl_nxf32 (r, vl), rm,
+                               __riscv_vmfgt_vf_f32m1 (r, 1.f / 3.f, vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (rm, 0.f,
-                           __riscv_vmfgt_vf_f32m1 (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
-                                           FLT_EPSILON, vl), vl);
+                                    __riscv_vmfgt_vf_f32m1
+                                    (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
+                                     FLT_EPSILON, vl), vl);
 }
 
 /**
@@ -9317,11 +11298,14 @@ jbm_flux_limiter_mean_nxf32 (const vfloat32m1_t d1,
                              const size_t vl)   ///< array size.
 {
   vfloat32m1_t r;
-  r = __riscv_vfmul_vf_f32m1 (__riscv_vfadd_vf_f32m1 (__riscv_vfdiv_vv_f32m1 (d1, d2, vl), 1.f, vl),
-                      0.5f, vl);
+  r =
+    __riscv_vfmul_vf_f32m1 (__riscv_vfadd_vf_f32m1
+                            (__riscv_vfdiv_vv_f32m1 (d1, d2, vl), 1.f, vl),
+                            0.5f, vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                           __riscv_vmfgt_vf_f32m1 (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
-                                           FLT_EPSILON, vl), vl);
+                                    __riscv_vmfgt_vf_f32m1
+                                    (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
+                                     FLT_EPSILON, vl), vl);
 }
 
 /**
@@ -9420,7 +11404,9 @@ jbm_integral_nxf32 (vfloat32m1_t (*f) (const vfloat32m1_t, const size_t),
       k2 = __riscv_vfmul_vf_f32m1 (dx, b[i], vl);
       f1 = f (__riscv_vfsub_vv_f32m1 (x, k2, vl), vl);
       f2 = f (__riscv_vfadd_vv_f32m1 (x, k2, vl), vl);
-      k = __riscv_vfmacc_vf_f32m1 (k, a[i], __riscv_vfadd_vv_f32m1 (f1, f2, vl), vl);
+      k =
+        __riscv_vfmacc_vf_f32m1 (k, a[i], __riscv_vfadd_vv_f32m1 (f1, f2, vl),
+                                 vl);
     }
 #endif
   k = __riscv_vfmul_vv_f32m1 (k, dx, vl);
@@ -9474,7 +11460,9 @@ jbm_hypot_nxf64 (const vfloat64m1_t x,  ///< 1st vfloat64m1_t vector.
                  const vfloat64m1_t y,  ///< 2nd vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  return __riscv_vfsqrt_v_f64m1 (__riscv_vfmacc_vv_f64m1 (jbm_sqr_nxf64 (x, vl), y, y, vl), vl);
+  return
+    __riscv_vfsqrt_v_f64m1 (__riscv_vfmacc_vv_f64m1
+                            (jbm_sqr_nxf64 (x, vl), y, y, vl), vl);
 }
 
 /**
@@ -9486,12 +11474,7 @@ static inline vint64m1_t
 jbm_floor_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  vint64m1_t i, i1;
-  vbool64_t m;
-  i = __riscv_vfcvt_rtz_x_f64m1 (x, vl);
-  i1 = __riscv_vadd_vx_i64m1 (i, -1);
-  m = __riscv_vmflt_vf_f64m1_b64 (x, 0., vl);
-  return __riscv_vfmerge_vvm_i64m1 (i1, i, m, vl);
+  return __riscv_vfcvt_x_f_v_i64m1 (x, vl);
 }
 
 /**
@@ -9505,9 +11488,11 @@ jbm_rest_nxf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
                 const size_t vl)        ///< vector size.
 {
   return
-    __riscv_vfsub_vv_f64m1 (x,
-                    __riscv_vfmul_vv_f64m1 (jbm_floor_nxf64 (__riscv_vfdiv_vv_f64m1 (x, d, vl),
-                                                     vl), d, vl), vl);
+    __riscv_vfmsac_vv_f64m1 (x,
+                             __riscv_vfcvt_f_x_v_f64m1 (jbm_floor_nxf64
+                                                        (__riscv_vfdiv_vv_f64m1
+                                                         (x, d, vl), vl), vl),
+                             d, vl);
 }
 
 /**
@@ -9517,7 +11502,7 @@ jbm_rest_nxf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
  */
 static inline vfloat64m1_t
 jbm_frexp_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                 vint64m1_t * e,        ///< pointer to the extracted exponents vector.
+                 vint64m1_t *e, ///< pointer to the extracted exponents vector.
                  const size_t vl)       ///< vector size.
 {
   JBMNxF64 a, y, y2, z;
@@ -9534,17 +11519,26 @@ jbm_frexp_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
   y2.i = __riscv_vfmv_v_x_u64m1 (0x0010000000000000L, vl);
   z.x = __riscv_vfdiv_vv_f64m1 (x, y2.x, vl);
   z.i = __riscv_vand_vx_u64m1 (z.i, 0x7ff0000000000000L, vl);
-  en = __riscv_vmerge_vvm_i64m1 (__riscv_vsub_vx_i64m1 (__riscv_vshra_vi_i64m1 ((vint64m1_t) z.i, 52,
-                                                        vl), 2044L, vl),
-                         __riscv_vsub_vx_i64m1 (__riscv_vshra_vi_i64m1 ((vint64m1_t) y.i, 52,
-                                                        vl), 1022L, vl), m2,
-                         vl);
-  y.x = __riscv_vfmerge_vvm_f64m1 (__riscv_vfmul_vv_f64m1 (y2.x, z.x, vl), y.x, m2, vl);
-  en = __riscv_vmerge_vvm_i64m1 (__riscv_vmv_v_x_i64m1 (0L, vl), en,
-                         __riscv_vmor_mm (m1, __riscv_vmand_mm (m2, m3, vl), vl), vl);
+  en =
+    __riscv_vmerge_vvm_i64m1 (__riscv_vsub_vx_i64m1
+                              (__riscv_vshra_vi_i64m1
+                               ((vint64m1_t) z.i, 52, vl), 2044L, vl),
+                              __riscv_vsub_vx_i64m1 (__riscv_vshra_vi_i64m1
+                                                     ((vint64m1_t) y.i, 52, vl),
+                                                     1022L, vl), m2, vl);
+  y.x =
+    __riscv_vfmerge_vvm_f64m1 (__riscv_vfmul_vv_f64m1 (y2.x, z.x, vl), y.x, m2,
+                               vl);
+  en =
+    __riscv_vmerge_vvm_i64m1 (__riscv_vmv_v_x_i64m1 (0L, vl), en,
+                              __riscv_vmor_mm (m1,
+                                               __riscv_vmand_mm (m2, m3, vl),
+                                               vl), vl);
   *e = en;
-  return __riscv_vfmerge_vvm_f64m1 (x, __riscv_vfmul_vf_f64m1 (__riscv_vfdiv_vv_f64m1 (x, y.x, vl), 0.5,
-                                              vl), m1, vl);
+  return __riscv_vfmerge_vvm_f64m1 (x,
+                                    __riscv_vfmul_vf_f64m1
+                                    (__riscv_vfdiv_vv_f64m1 (x, y.x, vl), 0.5,
+                                     vl), m1, vl);
 }
 
 /**
@@ -9559,14 +11553,18 @@ jbm_exp2n_nxf64 (vint64m1_t e,  ///< exponent vector (vint64m1_t).
 {
   vfloat64m1_t x;
   x = __riscv_vfmerge_vvm_f64m1
-    ((vfloat64m1_t) __riscv_vshla_vi_i64m1 (__riscv_vadd_vx_i64m1 (e, 1023L, vl), 52, vl),
-     (vfloat64m1_t) __riscv_vshra_vv_i64m1 (__riscv_vmv_v_x_i64m1 (0x0008000000000000L, vl),
-                                    __riscv_vsub_vx_i64m1 (e, -1023L, vl)),
+    ((vfloat64m1_t)
+     __riscv_vshla_vi_i64m1 (__riscv_vadd_vx_i64m1 (e, 1023L, vl), 52, vl),
+     (vfloat64m1_t)
+     __riscv_vshra_vv_i64m1 (__riscv_vmv_v_x_i64m1 (0x0008000000000000L, vl),
+                             __riscv_vsub_vx_i64m1 (e, -1023L, vl)),
      __riscv_vmgt_vx_i64m1_b64 (e, -1023L, vl));
-  x = __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl), x,
-                        __riscv_vmlt_vx_i64m1_b64 (e, -1074L, vl), vl);
+  x =
+    __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl), x,
+                               __riscv_vmlt_vx_i64m1_b64 (e, -1074L, vl), vl);
   return __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (INFINITY, vl), x,
-                           __riscv_vmgt_vx_i64m1_b64 (e, 1023L, vl), vl);
+                                    __riscv_vmgt_vx_i64m1_b64 (e, 1023L, vl),
+                                    vl);
 }
 
 /**
@@ -9612,19 +11610,23 @@ jbm_modmin_nxf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
 {
   vfloat64m1_t aa, ab, y;
   ab = __riscv_vfmul_vv_f64m1 (a, b, vl);
-  y = __riscv_vfmerge_vfm_f64m1 (a, 0., __riscv_vmfgt_vf_f64m1_b64 (ab, 0., vl)), vl;
+  y =
+    __riscv_vfmerge_vfm_f64m1 (a, 0., __riscv_vmfgt_vf_f64m1_b64 (ab, 0., vl)),
+    vl;
   aa = jbm_abs_nxf64 (y, vl);
   ab = jbm_abs_nxf64 (b, vl);
-  return __riscv_vfmerge_vvm_f64m1 (b, y, __riscv_vmfgt_vv_f64m1_b64 (aa, ab, vl), vl);
+  return __riscv_vfmerge_vvm_f64m1 (b, y,
+                                    __riscv_vmfgt_vv_f64m1_b64 (aa, ab, vl),
+                                    vl);
 }
 
 /**
  * Function to interchange 2 vfloat64m1_t numbers.
  */
 static inline void
-jbm_change_nxf64 (vfloat64m1_t * restrict a,
+jbm_change_nxf64 (vfloat64m1_t *restrict a,
                   ///< 1st vfloat64m1_t vector pointer.
-                  vfloat64m1_t * restrict b)
+                  vfloat64m1_t *restrict b)
                   ///< 2nd vfloat64m1_t vector pointer.
 {
   vfloat64m1_t c;
@@ -9677,8 +11679,11 @@ jbm_extrapolate_nxf64 (const vfloat64m1_t x,
   vfloat64m1_t d;
   d = __riscv_vfsub_vv_f64m1 (x, x1, vl);
   return __riscv_vfmacc_vv_f64m1 (y1, d,
-                          __riscv_vfdiv_vv_f64m1 (__riscv_vfsub_vv_f64m1 (y2, y1, vl),
-                                          __riscv_vfsub_vv_f64m1 (x2, x1, vl), vl), vl);
+                                  __riscv_vfdiv_vv_f64m1 (__riscv_vfsub_vv_f64m1
+                                                          (y2, y1, vl),
+                                                          __riscv_vfsub_vv_f64m1
+                                                          (x2, x1, vl), vl),
+                                  vl);
 }
 
 /**
@@ -9702,8 +11707,11 @@ jbm_interpolate_nxf64 (const vfloat64m1_t x,
 {
   vfloat64m1_t k;
   k = jbm_extrapolate_nxf64 (x, x1, x2, y1, y2, vl);
-  k = __riscv_vfmerge_vvm_f64m1 (k, y1, __riscv_vmfgt_vv_f64m1_b32 (x, x1, vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (k, y2, __riscv_vmflt_vv_f64m1_b32 (x, x2, vl), vl);
+  k =
+    __riscv_vfmerge_vvm_f64m1 (k, y1, __riscv_vmfgt_vv_f64m1_b32 (x, x1, vl),
+                               vl);
+  return __riscv_vfmerge_vvm_f64m1 (k, y2,
+                                    __riscv_vmflt_vv_f64m1_b32 (x, x2, vl), vl);
 }
 
 /**
@@ -9788,7 +11796,7 @@ jbm_polynomial_2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_1_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_1_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9802,7 +11810,7 @@ jbm_polynomial_3_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_2_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_2_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9816,7 +11824,7 @@ jbm_polynomial_4_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_3_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_3_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9830,7 +11838,7 @@ jbm_polynomial_5_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_4_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_4_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9844,7 +11852,7 @@ jbm_polynomial_6_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_5_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_5_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9858,7 +11866,7 @@ jbm_polynomial_7_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_6_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_6_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9872,7 +11880,7 @@ jbm_polynomial_8_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_7_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_7_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9886,7 +11894,7 @@ jbm_polynomial_9_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_8_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_8_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9900,7 +11908,7 @@ jbm_polynomial_10_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_9_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_9_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9914,7 +11922,7 @@ jbm_polynomial_11_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_10_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_10_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9928,7 +11936,7 @@ jbm_polynomial_12_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_11_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_11_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9942,7 +11950,7 @@ jbm_polynomial_13_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_12_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_12_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9956,7 +11964,7 @@ jbm_polynomial_14_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_13_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_13_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9970,7 +11978,7 @@ jbm_polynomial_15_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_14_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_14_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9984,7 +11992,7 @@ jbm_polynomial_16_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_15_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_15_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -9998,7 +12006,7 @@ jbm_polynomial_17_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_16_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_16_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10012,7 +12020,7 @@ jbm_polynomial_18_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_17_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_17_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10026,7 +12034,7 @@ jbm_polynomial_19_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_18_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_18_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10040,7 +12048,7 @@ jbm_polynomial_20_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_19_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_19_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10054,7 +12062,7 @@ jbm_polynomial_21_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_20_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_20_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10068,7 +12076,7 @@ jbm_polynomial_22_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_21_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_21_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10082,7 +12090,7 @@ jbm_polynomial_23_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_22_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_22_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10096,7 +12104,7 @@ jbm_polynomial_24_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_23_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_23_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10110,7 +12118,7 @@ jbm_polynomial_25_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_24_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_24_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10124,7 +12132,7 @@ jbm_polynomial_26_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_25_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_25_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10138,7 +12146,7 @@ jbm_polynomial_27_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_26_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_26_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10152,7 +12160,7 @@ jbm_polynomial_28_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_27_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_27_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10166,7 +12174,7 @@ jbm_polynomial_29_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                          const size_t vl)       ///< array size.
 {
   return __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,
-                          jbm_polynomial_28_nxf64 (x, p + 1, vl), vl);
+                                  jbm_polynomial_28_nxf64 (x, p + 1, vl), vl);
 }
 
 /**
@@ -10180,7 +12188,8 @@ jbm_rational_1_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                         __riscv_vfmacc_vf_f64 (__riscv_vfmv_v_f_f64m1 (1., vl), p[1], x, vl));
+                                 __riscv_vfmacc_vf_f64 (__riscv_vfmv_v_f_f64m1
+                                                        (1., vl), p[1], x, vl));
 }
 
 /**
@@ -10195,9 +12204,13 @@ jbm_rational_2_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10212,7 +12225,9 @@ jbm_rational_2_1_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[2], x, vl), vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[2], x, vl),
+                            vl);
 }
 
 /**
@@ -10227,9 +12242,13 @@ jbm_rational_3_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10244,9 +12263,13 @@ jbm_rational_3_1_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10261,7 +12284,9 @@ jbm_rational_3_2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[3], x, vl), vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[3], x, vl),
+                            vl);
 }
 
 /**
@@ -10276,9 +12301,13 @@ jbm_rational_4_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10293,9 +12322,13 @@ jbm_rational_4_1_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10310,9 +12343,13 @@ jbm_rational_4_2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10327,7 +12364,9 @@ jbm_rational_4_3_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[4], x, vl), vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[4], x, vl),
+                            vl);
 }
 
 /**
@@ -10342,9 +12381,13 @@ jbm_rational_5_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10359,9 +12402,13 @@ jbm_rational_5_1_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10376,9 +12423,13 @@ jbm_rational_5_2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10393,9 +12444,13 @@ jbm_rational_5_3_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10410,7 +12465,9 @@ jbm_rational_5_4_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[5], x, vl), vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[5], x, vl),
+                            vl);
 }
 
 /**
@@ -10425,9 +12482,13 @@ jbm_rational_6_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10442,9 +12503,13 @@ jbm_rational_6_1_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10459,9 +12524,13 @@ jbm_rational_6_2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10476,9 +12545,13 @@ jbm_rational_6_3_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10493,9 +12566,13 @@ jbm_rational_6_4_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10510,7 +12587,9 @@ jbm_rational_6_5_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[6], x, vl), vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[6], x, vl),
+                            vl);
 }
 
 /**
@@ -10525,9 +12604,13 @@ jbm_rational_7_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10542,9 +12625,13 @@ jbm_rational_7_1_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10559,9 +12646,13 @@ jbm_rational_7_2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10576,9 +12667,13 @@ jbm_rational_7_3_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10593,9 +12688,13 @@ jbm_rational_7_4_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10610,9 +12709,13 @@ jbm_rational_7_5_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10627,7 +12730,9 @@ jbm_rational_7_6_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[7], x, vl), vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[7], x, vl),
+                            vl);
 }
 
 /**
@@ -10642,9 +12747,13 @@ jbm_rational_8_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10659,9 +12768,13 @@ jbm_rational_8_1_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10676,9 +12789,13 @@ jbm_rational_8_2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10693,9 +12810,13 @@ jbm_rational_8_3_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10710,9 +12831,13 @@ jbm_rational_8_4_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10727,9 +12852,13 @@ jbm_rational_8_5_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10744,9 +12873,13 @@ jbm_rational_8_6_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10761,7 +12894,9 @@ jbm_rational_8_7_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[8], x, vl), vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[8], x, vl),
+                            vl);
 }
 
 /**
@@ -10776,9 +12911,13 @@ jbm_rational_9_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10793,9 +12932,13 @@ jbm_rational_9_1_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10810,9 +12953,13 @@ jbm_rational_9_2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10827,9 +12974,13 @@ jbm_rational_9_3_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10844,9 +12995,13 @@ jbm_rational_9_4_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10861,9 +13016,13 @@ jbm_rational_9_5_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10878,9 +13037,13 @@ jbm_rational_9_6_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10895,9 +13058,13 @@ jbm_rational_9_7_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10912,7 +13079,9 @@ jbm_rational_9_8_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[9], x, vl), vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[9], x, vl),
+                            vl);
 }
 
 /**
@@ -10927,9 +13096,13 @@ jbm_rational_10_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             1,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10944,9 +13117,13 @@ jbm_rational_10_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10961,9 +13138,13 @@ jbm_rational_10_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10978,9 +13159,13 @@ jbm_rational_10_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -10995,9 +13180,13 @@ jbm_rational_10_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11012,9 +13201,13 @@ jbm_rational_10_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11029,9 +13222,13 @@ jbm_rational_10_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11046,9 +13243,13 @@ jbm_rational_10_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11063,9 +13264,13 @@ jbm_rational_10_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11080,8 +13285,9 @@ jbm_rational_10_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[10], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[10], x, vl),
+                            vl);
 }
 
 /**
@@ -11096,9 +13302,14 @@ jbm_rational_11_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11113,9 +13324,13 @@ jbm_rational_11_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             2,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11130,9 +13345,13 @@ jbm_rational_11_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11147,9 +13366,13 @@ jbm_rational_11_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11164,9 +13387,13 @@ jbm_rational_11_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11181,9 +13408,13 @@ jbm_rational_11_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11198,9 +13429,13 @@ jbm_rational_11_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11215,9 +13450,13 @@ jbm_rational_11_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11232,9 +13471,13 @@ jbm_rational_11_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11249,9 +13492,13 @@ jbm_rational_11_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11266,8 +13513,9 @@ jbm_rational_11_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[11], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[11], x, vl),
+                            vl);
 }
 
 /**
@@ -11282,9 +13530,14 @@ jbm_rational_12_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11299,9 +13552,14 @@ jbm_rational_12_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11316,9 +13574,13 @@ jbm_rational_12_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             3,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11333,9 +13595,13 @@ jbm_rational_12_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11350,9 +13616,13 @@ jbm_rational_12_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11367,9 +13637,13 @@ jbm_rational_12_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11384,9 +13658,13 @@ jbm_rational_12_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11401,9 +13679,13 @@ jbm_rational_12_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11418,9 +13700,13 @@ jbm_rational_12_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11435,9 +13721,13 @@ jbm_rational_12_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11452,9 +13742,13 @@ jbm_rational_12_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11469,8 +13763,9 @@ jbm_rational_12_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[12], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[12], x, vl),
+                            vl);
 }
 
 /**
@@ -11485,9 +13780,14 @@ jbm_rational_13_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11502,9 +13802,14 @@ jbm_rational_13_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11519,9 +13824,14 @@ jbm_rational_13_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11536,9 +13846,13 @@ jbm_rational_13_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             4,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11553,9 +13867,13 @@ jbm_rational_13_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11570,9 +13888,13 @@ jbm_rational_13_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11587,9 +13909,13 @@ jbm_rational_13_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11604,9 +13930,13 @@ jbm_rational_13_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11621,9 +13951,13 @@ jbm_rational_13_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11638,9 +13972,13 @@ jbm_rational_13_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11655,9 +13993,13 @@ jbm_rational_13_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11672,9 +14014,13 @@ jbm_rational_13_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11689,8 +14035,9 @@ jbm_rational_13_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[13], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[13], x, vl),
+                            vl);
 }
 
 /**
@@ -11705,9 +14052,14 @@ jbm_rational_14_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11722,9 +14074,14 @@ jbm_rational_14_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11739,9 +14096,14 @@ jbm_rational_14_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11756,9 +14118,14 @@ jbm_rational_14_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11773,9 +14140,13 @@ jbm_rational_14_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             5,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11790,9 +14161,13 @@ jbm_rational_14_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11807,9 +14182,13 @@ jbm_rational_14_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11824,9 +14203,13 @@ jbm_rational_14_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11841,9 +14224,13 @@ jbm_rational_14_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11858,9 +14245,13 @@ jbm_rational_14_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11875,9 +14266,13 @@ jbm_rational_14_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11892,9 +14287,13 @@ jbm_rational_14_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11909,9 +14308,13 @@ jbm_rational_14_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11926,8 +14329,9 @@ jbm_rational_14_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[14], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[14], x, vl),
+                            vl);
 }
 
 /**
@@ -11942,9 +14346,14 @@ jbm_rational_15_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11959,9 +14368,14 @@ jbm_rational_15_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11976,9 +14390,14 @@ jbm_rational_15_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -11993,9 +14412,14 @@ jbm_rational_15_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12010,9 +14434,14 @@ jbm_rational_15_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12027,9 +14456,13 @@ jbm_rational_15_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             6,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12044,9 +14477,13 @@ jbm_rational_15_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12061,9 +14498,13 @@ jbm_rational_15_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12078,9 +14519,13 @@ jbm_rational_15_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12095,9 +14540,13 @@ jbm_rational_15_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12112,9 +14561,13 @@ jbm_rational_15_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12129,9 +14582,13 @@ jbm_rational_15_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12146,9 +14603,13 @@ jbm_rational_15_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12163,9 +14624,13 @@ jbm_rational_15_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12180,8 +14645,9 @@ jbm_rational_15_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[15], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[15], x, vl),
+                            vl);
 }
 
 /**
@@ -12196,9 +14662,14 @@ jbm_rational_16_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12213,9 +14684,14 @@ jbm_rational_16_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12230,9 +14706,14 @@ jbm_rational_16_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12247,9 +14728,14 @@ jbm_rational_16_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12264,9 +14750,14 @@ jbm_rational_16_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12281,9 +14772,14 @@ jbm_rational_16_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12298,9 +14794,13 @@ jbm_rational_16_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             7,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12315,9 +14815,13 @@ jbm_rational_16_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12332,9 +14836,13 @@ jbm_rational_16_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12349,9 +14857,13 @@ jbm_rational_16_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12366,9 +14878,13 @@ jbm_rational_16_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12383,9 +14899,13 @@ jbm_rational_16_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12400,9 +14920,13 @@ jbm_rational_16_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12417,9 +14941,13 @@ jbm_rational_16_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12434,9 +14962,13 @@ jbm_rational_16_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12451,8 +14983,9 @@ jbm_rational_16_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[16], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[16], x, vl),
+                            vl);
 }
 
 /**
@@ -12467,9 +15000,14 @@ jbm_rational_17_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12484,9 +15022,14 @@ jbm_rational_17_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12501,9 +15044,14 @@ jbm_rational_17_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12518,9 +15066,14 @@ jbm_rational_17_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12535,9 +15088,14 @@ jbm_rational_17_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12552,9 +15110,14 @@ jbm_rational_17_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12569,9 +15132,14 @@ jbm_rational_17_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12586,9 +15154,13 @@ jbm_rational_17_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             8,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12603,9 +15175,13 @@ jbm_rational_17_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12620,9 +15196,13 @@ jbm_rational_17_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12637,9 +15217,13 @@ jbm_rational_17_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12654,9 +15238,13 @@ jbm_rational_17_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12671,9 +15259,13 @@ jbm_rational_17_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12688,9 +15280,13 @@ jbm_rational_17_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12705,9 +15301,13 @@ jbm_rational_17_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12722,9 +15322,13 @@ jbm_rational_17_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12739,8 +15343,9 @@ jbm_rational_17_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[17], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[17], x, vl),
+                            vl);
 }
 
 /**
@@ -12755,9 +15360,14 @@ jbm_rational_18_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12772,9 +15382,14 @@ jbm_rational_18_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12789,9 +15404,14 @@ jbm_rational_18_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12806,9 +15426,14 @@ jbm_rational_18_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12823,9 +15448,14 @@ jbm_rational_18_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12840,9 +15470,14 @@ jbm_rational_18_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12857,9 +15492,14 @@ jbm_rational_18_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12874,9 +15514,14 @@ jbm_rational_18_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12891,9 +15536,13 @@ jbm_rational_18_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             9,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12908,9 +15557,13 @@ jbm_rational_18_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12925,9 +15578,13 @@ jbm_rational_18_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12942,9 +15599,13 @@ jbm_rational_18_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12959,9 +15620,13 @@ jbm_rational_18_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12976,9 +15641,13 @@ jbm_rational_18_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -12993,9 +15662,13 @@ jbm_rational_18_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13010,9 +15683,13 @@ jbm_rational_18_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13027,9 +15704,13 @@ jbm_rational_18_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13044,8 +15725,9 @@ jbm_rational_18_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[18], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[18], x, vl),
+                            vl);
 }
 
 /**
@@ -13060,9 +15742,14 @@ jbm_rational_19_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13077,9 +15764,14 @@ jbm_rational_19_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13094,9 +15786,14 @@ jbm_rational_19_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13111,9 +15808,14 @@ jbm_rational_19_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13128,9 +15830,14 @@ jbm_rational_19_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13145,9 +15852,14 @@ jbm_rational_19_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13162,9 +15874,14 @@ jbm_rational_19_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13179,9 +15896,14 @@ jbm_rational_19_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13196,9 +15918,14 @@ jbm_rational_19_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13213,9 +15940,13 @@ jbm_rational_19_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             10,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13230,9 +15961,13 @@ jbm_rational_19_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13247,9 +15982,13 @@ jbm_rational_19_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13264,9 +16003,13 @@ jbm_rational_19_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13281,9 +16024,13 @@ jbm_rational_19_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13298,9 +16045,13 @@ jbm_rational_19_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13315,9 +16066,13 @@ jbm_rational_19_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13332,9 +16087,13 @@ jbm_rational_19_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13349,9 +16108,13 @@ jbm_rational_19_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13366,8 +16129,9 @@ jbm_rational_19_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[19], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[19], x, vl),
+                            vl);
 }
 
 /**
@@ -13382,9 +16146,14 @@ jbm_rational_20_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_19_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_19_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13399,9 +16168,14 @@ jbm_rational_20_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13416,9 +16190,14 @@ jbm_rational_20_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13433,9 +16212,14 @@ jbm_rational_20_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13450,9 +16234,14 @@ jbm_rational_20_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13467,9 +16256,14 @@ jbm_rational_20_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13484,9 +16278,14 @@ jbm_rational_20_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13501,9 +16300,14 @@ jbm_rational_20_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13518,9 +16322,14 @@ jbm_rational_20_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13535,9 +16344,14 @@ jbm_rational_20_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13552,9 +16366,13 @@ jbm_rational_20_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             11,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13569,9 +16387,13 @@ jbm_rational_20_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13586,9 +16408,13 @@ jbm_rational_20_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13603,9 +16429,13 @@ jbm_rational_20_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13620,9 +16450,13 @@ jbm_rational_20_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13637,9 +16471,13 @@ jbm_rational_20_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13654,9 +16492,13 @@ jbm_rational_20_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13671,9 +16513,13 @@ jbm_rational_20_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13688,9 +16534,13 @@ jbm_rational_20_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13705,8 +16555,9 @@ jbm_rational_20_19_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_19_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[20], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[20], x, vl),
+                            vl);
 }
 
 /**
@@ -13721,9 +16572,14 @@ jbm_rational_21_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_20_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_20_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13738,9 +16594,14 @@ jbm_rational_21_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_19_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_19_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13755,9 +16616,14 @@ jbm_rational_21_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13772,9 +16638,14 @@ jbm_rational_21_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13789,9 +16660,14 @@ jbm_rational_21_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13806,9 +16682,14 @@ jbm_rational_21_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13823,9 +16704,14 @@ jbm_rational_21_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13840,9 +16726,14 @@ jbm_rational_21_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13857,9 +16748,14 @@ jbm_rational_21_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13874,9 +16770,14 @@ jbm_rational_21_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13891,9 +16792,14 @@ jbm_rational_21_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13908,9 +16814,13 @@ jbm_rational_21_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             12,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13925,9 +16835,13 @@ jbm_rational_21_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13942,9 +16856,13 @@ jbm_rational_21_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13959,9 +16877,13 @@ jbm_rational_21_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13976,9 +16898,13 @@ jbm_rational_21_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -13993,9 +16919,13 @@ jbm_rational_21_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14010,9 +16940,13 @@ jbm_rational_21_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14027,9 +16961,13 @@ jbm_rational_21_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14044,9 +16982,13 @@ jbm_rational_21_19_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_19_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14061,8 +17003,9 @@ jbm_rational_21_20_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_20_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[21], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[21], x, vl),
+                            vl);
 }
 
 /**
@@ -14077,9 +17020,14 @@ jbm_rational_22_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_21_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_21_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14094,9 +17042,14 @@ jbm_rational_22_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_20_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_20_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14111,9 +17064,14 @@ jbm_rational_22_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_19_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_19_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14128,9 +17086,14 @@ jbm_rational_22_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14145,9 +17108,14 @@ jbm_rational_22_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14162,9 +17130,14 @@ jbm_rational_22_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14179,9 +17152,14 @@ jbm_rational_22_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14196,9 +17174,14 @@ jbm_rational_22_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14213,9 +17196,14 @@ jbm_rational_22_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14230,9 +17218,14 @@ jbm_rational_22_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14247,9 +17240,14 @@ jbm_rational_22_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14264,9 +17262,14 @@ jbm_rational_22_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14281,9 +17284,13 @@ jbm_rational_22_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             13,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14298,9 +17305,13 @@ jbm_rational_22_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14315,9 +17326,13 @@ jbm_rational_22_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14332,9 +17347,13 @@ jbm_rational_22_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14349,9 +17368,13 @@ jbm_rational_22_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14366,9 +17389,13 @@ jbm_rational_22_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14383,9 +17410,13 @@ jbm_rational_22_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14400,9 +17431,13 @@ jbm_rational_22_19_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_19_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14417,9 +17452,13 @@ jbm_rational_22_20_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_20_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14434,8 +17473,9 @@ jbm_rational_22_21_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_21_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[22], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[22], x, vl),
+                            vl);
 }
 
 /**
@@ -14450,9 +17490,14 @@ jbm_rational_23_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_22_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_22_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14467,9 +17512,14 @@ jbm_rational_23_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_21_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_21_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14484,9 +17534,14 @@ jbm_rational_23_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_20_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_20_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14501,9 +17556,14 @@ jbm_rational_23_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_19_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_19_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14518,9 +17578,14 @@ jbm_rational_23_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14535,9 +17600,14 @@ jbm_rational_23_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14552,9 +17622,14 @@ jbm_rational_23_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14569,9 +17644,14 @@ jbm_rational_23_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14586,9 +17666,14 @@ jbm_rational_23_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14603,9 +17688,14 @@ jbm_rational_23_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14620,9 +17710,14 @@ jbm_rational_23_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14637,9 +17732,14 @@ jbm_rational_23_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14654,9 +17754,14 @@ jbm_rational_23_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14671,9 +17776,13 @@ jbm_rational_23_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             14,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14688,9 +17797,13 @@ jbm_rational_23_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14705,9 +17818,13 @@ jbm_rational_23_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14722,9 +17839,13 @@ jbm_rational_23_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14739,9 +17860,13 @@ jbm_rational_23_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14756,9 +17881,13 @@ jbm_rational_23_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14773,9 +17902,13 @@ jbm_rational_23_19_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_19_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14790,9 +17923,13 @@ jbm_rational_23_20_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_20_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14807,9 +17944,13 @@ jbm_rational_23_21_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_21_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14824,8 +17965,9 @@ jbm_rational_23_22_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_22_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[23], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[23], x, vl),
+                            vl);
 }
 
 /**
@@ -14840,9 +17982,14 @@ jbm_rational_24_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_23_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_23_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14857,9 +18004,14 @@ jbm_rational_24_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_22_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_22_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14874,9 +18026,14 @@ jbm_rational_24_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_21_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_21_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14891,9 +18048,14 @@ jbm_rational_24_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_20_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_20_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14908,9 +18070,14 @@ jbm_rational_24_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_19_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_19_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14925,9 +18092,14 @@ jbm_rational_24_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14942,9 +18114,14 @@ jbm_rational_24_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14959,9 +18136,14 @@ jbm_rational_24_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14976,9 +18158,14 @@ jbm_rational_24_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -14993,9 +18180,14 @@ jbm_rational_24_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15010,9 +18202,14 @@ jbm_rational_24_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15027,9 +18224,14 @@ jbm_rational_24_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15044,9 +18246,14 @@ jbm_rational_24_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15061,9 +18268,14 @@ jbm_rational_24_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15078,9 +18290,13 @@ jbm_rational_24_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             15,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15095,9 +18311,13 @@ jbm_rational_24_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15112,9 +18332,13 @@ jbm_rational_24_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15129,9 +18353,13 @@ jbm_rational_24_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15146,9 +18374,13 @@ jbm_rational_24_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15163,9 +18395,13 @@ jbm_rational_24_19_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_19_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15180,9 +18416,13 @@ jbm_rational_24_20_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_20_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15197,9 +18437,13 @@ jbm_rational_24_21_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_21_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15214,9 +18458,13 @@ jbm_rational_24_22_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_22_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15231,8 +18479,9 @@ jbm_rational_24_23_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_23_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[24], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[24], x, vl),
+                            vl);
 }
 
 /**
@@ -15247,9 +18496,14 @@ jbm_rational_25_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_24_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_24_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15264,9 +18518,14 @@ jbm_rational_25_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_23_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_23_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15281,9 +18540,14 @@ jbm_rational_25_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_22_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_22_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15298,9 +18562,14 @@ jbm_rational_25_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_21_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_21_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15315,9 +18584,14 @@ jbm_rational_25_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_20_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_20_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15332,9 +18606,14 @@ jbm_rational_25_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_19_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_19_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15349,9 +18628,14 @@ jbm_rational_25_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15366,9 +18650,14 @@ jbm_rational_25_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15383,9 +18672,14 @@ jbm_rational_25_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15400,9 +18694,14 @@ jbm_rational_25_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15417,9 +18716,14 @@ jbm_rational_25_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15434,9 +18738,14 @@ jbm_rational_25_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15451,9 +18760,14 @@ jbm_rational_25_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15468,9 +18782,14 @@ jbm_rational_25_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15485,9 +18804,14 @@ jbm_rational_25_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              15,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15502,9 +18826,13 @@ jbm_rational_25_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             16,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15519,9 +18847,13 @@ jbm_rational_25_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15536,9 +18868,13 @@ jbm_rational_25_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15553,9 +18889,13 @@ jbm_rational_25_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15570,9 +18910,13 @@ jbm_rational_25_19_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_19_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15587,9 +18931,13 @@ jbm_rational_25_20_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_20_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15604,9 +18952,13 @@ jbm_rational_25_21_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_21_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15621,9 +18973,13 @@ jbm_rational_25_22_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_22_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15638,9 +18994,13 @@ jbm_rational_25_23_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_23_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 24, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             24,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15655,8 +19015,9 @@ jbm_rational_25_24_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_24_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[25], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[25], x, vl),
+                            vl);
 }
 
 /**
@@ -15671,9 +19032,14 @@ jbm_rational_26_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_25_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_25_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15688,9 +19054,14 @@ jbm_rational_26_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_24_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_24_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15705,9 +19076,14 @@ jbm_rational_26_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_23_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_23_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15722,9 +19098,14 @@ jbm_rational_26_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_22_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_22_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15739,9 +19120,14 @@ jbm_rational_26_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_21_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_21_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15756,9 +19142,14 @@ jbm_rational_26_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_20_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_20_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15773,9 +19164,14 @@ jbm_rational_26_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_19_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_19_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15790,9 +19186,14 @@ jbm_rational_26_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15807,9 +19208,14 @@ jbm_rational_26_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15824,9 +19230,14 @@ jbm_rational_26_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15841,9 +19252,14 @@ jbm_rational_26_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15858,9 +19274,14 @@ jbm_rational_26_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15875,9 +19296,14 @@ jbm_rational_26_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15892,9 +19318,14 @@ jbm_rational_26_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15909,9 +19340,14 @@ jbm_rational_26_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              15,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15926,9 +19362,14 @@ jbm_rational_26_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              16,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15943,9 +19384,13 @@ jbm_rational_26_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             17,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15960,9 +19405,13 @@ jbm_rational_26_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15977,9 +19426,13 @@ jbm_rational_26_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -15994,9 +19447,13 @@ jbm_rational_26_19_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_19_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16011,9 +19468,13 @@ jbm_rational_26_20_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_20_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16028,9 +19489,13 @@ jbm_rational_26_21_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_21_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16045,9 +19510,13 @@ jbm_rational_26_22_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_22_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16062,9 +19531,13 @@ jbm_rational_26_23_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_23_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 24, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             24,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16079,9 +19552,13 @@ jbm_rational_26_24_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_24_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 25, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             25,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16096,8 +19573,9 @@ jbm_rational_26_25_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_25_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[26], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[26], x, vl),
+                            vl);
 }
 
 /**
@@ -16112,9 +19590,14 @@ jbm_rational_27_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_26_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_26_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16129,9 +19612,14 @@ jbm_rational_27_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_25_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_25_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16146,9 +19634,14 @@ jbm_rational_27_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_24_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_24_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16163,9 +19656,14 @@ jbm_rational_27_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_23_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_23_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16180,9 +19678,14 @@ jbm_rational_27_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_22_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_22_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16197,9 +19700,14 @@ jbm_rational_27_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_21_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_21_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16214,9 +19722,14 @@ jbm_rational_27_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_20_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_20_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16231,9 +19744,14 @@ jbm_rational_27_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_19_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_19_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16248,9 +19766,14 @@ jbm_rational_27_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16265,9 +19788,14 @@ jbm_rational_27_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16282,9 +19810,14 @@ jbm_rational_27_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16299,9 +19832,14 @@ jbm_rational_27_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16316,9 +19854,14 @@ jbm_rational_27_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16333,9 +19876,14 @@ jbm_rational_27_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16350,9 +19898,14 @@ jbm_rational_27_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              15,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16367,9 +19920,14 @@ jbm_rational_27_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              16,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16384,9 +19942,14 @@ jbm_rational_27_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              17,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16401,9 +19964,13 @@ jbm_rational_27_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             18,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16418,9 +19985,13 @@ jbm_rational_27_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16435,9 +20006,13 @@ jbm_rational_27_19_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_19_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16452,9 +20027,13 @@ jbm_rational_27_20_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_20_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16469,9 +20048,13 @@ jbm_rational_27_21_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_21_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16486,9 +20069,13 @@ jbm_rational_27_22_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_22_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16503,9 +20090,13 @@ jbm_rational_27_23_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_23_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 24, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             24,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16520,9 +20111,13 @@ jbm_rational_27_24_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_24_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 25, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             25,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16537,9 +20132,13 @@ jbm_rational_27_25_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_25_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 26, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             26,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16554,8 +20153,9 @@ jbm_rational_27_26_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_26_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[27], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[27], x, vl),
+                            vl);
 }
 
 /**
@@ -16570,9 +20170,14 @@ jbm_rational_28_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_27_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_27_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16587,9 +20192,14 @@ jbm_rational_28_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_26_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_26_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16604,9 +20214,14 @@ jbm_rational_28_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_25_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_25_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16621,9 +20236,14 @@ jbm_rational_28_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_24_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_24_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16638,9 +20258,14 @@ jbm_rational_28_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_23_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_23_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16655,9 +20280,14 @@ jbm_rational_28_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_22_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_22_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16672,9 +20302,14 @@ jbm_rational_28_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_21_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_21_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16689,9 +20324,14 @@ jbm_rational_28_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_20_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_20_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16706,9 +20346,14 @@ jbm_rational_28_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_19_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_19_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16723,9 +20368,14 @@ jbm_rational_28_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16740,9 +20390,14 @@ jbm_rational_28_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16757,9 +20412,14 @@ jbm_rational_28_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16774,9 +20434,14 @@ jbm_rational_28_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16791,9 +20456,14 @@ jbm_rational_28_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16808,9 +20478,14 @@ jbm_rational_28_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              15,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16825,9 +20500,14 @@ jbm_rational_28_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              16,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16842,9 +20522,14 @@ jbm_rational_28_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              17,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16859,9 +20544,14 @@ jbm_rational_28_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              18,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16876,9 +20566,13 @@ jbm_rational_28_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             19,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16893,9 +20587,13 @@ jbm_rational_28_19_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_19_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16910,9 +20608,13 @@ jbm_rational_28_20_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_20_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16927,9 +20629,13 @@ jbm_rational_28_21_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_21_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16944,9 +20650,13 @@ jbm_rational_28_22_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_22_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16961,9 +20671,13 @@ jbm_rational_28_23_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_23_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 24, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             24,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16978,9 +20692,13 @@ jbm_rational_28_24_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_24_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 25, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             25,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -16995,9 +20713,13 @@ jbm_rational_28_25_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_25_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 26, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             26,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17012,9 +20734,13 @@ jbm_rational_28_26_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_26_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 27, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             27,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17029,8 +20755,9 @@ jbm_rational_28_27_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_27_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[28], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[28], x, vl),
+                            vl);
 }
 
 /**
@@ -17045,9 +20772,14 @@ jbm_rational_29_0_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_28_nxf64 (x, p + 1, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_28_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              1,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17062,9 +20794,14 @@ jbm_rational_29_1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_1_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_27_nxf64 (x, p + 2, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_27_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              2,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17079,9 +20816,14 @@ jbm_rational_29_2_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_2_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_26_nxf64 (x, p + 3, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_26_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              3,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17096,9 +20838,14 @@ jbm_rational_29_3_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_3_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_25_nxf64 (x, p + 4, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_25_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              4,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17113,9 +20860,14 @@ jbm_rational_29_4_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_4_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_24_nxf64 (x, p + 5, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_24_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              5,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17130,9 +20882,14 @@ jbm_rational_29_5_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_5_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_23_nxf64 (x, p + 6, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_23_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              6,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17147,9 +20904,14 @@ jbm_rational_29_6_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_6_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_22_nxf64 (x, p + 7, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_22_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              7,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17164,9 +20926,14 @@ jbm_rational_29_7_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_7_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_21_nxf64 (x, p + 8, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_21_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              8,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17181,9 +20948,14 @@ jbm_rational_29_8_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_8_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_20_nxf64 (x, p + 9, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_20_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              9,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17198,9 +20970,14 @@ jbm_rational_29_9_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_9_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_19_nxf64 (x, p + 10, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_19_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              10,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17215,9 +20992,14 @@ jbm_rational_29_10_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_10_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_18_nxf64 (x, p + 11, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_18_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              11,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17232,9 +21014,14 @@ jbm_rational_29_11_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_11_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_17_nxf64 (x, p + 12, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_17_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              12,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17249,9 +21036,14 @@ jbm_rational_29_12_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_12_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_16_nxf64 (x, p + 13, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_16_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              13,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17266,9 +21058,14 @@ jbm_rational_29_13_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_13_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_15_nxf64 (x, p + 14, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_15_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              14,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17283,9 +21080,14 @@ jbm_rational_29_14_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_14_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_14_nxf64 (x, p + 15, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_14_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              15,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17300,9 +21102,14 @@ jbm_rational_29_15_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_15_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_13_nxf64 (x, p + 16, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_13_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              16,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17317,9 +21124,14 @@ jbm_rational_29_16_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_16_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_12_nxf64 (x, p + 17, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_12_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              17,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17334,9 +21146,14 @@ jbm_rational_29_17_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_17_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_11_nxf64 (x, p + 18, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_11_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              18,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17351,9 +21168,14 @@ jbm_rational_29_18_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_18_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_10_nxf64 (x, p + 19, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_10_nxf64 (x,
+                                                                              p
+                                                                              +
+                                                                              19,
+                                                                              vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17368,9 +21190,13 @@ jbm_rational_29_19_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_19_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_9_nxf64 (x, p + 20, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_9_nxf64 (x,
+                                                                             p +
+                                                                             20,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17385,9 +21211,13 @@ jbm_rational_29_20_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_20_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_8_nxf64 (x, p + 21, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_8_nxf64 (x,
+                                                                             p +
+                                                                             21,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17402,9 +21232,13 @@ jbm_rational_29_21_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_21_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_7_nxf64 (x, p + 22, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_7_nxf64 (x,
+                                                                             p +
+                                                                             22,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17419,9 +21253,13 @@ jbm_rational_29_22_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_22_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_6_nxf64 (x, p + 23, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_6_nxf64 (x,
+                                                                             p +
+                                                                             23,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17436,9 +21274,13 @@ jbm_rational_29_23_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_23_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_5_nxf64 (x, p + 24, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_5_nxf64 (x,
+                                                                             p +
+                                                                             24,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17453,9 +21295,13 @@ jbm_rational_29_24_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_24_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_4_nxf64 (x, p + 25, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_4_nxf64 (x,
+                                                                             p +
+                                                                             25,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17470,9 +21316,13 @@ jbm_rational_29_25_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_25_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_3_nxf64 (x, p + 26, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_3_nxf64 (x,
+                                                                             p +
+                                                                             26,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17487,9 +21337,13 @@ jbm_rational_29_26_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_26_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_2_nxf64 (x, p + 27, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_2_nxf64 (x,
+                                                                             p +
+                                                                             27,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17504,9 +21358,13 @@ jbm_rational_29_27_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_27_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                                     jbm_polynomial_1_nxf64 (x, p + 28, vl),
-                                     vl), vl);
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     jbm_polynomial_1_nxf64 (x,
+                                                                             p +
+                                                                             28,
+                                                                             vl),
+                                                     vl), vl);
 }
 
 /**
@@ -17521,8 +21379,9 @@ jbm_rational_29_28_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 {
   return
     __riscv_vfdiv_vv_f64m1 (jbm_polynomial_28_nxf64 (x, p, vl),
-                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[29], x, vl),
-                    vl);
+                            __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), p[29], x, vl),
+                            vl);
 }
 
 /**
@@ -17547,18 +21406,24 @@ jbm_expm1wc_nxf64 (const vfloat64m1_t x,
   x2 = jbm_sqr_nxf64 (x, vl);
   return
     __riscv_vfdiv_vv_f64m1 (__riscv_vfmul_vv_f64m1 (x,
-                                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (a1, vl),
-                                                     a3, x2, vl), vl),
-                    __riscv_vfmacc_vv_f64m1
-                    (__riscv_vfmv_v_f_f64m1 (1., vl), x,
-                     __riscv_vfmacc_vv_f64m1
-                     (__riscv_vfmv_v_f_f64m1 (a4), x,
-                      __riscv_vfmacc_vv_f64m1
-                      (__riscv_vfmv_v_f_f64m1 (a5), x,
-                       __riscv_vfmacc_vv_f64m1
-                       (__riscv_vfmv_v_f_f64m1 (a6), x,
-                        __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (a7), a9, x2, vl), vl),
-                       vl), vl), vl), vl);
+                                                    __riscv_vfmacc_vf_f64m1
+                                                    (__riscv_vfmv_v_f_f64m1
+                                                     (a1, vl), a3, x2, vl), vl),
+                            __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                     (1., vl), x,
+                                                     __riscv_vfmacc_vv_f64m1
+                                                     (__riscv_vfmv_v_f_f64m1
+                                                      (a4), x,
+                                                      __riscv_vfmacc_vv_f64m1
+                                                      (__riscv_vfmv_v_f_f64m1
+                                                       (a5), x,
+                                                       __riscv_vfmacc_vv_f64m1
+                                                       (__riscv_vfmv_v_f_f64m1
+                                                        (a6), x,
+                                                        __riscv_vfmacc_vf_f64m1
+                                                        (__riscv_vfmv_v_f_f64m1
+                                                         (a7), a9, x2, vl), vl),
+                                                       vl), vl), vl), vl);
 }
 
 /**
@@ -17642,9 +21507,11 @@ jbm_expm1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< array size.
 {
   return __riscv_vfmerge_vvm_f64m1 (jbm_expm1wc_nxf64 (x, vl),
-                           __riscv_vfsub_vf_f64m1 (jbm_exp_nxf64 (x, vl), 1., vl),
-                           __riscv_vmflt_vf_f64m1 (jbm_abs_nxf64 (x, vl), M_LN2 / 2.,
-                                           vl), vl);
+                                    __riscv_vfsub_vf_f64m1 (jbm_exp_nxf64
+                                                            (x, vl), 1., vl),
+                                    __riscv_vmflt_vf_f64m1 (jbm_abs_nxf64
+                                                            (x, vl), M_LN2 / 2.,
+                                                            vl), vl);
 }
 
 /**
@@ -17691,9 +21558,14 @@ jbm_log2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
   vfloat64m1_t y;
   vint64m1_t e;
   y = jbm_frexp_nxf64 (x, &e, vl);
-  y = __riscv_vfadd_vv_f64m1 (jbm_log2wc_nxf64 (y, vl), __riscv_vfcvt_v_x_v_i64m1 (e, vl), vl);
-  y = __riscv_vfmerge_vfm_f64m1 (y, -INFINITY, __riscv_vmfgt_vf_f64m1_b64 (x, 0., vl), vl);
-  return __riscv_vfmerge_vfm_f64m1 (y, NAN, vmfge_vf_f64m1_b64 (x, 0., vl), vl);
+  y =
+    __riscv_vfadd_vv_f64m1 (jbm_log2wc_nxf64 (y, vl),
+                            __riscv_vfcvt_v_x_v_i64m1 (e, vl), vl);
+  y =
+    __riscv_vfmerge_vfm_f64m1 (y, -INFINITY,
+                               __riscv_vmfgt_vf_f64m1_b64 (x, 0., vl), vl);
+  return __riscv_vfmerge_vfm_f64m1 (y, NAN,
+                                    __riscv_vmfge_vf_f64m1_b64 (x, 0., vl), vl);
 }
 
 /**
@@ -17761,7 +21633,8 @@ jbm_pow_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
   f = floor (e);
   if (f == e)
     return jbm_pown_nxf64 (x, (int) e, vl);
-  return jbm_exp2_nxf64 (__riscv_vfmul_vf_f64m1 (jbm_log2_nxf64 (x, vl), e, vl), vl);
+  return jbm_exp2_nxf64 (__riscv_vfmul_vf_f64m1 (jbm_log2_nxf64 (x, vl), e, vl),
+                         vl);
 }
 
 /**
@@ -17777,7 +21650,8 @@ jbm_cbrt_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
   vfloat64m1_t f;
   f = jbm_pow_nxf64 (jbm_abs_nxf64 (x, vl), 1. / 3., vl);
   return __riscv_vfmerge_vvm_f64m1 (f, jbm_opposite_nxf64 (f, vl),
-                           vmfltz_vf_f64m1_b64 (x, 0., vl), vl);
+                                    __riscv_vmfltz_vf_f64m1_b64 (x, 0., vl),
+                                    vl);
 }
 
 /**
@@ -17800,8 +21674,9 @@ jbm_sinwc_nxf64 (const vfloat64m1_t x,
     -2.5051208834780181372040633623490924e-08,
     1.5924807404448211967660639660668199e-10
   };
-  return __riscv_vfmul_vv_f64m1 (x, jbm_polynomial_6_nxf64 (jbm_sqr_nxf64 (x, vl),
-                                                    a, vl), vl);
+  return __riscv_vfmul_vv_f64m1 (x,
+                                 jbm_polynomial_6_nxf64 (jbm_sqr_nxf64 (x, vl),
+                                                         a, vl), vl);
 }
 
 /**
@@ -17835,16 +21710,18 @@ jbm_coswc_nxf64 (const vfloat64m1_t x,
 static inline void
 jbm_sincoswc_nxf64 (const vfloat64m1_t x,
                     ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat64m1_t * s,
+                    vfloat64m1_t *s,
                     ///< pointer to the f32 function value (vfloat64m1_t).
-                    vfloat64m1_t * c,
+                    vfloat64m1_t *c,
                     ///< pointer to the f32 function value (vfloat64m1_t).
                     const size_t vl)    ///< array size.
 {
   vfloat64m1_t s0;
   *s = s0 = jbm_sinwc_nxf64 (x, vl);
-  *c = __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64 (__riscv_vfmv_v_f_f64m1 (1., vl),
-                                     jbm_sqr_nxf64 (x, vl), vl), vl);
+  *c =
+    __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64
+                            (__riscv_vfmv_v_f_f64m1 (1., vl),
+                             jbm_sqr_nxf64 (x, vl), vl), vl);
 }
 
 /**
@@ -17863,17 +21740,23 @@ jbm_sin_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
   s = jbm_sinwc_nxf64 (__riscv_vfsub_vv_f64m1 (y, pi2, vl), vl);
   s = __riscv_vfmerge_vvm_f64m1
     (jbm_opposite_nxf64
-     (jbm_coswc_nxf64 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (3. * M_PI_2, vl),
-                                       y, vl), vl), vl),
-     s, __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
-  s = __riscv_vfmerge_vvm_f64m1
-    (jbm_sinwc_nxf64 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl)),
-     s, __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl));
-  s = __riscv_vfmerge_vvm_f64m1
-    (jbm_coswc_nxf64 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl)),
-     s, __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4, vl), vl);
+     (jbm_coswc_nxf64
+      (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (3. * M_PI_2, vl), y, vl),
+       vl), vl), s, __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
+  s =
+    __riscv_vfmerge_vvm_f64m1 (jbm_sinwc_nxf64
+                               (__riscv_vfsub_vv_f64m1
+                                (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl)), s,
+                               __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl));
+  s =
+    __riscv_vfmerge_vvm_f64m1 (jbm_coswc_nxf64
+                               (__riscv_vfsub_vv_f64m1
+                                (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl)),
+                               s, __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4,
+                                                              vl), vl);
   return __riscv_vfmerge_vvm_f64m1 (jbm_sinwc_nxf64 (y, vl), s,
-                           __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl), vl);
+                                    __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl),
+                                    vl);
 }
 
 /**
@@ -17890,19 +21773,31 @@ jbm_cos_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
   pi2 = __riscv_vfmv_v_f_f64m1 (2. * M_PI, vl);
   y = jbm_rest_nxf64 (x, pi2, vl);
   c = jbm_coswc_nxf64 (__riscv_vfsub_vv_f64m1 (y, pi2, vl), vl);
-  c = __riscv_vfmerge_vvm_f64m1 (jbm_sinwc_nxf64 (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl),
-                                         vl),
-                        c, __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
-  c = __riscv_vfmerge_vvm_f64m1
-    (jbm_opposite_nxf64
-     (jbm_coswc_nxf64 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl),
-                       vl), vl),
-     c, __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl), vl);
-  c = __riscv_vfmerge_vvm_f64m1
-    (jbm_sinwc_nxf64 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI_2), y, vl), vl),
-     c, __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4, vl), vl);
+  c =
+    __riscv_vfmerge_vvm_f64m1 (jbm_sinwc_nxf64
+                               (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl),
+                                vl), c, __riscv_vmflt_vf_f64m1_b64 (y,
+                                                                    7. * M_PI_4,
+                                                                    vl), vl);
+  c =
+    __riscv_vfmerge_vvm_f64m1 (jbm_opposite_nxf64
+                               (jbm_coswc_nxf64
+                                (__riscv_vfsub_vv_f64m1
+                                 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl),
+                                 vl), vl), c, __riscv_vmflt_vf_f64m1_b64 (y,
+                                                                          5. *
+                                                                          M_PI_4,
+                                                                          vl),
+                               vl);
+  c =
+    __riscv_vfmerge_vvm_f64m1 (jbm_sinwc_nxf64
+                               (__riscv_vfsub_vv_f64m1
+                                (__riscv_vfmv_v_f_f64m1 (M_PI_2), y, vl), vl),
+                               c, __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4,
+                                                              vl), vl);
   return __riscv_vfmerge_vfm_f64m1 (jbm_coswc_nxf64 (y, vl), c,
-                           __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl), vl);
+                                    __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl),
+                                    vl);
 }
 
 /**
@@ -17912,9 +21807,9 @@ jbm_cos_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
 static inline void
 jbm_sincos_nxf64 (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat64m1_t * s,
+                  vfloat64m1_t *s,
                   ///< pointer to the f32 function value (vfloat64m1_t).
-                  vfloat64m1_t * c,
+                  vfloat64m1_t *c,
                   ///< pointer to the f32 function value (vfloat64m1_t).
                   const size_t vl)      ///< array size.
 {
@@ -17923,17 +21818,18 @@ jbm_sincos_nxf64 (const vfloat64m1_t x,
   pi2 = __riscv_vfmv_v_f_f64m1 (2. * M_PIf, vl);
   y = jbm_rest_nxf64 (x, pi2, vl);
   jbm_sincoswc_nxf64 (__riscv_vfsub_vv_f64m1 (y, pi2, vl), &s1, &c1, vl);
-  jbm_sincoswc_nxf64 (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), &c2, &s2, vl);
+  jbm_sincoswc_nxf64 (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), &c2, &s2,
+                      vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4f, vl);
   s1 = __riscv_vfmerge_vvm_f64m1 (jbm_opposite_nxf64 (s2, vl), s1, m, vl);
   c1 = __riscv_vfmerge_vvm_f64m1 (c2, c1, m, vl);
-  jbm_sincoswc_nxf64 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI), y, vl),
-                      &s2, &c2, vl);
+  jbm_sincoswc_nxf64 (__riscv_vfsub_vv_f64m1
+                      (__riscv_vfmv_v_f_f64m1 (M_PI), y, vl), &s2, &c2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl);
   s1 = __riscv_vfmerge_vvm_f64m1 (s2, s1, m, vl);
   c1 = __riscv_vfmerge_vvm_f64m1 (jbm_opposite_nxf64 (c2, vl), c1, m, vl);
-  jbm_sincoswc_nxf64 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI_2), y, vl),
-                      &c2, &s2, vl);
+  jbm_sincoswc_nxf64 (__riscv_vfsub_vv_f64m1
+                      (__riscv_vfmv_v_f_f64m1 (M_PI_2), y, vl), &c2, &s2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4f, vl);
   s1 = __riscv_vfmerge_vvm_f64m1 (s2, s1, m, vl);
   c1 = __riscv_vfmerge_vvm_f64m1 (c2, c1, m, vl);
@@ -17981,8 +21877,9 @@ jbm_atanwc0_nxf64 (const vfloat64m1_t x,
     6.4625846927010323822388899418597147e-02,
     1.0861419677837522058022889198563474e-03
   };
-  return __riscv_vfmul_vv_f64m1 (x, jbm_rational_9_4_nxf64 (jbm_sqr_nxf64 (x, vl),
-                                                    a, vl), vl);
+  return __riscv_vfmul_vv_f64m1 (x,
+                                 jbm_rational_9_4_nxf64 (jbm_sqr_nxf64 (x, vl),
+                                                         a, vl), vl);
 }
 
 /**
@@ -18033,12 +21930,17 @@ jbm_atan_nxf64 (const vfloat64m1_t x,   ///< double number.
   ax = jbm_abs_nxf64 (x, vl);
   m = __riscv_vmfgt_vf_f64m1_b64 (ax, 1.5, vl);
   ax = __riscv_vfmerge_vvm_f64m1 (jbm_reciprocal_nxf64 (ax, vl), ax, m, vl);
-  f = __riscv_vfmerge_vvm_f64m1 (jbm_atanwc1_nxf64 (ax, vl), jbm_atanwc0_nxf64 (ax, vl),
-                        __riscv_vmfgt_vf_f64m1_b64 (ax, 0.5, vl), vl);
-  f = __riscv_vfmerge_vvm_f64m1 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), f, vl), f,
-                        m, f);
+  f =
+    __riscv_vfmerge_vvm_f64m1 (jbm_atanwc1_nxf64 (ax, vl),
+                               jbm_atanwc0_nxf64 (ax, vl),
+                               __riscv_vmfgt_vf_f64m1_b64 (ax, 0.5, vl), vl);
+  f =
+    __riscv_vfmerge_vvm_f64m1 (__riscv_vfsub_vv_f64m1
+                               (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), f, vl), f,
+                               m, f);
   return __riscv_vfmerge_vvm_f64m1 (jbm_opposite_nxf64 (f), f,
-                           __riscv_vmflt_vf_f64m1_b64 (x, 0.f, vl), vl);
+                                    __riscv_vmflt_vf_f64m1_b64 (x, 0.f, vl),
+                                    vl);
 }
 
 /**
@@ -18058,9 +21960,11 @@ jbm_atan2_nxf64 (const vfloat64m1_t y,  ///< vfloat64m1_t y component.
   mx = __riscv_vmflt_vf_f64m1_b64 (x, 0., vl);
   my = vmvlt_vf_f64m1_b64 (y, 0., vl);
   f = __riscv_vfmerge_vvm_f64m1 (__riscv_vfsub_vf_f64m1 (f, M_PI, vl), f,
-                        __riscv_vmand_mm (my, mx, vl), vl);
+                                 __riscv_vmand_mm (my, mx, vl), vl);
   return __riscv_vfmerge_vvm_f64m1 (__riscv_vfadd_vf_f64m1 (f, M_PI, vl), f,
-                           __riscv_vmand_mm (my, vmnot_m (mx, vl), vl), vl);
+                                    __riscv_vmand_mm (my,
+                                                      __riscv_vmnot_m (mx, vl),
+                                                      vl), vl);
 }
 
 /**
@@ -18076,9 +21980,11 @@ jbm_asin_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
   return
     jbm_atan_nxf64
     (__riscv_vfdiv_vv_f64m1 (x,
-                     __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl),
-                                                     jbm_sqr_nxf64 (x, vl), vl),
-                                     vl), vl), vl);
+                             __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64m1
+                                                     (__riscv_vfmv_v_f_f64m1
+                                                      (1., vl),
+                                                      jbm_sqr_nxf64 (x, vl),
+                                                      vl), vl), vl), vl);
 }
 
 /**
@@ -18094,11 +22000,12 @@ jbm_acos_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
   vfloat64m1_t f;
   f =
     jbm_atan_nxf64 (__riscv_vfdiv_vv_f64m1
-                    (__riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl),
-                                                     jbm_sqr_nxf64 (x, vl), vl),
-                                     x), vl), vl);
+                    (__riscv_vfsqrt_v_f64m1
+                     (__riscv_vfsub_vv_f64m1
+                      (__riscv_vfmv_v_f_f64m1 (1., vl), jbm_sqr_nxf64 (x, vl),
+                       vl), x), vl), vl);
   return __riscv_vfmerge_vvm_f64m1 (__riscv_vfadd_vf_f64m1 (f, M_PI, vl), f,
-                           __riscv_vmflt_vf_f64m1 (x, 0., vl), vl);
+                                    __riscv_vmflt_vf_f64m1 (x, 0., vl), vl);
 }
 
 /**
@@ -18112,8 +22019,9 @@ jbm_sinh_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
 {
   vfloat64m1_t f;
   f = jbm_exp_nxf64 (x, vl);
-  return __riscv_vfmul_vf_f64m1 (__riscv_vfsub_vv_f64m1 (f, jbm_reciprocal_nxf64 (f, vl), vl),
-                         0.5, vl);
+  return
+    __riscv_vfmul_vf_f64m1 (__riscv_vfsub_vv_f64m1
+                            (f, jbm_reciprocal_nxf64 (f, vl), vl), 0.5, vl);
 }
 
 /**
@@ -18127,8 +22035,9 @@ jbm_cosh_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
 {
   vfloat64m1_t f;
   f = jbm_exp_nxf64 (x, vl);
-  return __riscv_vfmul_vf_f64m1 (__riscv_vfadd_vv_f64m1 (f, jbm_reciprocal_nxf64 (f, vl), vl),
-                         0.5, vl);
+  return
+    __riscv_vfmul_vf_f64m1 (__riscv_vfadd_vv_f64m1
+                            (f, jbm_reciprocal_nxf64 (f, vl), vl), 0.5, vl);
 }
 
 /**
@@ -18143,12 +22052,17 @@ jbm_tanh_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
   vfloat64m1_t f, fi;
   f = jbm_exp_nxf64 (x, vl);
   fi = jbm_reciprocal_nxf64 (f, vl);
-  f = __riscv_vfdiv_vv_f64m1 (__riscv_vfsub_vv_f64m1 (f, fi, vl), __riscv_vfadd_vv_f64m1 (f, fi, vl),
-                      vl);
-  f = __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (1.f, vl), f,
-                        __riscv_vmfgt_vf_f64m1_b64 (x, JBM_FLT_MAX_E_EXP, vl), vl);
+  f =
+    __riscv_vfdiv_vv_f64m1 (__riscv_vfsub_vv_f64m1 (f, fi, vl),
+                            __riscv_vfadd_vv_f64m1 (f, fi, vl), vl);
+  f =
+    __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (1.f, vl), f,
+                               __riscv_vmfgt_vf_f64m1_b64 (x, JBM_FLT_MAX_E_EXP,
+                                                           vl), vl);
   return __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (-1.f), f,
-                           __riscv_vmflt_vf_f64m1_b64 (x, -JBM_FLT_MAX_E_EXP, vl), vl);
+                                    __riscv_vmflt_vf_f64m1_b64 (x,
+                                                                -JBM_FLT_MAX_E_EXP,
+                                                                vl), vl);
 }
 
 /**
@@ -18163,8 +22077,10 @@ jbm_asinh_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t number.
   return
     jbm_log_nxf64
     (__riscv_vfadd_vv_f64m1
-     (x, __riscv_vfsqrt_v_f64m1 (__riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1.f, vl), x, x, vl),
-                         vl), vl), vl);
+     (x,
+      __riscv_vfsqrt_v_f64m1 (__riscv_vfmacc_vv_f64m1
+                              (__riscv_vfmv_v_f_f64m1 (1.f, vl), x, x, vl), vl),
+      vl), vl);
 }
 
 /**
@@ -18178,8 +22094,10 @@ jbm_acosh_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t number.
 {
   return
     jbm_log_nxf64
-    (__riscv_vfadd_vv_f64m1 (x, __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vf_f64m1 (jbm_sqr_nxf64 (x, vl),
-                                                        1., vl), vl), vl), vl);
+    (__riscv_vfadd_vv_f64m1
+     (x,
+      __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vf_f64m1
+                              (jbm_sqr_nxf64 (x, vl), 1., vl), vl), vl), vl);
 }
 
 /**
@@ -18194,9 +22112,11 @@ jbm_atanh_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t number.
   vfloat64m1_t u;
   u = __riscv_vfmv_v_f_f64m1 (1.);
   return
-    __riscv_vfmul_vf_f64m1 (jbm_log_nxf64 (__riscv_vfdiv_vv_f64m1 (__riscv_vfadd_vv_f64m1 (u, x, vl),
-                                                   __riscv_vfsub_vv_f64m1 (u, x, vl),
-                                                   vl), 0.5, vl), vl);
+    __riscv_vfmul_vf_f64m1 (jbm_log_nxf64
+                            (__riscv_vfdiv_vv_f64m1
+                             (__riscv_vfadd_vv_f64m1 (u, x, vl),
+                              __riscv_vfsub_vv_f64m1 (u, x, vl), vl), 0.5, vl),
+                            vl);
 }
 
 /**
@@ -18222,8 +22142,9 @@ jbm_erfwc_nxf64 (const vfloat64m1_t x,
     6.8136985371491773172998872537320205e-04,
     2.0308921409930923470822806343114398e-05
   };
-  return __riscv_vfmul_vv_f64m1 (x, jbm_rational_9_4_nxf64 (jbm_sqr_nxf64 (x, vl), a,
-                                                    vl), vl);
+  return __riscv_vfmul_vv_f64m1 (x,
+                                 jbm_rational_9_4_nxf64 (jbm_sqr_nxf64 (x, vl),
+                                                         a, vl), vl);
 }
 
 /**
@@ -18262,11 +22183,13 @@ jbm_erfcwc_nxf64 (const vfloat64m1_t x,
   const double m = 2.7213293210812948815313823864674587e+01;
   vfloat64m1_t f, x2;
   x2 = jbm_sqr_nxf64 (x, vl);
-  f = __riscv_vfdiv_vv_f64m1 (jbm_rational_19_9_nxf64 (jbm_reciprocal_nxf64 (x2, vl), a,
-                                               vl),
-                      __riscv_vfmul_vv_f64m1 (x, jbm_exp_nxf64 (x2, vl), vl), vl);
+  f =
+    __riscv_vfdiv_vv_f64m1 (jbm_rational_19_9_nxf64
+                            (jbm_reciprocal_nxf64 (x2, vl), a, vl),
+                            __riscv_vfmul_vv_f64m1 (x, jbm_exp_nxf64 (x2, vl),
+                                                    vl), vl);
   return __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl), f,
-                           __riscv_vmfgt_vf_f64m1 (x, m, vl), vl);
+                                    __riscv_vmfgt_vf_f64m1 (x, m, vl), vl);
 }
 
 /**
@@ -18283,9 +22206,11 @@ jbm_erf_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
   ax = jbm_abs_nxf64 (x, vl);
   u = __riscv_vfmv_v_f_f64m1 (1., vl);
   f = __riscv_vfmul_vv_f64m1 (__riscv_vfdiv_vv_f64m1 (x, ax, vl),
-                      __riscv_vfsub_vv_f64m1 (u, jbm_erfcwc_nxf64 (ax, vl), vl), vl);
+                              __riscv_vfsub_vv_f64m1 (u,
+                                                      jbm_erfcwc_nxf64 (ax, vl),
+                                                      vl), vl);
   return __riscv_vfmerge_vvm_f64m1 (jbm_erfwc_nxf64 (x, vl), f,
-                           __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
+                                    __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
 }
 
 /**
@@ -18302,12 +22227,18 @@ jbm_erfc_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
   ax = jbm_abs_nxf64 (x, vl);
   u = __riscv_vfmv_v_f_f64m1 (1.f, vl);
   f = __riscv_vfsub_vv_f64m1 (u,
-                      __riscv_vfmul_vv_f64m1 (__riscv_vfdiv_vv_f64m1 (x, ax, vl),
-                                      __riscv_vfsub_vv_f64m1 (u,
-                                                      jbm_erfcwc_nxf64 (ax, vl),
-                                                      vl), vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (__riscv_vfsub_vv_f64m1 (u, jbm_erfwc_nxf64 (x, vl), vl), f,
-                           __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
+                              __riscv_vfmul_vv_f64m1 (__riscv_vfdiv_vv_f64m1
+                                                      (x, ax, vl),
+                                                      __riscv_vfsub_vv_f64m1 (u,
+                                                                              jbm_erfcwc_nxf64
+                                                                              (ax,
+                                                                               vl),
+                                                                              vl),
+                                                      vl), vl);
+  return
+    __riscv_vfmerge_vvm_f64m1 (__riscv_vfsub_vv_f64m1
+                               (u, jbm_erfwc_nxf64 (x, vl), vl), f,
+                               __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
 }
 
 /**
@@ -18330,11 +22261,17 @@ jbm_solve_quadratic_reduced_nxf64 (vfloat64m1_t a,
 {
   vfloat64m1_t k1, k2;
   a = __riscv_vfmul_vf_f64m1 (a, -0.5f, vl);
-  b = __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64m1 (jbm_sqr_nxf64 (a, vl), b, vl), vl);
+  b =
+    __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64m1
+                            (jbm_sqr_nxf64 (a, vl), b, vl), vl);
   k1 = __riscv_vfadd_vv_f64m1 (a, b, vl);
   k2 = __riscv_vfsub_vv_f64m1 (a, b, vl);
-  k1 = __riscv_vfmerge_vvm_f64m1 (k2, k1, __riscv_vmflt_vv_f64m1_b64 (k1, x1, vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (k2, k1, __riscv_vmfgt_vv_f64m1_b64 (k1, x2, vl), vl);
+  k1 =
+    __riscv_vfmerge_vvm_f64m1 (k2, k1, __riscv_vmflt_vv_f64m1_b64 (k1, x1, vl),
+                               vl);
+  return __riscv_vfmerge_vvm_f64m1 (k2, k1,
+                                    __riscv_vmfgt_vv_f64m1_b64 (k1, x2, vl),
+                                    vl);
 }
 
 /**
@@ -18391,34 +22328,63 @@ jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
   k0 = __riscv_vfsub_vv_f64n1
     (__riscv_vfmul_vv_f64m1 (a3, k0, vl),
      __riscv_vfmul_vf_f64m1 (__riscv_vfsub_vv_f64m1 (b,
-                                     __riscv_vfmul_vv_f64m1 (a3, c, vl), 0.5, vl),
-                     vl), vl);
+                                                     __riscv_vfmul_vv_f64m1 (a3,
+                                                                             c,
+                                                                             vl),
+                                                     0.5, vl), vl), vl);
   k3 = __riscv_vfmul_vv_f64m1 (k1, jbm_sqr_nxf64 (k1, vl), vl);
   k2 = __riscv_vfmacc_vv_f64m1 (k3, k0, k0, vl);
   l1 = __riscv_vfsqrt_v_f64m1 (jbm_opposite_nxf64 (k1, vl), vl);
-  l0 = __riscv_vfmul_vf_f64m1 (jbm_acos_nxf64 (__riscv_vfdiv_vv_f64m1 (k0, k3, vl), vl),
-                       1. / 3., vl);
+  l0 =
+    __riscv_vfmul_vf_f64m1 (jbm_acos_nxf64
+                            (__riscv_vfdiv_vv_f64m1 (k0, k3, vl), vl), 1. / 3.,
+                            vl);
   l1 = jbm_dbl_nxf64 (l1);
-  l2 = __riscv_vfsub_vv_f64m1 (a3, __riscv_vfmul_vv_f64m1 (l1, jbm_cos_nxf64 (k0, vl), vl), vl);
-  l3 = __riscv_vfsub_vv_f64m1
-    (a3, __riscv_vfmul_vv_f64m1
-     (l1, jbm_cos_nxf64 (__riscv_vfadd_vf_f64m1 (l0, 2. * M_PI / 3., vl), vl), vl), vl);
-  l3 = __riscv_vfmerge_vvm_f64m1 (l2, l3,
-                         __riscv_vmor_mm (__riscv_vmflt_vv_f64m1_b64 (l2, x1, vl),
-                                  __riscv_vmfgt_vv_f64m1_b64 (l2, x2, vl), vl), vl);
-  l4 = __riscv_vfsub_vv_f64m1
-    (a, __riscv_vfmul_vv_f64m1
-     (l1, jbm_cos_nxf64 (__riscv_vfsub_vf_f64m1 (l0, 2. * M_PI / 3., vl), vl), vl), vl);
-  l4 = __riscv_vfmerge_vvm_f64m1 (l3, l4,
-                         __riscv_vmor_mm (__riscv_vmflt_vv_f64m1_b64 (l3, x1, vl),
-                                  __riscv_vmfgt_vv_f64m1_b64 (l3, x2, vl), vl), vl);
+  l2 =
+    __riscv_vfsub_vv_f64m1 (a3,
+                            __riscv_vfmul_vv_f64m1 (l1, jbm_cos_nxf64 (k0, vl),
+                                                    vl), vl);
+  l3 =
+    __riscv_vfsub_vv_f64m1 (a3,
+                            __riscv_vfmul_vv_f64m1 (l1,
+                                                    jbm_cos_nxf64
+                                                    (__riscv_vfadd_vf_f64m1
+                                                     (l0, 2. * M_PI / 3., vl),
+                                                     vl), vl), vl);
+  l3 =
+    __riscv_vfmerge_vvm_f64m1 (l2, l3,
+                               __riscv_vmor_mm (__riscv_vmflt_vv_f64m1_b64
+                                                (l2, x1, vl),
+                                                __riscv_vmfgt_vv_f64m1_b64 (l2,
+                                                                            x2,
+                                                                            vl),
+                                                vl), vl);
+  l4 =
+    __riscv_vfsub_vv_f64m1 (a,
+                            __riscv_vfmul_vv_f64m1 (l1,
+                                                    jbm_cos_nxf64
+                                                    (__riscv_vfsub_vf_f64m1
+                                                     (l0, 2. * M_PI / 3., vl),
+                                                     vl), vl), vl);
+  l4 =
+    __riscv_vfmerge_vvm_f64m1 (l3, l4,
+                               __riscv_vmor_mm (__riscv_vmflt_vv_f64m1_b64
+                                                (l3, x1, vl),
+                                                __riscv_vmfgt_vv_f64m1_b64 (l3,
+                                                                            x2,
+                                                                            vl),
+                                                vl), vl);
   k1 = __riscv_vfsqrt_v_f64m1 (k2, vl);
   l5 = __riscv_vfadd_vv_f64m1 (k0, k1, vl);
   l5 = jbm_cbrt_nxf64 (k2, vl);
   k0 = __riscv_vfsub_vv_f64m1 (k0, k1, vl);
-  l5 = __riscv_vfadd_vv_f64m1 (l5, __riscv_vfsub_vv_f64m1 (jbm_cbrt_nxf64 (k0, vl), a3, vl),
-                       vl);
-  return __riscv_vfmerge_vvm_f64m1 (l5, l4, __riscv_vmflt_vf_f64m1_b64 (k2, 0., vl), vl);
+  l5 =
+    __riscv_vfadd_vv_f64m1 (l5,
+                            __riscv_vfsub_vv_f64m1 (jbm_cbrt_nxf64 (k0, vl), a3,
+                                                    vl), vl);
+  return __riscv_vfmerge_vvm_f64m1 (l5, l4,
+                                    __riscv_vmflt_vf_f64m1_b64 (k2, 0., vl),
+                                    vl);
 }
 
 /**
@@ -18445,11 +22411,12 @@ jbm_solve_cubic_nxf64 (vfloat64m1_t a,
 {
   return
     __riscv_vfmerge_vvm_f64m1 (jbm_small_nxf64 (a, vl),
-                      jbm_solve_quadratic_nxf64 (b, c, d, x1, x2, vl),
-                      jbm_solve_cubic_reduced_nxf64 (__riscv_vfdiv_vv_f64m1 (b, a, vl),
-                                                     __riscv_vfdiv_vv_f64m1 (c, a, vl),
-                                                     __riscv_vfdiv_vv_f64m1 (d, a, vl),
-                                                     x1, x2, vl), vl);
+                               jbm_solve_quadratic_nxf64 (b, c, d, x1, x2, vl),
+                               jbm_solve_cubic_reduced_nxf64
+                               (__riscv_vfdiv_vv_f64m1 (b, a, vl),
+                                __riscv_vfdiv_vv_f64m1 (c, a, vl),
+                                __riscv_vfdiv_vv_f64m1 (d, a, vl), x1, x2, vl),
+                               vl);
 }
 
 /**
@@ -18497,8 +22464,9 @@ jbm_flux_limiter_centred_nxf64 (const vfloat64m1_t d1,
                                 ///< 2nd flux limiter function parameter.
                                 const size_t vl)        ///< array size.
 {
-  return __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl), __riscv_vfdiv_vv_f64m1 (d1, d2, vl),
-                           jbm_small_nxf64 (d2, vl), vl);
+  return __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl),
+                                    __riscv_vfdiv_vv_f64m1 (d1, d2, vl),
+                                    jbm_small_nxf64 (d2, vl), vl);
 }
 
 /**
@@ -18518,10 +22486,14 @@ jbm_flux_limiter_superbee_nxf64 (const vfloat64m1_t d1,
 {
   vfloat64m1_t r;
   r = __riscv_vfdiv_vv_f64m1 (d1, d2, vl);
-  r = __riscv_vfmax_vv_f64m1 (__riscv_vfmin_vf_f64m1 (jbm_dbl_nxf64 (r, vl), 1., vl),
-                      __riscv_vfmin_vf_f64m1 (r, 2., vl), vl);
-  return __riscv_vfmerge_vfm_f64m1 (r, 0., __riscv_vmfgt_vf_f64m1 (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
-                                                  DBL_EPSILON, vl), vl);
+  r =
+    __riscv_vfmax_vv_f64m1 (__riscv_vfmin_vf_f64m1
+                            (jbm_dbl_nxf64 (r, vl), 1., vl),
+                            __riscv_vfmin_vf_f64m1 (r, 2., vl), vl);
+  return __riscv_vfmerge_vfm_f64m1 (r, 0.,
+                                    __riscv_vmfgt_vf_f64m1
+                                    (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
+                                     DBL_EPSILON, vl), vl);
 }
 
 /**
@@ -18540,8 +22512,10 @@ jbm_flux_limiter_minmod_nxf64 (const vfloat64m1_t d1,
 {
   vfloat64m1_t r;
   r = __riscv_vfmin_vf_f64m1 (__riscv_vfdiv_vv_f64m1 (d1, d2), 1., vl);
-  return __riscv_vfmerge_vfm_f64m1 (r, 0., __riscv_vmfgt_vf_f64m1 (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
-                                                  DBL_EPSILON, vl), vl);
+  return __riscv_vfmerge_vfm_f64m1 (r, 0.,
+                                    __riscv_vmfgt_vf_f64m1
+                                    (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
+                                     DBL_EPSILON, vl), vl);
 }
 
 /**
@@ -18562,10 +22536,13 @@ jbm_flux_limiter_VanLeer_nxf64 (const vfloat64m1_t d1,
   vfloat64m1_t r, k;
   r = __riscv_vfdiv_vv_f64m1 (d1, d2, vl);
   k = jbm_abs_nxf64 (r, vl);
-  r = __riscv_vfdiv_vv_f64m1 (__riscv_vfadd_vv_f64m1 (r, k, vl), __riscv_vfadd_vf_f64m1 (k, 1., vl),
-                      vl);
-  return __riscv_vfmerge_vfm_f64m1 (r, 0., __riscv_vmfgt_vf_f64m1 (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
-                                                  DBL_EPSILON, vl), vl);
+  r =
+    __riscv_vfdiv_vv_f64m1 (__riscv_vfadd_vv_f64m1 (r, k, vl),
+                            __riscv_vfadd_vf_f64m1 (k, 1., vl), vl);
+  return __riscv_vfmerge_vfm_f64m1 (r, 0.,
+                                    __riscv_vmfgt_vf_f64m1
+                                    (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
+                                     DBL_EPSILON, vl), vl);
 }
 
 /**
@@ -18585,10 +22562,13 @@ jbm_flux_limiter_VanAlbada_nxf64 (const vfloat64m1_t d1,
   vfloat64m1_t r, k;
   r = __riscv_vfdiv_vv_f64m1 (d1, d2, vl);
   k = jbm_sqr_nxf64 (r, vl);
-  r = __riscv_vfdiv_vv_f64m1 (__riscv_vfadd_vv_f64m1 (r, k, vl), __riscv_vfadd_vf_f64m1 (k, 1., vl),
-                      vl);
-  return __riscv_vfmerge_vfm_f64m1 (r, 0., __riscv_vmfgt_vf_f64m1 (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
-                                                  DBL_EPSILON, vl), vl);
+  r =
+    __riscv_vfdiv_vv_f64m1 (__riscv_vfadd_vv_f64m1 (r, k, vl),
+                            __riscv_vfadd_vf_f64m1 (k, 1., vl), vl);
+  return __riscv_vfmerge_vfm_f64m1 (r, 0.,
+                                    __riscv_vmfgt_vf_f64m1
+                                    (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
+                                     DBL_EPSILON, vl), vl);
 }
 
 /**
@@ -18607,8 +22587,10 @@ jbm_flux_limiter_minsuper_nxf64 (const vfloat64m1_t d1,
 {
   vfloat64m1_t r;
   r = __riscv_vfmin_vf_f64m1 (__riscv_vfdiv_vv_f64m1 (d1, d2, vl), 2., vl);
-  return __riscv_vfmerge_vfm_f64m1 (r, 0., __riscv_vmfgt_vf_f64m1 (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
-                                                  DBL_EPSILON, vl), vl);
+  return __riscv_vfmerge_vfm_f64m1 (r, 0.,
+                                    __riscv_vmfgt_vf_f64m1
+                                    (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
+                                     DBL_EPSILON, vl), vl);
 }
 
 /**
@@ -18628,8 +22610,10 @@ jbm_flux_limiter_supermin_nxf64 (const vfloat64m1_t d1,
   vfloat64m1_t r;
   r = __riscv_vfdiv_vv_f64m1 (d1, d2, vl);
   r = __riscv_vfmin_vf_f64m1 (jbm_dbl_nxf64 (r, vl), 1., vl);
-  return __riscv_vfmerge_vfm_f64m1 (r, 0., __riscv_vmfgt_vf_f64m1 (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
-                                                  DBL_EPSILON, vl), vl);
+  return __riscv_vfmerge_vfm_f64m1 (r, 0.,
+                                    __riscv_vmfgt_vf_f64m1
+                                    (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
+                                     DBL_EPSILON, vl), vl);
 }
 
 /**
@@ -18650,12 +22634,16 @@ jbm_flux_limiter_monotonized_central_nxf64 (const vfloat64m1_t d1,
   vfloat64m1_t r, rm;
   r = __riscv_vfdiv_vv_f64m1 (d1, d2, vl);
   rm = __riscv_vfmul_vf_f64m1 (__riscv_vfadd_vf_f64m1 (r, 1., vl), 0.5, vl);
-  rm = __riscv_vfmerge_vfm_f64m1 (rm, 2., __riscv_vmflt_vf_f64m1_b64 (r, 3., vl), vl);
-  rm = __riscv_vfmerge_vfm_f64m1 (jbm_dbl_nxf64 (r, vl), rm,
-                         __riscv_vmfgt_vf_f64m1 (r, 1. / 3., vl), vl);
+  rm =
+    __riscv_vfmerge_vfm_f64m1 (rm, 2., __riscv_vmflt_vf_f64m1_b64 (r, 3., vl),
+                               vl);
+  rm =
+    __riscv_vfmerge_vfm_f64m1 (jbm_dbl_nxf64 (r, vl), rm,
+                               __riscv_vmfgt_vf_f64m1 (r, 1. / 3., vl), vl);
   return __riscv_vfmerge_vfm_f64m1 (rm, 0.,
-                           __riscv_vmfgt_vf_f64m1 (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
-                                           DBL_EPSILON, vl), vl);
+                                    __riscv_vmfgt_vf_f64m1
+                                    (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
+                                     DBL_EPSILON, vl), vl);
 }
 
 /**
@@ -18673,11 +22661,14 @@ jbm_flux_limiter_mean_nxf64 (const vfloat64m1_t d1,
                              const size_t vl)   ///< array size.
 {
   vfloat64m1_t r;
-  r = __riscv_vfmul_vf_f64m1 (__riscv_vfadd_vf_f64m1 (__riscv_vfdiv_vv_f64m1 (d1, d2, vl), 1., vl), 0.5,
-                      vl);
+  r =
+    __riscv_vfmul_vf_f64m1 (__riscv_vfadd_vf_f64m1
+                            (__riscv_vfdiv_vv_f64m1 (d1, d2, vl), 1., vl), 0.5,
+                            vl);
   return __riscv_vfmerge_vfm_f64m1 (r, 0.,
-                           __riscv_vmfgt_vf_f64m1 (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
-                                           DBL_EPSILON, vl), vl);
+                                    __riscv_vmfgt_vf_f64m1
+                                    (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
+                                     DBL_EPSILON, vl), vl);
 }
 
 /**
@@ -18775,7 +22766,9 @@ jbm_integral_nxf64 (vfloat64m1_t (*f) (vfloat64m1_t, size_t),
       k2 = __riscv_vfmul_vf_f64m1 (dx, b[i], vl);
       f1 = f (__riscv_vfsub_vv_f64m1 (x, k2, vl), vl);
       f2 = f (__riscv_vfadd_vv_f64m1 (x, k2, vl), vl);
-      k = __riscv_vfmacc_vf_f64m1 (k, a[i], __riscv_vfadd_vv_f64m1 (f1, f2, vl), vl);
+      k =
+        __riscv_vfmacc_vf_f64m1 (k, a[i], __riscv_vfadd_vv_f64m1 (f1, f2, vl),
+                                 vl);
     }
 #endif
   k = __riscv_vfmul_vv_f64m1 (k, dx, vl);
