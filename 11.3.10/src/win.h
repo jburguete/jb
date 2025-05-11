@@ -63,9 +63,7 @@ jbw_init (int *argn __attribute__((unused)),
 #include <vulkan/vulkan.h>
 #endif
 #include <gtk/gtk.h>
-#if HAVE_FREEGLUT
-#include <GL/freeglut.h>
-#elif HAVE_SDL
+#if HAVE_SDL
 #include <SDL.h>
 #if HAVE_VULKAN
 #include <SDL_vulkan.h>
@@ -283,8 +281,6 @@ struct _JBWGraphic
 #if HAVE_GTKGLAREA
   GtkWindow *window;            ///< GtkWindow window.
   GtkGLArea *widget;            ///< GtkGLArea widget.
-#elif HAVE_FREEGLUT
-  int window;                   ///< FreeGLUT window number.
 #elif HAVE_SDL
   SDL_Window *window;           ///< SDL window.
   SDL_GLContext *sdl_context;   ///< SDL context.
@@ -417,10 +413,6 @@ extern const GLfloat jbw_identity[16];
 #if HAVE_GTKGLAREA
 extern int (*jbw_graphic_loop_idle) (void);
 extern GMainLoop *jbw_graphic_loop_pointer;
-#elif HAVE_FREEGLUT
-extern void (*jbw_graphic_loop_idle) (void);
-extern void (*jbw_graphic_loop_resize) (int width, int height);
-extern void (*jbw_graphic_loop_render) (void);
 #elif HAVE_SDL
 extern int (*jbw_graphic_loop_idle) (void);
 extern void (*jbw_graphic_loop_resize) (int width, int height);
@@ -710,8 +702,6 @@ jbw_graphic_loop_quit (void)
 {
 #if HAVE_GTKGLAREA
   g_main_loop_quit (jbw_graphic_loop_pointer);
-#elif HAVE_FREEGLUT
-  glutLeaveMainLoop ();
 #elif HAVE_SDL
   SDL_Event event[1];
   event->type = SDL_QUIT;

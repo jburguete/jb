@@ -191,7 +191,7 @@ jbm_frexp_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  vint32m1_t *e, ///< pointer to the extracted exponents vector.
                  const size_t vl)       ///< vector size.
 {
-  vfloat32m1_t ax, yx, y2x, zx;
+  vfloat32m1_t yx, y2x, zx;
   vuint32m1_t ai, yi, y2i, zi;
   vint32m1_t en;
   vbool32_t m1, m2, m3;
@@ -209,21 +209,21 @@ jbm_frexp_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
   zi = __riscv_vand_vx_u32m1 (zi, 0x7f800000, vl);
   en =
     __riscv_vmerge_vvm_i32m1 (__riscv_vsub_vx_i32m1
-                              (__riscv_vshra_vi_i32m1 ((vint32m1_t) zi, 23, vl),
+                              (__riscv_vsra_vx_i32m1 (__riscv_vreinterpret_v_u32m1_i32m1 (zi), 23, vl),
                                253, vl),
-                              __riscv_vsub_vx_i32m1 (__riscv_vshra_vi_i32m1
-                                                     ((vint32m1_t) yi, 23, vl),
+                              __riscv_vsub_vx_i32m1 (__riscv_vsra_vx_i32m1
+                                                     (__riscv_vreinterpret_v_u32m1_i32m1 (yi), 23, vl),
                                                      126, vl), m2, vl);
   yx =
-    __riscv_vfmerge_vvm_f32m1 (__riscv_vfmul_vv_f32m1 (y2x, zx, vl), yx, m2,
+    __riscv_vmerge_vvm_f32m1 (__riscv_vfmul_vv_f32m1 (y2x, zx, vl), yx, m2,
                                vl);
   en =
     __riscv_vmerge_vvm_i32m1 (__riscv_vmv_v_x_i32m1 (0, vl), en,
-                              __riscv_vmor_mm (m1,
-                                               __riscv_vmand_mm (m2, m3, vl),
+                              __riscv_vmor_mm_b32 (m1,
+                                               __riscv_vmand_mm_b32 (m2, m3, vl),
                                                vl), vl);
   *e = en;
-  return __riscv_vfmerge_vvm_f32m1 (x,
+  return __riscv_vmerge_vvm_f32m1 (x,
                                     __riscv_vfmul_vf_f32m1
                                     (__riscv_vfdiv_vv_f32m1 (x, yx, vl), 0.5f,
                                      vl), m1, vl);
@@ -240,18 +240,18 @@ jbm_exp2n_nxf32 (vint32m1_t e,  ///< exponent vector (vint32m1_t).
                  const size_t vl)       ///< vector size.
 {
   vfloat32m1_t x;
-  x = __riscv_vfmerge_vvm_f32m1
-    ((vfloat32m1_t)
-     __riscv_vshla_vi_i32m1 (__riscv_vadd_vx_i32m1 (e, 127, vl), 23, vl),
-     (vfloat32m1_t)
-     __riscv_vshra_vv_i32m1 (__riscv_vmv_v_x_i32m1 (0x00400000, vl),
-                             __riscv_vsub_vx_i32m1 (e, 127, vl)),
-     __riscv_vmgt_vx_i32m1_b32 (e, 127, vl));
+  x = __riscv_vmerge_vvm_f32m1
+    (__riscv_vreinterpret_v_i32m1_f32m1
+     (__riscv_vsll_vx_i32m1 (__riscv_vadd_vx_i32m1 (e, 127, vl), 23, vl)),
+     __riscv_vreinterpret_v_i32m1_f32m1
+     (__riscv_vsll_vv_i32m1 (__riscv_vmv_v_x_i32m1 (0x00400000, vl),
+                             __riscv_vsub_vx_u32m1 (__riscv_vreinterpret_v_i32m1_u32m1 (e), 127, vl), vl)),
+     __riscv_vmsgt_vx_i32m1_b32 (e, 127, vl), vl);
   x =
-    __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f, vl), x,
-                               __riscv_vmlt_vx_i32m1_b32 (e, -150, vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (INFINITY, vl), x,
-                                    __riscv_vmgt_vx_i32m1_b32 (e, 127, vl), vl);
+    __riscv_vmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f, vl), x,
+                               __riscv_vmslt_vx_i32m1_b32 (e, -150, vl), vl);
+  return __riscv_vmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (INFINITY, vl), x,
+                                    __riscv_vmsgt_vx_i32m1_b32 (e, 127, vl), vl);
 }
 
 /**
@@ -302,7 +302,7 @@ jbm_modmin_nxf32 (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
                                vl);
   aa = jbm_abs_nxf32 (y, vl);
   ab = jbm_abs_nxf32 (b, vl);
-  return __riscv_vfmerge_vvm_f32m1 (b, y,
+  return __riscv_vmerge_vvm_f32m1 (b, y,
                                     __riscv_vmfgt_vv_f32m1_b32 (aa, ab, vl),
                                     vl);
 }
@@ -393,9 +393,9 @@ jbm_interpolate_nxf32 (const vfloat32m1_t x,
   vfloat32m1_t k;
   k = jbm_extrapolate_nxf32 (x, x1, x2, y1, y2, vl);
   k =
-    __riscv_vfmerge_vvm_f32m1 (k, y1, __riscv_vmfgt_vv_f32m1_b32 (x, x1, vl),
+    __riscv_vmerge_vvm_f32m1 (k, y1, __riscv_vmfgt_vv_f32m1_b32 (x, x1, vl),
                                vl);
-  return __riscv_vfmerge_vvm_f32m1 (k, y2,
+  return __riscv_vmerge_vvm_f32m1 (k, y2,
                                     __riscv_vmflt_vv_f32m1_b32 (x, x2, vl), vl);
 }
 
@@ -10129,7 +10129,7 @@ jbm_exp2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   vfloat32m1_t f, y;
   vint32m1_t i;
   i = jbm_floor_nxf32 (x, vl);
-  f = __riscv_vfsub_vv_f32m1 (x, __riscv_vfcvt_v_x_v_i32m1 (i, vl), vl);
+  f = __riscv_vfsub_vv_f32m1 (x, __riscv_vfcvt_f_x_v_f32m1 (i, vl), vl);
   y = jbm_exp2n_nxf32 (i, vl);
   return __riscv_vfmul_vv_f32m1 (y, jbm_exp2wc_nxf32 (f, vl), vl);
 }
@@ -10170,10 +10170,10 @@ static inline vfloat32m1_t
 jbm_expm1_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< array size.
 {
-  return __riscv_vfmerge_vvm_f32m1 (jbm_expm1wc_nxf32 (x, vl),
+  return __riscv_vmerge_vvm_f32m1 (jbm_expm1wc_nxf32 (x, vl),
                                     __riscv_vfsub_vf_f32m1 (jbm_exp_nxf32
                                                             (x, vl), 1.f, vl),
-                                    __riscv_vmflt_vf_f32m1 (jbm_abs_nxf32
+                                    __riscv_vmflt_vf_f32m1_b32 (jbm_abs_nxf32
                                                             (x, vl),
                                                             M_LN2f / 2.f, vl),
                                     vl);
@@ -10217,7 +10217,7 @@ jbm_log2_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   y = jbm_frexp_nxf32 (x, &e, vl);
   y =
     __riscv_vfadd_vv_f32m1 (jbm_log2wc_nxf32 (y, vl),
-                            __riscv_vfcvt_v_x_v_i32m1 (e, vl), vl);
+                            __riscv_vfcvt_f_x_v_f32m1 (e, vl), vl);
   y =
     __riscv_vfmerge_vfm_f32m1 (y, -INFINITY,
                                __riscv_vmfgt_vf_f32m1_b32 (x, 0.f, vl), vl);
@@ -10307,8 +10307,8 @@ jbm_cbrt_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   vfloat32m1_t f;
   f = jbm_abs_nxf32 (x, vl);
   f = jbm_pow_nxf32 (x, 1.f / 3.f, vl);
-  return __riscv_vfmerge_vvm_f32m1 (f, jbm_opposite_nxf32 (f, vl),
-                                    __riscv_vmfltz_vf_f32m1_b32 (x, 0.f, vl),
+  return __riscv_vmerge_vvm_f32m1 (f, jbm_opposite_nxf32 (f, vl),
+                                    __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl),
                                     vl);
 }
 
@@ -10390,29 +10390,29 @@ jbm_sin_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
   pi2 = __riscv_vfmv_v_f_f32m1 (2.f * M_PIf, vl);
   y = jbm_rest_nxf32 (x, pi2, vl);
   s = jbm_sinwc_nxf32 (__riscv_vfsub_vv_f32m1 (y, pi2, vl), vl);
-  s = __riscv_vfmerge_vvm_f32m1
+  s = __riscv_vmerge_vvm_f32m1
     (jbm_opposite_nxf32
      (jbm_coswc_nxf32
       (__riscv_vfsub_vv_f32m1
        (__riscv_vfmv_v_f_f32m1 (3.f * M_PI_2f, vl), y, vl), vl), vl), s,
      __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl), vl);
   s =
-    __riscv_vfmerge_vvm_f32m1 (jbm_sinwc_nxf32
+    __riscv_vmerge_vvm_f32m1 (jbm_sinwc_nxf32
                                (__riscv_vfsub_vv_f32m1
                                 (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl),
                                 vl), s, __riscv_vmflt_vf_f32m1_b32 (y,
                                                                     5.f *
                                                                     M_PI_4f,
-                                                                    vl));
+                                                                    vl), vl);
   s =
-    __riscv_vfmerge_vvm_f32m1 (jbm_coswc_nxf32
+    __riscv_vmerge_vvm_f32m1 (jbm_coswc_nxf32
                                (__riscv_vfsub_vv_f32m1
                                 (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl),
                                 vl), s, __riscv_vmflt_vf_f32m1_b32 (y,
                                                                     3.f *
                                                                     M_PI_4f,
                                                                     vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (jbm_sinwc_nxf32 (y, vl), s,
+  return __riscv_vmerge_vvm_f32m1 (jbm_sinwc_nxf32 (y, vl), s,
                                     __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl),
                                     vl);
 }
@@ -10432,14 +10432,14 @@ jbm_cos_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
   y = jbm_rest_nxf32 (x, pi2, vl);
   c = jbm_coswc_nxf32 (__riscv_vfsub_vv_f32m1 (y, pi2, vl), vl);
   c =
-    __riscv_vfmerge_vvm_f32m1 (jbm_sinwc_nxf32
+    __riscv_vmerge_vvm_f32m1 (jbm_sinwc_nxf32
                                (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl),
                                 vl), c, __riscv_vmflt_vf_f32m1_b32 (y,
                                                                     7.f *
                                                                     M_PI_4f,
                                                                     vl), vl);
   c =
-    __riscv_vfmerge_vvm_f32m1 (jbm_opposite_nxf32
+    __riscv_vmerge_vvm_f32m1 (jbm_opposite_nxf32
                                (jbm_coswc_nxf32
                                 (__riscv_vfsub_vv_f32m1
                                  (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl),
@@ -10449,14 +10449,14 @@ jbm_cos_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
                                                                           vl),
                                vl);
   c =
-    __riscv_vfmerge_vvm_f32m1 (jbm_sinwc_nxf32
+    __riscv_vmerge_vvm_f32m1 (jbm_sinwc_nxf32
                                (__riscv_vfsub_vv_f32m1
                                 (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl),
                                 vl), c, __riscv_vmflt_vf_f32m1_b32 (y,
                                                                     3.f *
                                                                     M_PI_4f,
                                                                     vl), vl);
-  return __riscv_vfmerge_vfm_f32m1 (jbm_coswc_nxf32 (y, vl), c,
+  return __riscv_vmerge_vvm_f32m1 (jbm_coswc_nxf32 (y, vl), c,
                                     __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl),
                                     vl);
 }
@@ -10482,24 +10482,24 @@ jbm_sincos_nxf32 (const vfloat32m1_t x,
   jbm_sincoswc_nxf32 (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl), &c2, &s2,
                       vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl);
-  s1 = __riscv_vfmerge_vvm_f32m1 (jbm_opposite_nxf32 (s2, vl), s1, m, vl);
-  c1 = __riscv_vfmerge_vvm_f32m1 (c2, c1, m, vl);
+  s1 = __riscv_vmerge_vvm_f32m1 (jbm_opposite_nxf32 (s2, vl), s1, m, vl);
+  c1 = __riscv_vmerge_vvm_f32m1 (c2, c1, m, vl);
   jbm_sincoswc_nxf32 (__riscv_vfsub_vv_f32m1
                       (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), &s2, &c2,
                       vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, 5.f * M_PI_4f, vl);
-  s1 = __riscv_vfmerge_vvm_f32m1 (s2, s1, m, vl);
-  c1 = __riscv_vfmerge_vvm_f32m1 (jbm_opposite_nxf32 (c2, vl), c1, m, vl);
+  s1 = __riscv_vmerge_vvm_f32m1 (s2, s1, m, vl);
+  c1 = __riscv_vmerge_vvm_f32m1 (jbm_opposite_nxf32 (c2, vl), c1, m, vl);
   jbm_sincoswc_nxf32 (__riscv_vfsub_vv_f32m1
                       (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl), &c2, &s2,
                       vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, 3.f * M_PI_4f, vl);
-  s1 = __riscv_vfmerge_vvm_f32m1 (s2, s1, m, vl);
-  c1 = __riscv_vfmerge_vvm_f32m1 (c2, c1, m, vl);
+  s1 = __riscv_vmerge_vvm_f32m1 (s2, s1, m, vl);
+  c1 = __riscv_vmerge_vvm_f32m1 (c2, c1, m, vl);
   jbm_sincoswc_nxf32 (y, &s2, &c2, vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl);
-  *s = __riscv_vfmerge_vvm_f32m1 (s2, s1, m, vl);
-  *c = __riscv_vfmerge_vvm_f32m1 (c2, c1, m, vl);
+  *s = __riscv_vmerge_vvm_f32m1 (s2, s1, m, vl);
+  *c = __riscv_vmerge_vvm_f32m1 (c2, c1, m, vl);
 }
 
 /**
@@ -10577,16 +10577,16 @@ jbm_atan_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   vbool32_t m;
   ax = jbm_abs_nxf32 (x, vl);
   m = __riscv_vmfgt_vf_f32m1_b32 (ax, 1.5f, vl);
-  ax = __riscv_vfmerge_vvm_f32m1 (jbm_reciprocal_nxf32 (ax, vl), ax, m, vl);
+  ax = __riscv_vmerge_vvm_f32m1 (jbm_reciprocal_nxf32 (ax, vl), ax, m, vl);
   f =
-    __riscv_vfmerge_vvm_f32m1 (jbm_atanwc1_nxf32 (ax, vl),
+    __riscv_vmerge_vvm_f32m1 (jbm_atanwc1_nxf32 (ax, vl),
                                jbm_atanwc0_nxf32 (ax, vl),
                                __riscv_vmfgt_vf_f32m1_b32 (ax, 0.5f, vl), vl);
   f =
-    __riscv_vfmerge_vvm_f32m1 (__riscv_vfsub_vv_f32m1
+    __riscv_vmerge_vvm_f32m1 (__riscv_vfsub_vv_f32m1
                                (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), f, vl), f,
-                               m, f);
-  return __riscv_vfmerge_vvm_f32m1 (jbm_opposite_nxf32 (f, vl), f,
+                               m, vl);
+  return __riscv_vmerge_vvm_f32m1 (jbm_opposite_nxf32 (f, vl), f,
                                     __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl),
                                     vl);
 }
@@ -10607,11 +10607,11 @@ jbm_atan2_nxf32 (const vfloat32m1_t y,  ///< vfloat32m1_t y component.
   f = jbm_atan_nxf32 (__riscv_vfdiv_vv_f32m1 (y, x, vl), vl);
   mx = __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl);
   my = __riscv_vmflt_vf_f32m1_b32 (y, 0.f, vl);
-  f = __riscv_vfmerge_vvm_f32m1 (__riscv_vfsub_vf_f32m1 (f, M_PIf, vl), f,
-                                 __riscv_vmand_mm (my, mx, vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (__riscv_vfadd_vf_f32m1 (f, M_PIf, vl), f,
-                                    __riscv_vmand_mm (my,
-                                                      __riscv_vmnot_m (mx, vl),
+  f = __riscv_vmerge_vvm_f32m1 (__riscv_vfsub_vf_f32m1 (f, M_PIf, vl), f,
+                                 __riscv_vmand_mm_b32 (my, mx, vl), vl);
+  return __riscv_vmerge_vvm_f32m1 (__riscv_vfadd_vf_f32m1 (f, M_PIf, vl), f,
+                                    __riscv_vmand_mm_b32 (my,
+                                                      __riscv_vmnot_m_b32 (mx, vl),
                                                       vl), vl);
 }
 
@@ -10628,11 +10628,11 @@ jbm_asin_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   return
     jbm_atan_nxf32
     (__riscv_vfdiv_vv_f32m1 (x,
-                             __riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vv_f32m1
+                             __riscv_vfsqrt_v_f32m1 (__riscv_vfmsac_vv_f32m1
                                                      (__riscv_vfmv_v_f_f32m1
                                                       (1.f, vl),
-                                                      jbm_sqr_nxf32 (x, vl),
-                                                      vl), vl), vl), vl);
+                                                      x, x, vl),
+                                                      vl), vl), vl);
 }
 
 /**
@@ -10649,11 +10649,11 @@ jbm_acos_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   f =
     jbm_atan_nxf32 (__riscv_vfdiv_vv_f32m1
                     (__riscv_vfsqrt_v_f32m1
-                     (__riscv_vfsub_vv_f32m1
-                      (__riscv_vfmv_v_f_f32m1 (1.f, vl), jbm_sqr_nxf32 (x, vl),
-                       vl), x, vl), vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (__riscv_vfadd_vf_f32m1 (f, M_PIf, vl), f,
-                                    __riscv_vmflt_vf_f32m1 (x, 0.f, vl), vl);
+                     (__riscv_vfmsac_vv_f32m1
+                      (__riscv_vfmv_v_f_f32m1 (1.f, vl), x, x, vl),
+                       vl), x, vl), vl);
+  return __riscv_vmerge_vvm_f32m1 (__riscv_vfadd_vf_f32m1 (f, M_PIf, vl), f,
+                                    __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl), vl);
 }
 
 /**
@@ -10704,10 +10704,10 @@ jbm_tanh_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t number.
     __riscv_vfdiv_vv_f32m1 (__riscv_vfsub_vv_f32m1 (f, fi, vl),
                             __riscv_vfadd_vv_f32m1 (f, fi, vl), vl);
   f =
-    __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), f,
+    __riscv_vmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), f,
                                __riscv_vmfgt_vf_f32m1_b32 (x, JBM_FLT_MAX_E_EXP,
                                                            vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (-1.f, vl), f,
+  return __riscv_vmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (-1.f, vl), f,
                                     __riscv_vmflt_vf_f32m1_b32 (x,
                                                                 -JBM_FLT_MAX_E_EXP,
                                                                 vl), vl);
@@ -10763,8 +10763,8 @@ jbm_atanh_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t number.
     __riscv_vfmul_vf_f32m1 (jbm_log_nxf32
                             (__riscv_vfdiv_vv_f32m1
                              (__riscv_vfadd_vv_f32m1 (u, x, vl),
-                              __riscv_vfsub_vv_f32m1 (u, x, vl), vl), 0.5f, vl),
-                            vl);
+                              __riscv_vfsub_vv_f32m1 (u, x, vl), vl), vl),
+                            0.5f, vl);
 }
 
 /**
@@ -10819,7 +10819,7 @@ jbm_erfcwc_nxf32 (const vfloat32m1_t x,
                             (jbm_reciprocal_nxf32 (x2, vl), a, vl),
                             __riscv_vfmul_vv_f32m1 (x, jbm_exp_nxf32 (x2, vl),
                                                     vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f), f,
+  return __riscv_vmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f, vl), f,
                                     __riscv_vmfgt_vf_f32m1_b32 (x, m, vl), vl);
 
 }
@@ -10841,7 +10841,7 @@ jbm_erf_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
                               __riscv_vfsub_vv_f32m1 (u,
                                                       jbm_erfcwc_nxf32 (ax, vl),
                                                       vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (jbm_erfwc_nxf32 (x, vl), f,
+  return __riscv_vmerge_vvm_f32m1 (jbm_erfwc_nxf32 (x, vl), f,
                                     __riscv_vmflt_vv_f32m1_b32 (ax, u, vl), vl);
 }
 
@@ -10868,7 +10868,7 @@ jbm_erfc_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                                                                               vl),
                                                       vl), vl);
   return
-    __riscv_vfmerge_vvm_f32m1 (__riscv_vfsub_vv_f32m1
+    __riscv_vmerge_vvm_f32m1 (__riscv_vfsub_vv_f32m1
                                (u, jbm_erfwc_nxf32 (x, vl), vl), f,
                                __riscv_vmflt_vv_f32m1_b32 (ax, u, vl), vl);
 }
@@ -10899,9 +10899,9 @@ jbm_solve_quadratic_reduced_nxf32 (vfloat32m1_t a,
   k1 = __riscv_vfadd_vv_f32m1 (a, b, vl);
   k2 = __riscv_vfsub_vv_f32m1 (a, b, vl);
   k1 =
-    __riscv_vfmerge_vvm_f32m1 (k2, k1, __riscv_vmflt_vv_f32m1_b32 (k1, x1, vl),
+    __riscv_vmerge_vvm_f32m1 (k2, k1, __riscv_vmflt_vv_f32m1_b32 (k1, x1, vl),
                                vl);
-  return __riscv_vfmerge_vvm_f32m1 (k2, k1,
+  return __riscv_vmerge_vvm_f32m1 (k2, k1,
                                     __riscv_vmfgt_vv_f32m1_b32 (k1, x2, vl),
                                     vl);
 }
@@ -10931,7 +10931,7 @@ jbm_solve_quadratic_nxf32 (const vfloat32m1_t a,
                                           __riscv_vfdiv_vv_f32m1 (c, a, vl),
                                           x1, x2, vl);
   k2 = __riscv_vfdiv_vv_f32m1 (jbm_opposite_nxf32 (c, vl), b, vl);
-  return __riscv_vfmerge_vvm_f32m1 (k2, k1, jbm_small_nxf32 (a, vl), vl);
+  return __riscv_vmerge_vvm_f32m1 (k2, k1, jbm_small_nxf32 (a, vl), vl);
 }
 
 /**
@@ -10954,19 +10954,16 @@ jbm_solve_cubic_reduced_nxf32 (const vfloat32m1_t a,
                                ///< right limit of the solution interval.
                                const size_t vl) ///< array size.
 {
-  vfloat32m1_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2;
+  vfloat32m1_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5;
   a3 = __riscv_vfmul_vf_f32m1 (a, 1.f / 3.f, vl);
   k0 = jbm_sqr_nxf32 (a3, vl);
   k1 =
     __riscv_vfsub_vv_f32m1 (k0, __riscv_vfmul_vf_f32m1 (b, 1.f / 3.f, vl), vl);
   k0 =
-    __riscv_vfsub_vv_f32n1 (__riscv_vfmul_vv_f32m1 (a3, k0, vl),
-                            __riscv_vfmul_vf_f32m1 (__riscv_vfsub_vv_f32m1
-                                                    (b,
-                                                     __riscv_vfmul_vv_f32m1 (a3,
-                                                                             c,
-                                                                             vl),
-                                                     0.5f, vl), vl), vl);
+    __riscv_vfsub_vv_f32m1 (__riscv_vfmul_vv_f32m1 (a3, k0, vl),
+                            __riscv_vfmul_vf_f32m1 (__riscv_vfmsac_vv_f32m1
+                                                    (b, a3, c, vl),
+                                                     0.5f, vl), vl);
   k3 = __riscv_vfmul_vv_f32m1 (k1, jbm_sqr_nxf32 (k1, vl), vl);
   k2 = __riscv_vfmacc_vv_f32m1 (k3, k0, k0, vl);
   l1 = __riscv_vfsqrt_v_f32m1 (jbm_opposite_nxf32 (k1, vl), vl);
@@ -10987,8 +10984,8 @@ jbm_solve_cubic_reduced_nxf32 (const vfloat32m1_t a,
                                                      (l0, 2.f * M_PIf / 3.f,
                                                       vl), vl), vl), vl);
   l3 =
-    __riscv_vfmerge_vvm_f32m1 (l2, l3,
-                               __riscv_vmor_mm (__riscv_vmflt_vv_f32m1_b32
+    __riscv_vmerge_vvm_f32m1 (l2, l3,
+                               __riscv_vmor_mm_b32 (__riscv_vmflt_vv_f32m1_b32
                                                 (l2, x1, vl),
                                                 __riscv_vmfgt_vv_f32m1_b32 (l2,
                                                                             x2,
@@ -11002,8 +10999,8 @@ jbm_solve_cubic_reduced_nxf32 (const vfloat32m1_t a,
                                                      (l0, 2.f * M_PIf / 3.f,
                                                       vl), vl), vl), vl);
   l4 =
-    __riscv_vfmerge_vvm_f32m1 (l3, l4,
-                               __riscv_vmor_mm (__riscv_vmflt_vv_f32m1_b32
+    __riscv_vmerge_vvm_f32m1 (l3, l4,
+                               __riscv_vmor_mm_b32 (__riscv_vmflt_vv_f32m1_b32
                                                 (l3, x1, vl),
                                                 __riscv_vmfgt_vv_f32m1_b32 (l3,
                                                                             x2,
@@ -11017,7 +11014,7 @@ jbm_solve_cubic_reduced_nxf32 (const vfloat32m1_t a,
     __riscv_vfadd_vv_f32m1 (l5,
                             __riscv_vfsub_vv_f32m1 (jbm_cbrt_nxf32 (k0, vl), a3,
                                                     vl), vl);
-  return __riscv_vfmerge_vvm_f32m1 (l5, l4,
+  return __riscv_vmerge_vvm_f32m1 (l5, l4,
                                     __riscv_vmflt_vf_f32m1_b32 (k2, 0.f, vl),
                                     vl);
 }
@@ -11045,7 +11042,7 @@ jbm_solve_cubic_nxf32 (vfloat32m1_t a,
                        const size_t vl) ///< array size.
 {
   return
-    __riscv_vfmerge_vvm_f32m1
+    __riscv_vmerge_vvm_f32m1
     (jbm_solve_quadratic_nxf32 (b, c, d, x1, x2, vl),
      jbm_solve_cubic_reduced_nxf32 (__riscv_vfdiv_vv_f32m1 (b, a, vl),
                                     __riscv_vfdiv_vv_f32m1 (c, a, vl),
@@ -11099,7 +11096,7 @@ jbm_flux_limiter_centred_nxf32 (const vfloat32m1_t d1,
                                 ///< 2nd flux limiter function parameter.
                                 const size_t vl)        ///< array size.
 {
-  return __riscv_vfmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f, vl),
+  return __riscv_vmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f, vl),
                                     __riscv_vfdiv_vv_f32m1 (d1, d2, vl),
                                     jbm_small_nxf32 (d2, vl), vl);
 }
@@ -11126,7 +11123,7 @@ jbm_flux_limiter_superbee_nxf32 (const vfloat32m1_t d1,
                             (jbm_dbl_nxf32 (r, vl), 1.f, vl),
                             __riscv_vfmin_vf_f32m1 (r, 2.f, vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                                    __riscv_vmfgt_vf_f32m1
+                                    __riscv_vmfgt_vf_f32m1_b32
                                     (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
                                      FLT_EPSILON, vl), vl);
 }
@@ -11148,7 +11145,7 @@ jbm_flux_limiter_minmod_nxf32 (const vfloat32m1_t d1,
   vfloat32m1_t r;
   r = __riscv_vfmin_vf_f32m1 (__riscv_vfdiv_vv_f32m1 (d1, d2, vl), 1.f, vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                                    __riscv_vmfgt_vf_f32m1
+                                    __riscv_vmfgt_vf_f32m1_b32
                                     (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
                                      FLT_EPSILON, vl), vl);
 }
@@ -11175,7 +11172,7 @@ jbm_flux_limiter_VanLeer_nxf32 (const vfloat32m1_t d1,
     __riscv_vfdiv_vv_f32m1 (__riscv_vfadd_vv_f32m1 (r, k, vl),
                             __riscv_vfadd_vf_f32m1 (k, 1.f, vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                                    __riscv_vmfgt_vf_f32m1
+                                    __riscv_vmfgt_vf_f32m1_b32
                                     (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
                                      FLT_EPSILON, vl), vl);
 }
@@ -11201,7 +11198,7 @@ jbm_flux_limiter_VanAlbada_nxf32 (const vfloat32m1_t d1,
     __riscv_vfdiv_vv_f32m1 (__riscv_vfadd_vv_f32m1 (r, k, vl),
                             __riscv_vfadd_vf_f32m1 (k, 1.f, vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                                    __riscv_vmfgt_vf_f32m1
+                                    __riscv_vmfgt_vf_f32m1_b32
                                     (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
                                      FLT_EPSILON, vl), vl);
 }
@@ -11225,7 +11222,7 @@ jbm_flux_limiter_minsuper_nxf32 (const vfloat32m1_t d1,
     __riscv_vfmin_vv_f32m1 (__riscv_vfdiv_vv_f32m1 (d1, d2, vl),
                             __riscv_vfmv_v_f_f32m1 (2.f, vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                                    __riscv_vmfgt_vf_f32m1
+                                    __riscv_vmfgt_vf_f32m1_b32
                                     (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
                                      FLT_EPSILON, vl), vl);
 }
@@ -11248,7 +11245,7 @@ jbm_flux_limiter_supermin_nxf32 (const vfloat32m1_t d1,
   r = __riscv_vfdiv_vv_f32m1 (d1, d2, vl);
   r = __riscv_vfmin_vf_f32m1 (jbm_dbl_nxf32 (r, vl), 1.f, vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                                    __riscv_vmfgt_vf_f32m1
+                                    __riscv_vmfgt_vf_f32m1_b32
                                     (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
                                      FLT_EPSILON, vl), vl);
 }
@@ -11275,10 +11272,10 @@ jbm_flux_limiter_monotonized_central_nxf32 (const vfloat32m1_t d1,
     __riscv_vfmerge_vfm_f32m1 (rm, 2.f, __riscv_vmflt_vf_f32m1_b32 (r, 3.f, vl),
                                vl);
   rm =
-    __riscv_vfmerge_vfm_f32m1 (jbm_dbl_nxf32 (r, vl), rm,
-                               __riscv_vmfgt_vf_f32m1 (r, 1.f / 3.f, vl), vl);
+    __riscv_vmerge_vvm_f32m1 (jbm_dbl_nxf32 (r, vl), rm,
+                               __riscv_vmfgt_vf_f32m1_b32 (r, 1.f / 3.f, vl), vl);
   return __riscv_vfmerge_vfm_f32m1 (rm, 0.f,
-                                    __riscv_vmfgt_vf_f32m1
+                                    __riscv_vmfgt_vf_f32m1_b32
                                     (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
                                      FLT_EPSILON, vl), vl);
 }
@@ -11303,7 +11300,7 @@ jbm_flux_limiter_mean_nxf32 (const vfloat32m1_t d1,
                             (__riscv_vfdiv_vv_f32m1 (d1, d2, vl), 1.f, vl),
                             0.5f, vl);
   return __riscv_vfmerge_vfm_f32m1 (r, 0.f,
-                                    __riscv_vmfgt_vf_f32m1
+                                    __riscv_vmfgt_vf_f32m1_b32
                                     (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
                                      FLT_EPSILON, vl), vl);
 }
@@ -11462,7 +11459,7 @@ jbm_hypot_nxf64 (const vfloat64m1_t x,  ///< 1st vfloat64m1_t vector.
 {
   return
     __riscv_vfsqrt_v_f64m1 (__riscv_vfmacc_vv_f64m1
-                            (jbm_sqr_nxf64 (x, vl), y, y, vl), vl);
+                            (__riscv_vfmul_vv_f64m1 (x, x, vl), y, y, vl), vl);
 }
 
 /**
@@ -11505,39 +11502,41 @@ jbm_frexp_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  vint64m1_t *e, ///< pointer to the extracted exponents vector.
                  const size_t vl)       ///< vector size.
 {
-  JBMNxF64 a, y, y2, z;
+  vfloat64m1_t yx, y2x, zx;
+  vuint64m1_t ai, yi, y2i, zi;
   vint64m1_t en;
   vbool64_t m1, m2, m3;
-  a.x = x;
-  b = __riscv_vfmv_v_x_u64m1 ();
-  y.i = __riscv_vand_vx_u64m1 (a.i, 0x7ff0000000000000L, vl);
-  m1 = __riscv_vmfeq_vx_u64m1_b64 (y.i, 0x7ff0000000000000L, vl);
-  m2 = __riscv_vmfeq_vx_u64m1_b64 (y.i, 0L, vl);
-  y2.x = x;
-  y2.i = __riscv_vand_vx_u64m1 (y2.i, 0x000fffffffffffffL, vl);
-  m3 = __riscv_vmfeq_vx_u64m1_b64 (y2.i, 0L, vl);
-  y2.i = __riscv_vfmv_v_x_u64m1 (0x0010000000000000L, vl);
-  z.x = __riscv_vfdiv_vv_f64m1 (x, y2.x, vl);
-  z.i = __riscv_vand_vx_u64m1 (z.i, 0x7ff0000000000000L, vl);
+  ai = __riscv_vreinterpret_v_f64m1_u64m1 (x);
+  yi = __riscv_vand_vx_u64m1 (ai, 0x7ff0000000000000L, vl);
+  m1 = __riscv_vmseq_vx_u64m1_b64 (yi, 0x7ff0000000000000L, vl);
+  m2 = __riscv_vmseq_vx_u64m1_b64 (yi, 0L, vl);
+  y2i = ai;
+  y2i = __riscv_vand_vx_u64m1 (y2i, 0x000fffffffffffffL, vl);
+  m3 = __riscv_vmseq_vx_u64m1_b64 (y2i, 0L, vl);
+  y2i = __riscv_vmv_v_x_u64m1 (0x0010000000000000L, vl);
+  y2x = __riscv_vreinterpret_v_u64m1_f64m1 (y2i);
+  zx = __riscv_vfdiv_vv_f64m1 (x, y2x, vl);
+  zi = __riscv_vreinterpret_v_f64m1_u64m1 (zx);
+  zi = __riscv_vand_vx_u64m1 (zi, 0x7ff0000000000000L, vl);
   en =
     __riscv_vmerge_vvm_i64m1 (__riscv_vsub_vx_i64m1
-                              (__riscv_vshra_vi_i64m1
-                               ((vint64m1_t) z.i, 52, vl), 2044L, vl),
-                              __riscv_vsub_vx_i64m1 (__riscv_vshra_vi_i64m1
-                                                     ((vint64m1_t) y.i, 52, vl),
+                              (__riscv_vsra_vx_i64m1 (__riscv_vreinterpret_v_u64m1_i64m1 (zi), 52, vl),
+                               2044L, vl),
+                              __riscv_vsub_vx_i64m1 (__riscv_vsra_vx_i64m1
+                                                     (__riscv_vreinterpret_v_u64m1_i64m1 (yi), 52, vl),
                                                      1022L, vl), m2, vl);
-  y.x =
-    __riscv_vfmerge_vvm_f64m1 (__riscv_vfmul_vv_f64m1 (y2.x, z.x, vl), y.x, m2,
+  yx =
+    __riscv_vmerge_vvm_f64m1 (__riscv_vfmul_vv_f64m1 (y2x, zx, vl), yx, m2,
                                vl);
   en =
     __riscv_vmerge_vvm_i64m1 (__riscv_vmv_v_x_i64m1 (0L, vl), en,
-                              __riscv_vmor_mm (m1,
-                                               __riscv_vmand_mm (m2, m3, vl),
+                              __riscv_vmor_mm_b64 (m1,
+                                               __riscv_vmand_mm_b64 (m2, m3, vl),
                                                vl), vl);
   *e = en;
-  return __riscv_vfmerge_vvm_f64m1 (x,
+  return __riscv_vmerge_vvm_f64m1 (x,
                                     __riscv_vfmul_vf_f64m1
-                                    (__riscv_vfdiv_vv_f64m1 (x, y.x, vl), 0.5,
+                                    (__riscv_vfdiv_vv_f64m1 (x, yx, vl), 0.5,
                                      vl), m1, vl);
 }
 
@@ -11552,18 +11551,18 @@ jbm_exp2n_nxf64 (vint64m1_t e,  ///< exponent vector (vint64m1_t).
                  const size_t vl)       ///< vector size.
 {
   vfloat64m1_t x;
-  x = __riscv_vfmerge_vvm_f64m1
-    ((vfloat64m1_t)
-     __riscv_vshla_vi_i64m1 (__riscv_vadd_vx_i64m1 (e, 1023L, vl), 52, vl),
-     (vfloat64m1_t)
-     __riscv_vshra_vv_i64m1 (__riscv_vmv_v_x_i64m1 (0x0008000000000000L, vl),
-                             __riscv_vsub_vx_i64m1 (e, -1023L, vl)),
-     __riscv_vmgt_vx_i64m1_b64 (e, -1023L, vl));
+  x = __riscv_vmerge_vvm_f64m1
+    (__riscv_vreinterpret_v_i64m1_f64m1
+     (__riscv_vsll_vx_i64m1 (__riscv_vadd_vx_i64m1 (e, 1023L, vl), 52, vl)),
+     __riscv_vreinterpret_v_i64m1_f64m1
+     (__riscv_vsra_vv_i64m1 (__riscv_vmv_v_x_i64m1 (0x0008000000000000L, vl),
+                             __riscv_vsub_vx_u64m1 (__riscv_vreinterpret_v_i64m1_u64m1 (e), -1023L, vl), vl)),
+     __riscv_vmsgt_vx_i64m1_b64 (e, -1023L, vl), vl);
   x =
-    __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl), x,
-                               __riscv_vmlt_vx_i64m1_b64 (e, -1074L, vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (INFINITY, vl), x,
-                                    __riscv_vmgt_vx_i64m1_b64 (e, 1023L, vl),
+    __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl), x,
+                               __riscv_vmslt_vx_i64m1_b64 (e, -1074L, vl), vl);
+  return __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (INFINITY, vl), x,
+                                    __riscv_vmsgt_vx_i64m1_b64 (e, 1023L, vl),
                                     vl);
 }
 
@@ -11589,7 +11588,7 @@ static inline vbool64_t
 jbm_small_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  return __riscv_vmflt_vf_f64m1_b32 (jbm_abs_nxf64 (x, vl), DBL_EPSILON, vl);
+  return __riscv_vmflt_vf_f64m1_b64 (jbm_abs_nxf64 (x, vl), DBL_EPSILON, vl);
 }
 
 /**
@@ -11611,11 +11610,11 @@ jbm_modmin_nxf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
   vfloat64m1_t aa, ab, y;
   ab = __riscv_vfmul_vv_f64m1 (a, b, vl);
   y =
-    __riscv_vfmerge_vfm_f64m1 (a, 0., __riscv_vmfgt_vf_f64m1_b64 (ab, 0., vl)),
-    vl;
+    __riscv_vfmerge_vfm_f64m1 (a, 0., __riscv_vmfgt_vf_f64m1_b64 (ab, 0., vl),
+    vl);
   aa = jbm_abs_nxf64 (y, vl);
   ab = jbm_abs_nxf64 (b, vl);
-  return __riscv_vfmerge_vvm_f64m1 (b, y,
+  return __riscv_vmerge_vvm_f64m1 (b, y,
                                     __riscv_vmfgt_vv_f64m1_b64 (aa, ab, vl),
                                     vl);
 }
@@ -11708,10 +11707,10 @@ jbm_interpolate_nxf64 (const vfloat64m1_t x,
   vfloat64m1_t k;
   k = jbm_extrapolate_nxf64 (x, x1, x2, y1, y2, vl);
   k =
-    __riscv_vfmerge_vvm_f64m1 (k, y1, __riscv_vmfgt_vv_f64m1_b32 (x, x1, vl),
+    __riscv_vmerge_vvm_f64m1 (k, y1, __riscv_vmfgt_vv_f64m1_b64 (x, x1, vl),
                                vl);
-  return __riscv_vfmerge_vvm_f64m1 (k, y2,
-                                    __riscv_vmflt_vv_f64m1_b32 (x, x2, vl), vl);
+  return __riscv_vmerge_vvm_f64m1 (k, y2,
+                                    __riscv_vmflt_vv_f64m1_b64 (x, x2, vl), vl);
 }
 
 /**
@@ -11782,7 +11781,7 @@ jbm_polynomial_1_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const double *p,        ///< array of coefficients.
                         const size_t vl)        ///< array size.
 {
-  return __riscv_vfmacc_vx_f64m1 (__riscv_vfmv_v_f_f64 (p[0], vl), p[1], x, vl);
+  return __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), p[1], x, vl);
 }
 
 /**
@@ -12188,8 +12187,8 @@ jbm_rational_1_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const size_t vl)        ///< array size.
 {
   return __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
-                                 __riscv_vfmacc_vf_f64 (__riscv_vfmv_v_f_f64m1
-                                                        (1., vl), p[1], x, vl));
+                                 __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
+                                                        (1., vl), p[1], x, vl), vl);
 }
 
 /**
@@ -21413,16 +21412,16 @@ jbm_expm1wc_nxf64 (const vfloat64m1_t x,
                                                      (1., vl), x,
                                                      __riscv_vfmacc_vv_f64m1
                                                      (__riscv_vfmv_v_f_f64m1
-                                                      (a4), x,
+                                                      (a4, vl), x,
                                                       __riscv_vfmacc_vv_f64m1
                                                       (__riscv_vfmv_v_f_f64m1
-                                                       (a5), x,
+                                                       (a5, vl), x,
                                                        __riscv_vfmacc_vv_f64m1
                                                        (__riscv_vfmv_v_f_f64m1
-                                                        (a6), x,
+                                                        (a6, vl), x,
                                                         __riscv_vfmacc_vf_f64m1
                                                         (__riscv_vfmv_v_f_f64m1
-                                                         (a7), a9, x2, vl), vl),
+                                                         (a7, vl), a9, x2, vl), vl),
                                                        vl), vl), vl), vl);
 }
 
@@ -21466,7 +21465,7 @@ jbm_exp2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
   vfloat64m1_t f, y;
   vint64m1_t i;
   i = jbm_floor_nxf64 (x, vl);
-  f = __riscv_vfsub_vv_f64m1 (x, __riscv_vfcvt_v_x_v_i64m1 (i, vl), vl);
+  f = __riscv_vfsub_vv_f64m1 (x, __riscv_vfcvt_f_x_v_f64m1 (i, vl), vl);
   y = jbm_exp2n_nxf64 (i, vl);
   return __riscv_vfmul_vv_f64m1 (y, jbm_exp2wc_nxf64 (f, vl), vl);
 }
@@ -21506,10 +21505,10 @@ static inline vfloat64m1_t
 jbm_expm1_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< array size.
 {
-  return __riscv_vfmerge_vvm_f64m1 (jbm_expm1wc_nxf64 (x, vl),
+  return __riscv_vmerge_vvm_f64m1 (jbm_expm1wc_nxf64 (x, vl),
                                     __riscv_vfsub_vf_f64m1 (jbm_exp_nxf64
                                                             (x, vl), 1., vl),
-                                    __riscv_vmflt_vf_f64m1 (jbm_abs_nxf64
+                                    __riscv_vmflt_vf_f64m1_b64 (jbm_abs_nxf64
                                                             (x, vl), M_LN2 / 2.,
                                                             vl), vl);
 }
@@ -21560,7 +21559,7 @@ jbm_log2_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
   y = jbm_frexp_nxf64 (x, &e, vl);
   y =
     __riscv_vfadd_vv_f64m1 (jbm_log2wc_nxf64 (y, vl),
-                            __riscv_vfcvt_v_x_v_i64m1 (e, vl), vl);
+                            __riscv_vfcvt_f_x_v_f64m1 (e, vl), vl);
   y =
     __riscv_vfmerge_vfm_f64m1 (y, -INFINITY,
                                __riscv_vmfgt_vf_f64m1_b64 (x, 0., vl), vl);
@@ -21649,8 +21648,8 @@ jbm_cbrt_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   vfloat64m1_t f;
   f = jbm_pow_nxf64 (jbm_abs_nxf64 (x, vl), 1. / 3., vl);
-  return __riscv_vfmerge_vvm_f64m1 (f, jbm_opposite_nxf64 (f, vl),
-                                    __riscv_vmfltz_vf_f64m1_b64 (x, 0., vl),
+  return __riscv_vmerge_vvm_f64m1 (f, jbm_opposite_nxf64 (f, vl),
+                                    __riscv_vmflt_vf_f64m1_b64 (x, 0., vl),
                                     vl);
 }
 
@@ -21719,7 +21718,7 @@ jbm_sincoswc_nxf64 (const vfloat64m1_t x,
   vfloat64m1_t s0;
   *s = s0 = jbm_sinwc_nxf64 (x, vl);
   *c =
-    __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64
+    __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64m1
                             (__riscv_vfmv_v_f_f64m1 (1., vl),
                              jbm_sqr_nxf64 (x, vl), vl), vl);
 }
@@ -21738,23 +21737,23 @@ jbm_sin_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
   pi2 = __riscv_vfmv_v_f_f64m1 (2. * M_PI, vl);
   y = jbm_rest_nxf64 (x, pi2, vl);
   s = jbm_sinwc_nxf64 (__riscv_vfsub_vv_f64m1 (y, pi2, vl), vl);
-  s = __riscv_vfmerge_vvm_f64m1
+  s = __riscv_vmerge_vvm_f64m1
     (jbm_opposite_nxf64
      (jbm_coswc_nxf64
       (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (3. * M_PI_2, vl), y, vl),
        vl), vl), s, __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
   s =
-    __riscv_vfmerge_vvm_f64m1 (jbm_sinwc_nxf64
+    __riscv_vmerge_vvm_f64m1 (jbm_sinwc_nxf64
                                (__riscv_vfsub_vv_f64m1
-                                (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl)), s,
-                               __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl));
+                                (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), vl), s,
+                               __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl), vl);
   s =
-    __riscv_vfmerge_vvm_f64m1 (jbm_coswc_nxf64
+    __riscv_vmerge_vvm_f64m1 (jbm_coswc_nxf64
                                (__riscv_vfsub_vv_f64m1
-                                (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl)),
+                                (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
                                s, __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4,
                                                               vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (jbm_sinwc_nxf64 (y, vl), s,
+  return __riscv_vmerge_vvm_f64m1 (jbm_sinwc_nxf64 (y, vl), s,
                                     __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl),
                                     vl);
 }
@@ -21774,13 +21773,13 @@ jbm_cos_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
   y = jbm_rest_nxf64 (x, pi2, vl);
   c = jbm_coswc_nxf64 (__riscv_vfsub_vv_f64m1 (y, pi2, vl), vl);
   c =
-    __riscv_vfmerge_vvm_f64m1 (jbm_sinwc_nxf64
+    __riscv_vmerge_vvm_f64m1 (jbm_sinwc_nxf64
                                (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl),
                                 vl), c, __riscv_vmflt_vf_f64m1_b64 (y,
                                                                     7. * M_PI_4,
                                                                     vl), vl);
   c =
-    __riscv_vfmerge_vvm_f64m1 (jbm_opposite_nxf64
+    __riscv_vmerge_vvm_f64m1 (jbm_opposite_nxf64
                                (jbm_coswc_nxf64
                                 (__riscv_vfsub_vv_f64m1
                                  (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl),
@@ -21790,12 +21789,12 @@ jbm_cos_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                                                                           vl),
                                vl);
   c =
-    __riscv_vfmerge_vvm_f64m1 (jbm_sinwc_nxf64
+    __riscv_vmerge_vvm_f64m1 (jbm_sinwc_nxf64
                                (__riscv_vfsub_vv_f64m1
-                                (__riscv_vfmv_v_f_f64m1 (M_PI_2), y, vl), vl),
+                                (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
                                c, __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4,
                                                               vl), vl);
-  return __riscv_vfmerge_vfm_f64m1 (jbm_coswc_nxf64 (y, vl), c,
+  return __riscv_vmerge_vvm_f64m1 (jbm_coswc_nxf64 (y, vl), c,
                                     __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl),
                                     vl);
 }
@@ -21821,22 +21820,22 @@ jbm_sincos_nxf64 (const vfloat64m1_t x,
   jbm_sincoswc_nxf64 (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), &c2, &s2,
                       vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4f, vl);
-  s1 = __riscv_vfmerge_vvm_f64m1 (jbm_opposite_nxf64 (s2, vl), s1, m, vl);
-  c1 = __riscv_vfmerge_vvm_f64m1 (c2, c1, m, vl);
+  s1 = __riscv_vmerge_vvm_f64m1 (jbm_opposite_nxf64 (s2, vl), s1, m, vl);
+  c1 = __riscv_vmerge_vvm_f64m1 (c2, c1, m, vl);
   jbm_sincoswc_nxf64 (__riscv_vfsub_vv_f64m1
-                      (__riscv_vfmv_v_f_f64m1 (M_PI), y, vl), &s2, &c2, vl);
+                      (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), &s2, &c2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl);
-  s1 = __riscv_vfmerge_vvm_f64m1 (s2, s1, m, vl);
-  c1 = __riscv_vfmerge_vvm_f64m1 (jbm_opposite_nxf64 (c2, vl), c1, m, vl);
+  s1 = __riscv_vmerge_vvm_f64m1 (s2, s1, m, vl);
+  c1 = __riscv_vmerge_vvm_f64m1 (jbm_opposite_nxf64 (c2, vl), c1, m, vl);
   jbm_sincoswc_nxf64 (__riscv_vfsub_vv_f64m1
-                      (__riscv_vfmv_v_f_f64m1 (M_PI_2), y, vl), &c2, &s2, vl);
+                      (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), &c2, &s2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4f, vl);
-  s1 = __riscv_vfmerge_vvm_f64m1 (s2, s1, m, vl);
-  c1 = __riscv_vfmerge_vvm_f64m1 (c2, c1, m, vl);
+  s1 = __riscv_vmerge_vvm_f64m1 (s2, s1, m, vl);
+  c1 = __riscv_vmerge_vvm_f64m1 (c2, c1, m, vl);
   jbm_sincoswc_nxf64 (y, &s2, &c2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl);
-  *s = __riscv_vfmerge_vvm_f64m1 (s2, s1, m, vl);
-  *c = __riscv_vfmerge_vvm_f64m1 (c2, c1, m, vl);
+  *s = __riscv_vmerge_vvm_f64m1 (s2, s1, m, vl);
+  *c = __riscv_vmerge_vvm_f64m1 (c2, c1, m, vl);
 }
 
 /**
@@ -21929,16 +21928,16 @@ jbm_atan_nxf64 (const vfloat64m1_t x,   ///< double number.
   vbool64_t m;
   ax = jbm_abs_nxf64 (x, vl);
   m = __riscv_vmfgt_vf_f64m1_b64 (ax, 1.5, vl);
-  ax = __riscv_vfmerge_vvm_f64m1 (jbm_reciprocal_nxf64 (ax, vl), ax, m, vl);
+  ax = __riscv_vmerge_vvm_f64m1 (jbm_reciprocal_nxf64 (ax, vl), ax, m, vl);
   f =
-    __riscv_vfmerge_vvm_f64m1 (jbm_atanwc1_nxf64 (ax, vl),
+    __riscv_vmerge_vvm_f64m1 (jbm_atanwc1_nxf64 (ax, vl),
                                jbm_atanwc0_nxf64 (ax, vl),
                                __riscv_vmfgt_vf_f64m1_b64 (ax, 0.5, vl), vl);
   f =
-    __riscv_vfmerge_vvm_f64m1 (__riscv_vfsub_vv_f64m1
+    __riscv_vmerge_vvm_f64m1 (__riscv_vfsub_vv_f64m1
                                (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), f, vl), f,
-                               m, f);
-  return __riscv_vfmerge_vvm_f64m1 (jbm_opposite_nxf64 (f), f,
+                               m, vl);
+  return __riscv_vmerge_vvm_f64m1 (jbm_opposite_nxf64 (f, vl), f,
                                     __riscv_vmflt_vf_f64m1_b64 (x, 0.f, vl),
                                     vl);
 }
@@ -21958,12 +21957,12 @@ jbm_atan2_nxf64 (const vfloat64m1_t y,  ///< vfloat64m1_t y component.
   vbool64_t mx, my;
   f = jbm_atan_nxf64 (__riscv_vfdiv_vv_f64m1 (y, x, vl), vl);
   mx = __riscv_vmflt_vf_f64m1_b64 (x, 0., vl);
-  my = vmvlt_vf_f64m1_b64 (y, 0., vl);
-  f = __riscv_vfmerge_vvm_f64m1 (__riscv_vfsub_vf_f64m1 (f, M_PI, vl), f,
-                                 __riscv_vmand_mm (my, mx, vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (__riscv_vfadd_vf_f64m1 (f, M_PI, vl), f,
-                                    __riscv_vmand_mm (my,
-                                                      __riscv_vmnot_m (mx, vl),
+  my = __riscv_vmflt_vf_f64m1_b64 (y, 0., vl);
+  f = __riscv_vmerge_vvm_f64m1 (__riscv_vfsub_vf_f64m1 (f, M_PI, vl), f,
+                                 __riscv_vmand_mm_b64 (my, mx, vl), vl);
+  return __riscv_vmerge_vvm_f64m1 (__riscv_vfadd_vf_f64m1 (f, M_PI, vl), f,
+                                    __riscv_vmand_mm_b64 (my,
+                                                      __riscv_vmnot_m_b64 (mx, vl),
                                                       vl), vl);
 }
 
@@ -22001,11 +22000,11 @@ jbm_acos_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
   f =
     jbm_atan_nxf64 (__riscv_vfdiv_vv_f64m1
                     (__riscv_vfsqrt_v_f64m1
-                     (__riscv_vfsub_vv_f64m1
-                      (__riscv_vfmv_v_f_f64m1 (1., vl), jbm_sqr_nxf64 (x, vl),
-                       vl), x), vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (__riscv_vfadd_vf_f64m1 (f, M_PI, vl), f,
-                                    __riscv_vmflt_vf_f64m1 (x, 0., vl), vl);
+                     (__riscv_vfmsac_vv_f64m1
+                      (__riscv_vfmv_v_f_f64m1 (1., vl), x, x, vl),
+                       vl), x, vl), vl);
+  return __riscv_vmerge_vvm_f64m1 (__riscv_vfadd_vf_f64m1 (f, M_PI, vl), f,
+                                    __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
 }
 
 /**
@@ -22056,10 +22055,10 @@ jbm_tanh_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
     __riscv_vfdiv_vv_f64m1 (__riscv_vfsub_vv_f64m1 (f, fi, vl),
                             __riscv_vfadd_vv_f64m1 (f, fi, vl), vl);
   f =
-    __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (1.f, vl), f,
+    __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (1.f, vl), f,
                                __riscv_vmfgt_vf_f64m1_b64 (x, JBM_FLT_MAX_E_EXP,
                                                            vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (-1.f), f,
+  return __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (-1.f, vl), f,
                                     __riscv_vmflt_vf_f64m1_b64 (x,
                                                                 -JBM_FLT_MAX_E_EXP,
                                                                 vl), vl);
@@ -22110,13 +22109,13 @@ jbm_atanh_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t number.
                  const size_t vl)       ///< array size.
 {
   vfloat64m1_t u;
-  u = __riscv_vfmv_v_f_f64m1 (1.);
+  u = __riscv_vfmv_v_f_f64m1 (1., vl);
   return
     __riscv_vfmul_vf_f64m1 (jbm_log_nxf64
                             (__riscv_vfdiv_vv_f64m1
                              (__riscv_vfadd_vv_f64m1 (u, x, vl),
-                              __riscv_vfsub_vv_f64m1 (u, x, vl), vl), 0.5, vl),
-                            vl);
+                              __riscv_vfsub_vv_f64m1 (u, x, vl), vl), vl),
+                            0.5, vl);
 }
 
 /**
@@ -22188,8 +22187,8 @@ jbm_erfcwc_nxf64 (const vfloat64m1_t x,
                             (jbm_reciprocal_nxf64 (x2, vl), a, vl),
                             __riscv_vfmul_vv_f64m1 (x, jbm_exp_nxf64 (x2, vl),
                                                     vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl), f,
-                                    __riscv_vmfgt_vf_f64m1 (x, m, vl), vl);
+  return __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl), f,
+                                    __riscv_vmfgt_vf_f64m1_b64 (x, m, vl), vl);
 }
 
 /**
@@ -22209,7 +22208,7 @@ jbm_erf_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                               __riscv_vfsub_vv_f64m1 (u,
                                                       jbm_erfcwc_nxf64 (ax, vl),
                                                       vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (jbm_erfwc_nxf64 (x, vl), f,
+  return __riscv_vmerge_vvm_f64m1 (jbm_erfwc_nxf64 (x, vl), f,
                                     __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
 }
 
@@ -22236,7 +22235,7 @@ jbm_erfc_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                                                                               vl),
                                                       vl), vl);
   return
-    __riscv_vfmerge_vvm_f64m1 (__riscv_vfsub_vv_f64m1
+    __riscv_vmerge_vvm_f64m1 (__riscv_vfsub_vv_f64m1
                                (u, jbm_erfwc_nxf64 (x, vl), vl), f,
                                __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
 }
@@ -22267,9 +22266,9 @@ jbm_solve_quadratic_reduced_nxf64 (vfloat64m1_t a,
   k1 = __riscv_vfadd_vv_f64m1 (a, b, vl);
   k2 = __riscv_vfsub_vv_f64m1 (a, b, vl);
   k1 =
-    __riscv_vfmerge_vvm_f64m1 (k2, k1, __riscv_vmflt_vv_f64m1_b64 (k1, x1, vl),
+    __riscv_vmerge_vvm_f64m1 (k2, k1, __riscv_vmflt_vv_f64m1_b64 (k1, x1, vl),
                                vl);
-  return __riscv_vfmerge_vvm_f64m1 (k2, k1,
+  return __riscv_vmerge_vvm_f64m1 (k2, k1,
                                     __riscv_vmfgt_vv_f64m1_b64 (k1, x2, vl),
                                     vl);
 }
@@ -22298,7 +22297,7 @@ jbm_solve_quadratic_nxf64 (const vfloat64m1_t a,
                                           __riscv_vfdiv_vv_f64m1 (c, a, vl),
                                           x1, x2, vl);
   k2 = __riscv_vfdiv_vv_f64m1 (jbm_opposite_nxf64 (c, vl), b, vl);
-  return __riscv_vfmerge_vvm_f64m1 (k2, k1, jbm_small_nxf64 (a, vl), vl);
+  return __riscv_vmerge_vvm_f64m1 (k2, k1, jbm_small_nxf64 (a, vl), vl);
 }
 
 /**
@@ -22321,17 +22320,15 @@ jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
                                ///< right limit of the solution interval.
                                const size_t vl) ///< array size.
 {
-  vfloat64m1_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2;
+  vfloat64m1_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5;
   a3 = __riscv_vfmul_vf_f64m1 (a, 1. / 3., vl);
   k0 = jbm_sqr_nxf64 (a3, vl);
   k1 = __riscv_vfsub_vv_f64m1 (k0, __riscv_vfmul_vf_f64m1 (b, 1. / 3., vl), vl);
-  k0 = __riscv_vfsub_vv_f64n1
-    (__riscv_vfmul_vv_f64m1 (a3, k0, vl),
-     __riscv_vfmul_vf_f64m1 (__riscv_vfsub_vv_f64m1 (b,
-                                                     __riscv_vfmul_vv_f64m1 (a3,
-                                                                             c,
-                                                                             vl),
-                                                     0.5, vl), vl), vl);
+  k0 =
+    __riscv_vfsub_vv_f64m1 (__riscv_vfmul_vv_f64m1 (a3, k0, vl),
+                            __riscv_vfmul_vf_f64m1 (__riscv_vfmsac_vv_f64m1
+                                                    (b, a3, c, vl),
+                                                     0.5, vl), vl);
   k3 = __riscv_vfmul_vv_f64m1 (k1, jbm_sqr_nxf64 (k1, vl), vl);
   k2 = __riscv_vfmacc_vv_f64m1 (k3, k0, k0, vl);
   l1 = __riscv_vfsqrt_v_f64m1 (jbm_opposite_nxf64 (k1, vl), vl);
@@ -22339,7 +22336,7 @@ jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
     __riscv_vfmul_vf_f64m1 (jbm_acos_nxf64
                             (__riscv_vfdiv_vv_f64m1 (k0, k3, vl), vl), 1. / 3.,
                             vl);
-  l1 = jbm_dbl_nxf64 (l1);
+  l1 = jbm_dbl_nxf64 (l1, vl);
   l2 =
     __riscv_vfsub_vv_f64m1 (a3,
                             __riscv_vfmul_vv_f64m1 (l1, jbm_cos_nxf64 (k0, vl),
@@ -22352,8 +22349,8 @@ jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
                                                      (l0, 2. * M_PI / 3., vl),
                                                      vl), vl), vl);
   l3 =
-    __riscv_vfmerge_vvm_f64m1 (l2, l3,
-                               __riscv_vmor_mm (__riscv_vmflt_vv_f64m1_b64
+    __riscv_vmerge_vvm_f64m1 (l2, l3,
+                               __riscv_vmor_mm_b64 (__riscv_vmflt_vv_f64m1_b64
                                                 (l2, x1, vl),
                                                 __riscv_vmfgt_vv_f64m1_b64 (l2,
                                                                             x2,
@@ -22367,8 +22364,8 @@ jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
                                                      (l0, 2. * M_PI / 3., vl),
                                                      vl), vl), vl);
   l4 =
-    __riscv_vfmerge_vvm_f64m1 (l3, l4,
-                               __riscv_vmor_mm (__riscv_vmflt_vv_f64m1_b64
+    __riscv_vmerge_vvm_f64m1 (l3, l4,
+                               __riscv_vmor_mm_b64 (__riscv_vmflt_vv_f64m1_b64
                                                 (l3, x1, vl),
                                                 __riscv_vmfgt_vv_f64m1_b64 (l3,
                                                                             x2,
@@ -22382,7 +22379,7 @@ jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
     __riscv_vfadd_vv_f64m1 (l5,
                             __riscv_vfsub_vv_f64m1 (jbm_cbrt_nxf64 (k0, vl), a3,
                                                     vl), vl);
-  return __riscv_vfmerge_vvm_f64m1 (l5, l4,
+  return __riscv_vmerge_vvm_f64m1 (l5, l4,
                                     __riscv_vmflt_vf_f64m1_b64 (k2, 0., vl),
                                     vl);
 }
@@ -22410,13 +22407,12 @@ jbm_solve_cubic_nxf64 (vfloat64m1_t a,
                        const size_t vl) ///< array size.
 {
   return
-    __riscv_vfmerge_vvm_f64m1 (jbm_small_nxf64 (a, vl),
-                               jbm_solve_quadratic_nxf64 (b, c, d, x1, x2, vl),
+    __riscv_vmerge_vvm_f64m1 (jbm_solve_quadratic_nxf64 (b, c, d, x1, x2, vl),
                                jbm_solve_cubic_reduced_nxf64
                                (__riscv_vfdiv_vv_f64m1 (b, a, vl),
                                 __riscv_vfdiv_vv_f64m1 (c, a, vl),
                                 __riscv_vfdiv_vv_f64m1 (d, a, vl), x1, x2, vl),
-                               vl);
+                               jbm_small_nxf64 (a, vl), vl);
 }
 
 /**
@@ -22464,7 +22460,7 @@ jbm_flux_limiter_centred_nxf64 (const vfloat64m1_t d1,
                                 ///< 2nd flux limiter function parameter.
                                 const size_t vl)        ///< array size.
 {
-  return __riscv_vfmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl),
+  return __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl),
                                     __riscv_vfdiv_vv_f64m1 (d1, d2, vl),
                                     jbm_small_nxf64 (d2, vl), vl);
 }
@@ -22491,7 +22487,7 @@ jbm_flux_limiter_superbee_nxf64 (const vfloat64m1_t d1,
                             (jbm_dbl_nxf64 (r, vl), 1., vl),
                             __riscv_vfmin_vf_f64m1 (r, 2., vl), vl);
   return __riscv_vfmerge_vfm_f64m1 (r, 0.,
-                                    __riscv_vmfgt_vf_f64m1
+                                    __riscv_vmfgt_vf_f64m1_b64
                                     (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
                                      DBL_EPSILON, vl), vl);
 }
@@ -22511,9 +22507,9 @@ jbm_flux_limiter_minmod_nxf64 (const vfloat64m1_t d1,
                                const size_t vl) ///< array size.
 {
   vfloat64m1_t r;
-  r = __riscv_vfmin_vf_f64m1 (__riscv_vfdiv_vv_f64m1 (d1, d2), 1., vl);
+  r = __riscv_vfmin_vf_f64m1 (__riscv_vfdiv_vv_f64m1 (d1, d2, vl), 1., vl);
   return __riscv_vfmerge_vfm_f64m1 (r, 0.,
-                                    __riscv_vmfgt_vf_f64m1
+                                    __riscv_vmfgt_vf_f64m1_b64
                                     (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
                                      DBL_EPSILON, vl), vl);
 }
@@ -22540,7 +22536,7 @@ jbm_flux_limiter_VanLeer_nxf64 (const vfloat64m1_t d1,
     __riscv_vfdiv_vv_f64m1 (__riscv_vfadd_vv_f64m1 (r, k, vl),
                             __riscv_vfadd_vf_f64m1 (k, 1., vl), vl);
   return __riscv_vfmerge_vfm_f64m1 (r, 0.,
-                                    __riscv_vmfgt_vf_f64m1
+                                    __riscv_vmfgt_vf_f64m1_b64
                                     (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
                                      DBL_EPSILON, vl), vl);
 }
@@ -22566,7 +22562,7 @@ jbm_flux_limiter_VanAlbada_nxf64 (const vfloat64m1_t d1,
     __riscv_vfdiv_vv_f64m1 (__riscv_vfadd_vv_f64m1 (r, k, vl),
                             __riscv_vfadd_vf_f64m1 (k, 1., vl), vl);
   return __riscv_vfmerge_vfm_f64m1 (r, 0.,
-                                    __riscv_vmfgt_vf_f64m1
+                                    __riscv_vmfgt_vf_f64m1_b64
                                     (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
                                      DBL_EPSILON, vl), vl);
 }
@@ -22588,7 +22584,7 @@ jbm_flux_limiter_minsuper_nxf64 (const vfloat64m1_t d1,
   vfloat64m1_t r;
   r = __riscv_vfmin_vf_f64m1 (__riscv_vfdiv_vv_f64m1 (d1, d2, vl), 2., vl);
   return __riscv_vfmerge_vfm_f64m1 (r, 0.,
-                                    __riscv_vmfgt_vf_f64m1
+                                    __riscv_vmfgt_vf_f64m1_b64
                                     (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
                                      DBL_EPSILON, vl), vl);
 }
@@ -22611,7 +22607,7 @@ jbm_flux_limiter_supermin_nxf64 (const vfloat64m1_t d1,
   r = __riscv_vfdiv_vv_f64m1 (d1, d2, vl);
   r = __riscv_vfmin_vf_f64m1 (jbm_dbl_nxf64 (r, vl), 1., vl);
   return __riscv_vfmerge_vfm_f64m1 (r, 0.,
-                                    __riscv_vmfgt_vf_f64m1
+                                    __riscv_vmfgt_vf_f64m1_b64
                                     (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
                                      DBL_EPSILON, vl), vl);
 }
@@ -22638,10 +22634,10 @@ jbm_flux_limiter_monotonized_central_nxf64 (const vfloat64m1_t d1,
     __riscv_vfmerge_vfm_f64m1 (rm, 2., __riscv_vmflt_vf_f64m1_b64 (r, 3., vl),
                                vl);
   rm =
-    __riscv_vfmerge_vfm_f64m1 (jbm_dbl_nxf64 (r, vl), rm,
-                               __riscv_vmfgt_vf_f64m1 (r, 1. / 3., vl), vl);
+    __riscv_vmerge_vvm_f64m1 (jbm_dbl_nxf64 (r, vl), rm,
+                               __riscv_vmfgt_vf_f64m1_b64 (r, 1. / 3., vl), vl);
   return __riscv_vfmerge_vfm_f64m1 (rm, 0.,
-                                    __riscv_vmfgt_vf_f64m1
+                                    __riscv_vmfgt_vf_f64m1_b64
                                     (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
                                      DBL_EPSILON, vl), vl);
 }
@@ -22666,7 +22662,7 @@ jbm_flux_limiter_mean_nxf64 (const vfloat64m1_t d1,
                             (__riscv_vfdiv_vv_f64m1 (d1, d2, vl), 1., vl), 0.5,
                             vl);
   return __riscv_vfmerge_vfm_f64m1 (r, 0.,
-                                    __riscv_vmfgt_vf_f64m1
+                                    __riscv_vmfgt_vf_f64m1_b64
                                     (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
                                      DBL_EPSILON, vl), vl);
 }

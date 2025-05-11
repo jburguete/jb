@@ -142,13 +142,6 @@ const GLfloat jbw_identity[16] = {
 int (*jbw_graphic_loop_idle) (void) = NULL;
 GMainLoop *jbw_graphic_loop_pointer = NULL;
 ///< pointer to the idle function on a main loop.
-#elif HAVE_FREEGLUT
-void (*jbw_graphic_loop_idle) (void) = NULL;
-///< pointer to the idle function on a main loop.
-void (*jbw_graphic_loop_resize) (int width, int height) = NULL;
-///< pointer to the resize function on a main loop.
-void (*jbw_graphic_loop_render) (void) = NULL;
-///< pointer to the render function on a main loop.
 #elif HAVE_SDL
 int (*jbw_graphic_loop_idle) (void) = NULL;
 ///< pointer to the idle function on a main loop.
@@ -177,10 +170,7 @@ jbw_init_gtk (int *argn __attribute__((unused)),
   ///< pointer to the command line arguments.
 {
   jb_init ();
-#if HAVE_FREEGLUT
-  glutInit (argn, *argc);
-  glutInitDisplayMode (GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-#elif HAVE_SDL
+#if HAVE_SDL
   if (SDL_Init (SDL_INIT_VIDEO))
     {
       printf ("%s:\n%s\n", _("unable to init SDL"), SDL_GetError ());
@@ -1872,8 +1862,6 @@ jbw_graphic_destroy (void)
       jbw_graphic_delete (graphic);
 #if HAVE_GTKGLAREA
       gtk_window_destroy (graphic->window);
-#elif HAVE_FREEGLUT
-      glutDestroyWindow (graphic->window);
 #elif HAVE_SDL
       SDL_DestroyWindow (graphic->window);
 #elif HAVE_GLFW
@@ -2338,9 +2326,6 @@ jbw_graphic_resize (int width,  ///< new screen width.
   height = JBM_MAX (height, graphic->minimum_height);
   graphic->width = width;
   graphic->height = height;
-#if HAVE_FREEGLUT
-  glutReshapeWindow (width, height);
-#endif
   glViewport (0, 0, width, height);
 }
 
@@ -2355,8 +2340,6 @@ jbw_graphic_render (void)
     graphic->draw (graphic);
 #if HAVE_GTKGLAREA
   gtk_widget_queue_draw (GTK_WIDGET (graphic->widget));
-#elif HAVE_FREEGLUT
-  glutSwapBuffers ();
 #elif HAVE_SDL
   SDL_GL_SwapWindow (graphic->window);
 #elif HAVE_GLFW
@@ -2409,17 +2392,6 @@ jbw_graphic_loop (void)
     g_idle_add ((GSourceFunc) jbw_graphic_loop_idle, NULL);
   g_main_loop_run (jbw_graphic_loop_pointer);
   g_main_loop_unref (jbw_graphic_loop_pointer);
-
-#elif HAVE_FREEGLUT
-
-  // Passing the GTK signals to the FreeGLUT main loop
-  glutIdleFunc (jbw_graphic_loop_idle);
-  // Setting our draw resize function as the FreeGLUT reshape function
-  glutReshapeFunc (jbw_graphic_loop_resize);
-  // Setting our draw function as the FreeGLUT display function
-  glutDisplayFunc (jbw_graphic_loop_render);
-  // FreeGLUT main loop
-  glutMainLoop ();
 
 #elif HAVE_SDL
 
@@ -2491,8 +2463,6 @@ jbw_graphic_set_title (const char *title)       ///< title label.
   graphic->str_title = title;
 #if HAVE_GTKGLAREA
   gtk_window_set_title (graphic->window, title);
-#elif HAVE_FREEGLUT
-  glutSetWindowTitle (title);
 #elif HAVE_SDL
   SDL_SetWindowTitle (graphic->window, title);
 #elif HAVE_GLFW
@@ -2589,9 +2559,6 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
   gtk_window_set_title (graphic->window, title);
   g_signal_connect_swapped (graphic->window, "destroy",
                             (GCallback) jbw_graphic_destroy, graphic);
-#elif HAVE_FREEGLUT
-  glutInitWindowSize (JBW_WINDOW_WIDTH, JBW_WINDOW_HEIGHT);
-  graphic->window = glutCreateWindow (title);
 #elif HAVE_SDL
   graphic->window
     = SDL_CreateWindow (title,
@@ -2629,9 +2596,7 @@ jbw_graphic_new (unsigned int nx,       ///< maximum number of x-tics.
   return graphic;
 
   // Exit and show an error message on error
-#if !HAVE_FREEGLUT
 error2:
-#endif
   jbw_graphic_destroy ();
 error1:
   jb_error_add (error_msg, NULL);
@@ -2652,9 +2617,6 @@ jbw_graphic_get_display_size (void)
     = gtk_widget_get_allocated_width (GTK_WIDGET (graphic->widget));
   graphic->height
     = gtk_widget_get_allocated_height (GTK_WIDGET (graphic->widget));
-#elif HAVE_FREEGLUT
-  graphic->width = glutGet (GLUT_WINDOW_WIDTH);
-  graphic->height = glutGet (GLUT_WINDOW_HEIGHT);
 #elif HAVE_SDL
   SDL_GetWindowSize (graphic->window, &graphic->width, &graphic->height);
 #elif HAVE_GLFW

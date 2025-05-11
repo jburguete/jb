@@ -9,7 +9,7 @@ if [[ $# != 6 ]]; then
 	echo "B: 1 on PGO"
 	echo "C: JB precision (1-7)"
 	echo "D: 3 on GTK3, 4 on GTK4, 0 without GUI"
-	echo "E: 1 on FreeGLUT, 2 on GLFW, 3 on SDL, 4 on GtkGLArea"
+	echo "E: 1 on GLFW, 2 on SDL, 3 on GtkGLArea"
 	echo "F: 1 on strip"
 	exit 1
 fi
@@ -29,12 +29,10 @@ fi
 if [[ $4 = 3 || $4 = 4 ]]; then
 	a4="--with-gtk=$4"
 	if [[ $5 = 1 ]]; then
-		a5="--with-freeglut"
-	elif [[ $5 = 2 ]]; then
 		a5="--with-glfw"
-	elif [[ $5 = 3 ]]; then
+	elif [[ $5 = 2 ]]; then
 		a5="--with-sdl"
-	elif [[ $5 = 4 ]]; then
+	elif [[ $5 = 3 ]]; then
 		a5="--with-gtkglarea"
 	else
 		echo "Unknown option"

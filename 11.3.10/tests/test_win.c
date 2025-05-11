@@ -2,35 +2,7 @@
 
 #define WITH_GTK 1
 
-#if HAVE_FREEGLUT
-
-JBWGraphic *graphic;
-
-static void
-jbw_freeglut_idle (void)
-{
-  GMainContext *context = g_main_context_default ();
-  if (jbw_gdk_gl_context)
-    gdk_gl_context_make_current (jbw_gdk_gl_context);
-  while (g_main_context_pending (context))
-    g_main_context_iteration (context, 0);
-  glutSetWindow (graphic->window);
-}
-
-static void
-jbw_freeglut_draw_resize (int width, int height)
-{
-  jbw_graphic_resize (width, height);
-  jbw_graphic_render ();
-}
-
-static void
-jbw_freeglut_draw_render (void)
-{
-  jbw_graphic_render ();
-}
-
-#elif HAVE_SDL
+#if HAVE_SDL
 
 JBWGraphic *graphic;
 
@@ -130,8 +102,6 @@ main (int argn, char **argc)
 
 #if HAVE_GTKGLAREA
   title = "GtkGLArea";
-#elif HAVE_FREEGLUT
-  title = "FreeGLUT";
 #elif HAVE_SDL
   title = "SDL";
 #elif HAVE_GLFW
@@ -155,11 +125,6 @@ main (int argn, char **argc)
   graphic->zmax = 2.9999;
 #if HAVE_GTKGLAREA
   jbw_graphic_show (graphic);
-#elif HAVE_FREEGLUT
-  jbw_graphic_init ();
-  jbw_graphic_loop_idle = jbw_freeglut_idle;
-  jbw_graphic_loop_resize = jbw_freeglut_draw_resize;
-  jbw_graphic_loop_render = jbw_freeglut_draw_render;
 #elif HAVE_SDL
   exit_event->type = SDL_QUIT;
   jbw_graphic_init ();
@@ -215,10 +180,6 @@ main (int argn, char **argc)
                             jbw_graphic_loop_pointer);
   g_signal_connect_swapped (window, close, (GCallback) g_main_loop_quit,
                             jbw_graphic_loop_pointer);
-#elif HAVE_FREEGLUT
-  g_signal_connect (button_close, "clicked", (GCallback) glutLeaveMainLoop,
-                    NULL);
-  g_signal_connect (window, close, (GCallback) glutLeaveMainLoop, NULL);
 #elif HAVE_SDL
   g_signal_connect_swapped (button_close, "clicked",
                             (GCallback) SDL_PushEvent, exit_event);

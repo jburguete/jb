@@ -1,6 +1,6 @@
 # Header
 AC_PREREQ([2.69])
-AC_INIT([jb],[11.3.9],[https://github.com/jburguete/jb])
+AC_INIT([jb],[11.3.10],[https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_TARGET
@@ -29,7 +29,7 @@ elif test `uname -s` = "Darwin"; then
 	AC_MSG_NOTICE([MacOS])
 	AC_MSG_NOTICE([Remember:])
 	AC_MSG_NOTICE("echo 'export PATH=''/usr/local/opt/llvm/bin:$PATH''' >> ./zshrc")
-	LDFLAGS="$LDFLAGS -L/usr/local/opt/llvm/lib -L/System/Library/Frameworks -framework GLUT -framework OpenGL"
+	LDFLAGS="$LDFLAGS -L/usr/local/opt/llvm/lib -L/System/Library/Frameworks -framework OpenGL"
 	CPPFLAGS="$CPPFLAGS -I/usr/local/opt/llvm/include"
 	mac=1
 elif test `uname -s` = "FreeBSD"; then
@@ -215,23 +215,16 @@ else
 	AC_SUBST(EXE_FILES, "\$(testsbin)")
 fi
 
-# Checks for GtkGLArea, FreeGLUT, GLFW or SDL to draw the graphic window
+# Checks for GtkGLArea, GLFW or SDL to draw the graphic window
 if test $gtk = 1; then
 	AC_ARG_WITH([gtkglarea],
 		AS_HELP_STRING([--with-gtkglarea],
 			[Build graphic window with GtkGLArea]))
-	AC_ARG_WITH([freeglut],
-		AS_HELP_STRING([--with-freeglut],
-			[Build graphic window with FreeGLUT]))
 	AC_ARG_WITH([glfw],
 		AS_HELP_STRING([--with-glfw], [Build graphic window with GLFW]))
 	AC_ARG_WITH([sdl],
 		AS_HELP_STRING([--with-sdl], [Build graphic window with SDL]))
-	if test "x$with_freeglut" = "xyes"; then
-		AC_SUBST(GRAPHIC, "-DHAVE_FREEGLUT=1")
-		PKG_CHECK_MODULES([GLUT], [glut], ,
-			[PKG_CHECK_MODULES([GLUT], [freeglut])])
-	elif test "x$with_glfw" = "xyes"; then
+	if test "x$with_glfw" = "xyes"; then
 		AC_SUBST(GRAPHIC, "-DHAVE_GLFW=1")
 		PKG_CHECK_MODULES([GLFW], [glfw3])
 	elif test "x$with_sdl" = "xyes"; then
