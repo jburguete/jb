@@ -28,7 +28,8 @@ config_h = $(SRC)config.h
 jb_config_h = $(SRC)jb_config.h
 def_h = $(SRC)def.h
 math_h = $(SRC)math.h $(SRC)math_f32.h $(SRC)math_f64.h $(SRC)math_sse.h \
-	$(SRC)math_avx.h $(SRC)math_avx512.h
+	$(SRC)math_avx.h $(SRC)math_avx512.h $(SRC)math_neon.h\
+	$(SRC)math_riscv.h
 xml_h = $(SRC)xml.h
 json_h = $(SRC)json.h
 win_h = $(SRC)win.h
