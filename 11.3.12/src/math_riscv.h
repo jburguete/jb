@@ -160,7 +160,12 @@ static inline vint32m1_t
 jbm_floor_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  return __riscv_vfcvt_x_f_v_i32m1 (x, vl);
+  vint32m1_t vi;
+  vfloat32m1_t vf;
+  vi = __riscv_vfcvt_x_f_v_i32m1 (x, vl);
+  vf = __riscv_vfcvt_f_x_v_f32m1 (vi, vl);
+  return __riscv_vmerge_vvm_i32m1 (__riscv_vsub_vx_i32m1 (vi, 1, vl), vi,
+		                   __riscv_vmfgt_vv_f32m1_b32 (vf, x, vl), vl);
 }
 
 /**
@@ -214,6 +219,7 @@ jbm_frexp_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                               __riscv_vsub_vx_i32m1 (__riscv_vsra_vx_i32m1
                                                      (__riscv_vreinterpret_v_u32m1_i32m1 (yi), 23, vl),
                                                      126, vl), m2, vl);
+  yx = __riscv_vreinterpret_v_u32m1_f32m1 (yi);
   yx =
     __riscv_vmerge_vvm_f32m1 (__riscv_vfmul_vv_f32m1 (y2x, zx, vl), yx, m2,
                                vl);
@@ -11471,7 +11477,12 @@ static inline vint64m1_t
 jbm_floor_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  return __riscv_vfcvt_x_f_v_i64m1 (x, vl);
+  vint64m1_t vi;
+  vfloat64m1_t vf;
+  vi = __riscv_vfcvt_x_f_v_i64m1 (x, vl);
+  vf = __riscv_vfcvt_f_x_v_f64m1 (vi, vl);
+  return __riscv_vmerge_vvm_i64m1 (__riscv_vsub_vx_i64m1 (vi, 1, vl), vi,
+		                   __riscv_vmfgt_vv_f64m1_b64 (vf, x, vl), vl);
 }
 
 /**
@@ -11525,6 +11536,7 @@ jbm_frexp_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                               __riscv_vsub_vx_i64m1 (__riscv_vsra_vx_i64m1
                                                      (__riscv_vreinterpret_v_u64m1_i64m1 (yi), 52, vl),
                                                      1022L, vl), m2, vl);
+  yx = __riscv_vreinterpret_v_u64m1_f64m1 (yi);
   yx =
     __riscv_vmerge_vvm_f64m1 (__riscv_vfmul_vv_f64m1 (y2x, zx, vl), yx, m2,
                                vl);

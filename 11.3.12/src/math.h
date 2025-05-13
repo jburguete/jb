@@ -73,11 +73,11 @@
 #define JB_ALIGNED __attribute__((aligned(64)))
 #define JB_MALLOC(size) (aligned_alloc (64, size))
 #define JB_FREE aligned_free
-#elif defined(__AVX__)
+#elif defined(__AVX__) || defined(__riscv_vector)
 #define JB_ALIGNED __attribute__((aligned(32)))
 #define JB_MALLOC(size) (aligned_alloc (32, size))
 #define JB_FREE aligned_free
-#elif defined(__SSE4_2__)
+#elif defined(__SSE4_2__) || defined(__ARM_NEON__)
 #define JB_ALIGNED __attribute__((aligned(16)))
 #define JB_MALLOC(size) (aligned_alloc (16, size))
 #define JB_FREE aligned_free

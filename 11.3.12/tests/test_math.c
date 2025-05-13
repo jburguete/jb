@@ -28,6 +28,39 @@ set_float64x2_t (double x1, double x0)
 
 #endif
 
+#ifdef __riscv_vector
+
+vfloat32m1_t
+set_float32x4_t (float x0, float x1, float x2, float x3)
+{
+  float x[4] = { x0, x1, x2, x3 };
+  return __riscv_vle32_v_f32m1 (x, 4);
+}
+
+vfloat64m1_t
+set_float64x2_t (double x0, double x1)
+{
+  double x[2] = { x0, x1 };
+  return __riscv_vle64_v_f64m1 (x, 2);
+}
+
+vfloat32m1_t
+set_float32x8_t (float x0, float x1, float x2, float x3, float x4, float x5,
+                 float x6, float x7)
+{
+  float x[8] = { x0, x1, x2, x3, x4, x5, x6, x7 };
+  return __riscv_vle32_v_f32m1 (x, 8);
+}
+
+vfloat64m1_t
+set_float64x4_t (double x0, double x1, double x2, double x3)
+{
+  double x[4] = { x0, x1, x2, x3 };
+  return __riscv_vle64_v_f64m1 (x, 4);
+}
+
+#endif
+
 const JBFLOAT pf[15] = { (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 4., (JBFLOAT) 8.,
   (JBFLOAT) 16., (JBFLOAT) 32., (JBFLOAT) 64., (JBFLOAT) 128., (JBFLOAT) 256.,
   (JBFLOAT) 512., (JBFLOAT) 1024., (JBFLOAT) 2048., (JBFLOAT) 4096.,
@@ -710,6 +743,190 @@ fn14_4xf32 (float32x4_t x)
 
 #endif
 
+#ifdef __riscv_vector
+
+vfloat32m1_t
+fn0_4xf32 (vfloat32m1_t x __attribute__((unused)))
+{
+  return __riscv_vfmv_v_f_f32m1 (1.f, 4);
+}
+
+vfloat32m1_t
+fn1_4xf32 (vfloat32m1_t x)
+{
+  return x;
+}
+
+vfloat32m1_t
+fn2_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn1_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn3_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn2_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn4_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn3_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn5_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn4_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn6_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn5_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn7_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn6_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn8_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn7_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn9_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn8_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn10_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn9_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn11_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn10_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn12_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn11_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn13_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn12_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn14_4xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn13_4xf32 (x), 4);
+}
+
+vfloat32m1_t
+fn0_8xf32 (vfloat32m1_t x __attribute__((unused)))
+{
+  return __riscv_vfmv_v_f_f32m1 (1.f, 8);
+}
+
+vfloat32m1_t
+fn1_8xf32 (vfloat32m1_t x)
+{
+  return x;
+}
+
+vfloat32m1_t
+fn2_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn1_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn3_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn2_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn4_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn3_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn5_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn4_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn6_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn5_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn7_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn6_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn8_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn7_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn9_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn8_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn10_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn9_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn11_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn10_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn12_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn11_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn13_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn12_8xf32 (x), 8);
+}
+
+vfloat32m1_t
+fn14_8xf32 (vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn13_8xf32 (x), 8);
+}
+
+#endif
+
 #ifdef __SSE4_2__
 
 __m128d
@@ -1082,6 +1299,190 @@ float64x2_t
 fn14_2xf64 (float64x2_t x)
 {
   return vmulq_f64 (x, fn13_2xf64 (x));
+}
+
+#endif
+
+#ifdef __riscv_vector
+
+vfloat64m1_t
+fn0_2xf64 (vfloat64m1_t x __attribute__((unused)))
+{
+  return __riscv_vfmv_v_f_f64m1 (1.f, 2);
+}
+
+vfloat64m1_t
+fn1_2xf64 (vfloat64m1_t x)
+{
+  return x;
+}
+
+vfloat64m1_t
+fn2_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn1_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn3_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn2_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn4_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn3_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn5_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn4_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn6_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn5_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn7_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn6_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn8_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn7_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn9_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn8_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn10_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn9_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn11_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn10_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn12_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn11_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn13_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn12_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn14_2xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn13_2xf64 (x), 2);
+}
+
+vfloat64m1_t
+fn0_4xf64 (vfloat64m1_t x __attribute__((unused)))
+{
+  return __riscv_vfmv_v_f_f64m1 (1.f, 4);
+}
+
+vfloat64m1_t
+fn1_4xf64 (vfloat64m1_t x)
+{
+  return x;
+}
+
+vfloat64m1_t
+fn2_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn1_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn3_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn2_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn4_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn3_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn5_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn4_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn6_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn5_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn7_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn6_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn8_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn7_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn9_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn8_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn10_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn9_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn11_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn10_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn12_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn11_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn13_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn12_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn14_4xf64 (vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn13_4xf64 (x), 4);
 }
 
 #endif
@@ -2209,6 +2610,450 @@ test_logn_2xf64 (float64x2_t (*f) (float64x2_t), double (*g) (double),
 
 #endif
 
+#ifdef __riscv_vector
+
+int
+check_uni_4xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float), float prec,
+                 float xmin, float xmax, unsigned int n)
+{
+  float x[4] JB_ALIGNED , f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  float dx;
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  dx = xmax - xmin;
+  for (i = 0; i < n;)
+    {
+      for (j = 0; j < 4; ++j, ++i)
+        {
+          if (i < n1)
+            x[j] = xmin + i * dx / n1;
+          else
+            x[j] = xmax;
+          g0[j] = g (x[j]);
+	}
+      __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 4)), 4);
+      for (j = 0; j < 4; ++j)
+        if (!check_f32 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_4xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float),
+                  float prec, float x0)
+{
+  float x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  float xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 4; ++j, xn *= 2.f)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 4)), 4);
+      for (j = 0; j < 4; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+	  if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabsf (xn) > 0.f;)
+    {
+      for (j = 0; j < 4; ++j, xn *= 0.5f)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 4)), 4);
+      for (j = 0; j < 4; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+	  if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_log_4xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float), float prec)
+{
+  if (!check_logn_4xf32 (f, g, prec, 1.f))
+    return 0;
+  return check_logn_4xf32 (f, g, prec, -1.f);
+}
+
+unsigned int
+test_uni_4xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float),
+                float xmin, float xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_4xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_4xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_4xf32 (f, g, n * FLT_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_4xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float), float x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_4xf32 (f, g, n * FLT_EPSILON, x0))
+      break;
+  return n;
+}
+
+int
+check_uni_2xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double),
+                 double prec, double xmin, double xmax, unsigned int n)
+{
+  double x[2] JB_ALIGNED , f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
+  double dx;
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  dx = xmax - xmin;
+  for (i = 0; i < n;)
+    {
+      for (j = 0; j < 2; ++j, ++i)
+        {
+          if (i < n1)
+            x[j] = xmin + i * dx / n1;
+          else
+            x[j] = xmax;
+          g0[j] = g (x[j]);
+	}
+      __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 2)), 2);
+      for (j = 0; j < 2; ++j)
+        if (!check_f64 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_2xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double),
+                  double prec, double x0)
+{
+  double x[2] JB_ALIGNED, f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
+  double xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 2; ++j, xn *= 2.)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 2)), 2);
+      for (j = 0; j < 2; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+	  if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabs (xn) > 0.;)
+    {
+      for (j = 0; j < 2; ++j, xn *= 0.5)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 2)), 2);
+      for (j = 0; j < 2; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+	  if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_log_2xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double),
+                 double prec)
+{
+  if (!check_logn_2xf64 (f, g, prec, 1.))
+    return 0;
+  return check_logn_2xf64 (f, g, prec, -1.);
+}
+
+unsigned int
+test_uni_2xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double),
+                double xmin, double xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_2xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_2xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_2xf64 (f, g, n * DBL_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_2xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double),
+                 double x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_2xf64 (f, g, n * DBL_EPSILON, x0))
+      break;
+  return n;
+}
+
+int
+check_uni_8xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float), float prec,
+                 float xmin, float xmax, unsigned int n)
+{
+  float x[8] JB_ALIGNED , f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  float dx;
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  dx = xmax - xmin;
+  for (i = 0; i < n;)
+    {
+      for (j = 0; j < 8; ++j, ++i)
+        {
+          if (i < n1)
+            x[j] = xmin + i * dx / n1;
+          else
+            x[j] = xmax;
+          g0[j] = g (x[j]);
+	}
+      __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 8)), 8);
+      for (j = 0; j < 8; ++j)
+        if (!check_f32 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_8xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float),
+                  float prec, float x0)
+{
+  float x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  float xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 8; ++j, xn *= 2.f)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 8)), 8);
+      for (j = 0; j < 8; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+	  if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabsf (xn) > 0.f;)
+    {
+      for (j = 0; j < 8; ++j, xn *= 0.5f)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 8)), 8);
+      for (j = 0; j < 8; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+	  if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_log_8xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float), float prec)
+{
+  if (!check_logn_8xf32 (f, g, prec, 1.f))
+    return 0;
+  return check_logn_8xf32 (f, g, prec, -1.f);
+}
+
+unsigned int
+test_uni_8xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float),
+                float xmin, float xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_8xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_8xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_8xf32 (f, g, n * FLT_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_8xf32 (vfloat32m1_t (*f) (vfloat32m1_t), float (*g) (float), float x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_8xf32 (f, g, n * FLT_EPSILON, x0))
+      break;
+  return n;
+}
+
+int
+check_uni_4xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double),
+                 double prec, double xmin, double xmax, unsigned int n)
+{
+  double x[4] JB_ALIGNED , f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  double dx;
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  dx = xmax - xmin;
+  for (i = 0; i < n;)
+    {
+      for (j = 0; j < 4; ++j, ++i)
+        {
+          if (i < n1)
+            x[j] = xmin + i * dx / n1;
+          else
+            x[j] = xmax;
+          g0[j] = g (x[j]);
+	}
+      __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 4)), 4);
+      for (j = 0; j < 4; ++j)
+        if (!check_f64 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_4xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double),
+                  double prec, double x0)
+{
+  double x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  double xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 4; ++j, xn *= 2.)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 4)), 4);
+      for (j = 0; j < 4; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+	  if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabs (xn) > 0.;)
+    {
+      for (j = 0; j < 4; ++j, xn *= 0.5)
+        {
+          x[j] = xn;
+	  g0[j] = g (xn);
+	}
+      __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 4)), 4);
+      for (j = 0; j < 4; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+	  if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_log_4xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double),
+                 double prec)
+{
+  if (!check_logn_4xf64 (f, g, prec, 1.))
+    return 0;
+  return check_logn_4xf64 (f, g, prec, -1.);
+}
+
+unsigned int
+test_uni_4xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double),
+                double xmin, double xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_4xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+      break;
+  return n;
+}
+
+unsigned int
+test_log_4xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_log_4xf64 (f, g, n * DBL_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_4xf64 (vfloat64m1_t (*f) (vfloat64m1_t), double (*g) (double),
+                 double x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_4xf64 (f, g, n * DBL_EPSILON, x0))
+      break;
+  return n;
+}
+
+#endif
+
 int
 check_uni (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
            JBFLOAT xmin, JBFLOAT xmax, unsigned int n)
@@ -2225,9 +3070,9 @@ check_uni (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
         x = xmax;
       f0 = f (x);
       g0 = g (x);
-// Fix: 1.f
-      if (FABS (f0 / g0 - 1.f) > prec && FABS (f0 - g0) > prec)
+      if (FABS (f0 / g0 - (JBFLOAT) 1.) > prec && FABS (f0 - g0) > prec)
         {
+// Fix printf
           printf ("x=" FWF " f=" FWF " g=" FWF "\n", x, f0, g0);
           return 0;
         }
@@ -2240,27 +3085,28 @@ check_logn (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
             JBFLOAT x0)
 {
   JBFLOAT x, f0, g0;
-// Fix: .f      
-  for (x = x0; isfinite (x); x *= 2.f)
+  for (x = x0; isfinite (x); x *= (JBFLOAT) 2.)
     {
       f0 = f (x);
       g0 = g (x);
       if (!isfinite (f0) && !isfinite (g0))
         break;
-      if (FABS (f0 / g0 - 1.f) > prec && FABS (f0 - g0) > prec)
+      if (FABS (f0 / g0 - (JBFLOAT) 1.) > prec && FABS (f0 - g0) > prec)
         {
+// Fix printf
           printf ("x=" FWF " f=" FWF " g=" FWF "\n", x, f0, g0);
           return 0;
         }
     }
-  for (x = x0; FABS (x) > 0.f; x *= 0.5f)
+  for (x = x0; FABS (x) > (JBFLOAT) 0.; x *= (JBFLOAT) 0.5)
     {
       f0 = f (x);
       g0 = g (x);
       if (!isfinite (f0) && !isfinite (g0))
         break;
-      if (FABS (f0 / g0 - 1.f) > prec && FABS (f0 - g0) > prec)
+      if (FABS (f0 / g0 - (JBFLOAT) 1.) > prec && FABS (f0 - g0) > prec)
         {
+// Fix printf
           printf ("x=" FWF " f=" FWF " g=" FWF "\n", x, f0, g0);
           return 0;
         }
@@ -2271,10 +3117,9 @@ check_logn (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
 int
 check_log (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec)
 {
-// Fix: .f      
-  if (!check_logn (f, g, prec, 1.f))
+  if (!check_logn (f, g, prec, (JBFLOAT) 1.))
     return 0;
-  return check_logn (f, g, prec, -1.f);
+  return check_logn (f, g, prec, (JBFLOAT) -1.);
 }
 
 int
@@ -2293,14 +3138,56 @@ check_unil (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE (*g) (JBDOUBLE), JBDOUBLE prec,
         x = xmax;
       f0 = f (x);
       g0 = g (x);
-// Fix: .f      
-      if (FABSL (f0 / g0 - 1.) > prec && FABSL (f0 - g0) > prec)
+      if (FABSL (f0 / g0 - (JBDOUBLE) 1.) > prec && FABSL (f0 - g0) > prec)
         {
+// Fix printf
           printf ("x=" FWL " f=" FWL " g=" FWL "\n", x, f0, g0);
           return 0;
         }
     }
   return 1;
+}
+
+int
+check_lognl (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE (*g) (JBDOUBLE), JBDOUBLE prec,
+             JBDOUBLE x0)
+{
+  JBDOUBLE x, f0, g0;
+  for (x = x0; isfinite (x); x *= (JBDOUBLE) 2.)
+    {
+      f0 = f (x);
+      g0 = g (x);
+      if (!isfinite (f0) && !isfinite (g0))
+        break;
+      if (FABSL (f0 / g0 - (JBDOUBLE) 1.) > prec && FABSL (f0 - g0) > prec)
+        {
+// Fix printf
+          printf ("x=" FWL " f=" FWL " g=" FWL "\n", x, f0, g0);
+          return 0;
+        }
+    }
+  for (x = x0; FABSL (x) > (JBDOUBLE) 0.; x *= (JBDOUBLE) 0.5)
+    {
+      f0 = f (x);
+      g0 = g (x);
+      if (!isfinite (f0) && !isfinite (g0))
+        break;
+      if (FABSL (f0 / g0 - (JBDOUBLE) 1.) > prec && FABSL (f0 - g0) > prec)
+        {
+// Fix printf
+          printf ("x=" FWL " f=" FWL " g=" FWL "\n", x, f0, g0);
+          return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_logl (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE (*g) (JBDOUBLE), JBDOUBLE prec)
+{
+  if (!check_lognl (f, g, prec, (JBDOUBLE) 1.))
+    return 0;
+  return check_lognl (f, g, prec, (JBDOUBLE) -1.);
 }
 
 double
@@ -2536,6 +3423,10 @@ main (void)
 #endif
 #ifdef __riscv_vector
   size_t vlmax32, vlmax64;
+  double *d_1, *d_2;
+  unsigned long long int *L_1;
+  vfloat64m1_t d_2xf64, d2_2xf64, d_4xf64, d2_4xf64;
+  vuint64m1_t m_2xf64, m2_2xf64, m_4xf64, m2_4xf64;
 #endif
   long long int iL, iL2;
   unsigned long long int uL, uL2;
@@ -2728,13 +3619,16 @@ main (void)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
 
-#if defined (__SSE4_2__) || defined (__ARM_NEON)
+#if defined (__SSE4_2__) || defined (__ARM_NEON) // || defined (__riscv_vector)
 
 #ifdef __SSE4_2__
   printf ("checking __m128 functions\n");
 #endif
 #ifdef __ARM_NEON
   printf ("checking float32x4_t functions\n");
+#endif
+#ifdef __riscv_vector
+  printf ("checking vfloat32m1_t functions (128 bits)\n");
 #endif
 
   n = test_log_4xf32 (jbm_exp2_4xf32, exp2f);
@@ -2815,6 +3709,9 @@ main (void)
 #ifdef __ARM_NEON
   printf ("checking float64x2_t functions\n");
 #endif
+#ifdef __riscv_vector
+  printf ("checking vfloat64m1_t functions (128 bits)\n");
+#endif
 
   n = test_log_2xf64 (jbm_exp2_2xf64, exp2);
   if (n == MAX_ITERATIONS)
@@ -2890,9 +3787,15 @@ main (void)
 
 #endif
 
-#if __AVX__
+#if defined (__AVX__) // || defined (__riscv_vector)
 
+#ifdef __AVX__
   printf ("checking __m256 functions\n");
+#endif
+#ifdef __riscv_vector
+  printf ("checking vfloat32m1_t functions (256 bits)\n");
+#endif
+
   n = test_log_8xf32 (jbm_exp2_8xf32, exp2f);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -2965,7 +3868,13 @@ main (void)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
 
+#ifdef __AVX__
   printf ("checking __m256d functions\n");
+#endif
+#ifdef __riscv_vector
+  printf ("checking vfloat64m1_t functions (256 bits)\n");
+#endif
+
   n = test_log_4xf64 (jbm_exp2_4xf64, exp2);
   if (n == MAX_ITERATIONS)
     return 1;
