@@ -3058,6 +3058,7 @@ int
 check_uni (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
            JBFLOAT xmin, JBFLOAT xmax, unsigned int n)
 {
+  char buffer[JB_BUFFER_SIZE];
   JBFLOAT x, dx, f0, g0;
   unsigned int i, n1;
   n1 = n - 1;
@@ -3072,8 +3073,12 @@ check_uni (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
       g0 = g (x);
       if (FABS (f0 / g0 - (JBFLOAT) 1.) > prec && FABS (f0 - g0) > prec)
         {
-// Fix printf
-          printf ("x=" FWF " f=" FWF " g=" FWF "\n", x, f0, g0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, x);
+          printf ("x=%s ", x);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f0);
+          printf ("f=%s ", f0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, g0);
+          printf ("g=%s\n", g0);
           return 0;
         }
     }
@@ -3084,6 +3089,7 @@ int
 check_logn (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
             JBFLOAT x0)
 {
+  char buffer[JB_BUFFER_SIZE];
   JBFLOAT x, f0, g0;
   for (x = x0; isfinite (x); x *= (JBFLOAT) 2.)
     {
@@ -3093,8 +3099,12 @@ check_logn (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
         break;
       if (FABS (f0 / g0 - (JBFLOAT) 1.) > prec && FABS (f0 - g0) > prec)
         {
-// Fix printf
-          printf ("x=" FWF " f=" FWF " g=" FWF "\n", x, f0, g0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, x);
+          printf ("x=%s ", x);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f0);
+          printf ("f=%s ", f0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, g0);
+          printf ("g=%s\n", g0);
           return 0;
         }
     }
@@ -3106,8 +3116,12 @@ check_logn (JBFLOAT (*f) (JBFLOAT), JBFLOAT (*g) (JBFLOAT), JBFLOAT prec,
         break;
       if (FABS (f0 / g0 - (JBFLOAT) 1.) > prec && FABS (f0 - g0) > prec)
         {
-// Fix printf
-          printf ("x=" FWF " f=" FWF " g=" FWF "\n", x, f0, g0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, x);
+          printf ("x=%s ", x);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f0);
+          printf ("f=%s ", f0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, g0);
+          printf ("g=%s\n", g0);
           return 0;
         }
     }
@@ -3126,6 +3140,7 @@ int
 check_unil (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE (*g) (JBDOUBLE), JBDOUBLE prec,
             JBDOUBLE xmin, JBDOUBLE xmax, unsigned int n)
 {
+  char buffer[JB_BUFFER_SIZE];
   JBDOUBLE x, dx, f0, g0;
   unsigned int i, n1;
   n1 = n - 1;
@@ -3140,8 +3155,12 @@ check_unil (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE (*g) (JBDOUBLE), JBDOUBLE prec,
       g0 = g (x);
       if (FABSL (f0 / g0 - (JBDOUBLE) 1.) > prec && FABSL (f0 - g0) > prec)
         {
-// Fix printf
-          printf ("x=" FWL " f=" FWL " g=" FWL "\n", x, f0, g0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWL, x);
+          printf ("x=%s ", x);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWL, f0);
+          printf ("f=%s ", f0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWL, g0);
+          printf ("g=%s\n", g0);
           return 0;
         }
     }
@@ -3152,6 +3171,7 @@ int
 check_lognl (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE (*g) (JBDOUBLE), JBDOUBLE prec,
              JBDOUBLE x0)
 {
+  char buffer[JB_BUFFER_SIZE];
   JBDOUBLE x, f0, g0;
   for (x = x0; isfinite (x); x *= (JBDOUBLE) 2.)
     {
@@ -3161,8 +3181,12 @@ check_lognl (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE (*g) (JBDOUBLE), JBDOUBLE prec,
         break;
       if (FABSL (f0 / g0 - (JBDOUBLE) 1.) > prec && FABSL (f0 - g0) > prec)
         {
-// Fix printf
-          printf ("x=" FWL " f=" FWL " g=" FWL "\n", x, f0, g0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWL, x);
+          printf ("x=%s ", x);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWL, f0);
+          printf ("f=%s ", f0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWL, g0);
+          printf ("g=%s\n", g0);
           return 0;
         }
     }
@@ -3174,8 +3198,12 @@ check_lognl (JBDOUBLE (*f) (JBDOUBLE), JBDOUBLE (*g) (JBDOUBLE), JBDOUBLE prec,
         break;
       if (FABSL (f0 / g0 - (JBDOUBLE) 1.) > prec && FABSL (f0 - g0) > prec)
         {
-// Fix printf
-          printf ("x=" FWL " f=" FWL " g=" FWL "\n", x, f0, g0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWL, x);
+          printf ("x=%s ", x);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWL, f0);
+          printf ("f=%s ", f0);
+          SNPRINTF (buffer, JB_BUFFER_SIZE, FWL, g0);
+          printf ("g=%s\n", g0);
           return 0;
         }
     }

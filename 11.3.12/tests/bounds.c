@@ -108,8 +108,7 @@ main ()
   printf ("double: %lu bits\n", (unsigned long int) 8l * sizeof (double));
   printf ("long double: %lu bits\n",
           (unsigned long int) 8l * sizeof (long double));
-  printf ("_Float128: %lu bits\n",
-          (unsigned long int) 8l * sizeof (_Float128));
+  printf ("_Float128: %lu bits\n", (unsigned long int) 8l * sizeof (_Float128));
 
   printf ("\nLIMITS\n");
   printf ("FLT_MIN=" FF "\n", (float) FLT_MIN);
@@ -280,7 +279,7 @@ main ()
   print_bits ("FLT128_MAX_10_EXP", &xq, 16);
   xq = FLT128_EPSILON;
   print_bits ("FLT128_EPSILON", &xq, 16);
-  xq = 1.F128;
+  xq = (__float128) 1.;
   print_bits ("1", &xq, 16);
 #endif
 
