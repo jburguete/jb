@@ -1,6 +1,6 @@
 # Header
 AC_PREREQ([2.69])
-AC_INIT([jb],[11.3.12],[https://github.com/jburguete/jb])
+AC_INIT([jb],[11.3.13],[https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_TARGET

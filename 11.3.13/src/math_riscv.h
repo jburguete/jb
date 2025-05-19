@@ -100,6 +100,29 @@ print_vfloat64m1_t (FILE *file, const char *label, vfloat64m1_t x,
 }
 
 /**
+ * Function to read the rounding register on RISCV.
+ *
+ * \return rounding register.
+ */
+static inline unsigned int
+jbm_riscv_read_frm ()
+{
+  unsigned int frm;
+  asm volatile ("frrm %0" : "=r" (frm));
+  return frm & 0x7;
+}
+
+/**
+ * Function to set the rounding register on RISCV.
+ */
+static inline void
+jbm_riscv_set_frm (unsigned int frm)    ///< rounding register.
+{
+  
+  asm volatile ("fsrm %0" : : "r" (frm));
+}
+
+/**
  * Function to calculate the additive inverse value of a vfloat32m1_t vector.
  *
  * \return opposite value vector (vfloat32m1_t).
@@ -152,20 +175,63 @@ jbm_hypot_nxf32 (const vfloat32m1_t x,  ///< 1st vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the rounding towards negative infinity.
- +
- + \return function value vector (vint32m1_t).
+ * Function to rounding to nearest (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_round_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                 const size_t vl)       ///< vector size.
+{
+  return __riscv_vfcvt_x_f_v_i32m1 (x, vl);
+}
+
+/**
+ * Function to rounding towards zero (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_trunc_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                 const size_t vl)       ///< vector size.
+{
+  vint32m1_t i;
+  jbm_riscv_set_frm (0x1);
+  i = __riscv_vfcvt_x_f_v_i32m1 (x, vl);
+  jbm_riscv_set_frm (0x0);
+  return i;
+}
+
+/**
+ * Function to rounding down (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
 jbm_floor_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  vint32m1_t vi;
-  vfloat32m1_t vf;
-  vi = __riscv_vfcvt_x_f_v_i32m1 (x, vl);
-  vf = __riscv_vfcvt_f_x_v_f32m1 (vi, vl);
-  return __riscv_vmerge_vvm_i32m1 (__riscv_vsub_vx_i32m1 (vi, 1, vl), vi,
-		                   __riscv_vmfgt_vv_f32m1_b32 (vf, x, vl), vl);
+  vint32m1_t i;
+  jbm_riscv_set_frm (0x2);
+  i = __riscv_vfcvt_x_f_v_i32m1 (x, vl);
+  jbm_riscv_set_frm (0x0);
+  return i;
+}
+
+/**
+ * Function to rounding top (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_ceil_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
+                const size_t vl)        ///< vector size.
+{
+  vint32m1_t i;
+  jbm_riscv_set_frm (0x3);
+  i = __riscv_vfcvt_x_f_v_i32m1 (x, vl);
+  jbm_riscv_set_frm (0x0);
+  return i;
 }
 
 /**
@@ -179,11 +245,10 @@ jbm_rest_nxf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
                 const size_t vl)        ///< vector size.
 {
   return
-    __riscv_vfmsac_vv_f32m1 (x,
-                             __riscv_vfcvt_f_x_v_f32m1 (jbm_floor_nxf32
-                                                        (__riscv_vfdiv_vv_f32m1
-                                                         (x, d, vl), vl), vl),
-                             d, vl);
+    __riscv_vfmsac_vv_f32m1
+    (x,
+     __riscv_vfcvt_f_x_v_f32m1
+     (jbm_floor_nxf32 (__riscv_vfdiv_vv_f32m1 (x, d, vl), vl), vl), d, vl);
 }
 
 /**
@@ -11469,20 +11534,63 @@ jbm_hypot_nxf64 (const vfloat64m1_t x,  ///< 1st vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the rounding towards negative infinity.
- +
- + \return function value vector (vint64m1_t).
+ * Function to rounding to nearest (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
+ */
+static inline vint64m1_t
+jbm_round_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                 const size_t vl)       ///< vector size.
+{
+  return __riscv_vfcvt_x_f_v_i64m1 (x, vl);
+}
+
+/**
+ * Function to rounding towards zero (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
+ */
+static inline vint64m1_t
+jbm_trunc_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                 const size_t vl)       ///< vector size.
+{
+  vint64m1_t i;
+  jbm_riscv_set_frm (0x1);
+  i = __riscv_vfcvt_x_f_v_i64m1 (x, vl);
+  jbm_riscv_set_frm (0x0);
+  return i;
+}
+
+/**
+ * Function to rounding down (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
 jbm_floor_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  vint64m1_t vi;
-  vfloat64m1_t vf;
-  vi = __riscv_vfcvt_x_f_v_i64m1 (x, vl);
-  vf = __riscv_vfcvt_f_x_v_f64m1 (vi, vl);
-  return __riscv_vmerge_vvm_i64m1 (__riscv_vsub_vx_i64m1 (vi, 1, vl), vi,
-		                   __riscv_vmfgt_vv_f64m1_b64 (vf, x, vl), vl);
+  vint64m1_t i;
+  jbm_riscv_set_frm (0x2);
+  i = __riscv_vfcvt_x_f_v_i64m1 (x, vl);
+  jbm_riscv_set_frm (0x0);
+  return i;
+}
+
+/**
+ * Function to rounding top (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
+ */
+static inline vint64m1_t
+jbm_ceil_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                const size_t vl)        ///< vector size.
+{
+  vint64m1_t i;
+  jbm_riscv_set_frm (0x3);
+  i = __riscv_vfcvt_x_f_v_i64m1 (x, vl);
+  jbm_riscv_set_frm (0x0);
+  return i;
 }
 
 /**
@@ -22867,12 +22975,45 @@ jbm_hypot_4xf32 (const vfloat32m1_t x,  ///< 1st vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the rounding towards negative infinity.
- +
- + \return function value vector (4x vint32m1_t).
+ * Function to rounding to nearest (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_round_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_round_nxf32 (x, 4);
+}
+
+/**
+ * Function to rounding towards zero (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_trunc_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_trunc_nxf32 (x, 4);
+}
+
+/**
+ * Function to rounding down (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
 jbm_floor_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_floor_nxf32 (x, 4);
+}
+
+/**
+ * Function to rounding top (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_ceil_4xf32 (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 {
   return jbm_floor_nxf32 (x, 4);
 }
@@ -29445,12 +29586,45 @@ jbm_hypot_2xf64 (const vfloat64m1_t x,  ///< 1st vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the rounding towards negative infinity.
- +
- + \return function value vector (2x vint32m1_t).
+ * Function to rounding to nearest (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
+ */
+static inline vint64m1_t
+jbm_round_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_round_nxf64 (x, 2);
+}
+
+/**
+ * Function to rounding towards zero (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
+ */
+static inline vint64m1_t
+jbm_trunc_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_trunc_nxf64 (x, 2);
+}
+
+/**
+ * Function to rounding down (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
 jbm_floor_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_floor_nxf64 (x, 2);
+}
+
+/**
+ * Function to rounding top (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
+ */
+static inline vint64m1_t
+jbm_ceil_2xf64 (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_floor_nxf64 (x, 2);
 }
@@ -36023,12 +36197,45 @@ jbm_hypot_8xf32 (const vfloat32m1_t x,  ///< 1st vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the rounding towards negative infinity.
- +
- + \return function value vector (8x vint32m1_t).
+ * Function to rounding to nearest (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_round_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_round_nxf32 (x, 8);
+}
+
+/**
+ * Function to rounding towards zero (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_trunc_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_trunc_nxf32 (x, 8);
+}
+
+/**
+ * Function to rounding down (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
 jbm_floor_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_floor_nxf32 (x, 8);
+}
+
+/**
+ * Function to rounding top (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_ceil_8xf32 (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 {
   return jbm_floor_nxf32 (x, 8);
 }
@@ -42601,12 +42808,45 @@ jbm_hypot_4xf64 (const vfloat64m1_t x,  ///< 1st vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the rounding towards negative infinity.
- +
- + \return function value vector (4x vint64m1_t).
+ * Function to rounding to nearest (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
+ */
+static inline vint64m1_t
+jbm_round_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_round_nxf64 (x, 4);
+}
+
+/**
+ * Function to rounding towards zero (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
+ */
+static inline vint64m1_t
+jbm_trunc_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_trunc_nxf64 (x, 4);
+}
+
+/**
+ * Function to rounding down (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
 jbm_floor_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_floor_nxf64 (x, 4);
+}
+
+/**
+ * Function to rounding top (vfloat64m1_t).
+ *
+ * \return function value vector (vint64m1_t).
+ */
+static inline vint64m1_t
+jbm_ceil_4xf64 (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_floor_nxf64 (x, 4);
 }
