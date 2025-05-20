@@ -11711,8 +11711,7 @@ jbm_modmin_nxf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
   aa = jbm_abs_nxf64 (y, vl);
   ab = jbm_abs_nxf64 (b, vl);
   return __riscv_vmerge_vvm_f64m1 (b, y,
-                                    __riscv_vmfgt_vv_f64m1_b64 (aa, ab, vl),
-                                    vl);
+                                   __riscv_vmfgt_vv_f64m1_b64 (aa, ab, vl), vl);
 }
 
 /**
@@ -21833,22 +21832,22 @@ jbm_sin_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
   y = jbm_rest_nxf64 (x, pi2, vl);
   s = jbm_sinwc_nxf64 (__riscv_vfsub_vv_f64m1 (y, pi2, vl), vl);
   s = __riscv_vmerge_vvm_f64m1
-    (jbm_opposite_nxf64
-     (jbm_coswc_nxf64
-      (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (3. * M_PI_2, vl), y, vl),
-       vl), vl), s, __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
-  s =
-    __riscv_vmerge_vvm_f64m1 (jbm_sinwc_nxf64
-                               (__riscv_vfsub_vv_f64m1
-                                (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), vl), s,
-                               __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl), vl);
-  s =
-    __riscv_vmerge_vvm_f64m1 (jbm_coswc_nxf64
-                               (__riscv_vfsub_vv_f64m1
-                                (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
-                               s, __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4,
+    (s, jbm_opposite_nxf64
+        (jbm_coswc_nxf64
+         (__riscv_vfsub_vv_f64m1
+	  (__riscv_vfmv_v_f_f64m1 (3. * M_PI_2, vl), y, vl), vl), vl),
+     __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
+  s = __riscv_vmerge_vvm_f64m1
+    (s, jbm_sinwc_nxf64
+        (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), vl),
+     __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl), vl);
+  s = __riscv_vmerge_vvm_f64m1
+    (s, jbm_coswc_nxf64
+        (__riscv_vfsub_vv_f64m1
+	 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
+     __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4,
                                                               vl), vl);
-  return __riscv_vmerge_vvm_f64m1 (jbm_sinwc_nxf64 (y, vl), s,
+  return __riscv_vmerge_vvm_f64m1 (s, jbm_sinwc_nxf64 (y, vl),
                                     __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl),
                                     vl);
 }
@@ -21867,31 +21866,24 @@ jbm_cos_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
   pi2 = __riscv_vfmv_v_f_f64m1 (2. * M_PI, vl);
   y = jbm_rest_nxf64 (x, pi2, vl);
   c = jbm_coswc_nxf64 (__riscv_vfsub_vv_f64m1 (y, pi2, vl), vl);
-  c =
-    __riscv_vmerge_vvm_f64m1 (jbm_sinwc_nxf64
-                               (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl),
-                                vl), c, __riscv_vmflt_vf_f64m1_b64 (y,
-                                                                    7. * M_PI_4,
-                                                                    vl), vl);
-  c =
-    __riscv_vmerge_vvm_f64m1 (jbm_opposite_nxf64
-                               (jbm_coswc_nxf64
-                                (__riscv_vfsub_vv_f64m1
-                                 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl),
-                                 vl), vl), c, __riscv_vmflt_vf_f64m1_b64 (y,
-                                                                          5. *
-                                                                          M_PI_4,
-                                                                          vl),
-                               vl);
-  c =
-    __riscv_vmerge_vvm_f64m1 (jbm_sinwc_nxf64
-                               (__riscv_vfsub_vv_f64m1
-                                (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
-                               c, __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4,
-                                                              vl), vl);
-  return __riscv_vmerge_vvm_f64m1 (jbm_coswc_nxf64 (y, vl), c,
-                                    __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl),
-                                    vl);
+  c = __riscv_vmerge_vvm_f64m1
+    (c, jbm_sinwc_nxf64
+        (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), vl),
+     __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
+  c = __riscv_vmerge_vvm_f64m1
+    (c, jbm_opposite_nxf64
+        (jbm_coswc_nxf64
+	 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl),
+                                  vl), vl),
+     __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl), vl);
+  c = __riscv_vmerge_vvm_f64m1
+      (c, jbm_sinwc_nxf64
+          (__riscv_vfsub_vv_f64m1
+           (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
+       __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4, vl), vl);
+  return
+    __riscv_vmerge_vvm_f64m1 (c, jbm_coswc_nxf64 (y, vl),
+                              __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl), vl);
 }
 
 /**
@@ -21915,22 +21907,23 @@ jbm_sincos_nxf64 (const vfloat64m1_t x,
   jbm_sincoswc_nxf64 (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), &c2, &s2,
                       vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4f, vl);
-  s1 = __riscv_vmerge_vvm_f64m1 (jbm_opposite_nxf64 (s2, vl), s1, m, vl);
-  c1 = __riscv_vmerge_vvm_f64m1 (c2, c1, m, vl);
+  s1 = __riscv_vmerge_vvm_f64m1 (s1, jbm_opposite_nxf64 (s2, vl), m, vl);
+  c1 = __riscv_vmerge_vvm_f64m1 (c1, c2, m, vl);
   jbm_sincoswc_nxf64 (__riscv_vfsub_vv_f64m1
                       (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), &s2, &c2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl);
-  s1 = __riscv_vmerge_vvm_f64m1 (s2, s1, m, vl);
-  c1 = __riscv_vmerge_vvm_f64m1 (jbm_opposite_nxf64 (c2, vl), c1, m, vl);
-  jbm_sincoswc_nxf64 (__riscv_vfsub_vv_f64m1
-                      (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), &c2, &s2, vl);
+  s1 = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
+  c1 = __riscv_vmerge_vvm_f64m1 (c1, jbm_opposite_nxf64 (c2, vl), m, vl);
+  jbm_sincoswc_nxf64
+  (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl),
+   &c2, &s2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4f, vl);
-  s1 = __riscv_vmerge_vvm_f64m1 (s2, s1, m, vl);
-  c1 = __riscv_vmerge_vvm_f64m1 (c2, c1, m, vl);
+  s1 = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
+  c1 = __riscv_vmerge_vvm_f64m1 (c1, c2, m, vl);
   jbm_sincoswc_nxf64 (y, &s2, &c2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl);
-  *s = __riscv_vmerge_vvm_f64m1 (s2, s1, m, vl);
-  *c = __riscv_vmerge_vvm_f64m1 (c2, c1, m, vl);
+  *s = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
+  *c = __riscv_vmerge_vvm_f64m1 (c1, c2, m, vl);
 }
 
 /**
@@ -22023,18 +22016,17 @@ jbm_atan_nxf64 (const vfloat64m1_t x,   ///< double number.
   vbool64_t m;
   ax = jbm_abs_nxf64 (x, vl);
   m = __riscv_vmfgt_vf_f64m1_b64 (ax, 1.5, vl);
-  ax = __riscv_vmerge_vvm_f64m1 (jbm_reciprocal_nxf64 (ax, vl), ax, m, vl);
+  ax = __riscv_vmerge_vvm_f64m1 (ax, jbm_reciprocal_nxf64 (ax, vl), m, vl);
   f =
-    __riscv_vmerge_vvm_f64m1 (jbm_atanwc1_nxf64 (ax, vl),
-                               jbm_atanwc0_nxf64 (ax, vl),
-                               __riscv_vmfgt_vf_f64m1_b64 (ax, 0.5, vl), vl);
+    __riscv_vmerge_vvm_f64m1 (jbm_atanwc0_nxf64 (ax, vl),
+                              jbm_atanwc1_nxf64 (ax, vl),
+                              __riscv_vmfgt_vf_f64m1_b64 (ax, 0.5, vl), vl);
   f =
-    __riscv_vmerge_vvm_f64m1 (__riscv_vfsub_vv_f64m1
-                               (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), f, vl), f,
-                               m, vl);
-  return __riscv_vmerge_vvm_f64m1 (jbm_opposite_nxf64 (f, vl), f,
-                                    __riscv_vmflt_vf_f64m1_b64 (x, 0.f, vl),
-                                    vl);
+    __riscv_vmerge_vvm_f64m1 (f, __riscv_vfsub_vv_f64m1
+                                 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), f, vl),
+                              m, vl);
+  return __riscv_vmerge_vvm_f64m1 (f, jbm_opposite_nxf64 (f, vl),
+                                   __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
 }
 
 /**
@@ -22053,12 +22045,11 @@ jbm_atan2_nxf64 (const vfloat64m1_t y,  ///< vfloat64m1_t y component.
   f = jbm_atan_nxf64 (__riscv_vfdiv_vv_f64m1 (y, x, vl), vl);
   mx = __riscv_vmflt_vf_f64m1_b64 (x, 0., vl);
   my = __riscv_vmflt_vf_f64m1_b64 (y, 0., vl);
-  f = __riscv_vmerge_vvm_f64m1 (__riscv_vfsub_vf_f64m1 (f, M_PI, vl), f,
-                                 __riscv_vmand_mm_b64 (my, mx, vl), vl);
-  return __riscv_vmerge_vvm_f64m1 (__riscv_vfadd_vf_f64m1 (f, M_PI, vl), f,
-                                    __riscv_vmand_mm_b64 (my,
-                                                      __riscv_vmnot_m_b64 (mx, vl),
-                                                      vl), vl);
+  f = __riscv_vmerge_vvm_f64m1 (f, __riscv_vfsub_vf_f64m1 (f, M_PI, vl),
+                                __riscv_vmand_mm_b64 (my, mx, vl), vl);
+  return __riscv_vmerge_vvm_f64m1 (f, __riscv_vfadd_vf_f64m1 (f, M_PI, vl),
+                                   __riscv_vmand_mm_b64
+				   (my, __riscv_vmnot_m_b64 (mx, vl), vl), vl);
 }
 
 /**
@@ -22098,7 +22089,7 @@ jbm_acos_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
                      (__riscv_vfnmsac_vv_f64m1
                       (__riscv_vfmv_v_f_f64m1 (1., vl), x, x, vl),
                        vl), x, vl), vl);
-  return __riscv_vmerge_vvm_f64m1 (__riscv_vfadd_vf_f64m1 (f, M_PI, vl), f,
+  return __riscv_vmerge_vvm_f64m1 (f, __riscv_vfadd_vf_f64m1 (f, M_PI, vl),
                                     __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
 }
 
@@ -22150,13 +22141,12 @@ jbm_tanh_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
     __riscv_vfdiv_vv_f64m1 (__riscv_vfsub_vv_f64m1 (f, fi, vl),
                             __riscv_vfadd_vv_f64m1 (f, fi, vl), vl);
   f =
-    __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (1.f, vl), f,
+    __riscv_vmerge_vvm_f64m1 (f, __riscv_vfmv_v_f_f64m1 (1.f, vl),
                                __riscv_vmfgt_vf_f64m1_b64 (x, JBM_FLT_MAX_E_EXP,
                                                            vl), vl);
-  return __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (-1.f, vl), f,
-                                    __riscv_vmflt_vf_f64m1_b64 (x,
-                                                                -JBM_FLT_MAX_E_EXP,
-                                                                vl), vl);
+  return __riscv_vmerge_vvm_f64m1 (f, __riscv_vfmv_v_f_f64m1 (-1.f, vl),
+                                   __riscv_vmflt_vf_f64m1_b64
+				   (x, -JBM_FLT_MAX_E_EXP, vl), vl);
 }
 
 /**
@@ -22282,8 +22272,8 @@ jbm_erfcwc_nxf64 (const vfloat64m1_t x,
                             (jbm_reciprocal_nxf64 (x2, vl), a, vl),
                             __riscv_vfmul_vv_f64m1 (x, jbm_exp_nxf64 (x2, vl),
                                                     vl), vl);
-  return __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl), f,
-                                    __riscv_vmfgt_vf_f64m1_b64 (x, m, vl), vl);
+  return __riscv_vmerge_vvm_f64m1 (f, __riscv_vfmv_v_f_f64m1 (0., vl),
+                                   __riscv_vmfgt_vf_f64m1_b64 (x, m, vl), vl);
 }
 
 /**
@@ -22303,7 +22293,7 @@ jbm_erf_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                               __riscv_vfsub_vv_f64m1 (u,
                                                       jbm_erfcwc_nxf64 (ax, vl),
                                                       vl), vl);
-  return __riscv_vmerge_vvm_f64m1 (jbm_erfwc_nxf64 (x, vl), f,
+  return __riscv_vmerge_vvm_f64m1 (f, jbm_erfwc_nxf64 (x, vl),
                                     __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
 }
 
@@ -22320,19 +22310,14 @@ jbm_erfc_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
   vfloat64m1_t ax, u, f;
   ax = jbm_abs_nxf64 (x, vl);
   u = __riscv_vfmv_v_f_f64m1 (1.f, vl);
-  f = __riscv_vfsub_vv_f64m1 (u,
-                              __riscv_vfmul_vv_f64m1 (__riscv_vfdiv_vv_f64m1
-                                                      (x, ax, vl),
-                                                      __riscv_vfsub_vv_f64m1 (u,
-                                                                              jbm_erfcwc_nxf64
-                                                                              (ax,
-                                                                               vl),
-                                                                              vl),
-                                                      vl), vl);
+  f = __riscv_vfsub_vv_f64m1
+    (u, __riscv_vfmul_vv_f64m1
+        (__riscv_vfdiv_vv_f64m1 (x, ax, vl),
+         __riscv_vfsub_vv_f64m1 (u, jbm_erfcwc_nxf64 (ax, vl), vl), vl), vl);
   return
-    __riscv_vmerge_vvm_f64m1 (__riscv_vfsub_vv_f64m1
-                               (u, jbm_erfwc_nxf64 (x, vl), vl), f,
-                               __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
+    __riscv_vmerge_vvm_f64m1 (f, __riscv_vfsub_vv_f64m1
+                                 (u, jbm_erfwc_nxf64 (x, vl), vl),
+                              __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
 }
 
 /**

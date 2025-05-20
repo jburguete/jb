@@ -3701,91 +3701,8 @@ main (void)
   vlmax64 = __riscv_vsetvlmax_e64m1 ();
   printf ("maximum 32 bits vector size=%lu\n", vlmax32);
   printf ("maximum 64 bits vector size=%lu\n", vlmax64);
-  printf ("checking vfloat32m1_t functions (128 bits)\n");
-  n = test_log_4xf32 (jbm_exp2_4xf32, exp2f);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check exp2: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_exp_4xf32, expf);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check exp: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_exp10_4xf32, exp10f);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check exp10: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_expm1_4xf32, expm1f);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check expm1: OK(%u)\n", n);
-  n = test_logn_4xf32 (jbm_log2_4xf32, log2f, 1.f);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check log2: OK(%u)\n", n);
-  n = test_logn_4xf32 (jbm_log_4xf32, logf, 1.f);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check log: OK(%u)\n", n);
-  n = test_logn_4xf32 (jbm_log10_4xf32, log10f, 1.f);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check log10: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_sin_4xf32, sinf, -2.f * M_PIf, 2.f * M_PIf);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check sin: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_cos_4xf32, cosf, -2.f * M_PIf, 2.f * M_PIf);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check cos: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_tan_4xf32, tanf, -2.f * M_PIf, 2.f * M_PIf);
-  if (n == MAX_ITERATIONS)
-    printf ("check tan: No\n");
-  n = test_log_4xf32 (jbm_atan_4xf32, atanf);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check atan: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_asin_4xf32, asinf, -1.f, 1.f);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check asin: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_acos_4xf32, acosf, -1.f, 1.f);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check acos: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_sinh_4xf32, sinhf);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check sinh: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_cosh_4xf32, coshf);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check cosh: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_tanh_4xf32, tanhf);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check tanh: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_erf_4xf32, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check erf: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_erfc_4xf32, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check erfc: OK(%u)\n", n);
-/*
-  printf ("checking vfloat64m1_t functions (128 bits)\n");
-  n = test_log_2xf64 (jbm_exp2_2xf64, exp2);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check exp2: OK(%u)\n", n);
-  n = test_log_2xf64 (jbm_exp_2xf64, exp);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check exp: OK(%u)\n", n);
-*/
 #endif
-#if defined (__SSE4_2__) || defined (__ARM_NEON) // || defined (__riscv_vector)
+#if defined (__SSE4_2__) || defined (__ARM_NEON) || defined (__riscv_vector)
 
 #ifdef __SSE4_2__
   printf ("checking __m128 functions\n");
@@ -3953,7 +3870,7 @@ main (void)
 
 #endif
 
-#if defined (__AVX__) // || defined (__riscv_vector)
+#if defined (__AVX__) || defined (__riscv_vector)
 
 #ifdef __AVX__
   printf ("checking __m256 functions\n");
