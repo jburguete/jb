@@ -17,13 +17,17 @@ typedef struct
 float32x4_t
 set_float32x4_t (const float x3, const float x2, const float x1, const float x0)
 {
-  return (float32x4_t) { x0, x1, x2, x3 };
+  return (float32x4_t)
+  {
+  x0, x1, x2, x3};
 }
 
 float64x2_t
 set_float64x2_t (const double x1, const double x0)
 {
-  return (float64x2_t) { x0, x1 };
+  return (float64x2_t)
+  {
+  x0, x1};
 }
 
 #endif
@@ -67,115 +71,216 @@ const JBFLOAT pf[15] = { (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 4., (JBFLOAT) 8.,
   (JBFLOAT) 512., (JBFLOAT) 1024., (JBFLOAT) 2048., (JBFLOAT) 4096.,
   (JBFLOAT) 8192., (JBFLOAT) 16384.
 };
+
 JBFLOAT mxf[] = {
-  (JBFLOAT) 1., (JBFLOAT) 3., (JBFLOAT) 2., (JBFLOAT) 1., (JBFLOAT) 18., (JBFLOAT)
-  (JBFLOAT) 2., (JBFLOAT) 4., (JBFLOAT) 8., (JBFLOAT) 0., (JBFLOAT) 18., (JBFLOAT)
-  (JBFLOAT) 3., (JBFLOAT) -1., (JBFLOAT) 4., (JBFLOAT) 2., (JBFLOAT) 4., (JBFLOAT)
+  (JBFLOAT) 1., (JBFLOAT) 3., (JBFLOAT) 2., (JBFLOAT) 1., (JBFLOAT) 18.,
+  (JBFLOAT) 2., (JBFLOAT) 4., (JBFLOAT) 8., (JBFLOAT) 0., (JBFLOAT) 18.,
+  (JBFLOAT) 3., (JBFLOAT) - 1., (JBFLOAT) 4., (JBFLOAT) 2., (JBFLOAT) 4.,
   (JBFLOAT) 4., (JBFLOAT) 0., (JBFLOAT) 3., (JBFLOAT) 1., (JBFLOAT) 11.
 };
-const JBFLOAT myf[] = { 3., (JBFLOAT) 5., (JBFLOAT) -1., (JBFLOAT) 2. };
-JBFLOAT Cf[] = { (JBFLOAT) 1., (JBFLOAT) -1., (JBFLOAT) -1. }, Df[] = { (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 1. },
-  Ef[] = { (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) -1. }, Hf[] = { (JBFLOAT) 5., (JBFLOAT) 9., (JBFLOAT) -7., (JBFLOAT) 6. },
-  Czf[] = { (JBFLOAT) 1., (JBFLOAT) -1., (JBFLOAT) 0., (JBFLOAT) 1. }, Dzf[] = { (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 0., (JBFLOAT) 2., (JBFLOAT) 1. },
-  Ezf[] = { (JBFLOAT) 1., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) -1. }, Hzf[] = { (JBFLOAT) 5., (JBFLOAT) 7., (JBFLOAT) -1., (JBFLOAT) -4., (JBFLOAT) 6. },
-  Cpf[] = { (JBFLOAT) 1., (JBFLOAT) -1., (JBFLOAT) -1. }, Dpf[] = { (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 1. },
-  Epf[] = { (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) -1. }, Bpf[] = { (JBFLOAT) 1., (JBFLOAT) -1. }, Fpf[] = { (JBFLOAT) -1., (JBFLOAT) 1. },
-  Hpf[] = { (JBFLOAT) 3., (JBFLOAT) 17., (JBFLOAT) -6., (JBFLOAT) 3. },
-  Cpzf[] = { (JBFLOAT) 1., (JBFLOAT) -1., (JBFLOAT) 0., (JBFLOAT) -1. }, Dpzf[] = { (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 0., (JBFLOAT) 2., (JBFLOAT) 1. },
-  Epzf[] = { (JBFLOAT) 1., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) -1. }, Bpzf[] = { (JBFLOAT) 1., (JBFLOAT) -1., (JBFLOAT) 0. },
-  Fpzf[] = { (JBFLOAT) 0., (JBFLOAT) -1., (JBFLOAT) 1. }, Hpzf[] = { 5., (JBFLOAT) 5., (JBFLOAT) 8., (JBFLOAT) -7., (JBFLOAT) 6. };
+const JBFLOAT myf[] = { 3., (JBFLOAT) 5., (JBFLOAT) - 1., (JBFLOAT) 2. };
+JBFLOAT Cf[] = { (JBFLOAT) 1., (JBFLOAT) - 1., (JBFLOAT) - 1. }, Df[] =
+  { (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 1. }, Ef[] =
+  { (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) - 1. }, Hf[] =
+  { (JBFLOAT) 5., (JBFLOAT) 9., (JBFLOAT) - 7., (JBFLOAT) 6. }, Czf[] =
+  { (JBFLOAT) 1., (JBFLOAT) - 1., (JBFLOAT) 0., (JBFLOAT) 1. }, Dzf[] =
+  { (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 0., (JBFLOAT) 2., (JBFLOAT) 1. },
+  Ezf[] = { (JBFLOAT) 1., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) - 1. }, Hzf[] =
+  { (JBFLOAT) 5., (JBFLOAT) 7., (JBFLOAT) - 1., (JBFLOAT) - 4., (JBFLOAT) 6. },
+  Cpf[] = { (JBFLOAT) 1., (JBFLOAT) - 1., (JBFLOAT) - 1. }, Dpf[] =
+  { (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 1. }, Epf[] =
+  { (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) - 1. }, Bpf[] =
+  { (JBFLOAT) 1., (JBFLOAT) - 1. }, Fpf[] =
+  { (JBFLOAT) - 1., (JBFLOAT) 1. }, Hpf[] =
+  { (JBFLOAT) 3., (JBFLOAT) 17., (JBFLOAT) - 6., (JBFLOAT) 3. }, Cpzf[] =
+  { (JBFLOAT) 1., (JBFLOAT) - 1., (JBFLOAT) 0., (JBFLOAT) - 1. }, Dpzf[] =
+  { (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 0., (JBFLOAT) 2., (JBFLOAT) 1. },
+  Epzf[] =
+  { (JBFLOAT) 1., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) - 1. }, Bpzf[] =
+  { (JBFLOAT) 1., (JBFLOAT) - 1., (JBFLOAT) 0. }, Fpzf[] =
+  { (JBFLOAT) 0., (JBFLOAT) - 1., (JBFLOAT) 1. }, Hpzf[] =
+  { (JBFLOAT) 5., (JBFLOAT) 5., (JBFLOAT) 8., (JBFLOAT) - 7., (JBFLOAT) 6. };
 const JBFLOAT rmlfx[] = {
-  (JBFLOAT) 0., (JBFLOAT) 0., (JBFLOAT) 0., (JBFLOAT) 0., (JBFLOAT) 0., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT)
-  (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT)
-  (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 5., (JBFLOAT) 5., (JBFLOAT) 5., (JBFLOAT) 5., (JBFLOAT) 5.
+  (JBFLOAT) 0., (JBFLOAT) 0., (JBFLOAT) 0., (JBFLOAT) 0., (JBFLOAT) 0.,
+    (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1.,
+    (JBFLOAT) 1., (JBFLOAT) 1.,
+  (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2.,
+    (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3.,
+    (JBFLOAT) 3., (JBFLOAT) 3.,
+  (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4.,
+    (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 5., (JBFLOAT) 5., (JBFLOAT) 5.,
+    (JBFLOAT) 5., (JBFLOAT) 5.
 };
+
 const JBFLOAT rmlfy[] = {
-  (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT)
-  (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT)
-  (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5.
+  (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4.,
+    (JBFLOAT) 5., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3.,
+    (JBFLOAT) 4., (JBFLOAT) 5.,
+  (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4.,
+    (JBFLOAT) 5., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3.,
+    (JBFLOAT) 4., (JBFLOAT) 5.,
+  (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4.,
+    (JBFLOAT) 5., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3.,
+    (JBFLOAT) 4., (JBFLOAT) 5.
 };
+
 const JBFLOAT rmlff1[] = {
-  (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 6., (JBFLOAT)
-  (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 6., (JBFLOAT) 7., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 6., (JBFLOAT) 7., (JBFLOAT) 8., (JBFLOAT)
-  (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 6., (JBFLOAT) 7., (JBFLOAT) 8., (JBFLOAT) 9., (JBFLOAT) 5., (JBFLOAT) 6., (JBFLOAT) 7., (JBFLOAT) 8., (JBFLOAT) 9., (JBFLOAT) 10.
+  (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4.,
+    (JBFLOAT) 5., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4.,
+    (JBFLOAT) 5., (JBFLOAT) 6.,
+  (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 6.,
+    (JBFLOAT) 7., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 6.,
+    (JBFLOAT) 7., (JBFLOAT) 8.,
+  (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 6., (JBFLOAT) 7., (JBFLOAT) 8.,
+    (JBFLOAT) 9., (JBFLOAT) 5., (JBFLOAT) 6., (JBFLOAT) 7., (JBFLOAT) 8.,
+    (JBFLOAT) 9., (JBFLOAT) 10.
 };
+
 const JBFLOAT rmlff2[] = {
-  (JBFLOAT) 10., (JBFLOAT) 12., (JBFLOAT) 14., (JBFLOAT) 16., (JBFLOAT) 18., (JBFLOAT) 20., (JBFLOAT) 9., (JBFLOAT) 11., (JBFLOAT) 13., (JBFLOAT) 15., (JBFLOAT) 17., (JBFLOAT) 19., (JBFLOAT)
-  (JBFLOAT) 8., (JBFLOAT) 10., (JBFLOAT) 12., (JBFLOAT) 14., (JBFLOAT) 16., (JBFLOAT) 18., (JBFLOAT) 7., (JBFLOAT) 9., (JBFLOAT) 11., (JBFLOAT) 13., (JBFLOAT) 15., (JBFLOAT) 17., (JBFLOAT)
-  (JBFLOAT) 6., (JBFLOAT) 8., (JBFLOAT) 10., (JBFLOAT) 12., (JBFLOAT) 14., (JBFLOAT) 16., (JBFLOAT) 5., (JBFLOAT) 7., (JBFLOAT) 9., (JBFLOAT) 11., (JBFLOAT) 13., (JBFLOAT) 15.
+  (JBFLOAT) 10., (JBFLOAT) 12., (JBFLOAT) 14., (JBFLOAT) 16., (JBFLOAT) 18.,
+    (JBFLOAT) 20., (JBFLOAT) 9., (JBFLOAT) 11., (JBFLOAT) 13., (JBFLOAT) 15.,
+    (JBFLOAT) 17., (JBFLOAT) 19.,
+  (JBFLOAT) 8., (JBFLOAT) 10., (JBFLOAT) 12., (JBFLOAT) 14., (JBFLOAT) 16.,
+    (JBFLOAT) 18., (JBFLOAT) 7., (JBFLOAT) 9., (JBFLOAT) 11., (JBFLOAT) 13.,
+    (JBFLOAT) 15., (JBFLOAT) 17.,
+  (JBFLOAT) 6., (JBFLOAT) 8., (JBFLOAT) 10., (JBFLOAT) 12., (JBFLOAT) 14.,
+    (JBFLOAT) 16., (JBFLOAT) 5., (JBFLOAT) 7., (JBFLOAT) 9., (JBFLOAT) 11.,
+    (JBFLOAT) 13., (JBFLOAT) 15.
 };
+
 JBFLOAT rmefx[] = {
-  (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT)
-  (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT)
+  (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 1.,
+    (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2., (JBFLOAT) 2.,
+  (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3., (JBFLOAT) 3.,
+    (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4., (JBFLOAT) 4.,
   (JBFLOAT) 5., (JBFLOAT) 5., (JBFLOAT) 5., (JBFLOAT) 5., (JBFLOAT) 5.
 };
+
 JBFLOAT rmefy[] = {
-  (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT)
-  (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5., (JBFLOAT)
+  (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5.,
+    (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5.,
+  (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5.,
+    (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5.,
   (JBFLOAT) 1., (JBFLOAT) 2., (JBFLOAT) 3., (JBFLOAT) 4., (JBFLOAT) 5.
 };
+
 JBFLOAT rmeff1[] = {
-  (JBFLOAT) 60., (JBFLOAT) 30., (JBFLOAT) 20., (JBFLOAT) 15., (JBFLOAT) 12., (JBFLOAT) 120., (JBFLOAT) 60., (JBFLOAT) 40., (JBFLOAT) 30., (JBFLOAT) 24., (JBFLOAT)
-  (JBFLOAT) 180., (JBFLOAT) 90., (JBFLOAT) 60., (JBFLOAT) 45., (JBFLOAT) 36., (JBFLOAT) 240., (JBFLOAT) 120., (JBFLOAT) 80., (JBFLOAT) 60., (JBFLOAT) 48., (JBFLOAT)
+  (JBFLOAT) 60., (JBFLOAT) 30., (JBFLOAT) 20., (JBFLOAT) 15., (JBFLOAT) 12.,
+    (JBFLOAT) 120., (JBFLOAT) 60., (JBFLOAT) 40., (JBFLOAT) 30., (JBFLOAT) 24.,
+  (JBFLOAT) 180., (JBFLOAT) 90., (JBFLOAT) 60., (JBFLOAT) 45., (JBFLOAT) 36.,
+    (JBFLOAT) 240., (JBFLOAT) 120., (JBFLOAT) 80., (JBFLOAT) 60., (JBFLOAT) 48.,
   (JBFLOAT) 300., (JBFLOAT) 150., (JBFLOAT) 100., (JBFLOAT) 75., (JBFLOAT) 60.
 };
 
-const JBDOUBLE pd[15] = { (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 4., 
+const JBDOUBLE pd[15] = { (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 4.,
   (JBDOUBLE) 8., (JBDOUBLE) 16., (JBDOUBLE) 32., (JBDOUBLE) 64.,
-  (JBDOUBLE) 128., (JBDOUBLE) 256., (JBDOUBLE) 512., (JBDOUBLE) 1024., 
+  (JBDOUBLE) 128., (JBDOUBLE) 256., (JBDOUBLE) 512., (JBDOUBLE) 1024.,
   (JBDOUBLE) 2048., (JBDOUBLE) 4096., (JBDOUBLE) 8192., (JBDOUBLE) 16384.
 };
+
 JBDOUBLE mxd[] = {
-  (JBDOUBLE) 1., (JBDOUBLE) 3., (JBDOUBLE) 2., (JBDOUBLE) 1., (JBDOUBLE) 18., (JBDOUBLE)
-  (JBDOUBLE) 2., (JBDOUBLE) 4., (JBDOUBLE) 8., (JBDOUBLE) 0., (JBDOUBLE) 18., (JBDOUBLE)
-  (JBDOUBLE) 3., (JBDOUBLE) -1., (JBDOUBLE) 4., (JBDOUBLE) 2., (JBDOUBLE) 4., (JBDOUBLE)
+  (JBDOUBLE) 1., (JBDOUBLE) 3., (JBDOUBLE) 2., (JBDOUBLE) 1., (JBDOUBLE) 18.,
+  (JBDOUBLE) 2., (JBDOUBLE) 4., (JBDOUBLE) 8., (JBDOUBLE) 0., (JBDOUBLE) 18.,
+  (JBDOUBLE) 3., (JBDOUBLE) - 1., (JBDOUBLE) 4., (JBDOUBLE) 2., (JBDOUBLE) 4.,
   (JBDOUBLE) 4., (JBDOUBLE) 0., (JBDOUBLE) 3., (JBDOUBLE) 1., (JBDOUBLE) 11.
 };
-const JBDOUBLE myd[] = { 3., (JBDOUBLE) 5., (JBDOUBLE) -1., (JBDOUBLE) 2. };
-JBDOUBLE Cd[] = { (JBDOUBLE) 1., (JBDOUBLE) -1., (JBDOUBLE) -1. }, Dd[] = { (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 1. },
-  Ed[] = { (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) -1. }, Hd[] = { (JBDOUBLE) 5., (JBDOUBLE) 9., (JBDOUBLE) -7., (JBDOUBLE) 6. },
-  Czd[] = { (JBDOUBLE) 1., (JBDOUBLE) -1., (JBDOUBLE) 0., (JBDOUBLE) 1. }, Dzd[] = { (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 0., (JBDOUBLE) 2., (JBDOUBLE) 1. },
-  Ezd[] = { (JBDOUBLE) 1., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) -1. }, Hzd[] = { (JBDOUBLE) 5., (JBDOUBLE) 7., (JBDOUBLE) -1., (JBDOUBLE) -4., (JBDOUBLE) 6. },
-  Cpd[] = { (JBDOUBLE) 1., (JBDOUBLE) -1., (JBDOUBLE) -1. }, Dpd[] = { (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 1. },
-  Epd[] = { (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) -1. }, Bpd[] = { (JBDOUBLE) 1., (JBDOUBLE) -1. }, Fpd[] = { (JBDOUBLE) -1., (JBDOUBLE) 1. },
-  Hpd[] = { (JBDOUBLE) 3., (JBDOUBLE) 17., (JBDOUBLE) -6., (JBDOUBLE) 3. },
-  Cpzd[] = { (JBDOUBLE) 1., (JBDOUBLE) -1., (JBDOUBLE) 0., (JBDOUBLE) -1. }, Dpzd[] = { (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 0., (JBDOUBLE) 2., (JBDOUBLE) 1. },
-  Epzd[] = { (JBDOUBLE) 1., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) -1. }, Bpzd[] = { (JBDOUBLE) 1., (JBDOUBLE) -1., (JBDOUBLE) 0. },
-  Fpzd[] = { (JBDOUBLE) 0., (JBDOUBLE) -1., (JBDOUBLE) 1. }, Hpzd[] = { 5., (JBDOUBLE) 5., (JBDOUBLE) 8., (JBDOUBLE) -7., (JBDOUBLE) 6. };
+const JBDOUBLE myd[] = { 3., (JBDOUBLE) 5., (JBDOUBLE) - 1., (JBDOUBLE) 2. };
+JBDOUBLE Cd[] = { (JBDOUBLE) 1., (JBDOUBLE) - 1., (JBDOUBLE) - 1. }, Dd[] =
+  { (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 1. }, Ed[] =
+  { (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) - 1. }, Hd[] =
+  { (JBDOUBLE) 5., (JBDOUBLE) 9., (JBDOUBLE) - 7., (JBDOUBLE) 6. }, Czd[] =
+  { (JBDOUBLE) 1., (JBDOUBLE) - 1., (JBDOUBLE) 0., (JBDOUBLE) 1. }, Dzd[] =
+  { (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 0., (JBDOUBLE) 2., (JBDOUBLE) 1. },
+  Ezd[] =
+  { (JBDOUBLE) 1., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) - 1. }, Hzd[] =
+  { (JBDOUBLE) 5., (JBDOUBLE) 7., (JBDOUBLE) - 1., (JBDOUBLE) - 4.,
+  (JBDOUBLE) 6.
+}, Cpd[] = { (JBDOUBLE) 1., (JBDOUBLE) - 1., (JBDOUBLE) - 1. }, Dpd[] =
+  { (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 1. }, Epd[] =
+  { (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) - 1. }, Bpd[] =
+  { (JBDOUBLE) 1., (JBDOUBLE) - 1. }, Fpd[] =
+  { (JBDOUBLE) - 1., (JBDOUBLE) 1. }, Hpd[] =
+  { (JBDOUBLE) 3., (JBDOUBLE) 17., (JBDOUBLE) - 6., (JBDOUBLE) 3. }, Cpzd[] =
+  { (JBDOUBLE) 1., (JBDOUBLE) - 1., (JBDOUBLE) 0., (JBDOUBLE) - 1. }, Dpzd[] =
+  { (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 0., (JBDOUBLE) 2., (JBDOUBLE) 1. },
+  Epzd[] =
+  { (JBDOUBLE) 1., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) - 1. }, Bpzd[] =
+  { (JBDOUBLE) 1., (JBDOUBLE) - 1., (JBDOUBLE) 0. }, Fpzd[] =
+  { (JBDOUBLE) 0., (JBDOUBLE) - 1., (JBDOUBLE) 1. }, Hpzd[] =
+  { 5., (JBDOUBLE) 5., (JBDOUBLE) 8., (JBDOUBLE) - 7., (JBDOUBLE) 6. };
 const JBDOUBLE rmldx[] = {
-  (JBDOUBLE) 0., (JBDOUBLE) 0., (JBDOUBLE) 0., (JBDOUBLE) 0., (JBDOUBLE) 0., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE)
-  (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE)
-  (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 5., (JBDOUBLE) 5., (JBDOUBLE) 5., (JBDOUBLE) 5., (JBDOUBLE) 5.
+  (JBDOUBLE) 0., (JBDOUBLE) 0., (JBDOUBLE) 0., (JBDOUBLE) 0., (JBDOUBLE) 0.,
+    (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1.,
+    (JBDOUBLE) 1., (JBDOUBLE) 1.,
+  (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2.,
+    (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3.,
+    (JBDOUBLE) 3., (JBDOUBLE) 3.,
+  (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4.,
+    (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 5., (JBDOUBLE) 5., (JBDOUBLE) 5.,
+    (JBDOUBLE) 5., (JBDOUBLE) 5.
 };
+
 const JBDOUBLE rmldy[] = {
-  (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE)
-  (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE)
-  (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5.
+  (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4.,
+    (JBDOUBLE) 5., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3.,
+    (JBDOUBLE) 4., (JBDOUBLE) 5.,
+  (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4.,
+    (JBDOUBLE) 5., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3.,
+    (JBDOUBLE) 4., (JBDOUBLE) 5.,
+  (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4.,
+    (JBDOUBLE) 5., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3.,
+    (JBDOUBLE) 4., (JBDOUBLE) 5.
 };
+
 const JBDOUBLE rmldf1[] = {
-  (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 6., (JBDOUBLE)
-  (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 6., (JBDOUBLE) 7., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 6., (JBDOUBLE) 7., (JBDOUBLE) 8., (JBDOUBLE)
-  (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 6., (JBDOUBLE) 7., (JBDOUBLE) 8., (JBDOUBLE) 9., (JBDOUBLE) 5., (JBDOUBLE) 6., (JBDOUBLE) 7., (JBDOUBLE) 8., (JBDOUBLE) 9., (JBDOUBLE) 10.
+  (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4.,
+    (JBDOUBLE) 5., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4.,
+    (JBDOUBLE) 5., (JBDOUBLE) 6.,
+  (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 6.,
+    (JBDOUBLE) 7., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 6.,
+    (JBDOUBLE) 7., (JBDOUBLE) 8.,
+  (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 6., (JBDOUBLE) 7., (JBDOUBLE) 8.,
+    (JBDOUBLE) 9., (JBDOUBLE) 5., (JBDOUBLE) 6., (JBDOUBLE) 7., (JBDOUBLE) 8.,
+    (JBDOUBLE) 9., (JBDOUBLE) 10.
 };
+
 const JBDOUBLE rmldf2[] = {
-  (JBDOUBLE) 10., (JBDOUBLE) 12., (JBDOUBLE) 14., (JBDOUBLE) 16., (JBDOUBLE) 18., (JBDOUBLE) 20., (JBDOUBLE) 9., (JBDOUBLE) 11., (JBDOUBLE) 13., (JBDOUBLE) 15., (JBDOUBLE) 17., (JBDOUBLE) 19., (JBDOUBLE)
-  (JBDOUBLE) 8., (JBDOUBLE) 10., (JBDOUBLE) 12., (JBDOUBLE) 14., (JBDOUBLE) 16., (JBDOUBLE) 18., (JBDOUBLE) 7., (JBDOUBLE) 9., (JBDOUBLE) 11., (JBDOUBLE) 13., (JBDOUBLE) 15., (JBDOUBLE) 17., (JBDOUBLE)
-  (JBDOUBLE) 6., (JBDOUBLE) 8., (JBDOUBLE) 10., (JBDOUBLE) 12., (JBDOUBLE) 14., (JBDOUBLE) 16., (JBDOUBLE) 5., (JBDOUBLE) 7., (JBDOUBLE) 9., (JBDOUBLE) 11., (JBDOUBLE) 13., (JBDOUBLE) 15.
+  (JBDOUBLE) 10., (JBDOUBLE) 12., (JBDOUBLE) 14., (JBDOUBLE) 16.,
+    (JBDOUBLE) 18., (JBDOUBLE) 20., (JBDOUBLE) 9., (JBDOUBLE) 11.,
+    (JBDOUBLE) 13., (JBDOUBLE) 15., (JBDOUBLE) 17., (JBDOUBLE) 19.,
+  (JBDOUBLE) 8., (JBDOUBLE) 10., (JBDOUBLE) 12., (JBDOUBLE) 14., (JBDOUBLE) 16.,
+    (JBDOUBLE) 18., (JBDOUBLE) 7., (JBDOUBLE) 9., (JBDOUBLE) 11.,
+    (JBDOUBLE) 13., (JBDOUBLE) 15., (JBDOUBLE) 17.,
+  (JBDOUBLE) 6., (JBDOUBLE) 8., (JBDOUBLE) 10., (JBDOUBLE) 12., (JBDOUBLE) 14.,
+    (JBDOUBLE) 16., (JBDOUBLE) 5., (JBDOUBLE) 7., (JBDOUBLE) 9., (JBDOUBLE) 11.,
+    (JBDOUBLE) 13., (JBDOUBLE) 15.
 };
+
 JBDOUBLE rmedx[] = {
-  (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE)
-  (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE)
+  (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 1.,
+    (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2., (JBDOUBLE) 2.,
+  (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3., (JBDOUBLE) 3.,
+    (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4., (JBDOUBLE) 4.,
   (JBDOUBLE) 5., (JBDOUBLE) 5., (JBDOUBLE) 5., (JBDOUBLE) 5., (JBDOUBLE) 5.
 };
+
 JBDOUBLE rmedy[] = {
-  (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE)
-  (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5., (JBDOUBLE)
+  (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5.,
+    (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5.,
+  (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5.,
+    (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5.,
   (JBDOUBLE) 1., (JBDOUBLE) 2., (JBDOUBLE) 3., (JBDOUBLE) 4., (JBDOUBLE) 5.
 };
+
 JBDOUBLE rmedf1[] = {
-  (JBDOUBLE) 60., (JBDOUBLE) 30., (JBDOUBLE) 20., (JBDOUBLE) 15., (JBDOUBLE) 12., (JBDOUBLE) 120., (JBDOUBLE) 60., (JBDOUBLE) 40., (JBDOUBLE) 30., (JBDOUBLE) 24., (JBDOUBLE)
-  (JBDOUBLE) 180., (JBDOUBLE) 90., (JBDOUBLE) 60., (JBDOUBLE) 45., (JBDOUBLE) 36., (JBDOUBLE) 240., (JBDOUBLE) 120., (JBDOUBLE) 80., (JBDOUBLE) 60., (JBDOUBLE) 48., (JBDOUBLE)
-  (JBDOUBLE) 300., (JBDOUBLE) 150., (JBDOUBLE) 100., (JBDOUBLE) 75., (JBDOUBLE) 60.
+  (JBDOUBLE) 60., (JBDOUBLE) 30., (JBDOUBLE) 20., (JBDOUBLE) 15.,
+    (JBDOUBLE) 12., (JBDOUBLE) 120., (JBDOUBLE) 60., (JBDOUBLE) 40.,
+    (JBDOUBLE) 30., (JBDOUBLE) 24.,
+  (JBDOUBLE) 180., (JBDOUBLE) 90., (JBDOUBLE) 60., (JBDOUBLE) 45.,
+    (JBDOUBLE) 36., (JBDOUBLE) 240., (JBDOUBLE) 120., (JBDOUBLE) 80.,
+    (JBDOUBLE) 60., (JBDOUBLE) 48.,
+  (JBDOUBLE) 300., (JBDOUBLE) 150., (JBDOUBLE) 100., (JBDOUBLE) 75.,
+    (JBDOUBLE) 60.
 };
 
 const double p_1[12] = { 1., 2., 4., 8., 16., 32., 64., 128., 256.,
@@ -1612,6 +1717,16 @@ check_log_f32 (float (*f) (const float), float (*g) (const float),
 }
 
 unsigned int
+test_f32 (float (*f) (const float), const float g, const float x)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_f32 (x, f, g, n * FLT_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
 test_uni_f32 (float (*f) (const float), float (*g) (const float),
               const float xmin, const float xmax)
 {
@@ -1714,6 +1829,16 @@ check_log_f64 (double (*f) (const double), double (*g) (const double),
 }
 
 unsigned int
+test_f64 (double (*f) (const double), const double g, const double x)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_f64 (x, f, g, n * DBL_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
 test_uni_f64 (double (*f) (const double), double (*g) (const double),
               const double xmin, const double xmax)
 {
@@ -1725,7 +1850,7 @@ test_uni_f64 (double (*f) (const double), double (*g) (const double),
 }
 
 unsigned int
-test_log_f64 (double (*f) (const double), double (*g) (const double))
+test_log_f64 (double (*f) (const double), double g)
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
@@ -1752,7 +1877,7 @@ check_uni_4xf32 (__m128 (*f) (const __m128), float (*g) (const float),
                  const float prec, const float xmin, const float xmax,
                  const unsigned int n)
 {
-  float x[4] JB_ALIGNED , f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  float x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
   float dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -1864,7 +1989,7 @@ check_uni_2xf64 (__m128d (*f) (const __m128d), double (*g) (const double),
                  const double prec, const double xmin, const double xmax,
                  const unsigned int n)
 {
-  double x[2] JB_ALIGNED , f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
+  double x[2] JB_ALIGNED, f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
   double dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -1980,7 +2105,7 @@ check_uni_8xf32 (__m256 (*f) (const __m256), float (*g) (const float),
                  const float prec, const float xmin, const float xmax,
                  const unsigned int n)
 {
-  float x[8] JB_ALIGNED , f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  float x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
   float dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -2092,7 +2217,7 @@ check_uni_4xf64 (__m256d (*f) (const __m256d), double (*g) (const double),
                  const double prec, const double xmin, const double xmax,
                  const unsigned int n)
 {
-  double x[4] JB_ALIGNED , f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  double x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
   double dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -2208,7 +2333,7 @@ check_uni_16xf32 (__m512 (*f) (const __m512), float (*g) (const float),
                   const float prec, const float xmin, const float xmax,
                   const unsigned int n)
 {
-  float x[16] JB_ALIGNED , f0[16] JB_ALIGNED, g0[16] JB_ALIGNED;
+  float x[16] JB_ALIGNED, f0[16] JB_ALIGNED, g0[16] JB_ALIGNED;
   float dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -2320,7 +2445,7 @@ check_uni_8xf64 (__m512d (*f) (const __m512d), double (*g) (const double),
                  const double prec, const double xmin, const double xmax,
                  const unsigned int n)
 {
-  double x[8] JB_ALIGNED , f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  double x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
   double dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -2436,7 +2561,7 @@ check_uni_4xf32 (float32x4_t (*f) (const float32x4_t), float (*g) (const float),
                  const float prec, const float xmin, const float xmax,
                  const unsigned int n)
 {
-  float x[4] JB_ALIGNED , f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  float x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
   float dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -2548,7 +2673,7 @@ check_uni_2xf64 (float64x2_t (*f) (const float64x2_t),
                  double (*g) (const double), const double prec,
                  const double xmin, const double xmax, const unsigned int n)
 {
-  double x[2] JB_ALIGNED , f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
+  double x[2] JB_ALIGNED, f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
   double dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -2626,7 +2751,7 @@ check_log_2xf64 (float64x2_t (*f) (const float64x2_t),
 
 unsigned int
 test_uni_2xf64 (float64x2_t (*f) (const float64x2_t),
-		double (*g) (const double),
+                double (*g) (const double),
                 const double xmin, const double xmax)
 {
   unsigned int n;
@@ -2667,7 +2792,7 @@ check_uni_4xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
                  float (*g) (const float), const float prec,
                  const float xmin, const float xmax, const unsigned int n)
 {
-  float x[4] JB_ALIGNED , f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  float x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
   float dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -2780,7 +2905,7 @@ check_uni_2xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
                  double (*g) (const double), const double prec,
                  const double xmin, const double xmax, const unsigned int n)
 {
-  double x[2] JB_ALIGNED , f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
+  double x[2] JB_ALIGNED, f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
   double dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -2895,7 +3020,7 @@ check_uni_8xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
                  float (*g) (const float), const float prec,
                  const float xmin, const float xmax, const unsigned int n)
 {
-  float x[8] JB_ALIGNED , f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  float x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
   float dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -3008,7 +3133,7 @@ check_uni_4xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
                  double (*g) (const double), const double prec,
                  const double xmin, const double xmax, const unsigned int n)
 {
-  double x[4] JB_ALIGNED , f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
+  double x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
   double dx;
   unsigned int i, j, n1;
   n1 = n - 1;
@@ -3190,7 +3315,7 @@ check_log (JBFLOAT (*f) (const JBFLOAT), JBFLOAT (*g) (const JBFLOAT),
 {
   if (!check_logn (f, g, prec, (JBFLOAT) 1.))
     return 0;
-  return check_logn (f, g, prec, (JBFLOAT) -1.);
+  return check_logn (f, g, prec, (JBFLOAT) - 1.);
 }
 
 int
@@ -3263,7 +3388,7 @@ check_logl (JBDOUBLE (*f) (const JBDOUBLE), JBDOUBLE (*g) (const JBDOUBLE),
 {
   if (!check_lognl (f, g, prec, (JBDOUBLE) 1.))
     return 0;
-  return check_lognl (f, g, prec, (JBDOUBLE) -1.);
+  return check_lognl (f, g, prec, (JBDOUBLE) - 1.);
 }
 
 double
@@ -4657,34 +4782,44 @@ main (void)
   printf ("changeull(1L,2L)=(%llu,%llu)\n", uL, uL2);
   printf ("small(0)=%d\n", jbm_small ((JBFLOAT) 0.));
   printf ("small(1)=%d\n", jbm_small ((JBFLOAT) 1.));
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_fmodmin ((JBFLOAT) 1., (JBFLOAT) 2.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_fmodmin ((JBFLOAT) 1., (JBFLOAT) 2.));
   printf ("fmodmin(1,2)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_fmodmin ((JBFLOAT) -1., (JBFLOAT) -2.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_fmodmin ((JBFLOAT) - 1., (JBFLOAT) - 2.));
   printf ("fmodmin(-1,-2)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_fmodmin ((JBFLOAT) 1., (JBFLOAT) -2.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_fmodmin ((JBFLOAT) 1., (JBFLOAT) - 2.));
   printf ("fmodmin(1,-2)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_fdbl ((JBFLOAT) 1.));
   printf ("fdbl(1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_fsqr ((JBFLOAT) -2.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_fsqr ((JBFLOAT) - 2.));
   printf ("fsqr(-2)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_extrapolate ((JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) -2., (JBFLOAT) 3., (JBFLOAT) 2.));
+            jbm_extrapolate ((JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) - 2.,
+                             (JBFLOAT) 3., (JBFLOAT) 2.));
   printf ("extrapolate(0,1,-2,3,2)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_interpolate ((JBFLOAT) 0., (JBFLOAT) -2., (JBFLOAT) 1., (JBFLOAT) 3., (JBFLOAT) 2.));
+            jbm_interpolate ((JBFLOAT) 0., (JBFLOAT) - 2., (JBFLOAT) 1.,
+                             (JBFLOAT) 3., (JBFLOAT) 2.));
   printf ("interpolate(0,-2,1,3,2)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_interpolate ((JBFLOAT) 1., (JBFLOAT) -2., (JBFLOAT) 0., (JBFLOAT) 3., (JBFLOAT) 2.));
+            jbm_interpolate ((JBFLOAT) 1., (JBFLOAT) - 2., (JBFLOAT) 0.,
+                             (JBFLOAT) 3., (JBFLOAT) 2.));
   printf ("interpolate(1,-2,0,3,2)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_interpolate ((JBFLOAT) -2., (JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) 3., (JBFLOAT) 2.));
+            jbm_interpolate ((JBFLOAT) - 2., (JBFLOAT) 0., (JBFLOAT) 1.,
+                             (JBFLOAT) 3., (JBFLOAT) 2.));
   printf ("interpolate(-2,0,1,3,2)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_v2_length ((JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) -2., (JBFLOAT) 3.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_v2_length ((JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) - 2.,
+                           (JBFLOAT) 3.));
   printf ("v2_length(0,1,-2,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_v3_length ((JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) -2., (JBFLOAT) 3., (JBFLOAT) 2., (JBFLOAT) -3.));
+            jbm_v3_length ((JBFLOAT) 0., (JBFLOAT) 1., (JBFLOAT) - 2.,
+                           (JBFLOAT) 3., (JBFLOAT) 2., (JBFLOAT) - 3.));
   printf ("v3_length(0,1,-2,3,2,-3)=%s\n", buffer);
-  f = (JBFLOAT) 1., f2 = (JBFLOAT) -2.;
+  f = (JBFLOAT) 1., f2 = (JBFLOAT) - 2.;
   jbm_fchange (&f, &f2);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, f);
   SNPRINTF (buffer2, JB_BUFFER_SIZE, FWF, f2);
@@ -4694,86 +4829,112 @@ main (void)
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_polynomial_11 ((JBFLOAT) 1., pf));
   printf ("polynomial_11(1,pf)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_solve_quadratic ((JBFLOAT) 2., (JBFLOAT) -1., (JBFLOAT) -1., (JBFLOAT) 0., (JBFLOAT) 2.));
+            jbm_solve_quadratic ((JBFLOAT) 2., (JBFLOAT) - 1., (JBFLOAT) - 1.,
+                                 (JBFLOAT) 0., (JBFLOAT) 2.));
   printf ("solve_quadratic(2,-1,-1,0,2)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_solve_quadratic ((JBFLOAT) 0., (JBFLOAT) -2., (JBFLOAT) 1., (JBFLOAT) 0., (JBFLOAT) 2.));
+            jbm_solve_quadratic ((JBFLOAT) 0., (JBFLOAT) - 2., (JBFLOAT) 1.,
+                                 (JBFLOAT) 0., (JBFLOAT) 2.));
   printf ("solve_quadratic(0,-2,1,0,2)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_solve_cubic ((JBFLOAT) 0.5, (JBFLOAT) 1., (JBFLOAT) 1., (JBFLOAT) 0.5, (JBFLOAT) -2., (JBFLOAT) 0.));
+            jbm_solve_cubic ((JBFLOAT) 0.5, (JBFLOAT) 1., (JBFLOAT) 1.,
+                             (JBFLOAT) 0.5, (JBFLOAT) - 2., (JBFLOAT) 0.));
   printf ("solve_cubic(0.5,1,1,0.5,-2,0)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_solve_cubic ((JBFLOAT) 0., (JBFLOAT) 2., (JBFLOAT) -1., (JBFLOAT) -1., (JBFLOAT) 0., (JBFLOAT) 2.));
+            jbm_solve_cubic ((JBFLOAT) 0., (JBFLOAT) 2., (JBFLOAT) - 1.,
+                             (JBFLOAT) - 1., (JBFLOAT) 0., (JBFLOAT) 2.));
   printf ("solve_cubic(0,2,-1,-1,0,2)=%s\n", buffer);
 
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_TOTAL));
+            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_TOTAL));
   printf ("flux_limiter_total(1,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_NULL));
+            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_NULL));
   printf ("flux_limiter_null(1,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_CENTRED));
+            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_CENTRED));
   printf ("flux_limiter_centred(1,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 0., JBM_FLUX_LIMITER_TYPE_CENTRED));
+            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 0.,
+                              JBM_FLUX_LIMITER_TYPE_CENTRED));
   printf ("flux_limiter_centred(1,0)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) -1., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_SUPERBEE));
+            jbm_flux_limiter ((JBFLOAT) - 1., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_SUPERBEE));
   printf ("flux_limiter_superbee(-1,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_SUPERBEE));
+            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_SUPERBEE));
   printf ("flux_limiter_superbee(1,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_SUPERBEE));
+            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_SUPERBEE));
   printf ("flux_limiter_superbee(2,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 3., (JBFLOAT) 2., JBM_FLUX_LIMITER_TYPE_SUPERBEE));
+            jbm_flux_limiter ((JBFLOAT) 3., (JBFLOAT) 2.,
+                              JBM_FLUX_LIMITER_TYPE_SUPERBEE));
   printf ("flux_limiter_superbee(3,2)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 3., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_SUPERBEE));
+            jbm_flux_limiter ((JBFLOAT) 3., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_SUPERBEE));
   printf ("flux_limiter_superbee(3,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) -1., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_MINMOD));
+            jbm_flux_limiter ((JBFLOAT) - 1., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_MINMOD));
   printf ("flux_limiter_minmod(-1,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_MINMOD));
+            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_MINMOD));
   printf ("flux_limiter_minmod(2,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 3., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_MINMOD));
+            jbm_flux_limiter ((JBFLOAT) 3., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_MINMOD));
   printf ("flux_limiter_minmod(3,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) -1., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_VAN_LEER));
+            jbm_flux_limiter ((JBFLOAT) - 1., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_VAN_LEER));
   printf ("flux_limiter_VanLeer(-1,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_VAN_LEER));
+            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_VAN_LEER));
   printf ("flux_limiter_VanLeer(2,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) -1., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_VAN_ALBADA));
+            jbm_flux_limiter ((JBFLOAT) - 1., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_VAN_ALBADA));
   printf ("flux_limiter_VanAlbada(-1,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_VAN_ALBADA));
+            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_VAN_ALBADA));
   printf ("flux_limiter_VanAlbada(2,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) -1., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_MINSUPER));
+            jbm_flux_limiter ((JBFLOAT) - 1., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_MINSUPER));
   printf ("flux_limiter_minsuper(-1,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_MINSUPER));
+            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_MINSUPER));
   printf ("flux_limiter_minsuper(2,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 3., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_MINSUPER));
+            jbm_flux_limiter ((JBFLOAT) 3., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_MINSUPER));
   printf ("flux_limiter_minsuper(3,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) -1., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_SUPERMIN));
+            jbm_flux_limiter ((JBFLOAT) - 1., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_SUPERMIN));
   printf ("flux_limiter_supermin(-1,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_SUPERMIN));
+            jbm_flux_limiter ((JBFLOAT) 1., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_SUPERMIN));
   printf ("flux_limiter_supermin(1,3)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 3., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_SUPERMIN));
+            jbm_flux_limiter ((JBFLOAT) 3., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_SUPERMIN));
   printf ("flux_limiter_supermin(3,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) -1., (JBFLOAT) 1.,
+            jbm_flux_limiter ((JBFLOAT) - 1., (JBFLOAT) 1.,
                               JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL));
   printf ("flux_limiter_monotonized_central(-1,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
@@ -4789,160 +4950,217 @@ main (void)
                               JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL));
   printf ("flux_limiter_monotonized_central(3,0.5)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) -1., (JBFLOAT) 1., JBM_FLUX_LIMITER_TYPE_MEAN));
+            jbm_flux_limiter ((JBFLOAT) - 1., (JBFLOAT) 1.,
+                              JBM_FLUX_LIMITER_TYPE_MEAN));
   printf ("flux_limiter_mean(-1,1)=%s\n", buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3., JBM_FLUX_LIMITER_TYPE_MEAN));
+            jbm_flux_limiter ((JBFLOAT) 2., (JBFLOAT) 3.,
+                              JBM_FLUX_LIMITER_TYPE_MEAN));
   printf ("flux_limiter_mean(2,3)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn0f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn0f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(1,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn1f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn1f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn2f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn2f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^2,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn3f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn3f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^3,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn4f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn4f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^4,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn5f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn5f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^5,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn6f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn6f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^6,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn7f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn7f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^7,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn8f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn8f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^8,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn9f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn9f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^9,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn10f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn10f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^10,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn11f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn11f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^11,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn12f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn12f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^12,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn13f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn13f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^13,0,1)=%s\n", buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_integral (fn14f, (JBFLOAT) 0., (JBFLOAT) 1.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_integral (fn14f, (JBFLOAT) 0., (JBFLOAT) 1.));
   printf ("integral(x^14,0,1)=%s\n", buffer);
   printf ("smalll(0)=%d\n", jbm_smalll ((JBDOUBLE) 0.));
   printf ("smalll(1)=%d\n", jbm_smalll ((JBDOUBLE) 1.));
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_fmodminl ((JBDOUBLE) 1., (JBDOUBLE) 2.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_fmodminl ((JBDOUBLE) 1., (JBDOUBLE) 2.));
   printf ("fmodminl(1,2)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_fmodminl ((JBDOUBLE) -1., (JBDOUBLE) -2.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_fmodminl ((JBDOUBLE) - 1., (JBDOUBLE) - 2.));
   printf ("fmodminl(-1,-2)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_fmodminl ((JBDOUBLE) 1., (JBDOUBLE) -2.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_fmodminl ((JBDOUBLE) 1., (JBDOUBLE) - 2.));
   printf ("fmodminl(1,-2)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_fdbll ((JBDOUBLE) 1.));
   printf ("fdbll(1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_fsqrl ((JBDOUBLE) -2.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_fsqrl ((JBDOUBLE) - 2.));
   printf ("fsqrl(-2)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_extrapolatel ((JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) -2., (JBDOUBLE) 3., (JBDOUBLE) 2.));
+             jbm_extrapolatel ((JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) - 2.,
+                               (JBDOUBLE) 3., (JBDOUBLE) 2.));
   printf ("extrapolatel(0,1,-2,3,2)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_interpolatel ((JBDOUBLE) 0., (JBDOUBLE) -2., (JBDOUBLE) 1., (JBDOUBLE) 3., (JBDOUBLE) 2.));
+             jbm_interpolatel ((JBDOUBLE) 0., (JBDOUBLE) - 2., (JBDOUBLE) 1.,
+                               (JBDOUBLE) 3., (JBDOUBLE) 2.));
   printf ("interpolatel(0,-2,1,3,2)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_interpolatel ((JBDOUBLE) 1., (JBDOUBLE) -2., (JBDOUBLE) 0., (JBDOUBLE) 3., (JBDOUBLE) 2.));
+             jbm_interpolatel ((JBDOUBLE) 1., (JBDOUBLE) - 2., (JBDOUBLE) 0.,
+                               (JBDOUBLE) 3., (JBDOUBLE) 2.));
   printf ("interpolatel(1,-2,0,3,2)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_interpolatel ((JBDOUBLE) -2., (JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) 3., (JBDOUBLE) 2.));
+             jbm_interpolatel ((JBDOUBLE) - 2., (JBDOUBLE) 0., (JBDOUBLE) 1.,
+                               (JBDOUBLE) 3., (JBDOUBLE) 2.));
   printf ("interpolatel(-2,0,1,3,2)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_v2_lengthl ((JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) -2., (JBDOUBLE) 3.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_v2_lengthl ((JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) - 2.,
+                             (JBDOUBLE) 3.));
   printf ("v2_lengthl(0,1,-2,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_v3_lengthl ((JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) -2., (JBDOUBLE) 3., (JBDOUBLE) 2., (JBDOUBLE) -3.));
+             jbm_v3_lengthl ((JBDOUBLE) 0., (JBDOUBLE) 1., (JBDOUBLE) - 2.,
+                             (JBDOUBLE) 3., (JBDOUBLE) 2., (JBDOUBLE) - 3.));
   printf ("v3_lengthl(0,1,-2,3,2,-3)=%s\n", buffer);
-  d = (JBDOUBLE) 1., d2 = (JBDOUBLE) -2.;
+  d = (JBDOUBLE) 1., d2 = (JBDOUBLE) - 2.;
   jbm_fchangel (&d, &d2);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, d);
   SNPRINTFL (buffer2, JB_BUFFER_SIZE, FWL, d2);
   printf ("fchangel(1,-2)=(%s,%s)\n", buffer, buffer2);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_polynomial_11l ((JBDOUBLE) 0.5, pd));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_polynomial_11l ((JBDOUBLE) 0.5, pd));
   printf ("polynomial_11l(0.5,pd)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_polynomial_11l ((JBDOUBLE) 1., pd));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_polynomial_11l ((JBDOUBLE) 1., pd));
   printf ("polynomial_11l(1,pd)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_solve_quadraticl ((JBDOUBLE) 2., (JBDOUBLE) -1., (JBDOUBLE) -1., (JBDOUBLE) 0., (JBDOUBLE) 2.));
+             jbm_solve_quadraticl ((JBDOUBLE) 2., (JBDOUBLE) - 1.,
+                                   (JBDOUBLE) - 1., (JBDOUBLE) 0.,
+                                   (JBDOUBLE) 2.));
   printf ("solve_quadraticl(2,-1,-1,0,2)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_solve_quadraticl ((JBDOUBLE) 0., (JBDOUBLE) -2., (JBDOUBLE) 1., (JBDOUBLE) 0., (JBDOUBLE) 2.));
+             jbm_solve_quadraticl ((JBDOUBLE) 0., (JBDOUBLE) - 2.,
+                                   (JBDOUBLE) 1., (JBDOUBLE) 0.,
+                                   (JBDOUBLE) 2.));
   printf ("solve_quadraticl(0,-2,1,0,2)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_solve_cubicl ((JBDOUBLE) 0.5, (JBDOUBLE) 1., (JBDOUBLE) 1., (JBDOUBLE) 0.5, (JBDOUBLE) -2., (JBDOUBLE) 0.));
+             jbm_solve_cubicl ((JBDOUBLE) 0.5, (JBDOUBLE) 1., (JBDOUBLE) 1.,
+                               (JBDOUBLE) 0.5, (JBDOUBLE) - 2., (JBDOUBLE) 0.));
   printf ("solve_cubicl(0.5,1,1,0.5,-2,0)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_solve_cubicl ((JBDOUBLE) 0., (JBDOUBLE) 2., (JBDOUBLE) -1., (JBDOUBLE) -1., (JBDOUBLE) 0., (JBDOUBLE) 2.));
+             jbm_solve_cubicl ((JBDOUBLE) 0., (JBDOUBLE) 2., (JBDOUBLE) - 1.,
+                               (JBDOUBLE) - 1., (JBDOUBLE) 0., (JBDOUBLE) 2.));
   printf ("solve_cubicl(0,2,-1,-1,0,2)=%s\n", buffer);
 
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_TOTAL));
+             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_TOTAL));
   printf ("flux_limiter_totall(1,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_NULL));
+             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_NULL));
   printf ("flux_limiter_nulll(1,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_CENTRED));
+             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_CENTRED));
   printf ("flux_limiter_centredl(1,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 0., JBM_FLUX_LIMITER_TYPE_CENTRED));
+             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 0.,
+                                JBM_FLUX_LIMITER_TYPE_CENTRED));
   printf ("flux_limiter_centredl(1,0)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) -1., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_SUPERBEE));
+             jbm_flux_limiterl ((JBDOUBLE) - 1., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_SUPERBEE));
   printf ("flux_limiter_superbeel(-1,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_SUPERBEE));
+             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_SUPERBEE));
   printf ("flux_limiter_superbeel(1,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_SUPERBEE));
+             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_SUPERBEE));
   printf ("flux_limiter_superbeel(2,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 3., (JBDOUBLE) 2., JBM_FLUX_LIMITER_TYPE_SUPERBEE));
+             jbm_flux_limiterl ((JBDOUBLE) 3., (JBDOUBLE) 2.,
+                                JBM_FLUX_LIMITER_TYPE_SUPERBEE));
   printf ("flux_limiter_superbeel(3,2)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 3., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_SUPERBEE));
+             jbm_flux_limiterl ((JBDOUBLE) 3., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_SUPERBEE));
   printf ("flux_limiter_superbeel(3,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) -1., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_MINMOD));
+             jbm_flux_limiterl ((JBDOUBLE) - 1., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_MINMOD));
   printf ("flux_limiter_minmodl(-1,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_MINMOD));
+             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_MINMOD));
   printf ("flux_limiter_minmodl(2,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 3., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_MINMOD));
+             jbm_flux_limiterl ((JBDOUBLE) 3., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_MINMOD));
   printf ("flux_limiter_minmodl(3,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) -1., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_VAN_LEER));
+             jbm_flux_limiterl ((JBDOUBLE) - 1., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_VAN_LEER));
   printf ("flux_limiter_VanLeerl(-1,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_VAN_LEER));
+             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_VAN_LEER));
   printf ("flux_limiter_VanLeerl(2,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) -1., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_VAN_ALBADA));
+             jbm_flux_limiterl ((JBDOUBLE) - 1., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_VAN_ALBADA));
   printf ("flux_limiter_VanAlbadal(-1,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_VAN_ALBADA));
+             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_VAN_ALBADA));
   printf ("flux_limiter_VanAlbadal(2,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) -1., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_MINSUPER));
+             jbm_flux_limiterl ((JBDOUBLE) - 1., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_MINSUPER));
   printf ("flux_limiter_minsuperl(-1,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_MINSUPER));
+             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_MINSUPER));
   printf ("flux_limiter_minsuperl(2,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 3., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_MINSUPER));
+             jbm_flux_limiterl ((JBDOUBLE) 3., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_MINSUPER));
   printf ("flux_limiter_minsuperl(3,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) -1., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_SUPERMIN));
+             jbm_flux_limiterl ((JBDOUBLE) - 1., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_SUPERMIN));
   printf ("flux_limiter_superminl(-1,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_SUPERMIN));
+             jbm_flux_limiterl ((JBDOUBLE) 1., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_SUPERMIN));
   printf ("flux_limiter_superminl(1,3)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 3., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_SUPERMIN));
+             jbm_flux_limiterl ((JBDOUBLE) 3., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_SUPERMIN));
   printf ("flux_limiter_superminl(3,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) -1., (JBDOUBLE) 1.,
+             jbm_flux_limiterl ((JBDOUBLE) - 1., (JBDOUBLE) 1.,
                                 JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL));
   printf ("flux_limiter_monotonized_centrall(-1,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
@@ -4958,40 +5176,57 @@ main (void)
                                 JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL));
   printf ("flux_limiter_monotonized_centrall(3,0.5)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) -1., (JBDOUBLE) 1., JBM_FLUX_LIMITER_TYPE_MEAN));
+             jbm_flux_limiterl ((JBDOUBLE) - 1., (JBDOUBLE) 1.,
+                                JBM_FLUX_LIMITER_TYPE_MEAN));
   printf ("flux_limiter_meanl(-1,1)=%s\n", buffer);
   SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
-             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3., JBM_FLUX_LIMITER_TYPE_MEAN));
+             jbm_flux_limiterl ((JBDOUBLE) 2., (JBDOUBLE) 3.,
+                                JBM_FLUX_LIMITER_TYPE_MEAN));
   printf ("flux_limiter_meanl(2,3)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn0d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn0d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(1,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn1d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn1d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn2d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn2d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^2,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn3d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn3d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^3,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn4d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn4d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^4,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn5d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn5d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^5,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn6d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn6d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^6,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn7d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn7d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^7,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn8d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn8d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^8,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn9d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn9d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^9,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn10d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn10d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^10,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn11d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn11d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^11,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn12d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn12d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^12,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn13d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn13d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^13,0,1)=%s\n", buffer);
-  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL, jbm_integrall (fn14d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
+  SNPRINTFL (buffer, JB_BUFFER_SIZE, FWL,
+             jbm_integrall (fn14d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^14,0,1)=%s\n", buffer);
 
 #ifdef __SSE4_2__
@@ -6022,9 +6257,9 @@ main (void)
   jbm_farray_destroy (fa);
   fa = jbm_farray_create (pf, 11);
   printf ("farray_search(-1,[1,2,4,...],11)=%d\n",
-          jbm_farray_search (fa, (JBFLOAT) -1.));
+          jbm_farray_search (fa, (JBFLOAT) - 1.));
   printf ("farray_search_extended(-1,[1,2,4,...],11)=%d\n",
-          jbm_farray_search_extended (fa, (JBFLOAT) -1.));
+          jbm_farray_search_extended (fa, (JBFLOAT) - 1.));
   printf ("farray_search_extended(3,[1,2,4,...],11)=%d\n",
           jbm_farray_search_extended (fa, (JBFLOAT) 3.));
   printf ("farray_search_extended(2048,[1,2,4,...],11)=%d\n",
@@ -6064,14 +6299,17 @@ main (void)
   farray_print (fa);
   jbm_farray_change (fa, fa2);
   farray_print (fa);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_farray_interpolate (fa, fa2, (JBFLOAT) 3.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_farray_interpolate (fa, fa2, (JBFLOAT) 3.));
   printf ("farray_interpolate(3,[1,2,4,...],[2048,1024,512,...],11)=%s\n",
           buffer);
-  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF, jbm_farray_interpolate (fa, fa2, (JBFLOAT) 0.));
+  SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
+            jbm_farray_interpolate (fa, fa2, (JBFLOAT) 0.));
   printf ("farray_interpolate(0,[1,2,4,...],[2048,1024,512,...],11)=%s\n",
           buffer);
   SNPRINTF (buffer, JB_BUFFER_SIZE, FWF,
-            jbm_farray_interpolate (fa, fa2, EXP ((JBFLOAT) 3. * (JBFLOAT) 3.)));
+            jbm_farray_interpolate (fa, fa2,
+                                    EXP ((JBFLOAT) 3. * (JBFLOAT) 3.)));
   printf ("farray_interpolate(exp(9),[1,2,4,...],[2048,1024,512,...],11)=%s\n",
           buffer);
   jbm_farray_dbl (fa2, fa);
