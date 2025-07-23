@@ -1721,7 +1721,7 @@ test_f32 (float (*f) (const float), const float g, const float x)
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_f32 (x, f, g, n * FLT_EPSILON))
+    if (check_f32 (x, f(x), g, n * FLT_EPSILON))
       break;
   return n;
 }
@@ -1833,7 +1833,7 @@ test_f64 (double (*f) (const double), const double g, const double x)
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_f64 (x, f, g, n * DBL_EPSILON))
+    if (check_f64 (x, f(x), g, n * DBL_EPSILON))
       break;
   return n;
 }
@@ -1850,7 +1850,7 @@ test_uni_f64 (double (*f) (const double), double (*g) (const double),
 }
 
 unsigned int
-test_log_f64 (double (*f) (const double), double g)
+test_log_f64 (double (*f) (const double), double (*g) (const double))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
