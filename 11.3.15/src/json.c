@@ -383,3 +383,151 @@ jb_json_object_set_time_with_default (JsonObject *object,
   if (t != def)
     jb_json_object_set_time (object, prop, t);
 }
+
+/**
+ * Function to get an array of floating numbers, in JBDOUBLE format, from a
+ * property of a JSON object.
+ *
+ * \return array of floating numbers value in JBDOUBLE format on success, NULL
+ * on error.
+ */
+JBDOUBLE*
+json_object_get_floats (JsonObject *object,     ///< JSON object struct.
+                        const char *prop,       ///< JSON object property.
+                        unsigned int *n_elements)
+///< number of array elements on success, 0 on error.
+{
+  JsonNode *node;
+  JsonArray *array;
+  GList *list, *list_initial;
+  const char *buffer;
+  JBDOUBLE *x = NULL;
+  unsigned int n;
+  *n_elements = 0;
+  node = json_object_get_member (object, prop);
+  if (json_node_get_node_type (node) != JSON_NODE_ARRAY)
+    return x;
+  array = json_node_get_array (node);
+  list_initial = json_array_get_elements (array);
+  for (n = 0, list = list_initial; list; ++n, list = list->next)
+    {
+      node = (JsonNode *) list->data;
+      if (json_node_get_node_type (node) != JSON_NODE_VALUE
+          || json_node_get_value_type (node) != G_TYPE_STRING)
+        goto exit_on_error;
+      buffer = (const char *) json_node_get_string (node);
+      if (!buffer)
+        goto exit_on_error;
+      x = (JBDOUBLE *) realloc (x, (n + 1) * sizeof (JBDOUBLE));
+      if (!x)
+        goto exit_on_error;
+      if (sscanf (buffer, FRL, x + n) != 1)
+        goto exit_on_error;
+    }
+  g_list_free (list_initial);
+  *n_elements = n;
+  return x;
+
+exit_on_error:
+  g_list_free (list_initial);
+  free (x);
+  return NULL;
+}
+
+/**
+ * Function to get an array of integer numbers from a property of a JSON object.
+ *
+ * \return array of integer numbers value on success, NULL on error.
+ */
+long int*
+json_object_get_ints (JsonObject *object,       ///< JSON object struct.
+                      const char *prop,         ///< JSON object property.
+                      unsigned int *n_elements)
+///< number of array elements on success, 0 on error.
+{
+  JsonNode *node;
+  JsonArray *array;
+  GList *list, *list_initial;
+  const char *buffer;
+  long int *x = NULL;
+  unsigned int n;
+  *n_elements = 0;
+  node = json_object_get_member (object, prop);
+  if (json_node_get_node_type (node) != JSON_NODE_ARRAY)
+    return x;
+  array = json_node_get_array (node);
+  list_initial = json_array_get_elements (array);
+  for (n = 0, list = list_initial; list; ++n, list = list->next)
+    {
+      node = (JsonNode *) list->data;
+      if (json_node_get_node_type (node) != JSON_NODE_VALUE
+          || json_node_get_value_type (node) != G_TYPE_STRING)
+        goto exit_on_error;
+      buffer = (const char *) json_node_get_string (node);
+      if (!buffer)
+        goto exit_on_error;
+      x = (long int *) realloc (x, (n + 1) * sizeof (long int));
+      if (!x)
+        goto exit_on_error;
+      if (sscanf (buffer, "%ld", x + n) != 1)
+        goto exit_on_error;
+    }
+  g_list_free (list_initial);
+  *n_elements = n;
+  return x;
+
+exit_on_error:
+  g_list_free (list_initial);
+  free (x);
+  return NULL;
+}
+
+/**
+ * Function to get an array of unsigned integer numbers from a property of a
+ * JSON object.
+ *
+ * \return array of unsigned integer numbers value on success, NULL on error.
+ */
+unsigned long int*
+json_object_get_uints (JsonObject *object,      ///< JSON object struct.
+                       const char *prop,        ///< JSON object property.
+                       unsigned int *n_elements)
+///< number of array elements on success, 0 on error.
+{
+  JsonNode *node;
+  JsonArray *array;
+  GList *list, *list_initial;
+  const char *buffer;
+  unsigned long int *x = NULL;
+  unsigned int n;
+  *n_elements = 0;
+  node = json_object_get_member (object, prop);
+  if (json_node_get_node_type (node) != JSON_NODE_ARRAY)
+    return x;
+  array = json_node_get_array (node);
+  list_initial = json_array_get_elements (array);
+  for (n = 0, list = list_initial; list; ++n, list = list->next)
+    {
+      node = (JsonNode *) list->data;
+      if (json_node_get_node_type (node) != JSON_NODE_VALUE
+          || json_node_get_value_type (node) != G_TYPE_STRING)
+        goto exit_on_error;
+      buffer = (const char *) json_node_get_string (node);
+      if (!buffer)
+        goto exit_on_error;
+      x = (unsigned long int *)
+        realloc (x, (n + 1) * sizeof (unsigned long int));
+      if (!x)
+        goto exit_on_error;
+      if (sscanf (buffer, "%lu", x + n) != 1)
+        goto exit_on_error;
+    }
+  g_list_free (list_initial);
+  *n_elements = n;
+  return x;
+
+exit_on_error:
+  g_list_free (list_initial);
+  free (x);
+  return NULL;
+}
