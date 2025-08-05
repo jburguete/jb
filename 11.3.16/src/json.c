@@ -392,9 +392,9 @@ jb_json_object_set_time_with_default (JsonObject *object,
  * on error.
  */
 JBDOUBLE*
-json_object_get_floats (JsonObject *object,     ///< JSON object struct.
-                        const char *prop,       ///< JSON object property.
-                        unsigned int *n_elements)
+jb_json_object_get_floats (JsonObject *object,  ///< JSON object struct.
+                           const char *prop,    ///< JSON object property.
+                           unsigned int *n_elements)
 ///< number of array elements on success, 0 on error.
 {
   JsonNode *node;
@@ -440,9 +440,9 @@ exit_on_error:
  * \return array of integer numbers value on success, NULL on error.
  */
 long int*
-json_object_get_ints (JsonObject *object,       ///< JSON object struct.
-                      const char *prop,         ///< JSON object property.
-                      unsigned int *n_elements)
+jb_json_object_get_ints (JsonObject *object,    ///< JSON object struct.
+                         const char *prop,      ///< JSON object property.
+                         unsigned int *n_elements)
 ///< number of array elements on success, 0 on error.
 {
   JsonNode *node;
@@ -489,9 +489,9 @@ exit_on_error:
  * \return array of unsigned integer numbers value on success, NULL on error.
  */
 unsigned long int*
-json_object_get_uints (JsonObject *object,      ///< JSON object struct.
-                       const char *prop,        ///< JSON object property.
-                       unsigned int *n_elements)
+jb_json_object_get_uints (JsonObject *object,   ///< JSON object struct.
+                          const char *prop,     ///< JSON object property.
+                          unsigned int *n_elements)
 ///< number of array elements on success, 0 on error.
 {
   JsonNode *node;
