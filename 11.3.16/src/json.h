@@ -66,10 +66,10 @@ JBDOUBLE jb_json_object_get_time_with_default
 void jb_json_object_set_time (JsonObject *, const char *, JBDOUBLE);
 void jb_json_object_set_time_with_default
   (JsonObject *, const char *, JBDOUBLE, JBDOUBLE);
-JBDOUBLE* jb_json_object_get_floats (JsonObject *, const char *,
+JBDOUBLE *jb_json_object_get_floats (JsonObject *, const char *,
                                      unsigned int *);
-long int* jb_json_object_get_ints (JsonObject *, const char *, unsigned int *);
-unsigned long int* jb_json_object_get_uints (JsonObject *, const char *,
-		                             unsigned int *);
+long int *jb_json_object_get_ints (JsonObject *, const char *, unsigned int *);
+unsigned long int *jb_json_object_get_uints (JsonObject *, const char *,
+                                             unsigned int *);
 
 #endif
