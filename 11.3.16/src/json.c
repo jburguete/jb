@@ -46,7 +46,7 @@ jb_json_object_get_float (JsonObject *object,   ///< JSON object struct.
 {
   JsonNode *node;
   const char *buffer;
-  JBDOUBLE x = 0.L;
+  JBDOUBLE x = (JBDOUBLE) 0.;
   *error = 0;
   node = json_object_get_member (object, prop);
   if (json_node_get_node_type (node) == JSON_NODE_VALUE
