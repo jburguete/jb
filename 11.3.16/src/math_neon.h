@@ -15766,9 +15766,9 @@ jbm_integral_2xf64 (float64x2_t (*f) (float64x2_t),
  * Function to add 2 float arrays.
  */
 static inline void
-jbm_array_add_f32 (float *xr,  ///< result float array.
-                   const float *x1,    ///< 1st addend float array.
-                   const float *x2,    ///< 1st addend float array.
+jbm_array_add_f32 (float *xr,   ///< result float array.
+                   const float *x1,     ///< 1st addend float array.
+                   const float *x2,     ///< 1st addend float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -15782,9 +15782,9 @@ jbm_array_add_f32 (float *xr,  ///< result float array.
  * Function to subtract 2 float arrays.
  */
 static inline void
-jbm_array_sub_f32 (float *xr,  ///< result float array.
-                   const float *x1,    ///< minuend float array.
-                   const float *x2,    ///< subtrahend float array.
+jbm_array_sub_f32 (float *xr,   ///< result float array.
+                   const float *x1,     ///< minuend float array.
+                   const float *x2,     ///< subtrahend float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -15798,9 +15798,9 @@ jbm_array_sub_f32 (float *xr,  ///< result float array.
  * Function to multiply a float array by a float number.
  */
 static inline void
-jbm_array_mul1_f32 (float *xr, ///< result float array.
-                    const float *x1,   ///< multiplier float array.
-                    const float x2,    ///< multiplicand float number.
+jbm_array_mul1_f32 (float *xr,  ///< result float array.
+                    const float *x1,    ///< multiplier float array.
+                    const float x2,     ///< multiplicand float number.
                     const unsigned int n)       ///< number of array elements.
 {
   float32x4_t s4;
@@ -15821,9 +15821,9 @@ jbm_array_mul1_f32 (float *xr, ///< result float array.
  * Function to divide a float array by a float number.
  */
 static inline void
-jbm_array_div1_f32 (float *xr, ///< result float array.
-                    const float *x1,   ///< dividend float array.
-                    const float x2,    ///< divisor float number.
+jbm_array_div1_f32 (float *xr,  ///< result float array.
+                    const float *x1,    ///< dividend float array.
+                    const float x2,     ///< divisor float number.
                     const unsigned int n)       ///< number of array elements.
 {
   float32x4_t s4;
@@ -15844,9 +15844,9 @@ jbm_array_div1_f32 (float *xr, ///< result float array.
  * Function to multiply 2 float arrays.
  */
 static inline void
-jbm_array_mul_f32 (float *xr,  ///< result float array.
-                   const float *x1,    ///< multiplier float array.
-                   const float *x2,    ///< multiplicand float array.
+jbm_array_mul_f32 (float *xr,   ///< result float array.
+                   const float *x1,     ///< multiplier float array.
+                   const float *x2,     ///< multiplicand float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -15860,9 +15860,9 @@ jbm_array_mul_f32 (float *xr,  ///< result float array.
  * Function to divide 2 float arrays.
  */
 static inline void
-jbm_array_div_f32 (float *xr,  ///< result float array.
-                   const float *x1,    ///< dividend float array.
-                   const float *x2,    ///< divisor float array.
+jbm_array_div_f32 (float *xr,   ///< result float array.
+                   const float *x1,     ///< dividend float array.
+                   const float *x2,     ///< divisor float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -15876,8 +15876,8 @@ jbm_array_div_f32 (float *xr,  ///< result float array.
  * Function to calculate the float of a float array.
  */
 static inline void
-jbm_array_dbl_f32 (float *xr,  ///< result float array.
-                   const float *xd,    ///< data float array.
+jbm_array_dbl_f32 (float *xr,   ///< result float array.
+                   const float *xd,     ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -15891,8 +15891,8 @@ jbm_array_dbl_f32 (float *xr,  ///< result float array.
  * Function to calculate the square of a float array.
  */
 static inline void
-jbm_array_sqr_f32 (float *xr,  ///< result float array.
-                   const float *xd,    ///< data float array.
+jbm_array_sqr_f32 (float *xr,   ///< result float array.
+                   const float *xd,     ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -15908,7 +15908,7 @@ jbm_array_sqr_f32 (float *xr,  ///< result float array.
  * \return the highest value.
  */
 static inline float
-jbm_array_max_f32 (const float *xx,    ///< float array.
+jbm_array_max_f32 (const float *xx,     ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
   float ax[4] JB_ALIGNED;
@@ -15944,7 +15944,7 @@ jbm_array_max_f32 (const float *xx,    ///< float array.
  * \return the lowest value.
  */
 static inline float
-jbm_array_min_f32 (const float *xx,    ///< float array.
+jbm_array_min_f32 (const float *xx,     ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
   float ax[4] JB_ALIGNED;
@@ -15978,9 +15978,9 @@ jbm_array_min_f32 (const float *xx,    ///< float array.
  * Function to find the highest and the lowest elements of a float array.
  */
 static inline void
-jbm_array_maxmin_f32 (const float *xx, ///< float array.
-                      float *max,      ///< the highest value.
-                      float *min,      ///< the lowest value.
+jbm_array_maxmin_f32 (const float *xx,  ///< float array.
+                      float *max,       ///< the highest value.
+                      float *min,       ///< the lowest value.
                       const unsigned int n)     ///< number of array elements.
 {
   float ax[4] JB_ALIGNED;

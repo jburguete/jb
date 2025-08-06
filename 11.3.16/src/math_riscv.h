@@ -36,7 +36,7 @@
 // Debug functions
 
 static inline void
-print_vuint32m1_t (FILE *file, const char *label, vuint32m1_t x,
+print_vuint32m1_t (FILE * file, const char *label, vuint32m1_t x,
                    const size_t vl)
 {
   unsigned int y[vl] JB_ALIGNED;
@@ -47,7 +47,7 @@ print_vuint32m1_t (FILE *file, const char *label, vuint32m1_t x,
 }
 
 static inline void
-print_vuint64m1_t (FILE *file, const char *label, vuint64m1_t x,
+print_vuint64m1_t (FILE * file, const char *label, vuint64m1_t x,
                    const size_t vl)
 {
   unsigned long int y[vl] JB_ALIGNED;
@@ -58,7 +58,7 @@ print_vuint64m1_t (FILE *file, const char *label, vuint64m1_t x,
 }
 
 static inline void
-print_vint32m1_t (FILE *file, const char *label, vint32m1_t x, const size_t vl)
+print_vint32m1_t (FILE * file, const char *label, vint32m1_t x, const size_t vl)
 {
   int y[vl] JB_ALIGNED;
   unsigned int i;
@@ -68,7 +68,7 @@ print_vint32m1_t (FILE *file, const char *label, vint32m1_t x, const size_t vl)
 }
 
 static inline void
-print_vint64m1_t (FILE *file, const char *label, vint64m1_t x, const size_t vl)
+print_vint64m1_t (FILE * file, const char *label, vint64m1_t x, const size_t vl)
 {
   long int y[vl] JB_ALIGNED;
   unsigned int i;
@@ -78,7 +78,7 @@ print_vint64m1_t (FILE *file, const char *label, vint64m1_t x, const size_t vl)
 }
 
 static inline void
-print_vfloat32m1_t (FILE *file, const char *label, vfloat32m1_t x,
+print_vfloat32m1_t (FILE * file, const char *label, vfloat32m1_t x,
                     const size_t vl)
 {
   float y[vl] JB_ALIGNED;
@@ -89,7 +89,7 @@ print_vfloat32m1_t (FILE *file, const char *label, vfloat32m1_t x,
 }
 
 static inline void
-print_vfloat64m1_t (FILE *file, const char *label, vfloat64m1_t x,
+print_vfloat64m1_t (FILE * file, const char *label, vfloat64m1_t x,
                     const size_t vl)
 {
   double y[vl] JB_ALIGNED;
@@ -108,7 +108,7 @@ static inline unsigned int
 jbm_riscv_read_frm ()
 {
   unsigned int frm;
-  asm volatile ("frrm %0" : "=r" (frm));
+  asm volatile ("frrm %0":"=r" (frm));
   return frm & 0x7;
 }
 
@@ -118,8 +118,8 @@ jbm_riscv_read_frm ()
 static inline void
 jbm_riscv_set_frm (unsigned int frm)    ///< rounding register.
 {
-  
-  asm volatile ("fsrm %0" : : "r" (frm));
+
+  asm volatile ("fsrm %0"::"r" (frm));
 }
 
 /**
@@ -258,7 +258,7 @@ jbm_rest_nxf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
  */
 static inline vfloat32m1_t
 jbm_frexp_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
-                 vint32m1_t *e, ///< pointer to the extracted exponents vector.
+                 vint32m1_t * e,        ///< pointer to the extracted exponents vector.
                  const size_t vl)       ///< vector size.
 {
   vfloat32m1_t yx, y2x, zx;
@@ -279,25 +279,27 @@ jbm_frexp_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
   zi = __riscv_vand_vx_u32m1 (zi, 0x7f800000, vl);
   en =
     __riscv_vmerge_vvm_i32m1 (__riscv_vsub_vx_i32m1
-                              (__riscv_vsra_vx_i32m1 (__riscv_vreinterpret_v_u32m1_i32m1 (zi), 23, vl),
-                               253, vl),
+                              (__riscv_vsra_vx_i32m1
+                               (__riscv_vreinterpret_v_u32m1_i32m1 (zi), 23,
+                                vl), 253, vl),
                               __riscv_vsub_vx_i32m1 (__riscv_vsra_vx_i32m1
-                                                     (__riscv_vreinterpret_v_u32m1_i32m1 (yi), 23, vl),
-                                                     126, vl), m2, vl);
+                                                     (__riscv_vreinterpret_v_u32m1_i32m1
+                                                      (yi), 23, vl), 126, vl),
+                              m2, vl);
   yx = __riscv_vreinterpret_v_u32m1_f32m1 (yi);
   yx =
-    __riscv_vmerge_vvm_f32m1 (__riscv_vfmul_vv_f32m1 (y2x, zx, vl), yx, m2,
-                               vl);
+    __riscv_vmerge_vvm_f32m1 (__riscv_vfmul_vv_f32m1 (y2x, zx, vl), yx, m2, vl);
   en =
     __riscv_vmerge_vvm_i32m1 (__riscv_vmv_v_x_i32m1 (0, vl), en,
                               __riscv_vmor_mm_b32 (m1,
-                                               __riscv_vmand_mm_b32 (m2, m3, vl),
-                                               vl), vl);
+                                                   __riscv_vmand_mm_b32 (m2, m3,
+                                                                         vl),
+                                                   vl), vl);
   *e = en;
   return __riscv_vmerge_vvm_f32m1 (x,
-                                    __riscv_vfmul_vf_f32m1
-                                    (__riscv_vfdiv_vv_f32m1 (x, yx, vl), 0.5f,
-                                     vl), m1, vl);
+                                   __riscv_vfmul_vf_f32m1
+                                   (__riscv_vfdiv_vv_f32m1 (x, yx, vl), 0.5f,
+                                    vl), m1, vl);
 }
 
 /**
@@ -315,16 +317,15 @@ jbm_exp2n_nxf32 (vint32m1_t e,  ///< exponent vector (vint32m1_t).
     (__riscv_vmerge_vxm_u32m1
      (__riscv_vmerge_vxm_u32m1
       (__riscv_vmerge_vvm_u32m1
-       (__riscv_vsll_vx_u32m1 (
-        __riscv_vreinterpret_v_i32m1_u32m1
-	(__riscv_vadd_vx_i32m1 (e, 127, vl)), 23, vl),
+       (__riscv_vsll_vx_u32m1 (__riscv_vreinterpret_v_i32m1_u32m1
+                               (__riscv_vadd_vx_i32m1 (e, 127, vl)), 23, vl),
         __riscv_vsrl_vv_u32m1
         (__riscv_vmv_v_x_u32m1 (0x00400000, vl),
          __riscv_vreinterpret_v_i32m1_u32m1
          (__riscv_vrsub_vx_i32m1 (e, -127, vl)), vl),
         __riscv_vmslt_vx_i32m1_b32 (e, -127, vl), vl), 0,
-      __riscv_vmslt_vx_i32m1_b32 (e, -150, vl), vl), 0x7f800000,
-     __riscv_vmsgt_vx_i32m1_b32 (e, 127, vl), vl));
+       __riscv_vmslt_vx_i32m1_b32 (e, -150, vl), vl), 0x7f800000,
+      __riscv_vmsgt_vx_i32m1_b32 (e, 127, vl), vl));
 }
 
 /**
@@ -376,17 +377,16 @@ jbm_modmin_nxf32 (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
   aa = jbm_abs_nxf32 (y, vl);
   ab = jbm_abs_nxf32 (b, vl);
   return __riscv_vmerge_vvm_f32m1 (b, y,
-                                    __riscv_vmfgt_vv_f32m1_b32 (aa, ab, vl),
-                                    vl);
+                                   __riscv_vmfgt_vv_f32m1_b32 (aa, ab, vl), vl);
 }
 
 /**
  * Function to interchange 2 vfloat32m1_t vectors.
  */
 static inline void
-jbm_change_nxf32 (vfloat32m1_t *restrict a,
+jbm_change_nxf32 (vfloat32m1_t * restrict a,
 ///< 1st vfloat32m1_t vector pointer.
-                  vfloat32m1_t *restrict b)
+                  vfloat32m1_t * restrict b)
 ///< 2nd vfloat32m1_t vector pointer.
 {
   vfloat32m1_t c;
@@ -467,9 +467,9 @@ jbm_interpolate_nxf32 (const vfloat32m1_t x,
   k = jbm_extrapolate_nxf32 (x, x1, x2, y1, y2, vl);
   k =
     __riscv_vmerge_vvm_f32m1 (k, y1, __riscv_vmfgt_vv_f32m1_b32 (x, x1, vl),
-                               vl);
+                              vl);
   return __riscv_vmerge_vvm_f32m1 (k, y2,
-                                    __riscv_vmflt_vv_f32m1_b32 (x, x2, vl), vl);
+                                   __riscv_vmflt_vv_f32m1_b32 (x, x2, vl), vl);
 }
 
 /**
@@ -10432,9 +10432,9 @@ jbm_coswc_nxf32 (const vfloat32m1_t x,
 static inline void
 jbm_sincoswc_nxf32 (const vfloat32m1_t x,
                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat32m1_t *s,
+                    vfloat32m1_t * s,
                     ///< pointer to the sin function value (vfloat32m1_t).
-                    vfloat32m1_t *c,
+                    vfloat32m1_t * c,
                     ///< pointer to the cos function value (vfloat32m1_t).
                     const size_t vl)    ///< array size.
 {
@@ -10462,19 +10462,19 @@ jbm_sin_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
   s = jbm_sinwc_nxf32 (__riscv_vfsub_vv_f32m1 (y, pi2, vl), vl);
   s = __riscv_vmerge_vvm_f32m1
     (s, jbm_opposite_nxf32
-        (jbm_coswc_nxf32
-         (__riscv_vfsub_vv_f32m1
-          (__riscv_vfmv_v_f_f32m1 (3.f * M_PI_2f, vl), y, vl), vl), vl),
+     (jbm_coswc_nxf32
+      (__riscv_vfsub_vv_f32m1
+       (__riscv_vfmv_v_f_f32m1 (3.f * M_PI_2f, vl), y, vl), vl), vl),
      __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl), vl);
   s = __riscv_vmerge_vvm_f32m1
     (s, jbm_sinwc_nxf32
-        (__riscv_vfsub_vv_f32m1
-         (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), vl),
+     (__riscv_vfsub_vv_f32m1
+      (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), vl),
      __riscv_vmflt_vf_f32m1_b32 (y, 5.f * M_PI_4f, vl), vl);
   s = __riscv_vmerge_vvm_f32m1
     (s, jbm_coswc_nxf32
-        (__riscv_vfsub_vv_f32m1
-	 (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl), vl),
+     (__riscv_vfsub_vv_f32m1
+      (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl), vl),
      __riscv_vmflt_vf_f32m1_b32 (y, 3.f * M_PI_4f, vl), vl);
   return __riscv_vmerge_vvm_f32m1
     (s, jbm_sinwc_nxf32 (y, vl), __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl),
@@ -10497,18 +10497,18 @@ jbm_cos_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
   c = jbm_coswc_nxf32 (__riscv_vfsub_vv_f32m1 (y, pi2, vl), vl);
   c = __riscv_vmerge_vvm_f32m1
     (c, jbm_sinwc_nxf32
-        (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl), vl),
-     __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f,vl), vl);
+     (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl), vl),
+     __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl), vl);
   c = __riscv_vmerge_vvm_f32m1
     (c, jbm_opposite_nxf32
-        (jbm_coswc_nxf32
-         (__riscv_vfsub_vv_f32m1
-	  (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), vl), vl),
+     (jbm_coswc_nxf32
+      (__riscv_vfsub_vv_f32m1
+       (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), vl), vl),
      __riscv_vmflt_vf_f32m1_b32 (y, 5.f * M_PI_4f, vl), vl);
   c = __riscv_vmerge_vvm_f32m1
     (c, jbm_sinwc_nxf32
-        (__riscv_vfsub_vv_f32m1
-          (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl), vl),
+     (__riscv_vfsub_vv_f32m1
+      (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl), vl),
      __riscv_vmflt_vf_f32m1_b32 (y, 3.f * M_PI_4f, vl), vl);
   return
     __riscv_vmerge_vvm_f32m1 (c, jbm_coswc_nxf32 (y, vl),
@@ -10522,9 +10522,9 @@ jbm_cos_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
 static inline void
 jbm_sincos_nxf32 (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat32m1_t *s,
+                  vfloat32m1_t * s,
                   ///< pointer to the sin function value (vfloat32m1_t).
-                  vfloat32m1_t *c,
+                  vfloat32m1_t * c,
                   ///< pointer to the cos function value (vfloat32m1_t).
                   const size_t vl)      ///< array size.
 {
@@ -10638,7 +10638,7 @@ jbm_atan_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                               __riscv_vmfgt_vf_f32m1_b32 (ax, 0.5f, vl), vl);
   f =
     __riscv_vmerge_vvm_f32m1 (f, __riscv_vfsub_vv_f32m1
-                                 (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), f, vl),
+                              (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), f, vl),
                               m, vl);
   return
     __riscv_vmerge_vvm_f32m1 (f, jbm_opposite_nxf32 (f, vl),
@@ -10666,7 +10666,7 @@ jbm_atan2_nxf32 (const vfloat32m1_t y,  ///< vfloat32m1_t y component.
   return
     __riscv_vmerge_vvm_f32m1 (f, __riscv_vfadd_vf_f32m1 (f, M_PIf, vl),
                               __riscv_vmand_mm_b32
-			      (my, __riscv_vmnot_m_b32 (mx, vl), vl), vl);
+                              (my, __riscv_vmnot_m_b32 (mx, vl), vl), vl);
 }
 
 /**
@@ -10683,8 +10683,8 @@ jbm_asin_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
     jbm_atan_nxf32
     (__riscv_vfdiv_vv_f32m1
      (x, __riscv_vfsqrt_v_f32m1
-         (__riscv_vfnmsac_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x, x, vl),
-          vl), vl), vl);
+      (__riscv_vfnmsac_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x, x, vl),
+       vl), vl), vl);
 }
 
 /**
@@ -10703,7 +10703,7 @@ jbm_acos_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                     (__riscv_vfsqrt_v_f32m1
                      (__riscv_vfnmsac_vv_f32m1
                       (__riscv_vfmv_v_f_f32m1 (1.f, vl), x, x, vl),
-                       vl), x, vl), vl);
+                      vl), x, vl), vl);
   return __riscv_vmerge_vvm_f32m1 (f, __riscv_vfadd_vf_f32m1 (f, M_PIf, vl),
                                    __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl), vl);
 }
@@ -10761,7 +10761,7 @@ jbm_tanh_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t number.
                                                           vl), vl);
   return __riscv_vmerge_vvm_f32m1 (f, __riscv_vfmv_v_f_f32m1 (-1.f, vl),
                                    __riscv_vmflt_vf_f32m1_b32
-				   (x, -JBM_FLT_MAX_E_EXP, vl), vl);
+                                   (x, -JBM_FLT_MAX_E_EXP, vl), vl);
 }
 
 /**
@@ -10871,7 +10871,7 @@ jbm_erfcwc_nxf32 (const vfloat32m1_t x,
                             __riscv_vfmul_vv_f32m1 (x, jbm_exp_nxf32 (x2, vl),
                                                     vl), vl);
   return __riscv_vmerge_vvm_f32m1 (f, __riscv_vfmv_v_f_f32m1 (0.f, vl),
-                                    __riscv_vmfgt_vf_f32m1_b32 (x, m, vl), vl);
+                                   __riscv_vmfgt_vf_f32m1_b32 (x, m, vl), vl);
 
 }
 
@@ -10911,11 +10911,11 @@ jbm_erfc_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   u = __riscv_vfmv_v_f_f32m1 (1.f, vl);
   f = __riscv_vfsub_vv_f32m1
     (u, __riscv_vfmul_vv_f32m1
-        (__riscv_vfdiv_vv_f32m1 (x, ax, vl),
-	 __riscv_vfsub_vv_f32m1 (u, jbm_erfcwc_nxf32 (ax, vl), vl), vl), vl);
+     (__riscv_vfdiv_vv_f32m1 (x, ax, vl),
+      __riscv_vfsub_vv_f32m1 (u, jbm_erfcwc_nxf32 (ax, vl), vl), vl), vl);
   return
     __riscv_vmerge_vvm_f32m1 (f, __riscv_vfsub_vv_f32m1
-                                 (u, jbm_erfwc_nxf32 (x, vl), vl),
+                              (u, jbm_erfwc_nxf32 (x, vl), vl),
                               __riscv_vmflt_vv_f32m1_b32 (ax, u, vl), vl);
 }
 
@@ -10946,10 +10946,9 @@ jbm_solve_quadratic_reduced_nxf32 (vfloat32m1_t a,
   k2 = __riscv_vfsub_vv_f32m1 (a, b, vl);
   k1 =
     __riscv_vmerge_vvm_f32m1 (k2, k1, __riscv_vmflt_vv_f32m1_b32 (k1, x1, vl),
-                               vl);
+                              vl);
   return __riscv_vmerge_vvm_f32m1 (k2, k1,
-                                    __riscv_vmfgt_vv_f32m1_b32 (k1, x2, vl),
-                                    vl);
+                                   __riscv_vmfgt_vv_f32m1_b32 (k1, x2, vl), vl);
 }
 
 /**
@@ -11009,7 +11008,7 @@ jbm_solve_cubic_reduced_nxf32 (const vfloat32m1_t a,
     __riscv_vfsub_vv_f32m1 (__riscv_vfmul_vv_f32m1 (a3, k0, vl),
                             __riscv_vfmul_vf_f32m1 (__riscv_vfnmsac_vv_f32m1
                                                     (b, a3, c, vl),
-                                                     0.5f, vl), vl);
+                                                    0.5f, vl), vl);
   k3 = __riscv_vfmul_vv_f32m1 (k1, jbm_sqr_nxf32 (k1, vl), vl);
   k2 = __riscv_vfmacc_vv_f32m1 (k3, k0, k0, vl);
   l1 = __riscv_vfsqrt_v_f32m1 (jbm_opposite_nxf32 (k1, vl), vl);
@@ -11031,12 +11030,10 @@ jbm_solve_cubic_reduced_nxf32 (const vfloat32m1_t a,
                                                       vl), vl), vl), vl);
   l3 =
     __riscv_vmerge_vvm_f32m1 (l2, l3,
-                               __riscv_vmor_mm_b32 (__riscv_vmflt_vv_f32m1_b32
-                                                (l2, x1, vl),
-                                                __riscv_vmfgt_vv_f32m1_b32 (l2,
-                                                                            x2,
-                                                                            vl),
-                                                vl), vl);
+                              __riscv_vmor_mm_b32 (__riscv_vmflt_vv_f32m1_b32
+                                                   (l2, x1, vl),
+                                                   __riscv_vmfgt_vv_f32m1_b32
+                                                   (l2, x2, vl), vl), vl);
   l4 =
     __riscv_vfsub_vv_f32m1 (a,
                             __riscv_vfmul_vv_f32m1 (l1,
@@ -11046,12 +11043,10 @@ jbm_solve_cubic_reduced_nxf32 (const vfloat32m1_t a,
                                                       vl), vl), vl), vl);
   l4 =
     __riscv_vmerge_vvm_f32m1 (l3, l4,
-                               __riscv_vmor_mm_b32 (__riscv_vmflt_vv_f32m1_b32
-                                                (l3, x1, vl),
-                                                __riscv_vmfgt_vv_f32m1_b32 (l3,
-                                                                            x2,
-                                                                            vl),
-                                                vl), vl);
+                              __riscv_vmor_mm_b32 (__riscv_vmflt_vv_f32m1_b32
+                                                   (l3, x1, vl),
+                                                   __riscv_vmfgt_vv_f32m1_b32
+                                                   (l3, x2, vl), vl), vl);
   k1 = __riscv_vfsqrt_v_f32m1 (k2, vl);
   l5 = __riscv_vfadd_vv_f32m1 (k0, k1, vl);
   l5 = jbm_cbrt_nxf32 (k2, vl);
@@ -11061,8 +11056,8 @@ jbm_solve_cubic_reduced_nxf32 (const vfloat32m1_t a,
                             __riscv_vfsub_vv_f32m1 (jbm_cbrt_nxf32 (k0, vl), a3,
                                                     vl), vl);
   return __riscv_vmerge_vvm_f32m1 (l5, l4,
-                                    __riscv_vmflt_vf_f32m1_b32 (k2, 0.f, vl),
-                                    vl);
+                                   __riscv_vmflt_vf_f32m1_b32 (k2, 0.f, vl),
+                                   vl);
 }
 
 /**
@@ -11143,8 +11138,8 @@ jbm_flux_limiter_centred_nxf32 (const vfloat32m1_t d1,
                                 const size_t vl)        ///< array size.
 {
   return __riscv_vmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f, vl),
-                                    __riscv_vfdiv_vv_f32m1 (d1, d2, vl),
-                                    jbm_small_nxf32 (d2, vl), vl);
+                                   __riscv_vfdiv_vv_f32m1 (d1, d2, vl),
+                                   jbm_small_nxf32 (d2, vl), vl);
 }
 
 /**
@@ -11319,7 +11314,8 @@ jbm_flux_limiter_monotonized_central_nxf32 (const vfloat32m1_t d1,
                                vl);
   rm =
     __riscv_vmerge_vvm_f32m1 (jbm_dbl_nxf32 (r, vl), rm,
-                               __riscv_vmfgt_vf_f32m1_b32 (r, 1.f / 3.f, vl), vl);
+                              __riscv_vmfgt_vf_f32m1_b32 (r, 1.f / 3.f, vl),
+                              vl);
   return __riscv_vfmerge_vfm_f32m1 (rm, 0.f,
                                     __riscv_vmfgt_vf_f32m1_b32
                                     (__riscv_vfmul_vv_f32m1 (d1, d2, vl),
@@ -11593,7 +11589,7 @@ jbm_rest_nxf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
  */
 static inline vfloat64m1_t
 jbm_frexp_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                 vint64m1_t *e, ///< pointer to the extracted exponents vector.
+                 vint64m1_t * e,        ///< pointer to the extracted exponents vector.
                  const size_t vl)       ///< vector size.
 {
   vfloat64m1_t yx, y2x, zx;
@@ -11614,25 +11610,27 @@ jbm_frexp_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
   zi = __riscv_vand_vx_u64m1 (zi, 0x7ff0000000000000L, vl);
   en =
     __riscv_vmerge_vvm_i64m1 (__riscv_vsub_vx_i64m1
-                              (__riscv_vsra_vx_i64m1 (__riscv_vreinterpret_v_u64m1_i64m1 (zi), 52, vl),
-                               2044L, vl),
+                              (__riscv_vsra_vx_i64m1
+                               (__riscv_vreinterpret_v_u64m1_i64m1 (zi), 52,
+                                vl), 2044L, vl),
                               __riscv_vsub_vx_i64m1 (__riscv_vsra_vx_i64m1
-                                                     (__riscv_vreinterpret_v_u64m1_i64m1 (yi), 52, vl),
-                                                     1022L, vl), m2, vl);
+                                                     (__riscv_vreinterpret_v_u64m1_i64m1
+                                                      (yi), 52, vl), 1022L, vl),
+                              m2, vl);
   yx = __riscv_vreinterpret_v_u64m1_f64m1 (yi);
   yx =
-    __riscv_vmerge_vvm_f64m1 (__riscv_vfmul_vv_f64m1 (y2x, zx, vl), yx, m2,
-                               vl);
+    __riscv_vmerge_vvm_f64m1 (__riscv_vfmul_vv_f64m1 (y2x, zx, vl), yx, m2, vl);
   en =
     __riscv_vmerge_vvm_i64m1 (__riscv_vmv_v_x_i64m1 (0L, vl), en,
                               __riscv_vmor_mm_b64 (m1,
-                                               __riscv_vmand_mm_b64 (m2, m3, vl),
-                                               vl), vl);
+                                                   __riscv_vmand_mm_b64 (m2, m3,
+                                                                         vl),
+                                                   vl), vl);
   *e = en;
   return __riscv_vmerge_vvm_f64m1 (x,
-                                    __riscv_vfmul_vf_f64m1
-                                    (__riscv_vfdiv_vv_f64m1 (x, yx, vl), 0.5,
-                                     vl), m1, vl);
+                                   __riscv_vfmul_vf_f64m1
+                                   (__riscv_vfdiv_vv_f64m1 (x, yx, vl), 0.5,
+                                    vl), m1, vl);
 }
 
 /**
@@ -11650,16 +11648,15 @@ jbm_exp2n_nxf64 (vint64m1_t e,  ///< exponent vector (vint64m1_t).
     (__riscv_vmerge_vxm_u64m1
      (__riscv_vmerge_vxm_u64m1
       (__riscv_vmerge_vvm_u64m1
-       (__riscv_vsll_vx_u64m1 (
-        __riscv_vreinterpret_v_i64m1_u64m1
-	(__riscv_vadd_vx_i64m1 (e, 1023ll, vl)), 52ll, vl),
-        __riscv_vsrl_vv_u64m1
-        (__riscv_vmv_v_x_u64m1 (0x0008000000000000ll, vl),
-         __riscv_vreinterpret_v_i64m1_u64m1
-         (__riscv_vrsub_vx_i64m1 (e, -1023ll, vl)), vl),
+       (__riscv_vsll_vx_u64m1 (__riscv_vreinterpret_v_i64m1_u64m1
+                               (__riscv_vadd_vx_i64m1 (e, 1023ll, vl)), 52ll,
+                               vl),
+        __riscv_vsrl_vv_u64m1 (__riscv_vmv_v_x_u64m1 (0x0008000000000000ll, vl),
+                               __riscv_vreinterpret_v_i64m1_u64m1
+                               (__riscv_vrsub_vx_i64m1 (e, -1023ll, vl)), vl),
         __riscv_vmslt_vx_i64m1_b64 (e, -1023ll, vl), vl), 0,
-      __riscv_vmslt_vx_i64m1_b64 (e, -1074ll, vl), vl), 0x7ff0000000000000ll,
-     __riscv_vmsgt_vx_i64m1_b64 (e, 1023ll, vl), vl));
+       __riscv_vmslt_vx_i64m1_b64 (e, -1074ll, vl), vl), 0x7ff0000000000000ll,
+      __riscv_vmsgt_vx_i64m1_b64 (e, 1023ll, vl), vl));
 }
 
 /**
@@ -11707,7 +11704,7 @@ jbm_modmin_nxf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
   ab = __riscv_vfmul_vv_f64m1 (a, b, vl);
   y =
     __riscv_vfmerge_vfm_f64m1 (a, 0., __riscv_vmfgt_vf_f64m1_b64 (ab, 0., vl),
-    vl);
+                               vl);
   aa = jbm_abs_nxf64 (y, vl);
   ab = jbm_abs_nxf64 (b, vl);
   return __riscv_vmerge_vvm_f64m1 (b, y,
@@ -11718,9 +11715,9 @@ jbm_modmin_nxf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
  * Function to interchange 2 vfloat64m1_t numbers.
  */
 static inline void
-jbm_change_nxf64 (vfloat64m1_t *restrict a,
+jbm_change_nxf64 (vfloat64m1_t * restrict a,
                   ///< 1st vfloat64m1_t vector pointer.
-                  vfloat64m1_t *restrict b)
+                  vfloat64m1_t * restrict b)
                   ///< 2nd vfloat64m1_t vector pointer.
 {
   vfloat64m1_t c;
@@ -11803,9 +11800,9 @@ jbm_interpolate_nxf64 (const vfloat64m1_t x,
   k = jbm_extrapolate_nxf64 (x, x1, x2, y1, y2, vl);
   k =
     __riscv_vmerge_vvm_f64m1 (k, y1, __riscv_vmfgt_vv_f64m1_b64 (x, x1, vl),
-                               vl);
+                              vl);
   return __riscv_vmerge_vvm_f64m1 (k, y2,
-                                    __riscv_vmflt_vv_f64m1_b64 (x, x2, vl), vl);
+                                   __riscv_vmflt_vv_f64m1_b64 (x, x2, vl), vl);
 }
 
 /**
@@ -11876,7 +11873,8 @@ jbm_polynomial_1_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                         const double *p,        ///< array of coefficients.
                         const size_t vl)        ///< array size.
 {
-  return __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), p[1], x, vl);
+  return __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), p[1], x,
+                                  vl);
 }
 
 /**
@@ -12283,7 +12281,8 @@ jbm_rational_1_0_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   return __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),
                                  __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1
-                                                        (1., vl), p[1], x, vl), vl);
+                                                          (1., vl), p[1], x,
+                                                          vl), vl);
 }
 
 /**
@@ -21516,8 +21515,8 @@ jbm_expm1wc_nxf64 (const vfloat64m1_t x,
                                                         (a6, vl), x,
                                                         __riscv_vfmacc_vf_f64m1
                                                         (__riscv_vfmv_v_f_f64m1
-                                                         (a7, vl), a9, x2, vl), vl),
-                                                       vl), vl), vl), vl);
+                                                         (a7, vl), a9, x2, vl),
+                                                        vl), vl), vl), vl), vl);
 }
 
 /**
@@ -21743,8 +21742,7 @@ jbm_cbrt_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
   vfloat64m1_t f;
   f = jbm_pow_nxf64 (jbm_abs_nxf64 (x, vl), 1. / 3., vl);
   return __riscv_vmerge_vvm_f64m1 (f, jbm_opposite_nxf64 (f, vl),
-                                    __riscv_vmflt_vf_f64m1_b64 (x, 0., vl),
-                                    vl);
+                                   __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
 }
 
 /**
@@ -21803,9 +21801,9 @@ jbm_coswc_nxf64 (const vfloat64m1_t x,
 static inline void
 jbm_sincoswc_nxf64 (const vfloat64m1_t x,
                     ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat64m1_t *s,
+                    vfloat64m1_t * s,
                     ///< pointer to the f32 function value (vfloat64m1_t).
-                    vfloat64m1_t *c,
+                    vfloat64m1_t * c,
                     ///< pointer to the f32 function value (vfloat64m1_t).
                     const size_t vl)    ///< array size.
 {
@@ -21833,23 +21831,22 @@ jbm_sin_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
   s = jbm_sinwc_nxf64 (__riscv_vfsub_vv_f64m1 (y, pi2, vl), vl);
   s = __riscv_vmerge_vvm_f64m1
     (s, jbm_opposite_nxf64
-        (jbm_coswc_nxf64
-         (__riscv_vfsub_vv_f64m1
-	  (__riscv_vfmv_v_f_f64m1 (3. * M_PI_2, vl), y, vl), vl), vl),
+     (jbm_coswc_nxf64
+      (__riscv_vfsub_vv_f64m1
+       (__riscv_vfmv_v_f_f64m1 (3. * M_PI_2, vl), y, vl), vl), vl),
      __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
   s = __riscv_vmerge_vvm_f64m1
     (s, jbm_sinwc_nxf64
-        (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), vl),
+     (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), vl),
      __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl), vl);
   s = __riscv_vmerge_vvm_f64m1
     (s, jbm_coswc_nxf64
-        (__riscv_vfsub_vv_f64m1
-	 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
-     __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4,
-                                                              vl), vl);
+     (__riscv_vfsub_vv_f64m1
+      (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
+     __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4, vl), vl);
   return __riscv_vmerge_vvm_f64m1 (s, jbm_sinwc_nxf64 (y, vl),
-                                    __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl),
-                                    vl);
+                                   __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl),
+                                   vl);
 }
 
 /**
@@ -21868,19 +21865,18 @@ jbm_cos_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
   c = jbm_coswc_nxf64 (__riscv_vfsub_vv_f64m1 (y, pi2, vl), vl);
   c = __riscv_vmerge_vvm_f64m1
     (c, jbm_sinwc_nxf64
-        (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), vl),
+     (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), vl),
      __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
   c = __riscv_vmerge_vvm_f64m1
     (c, jbm_opposite_nxf64
-        (jbm_coswc_nxf64
-	 (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl),
-                                  vl), vl),
-     __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl), vl);
+     (jbm_coswc_nxf64
+      (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl),
+       vl), vl), __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl), vl);
   c = __riscv_vmerge_vvm_f64m1
-      (c, jbm_sinwc_nxf64
-          (__riscv_vfsub_vv_f64m1
-           (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
-       __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4, vl), vl);
+    (c, jbm_sinwc_nxf64
+     (__riscv_vfsub_vv_f64m1
+      (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
+     __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4, vl), vl);
   return
     __riscv_vmerge_vvm_f64m1 (c, jbm_coswc_nxf64 (y, vl),
                               __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl), vl);
@@ -21893,9 +21889,9 @@ jbm_cos_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
 static inline void
 jbm_sincos_nxf64 (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat64m1_t *s,
+                  vfloat64m1_t * s,
                   ///< pointer to the f32 function value (vfloat64m1_t).
-                  vfloat64m1_t *c,
+                  vfloat64m1_t * c,
                   ///< pointer to the f32 function value (vfloat64m1_t).
                   const size_t vl)      ///< array size.
 {
@@ -21915,8 +21911,8 @@ jbm_sincos_nxf64 (const vfloat64m1_t x,
   s1 = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
   c1 = __riscv_vmerge_vvm_f64m1 (c1, jbm_opposite_nxf64 (c2, vl), m, vl);
   jbm_sincoswc_nxf64
-  (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl),
-   &c2, &s2, vl);
+    (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl),
+     &c2, &s2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4f, vl);
   s1 = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
   c1 = __riscv_vmerge_vvm_f64m1 (c1, c2, m, vl);
@@ -22023,7 +22019,7 @@ jbm_atan_nxf64 (const vfloat64m1_t x,   ///< double number.
                               __riscv_vmfgt_vf_f64m1_b64 (ax, 0.5, vl), vl);
   f =
     __riscv_vmerge_vvm_f64m1 (f, __riscv_vfsub_vv_f64m1
-                                 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), f, vl),
+                              (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), f, vl),
                               m, vl);
   return __riscv_vmerge_vvm_f64m1 (f, jbm_opposite_nxf64 (f, vl),
                                    __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
@@ -22049,7 +22045,7 @@ jbm_atan2_nxf64 (const vfloat64m1_t y,  ///< vfloat64m1_t y component.
                                 __riscv_vmand_mm_b64 (my, mx, vl), vl);
   return __riscv_vmerge_vvm_f64m1 (f, __riscv_vfadd_vf_f64m1 (f, M_PI, vl),
                                    __riscv_vmand_mm_b64
-				   (my, __riscv_vmnot_m_b64 (mx, vl), vl), vl);
+                                   (my, __riscv_vmnot_m_b64 (mx, vl), vl), vl);
 }
 
 /**
@@ -22088,9 +22084,9 @@ jbm_acos_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
                     (__riscv_vfsqrt_v_f64m1
                      (__riscv_vfnmsac_vv_f64m1
                       (__riscv_vfmv_v_f_f64m1 (1., vl), x, x, vl),
-                       vl), x, vl), vl);
+                      vl), x, vl), vl);
   return __riscv_vmerge_vvm_f64m1 (f, __riscv_vfadd_vf_f64m1 (f, M_PI, vl),
-                                    __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
+                                   __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
 }
 
 /**
@@ -22142,11 +22138,11 @@ jbm_tanh_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t number.
                             __riscv_vfadd_vv_f64m1 (f, fi, vl), vl);
   f =
     __riscv_vmerge_vvm_f64m1 (f, __riscv_vfmv_v_f_f64m1 (1.f, vl),
-                               __riscv_vmfgt_vf_f64m1_b64 (x, JBM_FLT_MAX_E_EXP,
-                                                           vl), vl);
+                              __riscv_vmfgt_vf_f64m1_b64 (x, JBM_FLT_MAX_E_EXP,
+                                                          vl), vl);
   return __riscv_vmerge_vvm_f64m1 (f, __riscv_vfmv_v_f_f64m1 (-1.f, vl),
                                    __riscv_vmflt_vf_f64m1_b64
-				   (x, -JBM_FLT_MAX_E_EXP, vl), vl);
+                                   (x, -JBM_FLT_MAX_E_EXP, vl), vl);
 }
 
 /**
@@ -22294,7 +22290,7 @@ jbm_erf_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                                                       jbm_erfcwc_nxf64 (ax, vl),
                                                       vl), vl);
   return __riscv_vmerge_vvm_f64m1 (f, jbm_erfwc_nxf64 (x, vl),
-                                    __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
+                                   __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
 }
 
 /**
@@ -22312,11 +22308,11 @@ jbm_erfc_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
   u = __riscv_vfmv_v_f_f64m1 (1.f, vl);
   f = __riscv_vfsub_vv_f64m1
     (u, __riscv_vfmul_vv_f64m1
-        (__riscv_vfdiv_vv_f64m1 (x, ax, vl),
-         __riscv_vfsub_vv_f64m1 (u, jbm_erfcwc_nxf64 (ax, vl), vl), vl), vl);
+     (__riscv_vfdiv_vv_f64m1 (x, ax, vl),
+      __riscv_vfsub_vv_f64m1 (u, jbm_erfcwc_nxf64 (ax, vl), vl), vl), vl);
   return
     __riscv_vmerge_vvm_f64m1 (f, __riscv_vfsub_vv_f64m1
-                                 (u, jbm_erfwc_nxf64 (x, vl), vl),
+                              (u, jbm_erfwc_nxf64 (x, vl), vl),
                               __riscv_vmflt_vv_f64m1_b64 (ax, u, vl), vl);
 }
 
@@ -22347,10 +22343,9 @@ jbm_solve_quadratic_reduced_nxf64 (vfloat64m1_t a,
   k2 = __riscv_vfsub_vv_f64m1 (a, b, vl);
   k1 =
     __riscv_vmerge_vvm_f64m1 (k2, k1, __riscv_vmflt_vv_f64m1_b64 (k1, x1, vl),
-                               vl);
+                              vl);
   return __riscv_vmerge_vvm_f64m1 (k2, k1,
-                                    __riscv_vmfgt_vv_f64m1_b64 (k1, x2, vl),
-                                    vl);
+                                   __riscv_vmfgt_vv_f64m1_b64 (k1, x2, vl), vl);
 }
 
 /**
@@ -22408,7 +22403,7 @@ jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
     __riscv_vfsub_vv_f64m1 (__riscv_vfmul_vv_f64m1 (a3, k0, vl),
                             __riscv_vfmul_vf_f64m1 (__riscv_vfnmsac_vv_f64m1
                                                     (b, a3, c, vl),
-                                                     0.5, vl), vl);
+                                                    0.5, vl), vl);
   k3 = __riscv_vfmul_vv_f64m1 (k1, jbm_sqr_nxf64 (k1, vl), vl);
   k2 = __riscv_vfmacc_vv_f64m1 (k3, k0, k0, vl);
   l1 = __riscv_vfsqrt_v_f64m1 (jbm_opposite_nxf64 (k1, vl), vl);
@@ -22430,12 +22425,10 @@ jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
                                                      vl), vl), vl);
   l3 =
     __riscv_vmerge_vvm_f64m1 (l2, l3,
-                               __riscv_vmor_mm_b64 (__riscv_vmflt_vv_f64m1_b64
-                                                (l2, x1, vl),
-                                                __riscv_vmfgt_vv_f64m1_b64 (l2,
-                                                                            x2,
-                                                                            vl),
-                                                vl), vl);
+                              __riscv_vmor_mm_b64 (__riscv_vmflt_vv_f64m1_b64
+                                                   (l2, x1, vl),
+                                                   __riscv_vmfgt_vv_f64m1_b64
+                                                   (l2, x2, vl), vl), vl);
   l4 =
     __riscv_vfsub_vv_f64m1 (a,
                             __riscv_vfmul_vv_f64m1 (l1,
@@ -22445,12 +22438,10 @@ jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
                                                      vl), vl), vl);
   l4 =
     __riscv_vmerge_vvm_f64m1 (l3, l4,
-                               __riscv_vmor_mm_b64 (__riscv_vmflt_vv_f64m1_b64
-                                                (l3, x1, vl),
-                                                __riscv_vmfgt_vv_f64m1_b64 (l3,
-                                                                            x2,
-                                                                            vl),
-                                                vl), vl);
+                              __riscv_vmor_mm_b64 (__riscv_vmflt_vv_f64m1_b64
+                                                   (l3, x1, vl),
+                                                   __riscv_vmfgt_vv_f64m1_b64
+                                                   (l3, x2, vl), vl), vl);
   k1 = __riscv_vfsqrt_v_f64m1 (k2, vl);
   l5 = __riscv_vfadd_vv_f64m1 (k0, k1, vl);
   l5 = jbm_cbrt_nxf64 (k2, vl);
@@ -22460,8 +22451,7 @@ jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
                             __riscv_vfsub_vv_f64m1 (jbm_cbrt_nxf64 (k0, vl), a3,
                                                     vl), vl);
   return __riscv_vmerge_vvm_f64m1 (l5, l4,
-                                    __riscv_vmflt_vf_f64m1_b64 (k2, 0., vl),
-                                    vl);
+                                   __riscv_vmflt_vf_f64m1_b64 (k2, 0., vl), vl);
 }
 
 /**
@@ -22488,11 +22478,11 @@ jbm_solve_cubic_nxf64 (vfloat64m1_t a,
 {
   return
     __riscv_vmerge_vvm_f64m1 (jbm_solve_quadratic_nxf64 (b, c, d, x1, x2, vl),
-                               jbm_solve_cubic_reduced_nxf64
-                               (__riscv_vfdiv_vv_f64m1 (b, a, vl),
-                                __riscv_vfdiv_vv_f64m1 (c, a, vl),
-                                __riscv_vfdiv_vv_f64m1 (d, a, vl), x1, x2, vl),
-                               jbm_small_nxf64 (a, vl), vl);
+                              jbm_solve_cubic_reduced_nxf64
+                              (__riscv_vfdiv_vv_f64m1 (b, a, vl),
+                               __riscv_vfdiv_vv_f64m1 (c, a, vl),
+                               __riscv_vfdiv_vv_f64m1 (d, a, vl), x1, x2, vl),
+                              jbm_small_nxf64 (a, vl), vl);
 }
 
 /**
@@ -22541,8 +22531,8 @@ jbm_flux_limiter_centred_nxf64 (const vfloat64m1_t d1,
                                 const size_t vl)        ///< array size.
 {
   return __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl),
-                                    __riscv_vfdiv_vv_f64m1 (d1, d2, vl),
-                                    jbm_small_nxf64 (d2, vl), vl);
+                                   __riscv_vfdiv_vv_f64m1 (d1, d2, vl),
+                                   jbm_small_nxf64 (d2, vl), vl);
 }
 
 /**
@@ -22715,7 +22705,7 @@ jbm_flux_limiter_monotonized_central_nxf64 (const vfloat64m1_t d1,
                                vl);
   rm =
     __riscv_vmerge_vvm_f64m1 (jbm_dbl_nxf64 (r, vl), rm,
-                               __riscv_vmfgt_vf_f64m1_b64 (r, 1. / 3., vl), vl);
+                              __riscv_vmfgt_vf_f64m1_b64 (r, 1. / 3., vl), vl);
   return __riscv_vfmerge_vfm_f64m1 (rm, 0.,
                                     __riscv_vmfgt_vf_f64m1_b64
                                     (__riscv_vfmul_vv_f64m1 (d1, d2, vl),
@@ -22852,37 +22842,37 @@ jbm_integral_nxf64 (vfloat64m1_t (*f) (vfloat64m1_t, size_t),
 }
 
 static inline void
-print_vuint32m1_t_2 (FILE *file, const char *label, vuint32m1_t x)
+print_vuint32m1_t_2 (FILE * file, const char *label, vuint32m1_t x)
 {
   print_vuint32m1_t (file, label, x, 2);
 }
 
 static inline void
-print_vuint64m1_t_2 (FILE *file, const char *label, vuint64m1_t x)
+print_vuint64m1_t_2 (FILE * file, const char *label, vuint64m1_t x)
 {
   print_vuint64m1_t (file, label, x, 2);
 }
 
 static inline void
-print_vint32m1_t_2 (FILE *file, const char *label, vint32m1_t x)
+print_vint32m1_t_2 (FILE * file, const char *label, vint32m1_t x)
 {
   print_vint32m1_t (file, label, x, 2);
 }
 
 static inline void
-print_vint64m1_t_2 (FILE *file, const char *label, vint64m1_t x)
+print_vint64m1_t_2 (FILE * file, const char *label, vint64m1_t x)
 {
   print_vint64m1_t (file, label, x, 2);
 }
 
 static inline void
-print_vfloat32m1_t_2 (FILE *file, const char *label, vfloat32m1_t x)
+print_vfloat32m1_t_2 (FILE * file, const char *label, vfloat32m1_t x)
 {
   print_vfloat32m1_t (file, label, x, 2);
 }
 
 static inline void
-print_vfloat64m1_t_2 (FILE *file, const char *label, vfloat64m1_t x)
+print_vfloat64m1_t_2 (FILE * file, const char *label, vfloat64m1_t x)
 {
   print_vfloat64m1_t (file, label, x, 2);
 }
@@ -22893,7 +22883,7 @@ print_vfloat64m1_t_2 (FILE *file, const char *label, vfloat64m1_t x)
  * \return opposite value vector (4x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_opposite_4xf32 (const vfloat32m1_t x)     ///< vfloat32m1_t vector.
+jbm_opposite_4xf32 (const vfloat32m1_t x)       ///< vfloat32m1_t vector.
 {
   return jbm_opposite_nxf32 (x, 4);
 }
@@ -22906,7 +22896,6 @@ jbm_opposite_4xf32 (const vfloat32m1_t x)     ///< vfloat32m1_t vector.
  */
 static inline vfloat32m1_t
 jbm_reciprocal_4xf32 (const vfloat32m1_t x)     ///< vfloat32m1_t vector.
-               
 {
   return jbm_reciprocal_nxf32 (x, 4);
 }
@@ -22997,7 +22986,7 @@ jbm_rest_4xf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
  */
 static inline vfloat32m1_t
 jbm_frexp_4xf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
-                 vint32m1_t *e) ///< pointer to the extracted exponents vector.
+                 vint32m1_t * e)        ///< pointer to the extracted exponents vector.
 {
   return jbm_frexp_nxf32 (x, e, 4);
 }
@@ -23033,7 +23022,6 @@ jbm_ldexp_4xf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
  */
 static inline vbool32_t
 jbm_small_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
-          
 {
   return jbm_small_nxf32 (x, 4);
 }
@@ -23052,7 +23040,6 @@ jbm_small_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 static inline vfloat32m1_t
 jbm_modmin_4xf32 (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat32m1_t b) ///< 2nd vfloat64m1_t vector.
-             
 {
   return jbm_modmin_nxf32 (a, b, 4);
 }
@@ -28928,9 +28915,9 @@ jbm_coswc_4xf32 (const vfloat32m1_t x)
 static inline void
 jbm_sincoswc_4xf32 (const vfloat32m1_t x,
                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat32m1_t *s,
+                    vfloat32m1_t * s,
                     ///< pointer to the sin function value (4x vfloat32m1_t).
-                    vfloat32m1_t *c)
+                    vfloat32m1_t * c)
                     ///< pointer to the cos function value (4x vfloat32m1_t).
 {
   jbm_sincoswc_nxf32 (x, s, c, 4);
@@ -28967,9 +28954,9 @@ jbm_cos_4xf32 (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 static inline void
 jbm_sincos_4xf32 (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat32m1_t *s,
+                  vfloat32m1_t * s,
                   ///< pointer to the sin function value (4x vfloat32m1_t).
-                  vfloat32m1_t *c)
+                  vfloat32m1_t * c)
                   ///< pointer to the cos function value (4x vfloat32m1_t).
 {
   jbm_sincos_nxf32 (x, s, c, 4);
@@ -29277,7 +29264,7 @@ static inline vfloat32m1_t
 jbm_flux_limiter_total_4xf32 (const vfloat32m1_t d1 __attribute__((unused)),
                               ///< 1st flux limiter function parameter.
                               const vfloat32m1_t d2 __attribute__((unused)))
-                              ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return jbm_flux_limiter_total_nxf32 (d1, d2, 4);
 }
@@ -29292,7 +29279,7 @@ static inline vfloat32m1_t
 jbm_flux_limiter_null_4xf32 (const vfloat32m1_t d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
                              const vfloat32m1_t d2 __attribute__((unused)))
-                             ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return jbm_flux_limiter_null_nxf32 (d1, d2, 4);
 }
@@ -29504,7 +29491,7 @@ jbm_integral_4xf32 (vfloat32m1_t (*f) (const vfloat32m1_t, const size_t),
  * \return opposite value vector (2x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_opposite_2xf64 (const vfloat64m1_t x)     ///< vfloat64m1_t vector.
+jbm_opposite_2xf64 (const vfloat64m1_t x)       ///< vfloat64m1_t vector.
 {
   return jbm_opposite_nxf64 (x, 2);
 }
@@ -29517,7 +29504,6 @@ jbm_opposite_2xf64 (const vfloat64m1_t x)     ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_reciprocal_2xf64 (const vfloat64m1_t x)     ///< vfloat64m1_t vector.
-               
 {
   return jbm_reciprocal_nxf64 (x, 2);
 }
@@ -29608,7 +29594,7 @@ jbm_rest_2xf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
  */
 static inline vfloat64m1_t
 jbm_frexp_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                 vint64m1_t *e) ///< pointer to the extracted exponents vector.
+                 vint64m1_t * e)        ///< pointer to the extracted exponents vector.
 {
   return jbm_frexp_nxf64 (x, e, 2);
 }
@@ -29644,7 +29630,6 @@ jbm_ldexp_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vbool64_t
 jbm_small_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
-          
 {
   return jbm_small_nxf64 (x, 2);
 }
@@ -29663,7 +29648,6 @@ jbm_small_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 static inline vfloat64m1_t
 jbm_modmin_2xf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat64m1_t b) ///< 2nd vfloat64m1_t vector.
-             
 {
   return jbm_modmin_nxf64 (a, b, 2);
 }
@@ -29785,7 +29769,7 @@ jbm_v3_length_2xf64 (const vfloat64m1_t x1,
  */
 static inline vfloat64m1_t
 jbm_polynomial_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_1_nxf64 (x, p, 2);
 }
@@ -29797,7 +29781,7 @@ jbm_polynomial_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_2_nxf64 (x, p, 2);
 }
@@ -29809,7 +29793,7 @@ jbm_polynomial_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_3_nxf64 (x, p, 2);
 }
@@ -29821,7 +29805,7 @@ jbm_polynomial_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_4_nxf64 (x, p, 2);
 }
@@ -29833,7 +29817,7 @@ jbm_polynomial_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_5_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_5_nxf64 (x, p, 2);
 }
@@ -29845,7 +29829,7 @@ jbm_polynomial_5_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_6_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_6_nxf64 (x, p, 2);
 }
@@ -29857,7 +29841,7 @@ jbm_polynomial_6_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_7_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_7_nxf64 (x, p, 2);
 }
@@ -29869,7 +29853,7 @@ jbm_polynomial_7_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_8_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_8_nxf64 (x, p, 2);
 }
@@ -29881,7 +29865,7 @@ jbm_polynomial_8_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_9_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_9_nxf64 (x, p, 2);
 }
@@ -29893,7 +29877,7 @@ jbm_polynomial_9_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_10_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_10_nxf64 (x, p, 2);
 }
@@ -29905,7 +29889,7 @@ jbm_polynomial_10_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_11_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_11_nxf64 (x, p, 2);
 }
@@ -29917,7 +29901,7 @@ jbm_polynomial_11_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_12_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_12_nxf64 (x, p, 2);
 }
@@ -29929,7 +29913,7 @@ jbm_polynomial_12_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_13_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_13_nxf64 (x, p, 2);
 }
@@ -29941,7 +29925,7 @@ jbm_polynomial_13_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_14_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_14_nxf64 (x, p, 2);
 }
@@ -29953,7 +29937,7 @@ jbm_polynomial_14_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_15_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_15_nxf64 (x, p, 2);
 }
@@ -29965,7 +29949,7 @@ jbm_polynomial_15_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_16_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_16_nxf64 (x, p, 2);
 }
@@ -29977,7 +29961,7 @@ jbm_polynomial_16_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_17_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_17_nxf64 (x, p, 2);
 }
@@ -29989,7 +29973,7 @@ jbm_polynomial_17_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_18_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_18_nxf64 (x, p, 2);
 }
@@ -30001,7 +29985,7 @@ jbm_polynomial_18_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_19_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_19_nxf64 (x, p, 2);
 }
@@ -30013,7 +29997,7 @@ jbm_polynomial_19_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_20_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_20_nxf64 (x, p, 2);
 }
@@ -30025,7 +30009,7 @@ jbm_polynomial_20_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_21_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_21_nxf64 (x, p, 2);
 }
@@ -30037,7 +30021,7 @@ jbm_polynomial_21_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_22_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_22_nxf64 (x, p, 2);
 }
@@ -30049,7 +30033,7 @@ jbm_polynomial_22_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_23_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_23_nxf64 (x, p, 2);
 }
@@ -30061,7 +30045,7 @@ jbm_polynomial_23_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_24_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_24_nxf64 (x, p, 2);
 }
@@ -30073,7 +30057,7 @@ jbm_polynomial_24_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_25_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_25_nxf64 (x, p, 2);
 }
@@ -30085,7 +30069,7 @@ jbm_polynomial_25_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_26_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_26_nxf64 (x, p, 2);
 }
@@ -30097,7 +30081,7 @@ jbm_polynomial_26_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_27_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_27_nxf64 (x, p, 2);
 }
@@ -30109,7 +30093,7 @@ jbm_polynomial_27_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_28_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_28_nxf64 (x, p, 2);
 }
@@ -30121,7 +30105,7 @@ jbm_polynomial_28_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_29_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_29_nxf64 (x, p, 2);
 }
@@ -30133,7 +30117,7 @@ jbm_polynomial_29_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_1_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_1_0_nxf64 (x, p, 2);
 }
@@ -30145,7 +30129,7 @@ jbm_rational_1_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_2_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_2_0_nxf64 (x, p, 2);
 }
@@ -30157,7 +30141,7 @@ jbm_rational_2_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_2_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_2_1_nxf64 (x, p, 2);
 }
@@ -30169,7 +30153,7 @@ jbm_rational_2_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_3_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_3_0_nxf64 (x, p, 2);
 }
@@ -30181,7 +30165,7 @@ jbm_rational_3_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_3_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_3_1_nxf64 (x, p, 2);
 }
@@ -30193,7 +30177,7 @@ jbm_rational_3_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_3_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_3_2_nxf64 (x, p, 2);
 }
@@ -30205,7 +30189,7 @@ jbm_rational_3_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_4_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_4_0_nxf64 (x, p, 2);
 }
@@ -30217,7 +30201,7 @@ jbm_rational_4_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_4_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_4_1_nxf64 (x, p, 2);
 }
@@ -30229,7 +30213,7 @@ jbm_rational_4_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_4_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_4_2_nxf64 (x, p, 2);
 }
@@ -30241,7 +30225,7 @@ jbm_rational_4_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_4_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_4_3_nxf64 (x, p, 2);
 }
@@ -30253,7 +30237,7 @@ jbm_rational_4_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_5_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_5_0_nxf64 (x, p, 2);
 }
@@ -30265,7 +30249,7 @@ jbm_rational_5_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_5_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_5_1_nxf64 (x, p, 2);
 }
@@ -30277,7 +30261,7 @@ jbm_rational_5_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_5_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_5_2_nxf64 (x, p, 2);
 }
@@ -30289,7 +30273,7 @@ jbm_rational_5_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_5_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_5_3_nxf64 (x, p, 2);
 }
@@ -30301,7 +30285,7 @@ jbm_rational_5_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_5_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_5_4_nxf64 (x, p, 2);
 }
@@ -30313,7 +30297,7 @@ jbm_rational_5_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_0_nxf64 (x, p, 2);
 }
@@ -30325,7 +30309,7 @@ jbm_rational_6_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_1_nxf64 (x, p, 2);
 }
@@ -30337,7 +30321,7 @@ jbm_rational_6_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_2_nxf64 (x, p, 2);
 }
@@ -30349,7 +30333,7 @@ jbm_rational_6_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_3_nxf64 (x, p, 2);
 }
@@ -30361,7 +30345,7 @@ jbm_rational_6_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_4_nxf64 (x, p, 2);
 }
@@ -30373,7 +30357,7 @@ jbm_rational_6_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_5_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_5_nxf64 (x, p, 2);
 }
@@ -30385,7 +30369,7 @@ jbm_rational_6_5_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_0_nxf64 (x, p, 2);
 }
@@ -30397,7 +30381,7 @@ jbm_rational_7_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_1_nxf64 (x, p, 2);
 }
@@ -30409,7 +30393,7 @@ jbm_rational_7_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_2_nxf64 (x, p, 2);
 }
@@ -30421,7 +30405,7 @@ jbm_rational_7_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_3_nxf64 (x, p, 2);
 }
@@ -30433,7 +30417,7 @@ jbm_rational_7_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_4_nxf64 (x, p, 2);
 }
@@ -30445,7 +30429,7 @@ jbm_rational_7_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_5_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_5_nxf64 (x, p, 2);
 }
@@ -30457,7 +30441,7 @@ jbm_rational_7_5_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_6_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_6_nxf64 (x, p, 2);
 }
@@ -30469,7 +30453,7 @@ jbm_rational_7_6_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_0_nxf64 (x, p, 2);
 }
@@ -30481,7 +30465,7 @@ jbm_rational_8_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_1_nxf64 (x, p, 2);
 }
@@ -30493,7 +30477,7 @@ jbm_rational_8_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_2_nxf64 (x, p, 2);
 }
@@ -30505,7 +30489,7 @@ jbm_rational_8_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_3_nxf64 (x, p, 2);
 }
@@ -30517,7 +30501,7 @@ jbm_rational_8_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_4_nxf64 (x, p, 2);
 }
@@ -30529,7 +30513,7 @@ jbm_rational_8_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_5_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_5_nxf64 (x, p, 2);
 }
@@ -30541,7 +30525,7 @@ jbm_rational_8_5_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_6_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_6_nxf64 (x, p, 2);
 }
@@ -30553,7 +30537,7 @@ jbm_rational_8_6_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_7_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_7_nxf64 (x, p, 2);
 }
@@ -30565,7 +30549,7 @@ jbm_rational_8_7_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_0_nxf64 (x, p, 2);
 }
@@ -30577,7 +30561,7 @@ jbm_rational_9_0_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_1_nxf64 (x, p, 2);
 }
@@ -30589,7 +30573,7 @@ jbm_rational_9_1_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_2_nxf64 (x, p, 2);
 }
@@ -30601,7 +30585,7 @@ jbm_rational_9_2_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_3_nxf64 (x, p, 2);
 }
@@ -30613,7 +30597,7 @@ jbm_rational_9_3_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_4_nxf64 (x, p, 2);
 }
@@ -30625,7 +30609,7 @@ jbm_rational_9_4_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_5_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_5_nxf64 (x, p, 2);
 }
@@ -30637,7 +30621,7 @@ jbm_rational_9_5_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_6_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_6_nxf64 (x, p, 2);
 }
@@ -30649,7 +30633,7 @@ jbm_rational_9_6_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_7_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_7_nxf64 (x, p, 2);
 }
@@ -30661,7 +30645,7 @@ jbm_rational_9_7_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_8_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_8_nxf64 (x, p, 2);
 }
@@ -30673,7 +30657,7 @@ jbm_rational_9_8_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_0_nxf64 (x, p, 2);
 }
@@ -30685,7 +30669,7 @@ jbm_rational_10_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_1_nxf64 (x, p, 2);
 }
@@ -30697,7 +30681,7 @@ jbm_rational_10_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_2_nxf64 (x, p, 2);
 }
@@ -30709,7 +30693,7 @@ jbm_rational_10_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_3_nxf64 (x, p, 2);
 }
@@ -30721,7 +30705,7 @@ jbm_rational_10_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_4_nxf64 (x, p, 2);
 }
@@ -30733,7 +30717,7 @@ jbm_rational_10_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_5_nxf64 (x, p, 2);
 }
@@ -30745,7 +30729,7 @@ jbm_rational_10_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_6_nxf64 (x, p, 2);
 }
@@ -30757,7 +30741,7 @@ jbm_rational_10_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_7_nxf64 (x, p, 2);
 }
@@ -30769,7 +30753,7 @@ jbm_rational_10_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_8_nxf64 (x, p, 2);
 }
@@ -30781,7 +30765,7 @@ jbm_rational_10_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_9_nxf64 (x, p, 2);
 }
@@ -30793,7 +30777,7 @@ jbm_rational_10_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_0_nxf64 (x, p, 2);
 }
@@ -30805,7 +30789,7 @@ jbm_rational_11_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_1_nxf64 (x, p, 2);
 }
@@ -30817,7 +30801,7 @@ jbm_rational_11_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_2_nxf64 (x, p, 2);
 }
@@ -30829,7 +30813,7 @@ jbm_rational_11_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_3_nxf64 (x, p, 2);
 }
@@ -30841,7 +30825,7 @@ jbm_rational_11_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_4_nxf64 (x, p, 2);
 }
@@ -30853,7 +30837,7 @@ jbm_rational_11_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_5_nxf64 (x, p, 2);
 }
@@ -30865,7 +30849,7 @@ jbm_rational_11_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_6_nxf64 (x, p, 2);
 }
@@ -30877,7 +30861,7 @@ jbm_rational_11_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_7_nxf64 (x, p, 2);
 }
@@ -30889,7 +30873,7 @@ jbm_rational_11_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_8_nxf64 (x, p, 2);
 }
@@ -30901,7 +30885,7 @@ jbm_rational_11_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_9_nxf64 (x, p, 2);
 }
@@ -30913,7 +30897,7 @@ jbm_rational_11_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_11_10_nxf64 (x, p, 2);
 }
@@ -30925,7 +30909,7 @@ jbm_rational_11_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_0_nxf64 (x, p, 2);
 }
@@ -30937,7 +30921,7 @@ jbm_rational_12_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_1_nxf64 (x, p, 2);
 }
@@ -30949,7 +30933,7 @@ jbm_rational_12_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_2_nxf64 (x, p, 2);
 }
@@ -30961,7 +30945,7 @@ jbm_rational_12_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_3_nxf64 (x, p, 2);
 }
@@ -30973,7 +30957,7 @@ jbm_rational_12_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_4_nxf64 (x, p, 2);
 }
@@ -30985,7 +30969,7 @@ jbm_rational_12_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_5_nxf64 (x, p, 2);
 }
@@ -30997,7 +30981,7 @@ jbm_rational_12_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_6_nxf64 (x, p, 2);
 }
@@ -31009,7 +30993,7 @@ jbm_rational_12_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_7_nxf64 (x, p, 2);
 }
@@ -31021,7 +31005,7 @@ jbm_rational_12_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_8_nxf64 (x, p, 2);
 }
@@ -31033,7 +31017,7 @@ jbm_rational_12_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_9_nxf64 (x, p, 2);
 }
@@ -31045,7 +31029,7 @@ jbm_rational_12_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_12_10_nxf64 (x, p, 2);
 }
@@ -31057,7 +31041,7 @@ jbm_rational_12_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_12_11_nxf64 (x, p, 2);
 }
@@ -31069,7 +31053,7 @@ jbm_rational_12_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_0_nxf64 (x, p, 2);
 }
@@ -31081,7 +31065,7 @@ jbm_rational_13_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_1_nxf64 (x, p, 2);
 }
@@ -31093,7 +31077,7 @@ jbm_rational_13_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_2_nxf64 (x, p, 2);
 }
@@ -31105,7 +31089,7 @@ jbm_rational_13_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_3_nxf64 (x, p, 2);
 }
@@ -31117,7 +31101,7 @@ jbm_rational_13_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_4_nxf64 (x, p, 2);
 }
@@ -31129,7 +31113,7 @@ jbm_rational_13_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_5_nxf64 (x, p, 2);
 }
@@ -31141,7 +31125,7 @@ jbm_rational_13_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_6_nxf64 (x, p, 2);
 }
@@ -31153,7 +31137,7 @@ jbm_rational_13_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_7_nxf64 (x, p, 2);
 }
@@ -31165,7 +31149,7 @@ jbm_rational_13_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_8_nxf64 (x, p, 2);
 }
@@ -31177,7 +31161,7 @@ jbm_rational_13_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_9_nxf64 (x, p, 2);
 }
@@ -31189,7 +31173,7 @@ jbm_rational_13_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_13_10_nxf64 (x, p, 2);
 }
@@ -31201,7 +31185,7 @@ jbm_rational_13_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_13_11_nxf64 (x, p, 2);
 }
@@ -31213,7 +31197,7 @@ jbm_rational_13_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_13_12_nxf64 (x, p, 2);
 }
@@ -31225,7 +31209,7 @@ jbm_rational_13_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_0_nxf64 (x, p, 2);
 }
@@ -31237,7 +31221,7 @@ jbm_rational_14_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_1_nxf64 (x, p, 2);
 }
@@ -31249,7 +31233,7 @@ jbm_rational_14_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_2_nxf64 (x, p, 2);
 }
@@ -31261,7 +31245,7 @@ jbm_rational_14_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_3_nxf64 (x, p, 2);
 }
@@ -31273,7 +31257,7 @@ jbm_rational_14_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_4_nxf64 (x, p, 2);
 }
@@ -31285,7 +31269,7 @@ jbm_rational_14_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_5_nxf64 (x, p, 2);
 }
@@ -31297,7 +31281,7 @@ jbm_rational_14_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_6_nxf64 (x, p, 2);
 }
@@ -31309,7 +31293,7 @@ jbm_rational_14_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_7_nxf64 (x, p, 2);
 }
@@ -31321,7 +31305,7 @@ jbm_rational_14_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_8_nxf64 (x, p, 2);
 }
@@ -31333,7 +31317,7 @@ jbm_rational_14_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_9_nxf64 (x, p, 2);
 }
@@ -31345,7 +31329,7 @@ jbm_rational_14_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_14_10_nxf64 (x, p, 2);
 }
@@ -31357,7 +31341,7 @@ jbm_rational_14_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_14_11_nxf64 (x, p, 2);
 }
@@ -31369,7 +31353,7 @@ jbm_rational_14_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_14_12_nxf64 (x, p, 2);
 }
@@ -31381,7 +31365,7 @@ jbm_rational_14_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_14_13_nxf64 (x, p, 2);
 }
@@ -31393,7 +31377,7 @@ jbm_rational_14_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_0_nxf64 (x, p, 2);
 }
@@ -31405,7 +31389,7 @@ jbm_rational_15_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_1_nxf64 (x, p, 2);
 }
@@ -31417,7 +31401,7 @@ jbm_rational_15_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_2_nxf64 (x, p, 2);
 }
@@ -31429,7 +31413,7 @@ jbm_rational_15_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_3_nxf64 (x, p, 2);
 }
@@ -31441,7 +31425,7 @@ jbm_rational_15_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_4_nxf64 (x, p, 2);
 }
@@ -31453,7 +31437,7 @@ jbm_rational_15_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_5_nxf64 (x, p, 2);
 }
@@ -31465,7 +31449,7 @@ jbm_rational_15_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_6_nxf64 (x, p, 2);
 }
@@ -31477,7 +31461,7 @@ jbm_rational_15_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_7_nxf64 (x, p, 2);
 }
@@ -31489,7 +31473,7 @@ jbm_rational_15_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_8_nxf64 (x, p, 2);
 }
@@ -31501,7 +31485,7 @@ jbm_rational_15_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_9_nxf64 (x, p, 2);
 }
@@ -31513,7 +31497,7 @@ jbm_rational_15_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_15_10_nxf64 (x, p, 2);
 }
@@ -31525,7 +31509,7 @@ jbm_rational_15_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_15_11_nxf64 (x, p, 2);
 }
@@ -31537,7 +31521,7 @@ jbm_rational_15_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_15_12_nxf64 (x, p, 2);
 }
@@ -31549,7 +31533,7 @@ jbm_rational_15_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_15_13_nxf64 (x, p, 2);
 }
@@ -31561,7 +31545,7 @@ jbm_rational_15_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_15_14_nxf64 (x, p, 2);
 }
@@ -31573,7 +31557,7 @@ jbm_rational_15_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_0_nxf64 (x, p, 2);
 }
@@ -31585,7 +31569,7 @@ jbm_rational_16_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_1_nxf64 (x, p, 2);
 }
@@ -31597,7 +31581,7 @@ jbm_rational_16_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_2_nxf64 (x, p, 2);
 }
@@ -31609,7 +31593,7 @@ jbm_rational_16_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_3_nxf64 (x, p, 2);
 }
@@ -31621,7 +31605,7 @@ jbm_rational_16_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_4_nxf64 (x, p, 2);
 }
@@ -31633,7 +31617,7 @@ jbm_rational_16_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_5_nxf64 (x, p, 2);
 }
@@ -31645,7 +31629,7 @@ jbm_rational_16_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_6_nxf64 (x, p, 2);
 }
@@ -31657,7 +31641,7 @@ jbm_rational_16_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_7_nxf64 (x, p, 2);
 }
@@ -31669,7 +31653,7 @@ jbm_rational_16_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_8_nxf64 (x, p, 2);
 }
@@ -31681,7 +31665,7 @@ jbm_rational_16_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_9_nxf64 (x, p, 2);
 }
@@ -31693,7 +31677,7 @@ jbm_rational_16_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_10_nxf64 (x, p, 2);
 }
@@ -31705,7 +31689,7 @@ jbm_rational_16_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_11_nxf64 (x, p, 2);
 }
@@ -31717,7 +31701,7 @@ jbm_rational_16_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_12_nxf64 (x, p, 2);
 }
@@ -31729,7 +31713,7 @@ jbm_rational_16_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_13_nxf64 (x, p, 2);
 }
@@ -31741,7 +31725,7 @@ jbm_rational_16_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_14_nxf64 (x, p, 2);
 }
@@ -31753,7 +31737,7 @@ jbm_rational_16_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_15_nxf64 (x, p, 2);
 }
@@ -31765,7 +31749,7 @@ jbm_rational_16_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_0_nxf64 (x, p, 2);
 }
@@ -31777,7 +31761,7 @@ jbm_rational_17_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_1_nxf64 (x, p, 2);
 }
@@ -31789,7 +31773,7 @@ jbm_rational_17_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_2_nxf64 (x, p, 2);
 }
@@ -31801,7 +31785,7 @@ jbm_rational_17_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_3_nxf64 (x, p, 2);
 }
@@ -31813,7 +31797,7 @@ jbm_rational_17_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_4_nxf64 (x, p, 2);
 }
@@ -31825,7 +31809,7 @@ jbm_rational_17_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_5_nxf64 (x, p, 2);
 }
@@ -31837,7 +31821,7 @@ jbm_rational_17_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_6_nxf64 (x, p, 2);
 }
@@ -31849,7 +31833,7 @@ jbm_rational_17_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_7_nxf64 (x, p, 2);
 }
@@ -31861,7 +31845,7 @@ jbm_rational_17_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_8_nxf64 (x, p, 2);
 }
@@ -31873,7 +31857,7 @@ jbm_rational_17_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_9_nxf64 (x, p, 2);
 }
@@ -31885,7 +31869,7 @@ jbm_rational_17_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_10_nxf64 (x, p, 2);
 }
@@ -31897,7 +31881,7 @@ jbm_rational_17_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_11_nxf64 (x, p, 2);
 }
@@ -31909,7 +31893,7 @@ jbm_rational_17_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_12_nxf64 (x, p, 2);
 }
@@ -31921,7 +31905,7 @@ jbm_rational_17_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_13_nxf64 (x, p, 2);
 }
@@ -31933,7 +31917,7 @@ jbm_rational_17_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_14_nxf64 (x, p, 2);
 }
@@ -31945,7 +31929,7 @@ jbm_rational_17_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_15_nxf64 (x, p, 2);
 }
@@ -31957,7 +31941,7 @@ jbm_rational_17_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_16_nxf64 (x, p, 2);
 }
@@ -31969,7 +31953,7 @@ jbm_rational_17_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_0_nxf64 (x, p, 2);
 }
@@ -31981,7 +31965,7 @@ jbm_rational_18_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_1_nxf64 (x, p, 2);
 }
@@ -31993,7 +31977,7 @@ jbm_rational_18_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_2_nxf64 (x, p, 2);
 }
@@ -32005,7 +31989,7 @@ jbm_rational_18_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_3_nxf64 (x, p, 2);
 }
@@ -32017,7 +32001,7 @@ jbm_rational_18_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_4_nxf64 (x, p, 2);
 }
@@ -32029,7 +32013,7 @@ jbm_rational_18_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_5_nxf64 (x, p, 2);
 }
@@ -32041,7 +32025,7 @@ jbm_rational_18_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_6_nxf64 (x, p, 2);
 }
@@ -32053,7 +32037,7 @@ jbm_rational_18_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_7_nxf64 (x, p, 2);
 }
@@ -32065,7 +32049,7 @@ jbm_rational_18_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_8_nxf64 (x, p, 2);
 }
@@ -32077,7 +32061,7 @@ jbm_rational_18_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_9_nxf64 (x, p, 2);
 }
@@ -32089,7 +32073,7 @@ jbm_rational_18_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_10_nxf64 (x, p, 2);
 }
@@ -32101,7 +32085,7 @@ jbm_rational_18_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_11_nxf64 (x, p, 2);
 }
@@ -32113,7 +32097,7 @@ jbm_rational_18_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_12_nxf64 (x, p, 2);
 }
@@ -32125,7 +32109,7 @@ jbm_rational_18_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_13_nxf64 (x, p, 2);
 }
@@ -32137,7 +32121,7 @@ jbm_rational_18_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_14_nxf64 (x, p, 2);
 }
@@ -32149,7 +32133,7 @@ jbm_rational_18_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_15_nxf64 (x, p, 2);
 }
@@ -32161,7 +32145,7 @@ jbm_rational_18_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_16_nxf64 (x, p, 2);
 }
@@ -32173,7 +32157,7 @@ jbm_rational_18_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_17_nxf64 (x, p, 2);
 }
@@ -32185,7 +32169,7 @@ jbm_rational_18_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_0_nxf64 (x, p, 2);
 }
@@ -32197,7 +32181,7 @@ jbm_rational_19_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_1_nxf64 (x, p, 2);
 }
@@ -32209,7 +32193,7 @@ jbm_rational_19_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_2_nxf64 (x, p, 2);
 }
@@ -32221,7 +32205,7 @@ jbm_rational_19_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_3_nxf64 (x, p, 2);
 }
@@ -32233,7 +32217,7 @@ jbm_rational_19_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_4_nxf64 (x, p, 2);
 }
@@ -32245,7 +32229,7 @@ jbm_rational_19_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_5_nxf64 (x, p, 2);
 }
@@ -32257,7 +32241,7 @@ jbm_rational_19_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_6_nxf64 (x, p, 2);
 }
@@ -32269,7 +32253,7 @@ jbm_rational_19_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_7_nxf64 (x, p, 2);
 }
@@ -32281,7 +32265,7 @@ jbm_rational_19_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_8_nxf64 (x, p, 2);
 }
@@ -32293,7 +32277,7 @@ jbm_rational_19_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_9_nxf64 (x, p, 2);
 }
@@ -32305,7 +32289,7 @@ jbm_rational_19_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_10_nxf64 (x, p, 2);
 }
@@ -32317,7 +32301,7 @@ jbm_rational_19_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_11_nxf64 (x, p, 2);
 }
@@ -32329,7 +32313,7 @@ jbm_rational_19_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_12_nxf64 (x, p, 2);
 }
@@ -32341,7 +32325,7 @@ jbm_rational_19_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_13_nxf64 (x, p, 2);
 }
@@ -32353,7 +32337,7 @@ jbm_rational_19_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_14_nxf64 (x, p, 2);
 }
@@ -32365,7 +32349,7 @@ jbm_rational_19_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_15_nxf64 (x, p, 2);
 }
@@ -32377,7 +32361,7 @@ jbm_rational_19_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_16_nxf64 (x, p, 2);
 }
@@ -32389,7 +32373,7 @@ jbm_rational_19_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_17_nxf64 (x, p, 2);
 }
@@ -32401,7 +32385,7 @@ jbm_rational_19_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_18_nxf64 (x, p, 2);
 }
@@ -32413,7 +32397,7 @@ jbm_rational_19_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_0_nxf64 (x, p, 2);
 }
@@ -32425,7 +32409,7 @@ jbm_rational_20_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_1_nxf64 (x, p, 2);
 }
@@ -32437,7 +32421,7 @@ jbm_rational_20_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_2_nxf64 (x, p, 2);
 }
@@ -32449,7 +32433,7 @@ jbm_rational_20_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_3_nxf64 (x, p, 2);
 }
@@ -32461,7 +32445,7 @@ jbm_rational_20_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_4_nxf64 (x, p, 2);
 }
@@ -32473,7 +32457,7 @@ jbm_rational_20_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_5_nxf64 (x, p, 2);
 }
@@ -32485,7 +32469,7 @@ jbm_rational_20_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_6_nxf64 (x, p, 2);
 }
@@ -32497,7 +32481,7 @@ jbm_rational_20_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_7_nxf64 (x, p, 2);
 }
@@ -32509,7 +32493,7 @@ jbm_rational_20_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_8_nxf64 (x, p, 2);
 }
@@ -32521,7 +32505,7 @@ jbm_rational_20_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_9_nxf64 (x, p, 2);
 }
@@ -32533,7 +32517,7 @@ jbm_rational_20_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_10_nxf64 (x, p, 2);
 }
@@ -32545,7 +32529,7 @@ jbm_rational_20_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_11_nxf64 (x, p, 2);
 }
@@ -32557,7 +32541,7 @@ jbm_rational_20_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_12_nxf64 (x, p, 2);
 }
@@ -32569,7 +32553,7 @@ jbm_rational_20_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_13_nxf64 (x, p, 2);
 }
@@ -32581,7 +32565,7 @@ jbm_rational_20_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_14_nxf64 (x, p, 2);
 }
@@ -32593,7 +32577,7 @@ jbm_rational_20_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_15_nxf64 (x, p, 2);
 }
@@ -32605,7 +32589,7 @@ jbm_rational_20_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_16_nxf64 (x, p, 2);
 }
@@ -32617,7 +32601,7 @@ jbm_rational_20_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_17_nxf64 (x, p, 2);
 }
@@ -32629,7 +32613,7 @@ jbm_rational_20_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_18_nxf64 (x, p, 2);
 }
@@ -32641,7 +32625,7 @@ jbm_rational_20_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_19_nxf64 (x, p, 2);
 }
@@ -32653,7 +32637,7 @@ jbm_rational_20_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_0_nxf64 (x, p, 2);
 }
@@ -32665,7 +32649,7 @@ jbm_rational_21_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_1_nxf64 (x, p, 2);
 }
@@ -32677,7 +32661,7 @@ jbm_rational_21_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_2_nxf64 (x, p, 2);
 }
@@ -32689,7 +32673,7 @@ jbm_rational_21_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_3_nxf64 (x, p, 2);
 }
@@ -32701,7 +32685,7 @@ jbm_rational_21_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_4_nxf64 (x, p, 2);
 }
@@ -32713,7 +32697,7 @@ jbm_rational_21_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_5_nxf64 (x, p, 2);
 }
@@ -32725,7 +32709,7 @@ jbm_rational_21_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_6_nxf64 (x, p, 2);
 }
@@ -32737,7 +32721,7 @@ jbm_rational_21_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_7_nxf64 (x, p, 2);
 }
@@ -32749,7 +32733,7 @@ jbm_rational_21_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_8_nxf64 (x, p, 2);
 }
@@ -32761,7 +32745,7 @@ jbm_rational_21_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_9_nxf64 (x, p, 2);
 }
@@ -32773,7 +32757,7 @@ jbm_rational_21_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_10_nxf64 (x, p, 2);
 }
@@ -32785,7 +32769,7 @@ jbm_rational_21_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_11_nxf64 (x, p, 2);
 }
@@ -32797,7 +32781,7 @@ jbm_rational_21_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_12_nxf64 (x, p, 2);
 }
@@ -32809,7 +32793,7 @@ jbm_rational_21_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_13_nxf64 (x, p, 2);
 }
@@ -32821,7 +32805,7 @@ jbm_rational_21_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_14_nxf64 (x, p, 2);
 }
@@ -32833,7 +32817,7 @@ jbm_rational_21_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_15_nxf64 (x, p, 2);
 }
@@ -32845,7 +32829,7 @@ jbm_rational_21_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_16_nxf64 (x, p, 2);
 }
@@ -32857,7 +32841,7 @@ jbm_rational_21_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_17_nxf64 (x, p, 2);
 }
@@ -32869,7 +32853,7 @@ jbm_rational_21_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_18_nxf64 (x, p, 2);
 }
@@ -32881,7 +32865,7 @@ jbm_rational_21_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_19_nxf64 (x, p, 2);
 }
@@ -32893,7 +32877,7 @@ jbm_rational_21_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_20_nxf64 (x, p, 2);
 }
@@ -32905,7 +32889,7 @@ jbm_rational_21_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_0_nxf64 (x, p, 2);
 }
@@ -32917,7 +32901,7 @@ jbm_rational_22_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_1_nxf64 (x, p, 2);
 }
@@ -32929,7 +32913,7 @@ jbm_rational_22_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_2_nxf64 (x, p, 2);
 }
@@ -32941,7 +32925,7 @@ jbm_rational_22_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_3_nxf64 (x, p, 2);
 }
@@ -32953,7 +32937,7 @@ jbm_rational_22_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_4_nxf64 (x, p, 2);
 }
@@ -32965,7 +32949,7 @@ jbm_rational_22_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_5_nxf64 (x, p, 2);
 }
@@ -32977,7 +32961,7 @@ jbm_rational_22_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_6_nxf64 (x, p, 2);
 }
@@ -32989,7 +32973,7 @@ jbm_rational_22_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_7_nxf64 (x, p, 2);
 }
@@ -33001,7 +32985,7 @@ jbm_rational_22_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_8_nxf64 (x, p, 2);
 }
@@ -33013,7 +32997,7 @@ jbm_rational_22_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_9_nxf64 (x, p, 2);
 }
@@ -33025,7 +33009,7 @@ jbm_rational_22_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_10_nxf64 (x, p, 2);
 }
@@ -33037,7 +33021,7 @@ jbm_rational_22_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_11_nxf64 (x, p, 2);
 }
@@ -33049,7 +33033,7 @@ jbm_rational_22_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_12_nxf64 (x, p, 2);
 }
@@ -33061,7 +33045,7 @@ jbm_rational_22_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_13_nxf64 (x, p, 2);
 }
@@ -33073,7 +33057,7 @@ jbm_rational_22_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_14_nxf64 (x, p, 2);
 }
@@ -33085,7 +33069,7 @@ jbm_rational_22_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_15_nxf64 (x, p, 2);
 }
@@ -33097,7 +33081,7 @@ jbm_rational_22_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_16_nxf64 (x, p, 2);
 }
@@ -33109,7 +33093,7 @@ jbm_rational_22_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_17_nxf64 (x, p, 2);
 }
@@ -33121,7 +33105,7 @@ jbm_rational_22_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_18_nxf64 (x, p, 2);
 }
@@ -33133,7 +33117,7 @@ jbm_rational_22_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_19_nxf64 (x, p, 2);
 }
@@ -33145,7 +33129,7 @@ jbm_rational_22_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_20_nxf64 (x, p, 2);
 }
@@ -33157,7 +33141,7 @@ jbm_rational_22_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_21_nxf64 (x, p, 2);
 }
@@ -33169,7 +33153,7 @@ jbm_rational_22_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_0_nxf64 (x, p, 2);
 }
@@ -33181,7 +33165,7 @@ jbm_rational_23_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_1_nxf64 (x, p, 2);
 }
@@ -33193,7 +33177,7 @@ jbm_rational_23_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_2_nxf64 (x, p, 2);
 }
@@ -33205,7 +33189,7 @@ jbm_rational_23_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_3_nxf64 (x, p, 2);
 }
@@ -33217,7 +33201,7 @@ jbm_rational_23_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_4_nxf64 (x, p, 2);
 }
@@ -33229,7 +33213,7 @@ jbm_rational_23_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_5_nxf64 (x, p, 2);
 }
@@ -33241,7 +33225,7 @@ jbm_rational_23_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_6_nxf64 (x, p, 2);
 }
@@ -33253,7 +33237,7 @@ jbm_rational_23_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_7_nxf64 (x, p, 2);
 }
@@ -33265,7 +33249,7 @@ jbm_rational_23_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_8_nxf64 (x, p, 2);
 }
@@ -33277,7 +33261,7 @@ jbm_rational_23_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_9_nxf64 (x, p, 2);
 }
@@ -33289,7 +33273,7 @@ jbm_rational_23_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_10_nxf64 (x, p, 2);
 }
@@ -33301,7 +33285,7 @@ jbm_rational_23_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_11_nxf64 (x, p, 2);
 }
@@ -33313,7 +33297,7 @@ jbm_rational_23_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_12_nxf64 (x, p, 2);
 }
@@ -33325,7 +33309,7 @@ jbm_rational_23_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_13_nxf64 (x, p, 2);
 }
@@ -33337,7 +33321,7 @@ jbm_rational_23_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_14_nxf64 (x, p, 2);
 }
@@ -33349,7 +33333,7 @@ jbm_rational_23_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_15_nxf64 (x, p, 2);
 }
@@ -33361,7 +33345,7 @@ jbm_rational_23_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_16_nxf64 (x, p, 2);
 }
@@ -33373,7 +33357,7 @@ jbm_rational_23_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_17_nxf64 (x, p, 2);
 }
@@ -33385,7 +33369,7 @@ jbm_rational_23_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_18_nxf64 (x, p, 2);
 }
@@ -33397,7 +33381,7 @@ jbm_rational_23_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_19_nxf64 (x, p, 2);
 }
@@ -33409,7 +33393,7 @@ jbm_rational_23_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_20_nxf64 (x, p, 2);
 }
@@ -33421,7 +33405,7 @@ jbm_rational_23_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_21_nxf64 (x, p, 2);
 }
@@ -33433,7 +33417,7 @@ jbm_rational_23_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_22_nxf64 (x, p, 2);
 }
@@ -33445,7 +33429,7 @@ jbm_rational_23_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_0_nxf64 (x, p, 2);
 }
@@ -33457,7 +33441,7 @@ jbm_rational_24_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_1_nxf64 (x, p, 2);
 }
@@ -33469,7 +33453,7 @@ jbm_rational_24_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_2_nxf64 (x, p, 2);
 }
@@ -33481,7 +33465,7 @@ jbm_rational_24_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_3_nxf64 (x, p, 2);
 }
@@ -33493,7 +33477,7 @@ jbm_rational_24_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_4_nxf64 (x, p, 2);
 }
@@ -33505,7 +33489,7 @@ jbm_rational_24_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_5_nxf64 (x, p, 2);
 }
@@ -33517,7 +33501,7 @@ jbm_rational_24_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_6_nxf64 (x, p, 2);
 }
@@ -33529,7 +33513,7 @@ jbm_rational_24_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_7_nxf64 (x, p, 2);
 }
@@ -33541,7 +33525,7 @@ jbm_rational_24_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_8_nxf64 (x, p, 2);
 }
@@ -33553,7 +33537,7 @@ jbm_rational_24_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_9_nxf64 (x, p, 2);
 }
@@ -33565,7 +33549,7 @@ jbm_rational_24_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_10_nxf64 (x, p, 2);
 }
@@ -33577,7 +33561,7 @@ jbm_rational_24_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_11_nxf64 (x, p, 2);
 }
@@ -33589,7 +33573,7 @@ jbm_rational_24_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_12_nxf64 (x, p, 2);
 }
@@ -33601,7 +33585,7 @@ jbm_rational_24_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_13_nxf64 (x, p, 2);
 }
@@ -33613,7 +33597,7 @@ jbm_rational_24_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_14_nxf64 (x, p, 2);
 }
@@ -33625,7 +33609,7 @@ jbm_rational_24_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_15_nxf64 (x, p, 2);
 }
@@ -33637,7 +33621,7 @@ jbm_rational_24_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_16_nxf64 (x, p, 2);
 }
@@ -33649,7 +33633,7 @@ jbm_rational_24_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_17_nxf64 (x, p, 2);
 }
@@ -33661,7 +33645,7 @@ jbm_rational_24_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_18_nxf64 (x, p, 2);
 }
@@ -33673,7 +33657,7 @@ jbm_rational_24_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_19_nxf64 (x, p, 2);
 }
@@ -33685,7 +33669,7 @@ jbm_rational_24_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_20_nxf64 (x, p, 2);
 }
@@ -33697,7 +33681,7 @@ jbm_rational_24_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_21_nxf64 (x, p, 2);
 }
@@ -33709,7 +33693,7 @@ jbm_rational_24_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_22_nxf64 (x, p, 2);
 }
@@ -33721,7 +33705,7 @@ jbm_rational_24_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_23_nxf64 (x, p, 2);
 }
@@ -33733,7 +33717,7 @@ jbm_rational_24_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_0_nxf64 (x, p, 2);
 }
@@ -33745,7 +33729,7 @@ jbm_rational_25_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_1_nxf64 (x, p, 2);
 }
@@ -33757,7 +33741,7 @@ jbm_rational_25_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_2_nxf64 (x, p, 2);
 }
@@ -33769,7 +33753,7 @@ jbm_rational_25_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_3_nxf64 (x, p, 2);
 }
@@ -33781,7 +33765,7 @@ jbm_rational_25_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_4_nxf64 (x, p, 2);
 }
@@ -33793,7 +33777,7 @@ jbm_rational_25_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_5_nxf64 (x, p, 2);
 }
@@ -33805,7 +33789,7 @@ jbm_rational_25_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_6_nxf64 (x, p, 2);
 }
@@ -33817,7 +33801,7 @@ jbm_rational_25_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_7_nxf64 (x, p, 2);
 }
@@ -33829,7 +33813,7 @@ jbm_rational_25_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_8_nxf64 (x, p, 2);
 }
@@ -33841,7 +33825,7 @@ jbm_rational_25_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_9_nxf64 (x, p, 2);
 }
@@ -33853,7 +33837,7 @@ jbm_rational_25_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_10_nxf64 (x, p, 2);
 }
@@ -33865,7 +33849,7 @@ jbm_rational_25_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_11_nxf64 (x, p, 2);
 }
@@ -33877,7 +33861,7 @@ jbm_rational_25_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_12_nxf64 (x, p, 2);
 }
@@ -33889,7 +33873,7 @@ jbm_rational_25_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_13_nxf64 (x, p, 2);
 }
@@ -33901,7 +33885,7 @@ jbm_rational_25_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_14_nxf64 (x, p, 2);
 }
@@ -33913,7 +33897,7 @@ jbm_rational_25_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_15_nxf64 (x, p, 2);
 }
@@ -33925,7 +33909,7 @@ jbm_rational_25_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_16_nxf64 (x, p, 2);
 }
@@ -33937,7 +33921,7 @@ jbm_rational_25_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_17_nxf64 (x, p, 2);
 }
@@ -33949,7 +33933,7 @@ jbm_rational_25_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_18_nxf64 (x, p, 2);
 }
@@ -33961,7 +33945,7 @@ jbm_rational_25_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_19_nxf64 (x, p, 2);
 }
@@ -33973,7 +33957,7 @@ jbm_rational_25_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_20_nxf64 (x, p, 2);
 }
@@ -33985,7 +33969,7 @@ jbm_rational_25_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_21_nxf64 (x, p, 2);
 }
@@ -33997,7 +33981,7 @@ jbm_rational_25_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_22_nxf64 (x, p, 2);
 }
@@ -34009,7 +33993,7 @@ jbm_rational_25_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_23_nxf64 (x, p, 2);
 }
@@ -34021,7 +34005,7 @@ jbm_rational_25_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_24_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_24_nxf64 (x, p, 2);
 }
@@ -34033,7 +34017,7 @@ jbm_rational_25_24_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_0_nxf64 (x, p, 2);
 }
@@ -34045,7 +34029,7 @@ jbm_rational_26_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_1_nxf64 (x, p, 2);
 }
@@ -34057,7 +34041,7 @@ jbm_rational_26_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_2_nxf64 (x, p, 2);
 }
@@ -34069,7 +34053,7 @@ jbm_rational_26_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_3_nxf64 (x, p, 2);
 }
@@ -34081,7 +34065,7 @@ jbm_rational_26_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_4_nxf64 (x, p, 2);
 }
@@ -34093,7 +34077,7 @@ jbm_rational_26_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_5_nxf64 (x, p, 2);
 }
@@ -34105,7 +34089,7 @@ jbm_rational_26_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_6_nxf64 (x, p, 2);
 }
@@ -34117,7 +34101,7 @@ jbm_rational_26_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_7_nxf64 (x, p, 2);
 }
@@ -34129,7 +34113,7 @@ jbm_rational_26_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_8_nxf64 (x, p, 2);
 }
@@ -34141,7 +34125,7 @@ jbm_rational_26_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_9_nxf64 (x, p, 2);
 }
@@ -34153,7 +34137,7 @@ jbm_rational_26_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_10_nxf64 (x, p, 2);
 }
@@ -34165,7 +34149,7 @@ jbm_rational_26_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_11_nxf64 (x, p, 2);
 }
@@ -34177,7 +34161,7 @@ jbm_rational_26_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_12_nxf64 (x, p, 2);
 }
@@ -34189,7 +34173,7 @@ jbm_rational_26_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_13_nxf64 (x, p, 2);
 }
@@ -34201,7 +34185,7 @@ jbm_rational_26_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_14_nxf64 (x, p, 2);
 }
@@ -34213,7 +34197,7 @@ jbm_rational_26_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_15_nxf64 (x, p, 2);
 }
@@ -34225,7 +34209,7 @@ jbm_rational_26_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_16_nxf64 (x, p, 2);
 }
@@ -34237,7 +34221,7 @@ jbm_rational_26_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_17_nxf64 (x, p, 2);
 }
@@ -34249,7 +34233,7 @@ jbm_rational_26_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_18_nxf64 (x, p, 2);
 }
@@ -34261,7 +34245,7 @@ jbm_rational_26_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_19_nxf64 (x, p, 2);
 }
@@ -34273,7 +34257,7 @@ jbm_rational_26_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_20_nxf64 (x, p, 2);
 }
@@ -34285,7 +34269,7 @@ jbm_rational_26_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_21_nxf64 (x, p, 2);
 }
@@ -34297,7 +34281,7 @@ jbm_rational_26_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_22_nxf64 (x, p, 2);
 }
@@ -34309,7 +34293,7 @@ jbm_rational_26_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_23_nxf64 (x, p, 2);
 }
@@ -34321,7 +34305,7 @@ jbm_rational_26_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_24_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_24_nxf64 (x, p, 2);
 }
@@ -34333,7 +34317,7 @@ jbm_rational_26_24_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_25_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_25_nxf64 (x, p, 2);
 }
@@ -34345,7 +34329,7 @@ jbm_rational_26_25_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_0_nxf64 (x, p, 2);
 }
@@ -34357,7 +34341,7 @@ jbm_rational_27_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_1_nxf64 (x, p, 2);
 }
@@ -34369,7 +34353,7 @@ jbm_rational_27_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_2_nxf64 (x, p, 2);
 }
@@ -34381,7 +34365,7 @@ jbm_rational_27_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_3_nxf64 (x, p, 2);
 }
@@ -34393,7 +34377,7 @@ jbm_rational_27_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_4_nxf64 (x, p, 2);
 }
@@ -34405,7 +34389,7 @@ jbm_rational_27_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_5_nxf64 (x, p, 2);
 }
@@ -34417,7 +34401,7 @@ jbm_rational_27_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_6_nxf64 (x, p, 2);
 }
@@ -34429,7 +34413,7 @@ jbm_rational_27_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_7_nxf64 (x, p, 2);
 }
@@ -34441,7 +34425,7 @@ jbm_rational_27_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_8_nxf64 (x, p, 2);
 }
@@ -34453,7 +34437,7 @@ jbm_rational_27_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_9_nxf64 (x, p, 2);
 }
@@ -34465,7 +34449,7 @@ jbm_rational_27_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_10_nxf64 (x, p, 2);
 }
@@ -34477,7 +34461,7 @@ jbm_rational_27_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_11_nxf64 (x, p, 2);
 }
@@ -34489,7 +34473,7 @@ jbm_rational_27_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_12_nxf64 (x, p, 2);
 }
@@ -34501,7 +34485,7 @@ jbm_rational_27_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_13_nxf64 (x, p, 2);
 }
@@ -34513,7 +34497,7 @@ jbm_rational_27_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_14_nxf64 (x, p, 2);
 }
@@ -34525,7 +34509,7 @@ jbm_rational_27_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_15_nxf64 (x, p, 2);
 }
@@ -34537,7 +34521,7 @@ jbm_rational_27_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_16_nxf64 (x, p, 2);
 }
@@ -34549,7 +34533,7 @@ jbm_rational_27_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_17_nxf64 (x, p, 2);
 }
@@ -34561,7 +34545,7 @@ jbm_rational_27_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_18_nxf64 (x, p, 2);
 }
@@ -34573,7 +34557,7 @@ jbm_rational_27_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_19_nxf64 (x, p, 2);
 }
@@ -34585,7 +34569,7 @@ jbm_rational_27_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_20_nxf64 (x, p, 2);
 }
@@ -34597,7 +34581,7 @@ jbm_rational_27_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_21_nxf64 (x, p, 2);
 }
@@ -34609,7 +34593,7 @@ jbm_rational_27_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_22_nxf64 (x, p, 2);
 }
@@ -34621,7 +34605,7 @@ jbm_rational_27_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_23_nxf64 (x, p, 2);
 }
@@ -34633,7 +34617,7 @@ jbm_rational_27_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_24_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_24_nxf64 (x, p, 2);
 }
@@ -34645,7 +34629,7 @@ jbm_rational_27_24_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_25_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_25_nxf64 (x, p, 2);
 }
@@ -34657,7 +34641,7 @@ jbm_rational_27_25_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_26_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_26_nxf64 (x, p, 2);
 }
@@ -34669,7 +34653,7 @@ jbm_rational_27_26_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_0_nxf64 (x, p, 2);
 }
@@ -34681,7 +34665,7 @@ jbm_rational_28_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_1_nxf64 (x, p, 2);
 }
@@ -34693,7 +34677,7 @@ jbm_rational_28_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_2_nxf64 (x, p, 2);
 }
@@ -34705,7 +34689,7 @@ jbm_rational_28_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_3_nxf64 (x, p, 2);
 }
@@ -34717,7 +34701,7 @@ jbm_rational_28_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_4_nxf64 (x, p, 2);
 }
@@ -34729,7 +34713,7 @@ jbm_rational_28_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_5_nxf64 (x, p, 2);
 }
@@ -34741,7 +34725,7 @@ jbm_rational_28_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_6_nxf64 (x, p, 2);
 }
@@ -34753,7 +34737,7 @@ jbm_rational_28_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_7_nxf64 (x, p, 2);
 }
@@ -34765,7 +34749,7 @@ jbm_rational_28_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_8_nxf64 (x, p, 2);
 }
@@ -34777,7 +34761,7 @@ jbm_rational_28_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_9_nxf64 (x, p, 2);
 }
@@ -34789,7 +34773,7 @@ jbm_rational_28_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_10_nxf64 (x, p, 2);
 }
@@ -34801,7 +34785,7 @@ jbm_rational_28_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_11_nxf64 (x, p, 2);
 }
@@ -34813,7 +34797,7 @@ jbm_rational_28_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_12_nxf64 (x, p, 2);
 }
@@ -34825,7 +34809,7 @@ jbm_rational_28_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_13_nxf64 (x, p, 2);
 }
@@ -34837,7 +34821,7 @@ jbm_rational_28_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_14_nxf64 (x, p, 2);
 }
@@ -34849,7 +34833,7 @@ jbm_rational_28_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_15_nxf64 (x, p, 2);
 }
@@ -34861,7 +34845,7 @@ jbm_rational_28_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_16_nxf64 (x, p, 2);
 }
@@ -34873,7 +34857,7 @@ jbm_rational_28_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_17_nxf64 (x, p, 2);
 }
@@ -34885,7 +34869,7 @@ jbm_rational_28_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_18_nxf64 (x, p, 2);
 }
@@ -34897,7 +34881,7 @@ jbm_rational_28_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_19_nxf64 (x, p, 2);
 }
@@ -34909,7 +34893,7 @@ jbm_rational_28_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_20_nxf64 (x, p, 2);
 }
@@ -34921,7 +34905,7 @@ jbm_rational_28_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_21_nxf64 (x, p, 2);
 }
@@ -34933,7 +34917,7 @@ jbm_rational_28_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_22_nxf64 (x, p, 2);
 }
@@ -34945,7 +34929,7 @@ jbm_rational_28_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_23_nxf64 (x, p, 2);
 }
@@ -34957,7 +34941,7 @@ jbm_rational_28_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_24_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_24_nxf64 (x, p, 2);
 }
@@ -34969,7 +34953,7 @@ jbm_rational_28_24_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_25_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_25_nxf64 (x, p, 2);
 }
@@ -34981,7 +34965,7 @@ jbm_rational_28_25_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_26_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_26_nxf64 (x, p, 2);
 }
@@ -34993,7 +34977,7 @@ jbm_rational_28_26_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_27_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_27_nxf64 (x, p, 2);
 }
@@ -35005,7 +34989,7 @@ jbm_rational_28_27_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_0_nxf64 (x, p, 2);
 }
@@ -35017,7 +35001,7 @@ jbm_rational_29_0_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_1_nxf64 (x, p, 2);
 }
@@ -35029,7 +35013,7 @@ jbm_rational_29_1_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_2_nxf64 (x, p, 2);
 }
@@ -35041,7 +35025,7 @@ jbm_rational_29_2_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_3_nxf64 (x, p, 2);
 }
@@ -35053,7 +35037,7 @@ jbm_rational_29_3_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_4_nxf64 (x, p, 2);
 }
@@ -35065,7 +35049,7 @@ jbm_rational_29_4_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_5_nxf64 (x, p, 2);
 }
@@ -35077,7 +35061,7 @@ jbm_rational_29_5_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_6_nxf64 (x, p, 2);
 }
@@ -35089,7 +35073,7 @@ jbm_rational_29_6_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_7_nxf64 (x, p, 2);
 }
@@ -35101,7 +35085,7 @@ jbm_rational_29_7_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_8_nxf64 (x, p, 2);
 }
@@ -35113,7 +35097,7 @@ jbm_rational_29_8_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_9_nxf64 (x, p, 2);
 }
@@ -35125,7 +35109,7 @@ jbm_rational_29_9_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_10_nxf64 (x, p, 2);
 }
@@ -35137,7 +35121,7 @@ jbm_rational_29_10_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_11_nxf64 (x, p, 2);
 }
@@ -35149,7 +35133,7 @@ jbm_rational_29_11_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_12_nxf64 (x, p, 2);
 }
@@ -35161,7 +35145,7 @@ jbm_rational_29_12_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_13_nxf64 (x, p, 2);
 }
@@ -35173,7 +35157,7 @@ jbm_rational_29_13_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_14_nxf64 (x, p, 2);
 }
@@ -35185,7 +35169,7 @@ jbm_rational_29_14_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_15_nxf64 (x, p, 2);
 }
@@ -35197,7 +35181,7 @@ jbm_rational_29_15_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_16_nxf64 (x, p, 2);
 }
@@ -35209,7 +35193,7 @@ jbm_rational_29_16_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_17_nxf64 (x, p, 2);
 }
@@ -35221,7 +35205,7 @@ jbm_rational_29_17_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_18_nxf64 (x, p, 2);
 }
@@ -35233,7 +35217,7 @@ jbm_rational_29_18_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_19_nxf64 (x, p, 2);
 }
@@ -35245,7 +35229,7 @@ jbm_rational_29_19_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_20_nxf64 (x, p, 2);
 }
@@ -35257,7 +35241,7 @@ jbm_rational_29_20_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_21_nxf64 (x, p, 2);
 }
@@ -35269,7 +35253,7 @@ jbm_rational_29_21_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_22_nxf64 (x, p, 2);
 }
@@ -35281,7 +35265,7 @@ jbm_rational_29_22_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_23_nxf64 (x, p, 2);
 }
@@ -35293,7 +35277,7 @@ jbm_rational_29_23_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_24_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_24_nxf64 (x, p, 2);
 }
@@ -35305,7 +35289,7 @@ jbm_rational_29_24_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_25_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_25_nxf64 (x, p, 2);
 }
@@ -35317,7 +35301,7 @@ jbm_rational_29_25_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_26_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_26_nxf64 (x, p, 2);
 }
@@ -35329,7 +35313,7 @@ jbm_rational_29_26_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_27_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_27_nxf64 (x, p, 2);
 }
@@ -35341,7 +35325,7 @@ jbm_rational_29_27_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_28_2xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_28_nxf64 (x, p, 2);
 }
@@ -35489,7 +35473,7 @@ jbm_pown_2xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_pow_2xf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
-               const double e)   ///< exponent (float).
+               const double e)  ///< exponent (float).
 {
   return jbm_pow_nxf64 (x, e, 2);
 }
@@ -35539,9 +35523,9 @@ jbm_coswc_2xf64 (const vfloat64m1_t x)
 static inline void
 jbm_sincoswc_2xf64 (const vfloat64m1_t x,
                     ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat64m1_t *s,
+                    vfloat64m1_t * s,
                     ///< pointer to the sin function value (2x vfloat64m1_t).
-                    vfloat64m1_t *c)
+                    vfloat64m1_t * c)
                     ///< pointer to the cos function value (2x vfloat64m1_t).
 {
   jbm_sincoswc_nxf64 (x, s, c, 2);
@@ -35578,9 +35562,9 @@ jbm_cos_2xf64 (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 static inline void
 jbm_sincos_2xf64 (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat64m1_t *s,
+                  vfloat64m1_t * s,
                   ///< pointer to the sin function value (2x vfloat64m1_t).
-                  vfloat64m1_t *c)
+                  vfloat64m1_t * c)
                   ///< pointer to the cos function value (2x vfloat64m1_t).
 {
   jbm_sincos_nxf64 (x, s, c, 2);
@@ -35888,7 +35872,7 @@ static inline vfloat64m1_t
 jbm_flux_limiter_total_2xf64 (const vfloat64m1_t d1 __attribute__((unused)),
                               ///< 1st flux limiter function parameter.
                               const vfloat64m1_t d2 __attribute__((unused)))
-                              ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return jbm_flux_limiter_total_nxf64 (d1, d2, 2);
 }
@@ -35903,7 +35887,7 @@ static inline vfloat64m1_t
 jbm_flux_limiter_null_2xf64 (const vfloat64m1_t d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
                              const vfloat64m1_t d2 __attribute__((unused)))
-                             ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return jbm_flux_limiter_null_nxf64 (d1, d2, 2);
 }
@@ -36106,7 +36090,7 @@ jbm_integral_2xf64 (vfloat64m1_t (*f) (const vfloat64m1_t, const size_t),
                     const vfloat64m1_t x2)
                     ///< right limit of the interval.
 {
-          return jbm_integral_nxf64 (f, x1, x2, 2);
+  return jbm_integral_nxf64 (f, x1, x2, 2);
 }
 
 /**
@@ -36115,7 +36099,7 @@ jbm_integral_2xf64 (vfloat64m1_t (*f) (const vfloat64m1_t, const size_t),
  * \return opposite value vector (8x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_opposite_8xf32 (const vfloat32m1_t x)     ///< vfloat32m1_t vector.
+jbm_opposite_8xf32 (const vfloat32m1_t x)       ///< vfloat32m1_t vector.
 {
   return jbm_opposite_nxf32 (x, 8);
 }
@@ -36128,7 +36112,6 @@ jbm_opposite_8xf32 (const vfloat32m1_t x)     ///< vfloat32m1_t vector.
  */
 static inline vfloat32m1_t
 jbm_reciprocal_8xf32 (const vfloat32m1_t x)     ///< vfloat32m1_t vector.
-               
 {
   return jbm_reciprocal_nxf32 (x, 8);
 }
@@ -36219,7 +36202,7 @@ jbm_rest_8xf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
  */
 static inline vfloat32m1_t
 jbm_frexp_8xf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
-                 vint32m1_t *e) ///< pointer to the extracted exponents vector.
+                 vint32m1_t * e)        ///< pointer to the extracted exponents vector.
 {
   return jbm_frexp_nxf32 (x, e, 8);
 }
@@ -36255,7 +36238,6 @@ jbm_ldexp_8xf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
  */
 static inline vbool32_t
 jbm_small_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
-          
 {
   return jbm_small_nxf32 (x, 8);
 }
@@ -36274,7 +36256,6 @@ jbm_small_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 static inline vfloat32m1_t
 jbm_modmin_8xf32 (const vfloat32m1_t a, ///< 1st vfloat32m1_t vector.
                   const vfloat32m1_t b) ///< 2nd vfloat32m1_t vector.
-             
 {
   return jbm_modmin_nxf32 (a, b, 8);
 }
@@ -42150,9 +42131,9 @@ jbm_coswc_8xf32 (const vfloat32m1_t x)
 static inline void
 jbm_sincoswc_8xf32 (const vfloat32m1_t x,
                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat32m1_t *s,
+                    vfloat32m1_t * s,
                     ///< pointer to the sin function value (8x vfloat32m1_t).
-                    vfloat32m1_t *c)
+                    vfloat32m1_t * c)
                     ///< pointer to the cos function value (8x vfloat32m1_t).
 {
   jbm_sincoswc_nxf32 (x, s, c, 8);
@@ -42189,9 +42170,9 @@ jbm_cos_8xf32 (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 static inline void
 jbm_sincos_8xf32 (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat32m1_t *s,
+                  vfloat32m1_t * s,
                   ///< pointer to the sin function value (8x vfloat32m1_t).
-                  vfloat32m1_t *c)
+                  vfloat32m1_t * c)
                   ///< pointer to the cos function value (8x vfloat32m1_t).
 {
   jbm_sincos_nxf32 (x, s, c, 8);
@@ -42499,7 +42480,7 @@ static inline vfloat32m1_t
 jbm_flux_limiter_total_8xf32 (const vfloat32m1_t d1 __attribute__((unused)),
                               ///< 1st flux limiter function parameter.
                               const vfloat32m1_t d2 __attribute__((unused)))
-                              ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return jbm_flux_limiter_total_nxf32 (d1, d2, 8);
 }
@@ -42514,7 +42495,7 @@ static inline vfloat32m1_t
 jbm_flux_limiter_null_8xf32 (const vfloat32m1_t d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
                              const vfloat32m1_t d2 __attribute__((unused)))
-                             ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return jbm_flux_limiter_null_nxf32 (d1, d2, 8);
 }
@@ -42726,7 +42707,7 @@ jbm_integral_8xf32 (vfloat32m1_t (*f) (const vfloat32m1_t, const size_t),
  * \return opposite value vector (4x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_opposite_4xf64 (const vfloat64m1_t x)     ///< vfloat64m1_t vector.
+jbm_opposite_4xf64 (const vfloat64m1_t x)       ///< vfloat64m1_t vector.
 {
   return jbm_opposite_nxf64 (x, 4);
 }
@@ -42739,7 +42720,6 @@ jbm_opposite_4xf64 (const vfloat64m1_t x)     ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_reciprocal_4xf64 (const vfloat64m1_t x)     ///< vfloat64m1_t vector.
-               
 {
   return jbm_reciprocal_nxf64 (x, 4);
 }
@@ -42830,7 +42810,7 @@ jbm_rest_4xf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
  */
 static inline vfloat64m1_t
 jbm_frexp_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                 vint64m1_t *e) ///< pointer to the extracted exponents vector.
+                 vint64m1_t * e)        ///< pointer to the extracted exponents vector.
 {
   return jbm_frexp_nxf64 (x, e, 4);
 }
@@ -42866,7 +42846,6 @@ jbm_ldexp_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vbool64_t
 jbm_small_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
-          
 {
   return jbm_small_nxf64 (x, 4);
 }
@@ -42885,7 +42864,6 @@ jbm_small_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 static inline vfloat64m1_t
 jbm_modmin_4xf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat64m1_t b) ///< 2nd vfloat64m1_t vector.
-             
 {
   return jbm_modmin_nxf64 (a, b, 4);
 }
@@ -43007,7 +42985,7 @@ jbm_v3_length_4xf64 (const vfloat64m1_t x1,
  */
 static inline vfloat64m1_t
 jbm_polynomial_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_1_nxf64 (x, p, 4);
 }
@@ -43019,7 +42997,7 @@ jbm_polynomial_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_2_nxf64 (x, p, 4);
 }
@@ -43031,7 +43009,7 @@ jbm_polynomial_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_3_nxf64 (x, p, 4);
 }
@@ -43043,7 +43021,7 @@ jbm_polynomial_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_4_nxf64 (x, p, 4);
 }
@@ -43055,7 +43033,7 @@ jbm_polynomial_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_5_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_5_nxf64 (x, p, 4);
 }
@@ -43067,7 +43045,7 @@ jbm_polynomial_5_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_6_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_6_nxf64 (x, p, 4);
 }
@@ -43079,7 +43057,7 @@ jbm_polynomial_6_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_7_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_7_nxf64 (x, p, 4);
 }
@@ -43091,7 +43069,7 @@ jbm_polynomial_7_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_8_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_8_nxf64 (x, p, 4);
 }
@@ -43103,7 +43081,7 @@ jbm_polynomial_8_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_9_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_polynomial_9_nxf64 (x, p, 4);
 }
@@ -43115,7 +43093,7 @@ jbm_polynomial_9_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_10_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_10_nxf64 (x, p, 4);
 }
@@ -43127,7 +43105,7 @@ jbm_polynomial_10_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_11_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_11_nxf64 (x, p, 4);
 }
@@ -43139,7 +43117,7 @@ jbm_polynomial_11_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_12_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_12_nxf64 (x, p, 4);
 }
@@ -43151,7 +43129,7 @@ jbm_polynomial_12_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_13_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_13_nxf64 (x, p, 4);
 }
@@ -43163,7 +43141,7 @@ jbm_polynomial_13_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_14_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_14_nxf64 (x, p, 4);
 }
@@ -43175,7 +43153,7 @@ jbm_polynomial_14_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_15_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_15_nxf64 (x, p, 4);
 }
@@ -43187,7 +43165,7 @@ jbm_polynomial_15_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_16_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_16_nxf64 (x, p, 4);
 }
@@ -43199,7 +43177,7 @@ jbm_polynomial_16_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_17_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_17_nxf64 (x, p, 4);
 }
@@ -43211,7 +43189,7 @@ jbm_polynomial_17_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_18_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_18_nxf64 (x, p, 4);
 }
@@ -43223,7 +43201,7 @@ jbm_polynomial_18_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_19_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_19_nxf64 (x, p, 4);
 }
@@ -43235,7 +43213,7 @@ jbm_polynomial_19_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_20_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_20_nxf64 (x, p, 4);
 }
@@ -43247,7 +43225,7 @@ jbm_polynomial_20_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_21_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_21_nxf64 (x, p, 4);
 }
@@ -43259,7 +43237,7 @@ jbm_polynomial_21_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_22_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_22_nxf64 (x, p, 4);
 }
@@ -43271,7 +43249,7 @@ jbm_polynomial_22_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_23_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_23_nxf64 (x, p, 4);
 }
@@ -43283,7 +43261,7 @@ jbm_polynomial_23_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_24_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_24_nxf64 (x, p, 4);
 }
@@ -43295,7 +43273,7 @@ jbm_polynomial_24_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_25_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_25_nxf64 (x, p, 4);
 }
@@ -43307,7 +43285,7 @@ jbm_polynomial_25_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_26_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_26_nxf64 (x, p, 4);
 }
@@ -43319,7 +43297,7 @@ jbm_polynomial_26_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_27_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_27_nxf64 (x, p, 4);
 }
@@ -43331,7 +43309,7 @@ jbm_polynomial_27_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_28_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_28_nxf64 (x, p, 4);
 }
@@ -43343,7 +43321,7 @@ jbm_polynomial_28_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_polynomial_29_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_polynomial_29_nxf64 (x, p, 4);
 }
@@ -43355,7 +43333,7 @@ jbm_polynomial_29_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_1_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_1_0_nxf64 (x, p, 4);
 }
@@ -43367,7 +43345,7 @@ jbm_rational_1_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_2_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_2_0_nxf64 (x, p, 4);
 }
@@ -43379,7 +43357,7 @@ jbm_rational_2_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_2_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_2_1_nxf64 (x, p, 4);
 }
@@ -43391,7 +43369,7 @@ jbm_rational_2_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_3_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_3_0_nxf64 (x, p, 4);
 }
@@ -43403,7 +43381,7 @@ jbm_rational_3_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_3_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_3_1_nxf64 (x, p, 4);
 }
@@ -43415,7 +43393,7 @@ jbm_rational_3_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_3_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_3_2_nxf64 (x, p, 4);
 }
@@ -43427,7 +43405,7 @@ jbm_rational_3_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_4_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_4_0_nxf64 (x, p, 4);
 }
@@ -43439,7 +43417,7 @@ jbm_rational_4_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_4_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_4_1_nxf64 (x, p, 4);
 }
@@ -43451,7 +43429,7 @@ jbm_rational_4_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_4_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_4_2_nxf64 (x, p, 4);
 }
@@ -43463,7 +43441,7 @@ jbm_rational_4_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_4_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_4_3_nxf64 (x, p, 4);
 }
@@ -43475,7 +43453,7 @@ jbm_rational_4_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_5_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_5_0_nxf64 (x, p, 4);
 }
@@ -43487,7 +43465,7 @@ jbm_rational_5_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_5_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_5_1_nxf64 (x, p, 4);
 }
@@ -43499,7 +43477,7 @@ jbm_rational_5_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_5_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_5_2_nxf64 (x, p, 4);
 }
@@ -43511,7 +43489,7 @@ jbm_rational_5_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_5_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_5_3_nxf64 (x, p, 4);
 }
@@ -43523,7 +43501,7 @@ jbm_rational_5_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_5_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_5_4_nxf64 (x, p, 4);
 }
@@ -43535,7 +43513,7 @@ jbm_rational_5_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_0_nxf64 (x, p, 4);
 }
@@ -43547,7 +43525,7 @@ jbm_rational_6_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_1_nxf64 (x, p, 4);
 }
@@ -43559,7 +43537,7 @@ jbm_rational_6_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_2_nxf64 (x, p, 4);
 }
@@ -43571,7 +43549,7 @@ jbm_rational_6_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_3_nxf64 (x, p, 4);
 }
@@ -43583,7 +43561,7 @@ jbm_rational_6_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_4_nxf64 (x, p, 4);
 }
@@ -43595,7 +43573,7 @@ jbm_rational_6_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_6_5_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_6_5_nxf64 (x, p, 4);
 }
@@ -43607,7 +43585,7 @@ jbm_rational_6_5_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_0_nxf64 (x, p, 4);
 }
@@ -43619,7 +43597,7 @@ jbm_rational_7_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_1_nxf64 (x, p, 4);
 }
@@ -43631,7 +43609,7 @@ jbm_rational_7_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_2_nxf64 (x, p, 4);
 }
@@ -43643,7 +43621,7 @@ jbm_rational_7_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_3_nxf64 (x, p, 4);
 }
@@ -43655,7 +43633,7 @@ jbm_rational_7_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_4_nxf64 (x, p, 4);
 }
@@ -43667,7 +43645,7 @@ jbm_rational_7_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_5_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_5_nxf64 (x, p, 4);
 }
@@ -43679,7 +43657,7 @@ jbm_rational_7_5_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_7_6_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_7_6_nxf64 (x, p, 4);
 }
@@ -43691,7 +43669,7 @@ jbm_rational_7_6_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_0_nxf64 (x, p, 4);
 }
@@ -43703,7 +43681,7 @@ jbm_rational_8_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_1_nxf64 (x, p, 4);
 }
@@ -43715,7 +43693,7 @@ jbm_rational_8_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_2_nxf64 (x, p, 4);
 }
@@ -43727,7 +43705,7 @@ jbm_rational_8_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_3_nxf64 (x, p, 4);
 }
@@ -43739,7 +43717,7 @@ jbm_rational_8_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_4_nxf64 (x, p, 4);
 }
@@ -43751,7 +43729,7 @@ jbm_rational_8_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_5_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_5_nxf64 (x, p, 4);
 }
@@ -43763,7 +43741,7 @@ jbm_rational_8_5_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_6_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_6_nxf64 (x, p, 4);
 }
@@ -43775,7 +43753,7 @@ jbm_rational_8_6_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_8_7_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_8_7_nxf64 (x, p, 4);
 }
@@ -43787,7 +43765,7 @@ jbm_rational_8_7_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_0_nxf64 (x, p, 4);
 }
@@ -43799,7 +43777,7 @@ jbm_rational_9_0_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_1_nxf64 (x, p, 4);
 }
@@ -43811,7 +43789,7 @@ jbm_rational_9_1_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_2_nxf64 (x, p, 4);
 }
@@ -43823,7 +43801,7 @@ jbm_rational_9_2_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_3_nxf64 (x, p, 4);
 }
@@ -43835,7 +43813,7 @@ jbm_rational_9_3_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_4_nxf64 (x, p, 4);
 }
@@ -43847,7 +43825,7 @@ jbm_rational_9_4_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_5_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_5_nxf64 (x, p, 4);
 }
@@ -43859,7 +43837,7 @@ jbm_rational_9_5_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_6_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_6_nxf64 (x, p, 4);
 }
@@ -43871,7 +43849,7 @@ jbm_rational_9_6_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_7_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_7_nxf64 (x, p, 4);
 }
@@ -43883,7 +43861,7 @@ jbm_rational_9_7_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_9_8_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                        const double *p) ///< array of coefficients.
+                        const double *p)        ///< array of coefficients.
 {
   return jbm_rational_9_8_nxf64 (x, p, 4);
 }
@@ -43895,7 +43873,7 @@ jbm_rational_9_8_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_0_nxf64 (x, p, 4);
 }
@@ -43907,7 +43885,7 @@ jbm_rational_10_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_1_nxf64 (x, p, 4);
 }
@@ -43919,7 +43897,7 @@ jbm_rational_10_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_2_nxf64 (x, p, 4);
 }
@@ -43931,7 +43909,7 @@ jbm_rational_10_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_3_nxf64 (x, p, 4);
 }
@@ -43943,7 +43921,7 @@ jbm_rational_10_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_4_nxf64 (x, p, 4);
 }
@@ -43955,7 +43933,7 @@ jbm_rational_10_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_5_nxf64 (x, p, 4);
 }
@@ -43967,7 +43945,7 @@ jbm_rational_10_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_6_nxf64 (x, p, 4);
 }
@@ -43979,7 +43957,7 @@ jbm_rational_10_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_7_nxf64 (x, p, 4);
 }
@@ -43991,7 +43969,7 @@ jbm_rational_10_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_8_nxf64 (x, p, 4);
 }
@@ -44003,7 +43981,7 @@ jbm_rational_10_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_10_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_10_9_nxf64 (x, p, 4);
 }
@@ -44015,7 +43993,7 @@ jbm_rational_10_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_0_nxf64 (x, p, 4);
 }
@@ -44027,7 +44005,7 @@ jbm_rational_11_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_1_nxf64 (x, p, 4);
 }
@@ -44039,7 +44017,7 @@ jbm_rational_11_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_2_nxf64 (x, p, 4);
 }
@@ -44051,7 +44029,7 @@ jbm_rational_11_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_3_nxf64 (x, p, 4);
 }
@@ -44063,7 +44041,7 @@ jbm_rational_11_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_4_nxf64 (x, p, 4);
 }
@@ -44075,7 +44053,7 @@ jbm_rational_11_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_5_nxf64 (x, p, 4);
 }
@@ -44087,7 +44065,7 @@ jbm_rational_11_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_6_nxf64 (x, p, 4);
 }
@@ -44099,7 +44077,7 @@ jbm_rational_11_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_7_nxf64 (x, p, 4);
 }
@@ -44111,7 +44089,7 @@ jbm_rational_11_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_8_nxf64 (x, p, 4);
 }
@@ -44123,7 +44101,7 @@ jbm_rational_11_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_11_9_nxf64 (x, p, 4);
 }
@@ -44135,7 +44113,7 @@ jbm_rational_11_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_11_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_11_10_nxf64 (x, p, 4);
 }
@@ -44147,7 +44125,7 @@ jbm_rational_11_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_0_nxf64 (x, p, 4);
 }
@@ -44159,7 +44137,7 @@ jbm_rational_12_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_1_nxf64 (x, p, 4);
 }
@@ -44171,7 +44149,7 @@ jbm_rational_12_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_2_nxf64 (x, p, 4);
 }
@@ -44183,7 +44161,7 @@ jbm_rational_12_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_3_nxf64 (x, p, 4);
 }
@@ -44195,7 +44173,7 @@ jbm_rational_12_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_4_nxf64 (x, p, 4);
 }
@@ -44207,7 +44185,7 @@ jbm_rational_12_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_5_nxf64 (x, p, 4);
 }
@@ -44219,7 +44197,7 @@ jbm_rational_12_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_6_nxf64 (x, p, 4);
 }
@@ -44231,7 +44209,7 @@ jbm_rational_12_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_7_nxf64 (x, p, 4);
 }
@@ -44243,7 +44221,7 @@ jbm_rational_12_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_8_nxf64 (x, p, 4);
 }
@@ -44255,7 +44233,7 @@ jbm_rational_12_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_12_9_nxf64 (x, p, 4);
 }
@@ -44267,7 +44245,7 @@ jbm_rational_12_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_12_10_nxf64 (x, p, 4);
 }
@@ -44279,7 +44257,7 @@ jbm_rational_12_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_12_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_12_11_nxf64 (x, p, 4);
 }
@@ -44291,7 +44269,7 @@ jbm_rational_12_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_0_nxf64 (x, p, 4);
 }
@@ -44303,7 +44281,7 @@ jbm_rational_13_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_1_nxf64 (x, p, 4);
 }
@@ -44315,7 +44293,7 @@ jbm_rational_13_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_2_nxf64 (x, p, 4);
 }
@@ -44327,7 +44305,7 @@ jbm_rational_13_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_3_nxf64 (x, p, 4);
 }
@@ -44339,7 +44317,7 @@ jbm_rational_13_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_4_nxf64 (x, p, 4);
 }
@@ -44351,7 +44329,7 @@ jbm_rational_13_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_5_nxf64 (x, p, 4);
 }
@@ -44363,7 +44341,7 @@ jbm_rational_13_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_6_nxf64 (x, p, 4);
 }
@@ -44375,7 +44353,7 @@ jbm_rational_13_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_7_nxf64 (x, p, 4);
 }
@@ -44387,7 +44365,7 @@ jbm_rational_13_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_8_nxf64 (x, p, 4);
 }
@@ -44399,7 +44377,7 @@ jbm_rational_13_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_13_9_nxf64 (x, p, 4);
 }
@@ -44411,7 +44389,7 @@ jbm_rational_13_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_13_10_nxf64 (x, p, 4);
 }
@@ -44423,7 +44401,7 @@ jbm_rational_13_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_13_11_nxf64 (x, p, 4);
 }
@@ -44435,7 +44413,7 @@ jbm_rational_13_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_13_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_13_12_nxf64 (x, p, 4);
 }
@@ -44447,7 +44425,7 @@ jbm_rational_13_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_0_nxf64 (x, p, 4);
 }
@@ -44459,7 +44437,7 @@ jbm_rational_14_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_1_nxf64 (x, p, 4);
 }
@@ -44471,7 +44449,7 @@ jbm_rational_14_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_2_nxf64 (x, p, 4);
 }
@@ -44483,7 +44461,7 @@ jbm_rational_14_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_3_nxf64 (x, p, 4);
 }
@@ -44495,7 +44473,7 @@ jbm_rational_14_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_4_nxf64 (x, p, 4);
 }
@@ -44507,7 +44485,7 @@ jbm_rational_14_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_5_nxf64 (x, p, 4);
 }
@@ -44519,7 +44497,7 @@ jbm_rational_14_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_6_nxf64 (x, p, 4);
 }
@@ -44531,7 +44509,7 @@ jbm_rational_14_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_7_nxf64 (x, p, 4);
 }
@@ -44543,7 +44521,7 @@ jbm_rational_14_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_8_nxf64 (x, p, 4);
 }
@@ -44555,7 +44533,7 @@ jbm_rational_14_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_14_9_nxf64 (x, p, 4);
 }
@@ -44567,7 +44545,7 @@ jbm_rational_14_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_14_10_nxf64 (x, p, 4);
 }
@@ -44579,7 +44557,7 @@ jbm_rational_14_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_14_11_nxf64 (x, p, 4);
 }
@@ -44591,7 +44569,7 @@ jbm_rational_14_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_14_12_nxf64 (x, p, 4);
 }
@@ -44603,7 +44581,7 @@ jbm_rational_14_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_14_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_14_13_nxf64 (x, p, 4);
 }
@@ -44615,7 +44593,7 @@ jbm_rational_14_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_0_nxf64 (x, p, 4);
 }
@@ -44627,7 +44605,7 @@ jbm_rational_15_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_1_nxf64 (x, p, 4);
 }
@@ -44639,7 +44617,7 @@ jbm_rational_15_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_2_nxf64 (x, p, 4);
 }
@@ -44651,7 +44629,7 @@ jbm_rational_15_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_3_nxf64 (x, p, 4);
 }
@@ -44663,7 +44641,7 @@ jbm_rational_15_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_4_nxf64 (x, p, 4);
 }
@@ -44675,7 +44653,7 @@ jbm_rational_15_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_5_nxf64 (x, p, 4);
 }
@@ -44687,7 +44665,7 @@ jbm_rational_15_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_6_nxf64 (x, p, 4);
 }
@@ -44699,7 +44677,7 @@ jbm_rational_15_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_7_nxf64 (x, p, 4);
 }
@@ -44711,7 +44689,7 @@ jbm_rational_15_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_8_nxf64 (x, p, 4);
 }
@@ -44723,7 +44701,7 @@ jbm_rational_15_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_15_9_nxf64 (x, p, 4);
 }
@@ -44735,7 +44713,7 @@ jbm_rational_15_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_15_10_nxf64 (x, p, 4);
 }
@@ -44747,7 +44725,7 @@ jbm_rational_15_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_15_11_nxf64 (x, p, 4);
 }
@@ -44759,7 +44737,7 @@ jbm_rational_15_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_15_12_nxf64 (x, p, 4);
 }
@@ -44771,7 +44749,7 @@ jbm_rational_15_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_15_13_nxf64 (x, p, 4);
 }
@@ -44783,7 +44761,7 @@ jbm_rational_15_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_15_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_15_14_nxf64 (x, p, 4);
 }
@@ -44795,7 +44773,7 @@ jbm_rational_15_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_0_nxf64 (x, p, 4);
 }
@@ -44807,7 +44785,7 @@ jbm_rational_16_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_1_nxf64 (x, p, 4);
 }
@@ -44819,7 +44797,7 @@ jbm_rational_16_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_2_nxf64 (x, p, 4);
 }
@@ -44831,7 +44809,7 @@ jbm_rational_16_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_3_nxf64 (x, p, 4);
 }
@@ -44843,7 +44821,7 @@ jbm_rational_16_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_4_nxf64 (x, p, 4);
 }
@@ -44855,7 +44833,7 @@ jbm_rational_16_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_5_nxf64 (x, p, 4);
 }
@@ -44867,7 +44845,7 @@ jbm_rational_16_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_6_nxf64 (x, p, 4);
 }
@@ -44879,7 +44857,7 @@ jbm_rational_16_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_7_nxf64 (x, p, 4);
 }
@@ -44891,7 +44869,7 @@ jbm_rational_16_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_8_nxf64 (x, p, 4);
 }
@@ -44903,7 +44881,7 @@ jbm_rational_16_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_16_9_nxf64 (x, p, 4);
 }
@@ -44915,7 +44893,7 @@ jbm_rational_16_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_10_nxf64 (x, p, 4);
 }
@@ -44927,7 +44905,7 @@ jbm_rational_16_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_11_nxf64 (x, p, 4);
 }
@@ -44939,7 +44917,7 @@ jbm_rational_16_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_12_nxf64 (x, p, 4);
 }
@@ -44951,7 +44929,7 @@ jbm_rational_16_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_13_nxf64 (x, p, 4);
 }
@@ -44963,7 +44941,7 @@ jbm_rational_16_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_14_nxf64 (x, p, 4);
 }
@@ -44975,7 +44953,7 @@ jbm_rational_16_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_16_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_16_15_nxf64 (x, p, 4);
 }
@@ -44987,7 +44965,7 @@ jbm_rational_16_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_0_nxf64 (x, p, 4);
 }
@@ -44999,7 +44977,7 @@ jbm_rational_17_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_1_nxf64 (x, p, 4);
 }
@@ -45011,7 +44989,7 @@ jbm_rational_17_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_2_nxf64 (x, p, 4);
 }
@@ -45023,7 +45001,7 @@ jbm_rational_17_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_3_nxf64 (x, p, 4);
 }
@@ -45035,7 +45013,7 @@ jbm_rational_17_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_4_nxf64 (x, p, 4);
 }
@@ -45047,7 +45025,7 @@ jbm_rational_17_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_5_nxf64 (x, p, 4);
 }
@@ -45059,7 +45037,7 @@ jbm_rational_17_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_6_nxf64 (x, p, 4);
 }
@@ -45071,7 +45049,7 @@ jbm_rational_17_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_7_nxf64 (x, p, 4);
 }
@@ -45083,7 +45061,7 @@ jbm_rational_17_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_8_nxf64 (x, p, 4);
 }
@@ -45095,7 +45073,7 @@ jbm_rational_17_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_17_9_nxf64 (x, p, 4);
 }
@@ -45107,7 +45085,7 @@ jbm_rational_17_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_10_nxf64 (x, p, 4);
 }
@@ -45119,7 +45097,7 @@ jbm_rational_17_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_11_nxf64 (x, p, 4);
 }
@@ -45131,7 +45109,7 @@ jbm_rational_17_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_12_nxf64 (x, p, 4);
 }
@@ -45143,7 +45121,7 @@ jbm_rational_17_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_13_nxf64 (x, p, 4);
 }
@@ -45155,7 +45133,7 @@ jbm_rational_17_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_14_nxf64 (x, p, 4);
 }
@@ -45167,7 +45145,7 @@ jbm_rational_17_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_15_nxf64 (x, p, 4);
 }
@@ -45179,7 +45157,7 @@ jbm_rational_17_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_17_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_17_16_nxf64 (x, p, 4);
 }
@@ -45191,7 +45169,7 @@ jbm_rational_17_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_0_nxf64 (x, p, 4);
 }
@@ -45203,7 +45181,7 @@ jbm_rational_18_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_1_nxf64 (x, p, 4);
 }
@@ -45215,7 +45193,7 @@ jbm_rational_18_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_2_nxf64 (x, p, 4);
 }
@@ -45227,7 +45205,7 @@ jbm_rational_18_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_3_nxf64 (x, p, 4);
 }
@@ -45239,7 +45217,7 @@ jbm_rational_18_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_4_nxf64 (x, p, 4);
 }
@@ -45251,7 +45229,7 @@ jbm_rational_18_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_5_nxf64 (x, p, 4);
 }
@@ -45263,7 +45241,7 @@ jbm_rational_18_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_6_nxf64 (x, p, 4);
 }
@@ -45275,7 +45253,7 @@ jbm_rational_18_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_7_nxf64 (x, p, 4);
 }
@@ -45287,7 +45265,7 @@ jbm_rational_18_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_8_nxf64 (x, p, 4);
 }
@@ -45299,7 +45277,7 @@ jbm_rational_18_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_18_9_nxf64 (x, p, 4);
 }
@@ -45311,7 +45289,7 @@ jbm_rational_18_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_10_nxf64 (x, p, 4);
 }
@@ -45323,7 +45301,7 @@ jbm_rational_18_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_11_nxf64 (x, p, 4);
 }
@@ -45335,7 +45313,7 @@ jbm_rational_18_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_12_nxf64 (x, p, 4);
 }
@@ -45347,7 +45325,7 @@ jbm_rational_18_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_13_nxf64 (x, p, 4);
 }
@@ -45359,7 +45337,7 @@ jbm_rational_18_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_14_nxf64 (x, p, 4);
 }
@@ -45371,7 +45349,7 @@ jbm_rational_18_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_15_nxf64 (x, p, 4);
 }
@@ -45383,7 +45361,7 @@ jbm_rational_18_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_16_nxf64 (x, p, 4);
 }
@@ -45395,7 +45373,7 @@ jbm_rational_18_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_18_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_18_17_nxf64 (x, p, 4);
 }
@@ -45407,7 +45385,7 @@ jbm_rational_18_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_0_nxf64 (x, p, 4);
 }
@@ -45419,7 +45397,7 @@ jbm_rational_19_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_1_nxf64 (x, p, 4);
 }
@@ -45431,7 +45409,7 @@ jbm_rational_19_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_2_nxf64 (x, p, 4);
 }
@@ -45443,7 +45421,7 @@ jbm_rational_19_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_3_nxf64 (x, p, 4);
 }
@@ -45455,7 +45433,7 @@ jbm_rational_19_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_4_nxf64 (x, p, 4);
 }
@@ -45467,7 +45445,7 @@ jbm_rational_19_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_5_nxf64 (x, p, 4);
 }
@@ -45479,7 +45457,7 @@ jbm_rational_19_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_6_nxf64 (x, p, 4);
 }
@@ -45491,7 +45469,7 @@ jbm_rational_19_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_7_nxf64 (x, p, 4);
 }
@@ -45503,7 +45481,7 @@ jbm_rational_19_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_8_nxf64 (x, p, 4);
 }
@@ -45515,7 +45493,7 @@ jbm_rational_19_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_19_9_nxf64 (x, p, 4);
 }
@@ -45527,7 +45505,7 @@ jbm_rational_19_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_10_nxf64 (x, p, 4);
 }
@@ -45539,7 +45517,7 @@ jbm_rational_19_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_11_nxf64 (x, p, 4);
 }
@@ -45551,7 +45529,7 @@ jbm_rational_19_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_12_nxf64 (x, p, 4);
 }
@@ -45563,7 +45541,7 @@ jbm_rational_19_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_13_nxf64 (x, p, 4);
 }
@@ -45575,7 +45553,7 @@ jbm_rational_19_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_14_nxf64 (x, p, 4);
 }
@@ -45587,7 +45565,7 @@ jbm_rational_19_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_15_nxf64 (x, p, 4);
 }
@@ -45599,7 +45577,7 @@ jbm_rational_19_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_16_nxf64 (x, p, 4);
 }
@@ -45611,7 +45589,7 @@ jbm_rational_19_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_17_nxf64 (x, p, 4);
 }
@@ -45623,7 +45601,7 @@ jbm_rational_19_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_19_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_19_18_nxf64 (x, p, 4);
 }
@@ -45635,7 +45613,7 @@ jbm_rational_19_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_0_nxf64 (x, p, 4);
 }
@@ -45647,7 +45625,7 @@ jbm_rational_20_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_1_nxf64 (x, p, 4);
 }
@@ -45659,7 +45637,7 @@ jbm_rational_20_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_2_nxf64 (x, p, 4);
 }
@@ -45671,7 +45649,7 @@ jbm_rational_20_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_3_nxf64 (x, p, 4);
 }
@@ -45683,7 +45661,7 @@ jbm_rational_20_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_4_nxf64 (x, p, 4);
 }
@@ -45695,7 +45673,7 @@ jbm_rational_20_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_5_nxf64 (x, p, 4);
 }
@@ -45707,7 +45685,7 @@ jbm_rational_20_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_6_nxf64 (x, p, 4);
 }
@@ -45719,7 +45697,7 @@ jbm_rational_20_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_7_nxf64 (x, p, 4);
 }
@@ -45731,7 +45709,7 @@ jbm_rational_20_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_8_nxf64 (x, p, 4);
 }
@@ -45743,7 +45721,7 @@ jbm_rational_20_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_20_9_nxf64 (x, p, 4);
 }
@@ -45755,7 +45733,7 @@ jbm_rational_20_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_10_nxf64 (x, p, 4);
 }
@@ -45767,7 +45745,7 @@ jbm_rational_20_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_11_nxf64 (x, p, 4);
 }
@@ -45779,7 +45757,7 @@ jbm_rational_20_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_12_nxf64 (x, p, 4);
 }
@@ -45791,7 +45769,7 @@ jbm_rational_20_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_13_nxf64 (x, p, 4);
 }
@@ -45803,7 +45781,7 @@ jbm_rational_20_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_14_nxf64 (x, p, 4);
 }
@@ -45815,7 +45793,7 @@ jbm_rational_20_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_15_nxf64 (x, p, 4);
 }
@@ -45827,7 +45805,7 @@ jbm_rational_20_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_16_nxf64 (x, p, 4);
 }
@@ -45839,7 +45817,7 @@ jbm_rational_20_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_17_nxf64 (x, p, 4);
 }
@@ -45851,7 +45829,7 @@ jbm_rational_20_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_18_nxf64 (x, p, 4);
 }
@@ -45863,7 +45841,7 @@ jbm_rational_20_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_20_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_20_19_nxf64 (x, p, 4);
 }
@@ -45875,7 +45853,7 @@ jbm_rational_20_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_0_nxf64 (x, p, 4);
 }
@@ -45887,7 +45865,7 @@ jbm_rational_21_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_1_nxf64 (x, p, 4);
 }
@@ -45899,7 +45877,7 @@ jbm_rational_21_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_2_nxf64 (x, p, 4);
 }
@@ -45911,7 +45889,7 @@ jbm_rational_21_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_3_nxf64 (x, p, 4);
 }
@@ -45923,7 +45901,7 @@ jbm_rational_21_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_4_nxf64 (x, p, 4);
 }
@@ -45935,7 +45913,7 @@ jbm_rational_21_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_5_nxf64 (x, p, 4);
 }
@@ -45947,7 +45925,7 @@ jbm_rational_21_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_6_nxf64 (x, p, 4);
 }
@@ -45959,7 +45937,7 @@ jbm_rational_21_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_7_nxf64 (x, p, 4);
 }
@@ -45971,7 +45949,7 @@ jbm_rational_21_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_8_nxf64 (x, p, 4);
 }
@@ -45983,7 +45961,7 @@ jbm_rational_21_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_21_9_nxf64 (x, p, 4);
 }
@@ -45995,7 +45973,7 @@ jbm_rational_21_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_10_nxf64 (x, p, 4);
 }
@@ -46007,7 +45985,7 @@ jbm_rational_21_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_11_nxf64 (x, p, 4);
 }
@@ -46019,7 +45997,7 @@ jbm_rational_21_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_12_nxf64 (x, p, 4);
 }
@@ -46031,7 +46009,7 @@ jbm_rational_21_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_13_nxf64 (x, p, 4);
 }
@@ -46043,7 +46021,7 @@ jbm_rational_21_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_14_nxf64 (x, p, 4);
 }
@@ -46055,7 +46033,7 @@ jbm_rational_21_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_15_nxf64 (x, p, 4);
 }
@@ -46067,7 +46045,7 @@ jbm_rational_21_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_16_nxf64 (x, p, 4);
 }
@@ -46079,7 +46057,7 @@ jbm_rational_21_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_17_nxf64 (x, p, 4);
 }
@@ -46091,7 +46069,7 @@ jbm_rational_21_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_18_nxf64 (x, p, 4);
 }
@@ -46103,7 +46081,7 @@ jbm_rational_21_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_19_nxf64 (x, p, 4);
 }
@@ -46115,7 +46093,7 @@ jbm_rational_21_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_21_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_21_20_nxf64 (x, p, 4);
 }
@@ -46127,7 +46105,7 @@ jbm_rational_21_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_0_nxf64 (x, p, 4);
 }
@@ -46139,7 +46117,7 @@ jbm_rational_22_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_1_nxf64 (x, p, 4);
 }
@@ -46151,7 +46129,7 @@ jbm_rational_22_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_2_nxf64 (x, p, 4);
 }
@@ -46163,7 +46141,7 @@ jbm_rational_22_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_3_nxf64 (x, p, 4);
 }
@@ -46175,7 +46153,7 @@ jbm_rational_22_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_4_nxf64 (x, p, 4);
 }
@@ -46187,7 +46165,7 @@ jbm_rational_22_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_5_nxf64 (x, p, 4);
 }
@@ -46199,7 +46177,7 @@ jbm_rational_22_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_6_nxf64 (x, p, 4);
 }
@@ -46211,7 +46189,7 @@ jbm_rational_22_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_7_nxf64 (x, p, 4);
 }
@@ -46223,7 +46201,7 @@ jbm_rational_22_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_8_nxf64 (x, p, 4);
 }
@@ -46235,7 +46213,7 @@ jbm_rational_22_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_22_9_nxf64 (x, p, 4);
 }
@@ -46247,7 +46225,7 @@ jbm_rational_22_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_10_nxf64 (x, p, 4);
 }
@@ -46259,7 +46237,7 @@ jbm_rational_22_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_11_nxf64 (x, p, 4);
 }
@@ -46271,7 +46249,7 @@ jbm_rational_22_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_12_nxf64 (x, p, 4);
 }
@@ -46283,7 +46261,7 @@ jbm_rational_22_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_13_nxf64 (x, p, 4);
 }
@@ -46295,7 +46273,7 @@ jbm_rational_22_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_14_nxf64 (x, p, 4);
 }
@@ -46307,7 +46285,7 @@ jbm_rational_22_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_15_nxf64 (x, p, 4);
 }
@@ -46319,7 +46297,7 @@ jbm_rational_22_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_16_nxf64 (x, p, 4);
 }
@@ -46331,7 +46309,7 @@ jbm_rational_22_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_17_nxf64 (x, p, 4);
 }
@@ -46343,7 +46321,7 @@ jbm_rational_22_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_18_nxf64 (x, p, 4);
 }
@@ -46355,7 +46333,7 @@ jbm_rational_22_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_19_nxf64 (x, p, 4);
 }
@@ -46367,7 +46345,7 @@ jbm_rational_22_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_20_nxf64 (x, p, 4);
 }
@@ -46379,7 +46357,7 @@ jbm_rational_22_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_22_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_22_21_nxf64 (x, p, 4);
 }
@@ -46391,7 +46369,7 @@ jbm_rational_22_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_0_nxf64 (x, p, 4);
 }
@@ -46403,7 +46381,7 @@ jbm_rational_23_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_1_nxf64 (x, p, 4);
 }
@@ -46415,7 +46393,7 @@ jbm_rational_23_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_2_nxf64 (x, p, 4);
 }
@@ -46427,7 +46405,7 @@ jbm_rational_23_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_3_nxf64 (x, p, 4);
 }
@@ -46439,7 +46417,7 @@ jbm_rational_23_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_4_nxf64 (x, p, 4);
 }
@@ -46451,7 +46429,7 @@ jbm_rational_23_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_5_nxf64 (x, p, 4);
 }
@@ -46463,7 +46441,7 @@ jbm_rational_23_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_6_nxf64 (x, p, 4);
 }
@@ -46475,7 +46453,7 @@ jbm_rational_23_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_7_nxf64 (x, p, 4);
 }
@@ -46487,7 +46465,7 @@ jbm_rational_23_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_8_nxf64 (x, p, 4);
 }
@@ -46499,7 +46477,7 @@ jbm_rational_23_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_23_9_nxf64 (x, p, 4);
 }
@@ -46511,7 +46489,7 @@ jbm_rational_23_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_10_nxf64 (x, p, 4);
 }
@@ -46523,7 +46501,7 @@ jbm_rational_23_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_11_nxf64 (x, p, 4);
 }
@@ -46535,7 +46513,7 @@ jbm_rational_23_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_12_nxf64 (x, p, 4);
 }
@@ -46547,7 +46525,7 @@ jbm_rational_23_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_13_nxf64 (x, p, 4);
 }
@@ -46559,7 +46537,7 @@ jbm_rational_23_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_14_nxf64 (x, p, 4);
 }
@@ -46571,7 +46549,7 @@ jbm_rational_23_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_15_nxf64 (x, p, 4);
 }
@@ -46583,7 +46561,7 @@ jbm_rational_23_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_16_nxf64 (x, p, 4);
 }
@@ -46595,7 +46573,7 @@ jbm_rational_23_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_17_nxf64 (x, p, 4);
 }
@@ -46607,7 +46585,7 @@ jbm_rational_23_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_18_nxf64 (x, p, 4);
 }
@@ -46619,7 +46597,7 @@ jbm_rational_23_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_19_nxf64 (x, p, 4);
 }
@@ -46631,7 +46609,7 @@ jbm_rational_23_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_20_nxf64 (x, p, 4);
 }
@@ -46643,7 +46621,7 @@ jbm_rational_23_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_21_nxf64 (x, p, 4);
 }
@@ -46655,7 +46633,7 @@ jbm_rational_23_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_23_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_23_22_nxf64 (x, p, 4);
 }
@@ -46667,7 +46645,7 @@ jbm_rational_23_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_0_nxf64 (x, p, 4);
 }
@@ -46679,7 +46657,7 @@ jbm_rational_24_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_1_nxf64 (x, p, 4);
 }
@@ -46691,7 +46669,7 @@ jbm_rational_24_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_2_nxf64 (x, p, 4);
 }
@@ -46703,7 +46681,7 @@ jbm_rational_24_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_3_nxf64 (x, p, 4);
 }
@@ -46715,7 +46693,7 @@ jbm_rational_24_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_4_nxf64 (x, p, 4);
 }
@@ -46727,7 +46705,7 @@ jbm_rational_24_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_5_nxf64 (x, p, 4);
 }
@@ -46739,7 +46717,7 @@ jbm_rational_24_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_6_nxf64 (x, p, 4);
 }
@@ -46751,7 +46729,7 @@ jbm_rational_24_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_7_nxf64 (x, p, 4);
 }
@@ -46763,7 +46741,7 @@ jbm_rational_24_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_8_nxf64 (x, p, 4);
 }
@@ -46775,7 +46753,7 @@ jbm_rational_24_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_24_9_nxf64 (x, p, 4);
 }
@@ -46787,7 +46765,7 @@ jbm_rational_24_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_10_nxf64 (x, p, 4);
 }
@@ -46799,7 +46777,7 @@ jbm_rational_24_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_11_nxf64 (x, p, 4);
 }
@@ -46811,7 +46789,7 @@ jbm_rational_24_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_12_nxf64 (x, p, 4);
 }
@@ -46823,7 +46801,7 @@ jbm_rational_24_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_13_nxf64 (x, p, 4);
 }
@@ -46835,7 +46813,7 @@ jbm_rational_24_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_14_nxf64 (x, p, 4);
 }
@@ -46847,7 +46825,7 @@ jbm_rational_24_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_15_nxf64 (x, p, 4);
 }
@@ -46859,7 +46837,7 @@ jbm_rational_24_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_16_nxf64 (x, p, 4);
 }
@@ -46871,7 +46849,7 @@ jbm_rational_24_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_17_nxf64 (x, p, 4);
 }
@@ -46883,7 +46861,7 @@ jbm_rational_24_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_18_nxf64 (x, p, 4);
 }
@@ -46895,7 +46873,7 @@ jbm_rational_24_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_19_nxf64 (x, p, 4);
 }
@@ -46907,7 +46885,7 @@ jbm_rational_24_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_20_nxf64 (x, p, 4);
 }
@@ -46919,7 +46897,7 @@ jbm_rational_24_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_21_nxf64 (x, p, 4);
 }
@@ -46931,7 +46909,7 @@ jbm_rational_24_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_22_nxf64 (x, p, 4);
 }
@@ -46943,7 +46921,7 @@ jbm_rational_24_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_24_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_24_23_nxf64 (x, p, 4);
 }
@@ -46955,7 +46933,7 @@ jbm_rational_24_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_0_nxf64 (x, p, 4);
 }
@@ -46967,7 +46945,7 @@ jbm_rational_25_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_1_nxf64 (x, p, 4);
 }
@@ -46979,7 +46957,7 @@ jbm_rational_25_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_2_nxf64 (x, p, 4);
 }
@@ -46991,7 +46969,7 @@ jbm_rational_25_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_3_nxf64 (x, p, 4);
 }
@@ -47003,7 +46981,7 @@ jbm_rational_25_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_4_nxf64 (x, p, 4);
 }
@@ -47015,7 +46993,7 @@ jbm_rational_25_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_5_nxf64 (x, p, 4);
 }
@@ -47027,7 +47005,7 @@ jbm_rational_25_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_6_nxf64 (x, p, 4);
 }
@@ -47039,7 +47017,7 @@ jbm_rational_25_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_7_nxf64 (x, p, 4);
 }
@@ -47051,7 +47029,7 @@ jbm_rational_25_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_8_nxf64 (x, p, 4);
 }
@@ -47063,7 +47041,7 @@ jbm_rational_25_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_25_9_nxf64 (x, p, 4);
 }
@@ -47075,7 +47053,7 @@ jbm_rational_25_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_10_nxf64 (x, p, 4);
 }
@@ -47087,7 +47065,7 @@ jbm_rational_25_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_11_nxf64 (x, p, 4);
 }
@@ -47099,7 +47077,7 @@ jbm_rational_25_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_12_nxf64 (x, p, 4);
 }
@@ -47111,7 +47089,7 @@ jbm_rational_25_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_13_nxf64 (x, p, 4);
 }
@@ -47123,7 +47101,7 @@ jbm_rational_25_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_14_nxf64 (x, p, 4);
 }
@@ -47135,7 +47113,7 @@ jbm_rational_25_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_15_nxf64 (x, p, 4);
 }
@@ -47147,7 +47125,7 @@ jbm_rational_25_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_16_nxf64 (x, p, 4);
 }
@@ -47159,7 +47137,7 @@ jbm_rational_25_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_17_nxf64 (x, p, 4);
 }
@@ -47171,7 +47149,7 @@ jbm_rational_25_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_18_nxf64 (x, p, 4);
 }
@@ -47183,7 +47161,7 @@ jbm_rational_25_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_19_nxf64 (x, p, 4);
 }
@@ -47195,7 +47173,7 @@ jbm_rational_25_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_20_nxf64 (x, p, 4);
 }
@@ -47207,7 +47185,7 @@ jbm_rational_25_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_21_nxf64 (x, p, 4);
 }
@@ -47219,7 +47197,7 @@ jbm_rational_25_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_22_nxf64 (x, p, 4);
 }
@@ -47231,7 +47209,7 @@ jbm_rational_25_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_23_nxf64 (x, p, 4);
 }
@@ -47243,7 +47221,7 @@ jbm_rational_25_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_25_24_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_25_24_nxf64 (x, p, 4);
 }
@@ -47255,7 +47233,7 @@ jbm_rational_25_24_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_0_nxf64 (x, p, 4);
 }
@@ -47267,7 +47245,7 @@ jbm_rational_26_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_1_nxf64 (x, p, 4);
 }
@@ -47279,7 +47257,7 @@ jbm_rational_26_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_2_nxf64 (x, p, 4);
 }
@@ -47291,7 +47269,7 @@ jbm_rational_26_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_3_nxf64 (x, p, 4);
 }
@@ -47303,7 +47281,7 @@ jbm_rational_26_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_4_nxf64 (x, p, 4);
 }
@@ -47315,7 +47293,7 @@ jbm_rational_26_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_5_nxf64 (x, p, 4);
 }
@@ -47327,7 +47305,7 @@ jbm_rational_26_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_6_nxf64 (x, p, 4);
 }
@@ -47339,7 +47317,7 @@ jbm_rational_26_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_7_nxf64 (x, p, 4);
 }
@@ -47351,7 +47329,7 @@ jbm_rational_26_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_8_nxf64 (x, p, 4);
 }
@@ -47363,7 +47341,7 @@ jbm_rational_26_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_26_9_nxf64 (x, p, 4);
 }
@@ -47375,7 +47353,7 @@ jbm_rational_26_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_10_nxf64 (x, p, 4);
 }
@@ -47387,7 +47365,7 @@ jbm_rational_26_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_11_nxf64 (x, p, 4);
 }
@@ -47399,7 +47377,7 @@ jbm_rational_26_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_12_nxf64 (x, p, 4);
 }
@@ -47411,7 +47389,7 @@ jbm_rational_26_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_13_nxf64 (x, p, 4);
 }
@@ -47423,7 +47401,7 @@ jbm_rational_26_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_14_nxf64 (x, p, 4);
 }
@@ -47435,7 +47413,7 @@ jbm_rational_26_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_15_nxf64 (x, p, 4);
 }
@@ -47447,7 +47425,7 @@ jbm_rational_26_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_16_nxf64 (x, p, 4);
 }
@@ -47459,7 +47437,7 @@ jbm_rational_26_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_17_nxf64 (x, p, 4);
 }
@@ -47471,7 +47449,7 @@ jbm_rational_26_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_18_nxf64 (x, p, 4);
 }
@@ -47483,7 +47461,7 @@ jbm_rational_26_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_19_nxf64 (x, p, 4);
 }
@@ -47495,7 +47473,7 @@ jbm_rational_26_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_20_nxf64 (x, p, 4);
 }
@@ -47507,7 +47485,7 @@ jbm_rational_26_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_21_nxf64 (x, p, 4);
 }
@@ -47519,7 +47497,7 @@ jbm_rational_26_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_22_nxf64 (x, p, 4);
 }
@@ -47531,7 +47509,7 @@ jbm_rational_26_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_23_nxf64 (x, p, 4);
 }
@@ -47543,7 +47521,7 @@ jbm_rational_26_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_24_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_24_nxf64 (x, p, 4);
 }
@@ -47555,7 +47533,7 @@ jbm_rational_26_24_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_26_25_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_26_25_nxf64 (x, p, 4);
 }
@@ -47567,7 +47545,7 @@ jbm_rational_26_25_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_0_nxf64 (x, p, 4);
 }
@@ -47579,7 +47557,7 @@ jbm_rational_27_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_1_nxf64 (x, p, 4);
 }
@@ -47591,7 +47569,7 @@ jbm_rational_27_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_2_nxf64 (x, p, 4);
 }
@@ -47603,7 +47581,7 @@ jbm_rational_27_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_3_nxf64 (x, p, 4);
 }
@@ -47615,7 +47593,7 @@ jbm_rational_27_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_4_nxf64 (x, p, 4);
 }
@@ -47627,7 +47605,7 @@ jbm_rational_27_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_5_nxf64 (x, p, 4);
 }
@@ -47639,7 +47617,7 @@ jbm_rational_27_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_6_nxf64 (x, p, 4);
 }
@@ -47651,7 +47629,7 @@ jbm_rational_27_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_7_nxf64 (x, p, 4);
 }
@@ -47663,7 +47641,7 @@ jbm_rational_27_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_8_nxf64 (x, p, 4);
 }
@@ -47675,7 +47653,7 @@ jbm_rational_27_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_27_9_nxf64 (x, p, 4);
 }
@@ -47687,7 +47665,7 @@ jbm_rational_27_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_10_nxf64 (x, p, 4);
 }
@@ -47699,7 +47677,7 @@ jbm_rational_27_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_11_nxf64 (x, p, 4);
 }
@@ -47711,7 +47689,7 @@ jbm_rational_27_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_12_nxf64 (x, p, 4);
 }
@@ -47723,7 +47701,7 @@ jbm_rational_27_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_13_nxf64 (x, p, 4);
 }
@@ -47735,7 +47713,7 @@ jbm_rational_27_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_14_nxf64 (x, p, 4);
 }
@@ -47747,7 +47725,7 @@ jbm_rational_27_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_15_nxf64 (x, p, 4);
 }
@@ -47759,7 +47737,7 @@ jbm_rational_27_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_16_nxf64 (x, p, 4);
 }
@@ -47771,7 +47749,7 @@ jbm_rational_27_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_17_nxf64 (x, p, 4);
 }
@@ -47783,7 +47761,7 @@ jbm_rational_27_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_18_nxf64 (x, p, 4);
 }
@@ -47795,7 +47773,7 @@ jbm_rational_27_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_19_nxf64 (x, p, 4);
 }
@@ -47807,7 +47785,7 @@ jbm_rational_27_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_20_nxf64 (x, p, 4);
 }
@@ -47819,7 +47797,7 @@ jbm_rational_27_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_21_nxf64 (x, p, 4);
 }
@@ -47831,7 +47809,7 @@ jbm_rational_27_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_22_nxf64 (x, p, 4);
 }
@@ -47843,7 +47821,7 @@ jbm_rational_27_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_23_nxf64 (x, p, 4);
 }
@@ -47855,7 +47833,7 @@ jbm_rational_27_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_24_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_24_nxf64 (x, p, 4);
 }
@@ -47867,7 +47845,7 @@ jbm_rational_27_24_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_25_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_25_nxf64 (x, p, 4);
 }
@@ -47879,7 +47857,7 @@ jbm_rational_27_25_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_27_26_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_27_26_nxf64 (x, p, 4);
 }
@@ -47891,7 +47869,7 @@ jbm_rational_27_26_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_0_nxf64 (x, p, 4);
 }
@@ -47903,7 +47881,7 @@ jbm_rational_28_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_1_nxf64 (x, p, 4);
 }
@@ -47915,7 +47893,7 @@ jbm_rational_28_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_2_nxf64 (x, p, 4);
 }
@@ -47927,7 +47905,7 @@ jbm_rational_28_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_3_nxf64 (x, p, 4);
 }
@@ -47939,7 +47917,7 @@ jbm_rational_28_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_4_nxf64 (x, p, 4);
 }
@@ -47951,7 +47929,7 @@ jbm_rational_28_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_5_nxf64 (x, p, 4);
 }
@@ -47963,7 +47941,7 @@ jbm_rational_28_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_6_nxf64 (x, p, 4);
 }
@@ -47975,7 +47953,7 @@ jbm_rational_28_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_7_nxf64 (x, p, 4);
 }
@@ -47987,7 +47965,7 @@ jbm_rational_28_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_8_nxf64 (x, p, 4);
 }
@@ -47999,7 +47977,7 @@ jbm_rational_28_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_28_9_nxf64 (x, p, 4);
 }
@@ -48011,7 +47989,7 @@ jbm_rational_28_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_10_nxf64 (x, p, 4);
 }
@@ -48023,7 +48001,7 @@ jbm_rational_28_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_11_nxf64 (x, p, 4);
 }
@@ -48035,7 +48013,7 @@ jbm_rational_28_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_12_nxf64 (x, p, 4);
 }
@@ -48047,7 +48025,7 @@ jbm_rational_28_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_13_nxf64 (x, p, 4);
 }
@@ -48059,7 +48037,7 @@ jbm_rational_28_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_14_nxf64 (x, p, 4);
 }
@@ -48071,7 +48049,7 @@ jbm_rational_28_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_15_nxf64 (x, p, 4);
 }
@@ -48083,7 +48061,7 @@ jbm_rational_28_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_16_nxf64 (x, p, 4);
 }
@@ -48095,7 +48073,7 @@ jbm_rational_28_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_17_nxf64 (x, p, 4);
 }
@@ -48107,7 +48085,7 @@ jbm_rational_28_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_18_nxf64 (x, p, 4);
 }
@@ -48119,7 +48097,7 @@ jbm_rational_28_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_19_nxf64 (x, p, 4);
 }
@@ -48131,7 +48109,7 @@ jbm_rational_28_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_20_nxf64 (x, p, 4);
 }
@@ -48143,7 +48121,7 @@ jbm_rational_28_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_21_nxf64 (x, p, 4);
 }
@@ -48155,7 +48133,7 @@ jbm_rational_28_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_22_nxf64 (x, p, 4);
 }
@@ -48167,7 +48145,7 @@ jbm_rational_28_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_23_nxf64 (x, p, 4);
 }
@@ -48179,7 +48157,7 @@ jbm_rational_28_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_24_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_24_nxf64 (x, p, 4);
 }
@@ -48191,7 +48169,7 @@ jbm_rational_28_24_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_25_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_25_nxf64 (x, p, 4);
 }
@@ -48203,7 +48181,7 @@ jbm_rational_28_25_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_26_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_26_nxf64 (x, p, 4);
 }
@@ -48215,7 +48193,7 @@ jbm_rational_28_26_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_28_27_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_28_27_nxf64 (x, p, 4);
 }
@@ -48227,7 +48205,7 @@ jbm_rational_28_27_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_0_nxf64 (x, p, 4);
 }
@@ -48239,7 +48217,7 @@ jbm_rational_29_0_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_1_nxf64 (x, p, 4);
 }
@@ -48251,7 +48229,7 @@ jbm_rational_29_1_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_2_nxf64 (x, p, 4);
 }
@@ -48263,7 +48241,7 @@ jbm_rational_29_2_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_3_nxf64 (x, p, 4);
 }
@@ -48275,7 +48253,7 @@ jbm_rational_29_3_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_4_nxf64 (x, p, 4);
 }
@@ -48287,7 +48265,7 @@ jbm_rational_29_4_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_5_nxf64 (x, p, 4);
 }
@@ -48299,7 +48277,7 @@ jbm_rational_29_5_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_6_nxf64 (x, p, 4);
 }
@@ -48311,7 +48289,7 @@ jbm_rational_29_6_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_7_nxf64 (x, p, 4);
 }
@@ -48323,7 +48301,7 @@ jbm_rational_29_7_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_8_nxf64 (x, p, 4);
 }
@@ -48335,7 +48313,7 @@ jbm_rational_29_8_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                         const double *p)        ///< array of coefficients.
+                         const double *p)       ///< array of coefficients.
 {
   return jbm_rational_29_9_nxf64 (x, p, 4);
 }
@@ -48347,7 +48325,7 @@ jbm_rational_29_9_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_10_nxf64 (x, p, 4);
 }
@@ -48359,7 +48337,7 @@ jbm_rational_29_10_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_11_nxf64 (x, p, 4);
 }
@@ -48371,7 +48349,7 @@ jbm_rational_29_11_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_12_nxf64 (x, p, 4);
 }
@@ -48383,7 +48361,7 @@ jbm_rational_29_12_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_13_nxf64 (x, p, 4);
 }
@@ -48395,7 +48373,7 @@ jbm_rational_29_13_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_14_nxf64 (x, p, 4);
 }
@@ -48407,7 +48385,7 @@ jbm_rational_29_14_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_15_nxf64 (x, p, 4);
 }
@@ -48419,7 +48397,7 @@ jbm_rational_29_15_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_16_nxf64 (x, p, 4);
 }
@@ -48431,7 +48409,7 @@ jbm_rational_29_16_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_17_nxf64 (x, p, 4);
 }
@@ -48443,7 +48421,7 @@ jbm_rational_29_17_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_18_nxf64 (x, p, 4);
 }
@@ -48455,7 +48433,7 @@ jbm_rational_29_18_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_19_nxf64 (x, p, 4);
 }
@@ -48467,7 +48445,7 @@ jbm_rational_29_19_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_20_nxf64 (x, p, 4);
 }
@@ -48479,7 +48457,7 @@ jbm_rational_29_20_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_21_nxf64 (x, p, 4);
 }
@@ -48491,7 +48469,7 @@ jbm_rational_29_21_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_22_nxf64 (x, p, 4);
 }
@@ -48503,7 +48481,7 @@ jbm_rational_29_22_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_23_nxf64 (x, p, 4);
 }
@@ -48515,7 +48493,7 @@ jbm_rational_29_23_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_24_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_24_nxf64 (x, p, 4);
 }
@@ -48527,7 +48505,7 @@ jbm_rational_29_24_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_25_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_25_nxf64 (x, p, 4);
 }
@@ -48539,7 +48517,7 @@ jbm_rational_29_25_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_26_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_26_nxf64 (x, p, 4);
 }
@@ -48551,7 +48529,7 @@ jbm_rational_29_26_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_27_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_27_nxf64 (x, p, 4);
 }
@@ -48563,7 +48541,7 @@ jbm_rational_29_27_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_rational_29_28_4xf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
-                          const double *p)       ///< array of coefficients.
+                          const double *p)      ///< array of coefficients.
 {
   return jbm_rational_29_28_nxf64 (x, p, 4);
 }
@@ -48711,7 +48689,7 @@ jbm_pown_4xf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
 jbm_pow_4xf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
-               const double e)   ///< exponent (float).
+               const double e)  ///< exponent (float).
 {
   return jbm_pow_nxf64 (x, e, 4);
 }
@@ -48761,9 +48739,9 @@ jbm_coswc_4xf64 (const vfloat64m1_t x)
 static inline void
 jbm_sincoswc_4xf64 (const vfloat64m1_t x,
                     ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat64m1_t *s,
+                    vfloat64m1_t * s,
                     ///< pointer to the sin function value (4x vfloat64m1_t).
-                    vfloat64m1_t *c)
+                    vfloat64m1_t * c)
                     ///< pointer to the cos function value (4x vfloat64m1_t).
 {
   jbm_sincoswc_nxf64 (x, s, c, 4);
@@ -48800,9 +48778,9 @@ jbm_cos_4xf64 (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 static inline void
 jbm_sincos_4xf64 (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat64m1_t *s,
+                  vfloat64m1_t * s,
                   ///< pointer to the sin function value (4x vfloat64m1_t).
-                  vfloat64m1_t *c)
+                  vfloat64m1_t * c)
                   ///< pointer to the cos function value (4x vfloat64m1_t).
 {
   jbm_sincos_nxf64 (x, s, c, 4);
@@ -49110,7 +49088,7 @@ static inline vfloat64m1_t
 jbm_flux_limiter_total_4xf64 (const vfloat64m1_t d1 __attribute__((unused)),
                               ///< 1st flux limiter function parameter.
                               const vfloat64m1_t d2 __attribute__((unused)))
-                              ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return jbm_flux_limiter_total_nxf64 (d1, d2, 4);
 }
@@ -49125,7 +49103,7 @@ static inline vfloat64m1_t
 jbm_flux_limiter_null_4xf64 (const vfloat64m1_t d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
                              const vfloat64m1_t d2 __attribute__((unused)))
-                             ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return jbm_flux_limiter_null_nxf64 (d1, d2, 4);
 }
