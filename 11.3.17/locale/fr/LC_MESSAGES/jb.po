@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: jb 11.3.16\n"
+"Project-Id-Version: jb 11.3.17\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-11 03:28+0200\n"
+"POT-Creation-Date: 2025-10-23 04:51+0200\n"
 "PO-Revision-Date: 2020-05-05 02:59+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,15 +17,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/def.c:351 src/win.c:751
+#: src/def.c:345 src/win.c:751
 msgid "unable to open the file"
 msgstr "impossible d'ouvrir le fichier"
 
-#: src/def.c:359
+#: src/def.c:353
 msgid "not enough memory to open the file"
 msgstr "mémoire insuffisante pour ouvrir le fichier"
 
-#: src/def.c:365
+#: src/def.c:359
 msgid "unable to read the file"
 msgstr "impossible de lire le fichier"
 

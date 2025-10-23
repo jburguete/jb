@@ -248,26 +248,26 @@ jb_get_ncores (void)
 static char *
 jb_string_add (char *string,    ///< string.
                const char *first_message,       ///< first message,
-               ...)             ///< additional messages (NULL-terminated).
+               va_list args)    ///< additional messages (NULL-terminated).
 {
-  va_list args;
+  va_list a;
   char **msg;
   char *buffer;
   unsigned int i, n;
 
   // arguments number
-  va_start (args, first_message);
-  for (n = 1; va_arg (args, const char *);)
+  va_copy (a, args);
+  for (n = 1; va_arg (a, const char *);)
     ++n;
-  va_end (args);
+  va_end (a);
 
   // array of arguments
   msg = (char **) malloc ((n + 2) * sizeof (char *));
   msg[0] = (char *) first_message;
-  va_start (args, first_message);
+  va_copy (a, args);
   for (i = 1; i < n; ++i)
-    msg[i] = (char *) va_arg (args, const char *);
-  va_end (args);
+    msg[i] = (char *) va_arg (a, const char *);
+  va_end (a);
   if (string)
     msg[i++] = string;
   msg[i] = NULL;
@@ -289,12 +289,9 @@ jb_error_add (const char *first_message,        ///< first message,
               ...)              ///< additional messages (NULL-terminated).
 {
   va_list args;
-  char *buffer;
-  buffer = jb_error_message;
   va_start (args, first_message);
   jb_error_message = jb_string_add (jb_error_message, first_message, args);
   va_end (args);
-  g_free (buffer);
 }
 
 /**
@@ -315,12 +312,9 @@ jb_warning_add (const char *first_message,      ///< first message,
                 ...)            ///< additional messages (NULL-terminated).
 {
   va_list args;
-  char *buffer;
-  buffer = jb_warning_message;
   va_start (args, first_message);
   jb_warning_message = jb_string_add (jb_warning_message, first_message, args);
   va_end (args);
-  g_free (buffer);
 }
 
 /**
