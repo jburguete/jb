@@ -139,7 +139,7 @@ const GLfloat jbw_identity[16] = {
 };                              ///< identity matrix.
 
 #if HAVE_GTKGLAREA
-int (*jbw_graphic_loop_idle) (void) = NULL;
+int (*jbw_graphic_loop_idle) (void *) = NULL;
 GMainLoop *jbw_graphic_loop_pointer = NULL;
 ///< pointer to the idle function on a main loop.
 #elif HAVE_SDL

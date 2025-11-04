@@ -411,7 +411,7 @@ extern const GLfloat jbw_white[4];
 extern const GLfloat jbw_identity[16];
 
 #if HAVE_GTKGLAREA
-extern int (*jbw_graphic_loop_idle) (void);
+extern int (*jbw_graphic_loop_idle) (void *);
 extern GMainLoop *jbw_graphic_loop_pointer;
 #elif HAVE_SDL
 extern int (*jbw_graphic_loop_idle) (void);
