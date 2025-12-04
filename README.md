@@ -88,8 +88,8 @@ This software has been built and tested in the following operative systems:
 * Debian 12 (Linux)
 * Devuan Linux 5
 * Dragonfly BSD 6.4.1
-* Fedora Linux 42
-* FreeBSD 14.2
+* Fedora Linux 43
+* FreeBSD 15.0
 * Gentoo Linux
 * Linux Mint DE 6
 * MacOS Sequoia + Homebrew
