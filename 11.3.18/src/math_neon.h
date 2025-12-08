@@ -180,7 +180,7 @@ jbm_rest_4xf32 (const float32x4_t x,    ///< dividend (float32x4_t).
  */
 static inline float32x4_t
 jbm_frexp_4xf32 (const float32x4_t x,   ///< float32x4_t vector.
-                 int32x4_t * e) ///< pointer to the extracted exponents vector.
+                 int32x4_t *e)  ///< pointer to the extracted exponents vector.
 {
   JBM4xF32 a, y, y2, z;
   uint32x4_t b, m1, m2, m3;
@@ -279,9 +279,9 @@ jbm_modmin_4xf32 (const float32x4_t a,  ///< 1st float64x2_t vector.
  * Function to interchange 2 float32x4_t vectors.
  */
 static inline void
-jbm_change_4xf32 (float32x4_t * restrict a,
+jbm_change_4xf32 (float32x4_t *restrict a,
 ///< 1st float32x4_t vector pointer.
-                  float32x4_t * restrict b)
+                  float32x4_t *restrict b)
 ///< 2nd float32x4_t vector pointer.
 {
   float32x4_t c;
@@ -7074,8 +7074,8 @@ jbm_coswc_4xf32 (const float32x4_t x)
 static inline void
 jbm_sincoswc_4xf32 (const float32x4_t x,
                     ///< float32x4_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    float32x4_t * s,    ///< pointer to the sin function value (float32x4_t).
-                    float32x4_t * c)    ///< pointer to the cos function value (float32x4_t).
+                    float32x4_t *s,     ///< pointer to the sin function value (float32x4_t).
+                    float32x4_t *c)     ///< pointer to the cos function value (float32x4_t).
 {
   float32x4_t s0;
   *s = s0 = jbm_sinwc_4xf32 (x);
@@ -7140,9 +7140,9 @@ jbm_cos_4xf32 (const float32x4_t x)     ///< float32x4_t vector.
 static inline void
 jbm_sincos_4xf32 (const float32x4_t x,
                   ///< float32x4_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  float32x4_t * s,
+                  float32x4_t *s,
                   ///< pointer to the sin function value (float32x4_t).
-                  float32x4_t * c)
+                  float32x4_t *c)
                   ///< pointer to the cos function value (float32x4_t).
 {
   float32x4_t y, pi2, s1, c1, s2, c2;
@@ -7977,7 +7977,7 @@ jbm_rest_2xf64 (const float64x2_t x,    ///< dividend (float64x2_t).
  */
 static inline float64x2_t
 jbm_frexp_2xf64 (const float64x2_t x,   ///< float64x2_t vector.
-                 int64x2_t * e) ///< pointer to the extracted exponents vector.
+                 int64x2_t *e)  ///< pointer to the extracted exponents vector.
 {
   JBM2xF64 a, y, y2, z;
   uint64x2_t b, m1, m2, m3;
@@ -8076,8 +8076,8 @@ jbm_modmin_2xf64 (const float64x2_t a,  ///< 1st float64x2_t vector.
  * Function to interchange 2 float64x2_t numbers.
  */
 static inline void
-jbm_change_2xf64 (float64x2_t * restrict a,     ///< 1st float64x2_t vector pointer.
-                  float64x2_t * restrict b)     ///< 2nd float64x2_t vector pointer.
+jbm_change_2xf64 (float64x2_t *restrict a,      ///< 1st float64x2_t vector pointer.
+                  float64x2_t *restrict b)      ///< 2nd float64x2_t vector pointer.
 {
   float64x2_t c;
   JB_CHANGE (*a, *b, c);
@@ -14894,9 +14894,9 @@ jbm_coswc_2xf64 (const float64x2_t x)
 static inline void
 jbm_sincoswc_2xf64 (const float64x2_t x,
                     ///< float64x2_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    float64x2_t * s,
+                    float64x2_t *s,
                     ///< pointer to the f32 function value (float64x2_t).
-                    float64x2_t * c)
+                    float64x2_t *c)
                     ///< pointer to the f32 function value (float64x2_t).
 {
   float64x2_t s0;
@@ -14961,9 +14961,9 @@ jbm_cos_2xf64 (const float64x2_t x)     ///< float64x2_t vector.
 static inline void
 jbm_sincos_2xf64 (const float64x2_t x,
                   ///< float64x2_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  float64x2_t * s,
+                  float64x2_t *s,
                   ///< pointer to the f32 function value (float64x2_t).
-                  float64x2_t * c)
+                  float64x2_t *c)
                   ///< pointer to the f32 function value (float64x2_t).
 {
   float64x2_t y, pi2, s1, c1, s2, c2;

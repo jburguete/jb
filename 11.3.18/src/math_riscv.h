@@ -36,7 +36,7 @@
 // Debug functions
 
 static inline void
-print_vuint32m1_t (FILE * file, const char *label, vuint32m1_t x,
+print_vuint32m1_t (FILE *file, const char *label, vuint32m1_t x,
                    const size_t vl)
 {
   unsigned int y[vl] JB_ALIGNED;
@@ -47,7 +47,7 @@ print_vuint32m1_t (FILE * file, const char *label, vuint32m1_t x,
 }
 
 static inline void
-print_vuint64m1_t (FILE * file, const char *label, vuint64m1_t x,
+print_vuint64m1_t (FILE *file, const char *label, vuint64m1_t x,
                    const size_t vl)
 {
   unsigned long int y[vl] JB_ALIGNED;
@@ -58,7 +58,7 @@ print_vuint64m1_t (FILE * file, const char *label, vuint64m1_t x,
 }
 
 static inline void
-print_vint32m1_t (FILE * file, const char *label, vint32m1_t x, const size_t vl)
+print_vint32m1_t (FILE *file, const char *label, vint32m1_t x, const size_t vl)
 {
   int y[vl] JB_ALIGNED;
   unsigned int i;
@@ -68,7 +68,7 @@ print_vint32m1_t (FILE * file, const char *label, vint32m1_t x, const size_t vl)
 }
 
 static inline void
-print_vint64m1_t (FILE * file, const char *label, vint64m1_t x, const size_t vl)
+print_vint64m1_t (FILE *file, const char *label, vint64m1_t x, const size_t vl)
 {
   long int y[vl] JB_ALIGNED;
   unsigned int i;
@@ -78,7 +78,7 @@ print_vint64m1_t (FILE * file, const char *label, vint64m1_t x, const size_t vl)
 }
 
 static inline void
-print_vfloat32m1_t (FILE * file, const char *label, vfloat32m1_t x,
+print_vfloat32m1_t (FILE *file, const char *label, vfloat32m1_t x,
                     const size_t vl)
 {
   float y[vl] JB_ALIGNED;
@@ -89,7 +89,7 @@ print_vfloat32m1_t (FILE * file, const char *label, vfloat32m1_t x,
 }
 
 static inline void
-print_vfloat64m1_t (FILE * file, const char *label, vfloat64m1_t x,
+print_vfloat64m1_t (FILE *file, const char *label, vfloat64m1_t x,
                     const size_t vl)
 {
   double y[vl] JB_ALIGNED;
@@ -258,7 +258,7 @@ jbm_rest_nxf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
  */
 static inline vfloat32m1_t
 jbm_frexp_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
-                 vint32m1_t * e,        ///< pointer to the extracted exponents vector.
+                 vint32m1_t *e, ///< pointer to the extracted exponents vector.
                  const size_t vl)       ///< vector size.
 {
   vfloat32m1_t yx, y2x, zx;
@@ -384,9 +384,9 @@ jbm_modmin_nxf32 (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
  * Function to interchange 2 vfloat32m1_t vectors.
  */
 static inline void
-jbm_change_nxf32 (vfloat32m1_t * restrict a,
+jbm_change_nxf32 (vfloat32m1_t *restrict a,
 ///< 1st vfloat32m1_t vector pointer.
-                  vfloat32m1_t * restrict b)
+                  vfloat32m1_t *restrict b)
 ///< 2nd vfloat32m1_t vector pointer.
 {
   vfloat32m1_t c;
@@ -10432,9 +10432,9 @@ jbm_coswc_nxf32 (const vfloat32m1_t x,
 static inline void
 jbm_sincoswc_nxf32 (const vfloat32m1_t x,
                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat32m1_t * s,
+                    vfloat32m1_t *s,
                     ///< pointer to the sin function value (vfloat32m1_t).
-                    vfloat32m1_t * c,
+                    vfloat32m1_t *c,
                     ///< pointer to the cos function value (vfloat32m1_t).
                     const size_t vl)    ///< array size.
 {
@@ -10522,9 +10522,9 @@ jbm_cos_nxf32 (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
 static inline void
 jbm_sincos_nxf32 (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat32m1_t * s,
+                  vfloat32m1_t *s,
                   ///< pointer to the sin function value (vfloat32m1_t).
-                  vfloat32m1_t * c,
+                  vfloat32m1_t *c,
                   ///< pointer to the cos function value (vfloat32m1_t).
                   const size_t vl)      ///< array size.
 {
@@ -11589,7 +11589,7 @@ jbm_rest_nxf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
  */
 static inline vfloat64m1_t
 jbm_frexp_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                 vint64m1_t * e,        ///< pointer to the extracted exponents vector.
+                 vint64m1_t *e, ///< pointer to the extracted exponents vector.
                  const size_t vl)       ///< vector size.
 {
   vfloat64m1_t yx, y2x, zx;
@@ -11715,9 +11715,9 @@ jbm_modmin_nxf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
  * Function to interchange 2 vfloat64m1_t numbers.
  */
 static inline void
-jbm_change_nxf64 (vfloat64m1_t * restrict a,
+jbm_change_nxf64 (vfloat64m1_t *restrict a,
                   ///< 1st vfloat64m1_t vector pointer.
-                  vfloat64m1_t * restrict b)
+                  vfloat64m1_t *restrict b)
                   ///< 2nd vfloat64m1_t vector pointer.
 {
   vfloat64m1_t c;
@@ -21801,9 +21801,9 @@ jbm_coswc_nxf64 (const vfloat64m1_t x,
 static inline void
 jbm_sincoswc_nxf64 (const vfloat64m1_t x,
                     ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat64m1_t * s,
+                    vfloat64m1_t *s,
                     ///< pointer to the f32 function value (vfloat64m1_t).
-                    vfloat64m1_t * c,
+                    vfloat64m1_t *c,
                     ///< pointer to the f32 function value (vfloat64m1_t).
                     const size_t vl)    ///< array size.
 {
@@ -21889,9 +21889,9 @@ jbm_cos_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
 static inline void
 jbm_sincos_nxf64 (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat64m1_t * s,
+                  vfloat64m1_t *s,
                   ///< pointer to the f32 function value (vfloat64m1_t).
-                  vfloat64m1_t * c,
+                  vfloat64m1_t *c,
                   ///< pointer to the f32 function value (vfloat64m1_t).
                   const size_t vl)      ///< array size.
 {
@@ -22842,37 +22842,37 @@ jbm_integral_nxf64 (vfloat64m1_t (*f) (vfloat64m1_t, size_t),
 }
 
 static inline void
-print_vuint32m1_t_2 (FILE * file, const char *label, vuint32m1_t x)
+print_vuint32m1_t_2 (FILE *file, const char *label, vuint32m1_t x)
 {
   print_vuint32m1_t (file, label, x, 2);
 }
 
 static inline void
-print_vuint64m1_t_2 (FILE * file, const char *label, vuint64m1_t x)
+print_vuint64m1_t_2 (FILE *file, const char *label, vuint64m1_t x)
 {
   print_vuint64m1_t (file, label, x, 2);
 }
 
 static inline void
-print_vint32m1_t_2 (FILE * file, const char *label, vint32m1_t x)
+print_vint32m1_t_2 (FILE *file, const char *label, vint32m1_t x)
 {
   print_vint32m1_t (file, label, x, 2);
 }
 
 static inline void
-print_vint64m1_t_2 (FILE * file, const char *label, vint64m1_t x)
+print_vint64m1_t_2 (FILE *file, const char *label, vint64m1_t x)
 {
   print_vint64m1_t (file, label, x, 2);
 }
 
 static inline void
-print_vfloat32m1_t_2 (FILE * file, const char *label, vfloat32m1_t x)
+print_vfloat32m1_t_2 (FILE *file, const char *label, vfloat32m1_t x)
 {
   print_vfloat32m1_t (file, label, x, 2);
 }
 
 static inline void
-print_vfloat64m1_t_2 (FILE * file, const char *label, vfloat64m1_t x)
+print_vfloat64m1_t_2 (FILE *file, const char *label, vfloat64m1_t x)
 {
   print_vfloat64m1_t (file, label, x, 2);
 }
@@ -22986,7 +22986,7 @@ jbm_rest_4xf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
  */
 static inline vfloat32m1_t
 jbm_frexp_4xf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
-                 vint32m1_t * e)        ///< pointer to the extracted exponents vector.
+                 vint32m1_t *e) ///< pointer to the extracted exponents vector.
 {
   return jbm_frexp_nxf32 (x, e, 4);
 }
@@ -28915,9 +28915,9 @@ jbm_coswc_4xf32 (const vfloat32m1_t x)
 static inline void
 jbm_sincoswc_4xf32 (const vfloat32m1_t x,
                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat32m1_t * s,
+                    vfloat32m1_t *s,
                     ///< pointer to the sin function value (4x vfloat32m1_t).
-                    vfloat32m1_t * c)
+                    vfloat32m1_t *c)
                     ///< pointer to the cos function value (4x vfloat32m1_t).
 {
   jbm_sincoswc_nxf32 (x, s, c, 4);
@@ -28954,9 +28954,9 @@ jbm_cos_4xf32 (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 static inline void
 jbm_sincos_4xf32 (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat32m1_t * s,
+                  vfloat32m1_t *s,
                   ///< pointer to the sin function value (4x vfloat32m1_t).
-                  vfloat32m1_t * c)
+                  vfloat32m1_t *c)
                   ///< pointer to the cos function value (4x vfloat32m1_t).
 {
   jbm_sincos_nxf32 (x, s, c, 4);
@@ -29594,7 +29594,7 @@ jbm_rest_2xf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
  */
 static inline vfloat64m1_t
 jbm_frexp_2xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                 vint64m1_t * e)        ///< pointer to the extracted exponents vector.
+                 vint64m1_t *e) ///< pointer to the extracted exponents vector.
 {
   return jbm_frexp_nxf64 (x, e, 2);
 }
@@ -35523,9 +35523,9 @@ jbm_coswc_2xf64 (const vfloat64m1_t x)
 static inline void
 jbm_sincoswc_2xf64 (const vfloat64m1_t x,
                     ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat64m1_t * s,
+                    vfloat64m1_t *s,
                     ///< pointer to the sin function value (2x vfloat64m1_t).
-                    vfloat64m1_t * c)
+                    vfloat64m1_t *c)
                     ///< pointer to the cos function value (2x vfloat64m1_t).
 {
   jbm_sincoswc_nxf64 (x, s, c, 2);
@@ -35562,9 +35562,9 @@ jbm_cos_2xf64 (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 static inline void
 jbm_sincos_2xf64 (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat64m1_t * s,
+                  vfloat64m1_t *s,
                   ///< pointer to the sin function value (2x vfloat64m1_t).
-                  vfloat64m1_t * c)
+                  vfloat64m1_t *c)
                   ///< pointer to the cos function value (2x vfloat64m1_t).
 {
   jbm_sincos_nxf64 (x, s, c, 2);
@@ -36202,7 +36202,7 @@ jbm_rest_8xf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
  */
 static inline vfloat32m1_t
 jbm_frexp_8xf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
-                 vint32m1_t * e)        ///< pointer to the extracted exponents vector.
+                 vint32m1_t *e) ///< pointer to the extracted exponents vector.
 {
   return jbm_frexp_nxf32 (x, e, 8);
 }
@@ -42131,9 +42131,9 @@ jbm_coswc_8xf32 (const vfloat32m1_t x)
 static inline void
 jbm_sincoswc_8xf32 (const vfloat32m1_t x,
                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat32m1_t * s,
+                    vfloat32m1_t *s,
                     ///< pointer to the sin function value (8x vfloat32m1_t).
-                    vfloat32m1_t * c)
+                    vfloat32m1_t *c)
                     ///< pointer to the cos function value (8x vfloat32m1_t).
 {
   jbm_sincoswc_nxf32 (x, s, c, 8);
@@ -42170,9 +42170,9 @@ jbm_cos_8xf32 (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 static inline void
 jbm_sincos_8xf32 (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat32m1_t * s,
+                  vfloat32m1_t *s,
                   ///< pointer to the sin function value (8x vfloat32m1_t).
-                  vfloat32m1_t * c)
+                  vfloat32m1_t *c)
                   ///< pointer to the cos function value (8x vfloat32m1_t).
 {
   jbm_sincos_nxf32 (x, s, c, 8);
@@ -42810,7 +42810,7 @@ jbm_rest_4xf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
  */
 static inline vfloat64m1_t
 jbm_frexp_4xf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                 vint64m1_t * e)        ///< pointer to the extracted exponents vector.
+                 vint64m1_t *e) ///< pointer to the extracted exponents vector.
 {
   return jbm_frexp_nxf64 (x, e, 4);
 }
@@ -48739,9 +48739,9 @@ jbm_coswc_4xf64 (const vfloat64m1_t x)
 static inline void
 jbm_sincoswc_4xf64 (const vfloat64m1_t x,
                     ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    vfloat64m1_t * s,
+                    vfloat64m1_t *s,
                     ///< pointer to the sin function value (4x vfloat64m1_t).
-                    vfloat64m1_t * c)
+                    vfloat64m1_t *c)
                     ///< pointer to the cos function value (4x vfloat64m1_t).
 {
   jbm_sincoswc_nxf64 (x, s, c, 4);
@@ -48778,9 +48778,9 @@ jbm_cos_4xf64 (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 static inline void
 jbm_sincos_4xf64 (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  vfloat64m1_t * s,
+                  vfloat64m1_t *s,
                   ///< pointer to the sin function value (4x vfloat64m1_t).
-                  vfloat64m1_t * c)
+                  vfloat64m1_t *c)
                   ///< pointer to the cos function value (4x vfloat64m1_t).
 {
   jbm_sincos_nxf64 (x, s, c, 4);

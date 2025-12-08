@@ -163,7 +163,7 @@ jbm_rest_16xf32 (const __m512 x,        ///< dividend (__m512).
  */
 static inline __m512
 jbm_frexp_16xf32 (const __m512 x,       ///< __m512 vector.
-                  __m512i * e)  ///< pointer to the extracted exponents vector.
+                  __m512i *e)   ///< pointer to the extracted exponents vector.
 {
   JBM16xF32 a, y, y2, z;
   __m512i e16, b, zi;
@@ -269,8 +269,8 @@ jbm_modmin_16xf32 (const __m512 a,      ///< 1st __m512d vector.
  * Function to interchange 2 __m512 vectors.
  */
 static inline void
-jbm_change_16xf32 (__m512 * restrict a, ///< 1st __m512 vector pointer.
-                   __m512 * restrict b) ///< 2nd __m512 vector pointer.
+jbm_change_16xf32 (__m512 *restrict a,  ///< 1st __m512 vector pointer.
+                   __m512 *restrict b)  ///< 2nd __m512 vector pointer.
 {
   __m512 c;
   JB_CHANGE (*a, *b, c);
@@ -7181,8 +7181,8 @@ jbm_coswc_16xf32 (const __m512 x)
 static inline void
 jbm_sincoswc_16xf32 (const __m512 x,
                      ///< __m512 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                     __m512 * s,        ///< pointer to the sin function value (__m512).
-                     __m512 * c)        ///< pointer to the cos function value (__m512).
+                     __m512 *s, ///< pointer to the sin function value (__m512).
+                     __m512 *c) ///< pointer to the cos function value (__m512).
 {
   __m512 s0;
   *s = s0 = jbm_sinwc_16xf32 (x);
@@ -7268,8 +7268,8 @@ jbm_cos_16xf32 (const __m512 x) ///< __m512 vector.
 static inline void
 jbm_sincos_16xf32 (const __m512 x,
                    ///< __m512 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                   __m512 * s,  ///< pointer to the sin function value (__m512).
-                   __m512 * c)  ///< pointer to the cos function value (__m512).
+                   __m512 *s,   ///< pointer to the sin function value (__m512).
+                   __m512 *c)   ///< pointer to the cos function value (__m512).
 {
   __m512 y, pi2, z, s1, c1, s2, c2;
   __mmask16 m;
@@ -8161,7 +8161,7 @@ jbm_rest_8xf64 (const __m512d x,        ///< dividend (__m512d).
  */
 static inline __m512d
 jbm_frexp_8xf64 (const __m512d x,       ///< __m512d vector.
-                 __m512i * e)   ///< pointer to the extracted exponents vector.
+                 __m512i *e)    ///< pointer to the extracted exponents vector.
 {
   JBM8xF64 a, y, y2, z;
   __m512i e2, b, zi;
@@ -8270,8 +8270,8 @@ jbm_modmin_8xf64 (const __m512d a,      ///< 1st __m512d vector.
  * Function to interchange 2 __m512d numbers.
  */
 static inline void
-jbm_change_8xf64 (__m512d * restrict a, ///< 1st __m512d vector pointer.
-                  __m512d * restrict b) ///< 2nd __m512d vector pointer.
+jbm_change_8xf64 (__m512d *restrict a,  ///< 1st __m512d vector pointer.
+                  __m512d *restrict b)  ///< 2nd __m512d vector pointer.
 {
   __m512d c;
   JB_CHANGE (*a, *b, c);
@@ -15158,9 +15158,9 @@ jbm_coswc_8xf64 (const __m512d x)
 static inline void
 jbm_sincoswc_8xf64 (const __m512d x,
                     ///< __m512d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    __m512d * s,
+                    __m512d *s,
                     ///< pointer to the f32 function value (__m512d).
-                    __m512d * c)
+                    __m512d *c)
     ///< pointer to the f32 function value (__m512d).
 {
   __m512d s0;
@@ -15240,8 +15240,8 @@ jbm_cos_8xf64 (const __m512d x) ///< __m512d vector.
 static inline void
 jbm_sincos_8xf64 (const __m512d x,
                   ///< __m512d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  __m512d * s,  ///< pointer to the f32 function value (__m512d).
-                  __m512d * c)  ///< pointer to the f32 function value (__m512d).
+                  __m512d *s,   ///< pointer to the f32 function value (__m512d).
+                  __m512d *c)   ///< pointer to the f32 function value (__m512d).
 {
   __m512d y, pi2, z, s1, c1, s2, c2;
   __mmask16 m;
