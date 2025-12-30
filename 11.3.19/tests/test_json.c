@@ -39,8 +39,7 @@ main (void)
   printf ("x %s 1\n", str);
   i = jb_json_object_get_int_with_default (object, JSON_I, &e2, 0);
   printf ("i %d 1\n", i);
-  x = jb_json_object_get_time_with_default (object, JSON_T,
-                                            &e3, (JBDOUBLE) 0.);
+  x = jb_json_object_get_time_with_default (object, JSON_T, &e3, (JBDOUBLE) 0.);
   SNPRINTFL (str, JB_BUFFER_SIZE, FWL, x);
   printf ("t %s 1\n", str);
   if (!e1 || !e2 || !e3)
