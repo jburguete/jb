@@ -38,6 +38,10 @@
 #define JBM_1_BITS_F32 0x3f800000u      ///< 1 bits for floats.
 #define K_ERFC_MAX_F32 9.1945494491346722541126284791161797e+00f
 ///< maximum value for the erfc function for floats.
+#define JBM_CBRT2_F32 1.2599210498948731647672106072782284f
+///< cbrt(2) for floats.
+#define JBM_CBRT4_F32 1.5874010519681994747517056392723083f
+///< cbrt(4) for floats.
 
 
 /**
@@ -48,6 +52,16 @@ typedef union
   float x;                      ///< floating point.
   uint32_t i;                   ///< bits.
 } JBMF32;
+
+///> constants to approximate the cbr5 function for floats.
+static const float K_CBRTWC_F32[6] JB_ALIGNED = {
+  2.8161682735545150103123149112801870e-01f,
+  4.2177555825677256686056577661107689e+00f,
+  4.7513737599056927748717867424267637e+00f,
+  2.7522639784879759608409561827672440e-01f,
+  5.6811029731502418980950973715327693e+00f,
+  2.8448695945274256424976742464095058e+00f
+};
 
 ///> constants to approximate the exp2 function for floats.
 static const float K_EXP2WC_F32[7] JB_ALIGNED = {
@@ -3617,6 +3631,50 @@ jbm_rational_21_20_f32 (const float x,  ///< float value.
 }
 
 /**
+ * Function to calculate the well conditionated function cbrt(x) for x
+ * \f$\in\left[\frac12\;,1\right]\f$ (float).
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_cbrtwc_f32 (const float x)
+                ///< float number \f$\in\left[\frac12,\;1\right]\f$.
+{
+  return jbm_rational_5_3_f32 (x, K_CBRTWC_F32);
+}
+
+/**
+ * Function to calculate the function cbrt(x) using the jbm_cbrtwc_f32 and
+ * jbm_ldexp_f32 functions (float).
+ *
+ * \return function value (float).
+ */
+static inline float
+jbm_cbrt_f32 (const float x)    ///< float number.
+{
+  float m;
+  int e, r;
+  m = jbm_frexp_f32 (jbm_abs_f32 (x), &e);
+  m = jbm_ldexp_f32 (jbm_cbrtwc_f32 (m), e / 3);
+  r = e % 3;
+  if (e < 0)
+    {
+      if (r & 1)
+        m /= JBM_CBRT2_F32;
+      if (r & 2)
+        m /= JBM_CBRT4_F32;
+    }
+  else
+    {
+      if (r & 1)
+        m *= JBM_CBRT2_F32;
+      if (r & 2)
+        m *= JBM_CBRT4_F32;
+    }
+  return jbm_copysign_f32 (m, x);
+}
+
+/**
  * Function to calculate the well conditionated function exp2(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (float).
  *
@@ -3790,23 +3848,7 @@ static inline float
 jbm_pow_f32 (const float x,     ///< float number.
              const float e)     ///< exponent (float).
 {
-  float f;
-  f = floorf (e);
-  if (f == e)
-    return jbm_pown_f32 (x, (int) e);
   return jbm_exp2_f32 (e * jbm_log2_f32 (x));
-}
-
-/**
- * Function to calculate the function cbrt(x) using the jbm_abs_f32 and
- * jbm_pow_f32 functions (float).
- *
- * \return function value (float).
- */
-static inline float
-jbm_cbrt_f32 (const float x)    ///< float number.
-{
-  return jbm_copysign_f32 (jbm_pow_f32 (jbm_abs_f32 (x), 1.f / 3.f), x);
 }
 
 /**

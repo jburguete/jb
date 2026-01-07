@@ -7364,7 +7364,7 @@ jbm_atan2_4xf32 (const __m128 y,        ///< __m128 y component.
   __m128 f, g;
   f = jbm_atan_4xf32 (_mm_div_ps (y, x));
   g = _mm_add_ps (f, jbm_copysign_4xf32 (pi, y));
-  return _mm_blendv_ps (f, g, _mm_cmp_ps (x, z, _CMP_LT_OS));
+  return _mm_blendv_ps (f, g, _mm_cmplt_ps (x, z));
 }
 
 /**
@@ -7551,10 +7551,8 @@ jbm_erfc_4xf32 (const __m128 x) ///< __m128 vector.
   wc = _mm_sub_ps (u, jbm_erfwc_4xf32 (x));
   return
     _mm_blendv_ps
-    (
-     _mm_blendv_ps
-     (wc, _mm_sub_ps (u2, cwc), _mm_cmp_ps (ax, u, _CMP_GT_OS)), cwc,
-     _mm_cmp_ps (x, u, _CMP_GT_OS));
+    (_mm_blendv_ps (wc, _mm_sub_ps (u2, cwc), _mm_cmpgt_ps (ax, u)), cwc,
+     _mm_cmpgt_ps (x, u));
 }
 
 /**
@@ -15187,7 +15185,7 @@ jbm_atan2_2xf64 (const __m128d y,       ///< __m128d y component.
   __m128d f, g;
   f = jbm_atan_2xf64 (_mm_div_pd (y, x));
   g = _mm_add_pd (f, jbm_copysign_2xf64 (pi, y));
-  return _mm_blendv_pd (f, g, _mm_cmp_pd (x, z, _CMP_LT_OS));
+  return _mm_blendv_pd (f, g, _mm_cmplt_pd (x, z));
 }
 
 /**
@@ -15375,10 +15373,8 @@ jbm_erfc_2xf64 (const __m128d x)        ///< __m128d vector.
   wc = _mm_sub_pd (u, jbm_erfwc_2xf64 (x));
   return
     _mm_blendv_pd
-    (
-     _mm_blendv_pd
-     (wc, _mm_sub_pd (u2, cwc), _mm_cmp_pd (ax, u, _CMP_GT_OS)), cwc,
-     _mm_cmp_pd (x, u, _CMP_GT_OS));
+    (_mm_blendv_pd (wc, _mm_sub_pd (u2, cwc), _mm_cmpgt_pd (ax, u)), cwc,
+     _mm_cmpgt_pd (x, u));
 }
 
 /**
