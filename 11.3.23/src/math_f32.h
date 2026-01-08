@@ -42,10 +42,6 @@
 ///< cbrt(2) for floats.
 #define JBM_CBRT4_F32 1.5874010519681994747517056392723083f
 ///< cbrt(4) for floats.
-#define JBM_CBRT1_2_F32 7.9370052598409973737585281963615413e-01f
-///< cbrt(1/2) for floats.
-#define JBM_CBRT1_4_F32 6.2996052494743658238360530363911417e-01f
-///< cbrt(1/4) for floats.
 
 /**
  * union to work with bits in float numbers.
@@ -56,7 +52,7 @@ typedef union
   uint32_t i;                   ///< bits.
 } JBMF32;
 
-///> constants to approximate the cbr5 function for floats.
+///> constants to approximate the cbrt function for floats.
 static const float K_CBRTWC_F32[6] JB_ALIGNED = {
   2.8161682735545150103123149112801870e-01f,
   4.2177555825677256686056577661107689e+00f,
@@ -3759,7 +3755,7 @@ jbm_log2wc_f32 (const float x)  ///< float number.
 }
 
 /**
- * Function to calculate the function log_2(x) using jbm_log2wc_f32 and
+ * Function to calculate the function log2(x) using jbm_log2wc_f32 and
  * jbm_frexp_f32 (float).
  *
  * \return function value (float).

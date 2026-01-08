@@ -3474,12 +3474,12 @@ main (int argn, char **argc)
                   nthreads, "truncf");
   efficiency_f32 (TYPE_ABS, thread_f32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
                   nthreads, "fabsf");
-  efficiency_f32 (TYPE_JBM_ABS, thread_f32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
-                  nthreads, "jbm_abs_f32");
+  efficiency_f32 (TYPE_JBM_ABS, thread_f32, x32, y32, r, n, -FLT_MAX_2,
+                  FLT_MAX_2, nthreads, "jbm_abs_f32");
   efficiency_f32 (TYPE_MOD, thread_f32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
                   nthreads, "mod_f32");
-  efficiency_f32 (TYPE_JBM_MOD, thread_f32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
-                  nthreads, "jbm_mod_f32");
+  efficiency_f32 (TYPE_JBM_MOD, thread_f32, x32, y32, r, n, -FLT_MAX_2,
+                  FLT_MAX_2, nthreads, "jbm_mod_f32");
   efficiency_f32 (TYPE_EXP2, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "exp2f");
   efficiency_f32 (TYPE_JBM_EXP2, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
@@ -3515,8 +3515,8 @@ main (int argn, char **argc)
                   nthreads, "jbm_pow_f32");
   efficiency_f32 (TYPE_CBRT, thread_f32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
                   nthreads, "cbrtf");
-  efficiency_f32 (TYPE_JBM_CBRT, thread_f32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
-                  nthreads, "jbm_cbrt_f32");
+  efficiency_f32 (TYPE_JBM_CBRT, thread_f32, x32, y32, r, n, -FLT_MAX_2,
+                  FLT_MAX_2, nthreads, "jbm_cbrt_f32");
   efficiency_f32 (TYPE_SIN, thread_f32, x32, y32, r, n, -4.f * M_PIf,
                   4.f * M_PIf, nthreads, "sinf");
   efficiency_f32 (TYPE_JBM_SIN, thread_f32, x32, y32, r, n, -4.f * M_PIf,
@@ -3531,8 +3531,8 @@ main (int argn, char **argc)
                   4.f * M_PIf, nthreads, "jbm_tan_f32");
   efficiency_f32 (TYPE_ATAN, thread_f32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
                   nthreads, "atanf");
-  efficiency_f32 (TYPE_JBM_ATAN, thread_f32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
-                  nthreads, "jbm_atan_f32");
+  efficiency_f32 (TYPE_JBM_ATAN, thread_f32, x32, y32, r, n, -FLT_MAX_2,
+                  FLT_MAX_2, nthreads, "jbm_atan_f32");
   efficiency_f32 (TYPE_ASIN, thread_f32, x32, y32, r, n, -1.f, 1.f, nthreads,
                   "asinf");
   efficiency_f32 (TYPE_JBM_ASIN, thread_f32, x32, y32, r, n, -1.f, 1.f,
@@ -3543,14 +3543,12 @@ main (int argn, char **argc)
                   nthreads, "jbm_acos_f32");
   efficiency_f32 (TYPE_SINH, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
                   JBM_FLT_MAX_E_EXP, nthreads, "sinhf");
-  efficiency_f32 (TYPE_JBM_SINH, thread_f32, x32, y32, r, n,
-                  -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_sinh_f32");
+  efficiency_f32 (TYPE_JBM_SINH, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
+                  JBM_FLT_MAX_E_EXP, nthreads, "jbm_sinh_f32");
   efficiency_f32 (TYPE_COSH, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
                   JBM_FLT_MAX_E_EXP, nthreads, "coshf");
-  efficiency_f32 (TYPE_JBM_COSH, thread_f32, x32, y32, r, n,
-                  -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_cosh_f32");
+  efficiency_f32 (TYPE_JBM_COSH, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
+                  JBM_FLT_MAX_E_EXP, nthreads, "jbm_cosh_f32");
   efficiency_f32 (TYPE_TANH, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "tanhf");
   efficiency_f32 (TYPE_JBM_TANH, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
@@ -4013,20 +4011,20 @@ main (int argn, char **argc)
 
   // __m512 functions
   printf ("__m512 functions\n");
-  efficiency_f32 (TYPE_ADD, thread_16xf32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
-                  nthreads, "add_16xf32");
-  efficiency_f32 (TYPE_SUB, thread_16xf32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
-                  nthreads, "sub_16xf32");
-  efficiency_f32 (TYPE_MUL, thread_16xf32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
-                  nthreads, "mul_16xf32");
-  efficiency_f32 (TYPE_DIV, thread_16xf32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
-                  nthreads, "div_16xf32");
+  efficiency_f32 (TYPE_ADD, thread_16xf32, x32, y32, r, n, -FLT_MAX_2,
+                  FLT_MAX_2, nthreads, "add_16xf32");
+  efficiency_f32 (TYPE_SUB, thread_16xf32, x32, y32, r, n, -FLT_MAX_2,
+                  FLT_MAX_2, nthreads, "sub_16xf32");
+  efficiency_f32 (TYPE_MUL, thread_16xf32, x32, y32, r, n, -FLT_MAX_2,
+                  FLT_MAX_2, nthreads, "mul_16xf32");
+  efficiency_f32 (TYPE_DIV, thread_16xf32, x32, y32, r, n, -FLT_MAX_2,
+                  FLT_MAX_2, nthreads, "div_16xf32");
   efficiency_f32 (TYPE_SQRT, thread_16xf32, x32, y32, r, n, 0.f, FLT_MAX,
                   nthreads, "sqrt_16xf32");
-  efficiency_f32 (TYPE_MAX, thread_16xf32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
-                  nthreads, "max_16xf32");
-  efficiency_f32 (TYPE_MIN, thread_16xf32, x32, y32, r, n, -FLT_MAX_2, FLT_MAX_2,
-                  nthreads, "min_16xf32");
+  efficiency_f32 (TYPE_MAX, thread_16xf32, x32, y32, r, n, -FLT_MAX_2,
+                  FLT_MAX_2, nthreads, "max_16xf32");
+  efficiency_f32 (TYPE_MIN, thread_16xf32, x32, y32, r, n, -FLT_MAX_2,
+                  FLT_MAX_2, nthreads, "min_16xf32");
   efficiency_f32 (TYPE_JBM_ABS, thread_16xf32, x32, y32, r, n, -FLT_MAX_2,
                   FLT_MAX_2, nthreads, "jbm_abs_16xf32");
   efficiency_f32 (TYPE_JBM_MOD, thread_16xf32, x32, y32, r, n, -FLT_MAX_2,
@@ -4044,8 +4042,8 @@ main (int argn, char **argc)
                   "jbm_expm1_16xf32");
   efficiency_f32 (TYPE_JBM_LOG2, thread_16xf32, x32, y32, r, n, FLT_MIN,
                   FLT_MAX, nthreads, "jbm_log2_16xf32");
-  efficiency_f32 (TYPE_JBM_LOG, thread_16xf32, x32, y32, r, n, FLT_MIN,
-                  FLT_MAX, nthreads, "jbm_log_16xf32");
+  efficiency_f32 (TYPE_JBM_LOG, thread_16xf32, x32, y32, r, n, FLT_MIN, FLT_MAX,
+                  nthreads, "jbm_log_16xf32");
   efficiency_f32 (TYPE_JBM_LOG10, thread_16xf32, x32, y32, r, n, FLT_MIN,
                   FLT_MAX, nthreads, "jbm_log10_16xf32");
   efficiency_f32 (TYPE_JBM_POW, thread_16xf32, x32, y32, r, n, 0., 100.,

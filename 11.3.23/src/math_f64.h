@@ -39,6 +39,10 @@
 #define JBM_1_BITS_F64 0x3ff0000000000000ull    ///< 1 bits for floats.
 #define K_ERFC_MAX_F64 2.6543258454250981382470219714223799e+01
 ///< maximum value for the erfc function for doubles.
+#define JBM_CBRT2_F64 1.2599210498948731647672106072782284
+///< cbrt(2) for floats.
+#define JBM_CBRT4_F64 1.5874010519681994747517056392723083
+///< cbrt(4) for floats.
 
 /**
  * union to work with bits in double numbers.
@@ -48,6 +52,22 @@ typedef union
   double x;                     ///< floating point.
   uint64_t i;                   ///< bits.
 } JBMF64;
+
+///> constants to approximate the cbrt function for floats.
+static const double K_CBRTWC_F64[12] JB_ALIGNED = {
+  1.7718686183875175603139544484533900e-01,
+  1.2169571213522369065772549976496928e+01,
+  1.1256066417598028003232640910156050e+02,
+  2.6547553832975422542280207425277638e+02,
+  1.7830804339229675842086626245539769e+02,
+  2.8519175311160106828576776700724692e+01,
+  3.8914609514372227872886598038878661e-01,
+  3.0350139138825850517393815412620929e+01,
+  1.7243126595509990438386931097781146e+02,
+  2.6791347699262659234583097582624045e+02,
+  1.1579465236861792653929300030594967e+02,
+  1.0109790924525940018717231389567802e+01
+};
 
 ///> constants to approximate the exp2 function for doubles.
 static const double K_EXP2WC_F64[10] JB_ALIGNED = {
@@ -127,7 +147,7 @@ static const double K_TANWC_F64[7] JB_ALIGNED = {
 };
 
 ///> constants to approximate the atan function for doubles.
-static const double K_ATANWC0_F64[9] JB_ALIGNED = {
+static const double K_ATANWC_F64[9] JB_ALIGNED = {
   9.9999999999999892885431242093460277e-01,
   1.7174903583161590067209802801700983e+00,
   8.9269426216044677721608513590021333e-01,
@@ -137,25 +157,6 @@ static const double K_ATANWC0_F64[9] JB_ALIGNED = {
   1.3763021593913388881909503195535988e+00,
   3.3309963863724327431836852841993498e-01,
   2.0896929539022880929863547442741776e-02
-};
-
-///> constants to approximate the atan function for doubles.
-static const double K_ATANWC1_F64[15] JB_ALIGNED = {
-  7.8539816339744830961566084581987570e-01,
-  3.1819390432632386792351556735031186e+00,
-  5.6964677966558444069447919149247881e+00,
-  5.8822520517759730397238177011228731e+00,
-  3.7851351983215295278973376585706051e+00,
-  1.5176905831213929328267835665386785e+00,
-  3.5100316653745272669543117337878952e-01,
-  3.6122687412995146191862538761021960e-02,
-  3.4147508464519440680261617756430658e+00,
-  5.3973800436361466541899660503959920e+00,
-  5.0342827275452574948898418914278895e+00,
-  2.9701830022488089959827768549032646e+00,
-  1.1031195818341327004866979100917678e+00,
-  2.3809707240199433412415230949880199e-01,
-  2.2996267647112199700778926061335174e-02
 };
 
 ///> constants to approximate the erf function for doubles.
@@ -3666,6 +3667,44 @@ jbm_rational_21_20_f64 (const double x, ///< double value.
 }
 
 /**
+ * Function to calculate the well conditionated function cbrt(x) for x
+ * \f$\in\left[\frac12\;,1\right]\f$ (double).
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_cbrtwc_f64 (const double x)
+                ///< double number \f$\in\left[\frac12,\;1\right]\f$.
+{
+  return jbm_rational_11_6_f64 (x, K_CBRTWC_F64);
+}
+
+/**
+ * Function to calculate the function cbrt(x) using the jbm_abs_f64 and
+ * jbm_pow_f64 functions (double).
+ *
+ * \return function value (double).
+ */
+static inline double
+jbm_cbrt_f64 (const double x)   ///< double number.
+{
+  double m;
+  int e, e3, r;
+  m = jbm_frexp_f64 (jbm_abs_f64 (x), &e);
+  e3 = e / 3;
+  r = e - 3 * e3;
+  e = r >> 31;
+  r += e & 3;
+  e3 -= e & 1;
+  m = jbm_ldexp_f64 (jbm_cbrtwc_f64 (m), e3);
+  if (r & 1)
+    m *= JBM_CBRT2_F64;
+  if (r & 2)
+    m *= JBM_CBRT4_F64;
+  return jbm_copysign_f64 (m, x);
+}
+
+/**
  * Function to calculate the well conditionated function exp2(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (double).
  *
@@ -3760,7 +3799,7 @@ jbm_log2wc_f64 (const double x) ///< double number.
 }
 
 /**
- * Function to calculate the function log_2(x) using jbm_log2wc_f64 and
+ * Function to calculate the function log2(x) using jbm_log2wc_f64 and
  * jbm_frexp_f64
  *
  * \return function value (double).
@@ -3835,23 +3874,7 @@ static inline double
 jbm_pow_f64 (const double x,    ///< double number.
              const double e)    ///< exponent (double).
 {
-  double f;
-  f = floor (e);
-  if (f == e)
-    return jbm_pown_f64 (x, (int) e);
   return jbm_exp2_f64 (e * jbm_log2_f64 (x));
-}
-
-/**
- * Function to calculate the function cbrt(x) using the jbm_abs_f64 and
- * jbm_pow_f64 functions (double).
- *
- * \return function value (double).
- */
-static inline double
-jbm_cbrt_f64 (const double x)   ///< double number.
-{
-  return jbm_copysign_f64 (jbm_pow_f64 (jbm_abs_f64 (x), 1. / 3.), x);
 }
 
 /**
@@ -3998,28 +4021,15 @@ jbm_tan_f64 (const double x)    ///< double number.
 
 /**
  * Function to calculate the well conditionated function atan(x) for x in
- * [-1/2,1/2].
+ * [-1,1].
  *
  * \return function value (double).
  */
 static inline double
-jbm_atanwc0_f64 (const double x)
-                 ///< double number \f$\in\left[0,\frac12\right]\f$.
+jbm_atanwc_f64 (const double x)
+                 ///< double number \f$\in\left[-1,1\right]\f$.
 {
-  return x * jbm_rational_8_4_f64 (x * x, K_ATANWC0_F64);
-}
-
-/**
- * Function to calculate the well conditionated function atan(x) for x in
- * [1/2,3/2].
- *
- * \return function value (double).
- */
-static inline double
-jbm_atanwc1_f64 (const double x)
-                 ///< double number \f$\in\left[\frac12,1\right]\f$.
-{
-  return jbm_rational_14_7_f64 (x - 1., K_ATANWC1_F64);
+  return x * jbm_rational_8_4_f64 (x * x, K_ATANWC_F64);
 }
 
 /**
@@ -4033,21 +4043,10 @@ jbm_atan_f64 (const double x)   ///< double number.
 {
   double f, ax;
   ax = jbm_abs_f64 (x);
-  if (ax > 1.5)
-    {
-      ax = 1. / ax;
-      if (ax > 0.5)
-        f = M_PI_2 - jbm_atanwc1_f64 (ax);
-      else
-        f = M_PI_2 - jbm_atanwc0_f64 (ax);
-    }
+  if (ax > 1.)
+    f = M_PI_2 - jbm_atanwc_f64 (1. / ax);
   else
-    {
-      if (ax > 0.5)
-        f = jbm_atanwc1_f64 (ax);
-      else
-        f = jbm_atanwc0_f64 (ax);
-    }
+    f = jbm_atanwc_f64 (ax);
   return jbm_copysign_f64 (f, x);
 }
 

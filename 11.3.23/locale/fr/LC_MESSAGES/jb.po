@@ -1,374 +1,376 @@
-# Spanish translations for jb package.
+# French translations for jb package.
 # Copyright (C) 2020 THE jb'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the jb package.
 # Automatically generated, 2020.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: jb 11.3.22\n"
+"Project-Id-Version: jb 11.3.23\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-23 04:51+0200\n"
 "PO-Revision-Date: 2020-05-05 02:59+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
-"Language: es\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: src/def.c:345 src/win.c:751
 msgid "unable to open the file"
-msgstr "no se pudo abrir el fichero"
+msgstr "impossible d'ouvrir le fichier"
 
 #: src/def.c:353
 msgid "not enough memory to open the file"
-msgstr "memoria insuficiente para abrir el fichero"
+msgstr "mémoire insuffisante pour ouvrir le fichier"
 
 #: src/def.c:359
 msgid "unable to read the file"
-msgstr "no se pudo leerr el fichero"
+msgstr "impossible de lire le fichier"
 
 #: src/win.c:46 src/win.c:242
 msgid "Error!"
-msgstr "¡Error!"
+msgstr "Erreur!"
 
 #: src/win.c:52 src/win.c:251
 msgid "Warning!"
-msgstr "¡Ojo!"
+msgstr "Attention!"
 
 #: src/win.c:176
 msgid "unable to init SDL"
-msgstr "no se pudo iniciar SDL"
+msgstr "impossible d'initialiser SDL"
 
 #: src/win.c:182
 msgid "unable to init GLFW"
-msgstr "no se pudo iniciar GLFW"
+msgstr "impossible d'initialiser GLFW"
 
 #: src/win.c:626
 msgid "unable to compile the texture fragment shader"
-msgstr "no se pudo compilar el fragment shader de textura"
+msgstr "impossible de compiler le fragment shader de la texture"
 
 #: src/win.c:639
 msgid "unable to compile the texture vertex shader"
-msgstr "no se pudo compilar el vertex shader de textura"
+msgstr "impossible de compiler le vertex shader de la texture"
 
 #: src/win.c:655
 msgid "unable to link the texture program"
-msgstr "no se pudo enlazar el programa de textura"
+msgstr "impossible de lier le programme de la texture"
 
 #: src/win.c:679
 msgid "could not bind texture attribute"
-msgstr "no se pudo enlazar el atributo de textura"
+msgstr "impossible de lier l'attribut de la texture"
 
 #: src/win.c:686
 msgid "could not bind texture position attribute"
-msgstr "no se pudo enlazar el atributo de posición de textura"
+msgstr "impossible de lier l'attribut de position de la texture"
 
 #: src/win.c:693
 msgid "could not bind texture uniform"
-msgstr "no se pudo enlazar la textura uniforme"
+msgstr "impossible de lier la texture uniforme"
 
 #: src/win.c:700
 msgid "could not bind matrix uniform"
-msgstr "no se pudo enlazar la matriz uniforme"
+msgstr "impossible de lier la matrice uniforme"
 
 #: src/win.c:758 src/win.c:764
 msgid "unable to open the PNG file"
-msgstr "no se pudo abrir el fichero PNG"
+msgstr "impossible d'ouvrir le fichier PNG"
 
 #: src/win.c:776
 msgid "not enough memory to open the widget"
-msgstr "memoria insuficiente para abrir el widget"
+msgstr "mémoire insuffisante pour ouvrir le widget"
 
 #: src/win.c:790
 msgid "not enough memory to open the image"
-msgstr "memoria insuficiente para abrir la imagen"
+msgstr "mémoire insuffisante pour ouvrir l'image"
 
 #: src/win.c:930
 msgid "no Vulkan instance extensions supported"
-msgstr "extensiones de instancia de Vulkan no soportadas"
+msgstr "aucune extension d'instance de Vulkan prise en charge"
 
 #: src/win.c:970
 msgid "no VK_KHR_surface Vulkan extension"
-msgstr "falta extensión VK_KHR_surface de Vulkan"
+msgstr "aucune extension de surface VK_KHR de Vulkan"
 
 #: src/win.c:987
 msgid "no available Vulkan validation layers"
-msgstr "capas de validación de Vulkan no disponibles"
+msgstr "aucune couche de validation de Vulkan disponible"
 
 #: src/win.c:996
 msgid "failed to create Vulkan instance"
-msgstr "no se pudo crear la instancia de Vulkan"
+msgstr "impossible de créer une instance de Vulkan"
 
 #: src/win.c:1023
 msgid "unable to create a Vulkan surface"
-msgstr "no se pudo crear la superficie de Vulkan"
+msgstr "impossible de créer une surface de Vulkan"
 
 #: src/win.c:1048
 msgid "failed to find a GPU with Vulkan support"
-msgstr "no se pudo encontrar una GPU con soporte para Vulkan"
+msgstr "impossible de trouver une GPU avec prise en charge de Vulkan"
 
 #: src/win.c:1060
 msgid "bad Vulkan physical devices"
-msgstr "dispositivos físicos de Vulkan incorrectos"
+msgstr "mauvais périphériques physiques de Vulkan"
 
 #: src/win.c:1103
 msgid "no suitable Vulkan physical devices"
-msgstr "dispositivos físicos de Vulkan no adecuados"
+msgstr "aucun périphérique physique de Vulkan appropié"
 
 #: src/win.c:1146
 msgid "no available Vulkan extension"
-msgstr "extensión de Vulkan no disponible"
+msgstr "aucune extension de Vulkan disponible"
 
 #: src/win.c:1190
 msgid "no suitable Vulkan physical device queue family"
-msgstr "familia de colas del dispositivo físico de Vulkan no adecuada"
+msgstr ""
+"aucune famille de files d'attente de phériphériques physiques de Vulkan "
+"appropiée"
 
 #: src/win.c:1205
 msgid "Vulkan device does not support surfaces"
-msgstr "dispositivo de Vulkan no soporta superficies"
+msgstr "le périphérique de Vulkan ne prend pas en charge les surfaces"
 
 #: src/win.c:1233
 msgid "unable to create the Vulkan logical device"
-msgstr "no se pudo crear el dispositivo lógico de Vulkan"
+msgstr "impossible de créer le périphérique logique de Vulkan"
 
 #: src/win.c:1347
 msgid "unable to create the Vulkan swap chain"
-msgstr "no se pudo crear la cadena de intercambio de Vulkan"
+msgstr "impossible de créer la chaîne d'échange de Vulkan"
 
 #: src/win.c:1392
 msgid "unable to create the Vulkan swap chain image view"
-msgstr ""
-"no se pudo crear la vista de imagen de la cadena de intercambio de Vulkan"
+msgstr "impossible de créer la vue d'image de la chaîne d'échange de Vulkan"
 
 #: src/win.c:1458
 msgid "failed to find supported format"
-msgstr "no se pudo encontrar un formato soportado"
+msgstr "impossible de trouver le format pris en charge"
 
 #: src/win.c:1547
 msgid "failed to create the Vulkan render pass"
-msgstr "no se pudo crear el paso de renderización de Vulkan"
+msgstr "impossible de créer la passe de rendu de Vulkan"
 
 #: src/win.c:1587
 msgid "failed to create the Vulkan descriptor set layout"
-msgstr "no se pudo crear la capa del conjunto descriptor de Vulkan"
+msgstr ""
+"impossible de créer la mise en page de l'ensemble de descripteurs de Vulkan"
 
 #: src/win.c:1613
 msgid "failed to open the shader file"
-msgstr "no se pudo abrir el fichero de shader"
+msgstr "impossible d'ouvrir le fichier de shader"
 
 #: src/win.c:1623
 msgid "failed to create the Vulkan shader module"
-msgstr "no se pudo crear el módulo de shader de Vulkan"
+msgstr "impossible de créer le module de shader de Vulkan"
 
 #: src/win.c:1959
 msgid "OpenGL 2.1 is not supported"
-msgstr "OpenGL 2.1 no está soportado"
+msgstr "OpenGL 2.1 n'est pas pris en charge"
 
 #: src/win.c:1984
 msgid "unable to compile the fragment shader"
-msgstr "no se pudo compilar el fragment shader"
+msgstr "impossible de compiler le fragment shader"
 
 #: src/win.c:1996
 msgid "unable to compile the 2D vertex shader"
-msgstr "no se pudo compilar el vertex shader 2D"
+msgstr "impossible de compiler le vertex shader 2D"
 
 #: src/win.c:2013
 msgid "unable to link the 2D program"
-msgstr "no se pudo enlazar el programa 2D"
+msgstr "impossible de lier le programme 2D"
 
 #: src/win.c:2025
 msgid "unable to compile the 3D vertex shader"
-msgstr "no se pudo compilar el vertex shader 3D"
+msgstr "impossible de compiler le vertex shader 3D"
 
 #: src/win.c:2042
 msgid "unable to link the 3D program"
-msgstr "no se pudo enlazar el programa 3D"
+msgstr "impossible de lier le programme 3D"
 
 #: src/win.c:2054
 msgid "unable to compile the 2D with color vertex shader"
-msgstr "no se pudo compilar el vertex shader 2D con color"
+msgstr "impossible de compiler le vertex shader 2D avec couleur"
 
 #: src/win.c:2071
 msgid "unable to link the 2D with color program"
-msgstr "no se pudo enlazar el programa 2D con color"
+msgstr "impossible de lier le programme 2D avec couleur"
 
 #: src/win.c:2083
 msgid "unable to compile the 3D with color vertex shader"
-msgstr "no se pudo compilar el vertex shader 3D con color"
+msgstr "impossible de compiler le vertex shader 3D avec couleur"
 
 #: src/win.c:2100
 msgid "unable to link the 3D with color program"
-msgstr "no se pudo enlazar el programa 3D con color"
+msgstr "impossible de lier le programme 3D avec couleur"
 
 #: src/win.c:2112
 msgid "unable to compile the text fragment shader"
-msgstr "no se pudo compilar el fragment shader de texto"
+msgstr "impossible de compiler le fragment shader de texte"
 
 #: src/win.c:2123
 msgid "unable to compile the text vertex shader"
-msgstr "no se pudo compilar el vertex shader de texto"
+msgstr "impossible de compiler le vertex shader de texte"
 
 #: src/win.c:2140
 msgid "unable to link the text program"
-msgstr "no se pudo enlazar el programa de texto"
+msgstr "impossible de lier le programme de texte"
 
 #: src/win.c:2149
 msgid "could not bind 2D position attribute"
-msgstr "no se pudo enlazar el atributo de posición 2D"
+msgstr "impossible de lier l'attribut de position 2D"
 
 #: src/win.c:2156
 msgid "could not bind 2D color"
-msgstr "no se pudo enlazar el color 2D"
+msgstr "impossible de lier la couleur 2D"
 
 #: src/win.c:2163
 msgid "could not bind 2D matrix"
-msgstr "no se pudo enlazar la matriz 2D"
+msgstr "impossible de lier la matrice 2D"
 
 #: src/win.c:2172
 msgid "could not bind 3D position attribute"
-msgstr "no se pudo enlazar el atributo de posición 3D"
+msgstr "impossible de lier l'attribut de position 3D"
 
 #: src/win.c:2179
 msgid "could not bind 3D color"
-msgstr "no se pudo enlazar el color 3D"
+msgstr "impossible de lier la couleur 3D"
 
 #: src/win.c:2186
 msgid "could not bind 3D matrix"
-msgstr "no se pudo enlazar la matriz 3D"
+msgstr "impossible de lier la matrice 3D"
 
 #: src/win.c:2195
 msgid "could not bind 2D with color position attribute"
-msgstr "no se pudo enlazar el atributo de posición 2D con color"
+msgstr "impossible de lier l'attribut de position 2D avec couleur"
 
 #: src/win.c:2202
 msgid "could not bind 2D with color color"
-msgstr "no se pudo enlazar el color 2D con color"
+msgstr "impossible de lier la couleur 2D avec couleur"
 
 #: src/win.c:2209
 msgid "could not bind 2D with color matrix"
-msgstr "no se pudo enlazar la matriz 2D con color"
+msgstr "impossible de lier la matrice 2D avec couleur"
 
 #: src/win.c:2218
 msgid "could not bind 3D with color position attribute"
-msgstr "no se pudo enlazar el atributo de posición 3D con color"
+msgstr "impossible de lier l'attribut de position 3D avec couleur"
 
 #: src/win.c:2225
 msgid "could not bind 3D with color color"
-msgstr "no se pudo enlazar el color 3D con color"
+msgstr "impossible de lier la couleur 3D avec couleur"
 
 #: src/win.c:2232
 msgid "could not bind 3D with color matrix"
-msgstr "no se pudo enlazar la matriz 3D con color"
+msgstr "impossible de lier la matrice 3D avec couleur"
 
 #: src/win.c:2245
 msgid "could not bind text position attribute"
-msgstr "no se pudo enlazar el atributo de posición de texto"
+msgstr "impossible de lier l'attribut de position du texte"
 
 #: src/win.c:2252
 msgid "could not bind text uniform"
-msgstr "no se pudo enlazar el texto uniforme"
+msgstr "impossible de lier l'uniforme du texte"
 
 #: src/win.c:2259
 msgid "could not bind text color uniform"
-msgstr "no se pudo enlazar el color uniforme"
+msgstr "impossible de lier la couleur du texte uniforme"
 
 #: src/win.c:2267
 msgid "not enough memory to init the FreeType library"
-msgstr "memoria insuficiente para iniciar la biblioteca FreeType"
+msgstr "mémoire insuffisante pour initialiser la bibliothèque FreeType"
 
 #: src/win.c:2272
 msgid "could not init the FreeType library"
-msgstr "no se pudo iniciar la biblioteca FreeType"
+msgstr "impossible d'initialiser la bibliothèque FreeType"
 
 #: src/win.c:2278
 msgid "not enough memory to open the font"
-msgstr "memoria insuficiente para abrir la fuente"
+msgstr "mémoire insuffisante pour ouvrir la police"
 
 #: src/win.c:2283
 msgid "could not open font"
-msgstr "no se pudo abrir la fuente"
+msgstr "impossible d'ouvrir la police"
 
 #: src/win.c:2508
 msgid "bad tics number"
-msgstr "número de marcas incorrecto"
+msgstr "nombre de tics incorrect"
 
 #: src/win.c:2516
 msgid "not enough memory to open the graphic area"
-msgstr "memoria insuficiente para abrir el área gráfica"
+msgstr "mémoire insuffisante pour ouvrir la zone graphique"
 
 #: src/win.c:2544
 msgid "unable to open the graphic area widget"
-msgstr "no se pudo abrir el widget de área gráfica"
+msgstr "impossible d'ouvrir le widget de la zone graphique"
 
 #: src/win.c:2585
 msgid "unable to open the window"
-msgstr "no se pudo abrir la ventana"
+msgstr "impossible d'ouvrir la fenêtre"
 
 #: src/win.c:3687 src/win.c:3702
 msgid "PNG file"
-msgstr "Fichero PNG"
+msgstr "Fichier PNG"
 
 #: src/win.c:3688
 msgid "JPEG file"
-msgstr "Fichero JPEG"
+msgstr "Fichier JPEG"
 
 #: src/win.c:3689
 msgid "XPM file"
-msgstr "Fichero XPM"
+msgstr "Fichier XPM"
 
 #: src/win.c:3690
 msgid "TIFF file"
-msgstr "Fichero TIFF"
+msgstr "Fichier TIFF"
 
 #: src/win.c:3691
 msgid "BMP file"
-msgstr "Fichero BMP"
+msgstr "Fichier BMP"
 
 #: src/win.c:3692
 msgid "GIF file"
-msgstr "Fichero GIF"
+msgstr "Fichier GIF"
 
 #: src/win.c:3693
 msgid "ICO file"
-msgstr "Fichero ICO"
+msgstr "Fichier ICO"
 
 #: src/win.c:3713
 msgid "Save graph"
-msgstr "Guardar gráfica"
+msgstr "Enregistrer le graphique"
 
 #: src/win.c:3716
 msgid "_OK"
-msgstr "_Aceptar"
+msgstr "_Accepter"
 
 #: src/win.c:3717
 msgid "_Cancel"
-msgstr "_Cancelar"
+msgstr "_Annuler"
 
 #: src/win.c:3758
 msgid "no a text editor type"
-msgstr "no es un tipo de editor de texto"
+msgstr "pas un type d'éditeur de texte"
 
 #: src/win.c:3761
 msgid "no an integer numbers editor type"
-msgstr "no es un tipo de editor de números enteros"
+msgstr "pas un type d'éditeur de nombres entiers"
 
 #: src/win.c:3764
 msgid "no a float numbers editor type"
-msgstr "no es un tipo de editor de números reales"
+msgstr "pas un type d'éditeur de nombres à virgule flottante"
 
 #: src/win.c:3767
 msgid "no a date editor type"
-msgstr "no es un tipo de editor de fechas"
+msgstr "pas un type d'éditeur de dates"
 
 #: src/win.c:4410
 msgid "bad array editor widget type"
-msgstr "tipo incorrecto de widget de editor de matrices"
+msgstr "mauvais type de widget d'éditeur de tableau"
 
 #: src/win.c:4416
 msgid "not enough memory to open the array editor"
-msgstr "memoria insuficiente para abrir el editor de matrices"
+msgstr "mémoire insuffisante pour ouvrir l'éditeur de tableau"
 
 #~ msgid "unable to get the GdkPixbuf widget"
-#~ msgstr "no se pudo abrir el widget GdkPixbuf"
+#~ msgstr "impossible d'obtenir le widget GdkPixbuf"
