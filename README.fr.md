@@ -1,4 +1,4 @@
-JB (version 11.3.21)
+JB (version 11.3.22)
 ==================
 
 :gb:[english](README.md) :es:[español](README.es.md)
@@ -131,11 +131,11 @@ ____________________________
 > $ git clone https://github.com/jburguete/jb
 
 2. Pour applications de terminal compilez les codes source avec:
-> $ cd 11.3.21
+> $ cd 11.3.22
 > $ ./build\_wihtout_\gui.sh
 
 2. Pour applications graphiques compilez les codes source avec:
-> $ cd 11.3.21
+> $ cd 11.3.22
 > $ ./build.sh
 
 LIEN LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
@@ -144,7 +144,7 @@ LIEN LA BIBLIOTHÈQUE DANS AUTRES PROGRAMMES
 1. Liez la dernière version dans une répertoire jb, p.ex.:
 > $ cd RÉPERTOIRE\_DE\_VÔTRE\_PROGRAMME
 >
-> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/11.3.21 jb
+> $ ln -s CHEMIN\_DE\_LA\_BIBLIOTHÈQUE\_JB/11.3.22 jb
 
 2. Incluez le fichier de configuration et les outils requis dans votre code
    source, p.ex.:
