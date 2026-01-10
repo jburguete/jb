@@ -39,8 +39,7 @@
 // Debug functions
 
 static inline void
-print_vbit32m1_t (FILE *file, const char *label, vuint32m1_t x,
-                   const size_t vl)
+print_vbit32m1_t (FILE *file, const char *label, vuint32m1_t x, const size_t vl)
 {
   unsigned int y[vl] JB_ALIGNED;
   unsigned int i;
@@ -50,8 +49,7 @@ print_vbit32m1_t (FILE *file, const char *label, vuint32m1_t x,
 }
 
 static inline void
-print_vbit64m1_t (FILE *file, const char *label, vuint64m1_t x,
-                   const size_t vl)
+print_vbit64m1_t (FILE *file, const char *label, vuint64m1_t x, const size_t vl)
 {
   unsigned long int y[vl] JB_ALIGNED;
   unsigned int i;
@@ -265,9 +263,9 @@ jbm_ceil_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
  * \return rest value vector (in [0,|divisor|) interval).
  */
 static inline vfloat32m1_t
-jbm_mod_nxf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
-                const vfloat32m1_t d,   ///< divisor (vfloat32m1_t).
-                const size_t vl)        ///< vector size.
+jbm_mod_nxf32 (const vfloat32m1_t x,    ///< dividend (vfloat32m1_t).
+               const vfloat32m1_t d,    ///< divisor (vfloat32m1_t).
+               const size_t vl) ///< vector size.
 {
   return
     __riscv_vfnmsac_vv_f32m1
@@ -10176,7 +10174,7 @@ jbm_exp2wc_nxf32 (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in[\frac12,1]\f$.
                   const size_t vl)      ///< array size.
 {
-  return jbm_polynomial_6_nxf32 (x, K_EXP2WC_F32, vl);
+  return jbm_polynomial_5_nxf32 (x, K_EXP2WC_F32, vl);
 }
 
 /**
@@ -10579,7 +10577,7 @@ jbm_atanwc_nxf32 (const vfloat32m1_t x,
 {
   return
     __riscv_vfmul_vv_f32m1 (x,
-                            jbm_rational_4_2_nxf32 (jbm_sqr_nxf32 (x, vl),
+                            jbm_rational_5_2_nxf32 (jbm_sqr_nxf32 (x, vl),
                                                     K_ATANWC_F32, vl), vl);
 }
 
@@ -10810,7 +10808,7 @@ jbm_erfcwc_nxf32 (const vfloat32m1_t x,
   vfloat32m1_t f, x2;
   x2 = jbm_sqr_nxf32 (x, vl);
   f =
-    __riscv_vfmul_vv_f32m1 (jbm_rational_7_4_nxf32
+    __riscv_vfmul_vv_f32m1 (jbm_rational_8_4_nxf32
                             (jbm_reciprocal_nxf32 (x, vl), K_ERFCWC_F32, vl),
                             __riscv_vfdiv_vv_f32m1 (x, jbm_exp_nxf32 (x2, vl),
                                                     vl), vl);
@@ -11516,9 +11514,9 @@ jbm_ceil_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  * \return rest value (in [0,|divisor|) interval) (vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_mod_nxf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
-                const vfloat64m1_t d,   ///< divisor (vfloat64m1_t).
-                const size_t vl)        ///< vector size.
+jbm_mod_nxf64 (const vfloat64m1_t x,    ///< dividend (vfloat64m1_t).
+               const vfloat64m1_t d,    ///< divisor (vfloat64m1_t).
+               const size_t vl) ///< vector size.
 {
   return
     __riscv_vfnmsac_vv_f64m1 (x,
@@ -21810,41 +21808,25 @@ jbm_tan_nxf64 (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [-1/2,1/2] (vfloat64m1_t).
+ * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_atanwc0_nxf64 (const vfloat64m1_t x,
-                   ///< vfloat64m1_t vector \f$\in\left[0,\frac12\right]\f$.
-                   const size_t vl)     ///< array size.
+jbm_atanwc_nxf64 (const vfloat64m1_t x,
+                  ///< vfloat64m1_t vector \f$\in\left[-1,1\right]\f$.
+                  const size_t vl)      ///< array size.
 {
   return
     __riscv_vfmul_vv_f64m1 (x,
-                            jbm_rational_8_4_nxf64 (jbm_sqr_nxf64 (x, vl),
-                                                    K_ATANWC0_F64, vl), vl);
+                            jbm_rational_11_5_nxf64 (jbm_sqr_nxf64 (x, vl),
+                                                     K_ATANWC_F64, vl), vl);
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [1/2,3/2] (vfloat64m1_t).
- *
- * \return function value (vfloat64m1_t).
- */
-static inline vfloat64m1_t
-jbm_atanwc1_nxf64 (const vfloat64m1_t x,
-                   ///< vfloat64m1_t vector \f$\in\left[\frac12,1\right]\f$.
-                   const size_t vl)     ///< array size.
-{
-  return
-    jbm_rational_14_7_nxf64 (__riscv_vfsub_vf_f64m1 (x, 1., vl), K_ATANWC1_F64,
-		             vl);
-}
-
-/**
- * Function to calculate the function atan(x) using the jbm_atanwc0_nxf64 and
- * jbm_atanwc1_nxf64 functions (vfloat64m1_t).
+ * Function to calculate the function atan(x) using the jbm_atanwc_nxf64
+ * function (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t in [-pi/2,pi/2]).
  */
@@ -21855,12 +21837,9 @@ jbm_atan_nxf64 (const vfloat64m1_t x,   ///< double number.
   vfloat64m1_t f, ax;
   vbool64_t m;
   ax = jbm_abs_nxf64 (x, vl);
-  m = __riscv_vmfgt_vf_f64m1_b64 (ax, 1.5, vl);
+  m = __riscv_vmfgt_vf_f64m1_b64 (ax, 1., vl);
   ax = __riscv_vmerge_vvm_f64m1 (ax, jbm_reciprocal_nxf64 (ax, vl), m, vl);
-  f =
-    __riscv_vmerge_vvm_f64m1 (jbm_atanwc0_nxf64 (ax, vl),
-                              jbm_atanwc1_nxf64 (ax, vl),
-                              __riscv_vmfgt_vf_f64m1_b64 (ax, 0.5, vl), vl);
+  f = jbm_atanwc_nxf64 (ax, vl);
   f =
     __riscv_vmerge_vvm_f64m1 (f, __riscv_vfsub_vv_f64m1
                               (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), f, vl),
@@ -22074,14 +22053,14 @@ jbm_erfcwc_nxf64 (const vfloat64m1_t x,
   vfloat64m1_t f, x2;
   x2 = jbm_sqr_nxf64 (x, vl);
   f =
-    __riscv_vfmul_vv_f64m1 (jbm_rational_17_10_nxf64
+    __riscv_vfmul_vv_f64m1 (jbm_rational_18_10_nxf64
                             (jbm_reciprocal_nxf64 (x, vl), K_ERFCWC_F64, vl),
                             __riscv_vfdiv_vv_f64m1 (x, jbm_exp_nxf64 (x2, vl),
                                                     vl), vl);
   return
     __riscv_vmerge_vvm_f64m1 (f, __riscv_vfmv_v_f_f64m1 (0., vl),
                               __riscv_vmfgt_vf_f64m1_b64 (x, K_ERFC_MAX_F64,
-				                          vl), vl);
+                                                          vl), vl);
 }
 
 /**
@@ -22785,8 +22764,8 @@ jbm_ceil_4xf32 (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
  * \return rest value vector (in [0,|divisor|) interval).
  */
 static inline vfloat32m1_t
-jbm_mod_4xf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
-                const vfloat32m1_t d)   ///< divisor (vfloat32m1_t).
+jbm_mod_4xf32 (const vfloat32m1_t x,    ///< dividend (vfloat32m1_t).
+               const vfloat32m1_t d)    ///< divisor (vfloat32m1_t).
 {
   return jbm_mod_nxf32 (x, d, 4);
 }
@@ -29393,8 +29372,8 @@ jbm_ceil_2xf64 (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
  * \return rest value vector (in [0,|divisor|) interval).
  */
 static inline vfloat64m1_t
-jbm_mod_2xf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
-                const vfloat64m1_t d)   ///< divisor (vfloat64m1_t).
+jbm_mod_2xf64 (const vfloat64m1_t x,    ///< dividend (vfloat64m1_t).
+               const vfloat64m1_t d)    ///< divisor (vfloat64m1_t).
 {
   return jbm_mod_nxf64 (x, d, 2);
 }
@@ -36001,8 +35980,8 @@ jbm_ceil_8xf32 (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
  * \return rest value vector (in [0,|divisor|) interval).
  */
 static inline vfloat32m1_t
-jbm_mod_8xf32 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
-                const vfloat32m1_t d)   ///< divisor (vfloat32m1_t).
+jbm_mod_8xf32 (const vfloat32m1_t x,    ///< dividend (vfloat32m1_t).
+               const vfloat32m1_t d)    ///< divisor (vfloat32m1_t).
 {
   return jbm_mod_nxf32 (x, d, 8);
 }
@@ -42609,8 +42588,8 @@ jbm_ceil_4xf64 (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
  * \return rest value vector (in [0,|divisor|) interval).
  */
 static inline vfloat64m1_t
-jbm_mod_4xf64 (const vfloat64m1_t x,   ///< dividend (vfloat64m1_t).
-                const vfloat64m1_t d)   ///< divisor (vfloat64m1_t).
+jbm_mod_4xf64 (const vfloat64m1_t x,    ///< dividend (vfloat64m1_t).
+               const vfloat64m1_t d)    ///< divisor (vfloat64m1_t).
 {
   return jbm_mod_nxf64 (x, d, 4);
 }

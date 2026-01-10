@@ -190,8 +190,8 @@ jbm_hypot_4xf32 (const float32x4_t x,   ///< 1st float32x4_t vector.
  * \return rest value vector (in [0,|divisor|) interval).
  */
 static inline float32x4_t
-jbm_mod_4xf32 (const float32x4_t x,    ///< dividend (float32x4_t).
-                const float32x4_t d)    ///< divisor (float32x4_t).
+jbm_mod_4xf32 (const float32x4_t x,     ///< dividend (float32x4_t).
+               const float32x4_t d)     ///< divisor (float32x4_t).
 {
   return vmlsq_f32 (x, vrndmq_f32 (vdivq_f32 (x, d)), d);
 }
@@ -6848,7 +6848,7 @@ static inline float32x4_t
 jbm_exp2wc_4xf32 (const float32x4_t x)
                   ///< float32x4_t vector \f$\in[\frac12,1]\f$.
 {
-  return jbm_polynomial_6_4xf32 (x, K_EXP2WC_F32);
+  return jbm_polynomial_5_4xf32 (x, K_EXP2WC_F32);
 }
 
 /**
@@ -7185,11 +7185,11 @@ jbm_atanwc_4xf32 (const float32x4_t x)
                   ///< float32x4_t vector \f$\in\left[-1,1\right]\f$.
 {
   return
-    vmulq_f32 (x, jbm_rational_4_2_4xf32 (jbm_sqr_4xf32 (x), K_ATANWC_F32));
+    vmulq_f32 (x, jbm_rational_5_2_4xf32 (jbm_sqr_4xf32 (x), K_ATANWC_F32));
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc0_4xf32
+ * Function to calculate the function atan(x) using the jbm_atanwc_4xf32
  * function (float32x4_t).
  *
  * \return function value (in [-pi/2,pi/2]) (float32x4_t).
@@ -7372,11 +7372,11 @@ jbm_erfcwc_4xf32 (const float32x4_t x)
 {
   float32x4_t f, x2;
   x2 = jbm_sqr_4xf32 (x);
-  f = vmulq_f32 (jbm_rational_7_4_4xf32 (jbm_reciprocal_4xf32 (x),
+  f = vmulq_f32 (jbm_rational_8_4_4xf32 (jbm_reciprocal_4xf32 (x),
                                          K_ERFCWC_F32),
                  vdivq_f32 (x, jbm_exp_4xf32 (x2)));
   return vbslq_f32 (vcgtq_f32 (x, vdupq_n_f32 (K_ERFC_MAX_F32)),
-		    vdupq_n_f32 (0.f), f);
+                    vdupq_n_f32 (0.f), f);
 
 }
 
@@ -7911,8 +7911,8 @@ jbm_hypot_2xf64 (const float64x2_t x,   ///< 1st float64x2_t vector.
  * \return rest value (in [0,|divisor|) interval) (float64x2_t).
  */
 static inline float64x2_t
-jbm_mod_2xf64 (const float64x2_t x,    ///< dividend (float64x2_t).
-                const float64x2_t d)    ///< divisor (float64x2_t).
+jbm_mod_2xf64 (const float64x2_t x,     ///< dividend (float64x2_t).
+               const float64x2_t d)     ///< divisor (float64x2_t).
 {
   return vmlsq_f64 (x, vrndmq_f64 (vdivq_f64 (x, d)), d);
 }
@@ -14882,36 +14882,22 @@ jbm_tan_2xf64 (const float64x2_t x)     ///< float64x2_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [-1/2,1/2] (float64x2_t).
+ * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * (float64x2_t).
  *
  * \return function value (float64x2_t).
  */
 static inline float64x2_t
-jbm_atanwc0_2xf64 (const float64x2_t x)
-                   ///< float64x2_t vector \f$\in\left[0,\frac12\right]\f$.
+jbm_atanwc_2xf64 (const float64x2_t x)
+                  ///< float64x2_t vector \f$\in\left[-1,1\right]\f$.
 {
   return
-    vmulq_f64 (x, jbm_rational_8_4_2xf64 (jbm_sqr_2xf64 (x), K_ATANWC0_F64));
+    vmulq_f64 (x, jbm_rational_11_5_2xf64 (jbm_sqr_2xf64 (x), K_ATANWC_F64));
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [1/2,3/2] (float64x2_t).
- *
- * \return function value (float64x2_t).
- */
-static inline float64x2_t
-jbm_atanwc1_2xf64 (const float64x2_t x)
-                   ///< float64x2_t vector \f$\in\left[\frac12,1\right]\f$.
-{
-  return
-    jbm_rational_14_7_2xf64 (vsubq_f64 (x, vdupq_n_f64 (1.)), K_ATANWC1_F64);
-}
-
-/**
- * Function to calculate the function atan(x) using the jbm_atanwc0_2xf64 and
- * jbm_atanwc1_2xf64 functions (float64x2_t).
+ * Function to calculate the function atan(x) using the jbm_atanwc_2xf64
+ * function (float64x2_t).
  *
  * \return function value (float64x2_t in [-pi/2,pi/2]).
  */
@@ -14921,10 +14907,9 @@ jbm_atan_2xf64 (const float64x2_t x)    ///< double number.
   float64x2_t f, ax;
   uint64x2_t m;
   ax = jbm_abs_2xf64 (x);
-  m = vcgtq_f64 (ax, vdupq_n_f64 (1.5));
+  m = vcgtq_f64 (ax, vdupq_n_f64 (1.));
   ax = vbslq_f64 (m, jbm_reciprocal_2xf64 (ax), ax);
-  f = vbslq_f64 (vcgtq_f64 (ax, vdupq_n_f64 (0.5)),
-                 jbm_atanwc1_2xf64 (ax), jbm_atanwc0_2xf64 (ax));
+  f = jbm_atanwc_2xf64 (ax);
   f = vbslq_f64 (m, vsubq_f64 (vdupq_n_f64 (M_PI_2), f), f);
   return vbslq_f64 (vcltzq_f64 (x), jbm_opposite_2xf64 (f), f);
 }
@@ -15093,7 +15078,7 @@ jbm_erfcwc_2xf64 (const float64x2_t x)
 {
   float64x2_t f, x2;
   x2 = jbm_sqr_2xf64 (x);
-  f = vmulq_f64 (jbm_rational_17_10_2xf64 (jbm_reciprocal_2xf64 (x),
+  f = vmulq_f64 (jbm_rational_18_10_2xf64 (jbm_reciprocal_2xf64 (x),
                                            K_ERFCWC_F64),
                  vdivq_f64 (x, jbm_exp_2xf64 (x2)));
   return vbslq_f64 (vcgtq_f64 (x, vdupq_n_f64 (K_ERFC_MAX_F64)),

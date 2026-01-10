@@ -1651,7 +1651,7 @@ check_f32 (const float x, const float f0, const float g0, const float prec)
 {
   if (fabsf (f0 / g0 - 1.f) > prec && fabsf (f0 - g0) > prec)
     {
-      printf ("f/g-1=%.8g f-g=%.8g\n", f0 / g0 - 1.f, f0 - g0);
+      printf ("f/g-1=%.8g f-g=%.8g p=%.8g\n", f0 / g0 - 1.f, f0 - g0, prec);
       printf ("x=%.8g f=%.8g g=%.8g\n", x, f0, g0);
       return 0;
     }
@@ -1763,7 +1763,8 @@ check_f64 (const double x, const double f0, const double g0, const double prec)
 {
   if (fabs (f0 / g0 - 1.) > prec && fabs (f0 - g0) > prec)
     {
-      printf ("f/g-1=%.17lg f-g=%.17lg\n", f0 / g0 - 1., f0 - g0);
+      printf ("f/g-1=%.17lg f-g=%.17lg p=%.17lg\n",
+              f0 / g0 - 1., f0 - g0, prec);
       printf ("x=%.17lg f=%.17lg g=%.17lg\n", x, f0, g0);
       return 0;
     }

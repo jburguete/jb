@@ -207,8 +207,8 @@ jbm_hypot_16xf32 (const __m512 x,       ///< 1st __m512 vector.
  * \return rest value vector (in [0,|divisor|) interval).
  */
 static inline __m512
-jbm_mod_16xf32 (const __m512 x,        ///< dividend (__m512).
-                 const __m512 d)        ///< divisor (__m512).
+jbm_mod_16xf32 (const __m512 x, ///< dividend (__m512).
+                const __m512 d) ///< divisor (__m512).
 {
   return _mm512_fnmadd_ps (_mm512_floor_ps (_mm512_div_ps (x, d)), d, x);
 }
@@ -6979,7 +6979,7 @@ static inline __m512
 jbm_exp2wc_16xf32 (const __m512 x)
                   ///< __m512 vector \f$\in\left[\frac12,1\right]\f$.
 {
-  return jbm_polynomial_6_16xf32 (x, K_EXP2WC_F32);
+  return jbm_polynomial_5_16xf32 (x, K_EXP2WC_F32);
 }
 
 /**
@@ -7182,7 +7182,7 @@ jbm_sinwc_16xf32 (const __m512 x)
 {
   return
     _mm512_mul_ps (x,
-		   jbm_polynomial_3_16xf32 (jbm_sqr_16xf32 (x), K_SINWC_F32));
+                   jbm_polynomial_3_16xf32 (jbm_sqr_16xf32 (x), K_SINWC_F32));
 }
 
 /**
@@ -7336,7 +7336,7 @@ jbm_atanwc_16xf32 (const __m512 x)
 {
   return
     _mm512_mul_ps (x,
-                   jbm_rational_4_2_16xf32 (jbm_sqr_16xf32 (x), K_ATANWC_F32));
+                   jbm_rational_5_2_16xf32 (jbm_sqr_16xf32 (x), K_ATANWC_F32));
 }
 
 /**
@@ -7532,7 +7532,7 @@ jbm_erfcwc_16xf32 (const __m512 x)
 {
   __m512 f, x2;
   x2 = jbm_sqr_16xf32 (x);
-  f = _mm512_mul_ps (jbm_rational_7_4_16xf32 (jbm_reciprocal_16xf32 (x),
+  f = _mm512_mul_ps (jbm_rational_8_4_16xf32 (jbm_reciprocal_16xf32 (x),
                                               K_ERFCWC_F32),
                      _mm512_div_ps (x, jbm_exp_16xf32 (x2)));
   return
@@ -8151,8 +8151,8 @@ jbm_hypot_8xf64 (const __m512d x,       ///< 1st __m512d vector.
  * \return rest value (in [0,|divisor|) interval) (__m512d).
  */
 static inline __m512d
-jbm_mod_8xf64 (const __m512d x,        ///< dividend (__m512d).
-                const __m512d d)        ///< divisor (__m512d).
+jbm_mod_8xf64 (const __m512d x, ///< dividend (__m512d).
+               const __m512d d) ///< divisor (__m512d).
 {
   return _mm512_fnmadd_pd (_mm512_floor_pd (_mm512_div_pd (x, d)), d, x);
 }
@@ -14871,7 +14871,7 @@ static inline __m512d
 jbm_expm1wc_8xf64 (const __m512d x)
 ///< __m512d vector \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
 {
-  return _mm512_mul_pd (x,  jbm_rational_8_2_8xf64 (x, K_EXPM1WC_F64));
+  return _mm512_mul_pd (x, jbm_rational_8_2_8xf64 (x, K_EXPM1WC_F64));
 }
 
 /**
@@ -15210,37 +15210,22 @@ jbm_tan_8xf64 (const __m512d x) ///< __m512d vector.
 
 /**
  * Function to calculate the well conditionated function atan(x) for x in
- * [-1/2,1/2] (__m512d).
+ * [-1,1] (__m512d).
  *
  * \return function value (__m512d).
  */
 static inline __m512d
-jbm_atanwc0_8xf64 (const __m512d x)
-    ///< __m512d vector \f$\in\left[0,\frac12\right]\f$.
+jbm_atanwc_8xf64 (const __m512d x)
+                  ///< __m512d vector \f$\in\left[0,\frac12\right]\f$.
 {
   return
     _mm512_mul_pd (x,
-		   jbm_rational_8_4_8xf64 (jbm_sqr_8xf64 (x), K_ATANWC0_F64));
+                   jbm_rational_11_5_8xf64 (jbm_sqr_8xf64 (x), K_ATANWC_F64));
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [1/2,3/2] (__m512d).
- *
- * \return function value (__m512d).
- */
-static inline __m512d
-jbm_atanwc1_8xf64 (const __m512d x)
-    ///< __m512d vector \f$\in\left[\frac12,1\right]\f$.
-{
-  return
-    jbm_rational_14_7_8xf64 (_mm512_sub_pd (x, _mm512_set1_pd (1.)),
-		             K_ATANWC1_F64);
-}
-
-/**
- * Function to calculate the function atan(x) using the jbm_atanwc0_8xf64 and
- * jbm_atanwc1_8xf64 functions (__m512d).
+ * Function to calculate the function atan(x) using the jbm_atanwc_8xf64
+ * function (__m512d).
  *
  * \return function value (__m512d in [-pi/2,pi/2]).
  */
@@ -15250,11 +15235,9 @@ jbm_atan_8xf64 (const __m512d x)        ///< double number.
   __m512d f, ax;
   __mmask16 m;
   ax = jbm_abs_8xf64 (x);
-  m = _mm512_cmp_pd_mask (ax, _mm512_set1_pd (1.5), _CMP_GT_OS);
+  m = _mm512_cmp_pd_mask (ax, _mm512_set1_pd (1.), _CMP_GT_OS);
   ax = _mm512_mask_blend_pd (m, ax, jbm_reciprocal_8xf64 (ax));
-  f = _mm512_mask_blend_pd (_mm512_cmp_pd_mask (ax, _mm512_set1_pd (0.5),
-                                                _CMP_GT_OS),
-                            jbm_atanwc0_8xf64 (ax), jbm_atanwc1_8xf64 (ax));
+  f = jbm_atanwc_8xf64 (ax);
   f = _mm512_mask_blend_pd (m, f, _mm512_sub_pd (_mm512_set1_pd (M_PI_2), f));
   return jbm_copysign_8xf64 (f, x);
 
@@ -15432,7 +15415,7 @@ jbm_erfcwc_8xf64 (const __m512d x)
 {
   __m512d f, x2;
   x2 = jbm_sqr_8xf64 (x);
-  f = _mm512_mul_pd (jbm_rational_17_10_8xf64 (jbm_reciprocal_8xf64 (x),
+  f = _mm512_mul_pd (jbm_rational_18_10_8xf64 (jbm_reciprocal_8xf64 (x),
                                                K_ERFCWC_F64),
                      _mm512_div_pd (x, jbm_exp_8xf64 (x2)));
   return

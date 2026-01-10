@@ -208,8 +208,8 @@ jbm_hypot_8xf32 (const __m256 x,        ///< 1st __m256 vector.
  * \return rest value vector (in [0,|divisor|) interval).
  */
 static inline __m256
-jbm_mod_8xf32 (const __m256 x, ///< dividend (__m256).
-               const __m256 d) ///< divisor (__m256).
+jbm_mod_8xf32 (const __m256 x,  ///< dividend (__m256).
+               const __m256 d)  ///< divisor (__m256).
 {
   return _mm256_fnmadd_ps (_mm256_floor_ps (_mm256_div_ps (x, d)), d, x);
 }
@@ -6929,7 +6929,7 @@ static inline __m256
 jbm_exp2wc_8xf32 (const __m256 x)
                   ///< __m256 vector \f$\in\left[\frac12,1\right]\f$.
 {
-  return jbm_polynomial_6_8xf32 (x, K_EXP2WC_F32);
+  return jbm_polynomial_5_8xf32 (x, K_EXP2WC_F32);
 }
 
 /**
@@ -7006,7 +7006,8 @@ jbm_expm1_8xf32 (const __m256 x)        ///< __m128 vector.
     _mm256_blendv_ps (_mm256_sub_ps (jbm_exp_8xf32 (x), _mm256_set1_ps (1.f)),
                       jbm_expm1wc_8xf32 (x),
                       _mm256_cmp_ps (jbm_abs_8xf32 (x),
-                                     _mm256_set1_ps (M_LN2f / 2.f),_CMP_LT_OS));
+                                     _mm256_set1_ps (M_LN2f / 2.f),
+                                     _CMP_LT_OS));
 }
 
 /**
@@ -7276,8 +7277,7 @@ jbm_atanwc_8xf32 (const __m256 x)
                   ///< __m256 vector \f$\in\left[-1,1\right]\f$.
 {
   return
-    _mm256_mul_ps (x,
-                   jbm_rational_4_2_8xf32 (jbm_sqr_8xf32 (x), K_ATANWC_F32));
+    _mm256_mul_ps (x, jbm_rational_5_2_8xf32 (jbm_sqr_8xf32 (x), K_ATANWC_F32));
 }
 
 /**
@@ -7470,7 +7470,7 @@ jbm_erfcwc_8xf32 (const __m256 x)
 {
   __m256 f, x2;
   x2 = jbm_sqr_8xf32 (x);
-  f = _mm256_mul_ps (jbm_rational_7_4_8xf32 (jbm_reciprocal_8xf32 (x),
+  f = _mm256_mul_ps (jbm_rational_8_4_8xf32 (jbm_reciprocal_8xf32 (x),
                                              K_ERFCWC_F32),
                      _mm256_div_ps (x, jbm_exp_8xf32 (x2)));
   return
@@ -7514,8 +7514,7 @@ jbm_erfc_8xf32 (const __m256 x) ///< __m256 vector.
   wc = _mm256_sub_ps (u, jbm_erfwc_8xf32 (x));
   return
     _mm256_blendv_ps
-    (
-     _mm256_blendv_ps
+    (_mm256_blendv_ps
      (wc, _mm256_sub_ps (u2, cwc), _mm256_cmp_ps (ax, u, _CMP_GT_OS)), cwc,
      _mm256_cmp_ps (x, u, _CMP_GT_OS));
 }
@@ -8035,7 +8034,7 @@ jbm_sign_4xf64 (const __m256d x)        ///< __m256d vector.
   y.x = x;
   y.i
     = _mm256_and_si256 (y.i,
-		        _mm256_set1_epi64x ((long long) JBM_SIGN_BITS_F64));
+                        _mm256_set1_epi64x ((long long) JBM_SIGN_BITS_F64));
   y.i = _mm256_and_si256 (y.i, _mm256_set1_epi64x ((long long) JBM_1_BITS_F64));
   return y.x;
 }
@@ -8092,8 +8091,8 @@ jbm_hypot_4xf64 (const __m256d x,       ///< 1st __m256d vector.
  * \return rest value (in [0,|divisor|) interval) (__m256d).
  */
 static inline __m256d
-jbm_mod_4xf64 (const __m256d x,        ///< dividend (__m256d).
-                const __m256d d)        ///< divisor (__m256d).
+jbm_mod_4xf64 (const __m256d x, ///< dividend (__m256d).
+               const __m256d d) ///< divisor (__m256d).
 {
   return _mm256_fnmadd_pd (_mm256_floor_pd (_mm256_div_pd (x, d)), d, x);
 }
@@ -8118,7 +8117,7 @@ jbm_frexp_4xf64 (const __m256d x,       ///< __m256d vector.
   y2.x = x;
   y2.i
     = _mm256_and_si256 (y2.i,
-		        _mm256_set1_epi64x ((long long) 0x000fffffffffffffull));
+                        _mm256_set1_epi64x ((long long) 0x000fffffffffffffull));
   m3 = _mm256_cmpeq_epi64 (y2.i, zi);
   y2.i = _mm256_set1_epi64x ((long long) 0x0010000000000000ull);
   z.x = _mm256_div_pd (x, y2.x);
@@ -15175,50 +15174,34 @@ jbm_tan_4xf64 (const __m256d x) ///< __m256d vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [-1/2,1/2] (__m256d).
+ * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * (__m256d).
  *
  * \return function value (__m256d).
  */
 static inline __m256d
-jbm_atanwc0_4xf64 (const __m256d x)
-    ///< __m256d vector \f$\in\left[0,\frac12\right]\f$.
+jbm_atanwc_4xf64 (const __m256d x)
+                  ///< __m256d vector \f$\in\left[0,\frac12\right]\f$.
 {
   return
     _mm256_mul_pd (x,
-		   jbm_rational_8_4_4xf64 (jbm_sqr_4xf64 (x), K_ATANWC0_F64));
+                   jbm_rational_11_5_4xf64 (jbm_sqr_4xf64 (x), K_ATANWC_F64));
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [1/2,3/2] (__m256d).
- *
- * \return function value (__m256d).
- */
-static inline __m256d
-jbm_atanwc1_4xf64 (const __m256d x)
-    ///< __m256d vector \f$\in\left[\frac12,1\right]\f$.
-{
-  return
-    jbm_rational_14_7_4xf64 (_mm256_sub_pd (x, _mm256_set1_pd (1.)),
-		             K_ATANWC1_F64);
-}
-
-/**
- * Function to calculate the function atan(x) using the jbm_atanwc0_4xf64 and
- * jbm_atanwc1_4xf64 functions (__m256d).
+ * Function to calculate the function atan(x) using the jbm_atanwc_4xf64 and
+ * function (__m256d).
  *
  * \return function value (__m256d in [-pi/2,pi/2]).
  */
 static inline __m256d
-jbm_atan_4xf64 (const __m256d x)        ///< double number.
+jbm_atan_4xf64 (const __m256d x)        ///< __m256d vector.
 {
   __m256d f, ax, m;
   ax = jbm_abs_4xf64 (x);
-  m = _mm256_cmp_pd (ax, _mm256_set1_pd (1.5), _CMP_GT_OS);
+  m = _mm256_cmp_pd (ax, _mm256_set1_pd (1.), _CMP_GT_OS);
   ax = _mm256_blendv_pd (ax, jbm_reciprocal_4xf64 (ax), m);
-  f = _mm256_blendv_pd (jbm_atanwc0_4xf64 (ax), jbm_atanwc1_4xf64 (ax),
-                        _mm256_cmp_pd (ax, _mm256_set1_pd (0.5), _CMP_GT_OS));
+  f = jbm_atanwc_4xf64 (ax);
   f = _mm256_blendv_pd (f, _mm256_sub_pd (_mm256_set1_pd (M_PI_2), f), m);
   return jbm_copysign_4xf64 (f, x);
 }
@@ -15395,8 +15378,8 @@ jbm_erfcwc_4xf64 (const __m256d x)
 {
   __m256d f, x2;
   x2 = jbm_sqr_4xf64 (x);
-  f = _mm256_mul_pd (jbm_rational_17_10_4xf64 (jbm_reciprocal_4xf64 (x),
-			                       K_ERFCWC_F64),
+  f = _mm256_mul_pd (jbm_rational_18_10_4xf64 (jbm_reciprocal_4xf64 (x),
+                                               K_ERFCWC_F64),
                      _mm256_div_pd (x, jbm_exp_4xf64 (x2)));
   return
     _mm256_blendv_pd (f, _mm256_setzero_pd (),
@@ -15439,8 +15422,7 @@ jbm_erfc_4xf64 (const __m256d x)        ///< __m256d vector.
   wc = _mm256_sub_pd (u, jbm_erfwc_4xf64 (x));
   return
     _mm256_blendv_pd
-    (
-     _mm256_blendv_pd
+    (_mm256_blendv_pd
      (wc, _mm256_sub_pd (u2, cwc), _mm256_cmp_pd (ax, u, _CMP_GT_OS)), cwc,
      _mm256_cmp_pd (x, u, _CMP_GT_OS));
 }

@@ -284,8 +284,8 @@ jbm_hypot_4xf32 (const __m128 x,        ///< 1st __m128 vector.
  * \return rest value vector (in [0,|divisor|) interval).
  */
 static inline __m128
-jbm_mod_4xf32 (const __m128 x, ///< dividend (__m128).
-                const __m128 d) ///< divisor (__m128).
+jbm_mod_4xf32 (const __m128 x,  ///< dividend (__m128).
+               const __m128 d)  ///< divisor (__m128).
 {
   return _mm_fnmadd_ps (_mm_floor_ps (_mm_div_ps (x, d)), d, x);
 }
@@ -6971,7 +6971,7 @@ static inline __m128
 jbm_exp2wc_4xf32 (const __m128 x)
                   ///< __m128 vector \f$\in[\frac12,1]\f$.
 {
-  return jbm_polynomial_6_4xf32 (x, K_EXP2WC_F32);
+  return jbm_polynomial_5_4xf32 (x, K_EXP2WC_F32);
 }
 
 /**
@@ -7216,7 +7216,7 @@ jbm_sin_4xf32 (const __m128 x)  ///< __m128 vector.
   l2 = _mm_cmplt_ps (q, pi3_2);
   m1 = _mm_andnot_ps (_mm_cmplt_ps (q, pi_2), l1);
   m2 = _mm_andnot_ps (l1, l2);
-  m3 = _mm_andnot_ps (l2, _mm_castsi128_ps(_mm_set1_epi32(0xffffffff)));
+  m3 = _mm_andnot_ps (l2, _mm_castsi128_ps (_mm_set1_epi32 (0xffffffff)));
   y1 = _mm_sub_ps (pi_2, y);
   y2 = _mm_sub_ps (pi, y);
   y3 = _mm_sub_ps (pi3_2, y);
@@ -7313,7 +7313,7 @@ jbm_atanwc_4xf32 (const __m128 x)
                   ///< __m128 vector \f$\in\left[-1,1\right]\f$.
 {
   return
-    _mm_mul_ps (x, jbm_rational_4_2_4xf32 (jbm_sqr_4xf32 (x), K_ATANWC_F32));
+    _mm_mul_ps (x, jbm_rational_5_2_4xf32 (jbm_sqr_4xf32 (x), K_ATANWC_F32));
 }
 
 /**
@@ -7495,7 +7495,7 @@ jbm_erfcwc_4xf32 (const __m128 x)
 {
   __m128 f, x2;
   x2 = jbm_sqr_4xf32 (x);
-  f = _mm_mul_ps (jbm_rational_7_4_4xf32 (jbm_reciprocal_4xf32 (x),
+  f = _mm_mul_ps (jbm_rational_8_4_4xf32 (jbm_reciprocal_4xf32 (x),
                                           K_ERFCWC_F32),
                   _mm_div_ps (x, jbm_exp_4xf32 (x2)));
   return _mm_blendv_ps (f, _mm_setzero_ps (),
@@ -8082,8 +8082,8 @@ jbm_hypot_2xf64 (const __m128d x,       ///< 1st __m128d vector.
  * \return rest value (in [0,|divisor|) interval) (__m128d).
  */
 static inline __m128d
-jbm_mod_2xf64 (const __m128d x,        ///< dividend (__m128d).
-                const __m128d d)        ///< divisor (__m128d).
+jbm_mod_2xf64 (const __m128d x, ///< dividend (__m128d).
+               const __m128d d) ///< divisor (__m128d).
 {
   return _mm_fnmadd_pd (_mm_floor_pd (_mm_div_pd (x, d)), d, x);
 }
@@ -15109,36 +15109,22 @@ jbm_tan_2xf64 (const __m128d x) ///< __m128d vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [-1/2,1/2] (__m128d).
+ * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * (__m128d).
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_atanwc0_2xf64 (const __m128d x)
-                   ///< __m128d vector \f$\in\left[0,\frac12\right]\f$.
+jbm_atanwc_2xf64 (const __m128d x)
+                  ///< __m128d vector \f$\in\left[-1,1\right]\f$.
 {
   return
-    _mm_mul_pd (x, jbm_rational_8_4_2xf64 (jbm_sqr_2xf64 (x), K_ATANWC0_F64));
+    _mm_mul_pd (x, jbm_rational_11_5_2xf64 (jbm_sqr_2xf64 (x), K_ATANWC_F64));
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [1/2,3/2] (__m128d).
- *
- * \return function value (__m128d).
- */
-static inline __m128d
-jbm_atanwc1_2xf64 (const __m128d x)
-                   ///< __m128d vector \f$\in\left[\frac12,1\right]\f$.
-{
-  return
-    jbm_rational_14_7_2xf64 (_mm_sub_pd (x, _mm_set1_pd (1.)), K_ATANWC1_F64);
-}
-
-/**
- * Function to calculate the function atan(x) using the jbm_atanwc0_2xf64 and
- * jbm_atanwc1_2xf64 functions (__m128d).
+ * Function to calculate the function atan(x) using the jbm_atanwc_2xf64
+ * function (__m128d).
  *
  * \return function value (__m128d in [-pi/2,pi/2]).
  */
@@ -15147,10 +15133,9 @@ jbm_atan_2xf64 (const __m128d x)        ///< double number.
 {
   __m128d f, ax, m;
   ax = jbm_abs_2xf64 (x);
-  m = _mm_cmpgt_pd (ax, _mm_set1_pd (1.5));
+  m = _mm_cmpgt_pd (ax, _mm_set1_pd (1.));
   ax = _mm_blendv_pd (ax, jbm_reciprocal_2xf64 (ax), m);
-  f = _mm_blendv_pd (jbm_atanwc0_2xf64 (ax), jbm_atanwc1_2xf64 (ax),
-                     _mm_cmpgt_pd (ax, _mm_set1_pd (0.5)));
+  f = jbm_atanwc_2xf64 (ax);
   f = _mm_blendv_pd (f, _mm_sub_pd (_mm_set1_pd (M_PI_2), f), m);
   return jbm_copysign_2xf64 (f, x);
 }
@@ -15316,8 +15301,8 @@ jbm_erfcwc_2xf64 (const __m128d x)
 {
   __m128d f, x2;
   x2 = jbm_sqr_2xf64 (x);
-  f = _mm_mul_pd (jbm_rational_17_10_2xf64 (jbm_reciprocal_2xf64 (x),
-			                    K_ERFCWC_F64),
+  f = _mm_mul_pd (jbm_rational_18_10_2xf64 (jbm_reciprocal_2xf64 (x),
+                                            K_ERFCWC_F64),
                   _mm_div_pd (x, jbm_exp_2xf64 (x2)));
   return
     _mm_blendv_pd (f, _mm_setzero_pd (),
