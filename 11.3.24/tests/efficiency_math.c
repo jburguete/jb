@@ -10,17 +10,18 @@
 
 // parallel bucles
 
-#define BUCLE(f) \
-  for (i = imin; i < imax; ++i) y[i] = f(x[i])
 #define BUCLE_INIT(type, f) \
   for (i = imin; i < imax; ++i) \
-    x[i] = (type) f (r[i], xmin, xmax, tau);
+    x[i] = (type) f (r[i], xmin, xmax, tau)
+#define BUCLE_FUNCTION(f) \
+  for (i = imin; i < imax; ++i) \
+    y[i] = f (x[i])
 #define BUCLE_ERROR(type, f, e) \
   for (i = imin; i < imax; ++i) \
     { \
-      ei = e (y[i], (type) f((long double) x[i])); \
+      ei = e (y[i], (type) f ((long double) x[i])); \
       if (ei > em) \
-        xm = x[i], em = ei; \
+        xm = x[i], em = ei, im = i; \
     }
 
 // function type
@@ -163,12 +164,12 @@ crono ()
 static inline double
 erfinv_f64 (const double y)
 {
-    const double a = 0.147;
-    double ln, t, x;
-    ln = log (1. - y * y);
-    t = 2.0 / M_PI * a + ln * 0.5;
-    x = sqrt (sqrt (t * t - ln / a) - t);
-    return copysign (x, y);
+  const double a = 0.147;
+  double ln, t, x;
+  ln = log (1. - y * y);
+  t = 2.0 / M_PI * a + ln * 0.5;
+  x = sqrt (sqrt (t * t - ln / a) - t);
+  return copysign (x, y);
 }
 
 static inline double
@@ -637,15 +638,18 @@ error_f32 (void *data, void *user_data __attribute__((unused)))
   Parallel_f32 *p;
   float *x, *y;
   float xm;
-  int32_t ei, em;
-  unsigned int i, type, imin, imax;
+  uint32_t ei, em;
+  unsigned int type;
+  unsigned long int i, imin, imax, im;
   p = (Parallel_f32 *) data;
   type = p->type;
   imin = p->imin;
   imax = p->imax;
   x = p->x;
   y = p->y;
-  em = 0;
+  em = 0u;
+  im = 0u;
+  xm = p->x[0];
   switch (type)
     {
     case TYPE_ADD:
@@ -859,6 +863,8 @@ error_f32 (void *data, void *user_data __attribute__((unused)))
       BUCLE_ERROR (float, pol15_f80, ulp_32);
       break;
     }
+  if (p->type == TYPE_ASIN)
+    printf ("im=%lu x[m]=%.8e xm=%.8e\n", im, x[im], xm);
   if ((uint64_t) em > global_error)
     {
       g_mutex_lock (&mutex);
@@ -901,7 +907,8 @@ error_f64 (void *data, void *user_data __attribute__((unused)))
   double *x, *y;
   double xm;
   uint64_t ei, em;
-  unsigned int i, type, imin, imax;
+  unsigned int type;
+  unsigned long int i, imin, imax, im;
   p = (Parallel_f64 *) data;
   type = p->type;
   imin = p->imin;
@@ -909,6 +916,8 @@ error_f64 (void *data, void *user_data __attribute__((unused)))
   x = p->x;
   y = p->y;
   em = 0ull;
+  im = 0u;
+  xm = p->x[0];
   switch (type)
     {
     case TYPE_ADD:
@@ -1664,49 +1673,49 @@ f32 (unsigned int type, float x)
     case TYPE_ERFC:
       return erfcf (x);
     case TYPE_JBM_ABS:
-      return fabsf (x);
+      return jbm_abs_f32 (x);
     case TYPE_JBM_MOD:
-      return mod_f32 (x);
+      return mod_f32_jbm (x);
     case TYPE_JBM_EXP2:
-      return exp2f (x);
+      return jbm_exp2_f32 (x);
     case TYPE_JBM_EXP:
-      return expf (x);
+      return jbm_exp_f32 (x);
     case TYPE_JBM_EXP10:
-      return exp10f (x);
+      return jbm_exp10_f32 (x);
     case TYPE_JBM_EXPM1:
-      return expm1f (x);
+      return jbm_expm1_f32 (x);
     case TYPE_JBM_LOG2:
-      return log2f (x);
+      return jbm_log2_f32 (x);
     case TYPE_JBM_LOG:
-      return logf (x);
+      return jbm_log_f32 (x);
     case TYPE_JBM_LOG10:
-      return log10f (x);
+      return jbm_log10_f32 (x);
     case TYPE_JBM_POW:
-      return pow_f32 (x);
+      return pow_f32_jbm (x);
     case TYPE_JBM_CBRT:
-      return cbrtf (x);
+      return jbm_cbrt_f32 (x);
     case TYPE_JBM_SIN:
-      return sinf (x);
+      return jbm_sin_f32 (x);
     case TYPE_JBM_COS:
-      return cosf (x);
+      return jbm_cos_f32 (x);
     case TYPE_JBM_TAN:
-      return tanf (x);
+      return jbm_tan_f32 (x);
     case TYPE_JBM_ATAN:
-      return atanf (x);
+      return jbm_atan_f32 (x);
     case TYPE_JBM_ASIN:
-      return asinf (x);
+      return jbm_asin_f32 (x);
     case TYPE_JBM_ACOS:
-      return acosf (x);
+      return jbm_acos_f32 (x);
     case TYPE_JBM_SINH:
-      return sinhf (x);
+      return jbm_sinh_f32 (x);
     case TYPE_JBM_COSH:
-      return coshf (x);
+      return jbm_cosh_f32 (x);
     case TYPE_JBM_TANH:
-      return tanhf (x);
+      return jbm_tanh_f32 (x);
     case TYPE_JBM_ERF:
-      return erff (x);
+      return jbm_erf_f32 (x);
     case TYPE_JBM_ERFC:
-      return erfcf (x);
+      return jbm_erfc_f32 (x);
     case TYPE_JBM_POL1:
       return pol1_f32 (x);
     case TYPE_JBM_POL2:
@@ -1852,214 +1861,214 @@ thread_f32 (void *data, void *user_data __attribute__((unused)))
   switch (p->type)
     {
     case TYPE_ADD:
-      BUCLE (add_f32);
+      BUCLE_FUNCTION (add_f32);
       break;
     case TYPE_SUB:
-      BUCLE (sub_f32);
+      BUCLE_FUNCTION (sub_f32);
       break;
     case TYPE_MUL:
-      BUCLE (mul_f32);
+      BUCLE_FUNCTION (mul_f32);
       break;
     case TYPE_DIV:
-      BUCLE (div_f32);
+      BUCLE_FUNCTION (div_f32);
       break;
     case TYPE_SQRT:
-      BUCLE (sqrtf);
+      BUCLE_FUNCTION (sqrtf);
       break;
     case TYPE_MAX:
-      BUCLE (max_f32);
+      BUCLE_FUNCTION (max_f32);
       break;
     case TYPE_MIN:
-      BUCLE (min_f32);
+      BUCLE_FUNCTION (min_f32);
       break;
     case TYPE_ROUND:
-      BUCLE (roundf);
+      BUCLE_FUNCTION (roundf);
       break;
     case TYPE_FLOOR:
-      BUCLE (floorf);
+      BUCLE_FUNCTION (floorf);
       break;
     case TYPE_CEIL:
-      BUCLE (ceilf);
+      BUCLE_FUNCTION (ceilf);
       break;
     case TYPE_TRUNC:
-      BUCLE (truncf);
+      BUCLE_FUNCTION (truncf);
       break;
     case TYPE_ABS:
-      BUCLE (fabsf);
+      BUCLE_FUNCTION (fabsf);
       break;
     case TYPE_MOD:
-      BUCLE (mod_f32);
+      BUCLE_FUNCTION (mod_f32);
       break;
     case TYPE_EXP2:
-      BUCLE (exp2f);
+      BUCLE_FUNCTION (exp2f);
       break;
     case TYPE_EXP:
-      BUCLE (expf);
+      BUCLE_FUNCTION (expf);
       break;
     case TYPE_EXP10:
-      BUCLE (exp10f);
+      BUCLE_FUNCTION (exp10f);
       break;
     case TYPE_EXPM1:
-      BUCLE (expm1f);
+      BUCLE_FUNCTION (expm1f);
       break;
     case TYPE_LOG2:
-      BUCLE (log2f);
+      BUCLE_FUNCTION (log2f);
       break;
     case TYPE_LOG:
-      BUCLE (logf);
+      BUCLE_FUNCTION (logf);
       break;
     case TYPE_LOG10:
-      BUCLE (log10f);
+      BUCLE_FUNCTION (log10f);
       break;
     case TYPE_POW:
-      BUCLE (pow_f32);
+      BUCLE_FUNCTION (pow_f32);
       break;
     case TYPE_CBRT:
-      BUCLE (cbrtf);
+      BUCLE_FUNCTION (cbrtf);
       break;
     case TYPE_SIN:
-      BUCLE (sinf);
+      BUCLE_FUNCTION (sinf);
       break;
     case TYPE_COS:
-      BUCLE (cosf);
+      BUCLE_FUNCTION (cosf);
       break;
     case TYPE_TAN:
-      BUCLE (tanf);
+      BUCLE_FUNCTION (tanf);
       break;
     case TYPE_ATAN:
-      BUCLE (atanf);
+      BUCLE_FUNCTION (atanf);
       break;
     case TYPE_ASIN:
-      BUCLE (asinf);
+      BUCLE_FUNCTION (asinf);
       break;
     case TYPE_ACOS:
-      BUCLE (acosf);
+      BUCLE_FUNCTION (acosf);
       break;
     case TYPE_SINH:
-      BUCLE (sinhf);
+      BUCLE_FUNCTION (sinhf);
       break;
     case TYPE_COSH:
-      BUCLE (coshf);
+      BUCLE_FUNCTION (coshf);
       break;
     case TYPE_TANH:
-      BUCLE (tanhf);
+      BUCLE_FUNCTION (tanhf);
       break;
     case TYPE_ERF:
-      BUCLE (erff);
+      BUCLE_FUNCTION (erff);
       break;
     case TYPE_ERFC:
-      BUCLE (erfcf);
+      BUCLE_FUNCTION (erfcf);
       break;
     case TYPE_JBM_ABS:
-      BUCLE (jbm_abs_f32);
+      BUCLE_FUNCTION (jbm_abs_f32);
       break;
     case TYPE_JBM_MOD:
-      BUCLE (mod_f32_jbm);
+      BUCLE_FUNCTION (mod_f32_jbm);
       break;
     case TYPE_JBM_EXP2:
-      BUCLE (jbm_exp2_f32);
+      BUCLE_FUNCTION (jbm_exp2_f32);
       break;
     case TYPE_JBM_EXP:
-      BUCLE (jbm_exp_f32);
+      BUCLE_FUNCTION (jbm_exp_f32);
       break;
     case TYPE_JBM_EXP10:
-      BUCLE (jbm_exp10_f32);
+      BUCLE_FUNCTION (jbm_exp10_f32);
       break;
     case TYPE_JBM_EXPM1:
-      BUCLE (jbm_expm1_f32);
+      BUCLE_FUNCTION (jbm_expm1_f32);
       break;
     case TYPE_JBM_LOG2:
-      BUCLE (jbm_log2_f32);
+      BUCLE_FUNCTION (jbm_log2_f32);
       break;
     case TYPE_JBM_LOG:
-      BUCLE (jbm_log_f32);
+      BUCLE_FUNCTION (jbm_log_f32);
       break;
     case TYPE_JBM_LOG10:
-      BUCLE (jbm_log10_f32);
+      BUCLE_FUNCTION (jbm_log10_f32);
       break;
     case TYPE_JBM_POW:
-      BUCLE (pow_f32_jbm);
+      BUCLE_FUNCTION (pow_f32_jbm);
       break;
     case TYPE_JBM_CBRT:
-      BUCLE (jbm_cbrt_f32);
+      BUCLE_FUNCTION (jbm_cbrt_f32);
       break;
     case TYPE_JBM_SIN:
-      BUCLE (jbm_sin_f32);
+      BUCLE_FUNCTION (jbm_sin_f32);
       break;
     case TYPE_JBM_COS:
-      BUCLE (jbm_cos_f32);
+      BUCLE_FUNCTION (jbm_cos_f32);
       break;
     case TYPE_JBM_TAN:
-      BUCLE (jbm_tan_f32);
+      BUCLE_FUNCTION (jbm_tan_f32);
       break;
     case TYPE_JBM_ATAN:
-      BUCLE (jbm_atan_f32);
+      BUCLE_FUNCTION (jbm_atan_f32);
       break;
     case TYPE_JBM_ASIN:
-      BUCLE (jbm_asin_f32);
+      BUCLE_FUNCTION (jbm_asin_f32);
       break;
     case TYPE_JBM_ACOS:
-      BUCLE (jbm_acos_f32);
+      BUCLE_FUNCTION (jbm_acos_f32);
       break;
     case TYPE_JBM_SINH:
-      BUCLE (jbm_sinh_f32);
+      BUCLE_FUNCTION (jbm_sinh_f32);
       break;
     case TYPE_JBM_COSH:
-      BUCLE (jbm_cosh_f32);
+      BUCLE_FUNCTION (jbm_cosh_f32);
       break;
     case TYPE_JBM_TANH:
-      BUCLE (jbm_tanh_f32);
+      BUCLE_FUNCTION (jbm_tanh_f32);
       break;
     case TYPE_JBM_ERF:
-      BUCLE (jbm_erf_f32);
+      BUCLE_FUNCTION (jbm_erf_f32);
       break;
     case TYPE_JBM_ERFC:
-      BUCLE (jbm_erfc_f32);
+      BUCLE_FUNCTION (jbm_erfc_f32);
       break;
     case TYPE_JBM_POL1:
-      BUCLE (pol1_f32);
+      BUCLE_FUNCTION (pol1_f32);
       break;
     case TYPE_JBM_POL2:
-      BUCLE (pol2_f32);
+      BUCLE_FUNCTION (pol2_f32);
       break;
     case TYPE_JBM_POL3:
-      BUCLE (pol3_f32);
+      BUCLE_FUNCTION (pol3_f32);
       break;
     case TYPE_JBM_POL4:
-      BUCLE (pol4_f32);
+      BUCLE_FUNCTION (pol4_f32);
       break;
     case TYPE_JBM_POL5:
-      BUCLE (pol5_f32);
+      BUCLE_FUNCTION (pol5_f32);
       break;
     case TYPE_JBM_POL6:
-      BUCLE (pol6_f32);
+      BUCLE_FUNCTION (pol6_f32);
       break;
     case TYPE_JBM_POL7:
-      BUCLE (pol7_f32);
+      BUCLE_FUNCTION (pol7_f32);
       break;
     case TYPE_JBM_POL8:
-      BUCLE (pol8_f32);
+      BUCLE_FUNCTION (pol8_f32);
       break;
     case TYPE_JBM_POL9:
-      BUCLE (pol9_f32);
+      BUCLE_FUNCTION (pol9_f32);
       break;
     case TYPE_JBM_POL10:
-      BUCLE (pol10_f32);
+      BUCLE_FUNCTION (pol10_f32);
       break;
     case TYPE_JBM_POL11:
-      BUCLE (pol11_f32);
+      BUCLE_FUNCTION (pol11_f32);
       break;
     case TYPE_JBM_POL12:
-      BUCLE (pol12_f32);
+      BUCLE_FUNCTION (pol12_f32);
       break;
     case TYPE_JBM_POL13:
-      BUCLE (pol13_f32);
+      BUCLE_FUNCTION (pol13_f32);
       break;
     case TYPE_JBM_POL14:
-      BUCLE (pol14_f32);
+      BUCLE_FUNCTION (pol14_f32);
       break;
     case TYPE_JBM_POL15:
-      BUCLE (pol15_f32);
+      BUCLE_FUNCTION (pol15_f32);
       break;
     }
 }
@@ -2597,49 +2606,49 @@ f64 (unsigned int type, double x)
     case TYPE_ERFC:
       return erfc (x);
     case TYPE_JBM_ABS:
-      return fabs (x);
+      return jbm_abs_f64 (x);
     case TYPE_JBM_MOD:
-      return mod_f64 (x);
+      return mod_f64_jbm (x);
     case TYPE_JBM_EXP2:
-      return exp2 (x);
+      return jbm_exp2_f64 (x);
     case TYPE_JBM_EXP:
-      return exp (x);
+      return jbm_exp_f64 (x);
     case TYPE_JBM_EXP10:
-      return exp10 (x);
+      return jbm_exp10_f64 (x);
     case TYPE_JBM_EXPM1:
-      return expm1 (x);
+      return jbm_expm1_f64 (x);
     case TYPE_JBM_LOG2:
-      return log2 (x);
+      return jbm_log2_f64 (x);
     case TYPE_JBM_LOG:
-      return log (x);
+      return jbm_log_f64 (x);
     case TYPE_JBM_LOG10:
-      return log10 (x);
+      return jbm_log10_f64 (x);
     case TYPE_JBM_POW:
-      return pow_f64 (x);
+      return pow_f64_jbm (x);
     case TYPE_JBM_CBRT:
-      return cbrt (x);
+      return jbm_cbrt_f64 (x);
     case TYPE_JBM_SIN:
-      return sin (x);
+      return jbm_sin_f64 (x);
     case TYPE_JBM_COS:
-      return cos (x);
+      return jbm_cos_f64 (x);
     case TYPE_JBM_TAN:
-      return tan (x);
+      return jbm_tan_f64 (x);
     case TYPE_JBM_ATAN:
-      return atan (x);
+      return jbm_atan_f64 (x);
     case TYPE_JBM_ASIN:
-      return asin (x);
+      return jbm_asin_f64 (x);
     case TYPE_JBM_ACOS:
-      return acos (x);
+      return jbm_acos_f64 (x);
     case TYPE_JBM_SINH:
-      return sinh (x);
+      return jbm_sinh_f64 (x);
     case TYPE_JBM_COSH:
-      return cosh (x);
+      return jbm_cosh_f64 (x);
     case TYPE_JBM_TANH:
-      return tanh (x);
+      return jbm_tanh_f64 (x);
     case TYPE_JBM_ERF:
-      return erf (x);
+      return jbm_erf_f64 (x);
     case TYPE_JBM_ERFC:
-      return erfc (x);
+      return jbm_erfc_f64 (x);
     case TYPE_JBM_POL1:
       return pol1_f64 (x);
     case TYPE_JBM_POL2:
@@ -2785,214 +2794,214 @@ thread_f64 (void *data, void *user_data __attribute__((unused)))
   switch (p->type)
     {
     case TYPE_ADD:
-      BUCLE (add_f64);
+      BUCLE_FUNCTION (add_f64);
       break;
     case TYPE_SUB:
-      BUCLE (sub_f64);
+      BUCLE_FUNCTION (sub_f64);
       break;
     case TYPE_MUL:
-      BUCLE (mul_f64);
+      BUCLE_FUNCTION (mul_f64);
       break;
     case TYPE_DIV:
-      BUCLE (div_f64);
+      BUCLE_FUNCTION (div_f64);
       break;
     case TYPE_SQRT:
-      BUCLE (sqrt);
+      BUCLE_FUNCTION (sqrt);
       break;
     case TYPE_MAX:
-      BUCLE (max_f64);
+      BUCLE_FUNCTION (max_f64);
       break;
     case TYPE_MIN:
-      BUCLE (min_f64);
+      BUCLE_FUNCTION (min_f64);
       break;
     case TYPE_ROUND:
-      BUCLE (round);
+      BUCLE_FUNCTION (round);
       break;
     case TYPE_FLOOR:
-      BUCLE (floor);
+      BUCLE_FUNCTION (floor);
       break;
     case TYPE_CEIL:
-      BUCLE (ceil);
+      BUCLE_FUNCTION (ceil);
       break;
     case TYPE_TRUNC:
-      BUCLE (trunc);
+      BUCLE_FUNCTION (trunc);
       break;
     case TYPE_ABS:
-      BUCLE (fabs);
+      BUCLE_FUNCTION (fabs);
       break;
     case TYPE_MOD:
-      BUCLE (mod_f64);
+      BUCLE_FUNCTION (mod_f64);
       break;
     case TYPE_EXP2:
-      BUCLE (exp2);
+      BUCLE_FUNCTION (exp2);
       break;
     case TYPE_EXP:
-      BUCLE (exp);
+      BUCLE_FUNCTION (exp);
       break;
     case TYPE_EXP10:
-      BUCLE (exp10);
+      BUCLE_FUNCTION (exp10);
       break;
     case TYPE_EXPM1:
-      BUCLE (expm1);
+      BUCLE_FUNCTION (expm1);
       break;
     case TYPE_LOG2:
-      BUCLE (log2);
+      BUCLE_FUNCTION (log2);
       break;
     case TYPE_LOG:
-      BUCLE (log);
+      BUCLE_FUNCTION (log);
       break;
     case TYPE_LOG10:
-      BUCLE (log10);
+      BUCLE_FUNCTION (log10);
       break;
     case TYPE_POW:
-      BUCLE (pow_f64);
+      BUCLE_FUNCTION (pow_f64);
       break;
     case TYPE_CBRT:
-      BUCLE (cbrt);
+      BUCLE_FUNCTION (cbrt);
       break;
     case TYPE_SIN:
-      BUCLE (sin);
+      BUCLE_FUNCTION (sin);
       break;
     case TYPE_COS:
-      BUCLE (cos);
+      BUCLE_FUNCTION (cos);
       break;
     case TYPE_TAN:
-      BUCLE (tan);
+      BUCLE_FUNCTION (tan);
       break;
     case TYPE_ATAN:
-      BUCLE (atan);
+      BUCLE_FUNCTION (atan);
       break;
     case TYPE_ASIN:
-      BUCLE (asin);
+      BUCLE_FUNCTION (asin);
       break;
     case TYPE_ACOS:
-      BUCLE (acos);
+      BUCLE_FUNCTION (acos);
       break;
     case TYPE_SINH:
-      BUCLE (sinh);
+      BUCLE_FUNCTION (sinh);
       break;
     case TYPE_COSH:
-      BUCLE (cosh);
+      BUCLE_FUNCTION (cosh);
       break;
     case TYPE_TANH:
-      BUCLE (tanh);
+      BUCLE_FUNCTION (tanh);
       break;
     case TYPE_ERF:
-      BUCLE (erf);
+      BUCLE_FUNCTION (erf);
       break;
     case TYPE_ERFC:
-      BUCLE (erfc);
+      BUCLE_FUNCTION (erfc);
       break;
     case TYPE_JBM_ABS:
-      BUCLE (jbm_abs_f64);
+      BUCLE_FUNCTION (jbm_abs_f64);
       break;
     case TYPE_JBM_MOD:
-      BUCLE (mod_f64_jbm);
+      BUCLE_FUNCTION (mod_f64_jbm);
       break;
     case TYPE_JBM_EXP2:
-      BUCLE (jbm_exp2_f64);
+      BUCLE_FUNCTION (jbm_exp2_f64);
       break;
     case TYPE_JBM_EXP:
-      BUCLE (jbm_exp_f64);
+      BUCLE_FUNCTION (jbm_exp_f64);
       break;
     case TYPE_JBM_EXP10:
-      BUCLE (jbm_exp10_f64);
+      BUCLE_FUNCTION (jbm_exp10_f64);
       break;
     case TYPE_JBM_EXPM1:
-      BUCLE (jbm_expm1_f64);
+      BUCLE_FUNCTION (jbm_expm1_f64);
       break;
     case TYPE_JBM_LOG2:
-      BUCLE (jbm_log2_f64);
+      BUCLE_FUNCTION (jbm_log2_f64);
       break;
     case TYPE_JBM_LOG:
-      BUCLE (jbm_log_f64);
+      BUCLE_FUNCTION (jbm_log_f64);
       break;
     case TYPE_JBM_LOG10:
-      BUCLE (jbm_log10_f64);
+      BUCLE_FUNCTION (jbm_log10_f64);
       break;
     case TYPE_JBM_POW:
-      BUCLE (pow_f64_jbm);
+      BUCLE_FUNCTION (pow_f64_jbm);
       break;
     case TYPE_JBM_CBRT:
-      BUCLE (jbm_cbrt_f64);
+      BUCLE_FUNCTION (jbm_cbrt_f64);
       break;
     case TYPE_JBM_SIN:
-      BUCLE (jbm_sin_f64);
+      BUCLE_FUNCTION (jbm_sin_f64);
       break;
     case TYPE_JBM_COS:
-      BUCLE (jbm_cos_f64);
+      BUCLE_FUNCTION (jbm_cos_f64);
       break;
     case TYPE_JBM_TAN:
-      BUCLE (jbm_tan_f64);
+      BUCLE_FUNCTION (jbm_tan_f64);
       break;
     case TYPE_JBM_ATAN:
-      BUCLE (jbm_atan_f64);
+      BUCLE_FUNCTION (jbm_atan_f64);
       break;
     case TYPE_JBM_ASIN:
-      BUCLE (jbm_asin_f64);
+      BUCLE_FUNCTION (jbm_asin_f64);
       break;
     case TYPE_JBM_ACOS:
-      BUCLE (jbm_acos_f64);
+      BUCLE_FUNCTION (jbm_acos_f64);
       break;
     case TYPE_JBM_SINH:
-      BUCLE (jbm_sinh_f64);
+      BUCLE_FUNCTION (jbm_sinh_f64);
       break;
     case TYPE_JBM_COSH:
-      BUCLE (jbm_cosh_f64);
+      BUCLE_FUNCTION (jbm_cosh_f64);
       break;
     case TYPE_JBM_TANH:
-      BUCLE (jbm_tanh_f64);
+      BUCLE_FUNCTION (jbm_tanh_f64);
       break;
     case TYPE_JBM_ERF:
-      BUCLE (jbm_erf_f64);
+      BUCLE_FUNCTION (jbm_erf_f64);
       break;
     case TYPE_JBM_ERFC:
-      BUCLE (jbm_erfc_f64);
+      BUCLE_FUNCTION (jbm_erfc_f64);
       break;
     case TYPE_JBM_POL1:
-      BUCLE (pol1_f64);
+      BUCLE_FUNCTION (pol1_f64);
       break;
     case TYPE_JBM_POL2:
-      BUCLE (pol2_f64);
+      BUCLE_FUNCTION (pol2_f64);
       break;
     case TYPE_JBM_POL3:
-      BUCLE (pol3_f64);
+      BUCLE_FUNCTION (pol3_f64);
       break;
     case TYPE_JBM_POL4:
-      BUCLE (pol4_f64);
+      BUCLE_FUNCTION (pol4_f64);
       break;
     case TYPE_JBM_POL5:
-      BUCLE (pol5_f64);
+      BUCLE_FUNCTION (pol5_f64);
       break;
     case TYPE_JBM_POL6:
-      BUCLE (pol6_f64);
+      BUCLE_FUNCTION (pol6_f64);
       break;
     case TYPE_JBM_POL7:
-      BUCLE (pol7_f64);
+      BUCLE_FUNCTION (pol7_f64);
       break;
     case TYPE_JBM_POL8:
-      BUCLE (pol8_f64);
+      BUCLE_FUNCTION (pol8_f64);
       break;
     case TYPE_JBM_POL9:
-      BUCLE (pol9_f64);
+      BUCLE_FUNCTION (pol9_f64);
       break;
     case TYPE_JBM_POL10:
-      BUCLE (pol10_f64);
+      BUCLE_FUNCTION (pol10_f64);
       break;
     case TYPE_JBM_POL11:
-      BUCLE (pol11_f64);
+      BUCLE_FUNCTION (pol11_f64);
       break;
     case TYPE_JBM_POL12:
-      BUCLE (pol12_f64);
+      BUCLE_FUNCTION (pol12_f64);
       break;
     case TYPE_JBM_POL13:
-      BUCLE (pol13_f64);
+      BUCLE_FUNCTION (pol13_f64);
       break;
     case TYPE_JBM_POL14:
-      BUCLE (pol14_f64);
+      BUCLE_FUNCTION (pol14_f64);
       break;
     case TYPE_JBM_POL15:
-      BUCLE (pol15_f64);
+      BUCLE_FUNCTION (pol15_f64);
       break;
     }
 }
@@ -4030,6 +4039,7 @@ efficiency_f32 (const unsigned int type, void (*thread) (void *, void *),
       t0 = crono ();
       thread (p, NULL);
       t = (crono () - t0) / (double) n;
+      x32_max = x[0];
       error_f32 (p, NULL);
     }
   else
@@ -4054,7 +4064,7 @@ efficiency_f32 (const unsigned int type, void (*thread) (void *, void *),
         g_thread_pool_push (pool, p + i, NULL);
       g_thread_pool_free (pool, FALSE, TRUE);
       t = (crono () - t0) / (double) n;
-      x32_max = p[0].x[0];
+      x32_max = x[0];
       pool = g_thread_pool_new (error_f32, NULL, nthreads, FALSE, NULL);
       for (i = 0; i < (unsigned long int) nthreads; ++i)
         g_thread_pool_push (pool, p + i, NULL);
@@ -4090,6 +4100,7 @@ efficiency_f64 (const unsigned int type, void (*thread) (void *, void *),
       t0 = crono ();
       thread (p, NULL);
       t = (crono () - t0) / (double) n;
+      x64_max = x[0];
       error_f64 (p, NULL);
     }
   else
@@ -4114,7 +4125,7 @@ efficiency_f64 (const unsigned int type, void (*thread) (void *, void *),
         g_thread_pool_push (pool, p + i, NULL);
       g_thread_pool_free (pool, FALSE, TRUE);
       t = (crono () - t0) / (double) n;
-      x64_max = p[0].x[0];
+      x64_max = x[0];
       pool = g_thread_pool_new (error_f64, NULL, nthreads, FALSE, NULL);
       for (i = 0; i < (unsigned long int) nthreads; ++i)
         g_thread_pool_push (pool, p + i, NULL);
@@ -4164,7 +4175,7 @@ main (int argn, char **argc)
   g_mutex_init (&mutex);
 
   // float functions
-  printf ("float functions\n");
+  printf ("\nfloat functions\n");
   efficiency_f32 (TYPE_ADD, thread_f32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
                   nthreads, "add_f32");
   efficiency_f32 (TYPE_ADD, thread_f32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
@@ -4279,38 +4290,38 @@ main (int argn, char **argc)
   efficiency_f32 (TYPE_JBM_ERFC, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "jbm_erfc_f32");
   efficiency_f32 (TYPE_JBM_POL1, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
-                  "jbm_pol1_f32");
+                  "pol1_f32");
   efficiency_f32 (TYPE_JBM_POL2, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
-                  "jbm_pol2_f32");
+                  "pol2_f32");
   efficiency_f32 (TYPE_JBM_POL3, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
-                  "jbm_pol3_f32");
+                  "pol3_f32");
   efficiency_f32 (TYPE_JBM_POL4, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
-                  "jbm_pol4_f32");
+                  "pol4_f32");
   efficiency_f32 (TYPE_JBM_POL5, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
-                  "jbm_pol5_f32");
+                  "pol5_f32");
   efficiency_f32 (TYPE_JBM_POL6, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
-                  "jbm_pol6_f32");
+                  "pol6_f32");
   efficiency_f32 (TYPE_JBM_POL7, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
-                  "jbm_pol7_f32");
+                  "pol7_f32");
   efficiency_f32 (TYPE_JBM_POL8, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
-                  "jbm_pol8_f32");
+                  "pol8_f32");
   efficiency_f32 (TYPE_JBM_POL9, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
-                  "jbm_pol9_f32");
+                  "pol9_f32");
   efficiency_f32 (TYPE_JBM_POL10, thread_f32, x32, y32, r, n, 0.f, 1.f,
-                  nthreads, "jbm_pol10_f32");
+                  nthreads, "pol10_f32");
   efficiency_f32 (TYPE_JBM_POL11, thread_f32, x32, y32, r, n, 0.f, 1.f,
-                  nthreads, "jbm_pol11_f32");
+                  nthreads, "pol11_f32");
   efficiency_f32 (TYPE_JBM_POL12, thread_f32, x32, y32, r, n, 0.f, 1.f,
-                  nthreads, "jbm_pol12_f32");
+                  nthreads, "pol12_f32");
   efficiency_f32 (TYPE_JBM_POL13, thread_f32, x32, y32, r, n, 0.f, 1.f,
-                  nthreads, "jbm_pol13_f32");
+                  nthreads, "pol13_f32");
   efficiency_f32 (TYPE_JBM_POL14, thread_f32, x32, y32, r, n, 0.f, 1.f,
-                  nthreads, "jbm_pol14_f32");
+                  nthreads, "pol14_f32");
   efficiency_f32 (TYPE_JBM_POL15, thread_f32, x32, y32, r, n, 0.f, 1.f,
-                  nthreads, "jbm_pol15_f32");
+                  nthreads, "pol15_f32");
 
   // double functions
-  printf ("double functions\n");
+  printf ("\ndouble functions\n");
   efficiency_f64 (TYPE_ADD, thread_f64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
                   nthreads, "add_f64");
   efficiency_f64 (TYPE_ADD, thread_f64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
@@ -4428,40 +4439,40 @@ main (int argn, char **argc)
   efficiency_f64 (TYPE_JBM_ERFC, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
                   DBL_MAX_EXP, nthreads, "jbm_erfc_f64");
   efficiency_f64 (TYPE_JBM_POL1, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol1_f64");
+                  nthreads, "pol1_f64");
   efficiency_f64 (TYPE_JBM_POL2, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol2_f64");
+                  nthreads, "pol2_f64");
   efficiency_f64 (TYPE_JBM_POL3, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol3_f64");
+                  nthreads, "pol3_f64");
   efficiency_f64 (TYPE_JBM_POL4, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol4_f64");
+                  nthreads, "pol4_f64");
   efficiency_f64 (TYPE_JBM_POL5, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol5_f64");
+                  nthreads, "pol5_f64");
   efficiency_f64 (TYPE_JBM_POL6, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol6_f64");
+                  nthreads, "pol6_f64");
   efficiency_f64 (TYPE_JBM_POL7, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol7_f64");
+                  nthreads, "pol7_f64");
   efficiency_f64 (TYPE_JBM_POL8, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol8_f64");
+                  nthreads, "pol8_f64");
   efficiency_f64 (TYPE_JBM_POL9, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol9_f64");
+                  nthreads, "pol9_f64");
   efficiency_f64 (TYPE_JBM_POL10, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol10_f64");
+                  nthreads, "pol10_f64");
   efficiency_f64 (TYPE_JBM_POL11, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol11_f64");
+                  nthreads, "pol11_f64");
   efficiency_f64 (TYPE_JBM_POL12, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol12_f64");
+                  nthreads, "pol12_f64");
   efficiency_f64 (TYPE_JBM_POL13, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol13_f64");
+                  nthreads, "pol13_f64");
   efficiency_f64 (TYPE_JBM_POL14, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol14_f64");
+                  nthreads, "pol14_f64");
   efficiency_f64 (TYPE_JBM_POL15, thread_f64, x64, y64, r, n, 0., 1.,
-                  nthreads, "jbm_pol15_f64");
+                  nthreads, "pol15_f64");
 
 #ifdef __SSE4_2__
 
-  // __m128 functions
-  printf ("__m128 functions\n");
+  // 4xf32 functions
+  printf ("\n4xf32 functions\n");
   efficiency_f32 (TYPE_ADD, thread_4xf32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
                   nthreads, "add_4xf32");
   efficiency_f32 (TYPE_SUB, thread_4xf32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
@@ -4525,7 +4536,8 @@ main (int argn, char **argc)
   efficiency_f32 (TYPE_JBM_ERFC, thread_4xf32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "jbm_erfc_4xf32");
 
-  printf ("__m128d functions\n");
+  // 2xf64 functions
+  printf ("\n2xf64 functions\n");
   efficiency_f64 (TYPE_ADD, thread_2xf64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
                   nthreads, "add_2xf64");
   efficiency_f64 (TYPE_SUB, thread_2xf64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
@@ -4593,8 +4605,8 @@ main (int argn, char **argc)
 
 #ifdef __AVX__
 
-  // __m256 functions
-  printf ("__m256 functions\n");
+  // 8xf32 functions
+  printf ("\n8xf32 functions\n");
   efficiency_f32 (TYPE_ADD, thread_8xf32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
                   nthreads, "add_8xf32");
   efficiency_f32 (TYPE_SUB, thread_8xf32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
@@ -4658,7 +4670,8 @@ main (int argn, char **argc)
   efficiency_f32 (TYPE_JBM_ERFC, thread_8xf32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "jbm_erfc_8xf32");
 
-  printf ("__m256d functions\n");
+  // 4xf64 functions
+  printf ("\n4xf64 functions\n");
   efficiency_f64 (TYPE_ADD, thread_4xf64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
                   nthreads, "add_4xf64");
   efficiency_f64 (TYPE_SUB, thread_4xf64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
@@ -4726,8 +4739,8 @@ main (int argn, char **argc)
 
 #ifdef __AVX512F__
 
-  // __m512 functions
-  printf ("__m512 functions\n");
+  // 16xf32 functions
+  printf ("\n16xf32 functions\n");
   efficiency_f32 (TYPE_ADD, thread_16xf32, x32, y32, r, n, -FLT_MAX,
                   FLT_MAX, nthreads, "add_16xf32");
   efficiency_f32 (TYPE_SUB, thread_16xf32, x32, y32, r, n, -FLT_MAX,
@@ -4792,7 +4805,8 @@ main (int argn, char **argc)
   efficiency_f32 (TYPE_JBM_ERFC, thread_16xf32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "jbm_erfc_16xf32");
 
-  printf ("__m512d functions\n");
+  // 8xf64 functions
+  printf ("\n8xf64 functions\n");
   efficiency_f64 (TYPE_ADD, thread_8xf64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
                   nthreads, "add_8xf64");
   efficiency_f64 (TYPE_SUB, thread_8xf64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
