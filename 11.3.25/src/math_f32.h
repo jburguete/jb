@@ -33,13 +33,16 @@
 #ifndef JB_MATH_F32__H
 #define JB_MATH_F32__H 1
 
-#define JBM_1_BITS_F32 0x3f800000u      ///< 1 bits for floats.
-#define JBM_ABS_BITS_F32 0x7fffffffu    ///< absolute value bits for floats.
+#define JBM_BIAS_F32 126u       ///< bias for doubles.
+#define JBM_BITS_1_F32 0x3f800000u      ///< 1 bits for floats.
+#define JBM_BITS_ABS_F32 0x7fffffffu    ///< absolute value bits for floats.
+#define JBM_BITS_EXPONENT_F32 0x7f800000u       ///< exponent bits for floats.
+#define JBM_BITS_MANTISSA_F32 0x007fffffu       ///< mantissa bits for floats.
+#define JBM_BITS_SIGN_F32 0x80000000u   ///< sign bits for floats.
 #define JBM_CBRT2_F32 1.2599210498948731647672106072782284f
 ///< cbrt(2) for floats.
 #define JBM_CBRT4_F32 1.5874010519681994747517056392723083f
 ///< cbrt(4) for floats.
-#define JBM_SIGN_BITS_F32 0x80000000u   ///< sign bits for floats.
 #define JBM_SQRT_FLT_MIN 1.0842021724855044340074528008699417e-19
 ///< root square of standard FLT_MIN.
 #define JBM_SQRT_FLT_EPSILON 3.4526698300124390839884978618400830e-04f
@@ -85,14 +88,13 @@ static const float K_EXPM1WC_F32[4] JB_ALIGNED = {
 };
 
 ///> constants to approximate the log2 function for floats.
-static const float K_LOG2WC_F32[7] JB_ALIGNED = {
-  -5.7506562407887487300958014716742165e+00f,
-  -2.3233235629253247901090256531451997e+01f,
-  1.6908973132803642485353485623659061e+01f,
-  1.2074918737238354145832572379467152e+01f,
-  1.2314415117263530373579285376643099e+01f,
-  1.6656231432877583115703300556555311e+01f,
-  2.4752041056680546028641516527334270e+00f
+static const float K_LOG2WC_F32[6] JB_ALIGNED = {
+  1.4426950746990941502408408968309535e+00f,
+  1.4426950746990941502408408884351743e+00f,
+  2.6330254369397960945891842219542586e-01f,
+  1.4999999999999999999999999941803609e+00f,
+  5.9917737484688445514802379024505870e-01f,
+  4.9588687423442227574011897067360151e-02f
 };
 
 ///> constants to approximate the sin function for floats.
@@ -184,8 +186,8 @@ jbm_sign_f32 (const float x)    ///< float number.
 {
   JBMF32 y;
   y.x = x;
-  y.i &= JBM_SIGN_BITS_F32;
-  y.i |= JBM_1_BITS_F32;
+  y.i &= JBM_BITS_SIGN_F32;
+  y.i |= JBM_BITS_1_F32;
   return y.x;
 }
 
@@ -199,7 +201,7 @@ jbm_abs_f32 (const float x)     ///< float number.
 {
   JBMF32 y;
   y.x = x;
-  y.i &= JBM_ABS_BITS_F32;
+  y.i &= JBM_BITS_ABS_F32;
   return y.x;
 }
 
@@ -215,7 +217,7 @@ jbm_copysign_f32 (const float x,        ///< float number to preserve magnitude.
   JBMF32 ax, sy;
   ax.x = jbm_abs_f32 (x);
   sy.x = y;
-  ax.i |= sy.i & JBM_SIGN_BITS_F32;
+  ax.i |= sy.i & JBM_BITS_SIGN_F32;
   return ax.x;
 }
 
@@ -252,32 +254,29 @@ static inline float
 jbm_frexp_f32 (const float x,   ///< float number.
                int *e)          ///< pointer to the extracted exponent.
 {
-  JBMF32 y, z;
+  JBMF32 y;
+  uint32_t exp;
   y.x = x;
-  y.i &= 0x7f800000u;
-  if (y.i == 0x7f800000u)
+  exp = y.i & 0x7fffffffu;
+  // check NaN or 0
+  if (exp >= 0x7f800000u || !exp)
     {
       *e = 0;
       return x;
     }
-  if (!y.i)
+  // extract exponent
+  exp = y.i >> 23u;
+  // subnormal
+  if (!exp)
     {
-      y.x = x;
-      y.i &= 0x007fffffu;
-      if (!y.i)
-        {
-          *e = 0;
-          return x;
-        }
-      y.i = 0x00400000u;
-      z.x = x / y.x;
-      z.i &= 0x7f800000u;
-      *e = (int) (z.i >> 23u) - 253;
-      y.x *= z.x;
+      y.x *= 0x1p23f;
+      exp = (y.i >> 23u) - 23u;
     }
-  else
-    *e = (int) (y.i >> 23u) - 126;
-  return 0.5f * (x / y.x);
+  // exponent
+  *e = (int) (exp - JBM_BIAS_F32);
+  // mantissa in [0.5,1)
+  y.i = (JBM_BIAS_F32 << 23u) | (y.i & 0x807fffffu);
+  return y.x;
 }
 
 /**
@@ -3748,20 +3747,20 @@ jbm_expm1_f32 (const float x)   ///< float number.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
- * [0.5,1] (float).
+ * Function to calculate the well conditionated function log2(1+x) for x in
+ * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (float).
  *
  * \return function value (float).
  */
 static inline float
 jbm_log2wc_f32 (const float x)  ///< float number.
 {
-  return jbm_rational_6_3_f32 (x, K_LOG2WC_F32);
+  return x * jbm_rational_5_2_f32 (x, K_LOG2WC_F32);
 }
 
 /**
- * Function to calculate the function log2(x) using jbm_log2wc_f32 and
- * jbm_frexp_f32 (float).
+ * Function to calculate the function log2(x) using jbm_log2wc0_f32,
+ * jbm_log2wc1_f32 and jbm_frexp_f32 (float).
  *
  * \return function value (float).
  */
@@ -3769,13 +3768,18 @@ static inline float
 jbm_log2_f32 (const float x)    ///< float number.
 {
   float y;
-  int e;
+  int e, m;
   if (x < 0.f)
     return NAN;
-  if (x <= 0.f)
+  if (x == 0.f)
     return -INFINITY;
+  if (!finitef (x))
+    return x;
   y = jbm_frexp_f32 (x, &e);
-  return jbm_log2wc_f32 (y) + (float) e;
+  m = y < M_SQRT1_2f;
+  y += (float) m * y;
+  e -= m;
+  return jbm_log2wc_f32 (y - 1.f) + (float) e;
 }
 
 /**

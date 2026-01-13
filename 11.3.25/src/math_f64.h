@@ -33,14 +33,19 @@
 #ifndef JB_MATH_F64__H
 #define JB_MATH_F64__H 1
 
-#define JBM_1_BITS_F64 0x3ff0000000000000ull    ///< 1 bits for floats.
-#define JBM_ABS_BITS_F64 0x7fffffffffffffffull
-///< absolute value bits for floats.
+#define JBM_BIAS_F64 1022ull    ///< bias for doubles.
+#define JBM_BITS_1_F64 0x3ff0000000000000ull    ///< 1 bits for doubles.
+#define JBM_BITS_ABS_F64 0x7fffffffffffffffull
+///< absolute value bits for doubles.
+#define JBM_BITS_EXPONENT_F64 0x8000000000000000ull
+///< exponent bits for doubles.
+#define JBM_BITS_MANTISSA_F64 0x7fffffffffffffffull
+///< mantissa bits for doubles.
+#define JBM_BITS_SIGN_F64 0x8000000000000000ull ///< sign bits for doubles.
 #define JBM_CBRT2_F64 1.2599210498948731647672106072782284
-///< cbrt(2) for floats.
+///< cbrt(2) for doubles.
 #define JBM_CBRT4_F64 1.5874010519681994747517056392723083
-///< cbrt(4) for floats.
-#define JBM_SIGN_BITS_F64 0x8000000000000000ull ///< sign bits for floats.
+///< cbrt(4) for doubles.
 #define JBM_SQRT_DBL_MIN 1.4916681462400413486581930630925868e-154
 ///< root square of standard DBL_MIN.
 #define JBM_SQRT_DBL_EPSILON 1.4901161193847656250000000000000000e-08
@@ -57,7 +62,7 @@ typedef union
   uint64_t i;                   ///< bits.
 } JBMF64;
 
-///> constants to approximate the cbrt function for floats.
+///> constants to approximate the cbrt function for doubles.
 static const double K_CBRTWC_F64[12] JB_ALIGNED = {
   1.7709017894907407556280328796928981e-01,
   1.2182890092250568818971099340972177e+01,
@@ -102,19 +107,48 @@ static const double K_EXPM1WC_F64[9] JB_ALIGNED = {
 
 ///> constants to approximate the log2 function for doubles.
 static const double K_LOG2WC_F64[13] JB_ALIGNED = {
-  -7.5559527697205957618692260249287695e+00,
-  -2.1038707083093408807949371954862680e+02,
-  -9.4151961033615684290035130577004647e+02,
-  -4.9771314765520564543676802565270664e+02,
-  1.0198318288761875133891281315410076e+03,
-  5.9179620551271022743383009150947882e+02,
-  4.5547747203119431355524053945822318e+01,
-  5.0309611347173410018462770027840052e+01,
-  4.3704732299184652360633718471829276e+02,
-  1.0741373862177021247385064431725615e+03,
-  8.3081392675410753268400366837130421e+02,
-  1.8181402381503583452136460232436932e+02,
-  6.8711413716613614444988056670730752e+00
+  1.4426950408889634003153062009652444e+00,
+  3.9340897774247799472904340760434672e+00,
+  3.9620544436888707854525493127912096e+00,
+  1.7977198380552606130854320288725168e+00,
+  3.5440034086959546467199534234742921e-01,
+  2.3234206036050428286617637709741661e-02,
+  1.1472520541168540377701172727173239e-04,
+  3.2269032372916887875106519727564103e+00,
+  4.0264051521804519530818840470706178e+00,
+  2.4336526008443986121268242088477202e+00,
+  7.2706865608178231129071918394229629e-01,
+  9.6308826082487637572177371513828549e-02,
+  3.9698989266925969725860592511745707e-03
+};
+
+///> constants to approximate the log2 function for doubles.
+static const double K_LOG2WC0_F64[11] JB_ALIGNED = {
+  -9.8656044724637514250921556933590351e-10,
+  1.4426950160192472953530000694931642e+00,
+  3.4003461522521490611370213513381309e+00,
+  2.7395236204328072263457780446004574e+00,
+  8.5136898384877813595675617686180590e-01,
+  7.6752459412026633559154614455226159e-02,
+  2.8569405402497283667267438156821747e+00,
+  2.9940312444841364757977560693852352e+00,
+  1.3848311444261790129755779008566000e+00,
+  2.6185432193878896367934072848562480e-01,
+  1.3125334743901998745928057098012348e-02
+};
+
+///> constants to approximate the log2 function for doubles.
+static const double K_LOG2WC1_F64[10] JB_ALIGNED = {
+  1.4426950408889633033511165725432726e+00,
+  3.0439380750680127896677972119234157e+00,
+  2.1287888578084798408722665565989615e+00,
+  5.4661675769065208333326817742871622e-01,
+  3.7048308248094166409536845126776830e-02,
+  2.6098970945325016715136012043678928e+00,
+  2.4471792087342613102137441017878813e+00,
+  9.8250977077711119073121987538435570e-01,
+  1.5368268926460432106994474957536483e-01,
+  5.8201663100744709086985256825699201e-03
 };
 
 ///> constants to approximate the sin function for doubles.
@@ -235,8 +269,8 @@ jbm_sign_f64 (const double x)   ///< double number.
 {
   JBMF64 y;
   y.x = x;
-  y.i &= JBM_SIGN_BITS_F64;
-  y.i |= JBM_1_BITS_F64;
+  y.i &= JBM_BITS_SIGN_F64;
+  y.i |= JBM_BITS_1_F64;
   return y.x;
 }
 
@@ -250,7 +284,7 @@ jbm_abs_f64 (const double x)    ///< double number.
 {
   JBMF64 y;
   y.x = x;
-  y.i &= JBM_ABS_BITS_F64;
+  y.i &= JBM_BITS_ABS_F64;
   return y.x;
 }
 
@@ -267,7 +301,7 @@ jbm_copysign_f64 (const double x,
   JBMF64 ax, sy;
   ax.x = jbm_abs_f64 (x);
   sy.x = y;
-  ax.i |= sy.i & JBM_SIGN_BITS_F64;
+  ax.i |= sy.i & JBM_BITS_SIGN_F64;
   return ax.x;
 }
 
@@ -304,32 +338,29 @@ static inline double
 jbm_frexp_f64 (const double x,  ///< double number.
                int *e)          ///< pointer to the extracted exponent.
 {
-  JBMF64 y, z;
+  JBMF64 y;
+  uint64_t exp;
   y.x = x;
-  y.i &= 0x7ff0000000000000ull;
-  if (y.i == 0x7ff0000000000000ull)
+  // check NaN or 0
+  exp = y.i & 0x7fffffffffffffffull;
+  if (exp >= 0x7ff0000000000000ull || !exp)
     {
       *e = 0;
       return x;
     }
-  if (!y.i)
+  // extract exponent
+  exp = y.i >> 52u;
+  // subnormal
+  if (!exp)
     {
-      y.x = x;
-      y.i &= 0x000fffffffffffffull;
-      if (!y.i)
-        {
-          *e = 0;
-          return x;
-        }
-      y.i = 0x0010000000000000ull;
-      z.x = x / y.x;
-      z.i &= 0x7ff0000000000000ull;
-      *e = (int) (z.i >> 52ll) - 2044;
-      y.x *= z.x;
+      y.x *= 0x1p52;
+      exp = (y.i >> 52u) - 52u;
     }
-  else
-    *e = (int) (y.i >> 52ll) - 1022;
-  return 0.5 * (x / y.x);
+  // exponent
+  *e = (int) exp - 1022;
+  // mantissa in [0.5,1)
+  y.i = (1022ull << 52u) | (y.i & 0x800fffffffffffffull);
+  return y.x;
 }
 
 /**
@@ -3795,15 +3826,15 @@ jbm_expm1_f64 (const double x)  ///< double number.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
- * [0.5,1] (double).
+ * Function to calculate the well conditionated function log2(1+x) for x in
+ * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (double).
  *
  * \return function value (double).
  */
 static inline double
 jbm_log2wc_f64 (const double x) ///< double number.
 {
-  return jbm_rational_12_6_f64 (x, K_LOG2WC_F64);
+  return x * jbm_rational_12_6_f64 (x, K_LOG2WC_F64);
 }
 
 /**
@@ -3819,10 +3850,17 @@ jbm_log2_f64 (const double x)   ///< double number.
   int e;
   if (x < 0.)
     return NAN;
-  if (x <= 0.)
+  if (x == 0.)
     return -INFINITY;
+  if (!finite (x))
+    return x;
   y = jbm_frexp_f64 (x, &e);
-  return jbm_log2wc_f64 (y) + (double) e;
+  if (y < M_SQRT1_2)
+    {
+      y *= 2.;
+      e -= 1;
+    }
+  return jbm_log2wc_f64 (y - 1.) + (double) e;
 }
 
 /**

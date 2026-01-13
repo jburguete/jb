@@ -205,7 +205,7 @@ static inline __m128
 jbm_opposite_4xf32 (const __m128 x)     ///< __m128 vector.
 {
   JBM4xF32 y;
-  y.i = _mm_set1_epi32 ((int) JBM_SIGN_BITS_F32);
+  y.i = _mm_set1_epi32 ((int) JBM_BITS_SIGN_F32);
   return _mm_xor_ps (x, y.x);
 }
 
@@ -230,8 +230,8 @@ jbm_sign_4xf32 (const __m128 x) ///< __m128 vector.
 {
   JBM4xF32 y;
   y.x = x;
-  y.i = _mm_and_si128 (y.i, _mm_set1_epi32 ((int) JBM_SIGN_BITS_F32));
-  y.i = _mm_or_si128 (y.i, _mm_set1_epi32 ((int) JBM_1_BITS_F32));
+  y.i = _mm_and_si128 (y.i, _mm_set1_epi32 ((int) JBM_BITS_SIGN_F32));
+  y.i = _mm_or_si128 (y.i, _mm_set1_epi32 ((int) JBM_BITS_1_F32));
   return y.x;
 }
 
@@ -244,7 +244,7 @@ static inline __m128
 jbm_abs_4xf32 (const __m128 x)  ///< __m128 vector.
 {
   JBM4xF32 y;
-  y.i = _mm_set1_epi32 ((int) JBM_SIGN_BITS_F32);
+  y.i = _mm_set1_epi32 ((int) JBM_BITS_SIGN_F32);
   return _mm_andnot_ps (y.x, x);
 }
 
@@ -261,7 +261,7 @@ jbm_copysign_4xf32 (const __m128 x,
   JBM4xF32 ax, sy, m;
   ax.x = jbm_abs_4xf32 (x);
   sy.x = y;
-  m.i = _mm_set1_epi32 ((int) JBM_SIGN_BITS_F32);
+  m.i = _mm_set1_epi32 ((int) JBM_BITS_SIGN_F32);
   ax.i = _mm_or_si128 (ax.i, _mm_and_si128 (sy.i, m.i));
   return ax.x;
 }
@@ -8003,7 +8003,7 @@ static inline __m128d
 jbm_opposite_2xf64 (const __m128d x)    ///< __m128d vector.
 {
   JBM2xF64 y;
-  y.i = _mm_set1_epi64 ((__m64) JBM_SIGN_BITS_F64);
+  y.i = _mm_set1_epi64 ((__m64) JBM_BITS_SIGN_F64);
   return _mm_xor_pd (x, y.x);
 }
 
@@ -8028,8 +8028,8 @@ jbm_sign_2xf64 (const __m128d x)        ///< __m128d vector.
 {
   JBM2xF64 y;
   y.x = x;
-  y.i = _mm_and_si128 (y.i, _mm_set1_epi64 ((__m64) JBM_SIGN_BITS_F64));
-  y.i = _mm_and_si128 (y.i, _mm_set1_epi64 ((__m64) JBM_1_BITS_F64));
+  y.i = _mm_and_si128 (y.i, _mm_set1_epi64 ((__m64) JBM_BITS_SIGN_F64));
+  y.i = _mm_and_si128 (y.i, _mm_set1_epi64 ((__m64) JBM_BITS_1_F64));
   return y.x;
 }
 
@@ -8042,7 +8042,7 @@ static inline __m128d
 jbm_abs_2xf64 (const __m128d x)
 {
   JBM2xF64 y;
-  y.i = _mm_set1_epi64 ((__m64) JBM_SIGN_BITS_F64);
+  y.i = _mm_set1_epi64 ((__m64) JBM_BITS_SIGN_F64);
   return _mm_andnot_pd (y.x, x);
 }
 
@@ -8059,7 +8059,7 @@ jbm_copysign_2xf64 (const __m128d x,
   JBM2xF64 ax, sy, m;
   ax.x = jbm_abs_2xf64 (x);
   sy.x = y;
-  m.i = _mm_set1_epi64 ((__m64) JBM_SIGN_BITS_F64);
+  m.i = _mm_set1_epi64 ((__m64) JBM_BITS_SIGN_F64);
   ax.x = _mm_or_pd (ax.x, _mm_and_pd (sy.x, m.x));
   return ax.x;
 }

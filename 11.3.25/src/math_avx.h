@@ -54,6 +54,36 @@ typedef union
   __m256i i;                    ///< bits.
 } JBM4xF64;
 
+// float constants
+
+#define JBM_BIAS_8xF32 _mm256_set1_epi32 (JBM_BIAS_F32)
+///< bias for floats.
+#define JBM_BITS_1_8xF32 _mm256_set1_epi32 (JBM_BITS_1_F32)
+///< 1 bits for floats.
+#define JBM_BITS_ABS_8xF32 _mm256_set1_epi32 (JBM_BITS_ABS_F32)
+///< absolute value bits for floats.
+#define JBM_BITS_EXPONENT_8xF32 _mm256_set1_epi32 (JBM_BITS_EXPONENT_F32)
+///< exponent bits for floats.
+#define JBM_BITS_MANTISSA_8xF32 _mm256_set1_epi32 (JBM_BITS_MANTISSA_F32)
+///< mantissa bits for floats.
+#define JBM_BITS_SIGN_8xF32 _mm256_set1_epi32 (JBM_BITS_SIGN_F32)
+///< sign bits for floats.
+
+// double constants
+
+#define JBM_BIAS_4xF64 _mm256_set1_epi64x (JBM_BIAS_F64)
+///< bias for doubles.
+#define JBM_BITS_1_4xF64 _mm256_set1_epi64x (JBM_BITS_1_F64)
+///< 1 bits for doubles.
+#define JBM_BITS_ABS_4xF64 _mm256_set1_epi64x (JBM_BITS_ABS_F64)
+///< absolute value bits for doubles.
+#define JBM_BITS_EXPONENT_4xF64 _mm256_set1_epi64x (JBM_BITS_EXPONENT_F64)
+///< exponent bits for doubles.
+#define JBM_BITS_MANTISSA_4xF64 _mm256_set1_epi64x (JBM_BITS_MANTISSA_F64)
+///< mantissa bits for doubles.
+#define JBM_BITS_SIGN_4xF64 _mm256_set1_epi64x (JBM_BITS_SIGN_F64)
+///< sign bits for floats.
+
 /* Debug functions
 
 static inline void
@@ -127,7 +157,7 @@ static inline __m256
 jbm_opposite_8xf32 (const __m256 x)     ///< __m256 vector.
 {
   JBM8xF32 y;
-  y.i = _mm256_set1_epi32 ((int) JBM_SIGN_BITS_F32);
+  y.i = _mm256_set1_epi32 ((int) JBM_BITS_SIGN_F32);
   return _mm256_xor_ps (x, y.x);
 }
 
@@ -152,8 +182,8 @@ jbm_sign_8xf32 (const __m256 x) ///< __m256 vector.
 {
   JBM8xF32 y;
   y.x = x;
-  y.i = _mm256_and_si256 (y.i, _mm256_set1_epi32 ((int) JBM_SIGN_BITS_F32));
-  y.i = _mm256_or_si256 (y.i, _mm256_set1_epi32 ((int) JBM_1_BITS_F32));
+  y.i = _mm256_and_si256 (y.i, _mm256_set1_epi32 ((int) JBM_BITS_SIGN_F32));
+  y.i = _mm256_or_si256 (y.i, _mm256_set1_epi32 ((int) JBM_BITS_1_F32));
   return y.x;
 }
 
@@ -166,7 +196,7 @@ static inline __m256
 jbm_abs_8xf32 (const __m256 x)  ///< __m256 vector.
 {
   JBM8xF32 y;
-  y.i = _mm256_set1_epi32 ((int) JBM_SIGN_BITS_F32);
+  y.i = _mm256_set1_epi32 ((int) JBM_BITS_SIGN_F32);
   return _mm256_andnot_ps (y.x, x);
 }
 
@@ -186,7 +216,7 @@ jbm_copysign_8xf32 (const __m256 x,
   ax.i =
     _mm256_or_si256
     (ax.i,
-     _mm256_and_si256 (sy.i, _mm256_set1_epi32 ((int) JBM_SIGN_BITS_F32)));
+     _mm256_and_si256 (sy.i, _mm256_set1_epi32 ((int) JBM_BITS_SIGN_F32)));
   return ax.x;
 }
 
@@ -223,33 +253,43 @@ static inline __m256
 jbm_frexp_8xf32 (const __m256 x,        ///< __m256 vector.
                  __m256i *e)    ///< pointer to the extracted exponents vector.
 {
-  JBM8xF32 a, y, y2, z;
-  __m256i e8, b, m1, m2, m3, zi;
-  a.x = x;
-  b = _mm256_set1_epi32 (0x7f800000);
-  y.i = _mm256_and_si256 (a.i, b);
-  m1 = _mm256_cmpeq_epi32 (y.i, b);
-  zi = _mm256_setzero_si256 ();
-  m2 = _mm256_cmpeq_epi32 (y.i, zi);
-  y2.x = x;
-  y2.i = _mm256_and_si256 (y2.i, _mm256_set1_epi32 (0x007fffff));
-  m3 = _mm256_cmpeq_epi32 (y2.i, zi);
-  y2.i = _mm256_set1_epi32 (0x00400000);
-  z.x = _mm256_div_ps (x, y2.x);
-  z.i = _mm256_and_si256 (z.i, b);
-  e8 = _mm256_blendv_epi8 (_mm256_sub_epi32 (_mm256_srli_epi32 (y.i, 23),
-                                             _mm256_set1_epi32 (126)),
-                           _mm256_sub_epi32 (_mm256_srli_epi32 (z.i, 23),
-                                             _mm256_set1_epi32 (253)), m2);
-  y.x = _mm256_blendv_ps (y.x, _mm256_mul_ps (y2.x, z.x),
-                          _mm256_castsi256_ps (m2));
-  m1 = _mm256_or_si256 (m1, _mm256_and_si256 (m2, m3));
-  e8 = _mm256_blendv_epi8 (e8, zi, m1);
-  *e = e8;
-  return
-    _mm256_blendv_ps (_mm256_mul_ps (_mm256_set1_ps (0.5f),
-                                     _mm256_div_ps (x, y.x)), x,
-                      _mm256_castsi256_ps (m1));
+  const __m256i zi = _mm256_setzero_si256 ();
+  const __m256i bias = JBM_BIAS_8xF32;
+  const __m256i abs_mask = JBM_BITS_ABS_8xF32;
+  const __m256i sign_mask = JBM_BITS_SIGN_8xF32;
+  const __m256i mant_mask = JBM_BITS_MANTISSA_8xF32;
+  JBM8xF32 y, z;
+  __m256i exp, is_z, is_sub, is_nan, is_finite;
+  // y(x)=abs(x)
+  y.x = x;
+  y.i = _mm256_and_si256 (y.i, abs_mask);
+  // masks
+  is_z = _mm256_cmpeq_epi32 (y.i, zi);
+  is_nan
+    = _mm256_cmpgt_epi32 (y.i, _mm256_set1_epi32 (JBM_BITS_EXPONENT_F32 - 1));
+  is_finite = _mm256_andnot_si256 (_mm256_or_si256 (is_z , is_nan),
+                                   _mm256_set1_epi32 (-1));
+  // extract exponent
+  exp = _mm256_srli_epi32 (y.i, 23);
+  is_sub = _mm256_and_si256 (is_finite, _mm256_cmpeq_epi32 (exp, zi));
+  // subnormals
+  y.x
+    = _mm256_blendv_ps (y.x,
+                        _mm256_mul_ps (y.x, _mm256_set1_ps (0x1p23f)),
+                        _mm256_castsi256_ps (is_sub));
+  exp
+    = _mm256_blendv_epi8 (exp, _mm256_sub_epi32 (_mm256_srli_epi32 (y.i, 23),
+                                                  _mm256_set1_epi32 (23)),
+                          is_sub);
+  // exponent
+  *e = _mm256_blendv_epi8 (zi, _mm256_sub_epi32 (exp, bias), is_finite);
+  // build mantissa in [0.5,1)
+  z.x = x;
+  y.i = _mm256_or_si256 (_mm256_and_si256 (z.i, sign_mask),
+                         _mm256_or_si256 (_mm256_set1_epi32 (JBM_BIAS_F32
+                                                             << 23),
+                                          _mm256_and_si256 (y.i, mant_mask)));
+  return _mm256_blendv_ps (x, y.x, _mm256_castsi256_ps (is_finite));
 }
 
 /**
@@ -8007,7 +8047,7 @@ static inline __m256d
 jbm_opposite_4xf64 (const __m256d x)    ///< __m256d vector.
 {
   JBM4xF64 y;
-  y.i = _mm256_set1_epi64x ((long long) JBM_SIGN_BITS_F64);
+  y.i = _mm256_set1_epi64x ((long long) JBM_BITS_SIGN_F64);
   return _mm256_xor_pd (x, y.x);
 }
 
@@ -8034,8 +8074,8 @@ jbm_sign_4xf64 (const __m256d x)        ///< __m256d vector.
   y.x = x;
   y.i
     = _mm256_and_si256 (y.i,
-                        _mm256_set1_epi64x ((long long) JBM_SIGN_BITS_F64));
-  y.i = _mm256_and_si256 (y.i, _mm256_set1_epi64x ((long long) JBM_1_BITS_F64));
+                        _mm256_set1_epi64x ((long long) JBM_BITS_SIGN_F64));
+  y.i = _mm256_and_si256 (y.i, _mm256_set1_epi64x ((long long) JBM_BITS_1_F64));
   return y.x;
 }
 
@@ -8048,7 +8088,7 @@ static inline __m256d
 jbm_abs_4xf64 (const __m256d x)
 {
   JBM4xF64 y;
-  y.i = _mm256_set1_epi64x ((long long) JBM_SIGN_BITS_F64);
+  y.i = _mm256_set1_epi64x ((long long) JBM_BITS_SIGN_F64);
   return _mm256_andnot_pd (y.x, x);
 }
 
@@ -8069,7 +8109,7 @@ jbm_copysign_4xf64 (const __m256d x,
     _mm256_or_si256
     (ax.i,
      _mm256_and_si256 (sy.i,
-                       _mm256_set1_epi64x ((long long) JBM_SIGN_BITS_F64)));
+                       _mm256_set1_epi64x ((long long) JBM_BITS_SIGN_F64)));
   return ax.x;
 }
 
@@ -8106,34 +8146,43 @@ static inline __m256d
 jbm_frexp_4xf64 (const __m256d x,       ///< __m256d vector.
                  __m256i *e)    ///< pointer to the extracted exponents vector.
 {
-  JBM4xF64 a, y, y2, z;
-  __m256i e2, b, m1, m2, m3, zi;
-  a.x = x;
-  b = _mm256_set1_epi64x ((long long) 0x7ff0000000000000ull);
-  y.i = _mm256_and_si256 (a.i, b);
-  m1 = _mm256_cmpeq_epi64 (y.i, b);
-  zi = _mm256_setzero_si256 ();
-  m2 = _mm256_cmpeq_epi64 (y.i, zi);
-  y2.x = x;
-  y2.i
-    = _mm256_and_si256 (y2.i,
-                        _mm256_set1_epi64x ((long long) 0x000fffffffffffffull));
-  m3 = _mm256_cmpeq_epi64 (y2.i, zi);
-  y2.i = _mm256_set1_epi64x ((long long) 0x0010000000000000ull);
-  z.x = _mm256_div_pd (x, y2.x);
-  z.i = _mm256_and_si256 (z.i, b);
-  e2 = _mm256_blendv_epi8 (_mm256_sub_epi64 (_mm256_srli_epi64 (y.i, 52),
-                                             _mm256_set1_epi64x (1022ll)),
-                           _mm256_sub_epi64 (_mm256_srli_epi64 (z.i, 52),
-                                             _mm256_set1_epi64x (2044ll)), m2);
-  y.x = _mm256_blendv_pd (y.x, _mm256_mul_pd (y2.x, z.x),
-                          _mm256_castsi256_pd (m2));
-  m1 = _mm256_or_si256 (m1, _mm256_and_si256 (m2, m3));
-  e2 = _mm256_blendv_epi8 (e2, zi, m1);
-  *e = e2;
-  return _mm256_blendv_pd (_mm256_mul_pd (_mm256_set1_pd (0.5),
-                                          _mm256_div_pd (x, y.x)), x,
-                           _mm256_castsi256_pd (m1));
+  const __m256i zi = _mm256_setzero_si256 ();
+  const __m256i bias = JBM_BIAS_4xF64;
+  const __m256i abs_mask = JBM_BITS_ABS_4xF64;
+  const __m256i sign_mask = JBM_BITS_SIGN_4xF64;
+  const __m256i mant_mask = JBM_BITS_MANTISSA_4xF64;
+  JBM4xF64 y, z;
+  __m256i exp, is_z, is_sub, is_nan, is_finite;
+  // y(x)=abs(x)
+  y.x = x;
+  y.i = _mm256_and_si256 (y.i, abs_mask);
+  // masks
+  is_z = _mm256_cmpeq_epi64 (y.i, zi);
+  is_nan =_mm256_cmpgt_epi64 (y.i,
+                              _mm256_set1_epi64x (JBM_BITS_EXPONENT_F64 - 1ll));
+  is_finite = _mm256_andnot_si256 (_mm256_or_si256 (is_z , is_nan),
+                                   _mm256_set1_epi64x (-1ll));
+  // extract exponent
+  exp = _mm256_srli_epi64 (y.i, 52);
+  is_sub = _mm256_and_si256 (is_finite,
+                             _mm256_cmpeq_epi64 (exp, zi));
+  // subnormals
+  y.x
+    = _mm256_blendv_pd (y.x, _mm256_mul_pd (y.x, _mm256_set1_pd (0x1p52)),
+                        _mm256_castsi256_pd (is_sub));
+  exp
+    = _mm256_blendv_epi8 (exp, _mm256_sub_epi64 (_mm256_srli_epi64 (y.i, 52),
+                                                  _mm256_set1_epi64x (52ll)),
+                          is_sub);
+  // exponent
+  *e = _mm256_blendv_epi8 (zi, _mm256_sub_epi64 (exp, bias), is_finite);
+  // build mantissa in [0.5,1)
+  z.x = x;
+  y.i = _mm256_or_si256 (_mm256_and_si256 (z.i, sign_mask),
+                         _mm256_or_si256 (_mm256_set1_epi64x (JBM_BIAS_F64
+                                                              << 52),
+                                          _mm256_and_si256 (y.i, mant_mask)));
+  return _mm256_blendv_pd (x, y.x, _mm256_castsi256_pd (is_finite));
 }
 
 /**

@@ -21,7 +21,7 @@
     { \
       ei = e (y[i], (type) f ((long double) x[i])); \
       if (ei > em) \
-        xm = x[i], em = ei, im = i; \
+        xm = x[i], em = ei; \
     }
 
 // function type
@@ -193,7 +193,7 @@ static inline double
 loguniform_f64 (const double r, const double xmin, const double xmax,
                 const double tau __attribute__((unused)))
 {
-  return exp2 (log2 (xmin) + r * log2 (xmax / xmin));
+  return exp2 (log2 (xmin) + r * (log2 (xmax) - log2 (xmin)));
 }
 
 // long double functions
@@ -613,10 +613,10 @@ bits_32 (const float x)
   memcpy (&i, &x, 4l);
   if (!(i & 0x7f800000u))
     i = 0u;
-  if (i & JBM_SIGN_BITS_F32)
-    i = JBM_SIGN_BITS_F32 - i;
+  if (i & JBM_BITS_SIGN_F32)
+    i = JBM_BITS_SIGN_F32 - i;
   else
-    i -= JBM_SIGN_BITS_F32;
+    i -= JBM_BITS_SIGN_F32;
   return i;
 }
 
@@ -640,7 +640,7 @@ error_f32 (void *data, void *user_data __attribute__((unused)))
   float xm;
   uint32_t ei, em;
   unsigned int type;
-  unsigned long int i, imin, imax, im;
+  unsigned long int i, imin, imax;
   p = (Parallel_f32 *) data;
   type = p->type;
   imin = p->imin;
@@ -648,7 +648,6 @@ error_f32 (void *data, void *user_data __attribute__((unused)))
   x = p->x;
   y = p->y;
   em = 0u;
-  im = 0u;
   xm = p->x[0];
   switch (type)
     {
@@ -863,8 +862,6 @@ error_f32 (void *data, void *user_data __attribute__((unused)))
       BUCLE_ERROR (float, pol15_f80, ulp_32);
       break;
     }
-  if (p->type == TYPE_ASIN)
-    printf ("im=%lu x[m]=%.8e xm=%.8e\n", im, x[im], xm);
   if ((uint64_t) em > global_error)
     {
       g_mutex_lock (&mutex);
@@ -881,10 +878,10 @@ bits_64 (const double x)
   memcpy (&i, &x, 8l);
   if (!(i & 0x7ff0000000000000ull))
     i = 0ull;
-  if (i & JBM_SIGN_BITS_F64)
-    i = JBM_SIGN_BITS_F64 - i;
+  if (i & JBM_BITS_SIGN_F64)
+    i = JBM_BITS_SIGN_F64 - i;
   else
-    i -= JBM_SIGN_BITS_F64;
+    i -= JBM_BITS_SIGN_F64;
   return i;
 }
 
@@ -908,7 +905,7 @@ error_f64 (void *data, void *user_data __attribute__((unused)))
   double xm;
   uint64_t ei, em;
   unsigned int type;
-  unsigned long int i, imin, imax, im;
+  unsigned long int i, imin, imax;
   p = (Parallel_f64 *) data;
   type = p->type;
   imin = p->imin;
@@ -916,7 +913,6 @@ error_f64 (void *data, void *user_data __attribute__((unused)))
   x = p->x;
   y = p->y;
   em = 0ull;
-  im = 0u;
   xm = p->x[0];
   switch (type)
     {
@@ -1793,11 +1789,9 @@ init_f32 (void *data, void *user_data __attribute__((unused)))
     case TYPE_LOG2:
     case TYPE_LOG:
     case TYPE_LOG10:
-    case TYPE_POW:
     case TYPE_JBM_LOG2:
     case TYPE_JBM_LOG:
     case TYPE_JBM_LOG10:
-    case TYPE_JBM_POW:
       BUCLE_INIT (float, loguniform_f64);
       break;
     case TYPE_ADD:
@@ -1813,6 +1807,7 @@ init_f32 (void *data, void *user_data __attribute__((unused)))
     case TYPE_TRUNC:
     case TYPE_ABS:
     case TYPE_MOD:
+    case TYPE_POW:
     case TYPE_CBRT:
     case TYPE_SIN:
     case TYPE_COS:
@@ -1821,6 +1816,7 @@ init_f32 (void *data, void *user_data __attribute__((unused)))
     case TYPE_ACOS:
     case TYPE_JBM_ABS:
     case TYPE_JBM_MOD:
+    case TYPE_JBM_POW:
     case TYPE_JBM_CBRT:
     case TYPE_JBM_SIN:
     case TYPE_JBM_COS:
@@ -2726,11 +2722,9 @@ init_f64 (void *data, void *user_data __attribute__((unused)))
     case TYPE_LOG2:
     case TYPE_LOG:
     case TYPE_LOG10:
-    case TYPE_POW:
     case TYPE_JBM_LOG2:
     case TYPE_JBM_LOG:
     case TYPE_JBM_LOG10:
-    case TYPE_JBM_POW:
       BUCLE_INIT (double, loguniform_f64);
       break;
     case TYPE_ADD:
@@ -2746,6 +2740,7 @@ init_f64 (void *data, void *user_data __attribute__((unused)))
     case TYPE_TRUNC:
     case TYPE_ABS:
     case TYPE_MOD:
+    case TYPE_POW:
     case TYPE_CBRT:
     case TYPE_SIN:
     case TYPE_COS:
@@ -2754,6 +2749,7 @@ init_f64 (void *data, void *user_data __attribute__((unused)))
     case TYPE_ACOS:
     case TYPE_JBM_ABS:
     case TYPE_JBM_MOD:
+    case TYPE_JBM_POW:
     case TYPE_JBM_CBRT:
     case TYPE_JBM_SIN:
     case TYPE_JBM_COS:
