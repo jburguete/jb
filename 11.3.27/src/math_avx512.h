@@ -274,8 +274,8 @@ jbm_frexp_16xf32 (const __m512 x,       ///< __m512 vector.
   is_finite = ~(is_z | is_nan);
   // extract exponent
   exp = _mm512_maskz_srli_epi32 (is_finite, y.i, 23);
-  is_sub = _mm512_cmpeq_epu32_mask (exp, zi) & is_finite;
   // subnormals
+  is_sub = _mm512_cmpeq_epu32_mask (exp, zi) & is_finite;
   y.x = _mm512_mask_mul_ps (y.x, is_sub, y.x, _mm512_set1_ps (0x1p23f));
   exp
     = _mm512_mask_blend_epi32
@@ -8216,7 +8216,7 @@ jbm_mod_8xf64 (const __m512d x, ///< dividend (__m512d).
  */
 static inline __m512d
 jbm_frexp_8xf64 (const __m512d x,       ///< __m512d vector.
-                 __m512i *e)    ///< pointer to the extracted exponents vector.
+                 __m256i *e)    ///< pointer to the extracted exponents vector.
 {
   const __m512i zi = _mm512_setzero_si512 ();
   const __m512i bias = JBM_BIAS_8xF64;
@@ -8236,15 +8236,16 @@ jbm_frexp_8xf64 (const __m512d x,       ///< __m512d vector.
   is_finite = ~(is_z | is_nan);
   // extract exponent
   exp = _mm512_maskz_srli_epi64 (is_finite, y.i, 52);
-  is_sub = _mm512_cmpeq_epu64_mask (exp, zi) & is_finite;
   // subnormals
+  is_sub = _mm512_cmpeq_epu64_mask (exp, zi) & is_finite;
   y.x = _mm512_mask_mul_pd (y.x, is_sub, y.x, _mm512_set1_pd (0x1p52));
   exp
     = _mm512_mask_blend_epi64
       (is_sub, exp, _mm512_sub_epi64 (_mm512_srli_epi64 (y.i, 52),
                                       _mm512_set1_epi64 (52ll)));
   // exponent
-  *e = _mm512_mask_sub_epi64 (zi, is_finite, exp, bias);
+  exp = _mm512_mask_sub_epi64 (zi, is_finite, exp, bias);
+  *e = _mm512_cvtepi64_epi32 (exp);
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm512_or_epi64 (_mm512_and_epi64 (z.i, sign_mask),
@@ -15029,15 +15030,15 @@ jbm_log2_8xf64 (const __m512d x)        ///< __m512d vector.
 {
   const __m512d z = _mm512_setzero_pd ();
   __m512d y;
-  __m512i e;
+  __m256i e;
   __mmask16 m;
   y = jbm_frexp_8xf64 (x, &e);
   m = _mm512_cmplt_pd_mask (y, _mm512_set1_pd (M_SQRT1_2));
   y = _mm512_add_pd (y, _mm512_maskz_mov_pd (m, y));
-  e = _mm512_sub_epi64 (e, _mm512_maskz_set1_epi64 (m, 1ll));
+  e = _mm512_sub_epi32 (e, _mm512_maskz_set1_epi32 (m, 1));
   y = _mm512_add_pd (jbm_log2wc_8xf64 (_mm512_sub_pd (y,
                                        _mm512_set1_pd (1.))),
-                     _mm512_cvtepi64_pd (e));
+                     _mm512_cvtepi32_pd (e));
   y = _mm512_mask_mov_pd (y, _mm512_cmpeq_pd_mask (x, z),
                           _mm512_set1_pd (-INFINITY));
   y = _mm512_mask_mov_pd (y, _mm512_cmplt_pd_mask (x, z), _mm512_set1_pd (NAN));

@@ -351,8 +351,8 @@ jbm_frexp_4xf32 (const __m128 x,        ///< __m128 vector.
                                 _mm_set1_epi32 (-1));
   // extract exponent
   exp = _mm_srli_epi32 (y.i, 23);
-  is_sub = _mm_and_si128 (is_finite, _mm_cmpeq_epi32 (exp, zi));
   // subnormals
+  is_sub = _mm_and_si128 (is_finite, _mm_cmpeq_epi32 (exp, zi));
   y.x
     = _mm_blendv_ps (y.x, _mm_mul_ps (y.x, _mm_set1_ps (0x1p23f)),
                      _mm_castsi128_ps (is_sub));
@@ -8167,8 +8167,8 @@ jbm_frexp_2xf64 (const __m128d x,       ///< __m128d vector.
                                 _mm_set1_epi64x (-1ll));
   // extract exponent
   exp = _mm_srli_epi64 (y.i, 52);
-  is_sub = _mm_and_si128 (is_finite, _mm_cmpeq_epi64 (exp, zi));
   // subnormals
+  is_sub = _mm_and_si128 (is_finite, _mm_cmpeq_epi64 (exp, zi));
   y.x
     = _mm_blendv_pd (y.x, _mm_mul_pd (y.x, _mm_set1_pd (0x1p52)),
                      _mm_castsi128_pd (is_sub));
@@ -8177,7 +8177,9 @@ jbm_frexp_2xf64 (const __m128d x,       ///< __m128d vector.
                                            _mm_set1_epi64x (52ll)),
                        is_sub);
   // exponent
-  *e = _mm_blendv_epi8 (zi, _mm_sub_epi64 (exp, bias), is_finite);
+  exp = _mm_blendv_epi8 (zi, _mm_sub_epi64 (exp, bias), is_finite);
+  *e = _mm_set_epi32 (0, 0, (int) _mm_cvtsi128_si64 (_mm_srli_si128 (exp, 8)),
+                      (int) _mm_cvtsi128_si64 (exp));
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm_or_si128 (_mm_and_si128 (z.i, sign_mask),
@@ -14944,10 +14946,10 @@ jbm_log2_2xf64 (const __m128d x)        ///< __m128d vector.
   y = jbm_frexp_2xf64 (x, &e);
   m = _mm_cmplt_pd (y, _mm_set1_pd (M_SQRT1_2));
   y = _mm_add_pd (y, _mm_and_pd (m, y));
-  e = _mm_sub_epi64 (e, _mm_and_si128 (_mm_castpd_si128 (m),
-                                       _mm_set1_epi64x (1)));
+  e = _mm_sub_epi32 (e, _mm_and_si128 (_mm_castpd_si128 (m),
+                                       _mm_set1_epi32 (1)));
   y = _mm_add_pd (jbm_log2wc_2xf64 (_mm_sub_pd (y, _mm_set1_pd (1.))),
-                  _mm_cvtepi64_pd (e));
+                  _mm_cvtepi32_pd (e));
   y = _mm_blendv_pd (y, _mm_set1_pd (-INFINITY), _mm_cmpeq_pd (x, z));
   y = _mm_blendv_pd (y, _mm_set1_pd (NAN), _mm_cmplt_pd (x, z));
   y = _mm_blendv_pd (y, x, _mm_cmpeq_pd (x, _mm_set1_pd (INFINITY)));

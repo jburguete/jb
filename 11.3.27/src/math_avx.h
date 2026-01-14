@@ -277,8 +277,8 @@ jbm_frexp_8xf32 (const __m256 x,        ///< __m256 vector.
                                    _mm256_set1_epi32 (-1));
   // extract exponent
   exp = _mm256_srli_epi32 (y.i, 23);
-  is_sub = _mm256_and_si256 (is_finite, _mm256_cmpeq_epi32 (exp, zi));
   // subnormals
+  is_sub = _mm256_and_si256 (is_finite, _mm256_cmpeq_epi32 (exp, zi));
   y.x
     = _mm256_blendv_ps (y.x,
                         _mm256_mul_ps (y.x, _mm256_set1_ps (0x1p23f)),
@@ -8162,7 +8162,7 @@ jbm_mod_4xf64 (const __m256d x, ///< dividend (__m256d).
  */
 static inline __m256d
 jbm_frexp_4xf64 (const __m256d x,       ///< __m256d vector.
-                 __m256i *e)    ///< pointer to the extracted exponents vector.
+                 __m128i *e)    ///< pointer to the extracted exponents vector.
 {
   const __m256i zi = _mm256_setzero_si256 ();
   const __m256i bias = JBM_BIAS_4xF64;
@@ -8182,9 +8182,9 @@ jbm_frexp_4xf64 (const __m256d x,       ///< __m256d vector.
                                    _mm256_set1_epi64x (-1ll));
   // extract exponent
   exp = _mm256_srli_epi64 (y.i, 52);
+  // subnormals
   is_sub = _mm256_and_si256 (is_finite,
                              _mm256_cmpeq_epi64 (exp, zi));
-  // subnormals
   y.x
     = _mm256_blendv_pd (y.x, _mm256_mul_pd (y.x, _mm256_set1_pd (0x1p52)),
                         _mm256_castsi256_pd (is_sub));
@@ -8193,7 +8193,8 @@ jbm_frexp_4xf64 (const __m256d x,       ///< __m256d vector.
                                                   _mm256_set1_epi64x (52ll)),
                           is_sub);
   // exponent
-  *e = _mm256_blendv_epi8 (zi, _mm256_sub_epi64 (exp, bias), is_finite);
+  exp = _mm256_blendv_epi8 (zi, _mm256_sub_epi64 (exp, bias), is_finite);
+  *e = _mm256_castsi256_si128 (_mm256_permute4x64_epi64 (exp64, 0xd8));
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm256_or_si256 (_mm256_and_si256 (z.i, sign_mask),
@@ -14987,12 +14988,13 @@ jbm_log2_4xf64 (const __m256d x)        ///< __m256d vector.
 {
   const __m256d z = _mm256_setzero_pd ();
   __m256d y, m;
-  __m256i e;
+  __m128i e;
   y = jbm_frexp_4xf64 (x, &e);
   m = _mm256_cmp_pd (y, _mm256_set1_pd (M_SQRT1_2), _CMP_LT_OQ);
   y = _mm256_add_pd (y, _mm256_and_pd (m, y));
-  e = _mm256_sub_epi64 (e, _mm256_and_si256 (_mm256_castpd_si256 (m),
-                                             _mm256_set1_epi64x (1)));
+  e = _mm_sub_epi32
+      (e, _mm_and_si128 (_mm_castpd_si128 (_mm256_castpd256_pd128 (m)),
+                         _mm256_set1_epi32 (1)));
   y = _mm256_add_pd (jbm_log2wc_4xf64 (_mm256_sub_pd (y,
                                         _mm256_set1_pd (1.))),
                      _mm256_cvtepi64_pd (e));
