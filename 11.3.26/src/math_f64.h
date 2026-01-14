@@ -37,9 +37,9 @@
 #define JBM_BITS_1_F64 0x3ff0000000000000ull    ///< 1 bits for doubles.
 #define JBM_BITS_ABS_F64 0x7fffffffffffffffull
 ///< absolute value bits for doubles.
-#define JBM_BITS_EXPONENT_F64 0x8000000000000000ull
+#define JBM_BITS_EXPONENT_F64 0x7ff0000000000000ull
 ///< exponent bits for doubles.
-#define JBM_BITS_MANTISSA_F64 0x7fffffffffffffffull
+#define JBM_BITS_MANTISSA_F64 0x000fffffffffffffull
 ///< mantissa bits for doubles.
 #define JBM_BITS_SIGN_F64 0x8000000000000000ull ///< sign bits for doubles.
 #define JBM_CBRT2_F64 1.2599210498948731647672106072782284
@@ -326,7 +326,9 @@ static inline double
 jbm_mod_f64 (const double x,    ///< dividend (double).
              const double d)    ///< divisor (double).
 {
-  return x - d * floor (x / d);
+  double r;
+  r = floor (x / d);
+  return (jbm_abs_f64 (r) > 1. / DBL_EPSILON) ? 0.5 * d : x - d * r;
 }
 
 /**
@@ -342,8 +344,8 @@ jbm_frexp_f64 (const double x,  ///< double number.
   uint64_t exp;
   y.x = x;
   // check NaN or 0
-  exp = y.i & 0x7fffffffffffffffull;
-  if (exp >= 0x7ff0000000000000ull || !exp)
+  exp = y.i & JBM_BITS_ABS_F64;
+  if (exp >= JBM_BITS_EXPONENT_F64 || !exp)
     {
       *e = 0;
       return x;
@@ -357,9 +359,9 @@ jbm_frexp_f64 (const double x,  ///< double number.
       exp = (y.i >> 52u) - 52u;
     }
   // exponent
-  *e = (int) exp - 1022;
+  *e = (int) exp - JBM_BIAS_F64;
   // mantissa in [0.5,1)
-  y.i = (1022ull << 52u) | (y.i & 0x800fffffffffffffull);
+  y.i = (JBM_BIAS_F64 << 52u) | (y.i & 0x800fffffffffffffull);
   return y.x;
 }
 

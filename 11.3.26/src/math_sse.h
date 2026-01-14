@@ -54,6 +54,36 @@ typedef union
   __m128i i;                    ///< bits.
 } JBM2xF64;
 
+// float constants
+
+#define JBM_BIAS_4xF32 _mm_set1_epi32 (JBM_BIAS_F32)
+///< bias for floats.
+#define JBM_BITS_1_4xF32 _mm_set1_epi32 (JBM_BITS_1_F32)
+///< 1 bits for floats.
+#define JBM_BITS_ABS_4xF32 _mm_set1_epi32 (JBM_BITS_ABS_F32)
+///< absolute value bits for floats.
+#define JBM_BITS_EXPONENT_4xF32 _mm_set1_epi32 (JBM_BITS_EXPONENT_F32)
+///< exponent bits for floats.
+#define JBM_BITS_MANTISSA_4xF32 _mm_set1_epi32 (JBM_BITS_MANTISSA_F32)
+///< mantissa bits for floats.
+#define JBM_BITS_SIGN_4xF32 _mm_set1_epi32 (JBM_BITS_SIGN_F32)
+///< sign bits for floats.
+
+// double constants
+
+#define JBM_BIAS_2xF64 _mm_set1_epi64x (JBM_BIAS_F64)
+///< bias for doubles.
+#define JBM_BITS_1_2xF64 _mm_set1_epi64x (JBM_BITS_1_F64)
+///< 1 bits for doubles.
+#define JBM_BITS_ABS_2xF64 _mm_set1_epi64x (JBM_BITS_ABS_F64)
+///< absolute value bits for doubles.
+#define JBM_BITS_EXPONENT_2xF64 _mm_set1_epi64x (JBM_BITS_EXPONENT_F64)
+///< exponent bits for doubles.
+#define JBM_BITS_MANTISSA_2xF64 _mm_set1_epi64x (JBM_BITS_MANTISSA_F64)
+///< mantissa bits for doubles.
+#define JBM_BITS_SIGN_2xF64 _mm_set1_epi64x (JBM_BITS_SIGN_F64)
+///< sign bits for floats.
+
 // Debug functions
 
 static inline void
@@ -287,7 +317,12 @@ static inline __m128
 jbm_mod_4xf32 (const __m128 x,  ///< dividend (__m128).
                const __m128 d)  ///< divisor (__m128).
 {
-  return _mm_fnmadd_ps (_mm_floor_ps (_mm_div_ps (x, d)), d, x);
+  __m128 r;
+  r = _mm_floor_ps (_mm_div_ps (x, d));
+  return _mm_blendv_ps (_mm_fnmadd_ps (r, d, x),
+                        _mm_mul_ps (d, _mm_set1_ps (0.5f)),
+                        _mm_cmpgt_ps (jbm_abs_4xf32 (r),
+                                      _mm_set1_ps (1.f / FLT_EPSILON)));
 }
 
 /**
@@ -299,30 +334,40 @@ static inline __m128
 jbm_frexp_4xf32 (const __m128 x,        ///< __m128 vector.
                  __m128i *e)    ///< pointer to the extracted exponents vector.
 {
-  const __m128i b = _mm_set1_epi32 ((int) 0x7f800000u);
   const __m128i zi = _mm_setzero_si128 ();
-  JBM4xF32 a, y, y2, z;
-  __m128i e4, m1, m2, m3;
-  a.x = x;
-  y.i = _mm_and_si128 (a.i, b);
-  m1 = _mm_cmpeq_epi32 (y.i, b);
-  m2 = _mm_cmpeq_epi32 (y.i, zi);
-  y2.x = x;
-  y2.i = _mm_and_si128 (y2.i, _mm_set1_epi32 ((int) 0x007fffffu));
-  m3 = _mm_cmpeq_epi32 (y2.i, zi);
-  y2.i = _mm_set1_epi32 ((int) 0x00400000u);
-  z.x = _mm_div_ps (x, y2.x);
-  z.i = _mm_and_si128 (z.i, b);
-  e4 = _mm_blendv_epi8 (_mm_sub_epi32 (_mm_srli_epi32 (y.i, 23),
-                                       _mm_set1_epi32 (126)),
-                        _mm_sub_epi32 (_mm_srli_epi32 (z.i, 23),
-                                       _mm_set1_epi32 (253)), m2);
-  y.x = _mm_blendv_ps (y.x, _mm_mul_ps (y2.x, z.x), _mm_castsi128_ps (m2));
-  m1 = _mm_or_si128 (m1, _mm_and_si128 (m2, m3));
-  e4 = _mm_blendv_epi8 (e4, zi, m1);
-  *e = e4;
-  return _mm_blendv_ps (_mm_mul_ps (_mm_set1_ps (0.5f), _mm_div_ps (x, y.x)), x,
-                        _mm_castsi128_ps (m1));
+  const __m128i bias = JBM_BIAS_4xF32;
+  const __m128i abs_mask = JBM_BITS_ABS_4xF32;
+  const __m128i sign_mask = JBM_BITS_SIGN_4xF32;
+  const __m128i mant_mask = JBM_BITS_MANTISSA_4xF32;
+  JBM4xF32 y, z;
+  __m128i exp, is_z, is_sub, is_nan, is_finite;
+  // y(x)=abs(x)
+  y.x = x;
+  y.i = _mm_and_si128 (y.i, abs_mask);
+  // masks
+  is_z = _mm_cmpeq_epi32 (y.i, zi);
+  is_nan = _mm_cmpgt_epi32 (y.i, _mm_set1_epi32 (JBM_BITS_EXPONENT_F32 - 1));
+  is_finite = _mm_andnot_si128 (_mm_or_si128 (is_z , is_nan),
+                                _mm_set1_epi32 (-1));
+  // extract exponent
+  exp = _mm_srli_epi32 (y.i, 23);
+  is_sub = _mm_and_si128 (is_finite, _mm_cmpeq_epi32 (exp, zi));
+  // subnormals
+  y.x
+    = _mm_blendv_ps (y.x, _mm_mul_ps (y.x, _mm_set1_ps (0x1p23f)),
+                     _mm_castsi128_ps (is_sub));
+  exp
+    = _mm_blendv_epi8 (exp, _mm_sub_epi32 (_mm_srli_epi32 (y.i, 23),
+                                           _mm_set1_epi32 (23)),
+                       is_sub);
+  // exponent
+  *e = _mm_blendv_epi8 (zi, _mm_sub_epi32 (exp, bias), is_finite);
+  // build mantissa in [0.5,1)
+  z.x = x;
+  y.i = _mm_or_si128 (_mm_and_si128 (z.i, sign_mask),
+                      _mm_or_si128 (_mm_set1_epi32 (JBM_BIAS_F32 << 23),
+                                    _mm_and_si128 (y.i, mant_mask)));
+  return _mm_blendv_ps (x, y.x, _mm_castsi128_ps (is_finite));
 }
 
 /**
@@ -7060,7 +7105,7 @@ jbm_expm1_4xf32 (const __m128 x)        ///< __m128 vector.
 static inline __m128
 jbm_log2wc_4xf32 (const __m128 x)       ///< __m128 vector.
 {
-  return jbm_rational_6_3_4xf32 (x, K_LOG2WC_F32);
+  return _mm_mul_ps (x, jbm_rational_5_2_4xf32 (x, K_LOG2WC_F32));
 }
 
 /**
@@ -7073,12 +7118,19 @@ static inline __m128
 jbm_log2_4xf32 (const __m128 x) ///< __m128 vector.
 {
   const __m128 z = _mm_setzero_ps ();
-  __m128 y;
+  __m128 y, m;
   __m128i e;
   y = jbm_frexp_4xf32 (x, &e);
-  y = _mm_add_ps (jbm_log2wc_4xf32 (y), _mm_cvtepi32_ps (e));
-  y = _mm_blendv_ps (_mm_set1_ps (-INFINITY), y, _mm_cmpgt_ps (x, z));
-  return _mm_blendv_ps (y, _mm_set1_ps (NAN), _mm_cmplt_ps (x, z));
+  m = _mm_cmplt_ps (y, _mm_set1_ps (M_SQRT1_2f));
+  y = _mm_add_ps (y, _mm_and_ps (m, y));
+  e = _mm_sub_epi32 (e, _mm_and_si128 (_mm_castps_si128 (m),
+                                       _mm_set1_epi32 (1)));
+  y = _mm_add_ps (jbm_log2wc_4xf32 (_mm_sub_ps (y, _mm_set1_ps (1.f))),
+                  _mm_cvtepi32_ps (e));
+  y = _mm_blendv_ps (y, _mm_set1_ps (-INFINITY), _mm_cmpeq_ps (x, z));
+  y = _mm_blendv_ps (y, _mm_set1_ps (NAN), _mm_cmplt_ps (x, z));
+  y = _mm_blendv_ps (y, x, _mm_cmpeq_ps (x, _mm_set1_ps (INFINITY)));
+  return _mm_blendv_ps (y, x, _mm_cmpunord_ps (x, x));
 }
 
 /**
@@ -7135,10 +7187,6 @@ static inline __m128
 jbm_pow_4xf32 (const __m128 x,  ///< __m128 vector.
                const float e)   ///< exponent (float).
 {
-  float f;
-  f = floorf (e);
-  if (f == e)
-    return jbm_pown_4xf32 (x, (int) e);
   return jbm_exp2_4xf32 (_mm_mul_ps (_mm_set1_ps (e), jbm_log2_4xf32 (x)));
 }
 
@@ -8085,7 +8133,12 @@ static inline __m128d
 jbm_mod_2xf64 (const __m128d x, ///< dividend (__m128d).
                const __m128d d) ///< divisor (__m128d).
 {
-  return _mm_fnmadd_pd (_mm_floor_pd (_mm_div_pd (x, d)), d, x);
+  __m128d r;
+  r = _mm_floor_pd (_mm_div_pd (x, d));
+  return _mm_blendv_pd (_mm_fnmadd_pd (r, d, x),
+                        _mm_mul_pd (d, _mm_set1_pd (0.5)),
+                        _mm_cmpgt_pd (jbm_abs_2xf64 (r),
+                                      _mm_set1_pd (1. / DBL_EPSILON)));
 }
 
 /**
@@ -8097,30 +8150,40 @@ static inline __m128d
 jbm_frexp_2xf64 (const __m128d x,       ///< __m128d vector.
                  __m128i *e)    ///< pointer to the extracted exponents vector.
 {
-  const __m128i b = _mm_set1_epi64 ((__m64) 0x7ff0000000000000ull);
   const __m128i zi = _mm_setzero_si128 ();
-  JBM2xF64 a, y, y2, z;
-  __m128i e2, m1, m2, m3;
-  a.x = x;
-  y.i = _mm_and_si128 (a.i, b);
-  m1 = _mm_cmpeq_epi64 (y.i, b);
-  m2 = _mm_cmpeq_epi64 (y.i, zi);
-  y2.x = x;
-  y2.i = _mm_and_si128 (y2.i, _mm_set1_epi64 ((__m64) 0x000fffffffffffffull));
-  m3 = _mm_cmpeq_epi64 (y2.i, zi);
-  y2.i = _mm_set1_epi64 ((__m64) 0x0010000000000000ull);
-  z.x = _mm_div_pd (x, y2.x);
-  z.i = _mm_and_si128 (z.i, b);
-  e2 = _mm_blendv_epi8 (_mm_sub_epi64 (_mm_srli_epi64 (y.i, 52),
-                                       _mm_set1_epi64 ((__m64) 1022ll)),
-                        _mm_sub_epi64 (_mm_srli_epi64 (z.i, 52),
-                                       _mm_set1_epi64 ((__m64) 2044ll)), m2);
-  y.x = _mm_blendv_pd (y.x, _mm_mul_pd (y2.x, z.x), _mm_castsi128_pd (m2));
-  m1 = _mm_or_si128 (m1, _mm_and_si128 (m2, m3));
-  e2 = _mm_blendv_epi8 (e2, zi, m1);
-  *e = e2;
-  return _mm_blendv_pd (_mm_mul_pd (_mm_set1_pd (0.5), _mm_div_pd (x, y.x)), x,
-                        _mm_castsi128_pd (m1));
+  const __m128i bias = JBM_BIAS_2xF64;
+  const __m128i abs_mask = JBM_BITS_ABS_2xF64;
+  const __m128i sign_mask = JBM_BITS_SIGN_2xF64;
+  const __m128i mant_mask = JBM_BITS_MANTISSA_2xF64;
+  JBM2xF64 y, z;
+  __m128i exp, is_z, is_sub, is_nan, is_finite;
+  // y(x)=abs(x)
+  y.x = x;
+  y.i = _mm_and_si128 (y.i, abs_mask);
+  // masks
+  is_z = _mm_cmpeq_epi64 (y.i, zi);
+  is_nan =_mm_cmpgt_epi64 (y.i, _mm_set1_epi64x (JBM_BITS_EXPONENT_F64 - 1ll));
+  is_finite = _mm_andnot_si128 (_mm_or_si128 (is_z , is_nan),
+                                _mm_set1_epi64x (-1ll));
+  // extract exponent
+  exp = _mm_srli_epi64 (y.i, 52);
+  is_sub = _mm_and_si128 (is_finite, _mm_cmpeq_epi64 (exp, zi));
+  // subnormals
+  y.x
+    = _mm_blendv_pd (y.x, _mm_mul_pd (y.x, _mm_set1_pd (0x1p52)),
+                     _mm_castsi128_pd (is_sub));
+  exp
+    = _mm_blendv_epi8 (exp, _mm_sub_epi64 (_mm_srli_epi64 (y.i, 52),
+                                           _mm_set1_epi64x (52ll)),
+                       is_sub);
+  // exponent
+  *e = _mm_blendv_epi8 (zi, _mm_sub_epi64 (exp, bias), is_finite);
+  // build mantissa in [0.5,1)
+  z.x = x;
+  y.i = _mm_or_si128 (_mm_and_si128 (z.i, sign_mask),
+                      _mm_or_si128 (_mm_set1_epi64x (JBM_BIAS_F64 << 52),
+                                    _mm_and_si128 (y.i, mant_mask)));
+  return _mm_blendv_pd (x, y.x, _mm_castsi128_pd (is_finite));
 }
 
 /**
@@ -14863,7 +14926,7 @@ jbm_expm1_2xf64 (const __m128d x)       ///< __m128d vector.
 static inline __m128d
 jbm_log2wc_2xf64 (const __m128d x)      ///< __m128d vector \f$\in[0.5,1]\f$.
 {
-  return jbm_rational_12_6_2xf64 (x, K_LOG2WC_F64);
+  return _mm_mul_pd (x, jbm_rational_12_6_2xf64 (x, K_LOG2WC_F64));
 }
 
 /**
@@ -14875,20 +14938,20 @@ jbm_log2wc_2xf64 (const __m128d x)      ///< __m128d vector \f$\in[0.5,1]\f$.
 static inline __m128d
 jbm_log2_2xf64 (const __m128d x)        ///< __m128d vector.
 {
-  __m128d y, z;
+  const __m128d z = _mm_setzero_pd ();
+  __m128d y, m;
   __m128i e;
-  y = jbm_log2wc_2xf64 (jbm_frexp_2xf64 (x, &e));
-#ifdef __AVX512F__
-  z = _mm_cvtepi64_pd (e);
-#else
-  z = _mm_set1_pd (0x0018000000000000ull);
-  e = _mm_add_epi64 (e, _mm_castpd_si128 (z));
-  z = _mm_sub_pd (_mm_castsi128_pd (e), z);
-#endif
-  y = _mm_add_pd (y, z);
-  z = _mm_setzero_pd ();
-  y = _mm_blendv_pd (y, _mm_set1_pd (-INFINITY), _mm_cmpgt_pd (x, z));
-  return _mm_blendv_pd (_mm_set1_pd (NAN), y, _mm_cmplt_pd (x, z));
+  y = jbm_frexp_2xf64 (x, &e);
+  m = _mm_cmplt_pd (y, _mm_set1_pd (M_SQRT1_2));
+  y = _mm_add_pd (y, _mm_and_pd (m, y));
+  e = _mm_sub_epi64 (e, _mm_and_si128 (_mm_castpd_si128 (m),
+                                       _mm_set1_epi64x (1)));
+  y = _mm_add_pd (jbm_log2wc_2xf64 (_mm_sub_pd (y, _mm_set1_pd (1.))),
+                  _mm_cvtepi64_pd (e));
+  y = _mm_blendv_pd (y, _mm_set1_pd (-INFINITY), _mm_cmpeq_pd (x, z));
+  y = _mm_blendv_pd (y, _mm_set1_pd (NAN), _mm_cmplt_pd (x, z));
+  y = _mm_blendv_pd (y, x, _mm_cmpeq_pd (x, _mm_set1_pd (INFINITY)));
+  return _mm_blendv_pd (y, x, _mm_cmpunord_pd (x, x));
 }
 
 /**
@@ -14945,10 +15008,6 @@ static inline __m128d
 jbm_pow_2xf64 (const __m128d x, ///< __m128d vector.
                const double e)  ///< exponent (__m128d).
 {
-  double f;
-  f = floor (e);
-  if (f == e)
-    return jbm_pown_2xf64 (x, (int) e);
   return jbm_exp2_2xf64 (_mm_mul_pd (_mm_set1_pd (e), jbm_log2_2xf64 (x)));
 }
 

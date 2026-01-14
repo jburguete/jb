@@ -242,7 +242,9 @@ static inline float
 jbm_mod_f32 (const float x,     ///< dividend (float).
              const float d)     ///< divisor (float).
 {
-  return x - d * floorf (x / d);
+  float r;
+  r = floorf (x / d);
+  return (jbm_abs_f32 (r) > 1.f / FLT_EPSILON) ? 0.5f * d : x - d * r;
 }
 
 /**

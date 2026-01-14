@@ -84,7 +84,7 @@ typedef union
 #define JBM_BITS_SIGN_8xF64 _mm512_set1_epi64 (JBM_BITS_SIGN_F64)
 ///< sign bits for floats.
 
-/* Debug functions
+// Debug functions
 
 static inline void
 print_m512b32 (FILE *file, const char *label, __m512i x)
@@ -145,8 +145,6 @@ print_m512d (FILE *file, const char *label, __m512d x)
   for (i = 0; i < 8; ++i)
     fprintf (file, "%s[%u]=%.17lg\n", label, i, y[i]);
 }
-
-*/
 
 /**
  * Function to calculate the additive inverse value of a __m512 vector.
@@ -240,7 +238,13 @@ static inline __m512
 jbm_mod_16xf32 (const __m512 x, ///< dividend (__m512).
                 const __m512 d) ///< divisor (__m512).
 {
-  return _mm512_fnmadd_ps (_mm512_floor_ps (_mm512_div_ps (x, d)), d, x);
+  __m512 r;
+  r = _mm512_floor_ps (_mm512_div_ps (x, d));
+  return
+    _mm512_mask_blend_ps
+    (_mm512_cmp_ps_mask (jbm_abs_16xf32 (r), _mm512_set1_ps (1.f / FLT_EPSILON),
+                         _CMP_GT_OQ),
+     _mm512_fnmadd_ps (r, d, x), _mm512_mul_ps (d, _mm512_set1_ps (0.5f)));
 }
 
 /**
@@ -7111,7 +7115,7 @@ jbm_expm1_16xf32 (const __m512 x)       ///< __m512 vector.
 static inline __m512
 jbm_log2wc_16xf32 (const __m512 x)      ///< __m512 vector.
 {
-  return jbm_rational_6_3_16xf32 (x, K_LOG2WC_F32);
+  return _mm512_mul_ps (x,  jbm_rational_5_2_16xf32 (x, K_LOG2WC_F32));
 }
 
 /**
@@ -7123,16 +7127,22 @@ jbm_log2wc_16xf32 (const __m512 x)      ///< __m512 vector.
 static inline __m512
 jbm_log2_16xf32 (const __m512 x)        ///< __m512 vector.
 {
-  __m512 y, z;
+  const __m512 z = _mm512_setzero_ps ();
+  __m512 y;
   __m512i e;
+  __mmask16 m;
   y = jbm_frexp_16xf32 (x, &e);
-  y = _mm512_add_ps (jbm_log2wc_16xf32 (y), _mm512_cvtepi32_ps (e));
-  z = _mm512_setzero_ps ();
-  y = _mm512_mask_blend_ps (_mm512_cmp_ps_mask (x, z, _CMP_GT_OS),
-                            _mm512_set1_ps (-INFINITY), y);
-  return _mm512_mask_blend_ps (_mm512_cmp_ps_mask (x, z, _CMP_LT_OS),
-                               y, _mm512_set1_ps (NAN));
-
+  m = _mm512_cmplt_ps_mask (y, _mm512_set1_ps (M_SQRT1_2f));
+  y = _mm512_add_ps (y, _mm512_maskz_mov_ps (m, y));
+  e = _mm512_sub_epi32 (e, _mm512_maskz_set1_epi32 (m, 1));
+  y = _mm512_add_ps (jbm_log2wc_16xf32 (_mm512_sub_ps (y,
+                                        _mm512_set1_ps (1.f))),
+                     _mm512_cvtepi32_ps (e));
+  y = _mm512_mask_mov_ps (y, _mm512_cmpeq_ps_mask (x, z),
+                          _mm512_set1_ps (-INFINITY));
+  y = _mm512_mask_mov_ps (y, _mm512_cmplt_ps_mask (x, z), _mm512_set1_ps (NAN));
+  return
+    _mm512_mask_mov_ps (y, _mm512_cmp_ps_mask (x, x, _CMP_ORD_Q) ^ 0xffff, x);
 }
 
 /**
@@ -7189,10 +7199,6 @@ static inline __m512
 jbm_pow_16xf32 (const __m512 x, ///< __m512 vector.
                 const float e)  ///< exponent (float).
 {
-  float f;
-  f = floorf (e);
-  if (f == e)
-    return jbm_pown_16xf32 (x, (int) e);
   return
     jbm_exp2_16xf32 (_mm512_mul_ps (_mm512_set1_ps (e), jbm_log2_16xf32 (x)));
 }
@@ -8194,7 +8200,13 @@ static inline __m512d
 jbm_mod_8xf64 (const __m512d x, ///< dividend (__m512d).
                const __m512d d) ///< divisor (__m512d).
 {
-  return _mm512_fnmadd_pd (_mm512_floor_pd (_mm512_div_pd (x, d)), d, x);
+  __m512d r;
+  r = _mm512_floor_pd (_mm512_div_pd (x, d));
+  return
+    _mm512_mask_blend_pd
+    (_mm512_cmp_pd_mask (jbm_abs_8xf64 (r), _mm512_set1_pd (1. / DBL_EPSILON),
+                         _CMP_GT_OQ),
+     _mm512_fnmadd_pd (r, d, x), _mm512_mul_pd (d, _mm512_set1_pd (0.5)));
 }
 
 /**
@@ -14996,14 +15008,14 @@ jbm_expm1_8xf64 (const __m512d x)       ///< __m512d vector.
 
 /**
  * Function to calculate the well conditionated function log2(x) for x in
- * [0.5,1] (__m512d).
+ * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (__m512d).
  *
  * \return function value (__m512d).
  */
 static inline __m512d
-jbm_log2wc_8xf64 (const __m512d x)      ///< __m512d vector \f$\in[0.5,1]\f$.
+jbm_log2wc_8xf64 (const __m512d x)      ///< __m512d vector.
 {
-  return jbm_rational_12_6_8xf64 (x, K_LOG2WC_F64);
+  return _mm512_mul_pd (x, jbm_rational_12_6_8xf64 (x, K_LOG2WC_F64));
 }
 
 /**
@@ -15015,15 +15027,22 @@ jbm_log2wc_8xf64 (const __m512d x)      ///< __m512d vector \f$\in[0.5,1]\f$.
 static inline __m512d
 jbm_log2_8xf64 (const __m512d x)        ///< __m512d vector.
 {
-  __m512d y, z;
+  const __m512d z = _mm512_setzero_pd ();
+  __m512d y;
   __m512i e;
+  __mmask16 m;
   y = jbm_frexp_8xf64 (x, &e);
-  y = _mm512_add_pd (jbm_log2wc_8xf64 (y), _mm512_cvtepi64_pd (e));
-  z = _mm512_setzero_pd ();
-  y = _mm512_mask_blend_pd (_mm512_cmp_pd_mask (x, z, _CMP_GT_OS),
-                            y, _mm512_set1_pd (-INFINITY));
-  return _mm512_mask_blend_pd (_mm512_cmp_pd_mask (x, z, _CMP_LT_OS),
-                               _mm512_set1_pd (NAN), y);
+  m = _mm512_cmplt_pd_mask (y, _mm512_set1_pd (M_SQRT1_2));
+  y = _mm512_add_pd (y, _mm512_maskz_mov_pd (m, y));
+  e = _mm512_sub_epi64 (e, _mm512_maskz_set1_epi64 (m, 1ll));
+  y = _mm512_add_pd (jbm_log2wc_8xf64 (_mm512_sub_pd (y,
+                                       _mm512_set1_pd (1.))),
+                     _mm512_cvtepi64_pd (e));
+  y = _mm512_mask_mov_pd (y, _mm512_cmpeq_pd_mask (x, z),
+                          _mm512_set1_pd (-INFINITY));
+  y = _mm512_mask_mov_pd (y, _mm512_cmplt_pd_mask (x, z), _mm512_set1_pd (NAN));
+  return
+    _mm512_mask_mov_pd (y, _mm512_cmp_pd_mask (x, x, _CMP_ORD_Q) ^ 0xffff, x);
 }
 
 /**
@@ -15080,10 +15099,6 @@ static inline __m512d
 jbm_pow_8xf64 (const __m512d x, ///< __m512d vector.
                const double e)  ///< exponent (__m512d).
 {
-  double f;
-  f = floor (e);
-  if (f == e)
-    return jbm_pown_8xf64 (x, (int) e);
   return
     jbm_exp2_8xf64 (_mm512_mul_pd (_mm512_set1_pd (e), jbm_log2_8xf64 (x)));
 }
