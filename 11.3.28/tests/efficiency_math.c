@@ -3,12 +3,35 @@
 #include <gsl/gsl_rng.h>
 #include <glib.h>
 
+#define DEBUG 0
 #define SEED 7l
 #define POL_HORNER 1
 #define POL_ESTRIN 2
 #define POL POL_HORNER
 
 // parallel bucles
+
+#if DEBUG
+
+#define BUCLE_INIT(type, f) \
+  for (i = imin; i < imax; ++i) \
+    { \
+      x[i] = (type) f (r[i], xmin, xmax, tau); \
+      printf ("x[%lu]=%g\n", i, x[i]); \
+    }
+#define BUCLE_FUNCTION(f) \
+  for (i = imin; i < imax; ++i) \
+    y[i] = f (x[i])
+#define BUCLE_ERROR(type, f, e) \
+  for (i = imin; i < imax; ++i) \
+    { \
+      z = (type) f ((long double) x[i]); \
+      ei = e (y[i], z); \
+      printf ("i=%lu x=%g y=%g f=%g e=%g\n", i, x[i], y[i], z, (type) ei); \
+      if (ei > em) \
+        xm = x[i], em = ei; \
+    }
+#else
 
 #define BUCLE_INIT(type, f) \
   for (i = imin; i < imax; ++i) \
@@ -19,10 +42,13 @@
 #define BUCLE_ERROR(type, f, e) \
   for (i = imin; i < imax; ++i) \
     { \
-      ei = e (y[i], (type) f ((long double) x[i])); \
+      z = (type) f ((long double) x[i]); \
+      ei = e (y[i], z); \
       if (ei > em) \
         xm = x[i], em = ei; \
     }
+
+#endif
 
 // function type
 
@@ -637,7 +663,7 @@ error_f32 (void *data, void *user_data __attribute__((unused)))
 {
   Parallel_f32 *p;
   float *x, *y;
-  float xm;
+  float xm, z;
   uint32_t ei, em;
   unsigned int type;
   unsigned long int i, imin, imax;
@@ -902,7 +928,7 @@ error_f64 (void *data, void *user_data __attribute__((unused)))
 {
   Parallel_f64 *p;
   double *x, *y;
-  double xm;
+  double xm, z;
   uint64_t ei, em;
   unsigned int type;
   unsigned long int i, imin, imax;
@@ -4204,6 +4230,10 @@ main (int argn, char **argc)
                   nthreads, "mod_f32");
   efficiency_f32 (TYPE_JBM_MOD, thread_f32, x32, y32, r, n, -FLT_MAX,
                   FLT_MAX, nthreads, "jbm_mod_f32");
+  efficiency_f32 (TYPE_CBRT, thread_f32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
+                  nthreads, "cbrtf");
+  efficiency_f32 (TYPE_JBM_CBRT, thread_f32, x32, y32, r, n, -FLT_MAX,
+                  FLT_MAX, nthreads, "jbm_cbrt_f32");
   efficiency_f32 (TYPE_EXP2, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "exp2f");
   efficiency_f32 (TYPE_JBM_EXP2, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
@@ -4237,10 +4267,6 @@ main (int argn, char **argc)
                   "pow");
   efficiency_f32 (TYPE_JBM_POW, thread_f32, x32, y32, r, n, 0.f, 100.f,
                   nthreads, "jbm_pow_f32");
-  efficiency_f32 (TYPE_CBRT, thread_f32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
-                  nthreads, "cbrtf");
-  efficiency_f32 (TYPE_JBM_CBRT, thread_f32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_cbrt_f32");
   efficiency_f32 (TYPE_SIN, thread_f32, x32, y32, r, n, -4.f * M_PIf,
                   4.f * M_PIf, nthreads, "sinf");
   efficiency_f32 (TYPE_JBM_SIN, thread_f32, x32, y32, r, n, -4.f * M_PIf,
@@ -4350,6 +4376,10 @@ main (int argn, char **argc)
                   nthreads, "mod_f64");
   efficiency_f64 (TYPE_JBM_MOD, thread_f64, x64, y64, r, n, -DBL_MAX,
                   DBL_MAX, nthreads, "jbm_mod_f64");
+  efficiency_f64 (TYPE_CBRT, thread_f64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
+                  nthreads, "cbrt");
+  efficiency_f64 (TYPE_JBM_CBRT, thread_f64, x64, y64, r, n, -DBL_MAX,
+                  DBL_MAX, nthreads, "jbm_cbrt_f64");
   efficiency_f64 (TYPE_EXP2, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
                   DBL_MAX_EXP, nthreads, "exp2");
   efficiency_f64 (TYPE_JBM_EXP2, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
@@ -4384,10 +4414,6 @@ main (int argn, char **argc)
                   "pow");
   efficiency_f64 (TYPE_JBM_POW, thread_f64, x64, y64, r, n, 0., 100.,
                   nthreads, "jbm_pow_f64");
-  efficiency_f64 (TYPE_CBRT, thread_f64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
-                  nthreads, "cbrt");
-  efficiency_f64 (TYPE_JBM_CBRT, thread_f64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_cbrt_f64");
   efficiency_f64 (TYPE_SIN, thread_f64, x64, y64, r, n, -4. * M_PI,
                   4. * M_PI, nthreads, "sin");
   efficiency_f64 (TYPE_JBM_SIN, thread_f64, x64, y64, r, n, -4. * M_PI,
@@ -4487,6 +4513,8 @@ main (int argn, char **argc)
                   FLT_MAX, nthreads, "jbm_abs_4xf32");
   efficiency_f32 (TYPE_JBM_MOD, thread_4xf32, x32, y32, r, n, -FLT_MAX,
                   FLT_MAX, nthreads, "jbm_mod_4xf32");
+  efficiency_f32 (TYPE_JBM_CBRT, thread_4xf32, x32, y32, r, n, -FLT_MAX,
+                  FLT_MAX, nthreads, "jbm_cbrt_4xf32");
   efficiency_f32 (TYPE_JBM_EXP2, thread_4xf32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "jbm_exp2_4xf32");
   efficiency_f32 (TYPE_JBM_EXP, thread_4xf32, x32, y32, r, n,
@@ -4505,8 +4533,6 @@ main (int argn, char **argc)
                   FLT_MAX, nthreads, "jbm_log10_4xf32");
   efficiency_f32 (TYPE_JBM_POW, thread_4xf32, x32, y32, r, n, 0., 100.,
                   nthreads, "jbm_pow_4xf32");
-  efficiency_f32 (TYPE_JBM_CBRT, thread_4xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_cbrt_4xf32");
   efficiency_f32 (TYPE_JBM_SIN, thread_4xf32, x32, y32, r, n, -4.f * M_PIf,
                   4.f * M_PIf, nthreads, "jbm_sin_4xf32");
   efficiency_f32 (TYPE_JBM_COS, thread_4xf32, x32, y32, r, n, -4.f * M_PIf,
@@ -4552,6 +4578,8 @@ main (int argn, char **argc)
                   DBL_MAX, nthreads, "jbm_abs_2xf64");
   efficiency_f64 (TYPE_JBM_MOD, thread_2xf64, x64, y64, r, n, -DBL_MAX,
                   DBL_MAX, nthreads, "jbm_mod_2xf64");
+  efficiency_f64 (TYPE_JBM_CBRT, thread_2xf64, x64, y64, r, n, -DBL_MAX,
+                  DBL_MAX, nthreads, "jbm_cbrt_2xf64");
   efficiency_f64 (TYPE_JBM_EXP2, thread_2xf64, x64, y64, r, n, -DBL_MAX_EXP,
                   DBL_MAX_EXP, nthreads, "jbm_exp2_2xf64");
   efficiency_f64 (TYPE_JBM_EXP, thread_2xf64, x64, y64, r, n,
@@ -4570,8 +4598,6 @@ main (int argn, char **argc)
                   DBL_MAX, nthreads, "jbm_log10_2xf64");
   efficiency_f64 (TYPE_JBM_POW, thread_2xf64, x64, y64, r, n, 0., 100.,
                   nthreads, "jbm_pow_2xf64");
-  efficiency_f64 (TYPE_JBM_CBRT, thread_2xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_cbrt_2xf64");
   efficiency_f64 (TYPE_JBM_SIN, thread_2xf64, x64, y64, r, n, -4. * M_PI,
                   4. * M_PI, nthreads, "jbm_sin_2xf64");
   efficiency_f64 (TYPE_JBM_COS, thread_2xf64, x64, y64, r, n, -4. * M_PI,
@@ -4621,6 +4647,8 @@ main (int argn, char **argc)
                   FLT_MAX, nthreads, "jbm_abs_8xf32");
   efficiency_f32 (TYPE_JBM_MOD, thread_8xf32, x32, y32, r, n, -FLT_MAX,
                   FLT_MAX, nthreads, "jbm_mod_8xf32");
+  efficiency_f32 (TYPE_JBM_CBRT, thread_8xf32, x32, y32, r, n, -FLT_MAX,
+                  FLT_MAX, nthreads, "jbm_cbrt_8xf32");
   efficiency_f32 (TYPE_JBM_EXP2, thread_8xf32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "jbm_exp2_8xf32");
   efficiency_f32 (TYPE_JBM_EXP, thread_8xf32, x32, y32, r, n,
@@ -4639,8 +4667,6 @@ main (int argn, char **argc)
                   FLT_MAX, nthreads, "jbm_log10_8xf32");
   efficiency_f32 (TYPE_JBM_POW, thread_8xf32, x32, y32, r, n, 0., 100.,
                   nthreads, "jbm_pow_8xf32");
-  efficiency_f32 (TYPE_JBM_CBRT, thread_8xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_cbrt_8xf32");
   efficiency_f32 (TYPE_JBM_SIN, thread_8xf32, x32, y32, r, n, -4.f * M_PIf,
                   4.f * M_PIf, nthreads, "jbm_sin_8xf32");
   efficiency_f32 (TYPE_JBM_COS, thread_8xf32, x32, y32, r, n, -4.f * M_PIf,
@@ -4686,6 +4712,8 @@ main (int argn, char **argc)
                   DBL_MAX, nthreads, "jbm_abs_4xf64");
   efficiency_f64 (TYPE_JBM_MOD, thread_4xf64, x64, y64, r, n, -DBL_MAX,
                   DBL_MAX, nthreads, "jbm_mod_4xf64");
+  efficiency_f64 (TYPE_JBM_CBRT, thread_4xf64, x64, y64, r, n, -DBL_MAX,
+                  DBL_MAX, nthreads, "jbm_cbrt_4xf64");
   efficiency_f64 (TYPE_JBM_EXP2, thread_4xf64, x64, y64, r, n, -DBL_MAX_EXP,
                   DBL_MAX_EXP, nthreads, "jbm_exp2_4xf64");
   efficiency_f64 (TYPE_JBM_EXP, thread_4xf64, x64, y64, r, n,
@@ -4704,8 +4732,6 @@ main (int argn, char **argc)
                   DBL_MAX, nthreads, "jbm_log10_4xf64");
   efficiency_f64 (TYPE_JBM_POW, thread_4xf64, x64, y64, r, n, 0., 100.,
                   nthreads, "jbm_pow_4xf64");
-  efficiency_f64 (TYPE_JBM_CBRT, thread_4xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_cbrt_4xf64");
   efficiency_f64 (TYPE_JBM_SIN, thread_4xf64, x64, y64, r, n, -4. * M_PI,
                   4. * M_PI, nthreads, "jbm_sin_4xf64");
   efficiency_f64 (TYPE_JBM_COS, thread_4xf64, x64, y64, r, n, -4. * M_PI,
@@ -4755,6 +4781,8 @@ main (int argn, char **argc)
                   FLT_MAX, nthreads, "jbm_abs_16xf32");
   efficiency_f32 (TYPE_JBM_MOD, thread_16xf32, x32, y32, r, n, -FLT_MAX,
                   FLT_MAX, nthreads, "jbm_mod_16xf32");
+  efficiency_f32 (TYPE_JBM_CBRT, thread_16xf32, x32, y32, r, n, -FLT_MAX,
+                  FLT_MAX, nthreads, "jbm_cbrt_16xf32");
   efficiency_f32 (TYPE_JBM_EXP2, thread_16xf32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "jbm_exp2_16xf32");
   efficiency_f32 (TYPE_JBM_EXP, thread_16xf32, x32, y32, r, n,
@@ -4774,8 +4802,6 @@ main (int argn, char **argc)
                   FLT_MAX, nthreads, "jbm_log10_16xf32");
   efficiency_f32 (TYPE_JBM_POW, thread_16xf32, x32, y32, r, n, 0., 100.,
                   nthreads, "jbm_pow_16xf32");
-  efficiency_f32 (TYPE_JBM_CBRT, thread_16xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_cbrt_16xf32");
   efficiency_f32 (TYPE_JBM_SIN, thread_16xf32, x32, y32, r, n, -4.f * M_PIf,
                   4.f * M_PIf, nthreads, "jbm_sin_16xf32");
   efficiency_f32 (TYPE_JBM_COS, thread_16xf32, x32, y32, r, n, -4.f * M_PIf,
@@ -4821,6 +4847,8 @@ main (int argn, char **argc)
                   DBL_MAX, nthreads, "jbm_abs_8xf64");
   efficiency_f64 (TYPE_JBM_MOD, thread_8xf64, x64, y64, r, n, -DBL_MAX,
                   DBL_MAX, nthreads, "jbm_abs_8xf64");
+  efficiency_f64 (TYPE_JBM_CBRT, thread_8xf64, x64, y64, r, n, -DBL_MAX,
+                  DBL_MAX, nthreads, "jbm_cbrt_8xf64");
   efficiency_f64 (TYPE_JBM_EXP2, thread_8xf64, x64, y64, r, n, -DBL_MAX_EXP,
                   DBL_MAX_EXP, nthreads, "jbm_exp2_8xf64");
   efficiency_f64 (TYPE_JBM_EXP, thread_8xf64, x64, y64, r, n,
@@ -4839,8 +4867,6 @@ main (int argn, char **argc)
                   DBL_MAX, nthreads, "jbm_log10_8xf64");
   efficiency_f64 (TYPE_JBM_POW, thread_8xf64, x64, y64, r, n, 0., 100.,
                   nthreads, "jbm_pow_8xf64");
-  efficiency_f64 (TYPE_JBM_CBRT, thread_8xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_cbrt_8xf64");
   efficiency_f64 (TYPE_JBM_SIN, thread_8xf64, x64, y64, r, n, -4. * M_PI,
                   4. * M_PI, nthreads, "jbm_sin_8xf64");
   efficiency_f64 (TYPE_JBM_COS, thread_8xf64, x64, y64, r, n, -4. * M_PI,

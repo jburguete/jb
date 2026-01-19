@@ -68,6 +68,10 @@ typedef union
 ///< mantissa bits for floats.
 #define JBM_BITS_SIGN_8xF32 _mm256_set1_epi32 (JBM_BITS_SIGN_F32)
 ///< sign bits for floats.
+#define JBM_CBRT2_8xF32 _mm256_set1_ps (JBM_CBRT2_F32)
+///< cbrt(2) for floats.
+#define JBM_CBRT4_8xF32 _mm256_set1_ps (JBM_CBRT4_F32)
+///< cbrt(4) for floats.
 
 // double constants
 
@@ -83,6 +87,10 @@ typedef union
 ///< mantissa bits for doubles.
 #define JBM_BITS_SIGN_4xF64 _mm256_set1_epi64x (JBM_BITS_SIGN_F64)
 ///< sign bits for floats.
+#define JBM_CBRT2_4xF64 _mm256_set1_pd (JBM_CBRT2_F64)
+///< cbrt(2) for doubles.
+#define JBM_CBRT4_4xF64 _mm256_set1_pd (JBM_CBRT4_F64)
+///< cbrt(4) for doubles.
 
 /* Debug functions
 
@@ -91,7 +99,7 @@ print_m256b32 (FILE *file, const char *label, __m256i x)
 {
   int y[8] JB_ALIGNED;
   unsigned int i;
-  _mm256_store_si256 ((__m128i *) y, x);
+  _mm256_store_si256 ((__m256i *) y, x);
   for (i = 0; i < 8; ++i)
     fprintf (file, "%s[%u]=%08x\n", label, i, y[i]);
 }
@@ -101,7 +109,7 @@ print_m256b64 (FILE *file, const char *label, __m256i x)
 {
   long long int y[4] JB_ALIGNED;
   unsigned int i;
-  _mm256_store_si256 ((__m128i *) y, x);
+  _mm256_store_si256 ((__m256i *) y, x);
   for (i = 0; i < 4; ++i)
     fprintf (file, "%s[%u]=%016llx\n", label, i, y[i]);
 }
@@ -111,7 +119,7 @@ print_m256i32 (FILE *file, const char *label, __m256i x)
 {
   int y[8] JB_ALIGNED;
   unsigned int i;
-  _mm256_store_si256 ((__m128i *) y, x);
+  _mm256_store_si256 ((__m256i *) y, x);
   for (i = 0; i < 8; ++i)
     fprintf (file, "%s[%u]=%d\n", label, i, y[i]);
 }
@@ -121,7 +129,7 @@ print_m256i64 (FILE *file, const char *label, __m256i x)
 {
   long long int y[4] JB_ALIGNED;
   unsigned int i;
-  _mm256_store_si256 ((__m128i *) y, x);
+  _mm256_store_si256 ((__m256i *) y, x);
   for (i = 0; i < 4; ++i)
     fprintf (file, "%s[%u]=%llu\n", label, i, y[i]);
 }
@@ -147,6 +155,26 @@ print_m256d (FILE *file, const char *label, __m256d x)
 }
 
 */
+
+/**
+ * Function to emulate a division opperation by an unsigned constant in 32 bits.
+ * This function is only valid for positive and no powers of 2.
+ *
+ * \return quotient vector (__mm256i)
+ */
+static inline __m256i
+jbm_div3_8xi16 (const __m256i x)        ///< dividend __m256i vector.
+{
+  const __m256i vi3 = _mm256_set1_epi32 (0x55555556);
+  __m256i adj, lo, hi;
+  adj  = _mm256_add_epi32 (x, _mm256_srai_epi32 (x, 31));
+  lo = _mm256_srli_epi64 (_mm256_mul_epi32 (adj, vi3), 32);
+  hi = _mm256_srli_epi64 (_mm256_mul_epi32 (_mm256_srli_epi64 (adj, 32), vi3),
+                          32);
+  return _mm256_blend_epi32 (_mm256_castsi128_si256(_mm256_castsi256_si128(lo)),
+                             _mm256_castsi128_si256(_mm256_castsi256_si128(hi)),
+                             0b10101010);
+}
 
 /**
  * Function to calculate the additive inverse value of a __m256 vector.
@@ -6966,6 +6994,53 @@ jbm_rational_29_28_8xf32 (const __m256 x,       ///< __m256 vector.
 }
 
 /**
+ * Function to calculate the well conditionated function cbrt(x) for x
+ * \f$\in\left[\frac12\;,1\right]\f$ (__m256).
+ *
+ * \return function value (__m256).
+ */
+static inline __m256
+jbm_cbrtwc_8xf32 (const __m256 x)
+                   ///< __m256 vector \f$\in\left[\frac12,\;1\right]\f$.
+{
+  return jbm_rational_5_3_8xf32 (x, K_CBRTWC_F32);
+}
+
+/**
+ * Function to calculate the function cbrt(x) using the jbm_cbrtwc_8xf32
+ * function (__m256).
+ *
+ * \return function value (__m256).
+ */
+static inline __m256
+jbm_cbrt_8xf32 (const __m256 x) ///< __m256 vector.
+{
+  const __m256 cbrt2 = JBM_CBRT2_8xF32;
+  const __m256 cbrt4 = JBM_CBRT4_8xF32;
+  const __m256i v3 = _mm256_set1_epi32 (3);
+  const __m256 v2 = _mm256_set1_ps (2.f);
+  const __m256 v1 = _mm256_set1_ps (1.f);
+  __m256 y, rf;
+  __m256i e, e3, r, n;
+  __m128i e16;
+  y = jbm_frexp_8xf32 (jbm_abs_8xf32 (x), &e);
+  e16 = _mm256_cvtepi32_epi16 (e);
+  e16 = _mm_mulhi_epi16 (e16, _mm_set1_epi16 (0x5556));
+  e3 = _mm256_cvtepi16_epi32 (e16);
+  r = _mm256_sub_epi32 (e, _mm256_mullo_epi32 (e3, v3));
+  n = _mm256_srai_epi32 (r, 31);
+  r = _mm256_add_epi32 (r, _mm256_and_si256 (n, v3));
+  e3 = _mm256_sub_epi32 (e3, _mm256_and_si256 (n, _mm256_set1_epi32 (1)));
+  y = jbm_ldexp_8xf32 (jbm_cbrtwc_8xf32 (y), e3);
+  rf = _mm256_cvtepi32_ps (r);
+  y = _mm256_blendv_ps (y, _mm256_mul_ps (y, cbrt2),
+                        _mm256_cmp_ps (_mm256_and_ps (rf, v1), v1, _CMP_EQ_OQ));
+  y = _mm256_blendv_ps (y, _mm256_mul_ps (y, cbrt4),
+                        _mm256_cmp_ps (_mm256_and_ps (rf, v2), v2, _CMP_EQ_OQ));
+  return jbm_copysign_8xf32 (y, x);
+}
+
+/**
  * Function to calculate the well conditionated function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (__m256).
  *
@@ -7154,18 +7229,6 @@ jbm_pow_8xf32 (const __m256 x,  ///< __m256 vector.
 {
   return
     jbm_exp2_8xf32 (_mm256_mul_ps (_mm256_set1_ps (e), jbm_log2_8xf32 (x)));
-}
-
-/**
- * Function to calculate the function cbrt(x) using the jbm_abs_8xf32 and
- * jbm_pow_8xf32 functions (__m256).
- *
- * \return function value (__m256).
- */
-static inline __m256
-jbm_cbrt_8xf32 (const __m256 x) ///< __m256 vector.
-{
-  return jbm_copysign_8xf32 (jbm_pow_8xf32 (jbm_abs_8xf32 (x), 1.f / 3.f), x);
 }
 
 /**
@@ -8194,7 +8257,7 @@ jbm_frexp_4xf64 (const __m256d x,       ///< __m256d vector.
                           is_sub);
   // exponent
   exp = _mm256_blendv_epi8 (zi, _mm256_sub_epi64 (exp, bias), is_finite);
-  *e = _mm256_castsi256_si128 (_mm256_permute4x64_epi64 (exp64, 0xd8));
+  *e = _mm256_castsi256_si128 (_mm256_permute4x64_epi64 (exp, 0xd8));
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm256_or_si256 (_mm256_and_si256 (z.i, sign_mask),
@@ -8211,27 +8274,28 @@ jbm_frexp_4xf64 (const __m256d x,       ///< __m256d vector.
  * \return function value (__m256d).
  */
 static inline __m256d
-jbm_exp2n_4xf64 (__m256i e)     ///< exponent vector (__m256i).
+jbm_exp2n_4xf64 (__m128i e)     ///< exponent vector (__m256i).
 {
+  const __m256i e64 = _mm256_cvtepi32_epi64 (e);
   __m256d x;
   x = _mm256_blendv_pd
     (_mm256_castsi256_pd
      (_mm256_sllv_epi64
       (_mm256_set1_epi64x ((long long) 0x0008000000000000ull),
-       _mm256_sub_epi64 (_mm256_set1_epi64x (-1023ll), e))),
+       _mm256_sub_epi64 (_mm256_set1_epi64x (-1023ll), e64))),
      _mm256_castsi256_pd
-     (_mm256_slli_epi64 (_mm256_add_epi64 (e, _mm256_set1_epi64x (1023ll)),
+     (_mm256_slli_epi64 (_mm256_add_epi64 (e64, _mm256_set1_epi64x (1023ll)),
                          52)),
      _mm256_castsi256_pd (_mm256_cmpgt_epi64
-                          (e, _mm256_set1_epi64x (-1023ll))));
+                          (e64, _mm256_set1_epi64x (-1023ll))));
   x =
     _mm256_blendv_pd (x, _mm256_setzero_pd (),
-                      _mm256_castsi256_pd (_mm256_cmpgt_epi64
-                                           (_mm256_set1_epi64x (-1074ll), e)));
+                      _mm256_castsi256_pd
+		      (_mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1074ll), e64)));
   return _mm256_blendv_pd (x, _mm256_set1_pd (INFINITY),
-                           _mm256_castsi256_pd (_mm256_cmpgt_epi64
-                                                (e,
-                                                 _mm256_set1_epi64x (1023ll))));
+                           _mm256_castsi256_pd
+			   (_mm256_cmpgt_epi64 (e64,
+                                                _mm256_set1_epi64x (1023ll))));
 }
 
 /**
@@ -8241,7 +8305,7 @@ jbm_exp2n_4xf64 (__m256i e)     ///< exponent vector (__m256i).
  */
 static inline __m256d
 jbm_ldexp_4xf64 (const __m256d x,       ///< __m256d vector.
-                 __m256i e)     ///< exponent vector (__m256i).
+                 __m128i e)     ///< exponent vector (__m256i).
 {
   return _mm256_mul_pd (x, jbm_exp2n_4xf64 (e));
 }
@@ -14875,6 +14939,51 @@ jbm_rational_29_28_4xf64 (const __m256d x,      ///< __m256d vector.
 }
 
 /**
+ * Function to calculate the well conditionated function cbrt(x) for x
+ * \f$\in\left[\frac12\;,1\right]\f$ (__m256d).
+ *
+ * \return function value (__m256d).
+ */
+static inline __m256d
+jbm_cbrtwc_4xf64 (const __m256d x)
+                  ///< __m256d vector \f$\in\left[\frac12,\;1\right]\f$.
+{
+  return jbm_rational_11_6_4xf64 (x, K_CBRTWC_F64);
+}
+
+/**
+ * Function to calculate the function cbrt(x) using the jbm_abs_4xf64 and
+ * jbm_pow_4xf64 functions (__m256d).
+ *
+ * \return function value (__m256d).
+ */
+static inline __m256d
+jbm_cbrt_4xf64 (const __m256d x)        ///< __m256d vector.
+{
+  const __m256d cbrt2 = JBM_CBRT2_4xF64;
+  const __m256d cbrt4 = JBM_CBRT4_4xF64;
+  const __m128i v3 = _mm_set1_epi32 (3);
+  const __m256d v2 = _mm256_set1_pd (2.);
+  const __m256d v1 = _mm256_set1_pd (1.);
+  __m256d y, rf;
+  __m128i e, e3, r, n;
+  y = jbm_frexp_4xf64 (jbm_abs_4xf64 (x), &e);
+  e3 = _mm_mulhi_epi16 (e, _mm_set1_epi16 (0x5556));
+  e3 = _mm_cvtepi16_epi32 (e3);
+  r = _mm_sub_epi32 (e, _mm_mullo_epi32 (e3, v3));
+  n = _mm_srai_epi32 (r, 31);
+  r = _mm_add_epi32 (r, _mm_and_si128 (n, v3));
+  e3 = _mm_sub_epi32 (e3, _mm_and_si128 (n, _mm_set1_epi32 (1)));
+  y = jbm_ldexp_4xf64 (jbm_cbrtwc_4xf64 (y), e3);
+  rf = _mm256_cvtepi64_pd (_mm256_cvtepi32_epi64 (r));
+  y = _mm256_blendv_pd (y, _mm256_mul_pd (y, cbrt2),
+                        _mm256_cmp_pd (_mm256_and_pd (rf, v1), v1, _CMP_EQ_OQ));
+  y = _mm256_blendv_pd (y, _mm256_mul_pd (y, cbrt4),
+                        _mm256_cmp_pd (_mm256_and_pd (rf, v2), v2, _CMP_EQ_OQ));
+  return jbm_copysign_4xf64 (y, x);
+}
+
+/**
  * Function to calculate the well conditionated function expm1(x) for x in
  * [-log(2)/2,log(2)/2] (__m256d).
  *
@@ -14915,12 +15024,13 @@ jbm_exp2_4xf64 (const __m256d x)        ///< __m256d vector.
   f = _mm256_sub_pd (x, y);
 #ifdef __AVX512F__
   i = _mm256_cvtpd_epi64 (y);
-  z = jbm_exp2n_4xf64 (i);
+  z = jbm_exp2n_4xf64 (_mm256_cvtepi64_epi32 (i));
 #else
   z = _mm256_set1_pd (0x0018000000000000);
   y = _mm256_add_pd (y, z);
   i = _mm256_sub_epi64 (_mm256_castpd_si256 (y), _mm256_castpd_si256 (z));
-  z = _mm256_blendv_pd (jbm_exp2n_4xf64 (i), _mm256_setzero_pd (),
+  z = _mm256_blendv_pd (jbm_exp2n_4xf64 (_mm256_cvtepi64_epi32 (i)),
+                        _mm256_setzero_pd (),
                         _mm256_cmp_pd (y, _mm256_set1_pd (-1074.), _CMP_LT_OS));
 #endif
   return _mm256_mul_pd (z, jbm_exp2wc_4xf64 (f));
@@ -14994,10 +15104,10 @@ jbm_log2_4xf64 (const __m256d x)        ///< __m256d vector.
   y = _mm256_add_pd (y, _mm256_and_pd (m, y));
   e = _mm_sub_epi32
       (e, _mm_and_si128 (_mm_castpd_si128 (_mm256_castpd256_pd128 (m)),
-                         _mm256_set1_epi32 (1)));
+                         _mm_set1_epi32 (1)));
   y = _mm256_add_pd (jbm_log2wc_4xf64 (_mm256_sub_pd (y,
                                         _mm256_set1_pd (1.))),
-                     _mm256_cvtepi64_pd (e));
+                     _mm256_cvtepi32_pd (e));
   y = _mm256_blendv_pd (y, _mm256_set1_pd (-INFINITY),
                         _mm256_cmp_pd (x, z, _CMP_EQ_OQ));
   y = _mm256_blendv_pd (y, _mm256_set1_pd (NAN),
@@ -15064,18 +15174,6 @@ jbm_pow_4xf64 (const __m256d x, ///< __m256d vector.
 {
   return
     jbm_exp2_4xf64 (_mm256_mul_pd (_mm256_set1_pd (e), jbm_log2_4xf64 (x)));
-}
-
-/**
- * Function to calculate the function cbrt(x) using the jbm_abs_4xf64 and
- * jbm_pow_4xf64 functions (__m256d).
- *
- * \return function value (__m256d).
- */
-static inline __m256d
-jbm_cbrt_4xf64 (const __m256d x)        ///< __m256d vector.
-{
-  return jbm_copysign_4xf64 (jbm_pow_4xf64 (jbm_abs_4xf64 (x), 1. / 3.), x);
 }
 
 /**

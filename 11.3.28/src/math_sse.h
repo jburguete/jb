@@ -227,6 +227,24 @@ _mm_sllv_epi64 (__m128i x, __m128i i)
 #endif
 
 /**
+ * Function to emulate a division opperation by an unsigned constant in 32 bits.
+ * This function is only valid for positive and no powers of 2.
+ *
+ * \return quotient vector (__m128i)
+ */
+static inline __m128i
+jbm_div3_4xi32 (const __m128i x)        ///< dividend __m128i vector.
+{
+  const __m128i vi3 = _mm_set1_epi32 (0x55555556);
+  __m128i adj, lo, hi;
+  adj  = _mm_add_epi32 (x, _mm_srai_epi32 (x, 31));
+  lo = _mm_srli_epi64 (_mm_mul_epu32 (adj, vi3), 32);
+  hi = _mm_srli_epi64 (_mm_mul_epu32 (_mm_srli_epi64 (adj, 32), vi3), 32);
+  return _mm_unpacklo_epi32 (_mm_shuffle_epi32 (lo, _MM_SHUFFLE (0,0,2,0)),
+                             _mm_shuffle_epi32 (hi, _MM_SHUFFLE (0,0,2,0)));
+}
+
+/**
  * Function to calculate the additive inverse value of a __m128 vector.
  *
  * \return opposite value vector (__m128).
@@ -6805,6 +6823,19 @@ jbm_rational_29_28_4xf32 (const __m128 x,       ///< __m128 vector.
 {
   return _mm_div_ps (jbm_polynomial_28_4xf32 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[29]), _mm_set1_ps (1.f)));
+}
+
+/**
+ * Function to calculate the well conditionated function cbrt(x) for x
+ * \f$\in\left[\frac12\;,1\right]\f$ (__m128).
+ *
+ * \return function value (__m128).
+ */
+static inline __m128
+jbm_cbrtwc_4xf32 (const __m128 x)
+                  ///< __m128 vector \f$\in\left[\frac12,\;1\right]\f$.
+{
+  return jbm_rational_5_3_4xf32 (x, K_CBRTWC_F32);
 }
 
 /**
@@ -14824,6 +14855,19 @@ jbm_rational_29_28_2xf64 (const __m128d x,      ///< __m128d vector.
 {
   return _mm_div_pd (jbm_polynomial_28_2xf64 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[29]), _mm_set1_pd (1.)));
+}
+
+/**
+ * Function to calculate the well conditionated function cbrt(x) for x
+ * \f$\in\left[\frac12\;,1\right]\f$ (__m128d).
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_cbrtwc_2xf64 (const __m128d x)
+                  ///< __m128d vector \f$\in\left[\frac12,\;1\right]\f$.
+{
+  return jbm_rational_11_6_2xf64 (x, K_CBRTWC_F64);
 }
 
 /**
