@@ -68,6 +68,10 @@ typedef union
 ///< mantissa bits for floats.
 #define JBM_BITS_SIGN_4xF32 _mm_set1_epi32 (JBM_BITS_SIGN_F32)
 ///< sign bits for floats.
+#define JBM_CBRT2_4xF32 _mm_set1_ps (JBM_CBRT2_F32)
+///< cbrt(2) for floats.
+#define JBM_CBRT4_4xF32 _mm_set1_ps (JBM_CBRT4_F32)
+///< cbrt(4) for floats.
 
 // double constants
 
@@ -83,11 +87,15 @@ typedef union
 ///< mantissa bits for doubles.
 #define JBM_BITS_SIGN_2xF64 _mm_set1_epi64x (JBM_BITS_SIGN_F64)
 ///< sign bits for floats.
+#define JBM_CBRT2_2xF64 _mm_set1_pd (JBM_CBRT2_F64)
+///< cbrt(2) for doubles.
+#define JBM_CBRT4_2xF64 _mm_set1_pd (JBM_CBRT4_F64)
+///< cbrt(4) for doubles.
 
 // Debug functions
 
 static inline void
-print_m128b32 (FILE *file, const char *label, __m128i x)
+print_m128b32 (FILE *file, const char *label, const __m128i x)
 {
   int y[4] JB_ALIGNED;
   unsigned int i;
@@ -97,7 +105,7 @@ print_m128b32 (FILE *file, const char *label, __m128i x)
 }
 
 static inline void
-print_m128b64 (FILE *file, const char *label, __m128i x)
+print_m128b64 (FILE *file, const char *label, const __m128i x)
 {
   long long int y[2] JB_ALIGNED;
   unsigned int i;
@@ -107,7 +115,7 @@ print_m128b64 (FILE *file, const char *label, __m128i x)
 }
 
 static inline void
-print_m128i32 (FILE *file, const char *label, __m128i x)
+print_m128i32 (FILE *file, const char *label, const __m128i x)
 {
   int y[4] JB_ALIGNED;
   unsigned int i;
@@ -117,7 +125,7 @@ print_m128i32 (FILE *file, const char *label, __m128i x)
 }
 
 static inline void
-print_m128i64 (FILE *file, const char *label, __m128i x)
+print_m128i64 (FILE *file, const char *label, const __m128i x)
 {
   long long int y[2] JB_ALIGNED;
   unsigned int i;
@@ -127,7 +135,7 @@ print_m128i64 (FILE *file, const char *label, __m128i x)
 }
 
 static inline void
-print_m128 (FILE *file, const char *label, __m128 x)
+print_m128 (FILE *file, const char *label, const __m128 x)
 {
   float y[4] JB_ALIGNED;
   unsigned int i;
@@ -137,7 +145,7 @@ print_m128 (FILE *file, const char *label, __m128 x)
 }
 
 static inline void
-print_m128d (FILE *file, const char *label, __m128d x)
+print_m128d (FILE *file, const char *label, const __m128d x)
 {
   double y[2] JB_ALIGNED;
   unsigned int i;
@@ -146,102 +154,66 @@ print_m128d (FILE *file, const char *label, __m128d x)
     fprintf (file, "%s[%u]=%.17lg\n", label, i, y[i]);
 }
 
-#ifndef __FMA__
-
-static inline __m128
-_mm_fmadd_ps (const __m128 x, const __m128 y, const __m128 z)
+/**
+ * Function to calculate the additive reduction value of a __m128 vector.
+ *
+ * \return additive reduction (float).
+ */
+static inline float
+jbm_reduce_add_4xf32 (const __m128 x)   ///< __m128 vector.
 {
-  return _mm_add_ps (_mm_mul_ps (x, y), z);
+  __m128 y;
+  y = _mm_hadd_ps (x, x);
+  return _mm_cvtss_f32 (_mm_hadd_ps (y, y));
 }
-
-static inline __m128
-_mm_fmsub_ps (const __m128 x, const __m128 y, const __m128 z)
-{
-  return _mm_sub_ps (_mm_mul_ps (x, y), z);
-}
-
-static inline __m128
-_mm_fnmadd_ps (const __m128 x, const __m128 y, const __m128 z)
-{
-  return _mm_sub_ps (z, _mm_mul_ps (x, y));
-}
-
-static inline __m128
-_mm_fnmsub_ps (const __m128 x, const __m128 y, const __m128 z)
-{
-  return _mm_sub_ps (_mm_setzero_ps (), _mm_fmadd_ps (x, y, z));
-}
-
-static inline __m128d
-_mm_fmadd_pd (const __m128d x, const __m128d y, const __m128d z)
-{
-  return _mm_add_pd (_mm_mul_pd (x, y), z);
-}
-
-static inline __m128d
-_mm_fmsub_pd (const __m128d x, const __m128d y, const __m128d z)
-{
-  return _mm_sub_pd (_mm_mul_pd (x, y), z);
-}
-
-static inline __m128d
-_mm_fnmadd_pd (const __m128d x, const __m128d y, const __m128d z)
-{
-  return _mm_sub_pd (z, _mm_mul_pd (x, y));
-}
-
-static inline __m128d
-_mm_fnmsub_pd (const __m128d x, const __m128d y, const __m128d z)
-{
-  return _mm_sub_pd (_mm_setzero_pd (), _mm_fmadd_pd (x, y, z));
-}
-
-#endif
-
-#ifndef __AVX__
-
-static inline __m128i
-_mm_sllv_epi32 (__m128i x, __m128i i)
-{
-  int xx[4] JB_ALIGNED, ii[4] JB_ALIGNED;
-  _mm_store_si128 ((__m128i *) xx, x);
-  _mm_store_si128 ((__m128i *) ii, i);
-  xx[0] <<= ii[0];
-  xx[1] <<= ii[1];
-  xx[2] <<= ii[2];
-  xx[3] <<= ii[3];
-  return _mm_load_si128 ((__m128i *) xx);
-}
-
-static inline __m128i
-_mm_sllv_epi64 (__m128i x, __m128i i)
-{
-  long long int xx[2] JB_ALIGNED, ii[2] JB_ALIGNED;
-  _mm_store_si128 ((__m128i *) xx, x);
-  _mm_store_si128 ((__m128i *) ii, i);
-  xx[0] <<= ii[0];
-  xx[1] <<= ii[1];
-  return _mm_load_si128 ((__m128i *) xx);
-}
-
-#endif
 
 /**
- * Function to emulate a division opperation by an unsigned constant in 32 bits.
- * This function is only valid for positive and no powers of 2.
+ * Function to calculate the maximum reduction value of a __m128 vector.
  *
- * \return quotient vector (__m128i)
+ * \return maximum reduction (float).
  */
-static inline __m128i
-jbm_div3_4xi32 (const __m128i x)        ///< dividend __m128i vector.
+static inline float
+jbm_reduce_max_4xf32 (const __m128 x)
 {
-  const __m128i vi3 = _mm_set1_epi32 (0x55555556);
-  __m128i adj, lo, hi;
-  adj  = _mm_add_epi32 (x, _mm_srai_epi32 (x, 31));
-  lo = _mm_srli_epi64 (_mm_mul_epu32 (adj, vi3), 32);
-  hi = _mm_srli_epi64 (_mm_mul_epu32 (_mm_srli_epi64 (adj, 32), vi3), 32);
-  return _mm_unpacklo_epi32 (_mm_shuffle_epi32 (lo, _MM_SHUFFLE (0,0,2,0)),
-                             _mm_shuffle_epi32 (hi, _MM_SHUFFLE (0,0,2,0)));
+  __m128 y;
+  y = _mm_max_ps (x, _mm_movehl_ps (x, x));
+  y = _mm_max_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE(1,0,3,2)));
+  return _mm_cvtss_f32 (y);
+}
+
+/**
+ * Function to calculate the minimum reduction value of a __m128 vector.
+ *
+ * \return minimum reduction (float).
+ */
+static inline float
+jbm_reduce_min_4xf32 (const __m128 x)
+{
+  __m128 y;
+  y = _mm_min_ps (x, _mm_movehl_ps (x, x));
+  y = _mm_min_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE(1,0,3,2)));
+  return _mm_cvtss_f32 (y);
+}
+
+/**
+ * Function to calculate the maximum and minimum reduction value of a
+ * __m128 vector.
+ */
+static inline void
+jbm_reduce_maxmin_4xf32 (const __m128 x,       ///< __m128 vector.
+                         float *max,
+                         ///< pointer to the maximum value (float).
+                         float *min)
+                         ///< pointer to the minimum value (float).
+{
+  __m128 y, z;
+  z = _mm_movehl_ps (x, x);
+  y = _mm_max_ps (x, z); 
+  y = _mm_max_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE(1,0,3,2)));
+  *max = _mm_cvtss_f32 (y);
+  y = _mm_min_ps (x, z); 
+  y = _mm_min_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE(1,0,3,2)));
+  *min = _mm_cvtss_f32 (y);
 }
 
 /**
@@ -253,7 +225,7 @@ static inline __m128
 jbm_opposite_4xf32 (const __m128 x)     ///< __m128 vector.
 {
   JBM4xF32 y;
-  y.i = _mm_set1_epi32 ((int) JBM_BITS_SIGN_F32);
+  y.i = JBM_BITS_SIGN_4xF32;
   return _mm_xor_ps (x, y.x);
 }
 
@@ -278,8 +250,8 @@ jbm_sign_4xf32 (const __m128 x) ///< __m128 vector.
 {
   JBM4xF32 y;
   y.x = x;
-  y.i = _mm_and_si128 (y.i, _mm_set1_epi32 ((int) JBM_BITS_SIGN_F32));
-  y.i = _mm_or_si128 (y.i, _mm_set1_epi32 ((int) JBM_BITS_1_F32));
+  y.i = _mm_and_si128 (y.i, JBM_BITS_SIGN_4xF32);
+  y.i = _mm_or_si128 (y.i, JBM_BITS_1_4xF32);
   return y.x;
 }
 
@@ -292,7 +264,7 @@ static inline __m128
 jbm_abs_4xf32 (const __m128 x)  ///< __m128 vector.
 {
   JBM4xF32 y;
-  y.i = _mm_set1_epi32 ((int) JBM_BITS_SIGN_F32);
+  y.i = JBM_BITS_SIGN_4xF32;
   return _mm_andnot_ps (y.x, x);
 }
 
@@ -306,12 +278,9 @@ jbm_copysign_4xf32 (const __m128 x,
 ///< __m128 vector to preserve magnitude.
                     const __m128 y)     ///< __m128 vector to preserve sign.
 {
-  JBM4xF32 ax, sy, m;
-  ax.x = jbm_abs_4xf32 (x);
-  sy.x = y;
-  m.i = _mm_set1_epi32 ((int) JBM_BITS_SIGN_F32);
-  ax.i = _mm_or_si128 (ax.i, _mm_and_si128 (sy.i, m.i));
-  return ax.x;
+  JBM4xF32 m;
+  m.i = JBM_BITS_SIGN_4xF32;
+  return _mm_or_ps (jbm_abs_4xf32 (x), _mm_and_ps (y, m.x));
 }
 
 /**
@@ -386,6 +355,205 @@ jbm_frexp_4xf32 (const __m128 x,        ///< __m128 vector.
                       _mm_or_si128 (_mm_set1_epi32 (JBM_BIAS_F32 << 23),
                                     _mm_and_si128 (y.i, mant_mask)));
   return _mm_blendv_ps (x, y.x, _mm_castsi128_ps (is_finite));
+}
+
+/**
+ * Function to calculate the function \f$2^n\f$ with n an integer vector
+ * (__m128i).
+ *
+ * \return function value (__m128).
+ */
+static inline __m128
+jbm_exp2n_4xf32 (const __m128i e)     ///< exponent vector (__m128i).
+{
+  __m128 x;
+  x = _mm_blendv_ps
+    (_mm_castsi128_ps (_mm_sllv_epi32 (_mm_set1_epi32 ((int) 0x00400000),
+                                       _mm_sub_epi32 (_mm_set1_epi32 (-127),
+                                                      e))),
+     _mm_castsi128_ps (_mm_slli_epi32 (_mm_add_epi32 (e,
+                                                      _mm_set1_epi32 (127)),
+                                       23)),
+     _mm_castsi128_ps (_mm_cmpgt_epi32 (e, _mm_set1_epi32 (-127))));
+  x = _mm_blendv_ps (x, _mm_setzero_ps (),
+                     _mm_castsi128_ps (_mm_cmplt_epi32 (e,
+                                                        _mm_set1_epi32
+                                                        (-150))));
+  return _mm_blendv_ps (x, _mm_set1_ps (INFINITY),
+                        _mm_castsi128_ps (_mm_cmpgt_epi32
+                                          (e, _mm_set1_epi32 (127))));
+}
+
+/**
+ * Function to implement the standard ldexp function (__m128).
+ *
+ * \return function value (__m128).
+ */
+static inline __m128
+jbm_ldexp_4xf32 (const __m128 x,        ///< __m128 vector.
+                 const __m128i e)       ///< exponent vector (__m128i).
+{
+  return _mm_mul_ps (x, jbm_exp2n_4xf32 (e));
+}
+
+/**
+ * Function to check small __m128 vectors.
+ *
+ * \return 1 on small number, 0 otherwise.
+ */
+static inline __m128
+jbm_small_4xf32 (const __m128 x)        ///< __m128d vector.
+{
+  return _mm_cmplt_ps (jbm_abs_4xf32 (x), _mm_set1_ps (FLT_EPSILON));
+}
+
+/**
+ * Function to calculate the __m128 vector with the components with lower
+ * module in the [a, b] interval.
+ * \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
+ * 0, & a\cdot b\le 0;\\
+ * a, & a,b\ne 0,\;|a|<|b|;\\
+ * b, & a,b\ne 0,\;|a|\ge|b|;
+ * \end{array}\right.\f$.
+ *
+ * \return modmin __m128 vector.
+ */
+static inline __m128
+jbm_modmin_4xf32 (const __m128 a,       ///< 1st __m128d vector.
+                  const __m128 b)       ///< 2nd __m128d vector.
+{
+  const __m128 z = _mm_setzero_ps ();
+  __m128 aa, ab, y;
+  ab = _mm_mul_ps (a, b);
+  y = _mm_blendv_ps (z, a, _mm_cmpgt_ps (ab, z));
+  aa = jbm_abs_4xf32 (y);
+  ab = jbm_abs_4xf32 (b);
+  return _mm_blendv_ps (y, b, _mm_cmpgt_ps (aa, ab));
+}
+
+/**
+ * Function to interchange 2 __m128 vectors.
+ */
+static inline void
+jbm_change_4xf32 (__m128 *restrict a,   ///< 1st __m128 vector pointer.
+                  __m128 *restrict b)   ///< 2nd __m128 vector pointer.
+{
+  __m128 c;
+  JB_CHANGE (*a, *b, c);
+}
+
+/**
+ * Function to calculate the double of a __m128 vector.
+ *
+ * \return __m128 double.
+ */
+static inline __m128
+jbm_dbl_4xf32 (const __m128 x)  ///< __m128d vector.
+{
+  return _mm_add_ps (x, x);
+}
+
+/**
+ * Function to calculate the square of the components of a __m128 vector.
+ *
+ * \return __m128 vector square.
+ */
+static inline __m128
+jbm_sqr_4xf32 (const __m128 x)  ///< __m128 vector.
+{
+  return _mm_mul_ps (x, x);
+}
+
+/**
+ * Function to perform an extrapolation between 2 __m128 vectors of 2D points.
+ *
+ * \return __m128 vector of y-coordinates of the extrapolated points.
+ */
+static inline __m128
+jbm_extrapolate_4xf32 (const __m128 x,
+                       ///< __m128 vector of x-coordinates of the extrapolated
+                       ///< points.
+                       const __m128 x1,
+                       ///< __m128 vector of x-coordinates of the 1st points.
+                       const __m128 x2,
+                       ///< __m128 vector of x-coordinates of the 2nd points.
+                       const __m128 y1,
+                       ///< __m128 vector of y-coordinates of the 1st points.
+                       const __m128 y2)
+                     ///< __m128 vector of y-coordinates of the 2nd points.
+{
+  return _mm_fmadd_ps (_mm_sub_ps (x, x1),
+                       _mm_div_ps (_mm_sub_ps (y2, y1),
+                                   _mm_sub_ps (x2, x1)), y1);
+}
+
+/**
+ * Function to perform an interpolation between 2 __m128 vectors of 2D points.
+ *
+ * \return __m128 vector of y-coordinates of the interpolated points.
+ */
+static inline __m128
+jbm_interpolate_4xf32 (const __m128 x,
+                       ///< __m128 vector of x-coordinates of the interpolated
+                       ///< points.
+                       const __m128 x1,
+                       ///< __m128 vector of x-coordinates of the 1st points.
+                       const __m128 x2,
+                       ///< __m128 vector of x-coordinates of the 2nd points.
+                       const __m128 y1,
+                       ///< __m128 vector of y-coordinates of the 1st points.
+                       const __m128 y2)
+                     ///< __m128 vector of y-coordinates of the 2nd points.
+{
+  __m128 k;
+  k = jbm_extrapolate_4xf32 (x, x1, x2, y1, y2);
+  k = _mm_blendv_ps (y1, k, _mm_cmpgt_ps (x, x1));
+  return _mm_blendv_ps (y2, k, _mm_cmplt_ps (x, x2));
+}
+
+/**
+ * Function to calculate the length of a __m128 vector of 2D segments.
+ *
+ * \return __m128 vector of segment lengths.
+ */
+static inline __m128
+jbm_v2_length_4xf32 (const __m128 x1,
+///< __m128 vector of x-coordinates of the 1st points defining the segment.
+                     const __m128 y1,
+///< __m128 vector of y-coordinates of the 1st points defining the segment.
+                     const __m128 x2,
+///< __m128 vector of x-coordinates of the 2nd points defining the segment.
+                     const __m128 y2)
+///< __m128 vector of y-coordinates of the 2nd points defining the segment.
+{
+  return jbm_hypot_4xf32 (_mm_sub_ps (x2, x1), _mm_sub_ps (y2, y1));
+}
+
+/**
+ * Function to calculate the length of a __m128 vector of 3D segments.
+ *
+ * \return __m128 vector of segment lengths.
+ */
+static inline __m128
+jbm_v3_length_4xf32 (const __m128 x1,
+///< __m128 vector of x-coordinates of the 1st points defining the segments.
+                     const __m128 y1,
+///< __m128 vector of y-coordinates of the 1st points defining the segments.
+                     const __m128 z1,
+///< __m128 vector of z-coordinates of the 1st points defining the segments.
+                     const __m128 x2,
+///< __m128 vector of x-coordinates of the 2nd points defining the segments.
+                     const __m128 y2,
+///< __m128 vector of y-coordinates of the 2nd points defining the segments.
+                     const __m128 z2)
+///< __m128 vector of z-coordinates of the 2nd points defining the segments.
+{
+  __m128 dx, dy, dz;
+  dx = jbm_sqr_4xf32 (_mm_sub_ps (x2, x1));
+  dy = _mm_sub_ps (y2, y1);
+  dy = _mm_fmadd_ps (dy, dy, dx);
+  dz = _mm_sub_ps (z2, z1);
+  return _mm_sqrt_ps (_mm_fmadd_ps (dz, dz, dy));
 }
 
 /**
@@ -6839,202 +7007,35 @@ jbm_cbrtwc_4xf32 (const __m128 x)
 }
 
 /**
- * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (__m128i).
+ * Function to calculate the function cbrt(x) using the jbm_cbrtwc_4xf32
+ * function (__m128).
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_exp2n_4xf32 (__m128i e)     ///< exponent vector (__m128i).
+jbm_cbrt_4xf32 (const __m128 x) ///< __m128 vector.
 {
-  __m128 x;
-  x = _mm_blendv_ps
-    (_mm_castsi128_ps (_mm_sllv_epi32 (_mm_set1_epi32 ((int) 0x00400000u),
-                                       _mm_sub_epi32 (_mm_set1_epi32 (-127),
-                                                      e))),
-     _mm_castsi128_ps (_mm_slli_epi32 (_mm_add_epi32 (e,
-                                                      _mm_set1_epi32 (127)),
-                                       23)),
-     _mm_castsi128_ps (_mm_cmpgt_epi32 (e, _mm_set1_epi32 (-127))));
-  x = _mm_blendv_ps (x, _mm_setzero_ps (),
-                     _mm_castsi128_ps (_mm_cmplt_epi32 (e,
-                                                        _mm_set1_epi32
-                                                        (-150))));
-  return _mm_blendv_ps (x, _mm_set1_ps (INFINITY),
-                        _mm_castsi128_ps (_mm_cmpgt_epi32
-                                          (e, _mm_set1_epi32 (127))));
-}
-
-/**
- * Function to implement the standard ldexp function (__m128).
- *
- * \return function value (__m128).
- */
-static inline __m128
-jbm_ldexp_4xf32 (const __m128 x,        ///< __m128 vector.
-                 __m128i e)     ///< exponent vector (__m128i).
-{
-  return _mm_mul_ps (x, jbm_exp2n_4xf32 (e));
-}
-
-/**
- * Function to check small __m128 vectors.
- *
- * \return 1 on small number, 0 otherwise.
- */
-static inline __m128
-jbm_small_4xf32 (const __m128 x)        ///< __m128d vector.
-{
-  return _mm_cmplt_ps (jbm_abs_4xf32 (x), _mm_set1_ps (FLT_EPSILON));
-}
-
-/**
- * Function to calculate the __m128 vector with the components with lower
- * module in the [a, b] interval.
- * \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
- * 0, & a\cdot b\le 0;\\
- * a, & a,b\ne 0,\;|a|<|b|;\\
- * b, & a,b\ne 0,\;|a|\ge|b|;
- * \end{array}\right.\f$.
- *
- * \return modmin __m128 vector.
- */
-static inline __m128
-jbm_modmin_4xf32 (const __m128 a,       ///< 1st __m128d vector.
-                  const __m128 b)       ///< 2nd __m128d vector.
-{
-  const __m128 z = _mm_setzero_ps ();
-  __m128 aa, ab, y;
-  ab = _mm_mul_ps (a, b);
-  y = _mm_blendv_ps (a, z, _mm_cmple_ps (ab, z));
-  aa = jbm_abs_4xf32 (y);
-  ab = jbm_abs_4xf32 (b);
-  return _mm_blendv_ps (y, b, _mm_cmpgt_ps (aa, ab));
-}
-
-/**
- * Function to interchange 2 __m128 vectors.
- */
-static inline void
-jbm_change_4xf32 (__m128 *restrict a,   ///< 1st __m128 vector pointer.
-                  __m128 *restrict b)   ///< 2nd __m128 vector pointer.
-{
-  __m128 c;
-  JB_CHANGE (*a, *b, c);
-}
-
-/**
- * Function to calculate the double of a __m128 vector.
- *
- * \return __m128 double.
- */
-static inline __m128
-jbm_dbl_4xf32 (const __m128 x)  ///< __m128d vector.
-{
-  return _mm_add_ps (x, x);
-}
-
-/**
- * Function to calculate the square of the components of a __m128 vector.
- *
- * \return __m128 vector square.
- */
-static inline __m128
-jbm_sqr_4xf32 (const __m128 x)  ///< __m128 vector.
-{
-  return _mm_mul_ps (x, x);
-}
-
-/**
- * Function to perform an extrapolation between 2 __m128 vectors of 2D points.
- *
- * \return __m128 vector of y-coordinates of the extrapolated points.
- */
-static inline __m128
-jbm_extrapolate_4xf32 (const __m128 x,
-                       ///< __m128 vector of x-coordinates of the extrapolated
-                       ///< points.
-                       const __m128 x1,
-                       ///< __m128 vector of x-coordinates of the 1st points.
-                       const __m128 x2,
-                       ///< __m128 vector of x-coordinates of the 2nd points.
-                       const __m128 y1,
-                       ///< __m128 vector of y-coordinates of the 1st points.
-                       const __m128 y2)
-                     ///< __m128 vector of y-coordinates of the 2nd points.
-{
-  return _mm_fmadd_ps (_mm_sub_ps (x, x1),
-                       _mm_div_ps (_mm_sub_ps (y2, y1),
-                                   _mm_sub_ps (x2, x1)), y1);
-}
-
-/**
- * Function to perform an interpolation between 2 __m128 vectors of 2D points.
- *
- * \return __m128 vector of y-coordinates of the interpolated points.
- */
-static inline __m128
-jbm_interpolate_4xf32 (const __m128 x,
-                       ///< __m128 vector of x-coordinates of the interpolated
-                       ///< points.
-                       const __m128 x1,
-                       ///< __m128 vector of x-coordinates of the 1st points.
-                       const __m128 x2,
-                       ///< __m128 vector of x-coordinates of the 2nd points.
-                       const __m128 y1,
-                       ///< __m128 vector of y-coordinates of the 1st points.
-                       const __m128 y2)
-                     ///< __m128 vector of y-coordinates of the 2nd points.
-{
-  __m128 k;
-  k = jbm_extrapolate_4xf32 (x, x1, x2, y1, y2);
-  k = _mm_blendv_ps (y1, k, _mm_cmpgt_ps (x, x1));
-  return _mm_blendv_ps (y2, k, _mm_cmplt_ps (x, x2));
-}
-
-/**
- * Function to calculate the length of a __m128 vector of 2D segments.
- *
- * \return __m128 vector of segment lengths.
- */
-static inline __m128
-jbm_v2_length_4xf32 (const __m128 x1,
-///< __m128 vector of x-coordinates of the 1st points defining the segment.
-                     const __m128 y1,
-///< __m128 vector of y-coordinates of the 1st points defining the segment.
-                     const __m128 x2,
-///< __m128 vector of x-coordinates of the 2nd points defining the segment.
-                     const __m128 y2)
-///< __m128 vector of y-coordinates of the 2nd points defining the segment.
-{
-  return jbm_hypot_4xf32 (_mm_sub_ps (x2, x1), _mm_sub_ps (y2, y1));
-}
-
-/**
- * Function to calculate the length of a __m128 vector of 3D segments.
- *
- * \return __m128 vector of segment lengths.
- */
-static inline __m128
-jbm_v3_length_4xf32 (const __m128 x1,
-///< __m128 vector of x-coordinates of the 1st points defining the segments.
-                     const __m128 y1,
-///< __m128 vector of y-coordinates of the 1st points defining the segments.
-                     const __m128 z1,
-///< __m128 vector of z-coordinates of the 1st points defining the segments.
-                     const __m128 x2,
-///< __m128 vector of x-coordinates of the 2nd points defining the segments.
-                     const __m128 y2,
-///< __m128 vector of y-coordinates of the 2nd points defining the segments.
-                     const __m128 z2)
-///< __m128 vector of z-coordinates of the 2nd points defining the segments.
-{
-  __m128 dx, dy, dz;
-  dx = jbm_sqr_4xf32 (_mm_sub_ps (x2, x1));
-  dy = _mm_sub_ps (y2, y1);
-  dy = _mm_fmadd_ps (dy, dy, dx);
-  dz = _mm_sub_ps (z2, z1);
-  return _mm_sqrt_ps (_mm_fmadd_ps (dz, dz, dy));
+  const __m128 cbrt2 = JBM_CBRT2_4xF32;
+  const __m128 cbrt4 = JBM_CBRT4_4xF32;
+  const __m128i v3 = _mm_set1_epi32 (3);
+  const __m128i v2 = _mm_set1_epi32 (2);
+  const __m128i v1 = _mm_set1_epi32 (1);
+  __m128 y;
+  __m128i e, e3, r, n, e16;
+  y = jbm_frexp_4xf32 (jbm_abs_4xf32 (x), &e);
+  e16 = _mm_cvtepi32_epi16 (e);
+  e16 = _mm_mulhi_epi16 (e16, _mm_set1_epi16 (0x5556));
+  e3 = _mm_cvtepi16_epi32 (e16);
+  r = _mm_sub_epi32 (e, _mm_mullo_epi32 (e3, v3));
+  n = _mm_srai_epi32 (r, 31);
+  r = _mm_add_epi32 (r, _mm_and_si128 (n, v3));
+  e3 = _mm_sub_epi32 (e3, _mm_and_si128 (n, v1));
+  y = jbm_ldexp_4xf32 (jbm_cbrtwc_4xf32 (y), e3);
+  y = _mm_blendv_ps (y, _mm_mul_ps (y, cbrt2),
+                     _mm_castsi128_ps (_mm_cmpeq_epi32 (r, v1)));
+  y = _mm_blendv_ps (y, _mm_mul_ps (y, cbrt4),
+                     _mm_castsi128_ps (_mm_cmpeq_epi32 (r, v2)));
+  return jbm_copysign_4xf32 (y, x);
 }
 
 /**
@@ -7222,18 +7223,6 @@ jbm_pow_4xf32 (const __m128 x,  ///< __m128 vector.
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_abs_4xf32 and
- * jbm_pow_4xf32 functions (__m128).
- *
- * \return function value (__m128).
- */
-static inline __m128
-jbm_cbrt_4xf32 (const __m128 x) ///< __m128 vector.
-{
-  return jbm_copysign_4xf32 (jbm_pow_4xf32 (jbm_abs_4xf32 (x), 1.f / 3.f), x);
-}
-
-/**
  * Function to calculate the well conditionated function sin(x) for x in
  * [-pi/4,pi/4] (__m128)
  *
@@ -7270,9 +7259,8 @@ jbm_sincoswc_4xf32 (const __m128 x,
                     __m128 *s,  ///< pointer to the sin function value (__m128).
                     __m128 *c)  ///< pointer to the cos function value (__m128).
 {
-  __m128 s0;
-  *s = s0 = jbm_sinwc_4xf32 (x);
-  *c = _mm_sqrt_ps (_mm_fnmadd_ps (s0, s0, _mm_set1_ps (1.f)));
+  *s = jbm_sinwc_4xf32 (x);
+  *c = jbm_coswc_4xf32 (x);
 }
 
 /**
@@ -7423,12 +7411,10 @@ static inline __m128
 jbm_atan2_4xf32 (const __m128 y,        ///< __m128 y component.
                  const __m128 x)        ///< __m128 x component.
 {
-  const __m128 pi = _mm_set1_ps (M_PIf);
-  const __m128 z = _mm_setzero_ps ();
   __m128 f, g;
   f = jbm_atan_4xf32 (_mm_div_ps (y, x));
-  g = _mm_add_ps (f, jbm_copysign_4xf32 (pi, y));
-  return _mm_blendv_ps (f, g, _mm_cmplt_ps (x, z));
+  g = _mm_add_ps (f, jbm_copysign_4xf32 (_mm_set1_ps (M_PIf), y));
+  return _mm_blendv_ps (f, g, _mm_cmplt_ps (x, _mm_setzero_ps ()));
 }
 
 /**
@@ -7627,21 +7613,21 @@ jbm_erfc_4xf32 (const __m128 x) ///< __m128 vector.
  * \return __m128 vector of solution values.
  */
 static inline __m128
-jbm_solve_quadratic_reduced_4xf32 (__m128 a,
+jbm_solve_quadratic_reduced_4xf32 (const __m128 a,
 ///< __m128 vector of 1st order coefficient of the equations.
-                                   __m128 b,
+                                   const __m128 b,
 ///< __m128 vector of 0th order coefficient of the equations.
                                    const __m128 x1,
 ///< __m128 vector of left limits of the solution intervals.
                                    const __m128 x2)
 ///< __m128 vector of right limits of the solution intervals.
 {
-  __m128 k1, k2;
+  __m128 ka, kb, k1, k2;
   k1 = _mm_set1_ps (-0.5f);
-  a = _mm_mul_ps (a, k1);
-  b = _mm_sqrt_ps (_mm_sub_ps (jbm_sqr_4xf32 (a), b));
-  k1 = _mm_add_ps (a, b);
-  k2 = _mm_sub_ps (a, b);
+  ka = _mm_mul_ps (a, k1);
+  kb = _mm_sqrt_ps (_mm_sub_ps (jbm_sqr_4xf32 (ka), b));
+  k1 = _mm_add_ps (ka, kb);
+  k2 = _mm_sub_ps (ka, kb);
   k1 = _mm_blendv_ps (k1, k2, _mm_cmplt_ps (k1, x1));
   return _mm_blendv_ps (k1, k2, _mm_cmpgt_ps (k1, x2));
 }
@@ -7726,17 +7712,17 @@ jbm_solve_cubic_reduced_4xf32 (const __m128 a,
  * \return __m128 vector of solution values.
  */
 static inline __m128
-jbm_solve_cubic_4xf32 (__m128 a,
+jbm_solve_cubic_4xf32 (const __m128 a,
 ///< __m128 vector of 3rd order coefficient of the equations.
-                       __m128 b,
+                       const __m128 b,
 ///< __m128 vector of 2nd order coefficient of the equations.
-                       __m128 c,
+                       const __m128 c,
 ///< __m128 vector of 1st order coefficient of the equations.
-                       __m128 d,
+                       const __m128 d,
 ///< __m128 vector of 0th order coefficient of the equations.
-                       __m128 x1,
+                       const __m128 x1,
 ///< __m128 vector of left limits of the solution intervals.
-                       __m128 x2)
+                       const __m128 x2)
 ///< __m128 vector of right limits of the solution intervals.
 {
   return
@@ -8020,34 +8006,6 @@ jbm_integral_4xf32 (__m128 (*f) (__m128),
                     const __m128 x1,    ///< left limit of the interval.
                     const __m128 x2)    ///< right limit of the interval.
 {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] JB_ALIGNED = { 2.f };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] JB_ALIGNED = { 8.f / 9.f, 5.f / 9.f },
-    b[2] JB_ALIGNED = { 0.f, 7.745966692414834e-1f };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] JB_ALIGNED = {
-    128.f / 225.f,
-    4.786286704993665e-1f,
-    2.369268850561891e-1f
-  }, b[3] JB_ALIGNED = {
-    0.f,
-    5.384693101056831e-1f,
-    9.061798459386640e-1f
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] JB_ALIGNED = {
-    4.179591836734694e-1f,
-    3.818300505051189e-1f,
-    2.797053914892767e-1f,
-    1.294849661688697e-1f
-  }, b[4] JB_ALIGNED = {
-    0.f,
-    4.058451513773972e-1f,
-    7.415311855993944e-1f,
-    9.491079123427585e-1f
-  };
-#endif
   __m128 k, x, dx, h;
 #if JBM_INTEGRAL_GAUSS_N > 1
   __m128 k2, f1, f2;
@@ -8056,21 +8014,69 @@ jbm_integral_4xf32 (__m128 (*f) (__m128),
   h = _mm_set1_ps (0.5f);
   dx = _mm_mul_ps (h, _mm_sub_ps (x2, x1));
   x = _mm_mul_ps (h, _mm_add_ps (x2, x1));
-  k = _mm_set1_ps (a[0]);
+  k = _mm_set1_ps (JBM_INTEGRAL_GAUSS_A_F32[0]);
   k = _mm_mul_ps (k, f (x));
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = _mm_set1_ps (b[i]);
+      k2 = _mm_set1_ps (JBM_INTEGRAL_GAUSS_B_F32[i]);
       k2 = _mm_mul_ps (k2, dx);
       f1 = f (_mm_sub_ps (x, k2));
       f2 = f (_mm_add_ps (x, k2));
-      h = _mm_set1_ps (a[i]);
+      h = _mm_set1_ps (JBM_INTEGRAL_GAUSS_A_F32[i]);
       k = _mm_fmadd_ps (h, _mm_add_ps (f1, f2), k);
     }
 #endif
-  k = _mm_mul_ps (k, dx);
-  return k;
+  return _mm_mul_ps (k, dx);
+}
+
+/**
+ * Function to calculate the additive reduction value of a __m128d vector.
+ *
+ * \return additive reduction (double).
+ */
+static inline double
+jbm_reduce_add_2xf64 (const __m128d x)  ///< __m128d vector.
+{
+  return _mm_cvtsd_f64 (_mm_hadd_pd (x, x));
+}
+
+/**
+ * Function to calculate the maximum reduction value of a __m128d vector.
+ *
+ * \return maximum reduction (double).
+ */
+static inline double
+jbm_reduce_max_2xf64 (const __m128d x)  ///< __m128d vector.
+{
+  return _mm_cvtsd_f64 (_mm_max_pd (x, _mm_unpackhi_pd (x, x)));
+}
+
+/**
+ * Function to calculate the minimum reduction value of a __m128d vector.
+ *
+ * \return minimum reduction (double).
+ */
+static inline double
+jbm_reduce_min_2xf64 (const __m128d x)  ///< __m128d vector.
+{
+  return _mm_cvtsd_f64 (_mm_min_pd (x, _mm_unpackhi_pd (x, x)));
+}
+
+/**
+ * Function to calculate the maximum and minimum reduction value of a
+ * __m128d vector.
+ */
+static inline void
+jbm_reduce_maxmin_2xf64 (const __m128d x,       ///< __m128d vector.
+                         double *max,
+                         ///< pointer to the maximum value (double).
+                         double *min)
+                         ///< pointer to the maximum value (double).
+{
+  __m128d y = _mm_unpackhi_pd (x, x);
+  *max = _mm_cvtsd_f64 (_mm_max_pd (x, y));
+  *min = _mm_cvtsd_f64 (_mm_min_pd (x, y));
 }
 
 /**
@@ -8082,7 +8088,7 @@ static inline __m128d
 jbm_opposite_2xf64 (const __m128d x)    ///< __m128d vector.
 {
   JBM2xF64 y;
-  y.i = _mm_set1_epi64 ((__m64) JBM_BITS_SIGN_F64);
+  y.i = JBM_BITS_SIGN_2xF64;
   return _mm_xor_pd (x, y.x);
 }
 
@@ -8107,8 +8113,8 @@ jbm_sign_2xf64 (const __m128d x)        ///< __m128d vector.
 {
   JBM2xF64 y;
   y.x = x;
-  y.i = _mm_and_si128 (y.i, _mm_set1_epi64 ((__m64) JBM_BITS_SIGN_F64));
-  y.i = _mm_and_si128 (y.i, _mm_set1_epi64 ((__m64) JBM_BITS_1_F64));
+  y.i = _mm_and_si128 (y.i, JBM_BITS_SIGN_2xF64);
+  y.i = _mm_and_si128 (y.i, JBM_BITS_1_2xF64);
   return y.x;
 }
 
@@ -8121,7 +8127,7 @@ static inline __m128d
 jbm_abs_2xf64 (const __m128d x)
 {
   JBM2xF64 y;
-  y.i = _mm_set1_epi64 ((__m64) JBM_BITS_SIGN_F64);
+  y.i = JBM_BITS_SIGN_2xF64;
   return _mm_andnot_pd (y.x, x);
 }
 
@@ -8135,12 +8141,9 @@ jbm_copysign_2xf64 (const __m128d x,
 ///< __m128 vector to preserve magnitude.
                     const __m128d y)    ///< __m128d vector to preserve sign.
 {
-  JBM2xF64 ax, sy, m;
-  ax.x = jbm_abs_2xf64 (x);
-  sy.x = y;
-  m.i = _mm_set1_epi64 ((__m64) JBM_BITS_SIGN_F64);
-  ax.x = _mm_or_pd (ax.x, _mm_and_pd (sy.x, m.x));
-  return ax.x;
+  JBM2xF64 m;
+  m.i = JBM_BITS_SIGN_2xF64;
+  return _mm_or_pd (jbm_abs_2xf64 (x), _mm_and_pd (y, m.x));
 }
 
 /**
@@ -8208,9 +8211,7 @@ jbm_frexp_2xf64 (const __m128d x,       ///< __m128d vector.
                                            _mm_set1_epi64x (52ll)),
                        is_sub);
   // exponent
-  exp = _mm_blendv_epi8 (zi, _mm_sub_epi64 (exp, bias), is_finite);
-  *e = _mm_set_epi32 (0, 0, (int) _mm_cvtsi128_si64 (_mm_srli_si128 (exp, 8)),
-                      (int) _mm_cvtsi128_si64 (exp));
+  *e = _mm_blendv_epi8 (zi, _mm_sub_epi64 (exp, bias), is_finite);
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm_or_si128 (_mm_and_si128 (z.i, sign_mask),
@@ -8226,25 +8227,26 @@ jbm_frexp_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_exp2n_2xf64 (__m128i e)     ///< exponent vector (__m128i).
+jbm_exp2n_2xf64 (const __m128i e)     ///< exponent vector (__m128i).
 {
+  const __m128i v1023 = _mm_set1_epi64x (1023ll);
   __m128d x;
+  // normal and subnormal
   x = _mm_blendv_pd
-    (_mm_castsi128_pd
-     (_mm_sllv_epi64
-      (_mm_set1_epi64 ((__m64) 0x0008000000000000ull),
-       _mm_sub_epi64 (_mm_set1_epi64 ((__m64) - 1023ll), e))),
-     _mm_castsi128_pd
-     (_mm_slli_epi64 (_mm_add_epi64 (e, _mm_set1_epi64 ((__m64) 1023ll)), 52)),
-     _mm_castsi128_pd (_mm_cmpgt_epi64 (e, _mm_set1_epi64 ((__m64) - 1023ll))));
-  x =
-    _mm_blendv_pd
-    (x, _mm_setzero_pd (),
-     _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64 ((__m64) - 1074ll), e)));
+      (_mm_castsi128_pd
+       (_mm_slli_epi64 (_mm_add_epi64 (e, v1023), 52)),
+       _mm_castsi128_pd
+       (_mm_sllv_epi64 (_mm_set1_epi64x (1),
+                        _mm_add_epi64 (e, _mm_set1_epi64x (1074ll)))),
+       _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64x (-1022ll), e)));
+  // zero
+  x = _mm_blendv_pd
+      (x, _mm_setzero_pd (),
+       _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64x (-1074ll), e)));
+  // infinity
   return
-    _mm_blendv_pd
-    (x, _mm_set1_pd (INFINITY),
-     _mm_castsi128_pd (_mm_cmpgt_epi64 (e, _mm_set1_epi64 ((__m64) 1023ll))));
+    _mm_blendv_pd (x, _mm_set1_pd (INFINITY),
+                   _mm_castsi128_pd (_mm_cmpgt_epi64 (e, v1023)));
 }
 
 /**
@@ -8254,7 +8256,7 @@ jbm_exp2n_2xf64 (__m128i e)     ///< exponent vector (__m128i).
  */
 static inline __m128d
 jbm_ldexp_2xf64 (const __m128d x,       ///< __m128d vector.
-                 __m128i e)     ///< exponent vector (__m128i).
+                 const __m128i e)     ///< exponent vector (__m128i).
 {
   return _mm_mul_pd (x, jbm_exp2n_2xf64 (e));
 }
@@ -14871,6 +14873,37 @@ jbm_cbrtwc_2xf64 (const __m128d x)
 }
 
 /**
+ * Function to calculate the function cbrt(x) using the jbm_abs_2xf64 and
+ * jbm_pow_2xf64 functions (__m128d).
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_cbrt_2xf64 (const __m128d x)        ///< __m128d vector.
+{
+  const __m128d cbrt2 = JBM_CBRT2_2xF64;
+  const __m128d cbrt4 = JBM_CBRT4_2xF64;
+  const __m128i v3 = _mm_set1_epi32 (3);
+  const __m128i v2 = _mm_set1_epi64x (2);
+  const __m128i v1 = _mm_set1_epi64x (1);
+  __m128d y;
+  __m128i e, e3, r, n;
+  y = jbm_frexp_2xf64 (jbm_abs_2xf64 (x), &e);
+  e3 = _mm_mul_epu32 (e, _mm_set1_epi32 (0x55555556));
+  e3 = _mm_srli_epi64 (e3, 32);
+  r = _mm_sub_epi32 (e, _mm_mullo_epi32 (e3, v3));
+  n = _mm_srai_epi32 (r, 31);
+  r = _mm_add_epi32 (r, _mm_and_si128 (n, v3));
+  e3 = _mm_sub_epi32 (e3, _mm_and_si128 (n, _mm_set1_epi32 (1)));
+  y = jbm_ldexp_2xf64 (jbm_cbrtwc_2xf64 (y), e3);
+  y = _mm_blendv_pd (y, _mm_mul_pd (y, cbrt2),
+                     _mm_castsi128_pd (_mm_cmpeq_epi64 (r, v1)));
+  y = _mm_blendv_pd (y, _mm_mul_pd (y, cbrt4),
+                     _mm_castsi128_pd (_mm_cmpeq_epi64 (r, v2)));
+  return jbm_copysign_2xf64 (y, x);
+}
+
+/**
  * Function to calculate the well conditionated function expm1(x) for x in
  * [-log(2)/2,log(2)/2] (__m128d).
  *
@@ -14905,24 +14938,16 @@ jbm_exp2wc_2xf64 (const __m128d x)
 static inline __m128d
 jbm_exp2_2xf64 (const __m128d x)        ///< __m128d vector.
 {
-  __m128d y, f, z;
-#ifndef __AVX512F__
-  __m128d k;
-#endif
+  __m128d y, f;
   __m128i i;
   y = _mm_floor_pd (x);
   f = _mm_sub_pd (x, y);
 #ifdef __AVX512F__
-  i = _mm_cvtpd_epi64 (y);
-  z = jbm_exp2n_2xf64 (i);
+  i = _mm_cvttpd_epi64 (y);
 #else
-  z = _mm_set1_pd (0x0018000000000000ull);
-  k = _mm_add_pd (y, z);
-  i = _mm_sub_epi64 (_mm_castpd_si128 (k), _mm_castpd_si128 (z));
-  z = _mm_blendv_pd (jbm_exp2n_2xf64 (i), _mm_setzero_pd (),
-                     _mm_cmplt_pd (y, _mm_set1_pd (-1074.)));
+  i = _mm_cvtepi32_epi64 (_mm_cvttpd_epi32 (y));
 #endif
-  return _mm_mul_pd (z, jbm_exp2wc_2xf64 (f));
+  return _mm_mul_pd (jbm_exp2n_2xf64 (i), jbm_exp2wc_2xf64 (f));
 }
 
 /**
@@ -14990,10 +15015,10 @@ jbm_log2_2xf64 (const __m128d x)        ///< __m128d vector.
   y = jbm_frexp_2xf64 (x, &e);
   m = _mm_cmplt_pd (y, _mm_set1_pd (M_SQRT1_2));
   y = _mm_add_pd (y, _mm_and_pd (m, y));
-  e = _mm_sub_epi32 (e, _mm_and_si128 (_mm_castpd_si128 (m),
-                                       _mm_set1_epi32 (1)));
+  e = _mm_sub_epi64 (e, _mm_and_si128 (_mm_castpd_si128 (m),
+                                       _mm_set1_epi64x (1ll)));
   y = _mm_add_pd (jbm_log2wc_2xf64 (_mm_sub_pd (y, _mm_set1_pd (1.))),
-                  _mm_cvtepi32_pd (e));
+                  _mm_cvtepi64_pd (e));
   y = _mm_blendv_pd (y, _mm_set1_pd (-INFINITY), _mm_cmpeq_pd (x, z));
   y = _mm_blendv_pd (y, _mm_set1_pd (NAN), _mm_cmplt_pd (x, z));
   y = _mm_blendv_pd (y, x, _mm_cmpeq_pd (x, _mm_set1_pd (INFINITY)));
@@ -15058,18 +15083,6 @@ jbm_pow_2xf64 (const __m128d x, ///< __m128d vector.
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_abs_2xf64 and
- * jbm_pow_2xf64 functions (__m128d).
- *
- * \return function value (__m128d).
- */
-static inline __m128d
-jbm_cbrt_2xf64 (const __m128d x)        ///< __m128d vector.
-{
-  return jbm_copysign_2xf64 (jbm_pow_2xf64 (jbm_abs_2xf64 (x), 1. / 3.), x);
-}
-
-/**
  * Function to calculate the well conditionated function sin(x) for x in
  * [-pi/4,pi/4] (__m128d)
  *
@@ -15108,9 +15121,8 @@ jbm_sincoswc_2xf64 (const __m128d x,
                     __m128d *c)
                     ///< pointer to the f32 function value (__m128d).
 {
-  __m128d s0;
-  *s = s0 = jbm_sinwc_2xf64 (x);
-  *c = _mm_sqrt_pd (_mm_fnmadd_pd (x, x, _mm_set1_pd (1.)));
+  *s = jbm_sinwc_2xf64 (x);
+  *c = jbm_coswc_2xf64 (x);
 }
 
 /**
@@ -15460,21 +15472,21 @@ jbm_erfc_2xf64 (const __m128d x)        ///< __m128d vector.
  * \return __m128d vector of solution values.
  */
 static inline __m128d
-jbm_solve_quadratic_reduced_2xf64 (__m128d a,
+jbm_solve_quadratic_reduced_2xf64 (const __m128d a,
 ///< __m128d vector of 1st order coefficient of the equations.
-                                   __m128d b,
+                                   const __m128d b,
 ///< __m128d vector of 0th order coefficient of the equations.
                                    const __m128d x1,
 ///< __m128d vector of left limits of the solution intervals.
                                    const __m128d x2)
 ///< __m128d vector of right limits of the solution intervals.
 {
-  __m128d k1, k2;
+  __m128d ka, kb, k1, k2;
   k1 = _mm_set1_pd (-0.5);
-  a = _mm_mul_pd (a, k1);
-  b = _mm_sqrt_pd (_mm_sub_pd (jbm_sqr_2xf64 (a), b));
-  k1 = _mm_add_pd (a, b);
-  k2 = _mm_sub_pd (a, b);
+  ka = _mm_mul_pd (a, k1);
+  kb = _mm_sqrt_pd (_mm_sub_pd (jbm_sqr_2xf64 (ka), b));
+  k1 = _mm_add_pd (ka, kb);
+  k2 = _mm_sub_pd (ka, kb);
   k1 = _mm_blendv_pd (k1, k2, _mm_cmplt_pd (k1, x1));
   return _mm_blendv_pd (k1, k2, _mm_cmpgt_pd (k1, x2));
 }
@@ -15559,17 +15571,17 @@ jbm_solve_cubic_reduced_2xf64 (const __m128d a,
  * \return __m128d vector of solution values.
  */
 static inline __m128d
-jbm_solve_cubic_2xf64 (__m128d a,
+jbm_solve_cubic_2xf64 (const __m128d a,
 ///< __m128d vector of 3rd order coefficient of the equations.
-                       __m128d b,
+                       const __m128d b,
 ///< __m128d vector of 2nd order coefficient of the equations.
-                       __m128d c,
+                       const __m128d c,
 ///< __m128d vector of 1st order coefficient of the equations.
-                       __m128d d,
+                       const __m128d d,
 ///< __m128d vector of 0th order coefficient of the equations.
-                       __m128d x1,
+                       const __m128d x1,
 ///< __m128d vector of left limits of the solution intervals.
-                       __m128d x2)
+                       const __m128d x2)
 ///< __m128d vector of right limits of the solution intervals.
 {
   return
@@ -15852,34 +15864,6 @@ jbm_integral_2xf64 (__m128d (*f) (__m128d),
                     const __m128d x1,   ///< left limit of the interval.
                     const __m128d x2)   ///< right limit of the interval.
 {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] JB_ALIGNED = { 2. };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] JB_ALIGNED = { 8. / 9., 5. / 9. },
-    b[2] JB_ALIGNED = { 0., 7.745966692414834e-1 };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] JB_ALIGNED = {
-    128. / 225.,
-    4.786286704993665e-1,
-    2.369268850561891e-1
-  }, b[3] JB_ALIGNED = {
-    0.,
-    5.384693101056831e-1,
-    9.061798459386640e-1
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] JB_ALIGNED = {
-    4.179591836734694e-1,
-    3.818300505051189e-1,
-    2.797053914892767e-1,
-    1.294849661688697e-1
-  }, b[4] JB_ALIGNED = {
-    0.,
-    4.058451513773972e-1,
-    7.415311855993944e-1,
-    9.491079123427585e-1
-  };
-#endif
   __m128d k, x, dx, h;
 #if JBM_INTEGRAL_GAUSS_N > 1
   __m128d k2, f1, f2;
@@ -15888,21 +15872,20 @@ jbm_integral_2xf64 (__m128d (*f) (__m128d),
   h = _mm_set1_pd (0.5);
   dx = _mm_mul_pd (h, _mm_sub_pd (x2, x1));
   x = _mm_mul_pd (h, _mm_add_pd (x2, x1));
-  k = _mm_set1_pd (a[0]);
+  k = _mm_set1_pd (JBM_INTEGRAL_GAUSS_A_F64[0]);
   k = _mm_mul_pd (k, f (x));
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = _mm_set1_pd (b[i]);
+      k2 = _mm_set1_pd (JBM_INTEGRAL_GAUSS_B_F64[i]);
       k2 = _mm_mul_pd (k2, dx);
       f1 = f (_mm_sub_pd (x, k2));
       f2 = f (_mm_add_pd (x, k2));
-      h = _mm_set1_pd (a[i]);
+      h = _mm_set1_pd (JBM_INTEGRAL_GAUSS_A_F64[i]);
       k = _mm_fmadd_pd (h, _mm_add_pd (f1, f2), k);
     }
 #endif
-  k = _mm_mul_pd (k, dx);
-  return k;
+  return _mm_mul_pd (k, dx);
 }
 
 #ifndef __AVX__

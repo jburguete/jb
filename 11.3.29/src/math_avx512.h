@@ -78,19 +78,94 @@ typedef union
 #define JBM_BIAS_8xF64 _mm512_set1_epi64 (JBM_BIAS_F64)
 ///< bias for doubles.
 #define JBM_BITS_1_8xF64 _mm512_set1_epi64 (JBM_BITS_1_F64)
-///< 1 bits for floats.
+///< 1 bits for doubles.
 #define JBM_BITS_ABS_8xF64 _mm512_set1_epi64 (JBM_BITS_ABS_F64)
-///< absolute value bits for floats.
+///< absolute value bits for doubles.
 #define JBM_BITS_EXPONENT_8xF64 _mm512_set1_epi64 (JBM_BITS_EXPONENT_F64)
-///< exponent bits for floats.
+///< exponent bits for doubles.
 #define JBM_BITS_MANTISSA_8xF64 _mm512_set1_epi64 (JBM_BITS_MANTISSA_F64)
-///< mantissa bits for floats.
+///< mantissa bits for doubles.
 #define JBM_BITS_SIGN_8xF64 _mm512_set1_epi64 (JBM_BITS_SIGN_F64)
-///< sign bits for floats.
+///< sign bits for doubles.
 #define JBM_CBRT2_8xF64 _mm512_set1_pd (JBM_CBRT2_F64)
 ///< cbrt(2) for doubles.
 #define JBM_CBRT4_8xF64 _mm512_set1_pd (JBM_CBRT4_F64)
 ///< cbrt(4) for doubles.
+
+///> macro to automatize operations on arrays.
+#define JBM_ARRAY_REDUCE_OP(type512, type256, type128, type, load512, load256, \
+                            load128, op512, op256, \
+		            op128, op, reduce512, reduce256, reduce128, size, \
+			    initial_value, prefetch) \
+  type512 a512, b512, c512, d512; \
+  type256 a256; \
+  type128 a128; \
+  type a = initial_value; \
+  unsigned int i, j; \
+  i = 0; \
+  j = n >> (7 - size); \
+  if (j) \
+    { \
+      if (n > prefetch) \
+        _mm_prefetch ((const char *) (x + prefetch), _MM_HINT_T0); \
+      a512 = load512 (x + i); \
+      b512 = load512 (x + i + (16 >> size)); \
+      c512 = load512 (x + i + (32 >> size)); \
+      d512 = load512 (x + i + (48 >> size)); \
+      while (--j) \
+        { \
+	  i += (64 >> size); \
+          if (n > i + prefetch) \
+            _mm_prefetch ((const char *) (x + i + prefetch), _MM_HINT_T0); \
+          a512 = op512 (a512, load512 (x + i)); \
+          b512 = op512 (b512, load512 (x + i + (16 >> size))); \
+          c512 = op512 (c512, load512 (x + i + (32 >> size))); \
+          d512 = op512 (d512, load512 (x + i + (48 >> size))); \
+	} \
+      a512 = op512 (a512, b512); \
+      c512 = op512 (c512, d512); \
+      a = reduce512 (op512 (a512, c512)); \
+      i += (64 >> size); \
+    } \
+  j = (n - i) >> (5 - size); \
+  if (j) \
+    { \
+      a512 = load512 (x + i); \
+      while (--j) \
+        { \
+	  i += (16 >> size); \
+          a512 = op512 (a512, load512 (x + i)); \
+	} \
+      a = op (a, reduce512 (a512)); \
+      i += (16 >> size); \
+    } \
+  j = (n - i) >> (4 - size); \
+  if (j) \
+    { \
+      a256 = load256 (x + i); \
+      while (--j) \
+        { \
+	  i += (8 >> size); \
+          a256 = op256 (a256, load256 (x + i)); \
+	} \
+      a = op (a, reduce256 (a256)); \
+      i += (8 >> size); \
+    } \
+  j = (n - i) >> (3 - size); \
+  if (j) \
+    { \
+      a128 = load128 (x + i); \
+      while (--j) \
+        { \
+	  i += (4 >> size); \
+          a128 = op128 (a128, load128 (x + i)); \
+	} \
+      a = op (a, reduce128 (a128)); \
+      i += (4 >> size); \
+    } \
+  while (i < n) \
+    a = op (a, x[i++]); \
+  return a;
 
 // Debug functions
 
@@ -155,6 +230,64 @@ print_m512d (FILE *file, const char *label, __m512d x)
 }
 
 /**
+ * Function to calculate the additive reduction value of a __m512 vector.
+ *
+ * \return additive reduction (float).
+ */
+static inline float
+jbm_reduce_add_16xf32 (const __m512 x)  ///< __m512 vector.
+{
+  __m256 h, l;
+  h = _mm512_extractf32x8_ps (x, 1);
+  l = _mm512_castps512_ps256 (x);
+  return jbm_reduce_add_8xf32 (_mm256_add_ps (h, l));
+}
+
+/**
+ * Function to calculate the maximum reduction value of a __m512 vector.
+ *
+ * \return maximum reduction (float).
+ */
+static inline float
+jbm_reduce_max_16xf32 (const __m512 x)  ///< __m512 vector.
+{
+  __m256 h, l;
+  h = _mm512_extractf32x8_ps (x, 1);
+  l = _mm512_castps512_ps256 (x);
+  return jbm_reduce_max_8xf32 (_mm256_max_ps (h, l));
+}
+
+/**
+ * Function to calculate the minimum reduction value of a __m512 vector.
+ *
+ * \return minimum reduction (float).
+ */
+static inline float
+jbm_reduce_min_16xf32 (const __m512 x)  ///< __m512 vector.
+{
+  __m256 h, l;
+  h = _mm512_extractf32x8_ps (x, 1);
+  l = _mm512_castps512_ps256 (x);
+  return jbm_reduce_min_8xf32 (_mm256_min_ps (h, l));
+}
+
+/**
+ * Function to calculate the maximum and minimum reduction value of a __m512
+ * vector.
+ */
+static inline void
+jbm_reduce_maxmin_16xf32 (const __m512 x,      ///< __m512 vector.
+                          float *max,  ///< pointer to the maximum value
+                          float *min)  ///< pointer to the minimum value
+{
+  __m256 h, l;
+  h = _mm512_extractf32x8_ps (x, 1);
+  l = _mm512_castps512_ps256 (x);
+  *max = jbm_reduce_max_8xf32 (_mm256_max_ps (h, l));
+  *min = jbm_reduce_min_8xf32 (_mm256_min_ps (h, l));
+}
+
+/**
  * Function to calculate the additive inverse value of a __m512 vector.
  *
  * \return opposite value vector (__m512).
@@ -216,13 +349,9 @@ jbm_copysign_16xf32 (const __m512 x,
 ///< __m512 vector to preserve magnitude.
                      const __m512 y)    ///< __m512 vector to preserve sign.
 {
-  JBM16xF32 ax, sy;
-  ax.x = jbm_abs_16xf32 (x);
-  sy.x = y;
-  ax.i =
-    _mm512_or_epi32
-    (ax.i, _mm512_and_epi32 (sy.i, JBM_BITS_SIGN_16xF32));
-  return ax.x;
+  JBM16xF32 m;
+  m.i = JBM_BITS_SIGN_16xF32;
+  return _mm512_or_ps (jbm_abs_16xf32 (x), _mm512_and_ps (y, m.x));
 }
 
 /**
@@ -325,7 +454,6 @@ jbm_exp2n_16xf32 (__m512i e)    ///< exponent vector (__m512i).
                         _mm512_set1_ps (INFINITY));
 }
 
-
 /**
  * Function to implement the standard ldexp function (__m512).
  *
@@ -365,8 +493,8 @@ static inline __m512
 jbm_modmin_16xf32 (const __m512 a,      ///< 1st __m512d vector.
                    const __m512 b)      ///< 2nd __m512d vector.
 {
-  __m512 aa, ab, y, z;
-  z = _mm512_setzero_ps ();
+  const __m512 z = _mm512_setzero_ps ();
+  __m512 aa, ab, y;
   ab = _mm512_mul_ps (a, b);
   y = _mm512_mask_mov_ps (z, _mm512_cmp_ps_mask (ab, z, _CMP_GT_OS), a);
   aa = jbm_abs_16xf32 (y);
@@ -425,10 +553,9 @@ jbm_extrapolate_16xf32 (const __m512 x,
                         const __m512 y2)
                      ///< __m512 vector of y-coordinates of the 2nd points.
 {
-  __m512 d;
-  d = _mm512_sub_ps (x, x1);
-  return _mm512_fmadd_ps (d, _mm512_div_ps (_mm512_sub_ps (y2, y1),
-                                            _mm512_sub_ps (x2, x1)), y1);
+  return _mm512_fmadd_ps (_mm512_sub_ps (x, x1),
+                          _mm512_div_ps (_mm512_sub_ps (y2, y1),
+                                         _mm512_sub_ps (x2, x1)), y1);
 }
 
 /**
@@ -7290,9 +7417,8 @@ jbm_sincoswc_16xf32 (const __m512 x,
                      __m512 *s, ///< pointer to the sin function value (__m512).
                      __m512 *c) ///< pointer to the cos function value (__m512).
 {
-  __m512 s0;
-  *s = s0 = jbm_sinwc_16xf32 (x);
-  *c = _mm512_sqrt_ps (_mm512_fnmadd_ps (s0, s0, _mm512_set1_ps (1.f)));
+  *s = jbm_sinwc_16xf32 (x);
+  *c = jbm_coswc_16xf32 (x);
 }
 
 /**
@@ -7304,11 +7430,11 @@ jbm_sincoswc_16xf32 (const __m512 x,
 static inline __m512
 jbm_sin_16xf32 (const __m512 x) ///< __m512 vector.
 {
-  __m512 y, q, s, pi, pi_2, pi_4, pi3_2;
-  pi = _mm512_set1_ps (M_PIf);
-  pi_2 = _mm512_set1_ps (M_PI_2f);
-  pi_4 = _mm512_set1_ps (M_PI_4f);
-  pi3_2 = _mm512_set1_ps (3.f * M_PI_2f);
+  const __m512 pi3_2 = _mm512_set1_ps (3.f * M_PI_2f);
+  const __m512 pi = _mm512_set1_ps (M_PIf);
+  const __m512 pi_2 = _mm512_set1_ps (M_PI_2f);
+  const __m512 pi_4 = _mm512_set1_ps (M_PI_4f);
+  __m512 y, q, s;
   q = jbm_mod_16xf32 (_mm512_add_ps (x, pi_4), _mm512_set1_ps (2.f * M_PIf));
   y = _mm512_sub_ps (q, pi_4);
   s = jbm_opposite_16xf32 (jbm_coswc_16xf32 (_mm512_sub_ps (pi3_2, y)));
@@ -7329,8 +7455,8 @@ jbm_sin_16xf32 (const __m512 x) ///< __m512 vector.
 static inline __m512
 jbm_cos_16xf32 (const __m512 x) ///< __m512 vector.
 {
-  __m512 y, c, pi2;
-  pi2 = _mm512_set1_ps (2.f * M_PIf);
+  const __m512 pi2 = _mm512_set1_ps (2.f * M_PIf);
+  __m512 y, c;
   y = jbm_mod_16xf32 (x, pi2);
   c = _mm512_mask_blend_ps (_mm512_cmp_ps_mask (y,
                                                 _mm512_set1_ps (7.f * M_PI_4f),
@@ -7365,15 +7491,15 @@ jbm_sincos_16xf32 (const __m512 x,
                    __m512 *s,   ///< pointer to the sin function value (__m512).
                    __m512 *c)   ///< pointer to the cos function value (__m512).
 {
-  __m512 y, pi2, z, s1, c1, s2, c2;
+  const __m512 pi2 = _mm512_set1_ps (2.f * M_PIf);
+  const __m512 z = _mm512_setzero_ps ();
+  __m512 y, s1, c1, s2, c2;
   __mmask16 m;
-  pi2 = _mm512_set1_ps (2.f * M_PIf);
   y = jbm_mod_16xf32 (x, pi2);
   jbm_sincoswc_16xf32 (_mm512_sub_ps (y, pi2), &s1, &c1);
   jbm_sincoswc_16xf32 (_mm512_sub_ps (y, _mm512_set1_ps (3.f * M_PI_2f)), &c2,
                        &s2);
   m = _mm512_cmp_ps_mask (y, _mm512_set1_ps (7.f * M_PI_4f), _CMP_LT_OS);
-  z = _mm512_setzero_ps ();
   s1 = _mm512_mask_mov_ps (s1, m, _mm512_sub_ps (z, s2));
   c1 = _mm512_mask_mov_ps (c1, m, c2);
   jbm_sincoswc_16xf32 (_mm512_sub_ps (_mm512_set1_ps (M_PIf), y), &s2, &c2);
@@ -7448,12 +7574,12 @@ static inline __m512
 jbm_atan2_16xf32 (const __m512 y,       ///< __m512 y component.
                   const __m512 x)       ///< __m512 x component.
 {
-  __m512 f, g, z, pi;
-  z = _mm512_setzero_ps ();
-  pi = _mm512_set1_ps (M_PIf);
+  __m512 f, g;
   f = jbm_atan_16xf32 (_mm512_div_ps (y, x));
-  g = _mm512_add_ps (f, jbm_copysign_16xf32 (pi, y));
-  return _mm512_mask_mov_ps (f, _mm512_cmp_ps_mask (x, z, _CMP_LT_OS), g);
+  g = _mm512_add_ps (f, jbm_copysign_16xf32 (_mm512_set1_ps (M_PIf), y));
+  return
+    _mm512_mask_mov_ps (f, _mm512_cmp_ps_mask (x, _mm512_setzero_ps (),
+                                               _CMP_LT_OS), g);
 }
 
 /**
@@ -7578,8 +7704,7 @@ jbm_acosh_16xf32 (const __m512 x)       ///< __m512 number.
 static inline __m512
 jbm_atanh_16xf32 (const __m512 x)       ///< __m512 number.
 {
-  __m512 u;
-  u = _mm512_set1_ps (1.f);
+  const __m512 u = _mm512_set1_ps (1.f);
   return _mm512_mul_ps (_mm512_set1_ps (0.5f),
                         jbm_log_16xf32 (_mm512_div_ps (_mm512_add_ps (u, x),
                                                        _mm512_sub_ps (u, x))));
@@ -7649,9 +7774,9 @@ jbm_erf_16xf32 (const __m512 x) ///< __m512 vector.
 static inline __m512
 jbm_erfc_16xf32 (const __m512 x)        ///< __m512 vector.
 {
-  __m512 ax, u, u2, cwc, wc;
-  u = _mm512_set1_ps (1.f);
-  u2 = _mm512_set1_ps (2.f);
+  const __m512 u2 = _mm512_set1_ps (2.f);
+  const __m512 u = _mm512_set1_ps (1.f);
+  __m512 ax, cwc, wc;
   ax = jbm_abs_16xf32 (x);
   cwc = jbm_erfcwc_16xf32 (ax);
   wc = _mm512_sub_ps (u, jbm_erfwc_16xf32 (x));
@@ -7670,21 +7795,21 @@ jbm_erfc_16xf32 (const __m512 x)        ///< __m512 vector.
  * \return __m512 vector of solution values.
  */
 static inline __m512
-jbm_solve_quadratic_reduced_16xf32 (__m512 a,
+jbm_solve_quadratic_reduced_16xf32 (const __m512 a,
 ///< __m512 vector of 1st order coefficient of the equations.
-                                    __m512 b,
+                                    const __m512 b,
 ///< __m512 vector of 0th order coefficient of the equations.
                                     const __m512 x1,
 ///< __m512 vector of left limits of the solution intervals.
                                     const __m512 x2)
 ///< __m512 vector of right limits of the solution intervals.
 {
-  __m512 k1, k2;
+  __m512 ka, kb, k1, k2;
   k1 = _mm512_set1_ps (-0.5f);
-  a = _mm512_mul_ps (a, k1);
-  b = _mm512_sqrt_ps (_mm512_sub_ps (jbm_sqr_16xf32 (a), b));
-  k1 = _mm512_add_ps (a, b);
-  k2 = _mm512_sub_ps (a, b);
+  ka = _mm512_mul_ps (a, k1);
+  kb = _mm512_sqrt_ps (_mm512_sub_ps (jbm_sqr_16xf32 (ka), b));
+  k1 = _mm512_add_ps (ka, kb);
+  k2 = _mm512_sub_ps (ka, kb);
   k1 = _mm512_mask_mov_ps (k1, _mm512_cmp_ps_mask (k1, x1, _CMP_LT_OS), k2);
   return _mm512_mask_mov_ps (k1, _mm512_cmp_ps_mask (k1, x2, _CMP_GT_OS), k2);
 }
@@ -7772,17 +7897,17 @@ jbm_solve_cubic_reduced_16xf32 (const __m512 a,
  * \return __m512 vector of solution values.
  */
 static inline __m512
-jbm_solve_cubic_16xf32 (__m512 a,
+jbm_solve_cubic_16xf32 (const __m512 a,
 ///< __m512 vector of 3rd order coefficient of the equations.
-                        __m512 b,
+                        const __m512 b,
 ///< __m512 vector of 2nd order coefficient of the equations.
-                        __m512 c,
+                        const __m512 c,
 ///< __m512 vector of 1st order coefficient of the equations.
-                        __m512 d,
+                        const __m512 d,
 ///< __m512 vector of 0th order coefficient of the equations.
-                        __m512 x1,
+                        const __m512 x1,
 ///< __m512 vector of left limits of the solution intervals.
-                        __m512 x2)
+                        const __m512 x2)
 ///< __m512 vector of right limits of the solution intervals.
 {
   return
@@ -8088,34 +8213,6 @@ jbm_integral_16xf32 (__m512 (*f) (__m512),
                      const __m512 x1,   ///< left limit of the interval.
                      const __m512 x2)   ///< right limit of the interval.
 {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] JB_ALIGNED = { 2.f };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] JB_ALIGNED = { 8.f / 9.f, 5.f / 9.f },
-    b[2] JB_ALIGNED = { 0.f, 7.745966692414834e-1f };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] JB_ALIGNED = {
-    128.f / 225.f,
-    4.786286704993665e-1f,
-    2.369268850561891e-1f
-  }, b[3] JB_ALIGNED = {
-    0.f,
-    5.384693101056831e-1f,
-    9.061798459386640e-1f
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] JB_ALIGNED = {
-    4.179591836734694e-1f,
-    3.818300505051189e-1f,
-    2.797053914892767e-1f,
-    1.294849661688697e-1f
-  }, b[4] JB_ALIGNED = {
-    0.f,
-    4.058451513773972e-1f,
-    7.415311855993944e-1f,
-    9.491079123427585e-1f
-  };
-#endif
   __m512 k, x, dx, h;
 #if JBM_INTEGRAL_GAUSS_N > 1
   __m512 k2, f1, f2;
@@ -8124,21 +8221,78 @@ jbm_integral_16xf32 (__m512 (*f) (__m512),
   h = _mm512_set1_ps (0.5f);
   dx = _mm512_mul_ps (h, _mm512_sub_ps (x2, x1));
   x = _mm512_mul_ps (h, _mm512_add_ps (x2, x1));
-  k = _mm512_set1_ps (a[0]);
+  k = _mm512_set1_ps (JBM_INTEGRAL_GAUSS_A_F32[0]);
   k = _mm512_mul_ps (k, f (x));
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = _mm512_set1_ps (b[i]);
+      k2 = _mm512_set1_ps (JBM_INTEGRAL_GAUSS_B_F32[i]);
       k2 = _mm512_mul_ps (k2, dx);
       f1 = f (_mm512_sub_ps (x, k2));
       f2 = f (_mm512_add_ps (x, k2));
-      h = _mm512_set1_ps (a[i]);
+      h = _mm512_set1_ps (JBM_INTEGRAL_GAUSS_A_F32[i]);
       k = _mm512_fmadd_ps (h, _mm512_add_ps (f1, f2), k);
     }
 #endif
-  k = _mm512_mul_ps (k, dx);
-  return k;
+  return _mm512_mul_ps (k, dx);
+}
+
+/**
+ * Function to calculate the additive reduction value of a __m512d vector.
+ *
+ * \return additive reduction (double).
+ */
+static inline double
+jbm_reduce_add_8xf64 (const __m512d x)  ///< __m512d vector.
+{
+  __m256d h, l;
+  h = _mm512_extractf64x4_pd (x, 1);
+  l = _mm512_castpd512_pd256 (x);
+  return jbm_reduce_add_4xf64 (_mm256_add_pd (h, l));
+}
+
+/**
+ * Function to calculate the maximum reduction value of a __m512d vector.
+ *
+ * \return maximum reduction (double).
+ */
+static inline double
+jbm_reduce_max_8xf64 (const __m512d x)  ///< __m512d vector.
+{
+  __m256d h, l;
+  h = _mm512_extractf64x4_pd (x, 1);
+  l = _mm512_castpd512_pd256 (x);
+  return jbm_reduce_max_4xf64 (_mm256_max_pd (h, l));
+}
+
+/**
+ * Function to calculate the minimum reduction value of a __m512d vector.
+ *
+ * \return minimum reduction (double).
+ */
+static inline double
+jbm_reduce_min_8xf64 (const __m512d x)  ///< __m512d vector.
+{
+  __m256d h, l;
+  h = _mm512_extractf64x4_pd (x, 1);
+  l = _mm512_castpd512_pd256 (x);
+  return jbm_reduce_min_4xf64 (_mm256_min_pd (h, l));
+}
+
+/**
+ * Function to calculate the maximum and minimum reduction value of a __m512d
+ * vector.
+ */
+static inline void
+jbm_reduce_maxmin_8xf64 (const __m512d x,       ///< __m512d vector.
+                         double *max,   ///< pointer to the maximum value
+                         double *min)   ///< pointer to the minimum value
+{
+  __m256d h, l;
+  h = _mm512_extractf64x4_pd (x, 1);
+  l = _mm512_castpd512_pd256 (x);
+  *max = jbm_reduce_max_4xf64 (_mm256_max_pd (h, l));
+  *min = jbm_reduce_min_4xf64 (_mm256_min_pd (h, l));
 }
 
 /**
@@ -8203,13 +8357,9 @@ jbm_copysign_8xf64 (const __m512d x,
 ///< __m512d vector to preserve magnitude.
                     const __m512d y)    ///< __m512d vector to preserve sign.
 {
-  JBM8xF64 ax, sy;
-  ax.x = jbm_abs_8xf64 (x);
-  sy.x = y;
-  ax.i =
-    _mm512_or_epi64
-    (ax.i, _mm512_and_epi64 (sy.i, JBM_BITS_SIGN_8xF64));
-  return ax.x;
+  JBM8xF64 m;
+  m.i = JBM_BITS_SIGN_8xF64;
+  return _mm512_or_pd (jbm_abs_8xf64 (x), _mm512_and_pd (y, m.x));
 }
 
 /**
@@ -8249,7 +8399,7 @@ jbm_mod_8xf64 (const __m512d x, ///< dividend (__m512d).
  */
 static inline __m512d
 jbm_frexp_8xf64 (const __m512d x,       ///< __m512d vector.
-                 __m256i *e)    ///< pointer to the extracted exponents vector.
+                 __m512i *e)    ///< pointer to the extracted exponents vector.
 {
   const __m512i zi = _mm512_setzero_si512 ();
   const __m512i bias = JBM_BIAS_8xF64;
@@ -8277,8 +8427,7 @@ jbm_frexp_8xf64 (const __m512d x,       ///< __m512d vector.
       (exp, is_sub, _mm512_sub_epi64 (_mm512_srli_epi64 (y.i, 52),
                                       _mm512_set1_epi64 (52ll)));
   // exponent
-  exp = _mm512_mask_sub_epi64 (zi, is_finite, exp, bias);
-  *e = _mm512_cvtepi64_epi32 (exp);
+  *e = _mm512_mask_sub_epi64 (zi, is_finite, exp, bias);
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm512_or_epi64 (_mm512_and_epi64 (z.i, sign_mask),
@@ -8295,28 +8444,28 @@ jbm_frexp_8xf64 (const __m512d x,       ///< __m512d vector.
  * \return function value (__m512d).
  */
 static inline __m512d
-jbm_exp2n_8xf64 (__m256i e)     ///< exponent vector (__m512i).
+jbm_exp2n_8xf64 (__m512i e)     ///< exponent vector (__m512i).
 {
-  const __m512i e64 = _mm512_cvtepi32_epi64 (e);
+  const __m512i v1074 = _mm512_set1_epi64 (1074ll);
   const __m512i v1023 = _mm512_set1_epi64 (1023ll);
   const __m512i vn1023 = _mm512_set1_epi64 (-1023ll);
   const __m512i vn1074 = _mm512_set1_epi64 (-1074ll);
   __m512d x;
   __mmask16 is_norm;
-  is_norm = _mm512_cmpgt_epi64_mask (e64, vn1023);
+  is_norm = _mm512_cmpgt_epi64_mask (e, vn1023);
   x =
     _mm512_mask_blend_pd
     (is_norm, _mm512_setzero_pd (),
-     _mm512_castsi512_pd (_mm512_slli_epi64 (_mm512_add_epi64 (e64,
+     _mm512_castsi512_pd (_mm512_slli_epi64 (_mm512_add_epi64 (e,
 			                                       v1023), 52)));
   x =
     _mm512_mask_mov_pd
-    (x, _mm512_cmpgt_epi32_mask (e64, vn1074) & ~is_norm,
+    (x, _mm512_cmpgt_epi64_mask (e, vn1074) & ~is_norm,
      _mm512_castsi512_pd
-     (_mm512_sllv_epi64 (_mm512_set1_epi64 (0x0008000000000000ll),
-                         _mm512_sub_epi64 (vn1023, e64))));
+     (_mm512_sllv_epi64 (_mm512_set1_epi64 (1ll),
+                         _mm512_add_epi64 (e, v1074))));
   return
-    _mm512_mask_mov_pd (x, _mm512_cmpgt_epi32_mask (e64, v1023),
+    _mm512_mask_mov_pd (x, _mm512_cmpgt_epi64_mask (e, v1023),
                         _mm512_set1_pd (INFINITY));
 }
 
@@ -8327,7 +8476,7 @@ jbm_exp2n_8xf64 (__m256i e)     ///< exponent vector (__m512i).
  */
 static inline __m512d
 jbm_ldexp_8xf64 (const __m512d x,       ///< __m512d vector.
-                 __m256i e)     ///< exponent vector (__m512i).
+                 __m512i e)     ///< exponent vector (__m512i).
 {
   return _mm512_mul_pd (x, jbm_exp2n_8xf64 (e));
 }
@@ -14984,20 +15133,21 @@ jbm_cbrt_8xf64 (const __m512d x)        ///< __m512d vector.
 {
   const __m512d cbrt2 = JBM_CBRT2_8xF64;
   const __m512d cbrt4 = JBM_CBRT4_8xF64;
-  const __m512i v2 = _mm512_set1_epi16 (2);
-  const __m512i v1 = _mm512_set1_epi16 (1);
+  const __m512i v3 = _mm512_set1_epi32 (3);
+  const __m512i v2 = _mm512_set1_epi64 (2);
+  const __m512i v1 = _mm512_set1_epi64 (1);
   __m512d y;
-  __m512i r512;
-  __m256i e32;
-  __m128i e, e3, r;
-  y = jbm_frexp_8xf64 (jbm_abs_8xf64 (x), &e32);
-  e = _mm256_cvtepi32_epi16 (e32);
-  e3 = _mm_mulhi_epi16 (e, _mm_set1_epi16 (0x5556));
-  r = _mm_sub_epi16 (e, _mm_mullo_epi16 (e3, _mm_set1_epi16 (3)));
-  y = jbm_ldexp_8xf64 (jbm_cbrtwc_8xf64 (y), _mm256_cvtepi16_epi32 (e3));
-  r512 = _mm512_castsi128_si512 (r);
-  y = _mm512_mask_mul_pd (y, _mm512_test_epi16_mask (r512, v1), y, cbrt2);
-  y = _mm512_mask_mul_pd (y, _mm512_test_epi16_mask (r512, v2), y, cbrt4);
+  __m512i e, e3, r, n;
+  y = jbm_frexp_8xf64 (jbm_abs_8xf64 (x), &e);
+  e3 = _mm512_mul_epu32 (e, _mm512_set1_epi32 (0x55555556));
+  e3 = _mm512_srli_epi64 (e3, 32);
+  r = _mm512_sub_epi32 (e, _mm512_mullo_epi32 (e3, v3));
+  n = _mm512_srai_epi32 (r, 31);
+  r = _mm512_add_epi32 (r, _mm512_and_si512 (n, v3));
+  e3 = _mm512_sub_epi32 (e3, _mm512_and_si512 (n, _mm512_set1_epi32 (1)));
+  y = jbm_ldexp_8xf64 (jbm_cbrtwc_8xf64 (y), e3);
+  y = _mm512_mask_mul_pd (y, _mm512_cmpeq_epi64_mask (r, v1), y, cbrt2);
+  y = _mm512_mask_mul_pd (y, _mm512_cmpeq_epi64_mask (r, v2), y, cbrt4);
   return jbm_copysign_8xf64 (y, x);
 }
 
@@ -15039,8 +15189,8 @@ jbm_exp2_8xf64 (const __m512d x)        ///< __m512d vector.
   __m512d y, f;
   y = _mm512_floor_pd (x);
   f = _mm512_sub_pd (x, y);
-  y = jbm_exp2n_8xf64 (_mm512_cvtpd_epi32 (y));
-  return _mm512_mul_pd (y, jbm_exp2wc_8xf64 (f));
+  return _mm512_mul_pd (jbm_exp2n_8xf64 (_mm512_cvtpd_epi64 (y)),
+                        jbm_exp2wc_8xf64 (f));
 }
 
 /**
@@ -15107,15 +15257,15 @@ jbm_log2_8xf64 (const __m512d x)        ///< __m512d vector.
 {
   const __m512d z = _mm512_setzero_pd ();
   __m512d y;
-  __m256i e;
+  __m512i e;
   __mmask16 m;
   y = jbm_frexp_8xf64 (x, &e);
   m = _mm512_cmplt_pd_mask (y, _mm512_set1_pd (M_SQRT1_2));
   y = _mm512_add_pd (y, _mm512_maskz_mov_pd (m, y));
-  e = _mm256_sub_epi32 (e, _mm256_maskz_set1_epi32 (m, 1));
+  e = _mm512_sub_epi64 (e, _mm512_maskz_set1_epi64 (m, 1));
   y = _mm512_add_pd (jbm_log2wc_8xf64 (_mm512_sub_pd (y,
                                        _mm512_set1_pd (1.))),
-                     _mm512_cvtepi32_pd (e));
+                     _mm512_cvtepi64_pd (e));
   y = _mm512_mask_mov_pd (y, _mm512_cmpeq_pd_mask (x, z),
                           _mm512_set1_pd (-INFINITY));
   y = _mm512_mask_mov_pd (y, _mm512_cmplt_pd_mask (x, z), _mm512_set1_pd (NAN));
@@ -15220,9 +15370,8 @@ jbm_sincoswc_8xf64 (const __m512d x,
                     __m512d *c)
     ///< pointer to the f32 function value (__m512d).
 {
-  __m512d s0;
-  *s = s0 = jbm_sinwc_8xf64 (x);
-  *c = _mm512_sqrt_pd (_mm512_fnmadd_pd (x, x, _mm512_set1_pd (1.)));
+  *s = jbm_sinwc_8xf64 (x);
+  *c = jbm_coswc_8xf64 (x);
 }
 
 /**
@@ -15234,8 +15383,8 @@ jbm_sincoswc_8xf64 (const __m512d x,
 static inline __m512d
 jbm_sin_8xf64 (const __m512d x) ///< __m512d vector.
 {
-  __m512d y, s, pi2;
-  pi2 = _mm512_set1_pd (2. * M_PI);
+  const __m512d pi2 = _mm512_set1_pd (2. * M_PI);
+  __m512d y, s;
   y = jbm_mod_8xf64 (x, pi2);
   s = jbm_sinwc_8xf64 (_mm512_sub_pd (y, pi2));
   s = _mm512_mask_mov_pd (s,
@@ -15269,8 +15418,8 @@ jbm_sin_8xf64 (const __m512d x) ///< __m512d vector.
 static inline __m512d
 jbm_cos_8xf64 (const __m512d x) ///< __m512d vector.
 {
-  __m512d y, c, pi2;
-  pi2 = _mm512_set1_pd (2. * M_PI);
+  const __m512d pi2 = _mm512_set1_pd (2. * M_PI);
+  __m512d y, c;
   y = jbm_mod_8xf64 (x, pi2);
   c = _mm512_mask_blend_pd (_mm512_cmp_pd_mask (y, _mm512_set1_pd (7. * M_PI_4),
                                                 _CMP_LT_OS),
@@ -15303,15 +15452,15 @@ jbm_sincos_8xf64 (const __m512d x,
                   __m512d *s,   ///< pointer to the f32 function value (__m512d).
                   __m512d *c)   ///< pointer to the f32 function value (__m512d).
 {
-  __m512d y, pi2, z, s1, c1, s2, c2;
+  const __m512d pi2 = _mm512_set1_pd (2. * M_PI);
+  const __m512d z = _mm512_setzero_pd ();
+  __m512d y, s1, c1, s2, c2;
   __mmask16 m;
-  pi2 = _mm512_set1_pd (2. * M_PI);
   y = jbm_mod_8xf64 (x, pi2);
   jbm_sincoswc_8xf64 (_mm512_sub_pd (y, pi2), &s1, &c1);
   jbm_sincoswc_8xf64 (_mm512_sub_pd (y, _mm512_set1_pd (3. * M_PI_2)), &c2,
                       &s2);
   m = _mm512_cmp_pd_mask (y, _mm512_set1_pd (7. * M_PI_4), _CMP_LT_OS);
-  z = _mm512_setzero_pd ();
   s1 = _mm512_mask_mov_pd (s1, m, _mm512_sub_pd (z, s2));
   c1 = _mm512_mask_mov_pd (c1, m, c2);
   jbm_sincoswc_8xf64 (_mm512_sub_pd (_mm512_set1_pd (M_PI), y), &s2, &c2);
@@ -15387,9 +15536,9 @@ static inline __m512d
 jbm_atan2_8xf64 (const __m512d y,       ///< __m512d y component.
                  const __m512d x)       ///< __m512d x component.
 {
-  __m512d f, g, z, pi;
-  z = _mm512_setzero_pd ();
-  pi = _mm512_set1_pd (M_PI);
+  const __m512d pi = _mm512_set1_pd (M_PI);
+  const __m512d z = _mm512_setzero_pd ();
+  __m512d f, g;
   f = jbm_atan_8xf64 (_mm512_div_pd (y, x));
   g = _mm512_add_pd (f, jbm_copysign_8xf64 (pi, y));
   return _mm512_mask_mov_pd (f, _mm512_cmp_pd_mask (x, z, _CMP_LT_OS), g);
@@ -15568,9 +15717,9 @@ jbm_erfcwc_8xf64 (const __m512d x)
 static inline __m512d
 jbm_erf_8xf64 (const __m512d x) ///< __m512d vector.
 {
-  __m512d ax, u;
+  const __m512d u = _mm512_set1_pd (1.);
+  __m512d ax;
   ax = jbm_abs_8xf64 (x);
-  u = _mm512_set1_pd (1.);
   return
     _mm512_mask_blend_pd (_mm512_cmp_pd_mask (ax, u, _CMP_LT_OS),
                           jbm_copysign_8xf64 (_mm512_sub_pd (u,
@@ -15587,9 +15736,9 @@ jbm_erf_8xf64 (const __m512d x) ///< __m512d vector.
 static inline __m512d
 jbm_erfc_8xf64 (const __m512d x)        ///< __m512d vector.
 {
-  __m512d ax, u, u2, cwc, wc;
-  u = _mm512_set1_pd (1.);
-  u2 = _mm512_set1_pd (2.);
+  const __m512d u2 = _mm512_set1_pd (2.);
+  const __m512d u = _mm512_set1_pd (1.);
+  __m512d ax, cwc, wc;
   ax = jbm_abs_8xf64 (x);
   cwc = jbm_erfcwc_8xf64 (ax);
   wc = _mm512_sub_pd (u, jbm_erfwc_8xf64 (x));
@@ -15710,17 +15859,17 @@ jbm_solve_cubic_reduced_8xf64 (const __m512d a,
  * \return __m512d vector of solution values.
  */
 static inline __m512d
-jbm_solve_cubic_8xf64 (__m512d a,
+jbm_solve_cubic_8xf64 (const __m512d a,
 ///< __m512d vector of 3rd order coefficient of the equations.
-                       __m512d b,
+                       const __m512d b,
 ///< __m512d vector of 2nd order coefficient of the equations.
-                       __m512d c,
+                       const __m512d c,
 ///< __m512d vector of 1st order coefficient of the equations.
-                       __m512d d,
+                       const __m512d d,
 ///< __m512d vector of 0th order coefficient of the equations.
-                       __m512d x1,
+                       const __m512d x1,
 ///< __m512d vector of left limits of the solution intervals.
-                       __m512d x2)
+                       const __m512d x2)
 ///< __m512d vector of right limits of the solution intervals.
 {
   return
@@ -16021,34 +16170,6 @@ jbm_integral_8xf64 (__m512d (*f) (__m512d),
                     const __m512d x1,   ///< left limit of the interval.
                     const __m512d x2)   ///< right limit of the interval.
 {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] JB_ALIGNED = { 2. };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] JB_ALIGNED = { 8. / 9., 5. / 9. },
-    b[2] JB_ALIGNED = { 0., 7.745966692414834e-1 };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] JB_ALIGNED = {
-    128. / 225.,
-    4.786286704993665e-1,
-    2.369268850561891e-1
-  }, b[3] JB_ALIGNED = {
-    0.,
-    5.384693101056831e-1,
-    9.061798459386640e-1
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] JB_ALIGNED = {
-    4.179591836734694e-1,
-    3.818300505051189e-1,
-    2.797053914892767e-1,
-    1.294849661688697e-1
-  }, b[4] JB_ALIGNED = {
-    0.,
-    4.058451513773972e-1,
-    7.415311855993944e-1,
-    9.491079123427585e-1
-  };
-#endif
   __m512d k, x, dx, h;
 #if JBM_INTEGRAL_GAUSS_N > 1
   __m512d k2, f1, f2;
@@ -16057,16 +16178,16 @@ jbm_integral_8xf64 (__m512d (*f) (__m512d),
   h = _mm512_set1_pd (0.5);
   dx = _mm512_mul_pd (h, _mm512_sub_pd (x2, x1));
   x = _mm512_mul_pd (h, _mm512_add_pd (x2, x1));
-  k = _mm512_set1_pd (a[0]);
+  k = _mm512_set1_pd (JBM_INTEGRAL_GAUSS_A_F64[0]);
   k = _mm512_mul_pd (k, f (x));
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = _mm512_set1_pd (b[i]);
+      k2 = _mm512_set1_pd (JBM_INTEGRAL_GAUSS_B_F64[i]);
       k2 = _mm512_mul_pd (k2, dx);
       f1 = f (_mm512_sub_pd (x, k2));
       f2 = f (_mm512_add_pd (x, k2));
-      h = _mm512_set1_pd (a[i]);
+      h = _mm512_set1_pd (JBM_INTEGRAL_GAUSS_A_F64[i]);
       k = _mm512_fmadd_pd (h, _mm512_add_pd (f1, f2), k);
     }
 #endif
@@ -16245,6 +16366,66 @@ jbm_array_div_f32 (float *xr,   ///< result float array.
 }
 
 /**
+ * Function to do the dot product of 2 float arrays.
+ *
+ * \return dot product (float).
+ */
+static inline float
+jbm_array_dot_f32 (const float *x1,     ///< multiplier float array.
+                   const float *x2,     ///< multiplicand float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  __m512 a512;
+  __m256 a256;
+  __m128 a128;
+  float a32 = 0.;
+  unsigned int i, j;
+  i = 0;
+  j = n >> 4;
+  if (j)
+    {
+      a512 = _mm512_mul_ps (_mm512_load_ps (x1 + i), _mm512_load_ps (x2 + i));
+      while (--j)
+        {
+	  i += 16;
+          a512 = _mm512_fmadd_ps (_mm512_load_ps (x1 + i),
+                                  _mm512_load_ps (x2 + i), a512);
+	}
+      a32 = jbm_reduce_add_16xf32 (a512);
+      i += 16;
+    }
+  j = (n - i) >> 3;
+  if (j)
+    {
+      a256 = _mm256_mul_ps (_mm256_load_ps (x1 + i), _mm256_load_ps (x2 + i));
+      while (--j)
+        {
+	  i += 8;
+          a256 = _mm256_fmadd_ps (_mm256_load_ps (x1 + i),
+                                  _mm256_load_ps (x2 + i), a256);
+	}
+      a32 += jbm_reduce_add_8xf32 (a256);
+      i += 8;
+    }
+  j = (n - i) >> 2;
+  if (j)
+    {
+      a128 = _mm_mul_ps (_mm_load_ps (x1 + i), _mm_load_ps (x2 + i));
+      while (--j)
+        {
+	  i += 4;
+          a128
+            = _mm_fmadd_ps (_mm_load_ps (x1 + i), _mm_load_ps (x2 + i), a128);
+	}
+      a32 += jbm_reduce_add_4xf32 (a128);
+      i += 4;
+    }
+  for (; i < n; ++i)
+    a32 += x1[i] * x2[i];
+  return a32;
+}
+
+/**
  * Function to calculate the double of a float array.
  */
 static inline void
@@ -16288,56 +16469,14 @@ jbm_array_sqr_f32 (float *xr,   ///< result float array.
  * \return the highest value.
  */
 static inline float
-jbm_array_max_f32 (const float *xx,     ///< float array.
+jbm_array_max_f32 (const float *x,      ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  float ax[4] JB_ALIGNED;
-  __m512 a16;
-  __m128 s4;
-  float k;
-  unsigned int i, j;
-  j = n >> 4;
-  if (j)
-    {
-      a16 = _mm512_load_ps (xx);
-      i = 16;
-      while (--j > 0)
-        {
-          a16 = _mm512_max_ps (a16, _mm512_load_ps (xx + i));
-          i += 16;
-        }
-      k = _mm512_reduce_max_ps (a16);
-      j = (n - i) >> 3;
-      if (j)
-        {
-          s4 = _mm_max_ps (_mm_load_ps (xx + i), _mm_load_ps (xx + i + 4));
-          _mm_store_ps (ax, s4);
-          k = fmaxf (k, ax[0]);
-          k = fmaxf (k, ax[1]);
-          k = fmaxf (k, ax[2]);
-          k = fmaxf (k, ax[3]);
-          i += 8;
-        }
-    }
-  else
-    {
-      j = n >> 3;
-      if (j)
-        {
-          s4 = _mm_max_ps (_mm_load_ps (xx), _mm_load_ps (xx + 4));
-          _mm_store_ps (ax, s4);
-          k = fmaxf (fmaxf (ax[0], ax[1]), fmaxf (ax[2], ax[3]));
-          i += 8;
-        }
-      else
-        {
-          k = xx[0];
-          i = 1;
-        }
-    }
-  while (i < n)
-    k = fmaxf (k, xx[i++]);
-  return k;
+  JBM_ARRAY_REDUCE_OP (__m512, __m256, __m128, float, _mm512_load_ps,
+                       _mm256_load_ps, _mm_load_ps, _mm512_max_ps,
+                       _mm256_max_ps, _mm_max_ps, fmaxf,
+		       jbm_reduce_max_16xf32, jbm_reduce_max_8xf32,
+		       jbm_reduce_max_4xf32, 1, -INFINITY, 512);
 }
 
 /**
@@ -16346,130 +16485,80 @@ jbm_array_max_f32 (const float *xx,     ///< float array.
  * \return the lowest value.
  */
 static inline float
-jbm_array_min_f32 (const float *xx,     ///< float array.
+jbm_array_min_f32 (const float *x,      ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  float ax[4] JB_ALIGNED;
-  __m512 a16;
-  __m128 s4;
-  float k;
-  unsigned int i, j;
-  j = n >> 4;
-  if (j)
-    {
-      a16 = _mm512_load_ps (xx);
-      i = 16;
-      while (--j > 0)
-        {
-          a16 = _mm512_min_ps (a16, _mm512_load_ps (xx + i));
-          i += 16;
-        }
-      k = _mm512_reduce_min_ps (a16);
-      j = (n - i) >> 3;
-      if (j)
-        {
-          s4 = _mm_min_ps (_mm_load_ps (xx + i), _mm_load_ps (xx + i + 4));
-          _mm_store_ps (ax, s4);
-          k = fminf (k, ax[0]);
-          k = fminf (k, ax[1]);
-          k = fminf (k, ax[2]);
-          k = fminf (k, ax[3]);
-          i += 8;
-        }
-    }
-  else
-    {
-      j = n >> 3;
-      if (j)
-        {
-          s4 = _mm_min_ps (_mm_load_ps (xx), _mm_load_ps (xx + 4));
-          _mm_store_ps (ax, s4);
-          k = fminf (fminf (ax[0], ax[1]), fminf (ax[2], ax[3]));
-          i += 8;
-        }
-      else
-        {
-          k = xx[0];
-          i = 1;
-        }
-    }
-  while (i < n)
-    k = fminf (k, xx[i++]);
-  return k;
+  JBM_ARRAY_REDUCE_OP (__m512, __m256, __m128, float, _mm512_load_ps,
+                       _mm256_load_ps, _mm_load_ps, _mm512_min_ps,
+                       _mm256_min_ps, _mm_min_ps, fminf,
+		       jbm_reduce_min_16xf32, jbm_reduce_min_8xf32,
+		       jbm_reduce_min_4xf32, 1, INFINITY, 512);
 }
 
 /**
  * Function to find the highest and the lowest elements of a float array.
  */
 static inline void
-jbm_array_maxmin_f32 (const float *xx,  ///< float array.
+jbm_array_maxmin_f32 (const float *x,   ///< float array.
                       float *max,       ///< the highest value.
                       float *min,       ///< the lowest value.
                       const unsigned int n)     ///< number of array elements.
 {
-  float ax[4] JB_ALIGNED;
-  __m512 a16, amax16, amin16;
-  __m128 s14, s24, smax4, smin4;
-  float kmax, kmin;
+  __m512 max512, min512; 
+  __m256 max256, min256;
+  __m128 max128, min128;
+  double max32 = -INFINITY;
+  double min32 = INFINITY;
   unsigned int i, j;
+  i = 0;
   j = n >> 4;
   if (j)
     {
-      amax16 = amin16 = _mm512_load_ps (xx);
-      i = 16;
-      while (--j > 0)
+      max512 = min512 = _mm512_load_ps (x + i);
+      while (--j)
         {
-          a16 = _mm512_load_ps (xx + i);
-          amax16 = _mm512_max_ps (amax16, a16);
-          amin16 = _mm512_min_ps (amin16, a16);
-          i += 16;
-        }
-      kmax = _mm512_reduce_max_ps (amax16);
-      kmin = _mm512_reduce_min_ps (amin16);
-      j = (n - i) >> 3;
-      if (j)
-        {
-          s14 = _mm_load_ps (xx + i);
-          s24 = _mm_load_ps (xx + i + 4);
-          smax4 = _mm_max_ps (s14, s24);
-          _mm_store_ps (ax, smax4);
-          kmax = fmaxf (kmax, ax[0]);
-          kmax = fmaxf (kmax, ax[1]);
-          kmax = fmaxf (kmax, ax[2]);
-          kmax = fmaxf (kmax, ax[3]);
-          smin4 = _mm_min_ps (s14, s24);
-          _mm_store_ps (ax, smin4);
-          kmin = fminf (kmin, ax[0]);
-          kmin = fminf (kmin, ax[1]);
-          kmin = fminf (kmin, ax[2]);
-          kmin = fminf (kmin, ax[3]);
-          i += 8;
-        }
+	  i += 16;
+          max512 = _mm512_max_ps (max512, _mm512_load_ps (x + i));
+          min512 = _mm512_min_ps (min512, _mm512_load_ps (x + i));
+	}
+      max32 = jbm_reduce_max_16xf32 (max512);
+      min32 = jbm_reduce_min_16xf32 (min512);
+      i += 16;
     }
-  else
+  j = (n - i) >> 3;
+  if (j)
     {
-      j = n >> 3;
-      if (j)
+      max256 = min256 = _mm256_load_ps (x + i);
+      while (--j)
         {
-          s14 = _mm_load_ps (xx);
-          s24 = _mm_load_ps (xx + 4);
-          smax4 = _mm_max_ps (s14, s24);
-          _mm_store_ps (ax, smax4);
-          kmax = fmaxf (fmaxf (ax[0], ax[1]), fmaxf (ax[2], ax[3]));
-          smin4 = _mm_min_ps (s14, s24);
-          _mm_store_ps (ax, smin4);
-          kmin = fminf (fminf (ax[0], ax[1]), fminf (ax[2], ax[3]));
-          i += 8;
-        }
-      else
+	  i += 8;
+          max256 = _mm256_max_ps (max256, _mm256_load_ps (x + i));
+          min256 = _mm256_min_ps (min256, _mm256_load_ps (x + i));
+	}
+      max32 = fmaxf (max32, jbm_reduce_max_8xf32 (max256));
+      min32 = fminf (min32, jbm_reduce_min_8xf32 (min256));
+      i += 8;
+    }
+  j = (n - i) >> 2;
+  if (j)
+    {
+      max128 = min128 = _mm_load_ps (x + i);
+      while (--j)
         {
-          kmax = kmin = xx[0];
-          i = 1;
-        }
+	  i += 4;
+          max128 = _mm_max_ps (max128, _mm_load_ps (x + i));
+          min128 = _mm_min_ps (min128, _mm_load_ps (x + i));
+	}
+      max32 = fmaxf (max32, jbm_reduce_max_4xf32 (max128));
+      min32 = fminf (min32, jbm_reduce_min_4xf32 (min128));
+      i += 4;
     }
   while (i < n)
-    kmax = fmaxf (kmax, xx[i]), kmin = fminf (kmin, xx[i++]);
-  *max = kmax, *min = kmin;
+    {
+      max32 = fmaxf (max32, x[i]);
+      min32 = fminf (min32, x[i++]);
+    }
+  *max = max32, *min = min32;
 }
 
 /**
@@ -16643,6 +16732,66 @@ jbm_array_div_f64 (double *xr,  ///< result double array.
 }
 
 /**
+ * Function to do the dot product of 2 double arrays.
+ *
+ * \return dot product (double).
+ */
+static inline double
+jbm_array_dot_f64 (const double *x1,     ///< multiplier double array.
+                   const double *x2,     ///< multiplicand double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  __m512d a512;
+  __m256d a256;
+  __m128d a128;
+  double a64 = 0.;
+  unsigned int i, j;
+  i = 0;
+  j = n >> 3;
+  if (j)
+    {
+      a512 = _mm512_mul_pd (_mm512_load_pd (x1 + i), _mm512_load_pd (x2 + i));
+      while (--j)
+        {
+	  i += 8;
+          a512 = _mm512_fmadd_pd (_mm512_load_pd (x1 + i),
+                                  _mm512_load_pd (x2 + i), a512);
+	}
+      a64 += jbm_reduce_add_8xf64 (a512);
+      i += 8;
+    }
+  j = (n - i) >> 2;
+  if (j)
+    {
+      a256 = _mm256_mul_pd (_mm256_load_pd (x1 + i), _mm256_load_pd (x2 + i));
+      while (--j)
+        {
+	  i += 4;
+          a256 = _mm256_fmadd_pd (_mm256_load_pd (x1 + i),
+                                  _mm256_load_pd (x2 + i), a256);
+	}
+      a64 += jbm_reduce_add_4xf64 (a256);
+      i += 4;
+    }
+  j = (n - i) >> 1;
+  if (j)
+    {
+      a128 = _mm_mul_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i));
+      while (--j)
+        {
+	  i += 2;
+          a128
+            = _mm_fmadd_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i), a128);
+	}
+      a64 += jbm_reduce_add_2xf64 (a128);
+      i += 2;
+    }
+  for (; i < n; ++i)
+    a64 += x1[i] * x2[i];
+  return a64;
+}
+
+/**
  * Function to calculate the double of a double array.
  */
 static inline void
@@ -16686,54 +16835,54 @@ jbm_array_sqr_f64 (double *xr,  ///< result double array.
  * \return the highest value.
  */
 static inline double
-jbm_array_max_f64 (const double *xx,    ///< double array.
+jbm_array_max_f64 (const double *x,     ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  double ax[2] JB_ALIGNED;
-  __m512d a8;
-  __m128d s2;
-  double k;
+  __m512d a512;
+  __m256d a256;
+  __m128d a128;
+  double a64 = -INFINITY;
   unsigned int i, j;
+  i = 0;
   j = n >> 3;
   if (j)
     {
-      a8 = _mm512_load_pd (xx);
-      i = 8;
-      while (--j > 0)
+      a512 = _mm512_load_pd (x + i);
+      while (--j)
         {
-          a8 = _mm512_max_pd (a8, _mm512_load_pd (xx + i));
-          i += 8;
-        }
-      k = _mm512_reduce_max_pd (a8);
-      j = (n - i) >> 2;
-      if (j)
-        {
-          s2 = _mm_max_pd (_mm_load_pd (xx + i), _mm_load_pd (xx + i + 2));
-          _mm_store_pd (ax, s2);
-          k = fmax (k, ax[0]);
-          k = fmax (k, ax[1]);
-          i += 4;
-        }
+	  i += 8;
+          a512 = _mm512_max_pd (a512, _mm512_load_pd (x + i));
+	}
+      a64 = fmax (a64, jbm_reduce_max_8xf64 (a512));
+      i += 8;
     }
-  else
+  j = (n - i) >> 2;
+  if (j)
     {
-      j = n >> 2;
-      if (j)
+      a256 = _mm256_load_pd (x + i);
+      while (--j)
         {
-          s2 = _mm_max_pd (_mm_load_pd (xx), _mm_load_pd (xx + 2));
-          _mm_store_pd (ax, s2);
-          k = fmax (ax[0], ax[1]);
-          i += 4;
-        }
-      else
+	  i += 4;
+          a256 = _mm256_max_pd (a256, _mm256_load_pd (x + i));
+	}
+      a64 = fmax (a64, jbm_reduce_max_4xf64 (a256));
+      i += 4;
+    }
+  j = (n - i) >> 1;
+  if (j)
+    {
+      a128 = _mm_load_pd (x + i);
+      while (--j)
         {
-          k = xx[0];
-          i = 1;
-        }
+	  i += 2;
+          a128 = _mm_max_pd (a128, _mm_load_pd (x + i));
+	}
+      a64 = fmax (a64, jbm_reduce_max_2xf64 (a128));
+      i += 2;
     }
   while (i < n)
-    k = fmax (k, xx[i++]);
-  return k;
+    a64 = fmax (a64, x[i++]);
+  return a64;
 }
 
 /**
@@ -16742,124 +16891,140 @@ jbm_array_max_f64 (const double *xx,    ///< double array.
  * \return the lowest value.
  */
 static inline double
-jbm_array_min_f64 (const double *xx,    ///< double array.
+jbm_array_min_f64 (const double *x,     ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  double ax[2] JB_ALIGNED;
-  __m512d a8;
-  __m128d s2;
-  double k;
+  __m512d a512, b512, c512, d512;
+  __m256d a256;
+  __m128d a128;
+  double a64 = INFINITY;
   unsigned int i, j;
-  j = n >> 3;
+  i = 0;
+  j = n >> 5;
   if (j)
     {
-      a8 = _mm512_load_pd (xx);
-      i = 8;
-      while (--j > 0)
+      a512 = _mm512_load_pd (x + i);
+      b512 = _mm512_load_pd (x + i + 8);
+      c512 = _mm512_load_pd (x + i + 16);
+      d512 = _mm512_load_pd (x + i + 24);
+      while (--j)
         {
-          a8 = _mm512_min_pd (a8, _mm512_load_pd (xx + i));
-          i += 8;
-        }
-      k = _mm512_reduce_min_pd (a8);
-      j = (n - i) >> 2;
-      if (j)
-        {
-          s2 = _mm_min_pd (_mm_load_pd (xx + i), _mm_load_pd (xx + i + 2));
-          _mm_store_pd (ax, s2);
-          k = fmin (k, ax[0]);
-          k = fmin (k, ax[1]);
-          i += 4;
-        }
+	  i += 32;
+          a512 = _mm512_min_pd (a512, _mm512_load_pd (x + i));
+          b512 = _mm512_min_pd (b512, _mm512_load_pd (x + i + 8));
+          c512 = _mm512_min_pd (c512, _mm512_load_pd (x + i + 16));
+          d512 = _mm512_min_pd (d512, _mm512_load_pd (x + i + 24));
+	}
+      a512 = _mm512_min_pd (a512, b512);
+      c512 = _mm512_min_pd (c512, d512);
+      a64 = jbm_reduce_min_8xf64 (_mm512_min_pd (a512, c512));
+      i += 32;
     }
-  else
+  j = (n - i) >> 3;
+  if (j)
     {
-      j = n >> 2;
-      if (j)
+      a512 = _mm512_load_pd (x + i);
+      while (--j)
         {
-          s2 = _mm_min_pd (_mm_load_pd (xx), _mm_load_pd (xx + 2));
-          _mm_store_pd (ax, s2);
-          k = fmin (ax[0], ax[1]);
-          i += 4;
-        }
-      else
+	  i += 8;
+          a512 = _mm512_min_pd (a512, _mm512_load_pd (x + i));
+	}
+      a64 = fmin (a64, jbm_reduce_min_8xf64 (a512));
+      i += 8;
+    }
+  j = (n - i) >> 2;
+  if (j)
+    {
+      a256 = _mm256_load_pd (x + i);
+      while (--j)
         {
-          k = xx[0];
-          i = 1;
-        }
+	  i += 4;
+          a256 = _mm256_min_pd (a256, _mm256_load_pd (x + i));
+	}
+      a64 = fmin (a64, jbm_reduce_min_4xf64 (a256));
+      i += 4;
+    }
+  j = (n - i) >> 1;
+  if (j)
+    {
+      a128 = _mm_load_pd (x + i);
+      while (--j)
+        {
+	  i += 2;
+          a128 = _mm_min_pd (a128, _mm_load_pd (x + i));
+	}
+      a64 = fmin (a64, jbm_reduce_min_2xf64 (a128));
+      i += 2;
     }
   while (i < n)
-    k = fmin (k, xx[i++]);
-  return k;
+    a64 = fmin (a64, x[i++]);
+  return a64;
 }
 
 /**
  * Function to find the highest and the lowest elements of a double array.
  */
 static inline void
-jbm_array_maxmin_f64 (const double *xx, ///< double array.
+jbm_array_maxmin_f64 (const double *x, ///< double array.
                       double *max,      ///< the highest value.
                       double *min,      ///< the lowest value.
                       const unsigned int n)     ///< number of array elements.
 {
-  double ax[2] JB_ALIGNED;
-  __m512d a8, amax8, amin8;
-  __m128d s12, s22, smax2, smin2;
-  double kmax, kmin;
+  __m512d max512 = _mm512_set1_pd (-INFINITY);
+  __m512d min512 = _mm512_set1_pd (INFINITY);
+  __m256d max256 = _mm256_set1_pd (-INFINITY);
+  __m256d min256 = _mm256_set1_pd (INFINITY);
+  __m128d max128 = _mm_set1_pd (-INFINITY);
+  __m128d min128 = _mm_set1_pd (INFINITY);
+  double max64 = -INFINITY;
+  double min64 = INFINITY;
   unsigned int i, j;
+  i = 0;
   j = n >> 3;
   if (j)
     {
-      amax8 = amin8 = _mm512_load_pd (xx);
-      i = 8;
-      while (--j > 0)
+      do
         {
-          a8 = _mm512_load_pd (xx + i);
-          amax8 = _mm512_max_pd (amax8, a8);
-          amin8 = _mm512_min_pd (amin8, a8);
-          i += 8;
-        }
-      kmax = _mm512_reduce_max_pd (amax8);
-      kmin = _mm512_reduce_min_pd (amin8);
-      j = (n - i) >> 2;
-      if (j)
-        {
-          s12 = _mm_load_pd (xx + i);
-          s22 = _mm_load_pd (xx + i + 2);
-          smax2 = _mm_max_pd (s12, s22);
-          _mm_store_pd (ax, smax2);
-          kmax = fmax (kmax, ax[0]);
-          kmax = fmax (kmax, ax[1]);
-          smin2 = _mm_min_pd (s12, s22);
-          _mm_store_pd (ax, smin2);
-          kmin = fmin (kmin, ax[0]);
-          kmin = fmin (kmin, ax[1]);
-          i += 4;
-        }
+          max512 = _mm512_max_pd (max512, _mm512_load_pd (x + i));
+          min512 = _mm512_min_pd (min512, _mm512_load_pd (x + i));
+	  i += 8;
+	}
+      while (--j);
+      max64 = fmax (max64, jbm_reduce_max_8xf64 (max512));
+      min64 = fmin (min64, jbm_reduce_min_8xf64 (min512));
     }
-  else
+  j = (n - i) >> 2;
+  if (j)
     {
-      j = n >> 2;
-      if (j)
+      do
         {
-          s12 = _mm_load_pd (xx);
-          s22 = _mm_load_pd (xx + 2);
-          smax2 = _mm_max_pd (s12, s22);
-          _mm_store_pd (ax, smax2);
-          kmax = fmax (ax[0], ax[1]);
-          smin2 = _mm_min_pd (s12, s22);
-          _mm_store_pd (ax, smin2);
-          kmin = fmin (ax[0], ax[1]);
-          i += 4;
-        }
-      else
+          max256 = _mm256_max_pd (max256, _mm256_load_pd (x + i));
+          min256 = _mm256_min_pd (min256, _mm256_load_pd (x + i));
+	  i += 4;
+	}
+      while (--j);
+      max64 = fmax (max64, jbm_reduce_max_4xf64 (max256));
+      min64 = fmin (min64, jbm_reduce_min_4xf64 (min256));
+    }
+  j = (n - i) >> 1;
+  if (j)
+    {
+      do
         {
-          kmax = kmin = xx[0];
-          i = 1;
-        }
+          max128 = _mm_max_pd (max128, _mm_load_pd (x + i));
+          min128 = _mm_min_pd (min128, _mm_load_pd (x + i));
+	  i += 2;
+	}
+      while (--j);
+      max64 = fmax (max64, jbm_reduce_max_2xf64 (max128));
+      min64 = fmin (min64, jbm_reduce_min_2xf64 (min128));
     }
   while (i < n)
-    kmax = fmax (kmax, xx[i]), kmin = fmin (kmin, xx[i++]);
-  *max = kmax, *min = kmin;
+    {
+      max64 = fmax (max64, x[i]);
+      min64 = fmin (min64, x[i++]);
+    }
+  *max = max64, *min = min64;
 }
 
 #endif

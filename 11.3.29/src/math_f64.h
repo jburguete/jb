@@ -237,6 +237,44 @@ static const double K_ERFCWC_F64[19] JB_ALIGNED = {
   2.8973290438600766459605944875366805e+02
 };
 
+///> 1st constant to calculate integrals by the Gauss method (double).
+static const double JBM_INTEGRAL_GAUSS_A_F64[JBM_INTEGRAL_GAUSS_N] = {
+#if JBM_INTEGRAL_GAUSS_N == 1
+  2.
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  8. / 9.,
+  5. / 9.
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  128. / 225.,
+  4.7862867049936646804129151483563819e-1,
+  2.3692688505618908751426404071991736e-1
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  4.1795918367346938775510204081632653e-1,
+  3.8183005050511894495036977548897513e-1,
+  2.7970539148927666790146777142377958e-1,
+  1.2948496616886969327061143267908202e-1
+#endif
+};
+
+///> 2nd constant to calculate integrals by the Gauss method (double).
+static const double JBM_INTEGRAL_GAUSS_B_F64[JBM_INTEGRAL_GAUSS_N] = {
+#if JBM_INTEGRAL_GAUSS_N == 1
+  0.
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  0.,
+  7.7459666924148340427791481488384306e-1
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  0.,
+  5.3846931010568309103631442070020880e-1,
+  9.0617984593866399279762687829939297e-1
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  0.,
+  4.0584515137739716690660641207696146e-1,
+  7.4153118559939443986386477328078841e-1,
+  9.4910791234275852452618968404785126e-1
+#endif
+};
+
 /**,,
  * Function to calculate the double of a double number.
  *
@@ -4277,6 +4315,36 @@ jbm_erfc_f64 (const double x)   ///< double number.
   if (x < -1.)
     return 2. - jbm_erfcwc_f64 (-x);
   return 1. - jbm_erfwc_f64 (x);
+}
+
+/**
+ * Function to approximate an integral of a function with the Gauss method
+ * defined in an interval (double).
+ *
+ * \return integral value (double).
+ */
+static inline double
+jbm_integral_f64 (double (*f) (double),
+                  ///< pointer to the function to integrate.
+                  const double x1,       ///< left limit of the interval.
+                  const double x2)       ///< right limit of the interval.
+{
+  double k, x, dx;
+#if JBM_INTEGRAL_GAUSS_N > 1
+  double k2;
+  unsigned int i;
+#endif
+  dx = 0.5f *(x2 - x1);
+  x = 0.5f *(x1 + x2);
+  k = JBM_INTEGRAL_GAUSS_A_F64[0] * f (x);
+#if JBM_INTEGRAL_GAUSS_N > 1
+  for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
+    {
+      k2 = JBM_INTEGRAL_GAUSS_B_F64[i] * dx;
+      k += JBM_INTEGRAL_GAUSS_A_F64[i] * (f (x - k2) + f (x + k2));
+    }
+#endif
+  return k * dx;
 }
 
 /**

@@ -1829,8 +1829,7 @@ jbm_integral (JBFLOAT (*f) (JBFLOAT),
       k += a[i] * (f (x - k2) + f (x + k2));
     }
 #endif
-  k *= dx;
-  return k;
+  return k * dx;
 }
 
 /**
@@ -2565,8 +2564,7 @@ jbm_integrall (JBDOUBLE (*f) (JBDOUBLE),
       k += a[i] * (f (x - k2) + f (x + k2));
     }
 #endif
-  k *= dx;
-  return k;
+  return k * dx;
 }
 
 /**

@@ -154,6 +154,44 @@ static const float K_ERFCWC_F32[9] JB_ALIGNED = {
   6.8342024588967421532528823521524584e-03f
 };
 
+///> 1st constant to calculate integrals by the Gauss method (float).
+static const float JBM_INTEGRAL_GAUSS_A_F32[JBM_INTEGRAL_GAUSS_N] = {
+#if JBM_INTEGRAL_GAUSS_N == 1
+  2.f
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  8.f / 9.f,
+  5.f / 9.f
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  128.f / 225.f,
+  4.7862867049936646804129151483563819e-1f,
+  2.3692688505618908751426404071991736e-1f
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  4.1795918367346938775510204081632653e-1f,
+  3.8183005050511894495036977548897513e-1f,
+  2.7970539148927666790146777142377958e-1f,
+  1.2948496616886969327061143267908202e-1f
+#endif
+};
+
+///> 2nd constant to calculate integrals by the Gauss method (float).
+static const float JBM_INTEGRAL_GAUSS_B_F32[JBM_INTEGRAL_GAUSS_N] = {
+#if JBM_INTEGRAL_GAUSS_N == 1
+  0.f
+#elif JBM_INTEGRAL_GAUSS_N == 2
+  0.f,
+  7.7459666924148340427791481488384306e-1f
+#elif JBM_INTEGRAL_GAUSS_N == 3
+  0.f,
+  5.3846931010568309103631442070020880e-1f,
+  9.0617984593866399279762687829939297e-1f
+#elif JBM_INTEGRAL_GAUSS_N == 4
+  0.f,
+  4.0584515137739716690660641207696146e-1f,
+  7.4153118559939443986386477328078841e-1f,
+  9.4910791234275852452618968404785126e-1f
+#endif
+};
+
 /**
  * Function to calculate the double of a float number.
  *
@@ -4200,6 +4238,36 @@ jbm_erfc_f32 (const float x)    ///< float number.
   if (x < -1.f)
     return 2.f - jbm_erfcwc_f32 (-x);
   return 1.f - jbm_erfwc_f32 (x);
+}
+
+/**
+ * Function to approximate an integral of a function with the Gauss method
+ * defined in an interval (float).
+ *
+ * \return integral value (float).
+ */
+static inline float
+jbm_integral_f32 (float (*f) (float),
+                  ///< pointer to the function to integrate.
+                  const float x1,       ///< left limit of the interval.
+                  const float x2)       ///< right limit of the interval.
+{
+  float k, x, dx;
+#if JBM_INTEGRAL_GAUSS_N > 1
+  float k2;
+  unsigned int i;
+#endif
+  dx = 0.5f *(x2 - x1);
+  x = 0.5f *(x1 + x2);
+  k = JBM_INTEGRAL_GAUSS_A_F32[0] * f (x);
+#if JBM_INTEGRAL_GAUSS_N > 1
+  for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
+    {
+      k2 = JBM_INTEGRAL_GAUSS_B_F32[i] * dx;
+      k += JBM_INTEGRAL_GAUSS_A_F32[i] * (f (x - k2) + f (x + k2));
+    }
+#endif
+  return k * dx;
 }
 
 #if !defined(__SSE4_2__) && !defined(__ARM_NEON__) && !defined(__riscv_vector)

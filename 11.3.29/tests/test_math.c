@@ -3680,6 +3680,10 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
+  n = test_uni_f32 (jbm_cbrt_f32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cbrt: OK(%u)\n", n);
   n = test_log_f32 (jbm_exp2_f32, exp2f);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -3708,10 +3712,6 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_f32 (jbm_cbrt_f32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check cbrt: OK(%u)\n", n);
   n = test_uni_f32 (jbm_sin_f32, sinf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -3761,6 +3761,10 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
+  n = test_uni_f64 (jbm_cbrt_f64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cbrt: OK(%u)\n", n);
   n = test_log_f64 (jbm_exp2_f64, exp2);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -3789,10 +3793,6 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_f64 (jbm_cbrt_f64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check cbrt: OK(%u)\n", n);
   n = test_uni_f64 (jbm_sin_f64, sin, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -3860,6 +3860,10 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
+  n = test_uni_4xf32 (jbm_cbrt_4xf32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cbrt: OK(%u)\n", n);
   n = test_log_4xf32 (jbm_exp2_4xf32, exp2f);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -3888,10 +3892,6 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_cbrt_4xf32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check cbrt: OK(%u)\n", n);
   n = test_uni_4xf32 (jbm_sin_4xf32, sinf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -3950,6 +3950,10 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
+  n = test_uni_2xf64 (jbm_cbrt_2xf64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cbrt: OK(%u)\n", n);
   n = test_log_2xf64 (jbm_exp2_2xf64, exp2);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -3978,10 +3982,6 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_2xf64 (jbm_cbrt_2xf64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check cbrt: OK(%u)\n", n);
   n = test_uni_2xf64 (jbm_sin_2xf64, sin, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4041,6 +4041,10 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
+  n = test_uni_8xf32 (jbm_cbrt_8xf32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cbrt: OK(%u)\n", n);
   n = test_log_8xf32 (jbm_exp2_8xf32, exp2f);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4069,10 +4073,6 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_8xf32 (jbm_cbrt_8xf32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check cbrt: OK(%u)\n", n);
   n = test_uni_8xf32 (jbm_sin_8xf32, sinf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4128,6 +4128,10 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
+  n = test_uni_4xf64 (jbm_cbrt_4xf64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cbrt: OK(%u)\n", n);
   n = test_log_4xf64 (jbm_exp2_4xf64, exp2);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4156,10 +4160,6 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_4xf64 (jbm_cbrt_4xf64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check cbrt: OK(%u)\n", n);
   n = test_uni_4xf64 (jbm_sin_4xf64, sin, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4213,6 +4213,10 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
+  n = test_uni_16xf32 (jbm_cbrt_16xf32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cbrt: OK(%u)\n", n);
   n = test_log_16xf32 (jbm_exp2_16xf32, exp2f);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4241,10 +4245,6 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_16xf32 (jbm_cbrt_16xf32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check cbrt: OK(%u)\n", n);
   n = test_uni_16xf32 (jbm_sin_16xf32, sinf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4294,6 +4294,10 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
+  n = test_uni_8xf64 (jbm_cbrt_8xf64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  if (n == MAX_ITERATIONS)
+    return 1;
+  printf ("check cbrt: OK(%u)\n", n);
   n = test_log_8xf64 (jbm_exp2_8xf64, exp2);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4322,10 +4326,6 @@ main (void)
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_8xf64 (jbm_cbrt_8xf64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
-  if (n == MAX_ITERATIONS)
-    return 1;
-  printf ("check cbrt: OK(%u)\n", n);
   n = test_uni_8xf64 (jbm_sin_8xf64, sin, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
