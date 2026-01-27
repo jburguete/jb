@@ -179,6 +179,10 @@
 #define JBM_DBL_MAX_E_EXP 7.0978271289338386e+02
 ///< maximum exponent for an exponential function on double precision.
 
+///> macro to define types for SIMD
+#define JBM_SIMD_SELECT(type, float_case, double_case) \
+  _Generic((type){0}, float: float_case, double: double_case)
+
 #if !HAVE_EXP10
 
 static inline float

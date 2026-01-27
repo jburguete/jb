@@ -92,6 +92,11 @@ typedef union
 #define JBM_CBRT4_2xF64 _mm_set1_pd (JBM_CBRT4_F64)
 ///< cbrt(4) for doubles.
 
+///> macro to define types for SSE
+#define JBM_TYPE_128(type) JBM_SIMD_SELECT(type, __m128, __m128d)
+///> macro to define loads for SSE
+#define JBM_LOAD_128(type) JBM_SIMD_SELECT(type, _mm_load_ps, _mm_load_pd)
+
 // Debug functions
 
 static inline void
@@ -153,6 +158,56 @@ print_m128d (FILE *file, const char *label, const __m128d x)
   for (i = 0; i < 2; ++i)
     fprintf (file, "%s[%u]=%.17lg\n", label, i, y[i]);
 }
+
+#ifndef __FMA__
+
+static inline __m128
+_mm_fmadd_ps (const __m128 x, const __m128 y, const __m128 z)
+{
+  return _mm_add_ps (_mm_mul_ps (x, y), z);
+}
+
+static inline __m128
+_mm_fmsub_ps (const __m128 x, const __m128 y, const __m128 z)
+{
+  return _mm_sub_ps (_mm_mul_ps (x, y), z);
+}
+
+static inline __m128
+_mm_fnmadd_ps (const __m128 x, const __m128 y, const __m128 z)
+{
+  return _mm_sub_ps (z, _mm_mul_ps (x, y));
+}
+
+static inline __m128d
+_mm_fmadd_pd (const __m128d x, const __m128d y, const __m128d z)
+{
+  return _mm_add_pd (_mm_mul_pd (x, y), z);
+}
+
+static inline __m128d
+_mm_fmsub_pd (const __m128d x, const __m128d y, const __m128d z)
+{
+  return _mm_sub_pd (_mm_mul_pd (x, y), z);
+}
+
+static inline __m128d
+_mm_fnmadd_pd (const __m128d x, const __m128d y, const __m128d z)
+{
+  return _mm_sub_pd (z, _mm_mul_pd (x, y));
+}
+
+#endif
+
+#ifndef __AVX512F__
+
+static inline __m128d
+_mm_cvtepi64_pd (__m128i x)
+{
+  return _mm_cvtepi32_pd (_mm_shuffle_epi32 (x, _MM_SHUFFLE (0, 0, 2, 0)));
+}
+
+#endif
 
 /**
  * Function to calculate the additive reduction value of a __m128 vector.

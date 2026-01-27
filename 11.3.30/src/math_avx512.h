@@ -92,76 +92,86 @@ typedef union
 #define JBM_CBRT4_8xF64 _mm512_set1_pd (JBM_CBRT4_F64)
 ///< cbrt(4) for doubles.
 
-///> macro to automatize operations on arrays.
-#define JBM_ARRAY_REDUCE_OP(type512, type256, type128, type, load512, load256, \
-                            load128, op512, op256, \
-		            op128, op, reduce512, reduce256, reduce128, size, \
-			    initial_value, prefetch) \
-  type512 a512, b512, c512, d512; \
-  type256 a256; \
-  type128 a128; \
+///> macro to define types for AVX512
+#define JBM_TYPE_512(type) JBM_SIMD_SELECT(type, __m512, __m512d)
+///> macro to define loads for AVX512
+#define JBM_LOAD_512(type) JBM_SIMD_SELECT(type, _mm512_load_ps, _mm512_load_pd)
+
+///> macro to automatize reduction operations on arrays.
+#define JBM_ARRAY_REDUCE_OP(type, op512, op256, op128, op, reduce512, \
+                            reduce256, reduce128, initial_value) \
+  JBM_TYPE_512 (type) a512, b512, c512, d512; \
+  JBM_TYPE_256 (type) a256; \
+  JBM_TYPE_128 (type) a128; \
   type a = initial_value; \
+  const unsigned int prefetch = sizeof (type) == 4 ? 1024 : 512; \
   unsigned int i, j; \
   i = 0; \
-  j = n >> (7 - size); \
+  j = n >> sizeof (type) == 4 ? 6 : 5; \
   if (j) \
     { \
       if (n > prefetch) \
         _mm_prefetch ((const char *) (x + prefetch), _MM_HINT_T0); \
-      a512 = load512 (x + i); \
-      b512 = load512 (x + i + (16 >> size)); \
-      c512 = load512 (x + i + (32 >> size)); \
-      d512 = load512 (x + i + (48 >> size)); \
+      a512 = JBM_LOAD_512 (type) (x + i); \
+      b512 = JBM_LOAD_512 (type) (x + i + sizeof (type) == 4 ? 16 : 8); \
+      c512 = JBM_LOAD_512 (type) (x + i + sizeof (type) == 4 ? 32 : 16); \
+      d512 = JBM_LOAD_512 (type) (x + i + sizeof (type) == 4 ? 48 : 24); \
       while (--j) \
         { \
-	  i += (64 >> size); \
+          i += sizeof (type) == 4 ? 64 : 32; \
           if (n > i + prefetch) \
             _mm_prefetch ((const char *) (x + i + prefetch), _MM_HINT_T0); \
-          a512 = op512 (a512, load512 (x + i)); \
-          b512 = op512 (b512, load512 (x + i + (16 >> size))); \
-          c512 = op512 (c512, load512 (x + i + (32 >> size))); \
-          d512 = op512 (d512, load512 (x + i + (48 >> size))); \
-	} \
+          a512 = op512 (a512, JBM_LOAD_512 (type) (x + i)); \
+          b512 = op512 (b512, \
+                        JBM_LOAD_512 (type) (x + i \
+                                             + sizeof (type) == 4 ? 16: 8)); \
+          c512 = op512 (c512, \
+                        JBM_LOAD_512( type) (x + i \
+                                             + sizeof (type) == 4 ? 32: 16)); \
+          d512 = op512 (d512, \
+                        JBM_LOAD_512 (type) (x + i \
+                                             + sizeof (type) == 4 ? 48: 24)); \
+        } \
       a512 = op512 (a512, b512); \
       c512 = op512 (c512, d512); \
       a = reduce512 (op512 (a512, c512)); \
-      i += (64 >> size); \
+      i += sizeof (type) == 4 ? 64 : 32; \
     } \
-  j = (n - i) >> (5 - size); \
+  j = (n - i) >> sizeof (type) == 4 ? 4 : 3; \
   if (j) \
     { \
-      a512 = load512 (x + i); \
+      a512 = JBM_LOAD_512 (type) (x + i); \
       while (--j) \
         { \
-	  i += (16 >> size); \
-          a512 = op512 (a512, load512 (x + i)); \
-	} \
+          i += sizeof (type) == 4 ? 16 : 8; \
+          a512 = op512 (a512, JBM_LOAD_512 (type) (x + i)); \
+        } \
       a = op (a, reduce512 (a512)); \
-      i += (16 >> size); \
+      i += sizeof (type) == 4 ? 16 : 8; \
     } \
-  j = (n - i) >> (4 - size); \
+  j = (n - i) >> sizeof (type) == 4 ? 3 : 2; \
   if (j) \
     { \
-      a256 = load256 (x + i); \
+      a256 = JBM_LOAD_256 (type) (x + i); \
       while (--j) \
         { \
-	  i += (8 >> size); \
-          a256 = op256 (a256, load256 (x + i)); \
-	} \
+          i += sizeof (type) == 4 ? 8 : 4; \
+          a256 = op256 (a256, JBM_LOAD_256 (type) (x + i)); \
+        } \
       a = op (a, reduce256 (a256)); \
-      i += (8 >> size); \
+      i += sizeof (type) == 4 ? 8 : 4; \
     } \
-  j = (n - i) >> (3 - size); \
+  j = (n - i) >> sizeof (type) == 4 ? 2 : 1; \
   if (j) \
     { \
-      a128 = load128 (x + i); \
+      a128 = JBM_LOAD_128 (type) (x + i); \
       while (--j) \
         { \
-	  i += (4 >> size); \
-          a128 = op128 (a128, load128 (x + i)); \
-	} \
+          i += sizeof (type) == 4 ? 4 : 2; \
+          a128 = op128 (a128, JBM_LOAD_128 (type) (x + i)); \
+        } \
       a = op (a, reduce128 (a128)); \
-      i += (4 >> size); \
+      i += sizeof (type) == 4 ? 4 : 2; \
     } \
   while (i < n) \
     a = op (a, x[i++]); \
@@ -424,7 +434,7 @@ jbm_frexp_16xf32 (const __m512 x,       ///< __m512 vector.
   z.x = x;
   y.i = _mm512_or_epi32 (_mm512_and_epi32 (z.i, sign_mask),
                          _mm512_or_epi32 (_mm512_set1_epi32 (JBM_BIAS_F32
-					                     << 23),
+                                                             << 23),
                                           _mm512_and_epi32 (y.i, mant_mask)));
   return _mm512_mask_mov_ps (x, is_finite, y.x);
 }
@@ -8432,7 +8442,7 @@ jbm_frexp_8xf64 (const __m512d x,       ///< __m512d vector.
   z.x = x;
   y.i = _mm512_or_epi64 (_mm512_and_epi64 (z.i, sign_mask),
                          _mm512_or_epi64 (_mm512_set1_epi64 (JBM_BIAS_F64
-					                     << 52),
+                                                             << 52),
                                           _mm512_and_epi64 (y.i, mant_mask)));
   return _mm512_mask_mov_pd (x, is_finite, y.x);
 }
@@ -8457,7 +8467,7 @@ jbm_exp2n_8xf64 (__m512i e)     ///< exponent vector (__m512i).
     _mm512_mask_blend_pd
     (is_norm, _mm512_setzero_pd (),
      _mm512_castsi512_pd (_mm512_slli_epi64 (_mm512_add_epi64 (e,
-			                                       v1023), 52)));
+                                                               v1023), 52)));
   x =
     _mm512_mask_mov_pd
     (x, _mm512_cmpgt_epi64_mask (e, vn1074) & ~is_norm,
@@ -16199,9 +16209,9 @@ jbm_integral_8xf64 (__m512d (*f) (__m512d),
  * Function to add 2 float arrays.
  */
 static inline void
-jbm_array_add_f32 (float *xr,   ///< result float array.
-                   const float *x1,     ///< 1st addend float array.
-                   const float *x2,     ///< 1st addend float array.
+jbm_array_add_f32 (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st addend float array.
+                   const float *restrict x2,    ///< 1st addend float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16222,9 +16232,9 @@ jbm_array_add_f32 (float *xr,   ///< result float array.
  * Function to subtract 2 float arrays.
  */
 static inline void
-jbm_array_sub_f32 (float *xr,   ///< result float array.
-                   const float *x1,     ///< minuend float array.
-                   const float *x2,     ///< subtrahend float array.
+jbm_array_sub_f32 (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< minuend float array.
+                   const float *restrict x2,    ///< subtrahend float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16245,8 +16255,8 @@ jbm_array_sub_f32 (float *xr,   ///< result float array.
  * Function to multiply a float array by a float number.
  */
 static inline void
-jbm_array_mul1_f32 (float *xr,  ///< result float array.
-                    const float *x1,    ///< multiplier float array.
+jbm_array_mul1_f32 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< multiplier float array.
                     const float x2,     ///< multiplicand float number.
                     const unsigned int n)       ///< number of array elements.
 {
@@ -16284,8 +16294,8 @@ jbm_array_mul1_f32 (float *xr,  ///< result float array.
  * Function to divide a float array by a float number.
  */
 static inline void
-jbm_array_div1_f32 (float *xr,  ///< result float array.
-                    const float *x1,    ///< dividend float array.
+jbm_array_div1_f32 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< dividend float array.
                     const float x2,     ///< divisor float number.
                     const unsigned int n)       ///< number of array elements.
 {
@@ -16323,9 +16333,9 @@ jbm_array_div1_f32 (float *xr,  ///< result float array.
  * Function to multiply 2 float arrays.
  */
 static inline void
-jbm_array_mul_f32 (float *xr,   ///< result float array.
-                   const float *x1,     ///< multiplier float array.
-                   const float *x2,     ///< multiplicand float array.
+jbm_array_mul_f32 (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< multiplier float array.
+                   const float *restrict x2,    ///< multiplicand float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16346,9 +16356,9 @@ jbm_array_mul_f32 (float *xr,   ///< result float array.
  * Function to divide 2 float arrays.
  */
 static inline void
-jbm_array_div_f32 (float *xr,   ///< result float array.
-                   const float *x1,     ///< dividend float array.
-                   const float *x2,     ///< divisor float array.
+jbm_array_div_f32 (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< dividend float array.
+                   const float *restrict x2,    ///< divisor float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16371,8 +16381,8 @@ jbm_array_div_f32 (float *xr,   ///< result float array.
  * \return dot product (float).
  */
 static inline float
-jbm_array_dot_f32 (const float *x1,     ///< multiplier float array.
-                   const float *x2,     ///< multiplicand float array.
+jbm_array_dot_f32 (const float *restrict x1,    ///< multiplier float array.
+                   const float *restrict x2,    ///< multiplicand float array.
                    const unsigned int n)        ///< number of array elements.
 {
   __m512 a512;
@@ -16387,10 +16397,10 @@ jbm_array_dot_f32 (const float *x1,     ///< multiplier float array.
       a512 = _mm512_mul_ps (_mm512_load_ps (x1 + i), _mm512_load_ps (x2 + i));
       while (--j)
         {
-	  i += 16;
+          i += 16;
           a512 = _mm512_fmadd_ps (_mm512_load_ps (x1 + i),
                                   _mm512_load_ps (x2 + i), a512);
-	}
+        }
       a32 = jbm_reduce_add_16xf32 (a512);
       i += 16;
     }
@@ -16400,10 +16410,10 @@ jbm_array_dot_f32 (const float *x1,     ///< multiplier float array.
       a256 = _mm256_mul_ps (_mm256_load_ps (x1 + i), _mm256_load_ps (x2 + i));
       while (--j)
         {
-	  i += 8;
+          i += 8;
           a256 = _mm256_fmadd_ps (_mm256_load_ps (x1 + i),
                                   _mm256_load_ps (x2 + i), a256);
-	}
+        }
       a32 += jbm_reduce_add_8xf32 (a256);
       i += 8;
     }
@@ -16413,10 +16423,10 @@ jbm_array_dot_f32 (const float *x1,     ///< multiplier float array.
       a128 = _mm_mul_ps (_mm_load_ps (x1 + i), _mm_load_ps (x2 + i));
       while (--j)
         {
-	  i += 4;
+          i += 4;
           a128
             = _mm_fmadd_ps (_mm_load_ps (x1 + i), _mm_load_ps (x2 + i), a128);
-	}
+        }
       a32 += jbm_reduce_add_4xf32 (a128);
       i += 4;
     }
@@ -16429,8 +16439,8 @@ jbm_array_dot_f32 (const float *x1,     ///< multiplier float array.
  * Function to calculate the double of a float array.
  */
 static inline void
-jbm_array_dbl_f32 (float *xr,   ///< result float array.
-                   const float *xd,     ///< data float array.
+jbm_array_dbl_f32 (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16448,8 +16458,8 @@ jbm_array_dbl_f32 (float *xr,   ///< result float array.
  * Function to calculate the square of a float array.
  */
 static inline void
-jbm_array_sqr_f32 (float *xr,   ///< result float array.
-                   const float *xd,     ///< data float array.
+jbm_array_sqr_f32 (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16472,11 +16482,9 @@ static inline float
 jbm_array_max_f32 (const float *x,      ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP (__m512, __m256, __m128, float, _mm512_load_ps,
-                       _mm256_load_ps, _mm_load_ps, _mm512_max_ps,
-                       _mm256_max_ps, _mm_max_ps, fmaxf,
-		       jbm_reduce_max_16xf32, jbm_reduce_max_8xf32,
-		       jbm_reduce_max_4xf32, 1, -INFINITY, 512);
+  JBM_ARRAY_REDUCE_OP (float, _mm512_max_ps, _mm256_max_ps, _mm_max_ps, fmaxf,
+                       jbm_reduce_max_16xf32, jbm_reduce_max_8xf32,
+                       jbm_reduce_max_4xf32, -INFINITY);
 }
 
 /**
@@ -16488,11 +16496,9 @@ static inline float
 jbm_array_min_f32 (const float *x,      ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP (__m512, __m256, __m128, float, _mm512_load_ps,
-                       _mm256_load_ps, _mm_load_ps, _mm512_min_ps,
-                       _mm256_min_ps, _mm_min_ps, fminf,
-		       jbm_reduce_min_16xf32, jbm_reduce_min_8xf32,
-		       jbm_reduce_min_4xf32, 1, INFINITY, 512);
+  JBM_ARRAY_REDUCE_OP (float, _mm512_min_ps, _mm256_min_ps, _mm_min_ps, fminf,
+                       jbm_reduce_min_16xf32, jbm_reduce_min_8xf32,
+                       jbm_reduce_min_4xf32, INFINITY);
 }
 
 /**
@@ -16517,10 +16523,10 @@ jbm_array_maxmin_f32 (const float *x,   ///< float array.
       max512 = min512 = _mm512_load_ps (x + i);
       while (--j)
         {
-	  i += 16;
+          i += 16;
           max512 = _mm512_max_ps (max512, _mm512_load_ps (x + i));
           min512 = _mm512_min_ps (min512, _mm512_load_ps (x + i));
-	}
+        }
       max32 = jbm_reduce_max_16xf32 (max512);
       min32 = jbm_reduce_min_16xf32 (min512);
       i += 16;
@@ -16531,10 +16537,10 @@ jbm_array_maxmin_f32 (const float *x,   ///< float array.
       max256 = min256 = _mm256_load_ps (x + i);
       while (--j)
         {
-	  i += 8;
+          i += 8;
           max256 = _mm256_max_ps (max256, _mm256_load_ps (x + i));
           min256 = _mm256_min_ps (min256, _mm256_load_ps (x + i));
-	}
+        }
       max32 = fmaxf (max32, jbm_reduce_max_8xf32 (max256));
       min32 = fminf (min32, jbm_reduce_min_8xf32 (min256));
       i += 8;
@@ -16545,10 +16551,10 @@ jbm_array_maxmin_f32 (const float *x,   ///< float array.
       max128 = min128 = _mm_load_ps (x + i);
       while (--j)
         {
-	  i += 4;
+          i += 4;
           max128 = _mm_max_ps (max128, _mm_load_ps (x + i));
           min128 = _mm_min_ps (min128, _mm_load_ps (x + i));
-	}
+        }
       max32 = fmaxf (max32, jbm_reduce_max_4xf32 (max128));
       min32 = fminf (min32, jbm_reduce_min_4xf32 (min128));
       i += 4;
@@ -16565,9 +16571,9 @@ jbm_array_maxmin_f32 (const float *x,   ///< float array.
  * Function to add 2 double arrays.
  */
 static inline void
-jbm_array_add_f64 (double *xr,  ///< result double array.
-                   const double *x1,    ///< 1st addend double array.
-                   const double *x2,    ///< 1st addend double array.
+jbm_array_add_f64 (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st addend double array.
+                   const double *restrict x2,   ///< 1st addend double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16588,9 +16594,9 @@ jbm_array_add_f64 (double *xr,  ///< result double array.
  * Function to subtract 2 double arrays.
  */
 static inline void
-jbm_array_sub_f64 (double *xr,  ///< result double array.
-                   const double *x1,    ///< minuend double array.
-                   const double *x2,    ///< subtrahend double array.
+jbm_array_sub_f64 (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< minuend double array.
+                   const double *restrict x2,   ///< subtrahend double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16611,8 +16617,8 @@ jbm_array_sub_f64 (double *xr,  ///< result double array.
  * Function to multiply a double array by a double number.
  */
 static inline void
-jbm_array_mul1_f64 (double *xr, ///< result double array.
-                    const double *x1,   ///< multiplier double array.
+jbm_array_mul1_f64 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< multiplier double array.
                     const double x2,    ///< multiplicand double number.
                     const unsigned int n)       ///< number of array elements.
 {
@@ -16650,8 +16656,8 @@ jbm_array_mul1_f64 (double *xr, ///< result double array.
  * Function to divide a double array by a double number.
  */
 static inline void
-jbm_array_div1_f64 (double *xr, ///< result double array.
-                    const double *x1,   ///< dividend double array.
+jbm_array_div1_f64 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< dividend double array.
                     const double x2,    ///< divisor double number.
                     const unsigned int n)       ///< number of array elements.
 {
@@ -16689,9 +16695,9 @@ jbm_array_div1_f64 (double *xr, ///< result double array.
  * Function to multiply 2 double arrays.
  */
 static inline void
-jbm_array_mul_f64 (double *xr,  ///< result double array.
-                   const double *x1,    ///< multiplier double array.
-                   const double *x2,    ///< multiplicand double array.
+jbm_array_mul_f64 (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< multiplier double array.
+                   const double *restrict x2,   ///< multiplicand double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16712,9 +16718,9 @@ jbm_array_mul_f64 (double *xr,  ///< result double array.
  * Function to divide 2 double arrays.
  */
 static inline void
-jbm_array_div_f64 (double *xr,  ///< result double array.
-                   const double *x1,    ///< dividend double array.
-                   const double *x2,    ///< divisor double array.
+jbm_array_div_f64 (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< dividend double array.
+                   const double *restrict x2,   ///< divisor double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16737,8 +16743,8 @@ jbm_array_div_f64 (double *xr,  ///< result double array.
  * \return dot product (double).
  */
 static inline double
-jbm_array_dot_f64 (const double *x1,     ///< multiplier double array.
-                   const double *x2,     ///< multiplicand double array.
+jbm_array_dot_f64 (const double *restrict x1,   ///< multiplier double array.
+                   const double *restrict x2,   ///< multiplicand double array.
                    const unsigned int n)        ///< number of array elements.
 {
   __m512d a512;
@@ -16753,10 +16759,10 @@ jbm_array_dot_f64 (const double *x1,     ///< multiplier double array.
       a512 = _mm512_mul_pd (_mm512_load_pd (x1 + i), _mm512_load_pd (x2 + i));
       while (--j)
         {
-	  i += 8;
+          i += 8;
           a512 = _mm512_fmadd_pd (_mm512_load_pd (x1 + i),
                                   _mm512_load_pd (x2 + i), a512);
-	}
+        }
       a64 += jbm_reduce_add_8xf64 (a512);
       i += 8;
     }
@@ -16766,10 +16772,10 @@ jbm_array_dot_f64 (const double *x1,     ///< multiplier double array.
       a256 = _mm256_mul_pd (_mm256_load_pd (x1 + i), _mm256_load_pd (x2 + i));
       while (--j)
         {
-	  i += 4;
+          i += 4;
           a256 = _mm256_fmadd_pd (_mm256_load_pd (x1 + i),
                                   _mm256_load_pd (x2 + i), a256);
-	}
+        }
       a64 += jbm_reduce_add_4xf64 (a256);
       i += 4;
     }
@@ -16779,10 +16785,10 @@ jbm_array_dot_f64 (const double *x1,     ///< multiplier double array.
       a128 = _mm_mul_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i));
       while (--j)
         {
-	  i += 2;
+          i += 2;
           a128
             = _mm_fmadd_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i), a128);
-	}
+        }
       a64 += jbm_reduce_add_2xf64 (a128);
       i += 2;
     }
@@ -16795,8 +16801,8 @@ jbm_array_dot_f64 (const double *x1,     ///< multiplier double array.
  * Function to calculate the double of a double array.
  */
 static inline void
-jbm_array_dbl_f64 (double *xr,  ///< result double array.
-                   const double *xd,    ///< data double array.
+jbm_array_dbl_f64 (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16814,8 +16820,8 @@ jbm_array_dbl_f64 (double *xr,  ///< result double array.
  * Function to calculate the square of a double array.
  */
 static inline void
-jbm_array_sqr_f64 (double *xr,  ///< result double array.
-                   const double *xd,    ///< data double array.
+jbm_array_sqr_f64 (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
@@ -16838,51 +16844,9 @@ static inline double
 jbm_array_max_f64 (const double *x,     ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  __m512d a512;
-  __m256d a256;
-  __m128d a128;
-  double a64 = -INFINITY;
-  unsigned int i, j;
-  i = 0;
-  j = n >> 3;
-  if (j)
-    {
-      a512 = _mm512_load_pd (x + i);
-      while (--j)
-        {
-	  i += 8;
-          a512 = _mm512_max_pd (a512, _mm512_load_pd (x + i));
-	}
-      a64 = fmax (a64, jbm_reduce_max_8xf64 (a512));
-      i += 8;
-    }
-  j = (n - i) >> 2;
-  if (j)
-    {
-      a256 = _mm256_load_pd (x + i);
-      while (--j)
-        {
-	  i += 4;
-          a256 = _mm256_max_pd (a256, _mm256_load_pd (x + i));
-	}
-      a64 = fmax (a64, jbm_reduce_max_4xf64 (a256));
-      i += 4;
-    }
-  j = (n - i) >> 1;
-  if (j)
-    {
-      a128 = _mm_load_pd (x + i);
-      while (--j)
-        {
-	  i += 2;
-          a128 = _mm_max_pd (a128, _mm_load_pd (x + i));
-	}
-      a64 = fmax (a64, jbm_reduce_max_2xf64 (a128));
-      i += 2;
-    }
-  while (i < n)
-    a64 = fmax (a64, x[i++]);
-  return a64;
+  JBM_ARRAY_REDUCE_OP (double, _mm512_max_pd, _mm256_max_pd, _mm_max_pd, fmax,
+                       jbm_reduce_max_8xf64, jbm_reduce_max_4xf64,
+                       jbm_reduce_max_2xf64, -INFINITY);
 }
 
 /**
@@ -16894,71 +16858,9 @@ static inline double
 jbm_array_min_f64 (const double *x,     ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  __m512d a512, b512, c512, d512;
-  __m256d a256;
-  __m128d a128;
-  double a64 = INFINITY;
-  unsigned int i, j;
-  i = 0;
-  j = n >> 5;
-  if (j)
-    {
-      a512 = _mm512_load_pd (x + i);
-      b512 = _mm512_load_pd (x + i + 8);
-      c512 = _mm512_load_pd (x + i + 16);
-      d512 = _mm512_load_pd (x + i + 24);
-      while (--j)
-        {
-	  i += 32;
-          a512 = _mm512_min_pd (a512, _mm512_load_pd (x + i));
-          b512 = _mm512_min_pd (b512, _mm512_load_pd (x + i + 8));
-          c512 = _mm512_min_pd (c512, _mm512_load_pd (x + i + 16));
-          d512 = _mm512_min_pd (d512, _mm512_load_pd (x + i + 24));
-	}
-      a512 = _mm512_min_pd (a512, b512);
-      c512 = _mm512_min_pd (c512, d512);
-      a64 = jbm_reduce_min_8xf64 (_mm512_min_pd (a512, c512));
-      i += 32;
-    }
-  j = (n - i) >> 3;
-  if (j)
-    {
-      a512 = _mm512_load_pd (x + i);
-      while (--j)
-        {
-	  i += 8;
-          a512 = _mm512_min_pd (a512, _mm512_load_pd (x + i));
-	}
-      a64 = fmin (a64, jbm_reduce_min_8xf64 (a512));
-      i += 8;
-    }
-  j = (n - i) >> 2;
-  if (j)
-    {
-      a256 = _mm256_load_pd (x + i);
-      while (--j)
-        {
-	  i += 4;
-          a256 = _mm256_min_pd (a256, _mm256_load_pd (x + i));
-	}
-      a64 = fmin (a64, jbm_reduce_min_4xf64 (a256));
-      i += 4;
-    }
-  j = (n - i) >> 1;
-  if (j)
-    {
-      a128 = _mm_load_pd (x + i);
-      while (--j)
-        {
-	  i += 2;
-          a128 = _mm_min_pd (a128, _mm_load_pd (x + i));
-	}
-      a64 = fmin (a64, jbm_reduce_min_2xf64 (a128));
-      i += 2;
-    }
-  while (i < n)
-    a64 = fmin (a64, x[i++]);
-  return a64;
+  JBM_ARRAY_REDUCE_OP (double, _mm512_min_pd, _mm256_min_pd, _mm_min_pd, fmin,
+                       jbm_reduce_min_8xf64, jbm_reduce_min_4xf64,
+                       jbm_reduce_min_2xf64, INFINITY);
 }
 
 /**
@@ -16987,8 +16889,8 @@ jbm_array_maxmin_f64 (const double *x, ///< double array.
         {
           max512 = _mm512_max_pd (max512, _mm512_load_pd (x + i));
           min512 = _mm512_min_pd (min512, _mm512_load_pd (x + i));
-	  i += 8;
-	}
+          i += 8;
+        }
       while (--j);
       max64 = fmax (max64, jbm_reduce_max_8xf64 (max512));
       min64 = fmin (min64, jbm_reduce_min_8xf64 (min512));
@@ -17000,8 +16902,8 @@ jbm_array_maxmin_f64 (const double *x, ///< double array.
         {
           max256 = _mm256_max_pd (max256, _mm256_load_pd (x + i));
           min256 = _mm256_min_pd (min256, _mm256_load_pd (x + i));
-	  i += 4;
-	}
+          i += 4;
+        }
       while (--j);
       max64 = fmax (max64, jbm_reduce_max_4xf64 (max256));
       min64 = fmin (min64, jbm_reduce_min_4xf64 (min256));
@@ -17013,8 +16915,8 @@ jbm_array_maxmin_f64 (const double *x, ///< double array.
         {
           max128 = _mm_max_pd (max128, _mm_load_pd (x + i));
           min128 = _mm_min_pd (min128, _mm_load_pd (x + i));
-	  i += 2;
-	}
+          i += 2;
+        }
       while (--j);
       max64 = fmax (max64, jbm_reduce_max_2xf64 (max128));
       min64 = fmin (min64, jbm_reduce_min_2xf64 (min128));

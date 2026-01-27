@@ -92,6 +92,11 @@ typedef union
 #define JBM_CBRT4_4xF64 _mm256_set1_pd (JBM_CBRT4_F64)
 ///< cbrt(4) for doubles.
 
+///> macro to define types for AVX
+#define JBM_TYPE_256(type) JBM_SIMD_SELECT(type, __m256, __m256d)
+///> macro to define loads for AVX
+#define JBM_LOAD_256(type) JBM_SIMD_SELECT(type, _mm256_load_ps, _mm256_load_pd)
+
 // Debug functions
 
 static inline void
