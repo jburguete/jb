@@ -215,7 +215,7 @@ _mm_cvtepi64_pd (__m128i x)
  * \return additive reduction (float).
  */
 static inline float
-jbm_reduce_add_4xf32 (const __m128 x)   ///< __m128 vector.
+jbm_4xf32_reduce_add (const __m128 x)   ///< __m128 vector.
 {
   __m128 y;
   y = _mm_hadd_ps (x, x);
@@ -228,7 +228,7 @@ jbm_reduce_add_4xf32 (const __m128 x)   ///< __m128 vector.
  * \return maximum reduction (float).
  */
 static inline float
-jbm_reduce_max_4xf32 (const __m128 x)
+jbm_4xf32_reduce_max (const __m128 x)
 {
   __m128 y;
   y = _mm_max_ps (x, _mm_movehl_ps (x, x));
@@ -242,7 +242,7 @@ jbm_reduce_max_4xf32 (const __m128 x)
  * \return minimum reduction (float).
  */
 static inline float
-jbm_reduce_min_4xf32 (const __m128 x)
+jbm_4xf32_reduce_min (const __m128 x)
 {
   __m128 y;
   y = _mm_min_ps (x, _mm_movehl_ps (x, x));
@@ -255,7 +255,7 @@ jbm_reduce_min_4xf32 (const __m128 x)
  * __m128 vector.
  */
 static inline void
-jbm_reduce_maxmin_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_reduce_maxmin (const __m128 x,       ///< __m128 vector.
                          float *max,
                          ///< pointer to the maximum value (float).
                          float *min)
@@ -277,7 +277,7 @@ jbm_reduce_maxmin_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return opposite value vector (__m128).
  */
 static inline __m128
-jbm_opposite_4xf32 (const __m128 x)     ///< __m128 vector.
+jbm_4xf32_opposite (const __m128 x)     ///< __m128 vector.
 {
   JBM4xF32 y;
   y.i = JBM_BITS_SIGN_4xF32;
@@ -290,7 +290,7 @@ jbm_opposite_4xf32 (const __m128 x)     ///< __m128 vector.
  * \return reciprocal value vector (__m128).
  */
 static inline __m128
-jbm_reciprocal_4xf32 (const __m128 x)   ///< __m128 vector.
+jbm_4xf32_reciprocal (const __m128 x)   ///< __m128 vector.
 {
   return _mm_div_ps (_mm_set1_ps (1.f), x);
 }
@@ -301,7 +301,7 @@ jbm_reciprocal_4xf32 (const __m128 x)   ///< __m128 vector.
  * \return sign vector (__m128).
  */
 static inline __m128
-jbm_sign_4xf32 (const __m128 x) ///< __m128 vector.
+jbm_4xf32_sign (const __m128 x) ///< __m128 vector.
 {
   JBM4xF32 y;
   y.x = x;
@@ -316,7 +316,7 @@ jbm_sign_4xf32 (const __m128 x) ///< __m128 vector.
  * \return absolute value vector (__m128).
  */
 static inline __m128
-jbm_abs_4xf32 (const __m128 x)  ///< __m128 vector.
+jbm_4xf32_abs (const __m128 x)  ///< __m128 vector.
 {
   JBM4xF32 y;
   y.i = JBM_BITS_SIGN_4xF32;
@@ -329,13 +329,13 @@ jbm_abs_4xf32 (const __m128 x)  ///< __m128 vector.
  * \return __m128 vector with magnitud of 1st vector and sign of 2nd vector.
  */
 static inline __m128
-jbm_copysign_4xf32 (const __m128 x,
+jbm_copy4xf32_sign (const __m128 x,
 ///< __m128 vector to preserve magnitude.
                     const __m128 y)     ///< __m128 vector to preserve sign.
 {
   JBM4xF32 m;
   m.i = JBM_BITS_SIGN_4xF32;
-  return _mm_or_ps (jbm_abs_4xf32 (x), _mm_and_ps (y, m.x));
+  return _mm_or_ps (jbm_4xf32_abs (x), _mm_and_ps (y, m.x));
 }
 
 /**
@@ -344,7 +344,7 @@ jbm_copysign_4xf32 (const __m128 x,
  * \return function value vector (__m128).
  */
 static inline __m128
-jbm_hypot_4xf32 (const __m128 x,        ///< 1st __m128 vector.
+jbm_4xf32_hypot (const __m128 x,        ///< 1st __m128 vector.
                  const __m128 y)        ///< 2nd __m128 vector.
 {
   return _mm_sqrt_ps (_mm_fmadd_ps (x, x, _mm_mul_ps (y, y)));
@@ -356,14 +356,14 @@ jbm_hypot_4xf32 (const __m128 x,        ///< 1st __m128 vector.
  * \return rest value vector (in [0,|divisor|) interval).
  */
 static inline __m128
-jbm_mod_4xf32 (const __m128 x,  ///< dividend (__m128).
+jbm_4xf32_mod (const __m128 x,  ///< dividend (__m128).
                const __m128 d)  ///< divisor (__m128).
 {
   __m128 r;
   r = _mm_floor_ps (_mm_div_ps (x, d));
   return _mm_blendv_ps (_mm_fnmadd_ps (r, d, x),
                         _mm_mul_ps (d, _mm_set1_ps (0.5f)),
-                        _mm_cmpgt_ps (jbm_abs_4xf32 (r),
+                        _mm_cmpgt_ps (jbm_4xf32_abs (r),
                                       _mm_set1_ps (1.f / FLT_EPSILON)));
 }
 
@@ -373,7 +373,7 @@ jbm_mod_4xf32 (const __m128 x,  ///< dividend (__m128).
  * \return normalized fraction value in [1/2,1).
  */
 static inline __m128
-jbm_frexp_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
                  __m128i *e)    ///< pointer to the extracted exponents vector.
 {
   const __m128i zi = _mm_setzero_si128 ();
@@ -419,7 +419,7 @@ jbm_frexp_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_exp2n_4xf32 (const __m128i e)     ///< exponent vector (__m128i).
+jbm_4xf32_exp2n (const __m128i e)     ///< exponent vector (__m128i).
 {
   __m128 x;
   x = _mm_blendv_ps
@@ -445,10 +445,10 @@ jbm_exp2n_4xf32 (const __m128i e)     ///< exponent vector (__m128i).
  * \return function value (__m128).
  */
 static inline __m128
-jbm_ldexp_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_ldexp (const __m128 x,        ///< __m128 vector.
                  const __m128i e)       ///< exponent vector (__m128i).
 {
-  return _mm_mul_ps (x, jbm_exp2n_4xf32 (e));
+  return _mm_mul_ps (x, jbm_4xf32_exp2n (e));
 }
 
 /**
@@ -459,7 +459,7 @@ jbm_ldexp_4xf32 (const __m128 x,        ///< __m128 vector.
 static inline __m128
 jbm_small_4xf32 (const __m128 x)        ///< __m128d vector.
 {
-  return _mm_cmplt_ps (jbm_abs_4xf32 (x), _mm_set1_ps (FLT_EPSILON));
+  return _mm_cmplt_ps (jbm_4xf32_abs (x), _mm_set1_ps (FLT_EPSILON));
 }
 
 /**
@@ -481,8 +481,8 @@ jbm_modmin_4xf32 (const __m128 a,       ///< 1st __m128d vector.
   __m128 aa, ab, y;
   ab = _mm_mul_ps (a, b);
   y = _mm_blendv_ps (z, a, _mm_cmpgt_ps (ab, z));
-  aa = jbm_abs_4xf32 (y);
-  ab = jbm_abs_4xf32 (b);
+  aa = jbm_4xf32_abs (y);
+  ab = jbm_4xf32_abs (b);
   return _mm_blendv_ps (y, b, _mm_cmpgt_ps (aa, ab));
 }
 
@@ -503,7 +503,7 @@ jbm_change_4xf32 (__m128 *restrict a,   ///< 1st __m128 vector pointer.
  * \return __m128 double.
  */
 static inline __m128
-jbm_dbl_4xf32 (const __m128 x)  ///< __m128d vector.
+jbm_4xf32_dbl (const __m128 x)  ///< __m128d vector.
 {
   return _mm_add_ps (x, x);
 }
@@ -514,7 +514,7 @@ jbm_dbl_4xf32 (const __m128 x)  ///< __m128d vector.
  * \return __m128 vector square.
  */
 static inline __m128
-jbm_sqr_4xf32 (const __m128 x)  ///< __m128 vector.
+jbm_4xf32_sqr (const __m128 x)  ///< __m128 vector.
 {
   return _mm_mul_ps (x, x);
 }
@@ -525,7 +525,7 @@ jbm_sqr_4xf32 (const __m128 x)  ///< __m128 vector.
  * \return __m128 vector of y-coordinates of the extrapolated points.
  */
 static inline __m128
-jbm_extrapolate_4xf32 (const __m128 x,
+jbm_4xf32_extrapolate (const __m128 x,
                        ///< __m128 vector of x-coordinates of the extrapolated
                        ///< points.
                        const __m128 x1,
@@ -548,7 +548,7 @@ jbm_extrapolate_4xf32 (const __m128 x,
  * \return __m128 vector of y-coordinates of the interpolated points.
  */
 static inline __m128
-jbm_interpolate_4xf32 (const __m128 x,
+jbm_4xf32_interpolate (const __m128 x,
                        ///< __m128 vector of x-coordinates of the interpolated
                        ///< points.
                        const __m128 x1,
@@ -561,7 +561,7 @@ jbm_interpolate_4xf32 (const __m128 x,
                      ///< __m128 vector of y-coordinates of the 2nd points.
 {
   __m128 k;
-  k = jbm_extrapolate_4xf32 (x, x1, x2, y1, y2);
+  k = jbm_4xf32_extrapolate (x, x1, x2, y1, y2);
   k = _mm_blendv_ps (y1, k, _mm_cmpgt_ps (x, x1));
   return _mm_blendv_ps (y2, k, _mm_cmplt_ps (x, x2));
 }
@@ -572,7 +572,7 @@ jbm_interpolate_4xf32 (const __m128 x,
  * \return __m128 vector of segment lengths.
  */
 static inline __m128
-jbm_v2_length_4xf32 (const __m128 x1,
+jbm_4xf32_v2_length (const __m128 x1,
 ///< __m128 vector of x-coordinates of the 1st points defining the segment.
                      const __m128 y1,
 ///< __m128 vector of y-coordinates of the 1st points defining the segment.
@@ -581,7 +581,7 @@ jbm_v2_length_4xf32 (const __m128 x1,
                      const __m128 y2)
 ///< __m128 vector of y-coordinates of the 2nd points defining the segment.
 {
-  return jbm_hypot_4xf32 (_mm_sub_ps (x2, x1), _mm_sub_ps (y2, y1));
+  return jbm_4xf32_hypot (_mm_sub_ps (x2, x1), _mm_sub_ps (y2, y1));
 }
 
 /**
@@ -590,7 +590,7 @@ jbm_v2_length_4xf32 (const __m128 x1,
  * \return __m128 vector of segment lengths.
  */
 static inline __m128
-jbm_v3_length_4xf32 (const __m128 x1,
+jbm_4xf32_v3_length (const __m128 x1,
 ///< __m128 vector of x-coordinates of the 1st points defining the segments.
                      const __m128 y1,
 ///< __m128 vector of y-coordinates of the 1st points defining the segments.
@@ -604,7 +604,7 @@ jbm_v3_length_4xf32 (const __m128 x1,
 ///< __m128 vector of z-coordinates of the 2nd points defining the segments.
 {
   __m128 dx, dy, dz;
-  dx = jbm_sqr_4xf32 (_mm_sub_ps (x2, x1));
+  dx = jbm_4xf32_sqr (_mm_sub_ps (x2, x1));
   dy = _mm_sub_ps (y2, y1);
   dy = _mm_fmadd_ps (dy, dy, dx);
   dz = _mm_sub_ps (z2, z1);
@@ -617,7 +617,7 @@ jbm_v3_length_4xf32 (const __m128 x1,
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_1_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_polynomial_1 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm_fmadd_ps (x, _mm_set1_ps (p[1]), _mm_set1_ps (p[0]));
@@ -629,10 +629,10 @@ jbm_polynomial_1_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_2_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_polynomial_2 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -642,10 +642,10 @@ jbm_polynomial_2_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_3_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_polynomial_3 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -655,10 +655,10 @@ jbm_polynomial_3_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_4_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_polynomial_4 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -668,10 +668,10 @@ jbm_polynomial_4_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_5_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_polynomial_5 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -681,10 +681,10 @@ jbm_polynomial_5_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_6_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_polynomial_6 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -694,10 +694,10 @@ jbm_polynomial_6_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_7_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_polynomial_7 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -707,10 +707,10 @@ jbm_polynomial_7_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_8_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_polynomial_8 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -720,10 +720,10 @@ jbm_polynomial_8_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_9_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_polynomial_9 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -733,10 +733,10 @@ jbm_polynomial_9_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_10_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_10 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -746,10 +746,10 @@ jbm_polynomial_10_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_11_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_11 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -759,10 +759,10 @@ jbm_polynomial_11_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_12_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_12 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -772,10 +772,10 @@ jbm_polynomial_12_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_13_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_13 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -785,10 +785,10 @@ jbm_polynomial_13_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_14_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_14 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -798,10 +798,10 @@ jbm_polynomial_14_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_15_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_15 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -811,10 +811,10 @@ jbm_polynomial_15_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_16_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_16 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -824,10 +824,10 @@ jbm_polynomial_16_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_17_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_17 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -837,10 +837,10 @@ jbm_polynomial_17_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_18_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_18 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -850,10 +850,10 @@ jbm_polynomial_18_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_19_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_19 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -863,10 +863,10 @@ jbm_polynomial_19_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_20_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_20 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -876,10 +876,10 @@ jbm_polynomial_20_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_21_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_21 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_20_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_20 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -889,10 +889,10 @@ jbm_polynomial_21_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_22_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_22 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_21_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_21 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -902,10 +902,10 @@ jbm_polynomial_22_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_23_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_23 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_22_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_22 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -915,10 +915,10 @@ jbm_polynomial_23_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_24_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_24 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_23_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_23 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -928,10 +928,10 @@ jbm_polynomial_24_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_25_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_25 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_24_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_24 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -941,10 +941,10 @@ jbm_polynomial_25_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_26_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_26 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_25_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_25 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -954,10 +954,10 @@ jbm_polynomial_26_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_27_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_27 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_26_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_26 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -967,10 +967,10 @@ jbm_polynomial_27_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_28_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_28 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_27_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_27 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -980,10 +980,10 @@ jbm_polynomial_28_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of polynomial values.
  */
 static inline __m128
-jbm_polynomial_29_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_polynomial_29 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_ps (x, jbm_polynomial_28_4xf32 (x, p + 1),
+  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_28 (x, p + 1),
                        _mm_set1_ps (p[0]));
 }
 
@@ -993,7 +993,7 @@ jbm_polynomial_29_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_1_0_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_1_0 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
@@ -1006,11 +1006,11 @@ jbm_rational_1_0_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_2_0_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_2_0 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1020,10 +1020,10 @@ jbm_rational_2_0_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_2_1_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_2_1 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[2]), _mm_set1_ps (1.f)));
 }
 
@@ -1033,11 +1033,11 @@ jbm_rational_2_1_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_3_0_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_3_0 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1047,11 +1047,11 @@ jbm_rational_3_0_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_3_1_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_3_1 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1061,10 +1061,10 @@ jbm_rational_3_1_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_3_2_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_3_2 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[3]), _mm_set1_ps (1.f)));
 }
 
@@ -1074,11 +1074,11 @@ jbm_rational_3_2_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_4_0_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_4_0 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1088,11 +1088,11 @@ jbm_rational_4_0_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_4_1_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_4_1 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1102,11 +1102,11 @@ jbm_rational_4_1_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_4_2_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_4_2 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1116,10 +1116,10 @@ jbm_rational_4_2_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_4_3_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_4_3 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[4]), _mm_set1_ps (1.f)));
 }
 
@@ -1129,11 +1129,11 @@ jbm_rational_4_3_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_5_0_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_5_0 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1143,11 +1143,11 @@ jbm_rational_5_0_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_5_1_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_5_1 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1157,11 +1157,11 @@ jbm_rational_5_1_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_5_2_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_5_2 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1171,11 +1171,11 @@ jbm_rational_5_2_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_5_3_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_5_3 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1185,10 +1185,10 @@ jbm_rational_5_3_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_5_4_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_5_4 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[5]), _mm_set1_ps (1.f)));
 }
 
@@ -1198,11 +1198,11 @@ jbm_rational_5_4_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_6_0_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_6_0 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1212,11 +1212,11 @@ jbm_rational_6_0_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_6_1_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_6_1 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1226,11 +1226,11 @@ jbm_rational_6_1_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_6_2_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_6_2 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1240,11 +1240,11 @@ jbm_rational_6_2_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_6_3_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_6_3 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1254,11 +1254,11 @@ jbm_rational_6_3_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_6_4_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_6_4 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1268,10 +1268,10 @@ jbm_rational_6_4_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_6_5_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_6_5 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[6]), _mm_set1_ps (1.f)));
 }
 
@@ -1281,11 +1281,11 @@ jbm_rational_6_5_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_7_0_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_7_0 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1295,11 +1295,11 @@ jbm_rational_7_0_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_7_1_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_7_1 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1309,11 +1309,11 @@ jbm_rational_7_1_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_7_2_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_7_2 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1323,11 +1323,11 @@ jbm_rational_7_2_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_7_3_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_7_3 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1337,11 +1337,11 @@ jbm_rational_7_3_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_7_4_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_7_4 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1351,11 +1351,11 @@ jbm_rational_7_4_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_7_5_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_7_5 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1365,10 +1365,10 @@ jbm_rational_7_5_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_7_6_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_7_6 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[7]), _mm_set1_ps (1.f)));
 }
 
@@ -1378,11 +1378,11 @@ jbm_rational_7_6_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_8_0_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_8_0 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1392,11 +1392,11 @@ jbm_rational_8_0_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_8_1_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_8_1 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1406,11 +1406,11 @@ jbm_rational_8_1_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_8_2_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_8_2 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1420,11 +1420,11 @@ jbm_rational_8_2_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_8_3_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_8_3 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1434,11 +1434,11 @@ jbm_rational_8_3_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_8_4_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_8_4 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1448,11 +1448,11 @@ jbm_rational_8_4_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_8_5_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_8_5 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1462,11 +1462,11 @@ jbm_rational_8_5_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_8_6_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_8_6 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1476,10 +1476,10 @@ jbm_rational_8_6_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_8_7_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_8_7 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[8]), _mm_set1_ps (1.f)));
 }
 
@@ -1489,11 +1489,11 @@ jbm_rational_8_7_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_9_0_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_9_0 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1503,11 +1503,11 @@ jbm_rational_9_0_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_9_1_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_9_1 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1517,11 +1517,11 @@ jbm_rational_9_1_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_9_2_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_9_2 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1531,11 +1531,11 @@ jbm_rational_9_2_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_9_3_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_9_3 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1545,11 +1545,11 @@ jbm_rational_9_3_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_9_4_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_9_4 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1559,11 +1559,11 @@ jbm_rational_9_4_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_9_5_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_9_5 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1573,11 +1573,11 @@ jbm_rational_9_5_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_9_6_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_9_6 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1587,11 +1587,11 @@ jbm_rational_9_6_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_9_7_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_9_7 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1601,10 +1601,10 @@ jbm_rational_9_7_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_9_8_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_rational_9_8 (const __m128 x, ///< __m128 vector.
                         const float *p) ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[9]), _mm_set1_ps (1.f)));
 }
 
@@ -1614,11 +1614,11 @@ jbm_rational_9_8_4xf32 (const __m128 x, ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_10_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_10_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1628,11 +1628,11 @@ jbm_rational_10_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_10_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_10_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1642,11 +1642,11 @@ jbm_rational_10_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_10_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_10_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1656,11 +1656,11 @@ jbm_rational_10_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_10_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_10_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1670,11 +1670,11 @@ jbm_rational_10_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_10_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_10_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1684,11 +1684,11 @@ jbm_rational_10_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_10_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_10_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1698,11 +1698,11 @@ jbm_rational_10_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_10_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_10_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1712,11 +1712,11 @@ jbm_rational_10_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_10_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_10_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1726,11 +1726,11 @@ jbm_rational_10_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_10_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_10_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1740,10 +1740,10 @@ jbm_rational_10_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_10_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_10_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[10]), _mm_set1_ps (1.f)));
 }
 
@@ -1753,11 +1753,11 @@ jbm_rational_10_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_11_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1767,11 +1767,11 @@ jbm_rational_11_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_11_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1781,11 +1781,11 @@ jbm_rational_11_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_11_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1795,11 +1795,11 @@ jbm_rational_11_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_11_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1809,11 +1809,11 @@ jbm_rational_11_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_11_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1823,11 +1823,11 @@ jbm_rational_11_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_11_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1837,11 +1837,11 @@ jbm_rational_11_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_11_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1851,11 +1851,11 @@ jbm_rational_11_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_11_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1865,11 +1865,11 @@ jbm_rational_11_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_11_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1879,11 +1879,11 @@ jbm_rational_11_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_11_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1893,10 +1893,10 @@ jbm_rational_11_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_11_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_11_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[11]), _mm_set1_ps (1.f)));
 }
 
@@ -1906,11 +1906,11 @@ jbm_rational_11_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_12_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1920,11 +1920,11 @@ jbm_rational_12_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_12_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1934,11 +1934,11 @@ jbm_rational_12_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_12_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1948,11 +1948,11 @@ jbm_rational_12_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_12_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1962,11 +1962,11 @@ jbm_rational_12_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_12_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1976,11 +1976,11 @@ jbm_rational_12_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_12_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -1990,11 +1990,11 @@ jbm_rational_12_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_12_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2004,11 +2004,11 @@ jbm_rational_12_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_12_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2018,11 +2018,11 @@ jbm_rational_12_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_12_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2032,11 +2032,11 @@ jbm_rational_12_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_12_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2046,11 +2046,11 @@ jbm_rational_12_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_12_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2060,10 +2060,10 @@ jbm_rational_12_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_12_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_12_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[12]), _mm_set1_ps (1.f)));
 }
 
@@ -2073,11 +2073,11 @@ jbm_rational_12_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_13_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2087,11 +2087,11 @@ jbm_rational_13_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_13_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2101,11 +2101,11 @@ jbm_rational_13_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_13_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2115,11 +2115,11 @@ jbm_rational_13_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_13_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2129,11 +2129,11 @@ jbm_rational_13_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_13_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2143,11 +2143,11 @@ jbm_rational_13_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_13_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2157,11 +2157,11 @@ jbm_rational_13_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_13_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2171,11 +2171,11 @@ jbm_rational_13_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_13_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2185,11 +2185,11 @@ jbm_rational_13_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_13_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2199,11 +2199,11 @@ jbm_rational_13_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_13_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2213,11 +2213,11 @@ jbm_rational_13_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_13_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2227,11 +2227,11 @@ jbm_rational_13_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_13_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2241,10 +2241,10 @@ jbm_rational_13_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_13_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_13_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[13]), _mm_set1_ps (1.f)));
 }
 
@@ -2254,11 +2254,11 @@ jbm_rational_13_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_14_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2268,11 +2268,11 @@ jbm_rational_14_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_14_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2282,11 +2282,11 @@ jbm_rational_14_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_14_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2296,11 +2296,11 @@ jbm_rational_14_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_14_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2310,11 +2310,11 @@ jbm_rational_14_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_14_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2324,11 +2324,11 @@ jbm_rational_14_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_14_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2338,11 +2338,11 @@ jbm_rational_14_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_14_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2352,11 +2352,11 @@ jbm_rational_14_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_14_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2366,11 +2366,11 @@ jbm_rational_14_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_14_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2380,11 +2380,11 @@ jbm_rational_14_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_14_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2394,11 +2394,11 @@ jbm_rational_14_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_14_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2408,11 +2408,11 @@ jbm_rational_14_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_14_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2422,11 +2422,11 @@ jbm_rational_14_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_14_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2436,10 +2436,10 @@ jbm_rational_14_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_14_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_14_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[14]), _mm_set1_ps (1.f)));
 }
 
@@ -2449,11 +2449,11 @@ jbm_rational_14_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_15_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2463,11 +2463,11 @@ jbm_rational_15_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_15_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2477,11 +2477,11 @@ jbm_rational_15_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_15_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2491,11 +2491,11 @@ jbm_rational_15_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_15_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2505,11 +2505,11 @@ jbm_rational_15_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_15_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2519,11 +2519,11 @@ jbm_rational_15_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_15_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2533,11 +2533,11 @@ jbm_rational_15_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_15_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2547,11 +2547,11 @@ jbm_rational_15_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_15_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2561,11 +2561,11 @@ jbm_rational_15_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_15_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2575,11 +2575,11 @@ jbm_rational_15_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_15_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2589,11 +2589,11 @@ jbm_rational_15_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_15_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2603,11 +2603,11 @@ jbm_rational_15_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_15_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2617,11 +2617,11 @@ jbm_rational_15_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_15_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2631,11 +2631,11 @@ jbm_rational_15_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_15_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2645,10 +2645,10 @@ jbm_rational_15_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_15_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_15_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[15]), _mm_set1_ps (1.f)));
 }
 
@@ -2658,11 +2658,11 @@ jbm_rational_15_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_16_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2672,11 +2672,11 @@ jbm_rational_16_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_16_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2686,11 +2686,11 @@ jbm_rational_16_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_16_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2700,11 +2700,11 @@ jbm_rational_16_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_16_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2714,11 +2714,11 @@ jbm_rational_16_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_16_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2728,11 +2728,11 @@ jbm_rational_16_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_16_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2742,11 +2742,11 @@ jbm_rational_16_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_16_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2756,11 +2756,11 @@ jbm_rational_16_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_16_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2770,11 +2770,11 @@ jbm_rational_16_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_16_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2784,11 +2784,11 @@ jbm_rational_16_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_16_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2798,11 +2798,11 @@ jbm_rational_16_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_16_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2812,11 +2812,11 @@ jbm_rational_16_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_16_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2826,11 +2826,11 @@ jbm_rational_16_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_16_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2840,11 +2840,11 @@ jbm_rational_16_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_16_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2854,11 +2854,11 @@ jbm_rational_16_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_16_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2868,10 +2868,10 @@ jbm_rational_16_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_16_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_16_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[16]), _mm_set1_ps (1.f)));
 }
 
@@ -2881,11 +2881,11 @@ jbm_rational_16_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_17_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2895,11 +2895,11 @@ jbm_rational_17_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_17_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2909,11 +2909,11 @@ jbm_rational_17_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_17_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2923,11 +2923,11 @@ jbm_rational_17_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_17_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2937,11 +2937,11 @@ jbm_rational_17_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_17_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2951,11 +2951,11 @@ jbm_rational_17_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_17_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2965,11 +2965,11 @@ jbm_rational_17_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_17_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2979,11 +2979,11 @@ jbm_rational_17_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_17_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -2993,11 +2993,11 @@ jbm_rational_17_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_17_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3007,11 +3007,11 @@ jbm_rational_17_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_17_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3021,11 +3021,11 @@ jbm_rational_17_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_17_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3035,11 +3035,11 @@ jbm_rational_17_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_17_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3049,11 +3049,11 @@ jbm_rational_17_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_17_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3063,11 +3063,11 @@ jbm_rational_17_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_17_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3077,11 +3077,11 @@ jbm_rational_17_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_17_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3091,11 +3091,11 @@ jbm_rational_17_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_17_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3105,10 +3105,10 @@ jbm_rational_17_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_17_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_17_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[17]), _mm_set1_ps (1.f)));
 }
 
@@ -3118,11 +3118,11 @@ jbm_rational_17_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_18_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3132,11 +3132,11 @@ jbm_rational_18_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_18_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3146,11 +3146,11 @@ jbm_rational_18_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_18_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3160,11 +3160,11 @@ jbm_rational_18_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_18_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3174,11 +3174,11 @@ jbm_rational_18_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_18_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3188,11 +3188,11 @@ jbm_rational_18_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_18_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3202,11 +3202,11 @@ jbm_rational_18_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_18_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3216,11 +3216,11 @@ jbm_rational_18_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_18_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3230,11 +3230,11 @@ jbm_rational_18_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_18_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3244,11 +3244,11 @@ jbm_rational_18_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_18_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3258,11 +3258,11 @@ jbm_rational_18_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_18_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3272,11 +3272,11 @@ jbm_rational_18_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_18_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3286,11 +3286,11 @@ jbm_rational_18_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_18_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3300,11 +3300,11 @@ jbm_rational_18_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_18_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3314,11 +3314,11 @@ jbm_rational_18_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_18_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3328,11 +3328,11 @@ jbm_rational_18_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_18_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3342,11 +3342,11 @@ jbm_rational_18_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_18_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3356,10 +3356,10 @@ jbm_rational_18_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_18_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_18_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[18]), _mm_set1_ps (1.f)));
 }
 
@@ -3369,11 +3369,11 @@ jbm_rational_18_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_19_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3383,11 +3383,11 @@ jbm_rational_19_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_19_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3397,11 +3397,11 @@ jbm_rational_19_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_19_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3411,11 +3411,11 @@ jbm_rational_19_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_19_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3425,11 +3425,11 @@ jbm_rational_19_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_19_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3439,11 +3439,11 @@ jbm_rational_19_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_19_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3453,11 +3453,11 @@ jbm_rational_19_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_19_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3467,11 +3467,11 @@ jbm_rational_19_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_19_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3481,11 +3481,11 @@ jbm_rational_19_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_19_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3495,11 +3495,11 @@ jbm_rational_19_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_19_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3509,11 +3509,11 @@ jbm_rational_19_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_19_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3523,11 +3523,11 @@ jbm_rational_19_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_19_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3537,11 +3537,11 @@ jbm_rational_19_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_19_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3551,11 +3551,11 @@ jbm_rational_19_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_19_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3565,11 +3565,11 @@ jbm_rational_19_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_19_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3579,11 +3579,11 @@ jbm_rational_19_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_19_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3593,11 +3593,11 @@ jbm_rational_19_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_19_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3607,11 +3607,11 @@ jbm_rational_19_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_19_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3621,10 +3621,10 @@ jbm_rational_19_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_19_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_19_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[19]), _mm_set1_ps (1.f)));
 }
 
@@ -3634,11 +3634,11 @@ jbm_rational_19_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_20_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3648,11 +3648,11 @@ jbm_rational_20_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_20_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3662,11 +3662,11 @@ jbm_rational_20_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_20_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3676,11 +3676,11 @@ jbm_rational_20_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_20_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3690,11 +3690,11 @@ jbm_rational_20_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_20_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3704,11 +3704,11 @@ jbm_rational_20_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_20_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3718,11 +3718,11 @@ jbm_rational_20_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_20_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3732,11 +3732,11 @@ jbm_rational_20_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_20_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3746,11 +3746,11 @@ jbm_rational_20_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_20_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3760,11 +3760,11 @@ jbm_rational_20_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_20_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3774,11 +3774,11 @@ jbm_rational_20_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_20_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3788,11 +3788,11 @@ jbm_rational_20_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_20_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3802,11 +3802,11 @@ jbm_rational_20_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_20_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3816,11 +3816,11 @@ jbm_rational_20_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_20_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3830,11 +3830,11 @@ jbm_rational_20_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_20_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3844,11 +3844,11 @@ jbm_rational_20_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_20_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3858,11 +3858,11 @@ jbm_rational_20_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_20_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3872,11 +3872,11 @@ jbm_rational_20_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_20_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3886,11 +3886,11 @@ jbm_rational_20_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_20_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 19),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 19),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3900,10 +3900,10 @@ jbm_rational_20_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_20_19_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_20_19 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_19_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_19 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[20]), _mm_set1_ps (1.f)));
 }
 
@@ -3913,11 +3913,11 @@ jbm_rational_20_19_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_21_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_20_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_20 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3927,11 +3927,11 @@ jbm_rational_21_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_21_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3941,11 +3941,11 @@ jbm_rational_21_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_21_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3955,11 +3955,11 @@ jbm_rational_21_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_21_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3969,11 +3969,11 @@ jbm_rational_21_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_21_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3983,11 +3983,11 @@ jbm_rational_21_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_21_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -3997,11 +3997,11 @@ jbm_rational_21_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_21_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4011,11 +4011,11 @@ jbm_rational_21_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_21_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4025,11 +4025,11 @@ jbm_rational_21_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_21_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4039,11 +4039,11 @@ jbm_rational_21_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_21_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4053,11 +4053,11 @@ jbm_rational_21_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4067,11 +4067,11 @@ jbm_rational_21_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4081,11 +4081,11 @@ jbm_rational_21_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4095,11 +4095,11 @@ jbm_rational_21_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4109,11 +4109,11 @@ jbm_rational_21_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4123,11 +4123,11 @@ jbm_rational_21_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4137,11 +4137,11 @@ jbm_rational_21_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4151,11 +4151,11 @@ jbm_rational_21_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4165,11 +4165,11 @@ jbm_rational_21_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 19),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 19),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4179,11 +4179,11 @@ jbm_rational_21_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_19_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_19 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_19_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 20),
+  return _mm_div_ps (jbm_4xf32_polynomial_19 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 20),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4193,10 +4193,10 @@ jbm_rational_21_19_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_21_20_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_21_20 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_20_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_20 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[21]), _mm_set1_ps (1.f)));
 }
 
@@ -4206,11 +4206,11 @@ jbm_rational_21_20_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_22_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_21_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_21 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4220,11 +4220,11 @@ jbm_rational_22_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_22_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_20_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_20 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4234,11 +4234,11 @@ jbm_rational_22_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_22_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4248,11 +4248,11 @@ jbm_rational_22_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_22_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4262,11 +4262,11 @@ jbm_rational_22_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_22_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4276,11 +4276,11 @@ jbm_rational_22_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_22_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4290,11 +4290,11 @@ jbm_rational_22_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_22_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4304,11 +4304,11 @@ jbm_rational_22_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_22_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4318,11 +4318,11 @@ jbm_rational_22_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_22_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4332,11 +4332,11 @@ jbm_rational_22_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_22_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4346,11 +4346,11 @@ jbm_rational_22_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4360,11 +4360,11 @@ jbm_rational_22_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4374,11 +4374,11 @@ jbm_rational_22_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4388,11 +4388,11 @@ jbm_rational_22_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4402,11 +4402,11 @@ jbm_rational_22_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4416,11 +4416,11 @@ jbm_rational_22_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4430,11 +4430,11 @@ jbm_rational_22_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4444,11 +4444,11 @@ jbm_rational_22_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4458,11 +4458,11 @@ jbm_rational_22_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 19),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 19),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4472,11 +4472,11 @@ jbm_rational_22_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_19_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_19 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_19_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 20),
+  return _mm_div_ps (jbm_4xf32_polynomial_19 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 20),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4486,11 +4486,11 @@ jbm_rational_22_19_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_20_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_20 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_20_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 21),
+  return _mm_div_ps (jbm_4xf32_polynomial_20 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 21),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4500,10 +4500,10 @@ jbm_rational_22_20_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_22_21_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_22_21 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_21_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_21 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[22]), _mm_set1_ps (1.f)));
 }
 
@@ -4513,11 +4513,11 @@ jbm_rational_22_21_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_23_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_22_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_22 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4527,11 +4527,11 @@ jbm_rational_23_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_23_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_21_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_21 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4541,11 +4541,11 @@ jbm_rational_23_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_23_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_20_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_20 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4555,11 +4555,11 @@ jbm_rational_23_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_23_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4569,11 +4569,11 @@ jbm_rational_23_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_23_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4583,11 +4583,11 @@ jbm_rational_23_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_23_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4597,11 +4597,11 @@ jbm_rational_23_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_23_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4611,11 +4611,11 @@ jbm_rational_23_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_23_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4625,11 +4625,11 @@ jbm_rational_23_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_23_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4639,11 +4639,11 @@ jbm_rational_23_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_23_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4653,11 +4653,11 @@ jbm_rational_23_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4667,11 +4667,11 @@ jbm_rational_23_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4681,11 +4681,11 @@ jbm_rational_23_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4695,11 +4695,11 @@ jbm_rational_23_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4709,11 +4709,11 @@ jbm_rational_23_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4723,11 +4723,11 @@ jbm_rational_23_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4737,11 +4737,11 @@ jbm_rational_23_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4751,11 +4751,11 @@ jbm_rational_23_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4765,11 +4765,11 @@ jbm_rational_23_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 19),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 19),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4779,11 +4779,11 @@ jbm_rational_23_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_19_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_19 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_19_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 20),
+  return _mm_div_ps (jbm_4xf32_polynomial_19 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 20),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4793,11 +4793,11 @@ jbm_rational_23_19_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_20_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_20 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_20_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 21),
+  return _mm_div_ps (jbm_4xf32_polynomial_20 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 21),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4807,11 +4807,11 @@ jbm_rational_23_20_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_21_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_21 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_21_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 22),
+  return _mm_div_ps (jbm_4xf32_polynomial_21 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 22),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4821,10 +4821,10 @@ jbm_rational_23_21_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_23_22_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_23_22 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_22_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_22 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[23]), _mm_set1_ps (1.f)));
 }
 
@@ -4834,11 +4834,11 @@ jbm_rational_23_22_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_24_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_23_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_23 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4848,11 +4848,11 @@ jbm_rational_24_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_24_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_22_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_22 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4862,11 +4862,11 @@ jbm_rational_24_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_24_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_21_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_21 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4876,11 +4876,11 @@ jbm_rational_24_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_24_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_20_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_20 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4890,11 +4890,11 @@ jbm_rational_24_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_24_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4904,11 +4904,11 @@ jbm_rational_24_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_24_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4918,11 +4918,11 @@ jbm_rational_24_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_24_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4932,11 +4932,11 @@ jbm_rational_24_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_24_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4946,11 +4946,11 @@ jbm_rational_24_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_24_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4960,11 +4960,11 @@ jbm_rational_24_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_24_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4974,11 +4974,11 @@ jbm_rational_24_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -4988,11 +4988,11 @@ jbm_rational_24_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5002,11 +5002,11 @@ jbm_rational_24_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5016,11 +5016,11 @@ jbm_rational_24_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5030,11 +5030,11 @@ jbm_rational_24_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5044,11 +5044,11 @@ jbm_rational_24_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5058,11 +5058,11 @@ jbm_rational_24_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5072,11 +5072,11 @@ jbm_rational_24_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5086,11 +5086,11 @@ jbm_rational_24_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 19),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 19),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5100,11 +5100,11 @@ jbm_rational_24_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_19_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_19 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_19_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 20),
+  return _mm_div_ps (jbm_4xf32_polynomial_19 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 20),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5114,11 +5114,11 @@ jbm_rational_24_19_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_20_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_20 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_20_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 21),
+  return _mm_div_ps (jbm_4xf32_polynomial_20 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 21),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5128,11 +5128,11 @@ jbm_rational_24_20_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_21_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_21 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_21_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 22),
+  return _mm_div_ps (jbm_4xf32_polynomial_21 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 22),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5142,11 +5142,11 @@ jbm_rational_24_21_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_22_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_22 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_22_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 23),
+  return _mm_div_ps (jbm_4xf32_polynomial_22 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 23),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5156,10 +5156,10 @@ jbm_rational_24_22_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_24_23_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_24_23 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_23_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_23 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[24]), _mm_set1_ps (1.f)));
 }
 
@@ -5169,11 +5169,11 @@ jbm_rational_24_23_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_25_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_24_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_24 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5183,11 +5183,11 @@ jbm_rational_25_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_25_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_23_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_23 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5197,11 +5197,11 @@ jbm_rational_25_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_25_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_22_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_22 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5211,11 +5211,11 @@ jbm_rational_25_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_25_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_21_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_21 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5225,11 +5225,11 @@ jbm_rational_25_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_25_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_20_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_20 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5239,11 +5239,11 @@ jbm_rational_25_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_25_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5253,11 +5253,11 @@ jbm_rational_25_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_25_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5267,11 +5267,11 @@ jbm_rational_25_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_25_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5281,11 +5281,11 @@ jbm_rational_25_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_25_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5295,11 +5295,11 @@ jbm_rational_25_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_25_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5309,11 +5309,11 @@ jbm_rational_25_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5323,11 +5323,11 @@ jbm_rational_25_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5337,11 +5337,11 @@ jbm_rational_25_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5351,11 +5351,11 @@ jbm_rational_25_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5365,11 +5365,11 @@ jbm_rational_25_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5379,11 +5379,11 @@ jbm_rational_25_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5393,11 +5393,11 @@ jbm_rational_25_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5407,11 +5407,11 @@ jbm_rational_25_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5421,11 +5421,11 @@ jbm_rational_25_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 19),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 19),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5435,11 +5435,11 @@ jbm_rational_25_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_19_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_19 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_19_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 20),
+  return _mm_div_ps (jbm_4xf32_polynomial_19 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 20),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5449,11 +5449,11 @@ jbm_rational_25_19_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_20_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_20 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_20_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 21),
+  return _mm_div_ps (jbm_4xf32_polynomial_20 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 21),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5463,11 +5463,11 @@ jbm_rational_25_20_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_21_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_21 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_21_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 22),
+  return _mm_div_ps (jbm_4xf32_polynomial_21 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 22),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5477,11 +5477,11 @@ jbm_rational_25_21_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_22_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_22 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_22_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 23),
+  return _mm_div_ps (jbm_4xf32_polynomial_22 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 23),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5491,11 +5491,11 @@ jbm_rational_25_22_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_23_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_23 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_23_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 24),
+  return _mm_div_ps (jbm_4xf32_polynomial_23 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 24),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5505,10 +5505,10 @@ jbm_rational_25_23_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_25_24_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_25_24 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_24_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_24 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[25]), _mm_set1_ps (1.f)));
 }
 
@@ -5518,11 +5518,11 @@ jbm_rational_25_24_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_26_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_25_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_25 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5532,11 +5532,11 @@ jbm_rational_26_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_26_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_24_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_24 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5546,11 +5546,11 @@ jbm_rational_26_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_26_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_23_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_23 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5560,11 +5560,11 @@ jbm_rational_26_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_26_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_22_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_22 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5574,11 +5574,11 @@ jbm_rational_26_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_26_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_21_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_21 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5588,11 +5588,11 @@ jbm_rational_26_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_26_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_20_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_20 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5602,11 +5602,11 @@ jbm_rational_26_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_26_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5616,11 +5616,11 @@ jbm_rational_26_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_26_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5630,11 +5630,11 @@ jbm_rational_26_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_26_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5644,11 +5644,11 @@ jbm_rational_26_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_26_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5658,11 +5658,11 @@ jbm_rational_26_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5672,11 +5672,11 @@ jbm_rational_26_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5686,11 +5686,11 @@ jbm_rational_26_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5700,11 +5700,11 @@ jbm_rational_26_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5714,11 +5714,11 @@ jbm_rational_26_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5728,11 +5728,11 @@ jbm_rational_26_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5742,11 +5742,11 @@ jbm_rational_26_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5756,11 +5756,11 @@ jbm_rational_26_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5770,11 +5770,11 @@ jbm_rational_26_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 19),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 19),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5784,11 +5784,11 @@ jbm_rational_26_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_19_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_19 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_19_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 20),
+  return _mm_div_ps (jbm_4xf32_polynomial_19 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 20),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5798,11 +5798,11 @@ jbm_rational_26_19_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_20_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_20 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_20_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 21),
+  return _mm_div_ps (jbm_4xf32_polynomial_20 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 21),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5812,11 +5812,11 @@ jbm_rational_26_20_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_21_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_21 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_21_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 22),
+  return _mm_div_ps (jbm_4xf32_polynomial_21 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 22),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5826,11 +5826,11 @@ jbm_rational_26_21_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_22_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_22 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_22_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 23),
+  return _mm_div_ps (jbm_4xf32_polynomial_22 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 23),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5840,11 +5840,11 @@ jbm_rational_26_22_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_23_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_23 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_23_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 24),
+  return _mm_div_ps (jbm_4xf32_polynomial_23 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 24),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5854,11 +5854,11 @@ jbm_rational_26_23_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_24_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_24 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_24_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 25),
+  return _mm_div_ps (jbm_4xf32_polynomial_24 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 25),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5868,10 +5868,10 @@ jbm_rational_26_24_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_26_25_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_26_25 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_25_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_25 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[26]), _mm_set1_ps (1.f)));
 }
 
@@ -5881,11 +5881,11 @@ jbm_rational_26_25_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_27_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_26_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_26 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5895,11 +5895,11 @@ jbm_rational_27_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_27_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_25_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_25 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5909,11 +5909,11 @@ jbm_rational_27_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_27_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_24_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_24 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5923,11 +5923,11 @@ jbm_rational_27_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_27_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_23_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_23 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5937,11 +5937,11 @@ jbm_rational_27_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_27_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_22_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_22 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5951,11 +5951,11 @@ jbm_rational_27_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_27_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_21_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_21 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5965,11 +5965,11 @@ jbm_rational_27_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_27_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_20_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_20 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5979,11 +5979,11 @@ jbm_rational_27_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_27_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -5993,11 +5993,11 @@ jbm_rational_27_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_27_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6007,11 +6007,11 @@ jbm_rational_27_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_27_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6021,11 +6021,11 @@ jbm_rational_27_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6035,11 +6035,11 @@ jbm_rational_27_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6049,11 +6049,11 @@ jbm_rational_27_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6063,11 +6063,11 @@ jbm_rational_27_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6077,11 +6077,11 @@ jbm_rational_27_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6091,11 +6091,11 @@ jbm_rational_27_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6105,11 +6105,11 @@ jbm_rational_27_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6119,11 +6119,11 @@ jbm_rational_27_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6133,11 +6133,11 @@ jbm_rational_27_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 19),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 19),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6147,11 +6147,11 @@ jbm_rational_27_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_19_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_19 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_19_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 20),
+  return _mm_div_ps (jbm_4xf32_polynomial_19 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 20),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6161,11 +6161,11 @@ jbm_rational_27_19_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_20_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_20 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_20_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 21),
+  return _mm_div_ps (jbm_4xf32_polynomial_20 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 21),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6175,11 +6175,11 @@ jbm_rational_27_20_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_21_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_21 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_21_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 22),
+  return _mm_div_ps (jbm_4xf32_polynomial_21 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 22),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6189,11 +6189,11 @@ jbm_rational_27_21_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_22_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_22 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_22_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 23),
+  return _mm_div_ps (jbm_4xf32_polynomial_22 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 23),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6203,11 +6203,11 @@ jbm_rational_27_22_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_23_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_23 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_23_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 24),
+  return _mm_div_ps (jbm_4xf32_polynomial_23 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 24),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6217,11 +6217,11 @@ jbm_rational_27_23_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_24_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_24 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_24_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 25),
+  return _mm_div_ps (jbm_4xf32_polynomial_24 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 25),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6231,11 +6231,11 @@ jbm_rational_27_24_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_25_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_25 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_25_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 26),
+  return _mm_div_ps (jbm_4xf32_polynomial_25 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 26),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6245,10 +6245,10 @@ jbm_rational_27_25_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_27_26_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_27_26 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_26_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_26 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[27]), _mm_set1_ps (1.f)));
 }
 
@@ -6258,11 +6258,11 @@ jbm_rational_27_26_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_28_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_27_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_27 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6272,11 +6272,11 @@ jbm_rational_28_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_28_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_26_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_26 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6286,11 +6286,11 @@ jbm_rational_28_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_28_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_25_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_25 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6300,11 +6300,11 @@ jbm_rational_28_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_28_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_24_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_24 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6314,11 +6314,11 @@ jbm_rational_28_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_28_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_23_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_23 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6328,11 +6328,11 @@ jbm_rational_28_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_28_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_22_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_22 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6342,11 +6342,11 @@ jbm_rational_28_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_28_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_21_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_21 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6356,11 +6356,11 @@ jbm_rational_28_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_28_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_20_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_20 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6370,11 +6370,11 @@ jbm_rational_28_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_28_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6384,11 +6384,11 @@ jbm_rational_28_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_28_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6398,11 +6398,11 @@ jbm_rational_28_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6412,11 +6412,11 @@ jbm_rational_28_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6426,11 +6426,11 @@ jbm_rational_28_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6440,11 +6440,11 @@ jbm_rational_28_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6454,11 +6454,11 @@ jbm_rational_28_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6468,11 +6468,11 @@ jbm_rational_28_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6482,11 +6482,11 @@ jbm_rational_28_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6496,11 +6496,11 @@ jbm_rational_28_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6510,11 +6510,11 @@ jbm_rational_28_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 19),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 19),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6524,11 +6524,11 @@ jbm_rational_28_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_19_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_19 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_19_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 20),
+  return _mm_div_ps (jbm_4xf32_polynomial_19 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 20),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6538,11 +6538,11 @@ jbm_rational_28_19_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_20_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_20 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_20_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 21),
+  return _mm_div_ps (jbm_4xf32_polynomial_20 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 21),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6552,11 +6552,11 @@ jbm_rational_28_20_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_21_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_21 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_21_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 22),
+  return _mm_div_ps (jbm_4xf32_polynomial_21 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 22),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6566,11 +6566,11 @@ jbm_rational_28_21_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_22_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_22 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_22_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 23),
+  return _mm_div_ps (jbm_4xf32_polynomial_22 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 23),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6580,11 +6580,11 @@ jbm_rational_28_22_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_23_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_23 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_23_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 24),
+  return _mm_div_ps (jbm_4xf32_polynomial_23 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 24),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6594,11 +6594,11 @@ jbm_rational_28_23_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_24_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_24 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_24_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 25),
+  return _mm_div_ps (jbm_4xf32_polynomial_24 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 25),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6608,11 +6608,11 @@ jbm_rational_28_24_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_25_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_25 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_25_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 26),
+  return _mm_div_ps (jbm_4xf32_polynomial_25 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 26),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6622,11 +6622,11 @@ jbm_rational_28_25_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_26_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_26 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_26_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 27),
+  return _mm_div_ps (jbm_4xf32_polynomial_26 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 27),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6636,10 +6636,10 @@ jbm_rational_28_26_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_28_27_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_28_27 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_27_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_27 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[28]), _mm_set1_ps (1.f)));
 }
 
@@ -6649,11 +6649,11 @@ jbm_rational_28_27_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_0_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_29_0 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
   return _mm_div_ps (_mm_set1_ps (p[0]),
-                     _mm_fmadd_ps (x, jbm_polynomial_28_4xf32 (x, p + 1),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_28 (x, p + 1),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6663,11 +6663,11 @@ jbm_rational_29_0_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_1_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_29_1 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_1_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_27_4xf32 (x, p + 2),
+  return _mm_div_ps (jbm_4xf32_polynomial_1 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_27 (x, p + 2),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6677,11 +6677,11 @@ jbm_rational_29_1_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_2_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_29_2 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_2_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_26_4xf32 (x, p + 3),
+  return _mm_div_ps (jbm_4xf32_polynomial_2 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_26 (x, p + 3),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6691,11 +6691,11 @@ jbm_rational_29_2_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_3_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_29_3 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_3_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_25_4xf32 (x, p + 4),
+  return _mm_div_ps (jbm_4xf32_polynomial_3 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_25 (x, p + 4),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6705,11 +6705,11 @@ jbm_rational_29_3_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_4_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_29_4 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_4_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_24_4xf32 (x, p + 5),
+  return _mm_div_ps (jbm_4xf32_polynomial_4 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_24 (x, p + 5),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6719,11 +6719,11 @@ jbm_rational_29_4_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_5_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_29_5 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_5_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_23_4xf32 (x, p + 6),
+  return _mm_div_ps (jbm_4xf32_polynomial_5 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_23 (x, p + 6),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6733,11 +6733,11 @@ jbm_rational_29_5_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_6_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_29_6 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_6_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_22_4xf32 (x, p + 7),
+  return _mm_div_ps (jbm_4xf32_polynomial_6 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_22 (x, p + 7),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6747,11 +6747,11 @@ jbm_rational_29_6_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_7_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_29_7 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_7_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_21_4xf32 (x, p + 8),
+  return _mm_div_ps (jbm_4xf32_polynomial_7 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_21 (x, p + 8),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6761,11 +6761,11 @@ jbm_rational_29_7_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_8_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_29_8 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_8_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_20_4xf32 (x, p + 9),
+  return _mm_div_ps (jbm_4xf32_polynomial_8 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_20 (x, p + 9),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6775,11 +6775,11 @@ jbm_rational_29_8_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_9_4xf32 (const __m128 x,        ///< __m128 vector.
+jbm_4xf32_rational_29_9 (const __m128 x,        ///< __m128 vector.
                          const float *p)        ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_9_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_19_4xf32 (x, p + 10),
+  return _mm_div_ps (jbm_4xf32_polynomial_9 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_19 (x, p + 10),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6789,11 +6789,11 @@ jbm_rational_29_9_4xf32 (const __m128 x,        ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_10_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_10 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_10_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_18_4xf32 (x, p + 11),
+  return _mm_div_ps (jbm_4xf32_polynomial_10 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_18 (x, p + 11),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6803,11 +6803,11 @@ jbm_rational_29_10_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_11_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_11 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_11_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_17_4xf32 (x, p + 12),
+  return _mm_div_ps (jbm_4xf32_polynomial_11 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_17 (x, p + 12),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6817,11 +6817,11 @@ jbm_rational_29_11_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_12_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_12 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_12_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_16_4xf32 (x, p + 13),
+  return _mm_div_ps (jbm_4xf32_polynomial_12 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_16 (x, p + 13),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6831,11 +6831,11 @@ jbm_rational_29_12_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_13_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_13 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_13_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_15_4xf32 (x, p + 14),
+  return _mm_div_ps (jbm_4xf32_polynomial_13 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_15 (x, p + 14),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6845,11 +6845,11 @@ jbm_rational_29_13_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_14_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_14 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_14_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_14_4xf32 (x, p + 15),
+  return _mm_div_ps (jbm_4xf32_polynomial_14 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_14 (x, p + 15),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6859,11 +6859,11 @@ jbm_rational_29_14_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_15_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_15 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_15_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_13_4xf32 (x, p + 16),
+  return _mm_div_ps (jbm_4xf32_polynomial_15 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_13 (x, p + 16),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6873,11 +6873,11 @@ jbm_rational_29_15_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_16_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_16 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_16_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_12_4xf32 (x, p + 17),
+  return _mm_div_ps (jbm_4xf32_polynomial_16 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_12 (x, p + 17),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6887,11 +6887,11 @@ jbm_rational_29_16_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_17_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_17 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_17_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_11_4xf32 (x, p + 18),
+  return _mm_div_ps (jbm_4xf32_polynomial_17 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_11 (x, p + 18),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6901,11 +6901,11 @@ jbm_rational_29_17_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_18_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_18 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_18_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_10_4xf32 (x, p + 19),
+  return _mm_div_ps (jbm_4xf32_polynomial_18 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_10 (x, p + 19),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6915,11 +6915,11 @@ jbm_rational_29_18_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_19_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_19 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_19_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_9_4xf32 (x, p + 20),
+  return _mm_div_ps (jbm_4xf32_polynomial_19 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_9 (x, p + 20),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6929,11 +6929,11 @@ jbm_rational_29_19_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_20_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_20 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_20_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_8_4xf32 (x, p + 21),
+  return _mm_div_ps (jbm_4xf32_polynomial_20 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_8 (x, p + 21),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6943,11 +6943,11 @@ jbm_rational_29_20_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_21_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_21 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_21_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_7_4xf32 (x, p + 22),
+  return _mm_div_ps (jbm_4xf32_polynomial_21 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_7 (x, p + 22),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6957,11 +6957,11 @@ jbm_rational_29_21_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_22_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_22 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_22_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_6_4xf32 (x, p + 23),
+  return _mm_div_ps (jbm_4xf32_polynomial_22 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_6 (x, p + 23),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6971,11 +6971,11 @@ jbm_rational_29_22_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_23_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_23 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_23_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_5_4xf32 (x, p + 24),
+  return _mm_div_ps (jbm_4xf32_polynomial_23 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_5 (x, p + 24),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6985,11 +6985,11 @@ jbm_rational_29_23_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_24_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_24 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_24_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_4_4xf32 (x, p + 25),
+  return _mm_div_ps (jbm_4xf32_polynomial_24 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_4 (x, p + 25),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -6999,11 +6999,11 @@ jbm_rational_29_24_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_25_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_25 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_25_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_3_4xf32 (x, p + 26),
+  return _mm_div_ps (jbm_4xf32_polynomial_25 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_3 (x, p + 26),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -7013,11 +7013,11 @@ jbm_rational_29_25_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_26_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_26 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_26_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_2_4xf32 (x, p + 27),
+  return _mm_div_ps (jbm_4xf32_polynomial_26 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_2 (x, p + 27),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -7027,11 +7027,11 @@ jbm_rational_29_26_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_27_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_27 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_27_4xf32 (x, p),
-                     _mm_fmadd_ps (x, jbm_polynomial_1_4xf32 (x, p + 28),
+  return _mm_div_ps (jbm_4xf32_polynomial_27 (x, p),
+                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_1 (x, p + 28),
                                    _mm_set1_ps (1.f)));
 }
 
@@ -7041,10 +7041,10 @@ jbm_rational_29_27_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return __m128 vector of rational values.
  */
 static inline __m128
-jbm_rational_29_28_4xf32 (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_rational_29_28 (const __m128 x,       ///< __m128 vector.
                           const float *p)       ///< array of coefficients.
 {
-  return _mm_div_ps (jbm_polynomial_28_4xf32 (x, p),
+  return _mm_div_ps (jbm_4xf32_polynomial_28 (x, p),
                      _mm_fmadd_ps (x, _mm_set1_ps (p[29]), _mm_set1_ps (1.f)));
 }
 
@@ -7055,20 +7055,20 @@ jbm_rational_29_28_4xf32 (const __m128 x,       ///< __m128 vector.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_cbrtwc_4xf32 (const __m128 x)
+jbm_4xf32_cbrtwc (const __m128 x)
                   ///< __m128 vector \f$\in\left[\frac12,\;1\right]\f$.
 {
-  return jbm_rational_5_3_4xf32 (x, K_CBRTWC_F32);
+  return jbm_4xf32_rational_5_3 (x, K_CBRTWC_F32);
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_cbrtwc_4xf32
+ * Function to calculate the function cbrt(x) using the jbm_cbrtwc_4xdbl
  * function (__m128).
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_cbrt_4xf32 (const __m128 x) ///< __m128 vector.
+jbm_4xf32_cbrt (const __m128 x) ///< __m128 vector.
 {
   const __m128 cbrt2 = JBM_CBRT2_4xF32;
   const __m128 cbrt4 = JBM_CBRT4_4xF32;
@@ -7077,7 +7077,7 @@ jbm_cbrt_4xf32 (const __m128 x) ///< __m128 vector.
   const __m128i v1 = _mm_set1_epi32 (1);
   __m128 y;
   __m128i e, e3, r, n, e16;
-  y = jbm_frexp_4xf32 (jbm_abs_4xf32 (x), &e);
+  y = jbm_4xf32_frexp (jbm_4xf32_abs (x), &e);
   e16 = _mm_cvtepi32_epi16 (e);
   e16 = _mm_mulhi_epi16 (e16, _mm_set1_epi16 (0x5556));
   e3 = _mm_cvtepi16_epi32 (e16);
@@ -7085,12 +7085,12 @@ jbm_cbrt_4xf32 (const __m128 x) ///< __m128 vector.
   n = _mm_srai_epi32 (r, 31);
   r = _mm_add_epi32 (r, _mm_and_si128 (n, v3));
   e3 = _mm_sub_epi32 (e3, _mm_and_si128 (n, v1));
-  y = jbm_ldexp_4xf32 (jbm_cbrtwc_4xf32 (y), e3);
+  y = jbm_4xf32_ldexp (jbm_4xf32_cbrtwc (y), e3);
   y = _mm_blendv_ps (y, _mm_mul_ps (y, cbrt2),
                      _mm_castsi128_ps (_mm_cmpeq_epi32 (r, v1)));
   y = _mm_blendv_ps (y, _mm_mul_ps (y, cbrt4),
                      _mm_castsi128_ps (_mm_cmpeq_epi32 (r, v2)));
-  return jbm_copysign_4xf32 (y, x);
+  return jbm_copy4xf32_sign (y, x);
 }
 
 /**
@@ -7100,50 +7100,50 @@ jbm_cbrt_4xf32 (const __m128 x) ///< __m128 vector.
  * \return function value.
  */
 static inline __m128
-jbm_exp2wc_4xf32 (const __m128 x)
+jbm_4xf32_exp2wc (const __m128 x)
                   ///< __m128 vector \f$\in[\frac12,1]\f$.
 {
-  return jbm_polynomial_5_4xf32 (x, K_EXP2WC_F32);
+  return jbm_4xf32_polynomial_5 (x, K_EXP2WC_F32);
 }
 
 /**
  * Function to calculate the function exp2(x) using the jbm_expwc_4xf32 and
- * jbm_exp2n_4xf32 functions (__m128).
+ * jbm_4xf32_exp2n functions (__m128).
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_exp2_4xf32 (const __m128 x) ///< __m128 vector.
+jbm_4xf32_exp2 (const __m128 x) ///< __m128 vector.
 {
   __m128 y, f;
   y = _mm_floor_ps (x);
   f = _mm_sub_ps (x, y);
-  y = jbm_exp2n_4xf32 (_mm_cvtps_epi32 (y));
-  return _mm_mul_ps (y, jbm_exp2wc_4xf32 (f));
+  y = jbm_4xf32_exp2n (_mm_cvtps_epi32 (y));
+  return _mm_mul_ps (y, jbm_4xf32_exp2wc (f));
 }
 
 /**
- * Function to calculate the function exp(x) using the jbm_exp2_4xf32 function
+ * Function to calculate the function exp(x) using the jbm_4xf32_exp2 function
  * (__m128).
  *
  * \return function value.
  */
 static inline __m128
-jbm_exp_4xf32 (const __m128 x)  ///< __m128 vector.
+jbm_4xf32_exp (const __m128 x)  ///< __m128 vector.
 {
-  return jbm_exp2_4xf32 (_mm_mul_ps (x, _mm_set1_ps (M_LOG2Ef)));
+  return jbm_4xf32_exp2 (_mm_mul_ps (x, _mm_set1_ps (M_LOG2Ef)));
 }
 
 /**
- * Function to calculate the function exp10(x) using the jbm_exp2_4xf32
+ * Function to calculate the function exp10(x) using the jbm_exp2_4xdbl
  * function (__m128).
  *
  * \return function value.
  */
 static inline __m128
-jbm_exp10_4xf32 (const __m128 x)        ///< __m128 vector.
+jbm_4xf32_exp10 (const __m128 x)        ///< __m128 vector.
 {
-  return jbm_exp2_4xf32 (_mm_mul_ps (x, _mm_set1_ps (M_LN10f / M_LN2f)));
+  return jbm_4xf32_exp2 (_mm_mul_ps (x, _mm_set1_ps (M_LN10f / M_LN2f)));
 }
 
 /**
@@ -7153,7 +7153,7 @@ jbm_exp10_4xf32 (const __m128 x)        ///< __m128 vector.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_expm1wc_4xf32 (const __m128 x)
+jbm_4xf32_expm1wc (const __m128 x)
 ///< __m128 vector \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
 {
   const float a1 = K_EXPM1WC_F32[0];
@@ -7161,7 +7161,7 @@ jbm_expm1wc_4xf32 (const __m128 x)
   const float b2 = K_EXPM1WC_F32[2];
   const float b4 = K_EXPM1WC_F32[3];
   __m128 x2;
-  x2 = jbm_sqr_4xf32 (x);
+  x2 = jbm_4xf32_sqr (x);
   x2 = _mm_fmadd_ps (x2, _mm_set1_ps (b4), _mm_set1_ps (b2));
   x2 = _mm_fmadd_ps (x2, x, _mm_set1_ps (b1));
   x2 = _mm_fmadd_ps (x2, x, _mm_set1_ps (1.f));
@@ -7169,17 +7169,17 @@ jbm_expm1wc_4xf32 (const __m128 x)
 }
 
 /**
- * Function to calculate the function expm1(x) using the jbm_expm1wc_4xf32 and
- * jbm_exp_4xf32 functions (__m128).
+ * Function to calculate the function expm1(x) using the jbm_4xf32_expm1wc and
+ * jbm_4xf32_exp functions (__m128).
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_expm1_4xf32 (const __m128 x)        ///< __m128 vector.
+jbm_4xf32_expm1 (const __m128 x)        ///< __m128 vector.
 {
-  return _mm_blendv_ps (_mm_sub_ps (jbm_exp_4xf32 (x), _mm_set1_ps (1.f)),
-                        jbm_expm1wc_4xf32 (x),
-                        _mm_cmplt_ps (jbm_abs_4xf32 (x),
+  return _mm_blendv_ps (_mm_sub_ps (jbm_4xf32_exp (x), _mm_set1_ps (1.f)),
+                        jbm_4xf32_expm1wc (x),
+                        _mm_cmplt_ps (jbm_4xf32_abs (x),
                                       _mm_set1_ps (M_LN2f / 2.f)));
 }
 
@@ -7190,29 +7190,29 @@ jbm_expm1_4xf32 (const __m128 x)        ///< __m128 vector.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_log2wc_4xf32 (const __m128 x)       ///< __m128 vector.
+jbm_4xf32_log2wc (const __m128 x)       ///< __m128 vector.
 {
-  return _mm_mul_ps (x, jbm_rational_5_2_4xf32 (x, K_LOG2WC_F32));
+  return _mm_mul_ps (x, jbm_4xf32_rational_5_2 (x, K_LOG2WC_F32));
 }
 
 /**
- * Function to calculate the function log_2(x) using jbm_log2wc_4xf32 and
- * jbm_frexp_4xf32 (__m128).
+ * Function to calculate the function log_2(x) using jbm_4xf32_log2wc and
+ * jbm_4xf32_frexp (__m128).
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_log2_4xf32 (const __m128 x) ///< __m128 vector.
+jbm_4xf32_log2 (const __m128 x) ///< __m128 vector.
 {
   const __m128 z = _mm_setzero_ps ();
   __m128 y, m;
   __m128i e;
-  y = jbm_frexp_4xf32 (x, &e);
+  y = jbm_4xf32_frexp (x, &e);
   m = _mm_cmplt_ps (y, _mm_set1_ps (M_SQRT1_2f));
   y = _mm_add_ps (y, _mm_and_ps (m, y));
   e = _mm_sub_epi32 (e, _mm_and_si128 (_mm_castps_si128 (m),
                                        _mm_set1_epi32 (1)));
-  y = _mm_add_ps (jbm_log2wc_4xf32 (_mm_sub_ps (y, _mm_set1_ps (1.f))),
+  y = _mm_add_ps (jbm_4xf32_log2wc (_mm_sub_ps (y, _mm_set1_ps (1.f))),
                   _mm_cvtepi32_ps (e));
   y = _mm_blendv_ps (y, _mm_set1_ps (-INFINITY), _mm_cmpeq_ps (x, z));
   y = _mm_blendv_ps (y, _mm_set1_ps (NAN), _mm_cmplt_ps (x, z));
@@ -7221,25 +7221,25 @@ jbm_log2_4xf32 (const __m128 x) ///< __m128 vector.
 }
 
 /**
- * Function to calculate the function log(x) using jbm_log2_4xf32 (__m128).
+ * Function to calculate the function log(x) using jbm_4xf32_log2 (__m128).
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_log_4xf32 (const __m128 x)  ///< __m128 vector.
+jbm_4xf32_log (const __m128 x)  ///< __m128 vector.
 {
-  return _mm_mul_ps (jbm_log2_4xf32 (x), _mm_set1_ps (M_LN2f));
+  return _mm_mul_ps (jbm_4xf32_log2 (x), _mm_set1_ps (M_LN2f));
 }
 
 /**
- * Function to calculate the function log10(x) using jbm_log2_4xf32.
+ * Function to calculate the function log10(x) using jbm_log2_4xdbl.
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_log10_4xf32 (const __m128 x)        ///< __m128 vector.
+jbm_4xf32_log10 (const __m128 x)        ///< __m128 vector.
 {
-  return _mm_mul_ps (jbm_log2_4xf32 (x), _mm_set1_ps (M_LN2f / M_LN10f));
+  return _mm_mul_ps (jbm_4xf32_log2 (x), _mm_set1_ps (M_LN2f / M_LN10f));
 }
 
 /**
@@ -7248,7 +7248,7 @@ jbm_log10_4xf32 (const __m128 x)        ///< __m128 vector.
  * \return function value (__m128) (__m128).
  */
 static inline __m128
-jbm_pown_4xf32 (const __m128 x, ///< __m128 vector.
+jbm_4xf32_pown (const __m128 x, ///< __m128 vector.
                 const int e)    ///< exponent (int).
 {
   __m128 f, xn;
@@ -7258,23 +7258,23 @@ jbm_pown_4xf32 (const __m128 x, ///< __m128 vector.
     xn = _mm_div_ps (f, x);
   else
     xn = x;
-  for (i = (unsigned int) abs (e); i; i >>= 1, xn = jbm_sqr_4xf32 (xn))
+  for (i = (unsigned int) abs (e); i; i >>= 1, xn = jbm_4xf32_sqr (xn))
     if (i & 1)
       f = _mm_mul_ps (f, xn);
   return f;
 }
 
 /**
- * Function to calculate the function pow using the jbm_exp2_4xf32 and
- * jbm_log2_4xf32 functions (__m128).
+ * Function to calculate the function pow using the jbm_4xf32_exp2 and
+ * jbm_4xf32_log2 functions (__m128).
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_pow_4xf32 (const __m128 x,  ///< __m128 vector.
+jbm_4xf32_pow (const __m128 x,  ///< __m128 vector.
                const float e)   ///< exponent (float).
 {
-  return jbm_exp2_4xf32 (_mm_mul_ps (_mm_set1_ps (e), jbm_log2_4xf32 (x)));
+  return jbm_4xf32_exp2 (_mm_mul_ps (_mm_set1_ps (e), jbm_4xf32_log2 (x)));
 }
 
 /**
@@ -7284,11 +7284,11 @@ jbm_pow_4xf32 (const __m128 x,  ///< __m128 vector.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_sinwc_4xf32 (const __m128 x)
+jbm_4xf32_sinwc (const __m128 x)
                  ///< __m128 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
   return
-    _mm_mul_ps (x, jbm_polynomial_3_4xf32 (jbm_sqr_4xf32 (x), K_SINWC_F32));
+    _mm_mul_ps (x, jbm_4xf32_polynomial_3 (jbm_4xf32_sqr (x), K_SINWC_F32));
 }
 
 /**
@@ -7298,41 +7298,41 @@ jbm_sinwc_4xf32 (const __m128 x)
  * \return function value (__m128).
  */
 static inline __m128
-jbm_coswc_4xf32 (const __m128 x)
+jbm_4xf32_coswc (const __m128 x)
                  ///< __m128 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
-  return jbm_polynomial_3_4xf32 (jbm_sqr_4xf32 (x), K_COSWC_F32);
+  return jbm_4xf32_polynomial_3 (jbm_4xf32_sqr (x), K_COSWC_F32);
 }
 
 /**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
- * x in [-pi/4,pi/4] from jbm_sinwc_4xf32 approximation (__m128).
+ * x in [-pi/4,pi/4] from jbm_4xf32_sinwc approximation (__m128).
  */
 static inline void
-jbm_sincoswc_4xf32 (const __m128 x,
+jbm_sin4xf32_coswc (const __m128 x,
                     ///< __m128 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     __m128 *s,  ///< pointer to the sin function value (__m128).
                     __m128 *c)  ///< pointer to the cos function value (__m128).
 {
-  *s = jbm_sinwc_4xf32 (x);
-  *c = jbm_coswc_4xf32 (x);
+  *s = jbm_4xf32_sinwc (x);
+  *c = jbm_4xf32_coswc (x);
 }
 
 /**
- * Function to calculate the function sin(x) from jbm_sinwc_4xf32 and
- * jbm_coswc_4xf32 approximations (__m128).
+ * Function to calculate the function sin(x) from jbm_4xf32_sinwc and
+ * jbm_4xf32_coswc approximations (__m128).
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_sin_4xf32 (const __m128 x)  ///< __m128 vector.
+jbm_4xf32_sin (const __m128 x)  ///< __m128 vector.
 {
   const __m128 pi3_2 = _mm_set1_ps (3.f * M_PI_2f);
   const __m128 pi = _mm_set1_ps (M_PIf);
   const __m128 pi_2 = _mm_set1_ps (M_PI_2f);
   const __m128 pi_4 = _mm_set1_ps (M_PI_4f);
   __m128 y, q, l1, l2, m1, m2, m3, y1, y2, y3;
-  q = jbm_mod_4xf32 (_mm_add_ps (x, pi_4), _mm_set1_ps (2.f * M_PIf));
+  q = jbm_4xf32_mod (_mm_add_ps (x, pi_4), _mm_set1_ps (2.f * M_PIf));
   y = _mm_sub_ps (q, pi_4);
   l1 = _mm_cmplt_ps (q, pi);
   l2 = _mm_cmplt_ps (q, pi3_2);
@@ -7345,44 +7345,44 @@ jbm_sin_4xf32 (const __m128 x)  ///< __m128 vector.
   y = _mm_blendv_ps (y, y1, m1);
   y = _mm_blendv_ps (y, y2, m2);
   y = _mm_blendv_ps (y, y3, m3);
-  y = _mm_blendv_ps (jbm_sinwc_4xf32 (y), jbm_coswc_4xf32 (y),
+  y = _mm_blendv_ps (jbm_4xf32_sinwc (y), jbm_4xf32_coswc (y),
                      _mm_or_ps (m1, m3));
-  return _mm_blendv_ps (y, jbm_opposite_4xf32 (y), m3);
+  return _mm_blendv_ps (y, jbm_4xf32_opposite (y), m3);
 }
 
 /**
- * Function to calculate the function cos(x) from jbm_sinwc_4xf32 and
- * jbm_coswc_4xf32 approximations (__m128).
+ * Function to calculate the function cos(x) from jbm_4xf32_sinwc and
+ * jbm_4xf32_coswc approximations (__m128).
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_cos_4xf32 (const __m128 x)  ///< __m128 vector.
+jbm_4xf32_cos (const __m128 x)  ///< __m128 vector.
 {
   const __m128 pi2 = _mm_set1_ps (2.f * M_PIf);
   __m128 y, c;
-  y = jbm_mod_4xf32 (x, pi2);
-  c = jbm_coswc_4xf32 (_mm_sub_ps (y, pi2));
+  y = jbm_4xf32_mod (x, pi2);
+  c = jbm_4xf32_coswc (_mm_sub_ps (y, pi2));
   c = _mm_blendv_ps (c,
-                     jbm_sinwc_4xf32
+                     jbm_4xf32_sinwc
                      (_mm_sub_ps (y, _mm_set1_ps (3.f * M_PI_2f))),
                      _mm_cmplt_ps (y, _mm_set1_ps (7.f * M_PI_4f)));
   c = _mm_blendv_ps (c,
-                     jbm_opposite_4xf32
-                     (jbm_coswc_4xf32 (_mm_sub_ps (_mm_set1_ps (M_PIf), y))),
+                     jbm_4xf32_opposite
+                     (jbm_4xf32_coswc (_mm_sub_ps (_mm_set1_ps (M_PIf), y))),
                      _mm_cmplt_ps (y, _mm_set1_ps (5.f * M_PI_4f)));
-  c = _mm_blendv_ps (c, jbm_sinwc_4xf32 (_mm_sub_ps (_mm_set1_ps (M_PI_2f), y)),
+  c = _mm_blendv_ps (c, jbm_4xf32_sinwc (_mm_sub_ps (_mm_set1_ps (M_PI_2f), y)),
                      _mm_cmplt_ps (y, _mm_set1_ps (3.f * M_PI_4f)));
-  return _mm_blendv_ps (c, jbm_coswc_4xf32 (y),
+  return _mm_blendv_ps (c, jbm_4xf32_coswc (y),
                         _mm_cmplt_ps (y, _mm_set1_ps (M_PI_4f)));
 }
 
 /**
  * Function to calculate the functions sin(x) and cos(x) from
- * jbm_sinwc_4xf32 and jbm_coswc_4xf32 approximations (__m128).
+ * jbm_4xf32_sinwc and jbm_4xf32_coswc approximations (__m128).
  */
 static inline void
-jbm_sincos_4xf32 (const __m128 x,
+jbm_sin4xf32_cos (const __m128 x,
                   ///< __m128 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   __m128 *s,    ///< pointer to the sin function value (__m128).
                   __m128 *c)    ///< pointer to the cos function value (__m128).
@@ -7390,37 +7390,37 @@ jbm_sincos_4xf32 (const __m128 x,
   const __m128 pi2 = _mm_set1_ps (2.f * M_PIf);
   const __m128 z = _mm_setzero_ps ();
   __m128 y, m, s1, c1, s2, c2;
-  y = jbm_mod_4xf32 (x, pi2);
-  jbm_sincoswc_4xf32 (_mm_sub_ps (y, pi2), &s1, &c1);
-  jbm_sincoswc_4xf32 (_mm_sub_ps (y, _mm_set1_ps (3.f * M_PI_2f)), &c2, &s2);
+  y = jbm_4xf32_mod (x, pi2);
+  jbm_sin4xf32_coswc (_mm_sub_ps (y, pi2), &s1, &c1);
+  jbm_sin4xf32_coswc (_mm_sub_ps (y, _mm_set1_ps (3.f * M_PI_2f)), &c2, &s2);
   m = _mm_cmplt_ps (y, _mm_set1_ps (7.f * M_PI_4f));
   s1 = _mm_blendv_ps (s1, _mm_sub_ps (z, s2), m);
   c1 = _mm_blendv_ps (c1, c2, m);
-  jbm_sincoswc_4xf32 (_mm_sub_ps (_mm_set1_ps (M_PIf), y), &s2, &c2);
+  jbm_sin4xf32_coswc (_mm_sub_ps (_mm_set1_ps (M_PIf), y), &s2, &c2);
   m = _mm_cmplt_ps (y, _mm_set1_ps (5.f * M_PI_4f));
   s1 = _mm_blendv_ps (s1, s2, m);
   c1 = _mm_blendv_ps (c1, _mm_sub_ps (z, c2), m);
-  jbm_sincoswc_4xf32 (_mm_sub_ps (_mm_set1_ps (M_PI_2f), y), &c2, &s2);
+  jbm_sin4xf32_coswc (_mm_sub_ps (_mm_set1_ps (M_PI_2f), y), &c2, &s2);
   m = _mm_cmplt_ps (y, _mm_set1_ps (3.f * M_PI_4f));
   s1 = _mm_blendv_ps (s1, s2, m);
   c1 = _mm_blendv_ps (c1, c2, m);
-  jbm_sincoswc_4xf32 (y, &s2, &c2);
+  jbm_sin4xf32_coswc (y, &s2, &c2);
   m = _mm_cmplt_ps (y, _mm_set1_ps (M_PI_4f));
   *s = _mm_blendv_ps (s1, s2, m);
   *c = _mm_blendv_ps (c1, c2, m);
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sincos_4xf32 function
+ * Function to calculate the function tan(x) from jbm_sin4xf32_cos function
  * (__m128).
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_tan_4xf32 (const __m128 x)  ///< __m128 vector.
+jbm_4xf32_tan (const __m128 x)  ///< __m128 vector.
 {
   __m128 s, c;
-  jbm_sincos_4xf32 (x, &s, &c);
+  jbm_sin4xf32_cos (x, &s, &c);
   return _mm_div_ps (s, c);
 }
 
@@ -7431,73 +7431,73 @@ jbm_tan_4xf32 (const __m128 x)  ///< __m128 vector.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_atanwc_4xf32 (const __m128 x)
+jbm_4xf32_atanwc (const __m128 x)
                   ///< __m128 vector \f$\in\left[-1,1\right]\f$.
 {
   return
-    _mm_mul_ps (x, jbm_rational_5_2_4xf32 (jbm_sqr_4xf32 (x), K_ATANWC_F32));
+    _mm_mul_ps (x, jbm_4xf32_rational_5_2 (jbm_4xf32_sqr (x), K_ATANWC_F32));
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc_4xf32
+ * Function to calculate the function atan(x) using the jbm_4xf32_atanwc
  * function (__m128).
  *
  * \return function value (in [-pi/2,pi/2]) (__m128).
  */
 static inline __m128
-jbm_atan_4xf32 (const __m128 x) ///< __m128 vector.
+jbm_4xf32_atan (const __m128 x) ///< __m128 vector.
 {
   __m128 f, ax, m;
-  ax = jbm_abs_4xf32 (x);
+  ax = jbm_4xf32_abs (x);
   m = _mm_cmpgt_ps (ax, _mm_set1_ps (1.f));
-  ax = _mm_blendv_ps (ax, jbm_reciprocal_4xf32 (ax), m);
-  f = jbm_atanwc_4xf32 (ax);
+  ax = _mm_blendv_ps (ax, jbm_4xf32_reciprocal (ax), m);
+  f = jbm_4xf32_atanwc (ax);
   f = _mm_blendv_ps (f, _mm_sub_ps (_mm_set1_ps (M_PI_2f), f), m);
-  return jbm_copysign_4xf32 (f, x);
+  return jbm_copy4xf32_sign (f, x);
 }
 
 /**
- * Function to calculate the function atan2(y,x) using the jbm_atan_4xf32
+ * Function to calculate the function atan2(y,x) using the jbm_4xf32_atan
  * function (__m128).
  *
  * \return function value (in [-pi,pi]) (__m128).
  */
 static inline __m128
-jbm_atan2_4xf32 (const __m128 y,        ///< __m128 y component.
+jbm_4xf32_atan2 (const __m128 y,        ///< __m128 y component.
                  const __m128 x)        ///< __m128 x component.
 {
   __m128 f, g;
-  f = jbm_atan_4xf32 (_mm_div_ps (y, x));
-  g = _mm_add_ps (f, jbm_copysign_4xf32 (_mm_set1_ps (M_PIf), y));
+  f = jbm_4xf32_atan (_mm_div_ps (y, x));
+  g = _mm_add_ps (f, jbm_copy4xf32_sign (_mm_set1_ps (M_PIf), y));
   return _mm_blendv_ps (f, g, _mm_cmplt_ps (x, _mm_setzero_ps ()));
 }
 
 /**
- * Function to calculate the function asin(x) using the jbm_atan_4xf32 function
+ * Function to calculate the function asin(x) using the jbm_4xf32_atan function
  * (__m128).
  *
  * \return function value (in [-pi/2,pi/2]).
  */
 static inline __m128
-jbm_asin_4xf32 (const __m128 x) ///< __m128 vector.
+jbm_4xf32_asin (const __m128 x) ///< __m128 vector.
 {
   return
-    jbm_atan_4xf32 (_mm_div_ps
+    jbm_4xf32_atan (_mm_div_ps
                     (x, _mm_sqrt_ps (_mm_fnmadd_ps (x, x, _mm_set1_ps (1.f)))));
 }
 
 /**
- * Function to calculate the function acos(x) using the jbm_atan_4xf32 function
+ * Function to calculate the function acos(x) using the jbm_4xf32_atan function
  * (__m128).
  *
  * \return function value (in [0,pi]) (__m128).
  */
 static inline __m128
-jbm_acos_4xf32 (const __m128 x) ///< __m128 vector.
+jbm_4xf32_acos (const __m128 x) ///< __m128 vector.
 {
   __m128 f;
   f =
-    jbm_atan_4xf32 (_mm_div_ps
+    jbm_4xf32_atan (_mm_div_ps
                     (_mm_sqrt_ps (_mm_fnmadd_ps (x, x, _mm_set1_ps (1.f))), x));
   return _mm_blendv_ps (f, _mm_add_ps (f, _mm_set1_ps (M_PIf)),
                         _mm_cmplt_ps (x, _mm_setzero_ps ()));
@@ -7509,12 +7509,12 @@ jbm_acos_4xf32 (const __m128 x) ///< __m128 vector.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_sinh_4xf32 (const __m128 x) ///< __m128 number.
+jbm_4xf32_sinh (const __m128 x) ///< __m128 number.
 {
   __m128 f;
-  f = jbm_exp_4xf32 (x);
+  f = jbm_4xf32_exp (x);
   return _mm_mul_ps (_mm_set1_ps (0.5f),
-                     _mm_sub_ps (f, jbm_reciprocal_4xf32 (f)));
+                     _mm_sub_ps (f, jbm_4xf32_reciprocal (f)));
 }
 
 /**
@@ -7523,12 +7523,12 @@ jbm_sinh_4xf32 (const __m128 x) ///< __m128 number.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_cosh_4xf32 (const __m128 x) ///< __m128 number.
+jbm_4xf32_cosh (const __m128 x) ///< __m128 number.
 {
   __m128 f;
-  f = jbm_exp_4xf32 (x);
+  f = jbm_4xf32_exp (x);
   return _mm_mul_ps (_mm_set1_ps (0.5f),
-                     _mm_add_ps (f, jbm_reciprocal_4xf32 (f)));
+                     _mm_add_ps (f, jbm_4xf32_reciprocal (f)));
 }
 
 /**
@@ -7537,11 +7537,11 @@ jbm_cosh_4xf32 (const __m128 x) ///< __m128 number.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_tanh_4xf32 (const __m128 x) ///< __m128 number.
+jbm_4xf32_tanh (const __m128 x) ///< __m128 number.
 {
   __m128 f, fi;
-  f = jbm_exp_4xf32 (x);
-  fi = jbm_reciprocal_4xf32 (f);
+  f = jbm_4xf32_exp (x);
+  fi = jbm_4xf32_reciprocal (f);
   f = _mm_div_ps (_mm_sub_ps (f, fi), _mm_add_ps (f, fi));
   f = _mm_blendv_ps (f, _mm_set1_ps (1.f),
                      _mm_cmpgt_ps (x, _mm_set1_ps (JBM_FLT_MAX_E_EXP)));
@@ -7555,10 +7555,10 @@ jbm_tanh_4xf32 (const __m128 x) ///< __m128 number.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_asinh_4xf32 (const __m128 x)        ///< __m128 number.
+jbm_4xf32_asinh (const __m128 x)        ///< __m128 number.
 {
   return
-    jbm_log_4xf32 (_mm_add_ps
+    jbm_4xf32_log (_mm_add_ps
                    (x, _mm_sqrt_ps (_mm_fmadd_ps (x, x, _mm_set1_ps (1.f)))));
 }
 
@@ -7568,10 +7568,10 @@ jbm_asinh_4xf32 (const __m128 x)        ///< __m128 number.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_acosh_4xf32 (const __m128 x)        ///< __m128 number.
+jbm_4xf32_acosh (const __m128 x)        ///< __m128 number.
 {
   return
-    jbm_log_4xf32 (_mm_add_ps
+    jbm_4xf32_log (_mm_add_ps
                    (x, _mm_sqrt_ps (_mm_fmsub_ps (x, x, _mm_set1_ps (1.f)))));
 }
 
@@ -7581,11 +7581,11 @@ jbm_acosh_4xf32 (const __m128 x)        ///< __m128 number.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_atanh_4xf32 (const __m128 x)        ///< __m128 number.
+jbm_4xf32_atanh (const __m128 x)        ///< __m128 number.
 {
   const __m128 u = _mm_set1_ps (1.f);
   return _mm_mul_ps (_mm_set1_ps (0.5f),
-                     jbm_log_4xf32 (_mm_div_ps (_mm_add_ps (u, x),
+                     jbm_4xf32_log (_mm_div_ps (_mm_add_ps (u, x),
                                                 _mm_sub_ps (u, x))));
 }
 
@@ -7596,11 +7596,11 @@ jbm_atanh_4xf32 (const __m128 x)        ///< __m128 number.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_erfwc_4xf32 (const __m128 x)
+jbm_4xf32_erfwc (const __m128 x)
                  ///< __m128 vector \f$\in\left[-1,1\right]\f$.
 {
   return
-    _mm_mul_ps (x, jbm_polynomial_5_4xf32 (jbm_sqr_4xf32 (x), K_ERFWC_F32));
+    _mm_mul_ps (x, jbm_4xf32_polynomial_5 (jbm_4xf32_sqr (x), K_ERFWC_F32));
 }
 
 /**
@@ -7610,50 +7610,50 @@ jbm_erfwc_4xf32 (const __m128 x)
  * \return function value (__m128).
  */
 static inline __m128
-jbm_erfcwc_4xf32 (const __m128 x)
+jbm_4xf32_erfcwc (const __m128 x)
                   ///< __m128 vector \f$\in\left[1,\infty\right]\f$.
 {
   __m128 f, x2;
-  x2 = jbm_sqr_4xf32 (x);
-  f = _mm_mul_ps (jbm_rational_8_4_4xf32 (jbm_reciprocal_4xf32 (x),
+  x2 = jbm_4xf32_sqr (x);
+  f = _mm_mul_ps (jbm_4xf32_rational_8_4 (jbm_4xf32_reciprocal (x),
                                           K_ERFCWC_F32),
-                  _mm_div_ps (x, jbm_exp_4xf32 (x2)));
+                  _mm_div_ps (x, jbm_4xf32_exp (x2)));
   return _mm_blendv_ps (f, _mm_setzero_ps (),
                         _mm_cmpgt_ps (x, _mm_set1_ps (K_ERFC_MAX_F32)));
 }
 
 /**
- * Function to calculate the function erf(x) using jbm_erfwc_4xf32 and
- * jbm_erfcwc_4xf32
+ * Function to calculate the function erf(x) using jbm_4xf32_erfwc and
+ * jbm_4xf32_erfcwc.
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_erf_4xf32 (const __m128 x)  ///< __m128 vector.
+jbm_4xf32_erf (const __m128 x)  ///< __m128 vector.
 {
   const __m128 u = _mm_set1_ps (1.f);
   __m128 ax, f;
-  ax = jbm_abs_4xf32 (x);
-  f = jbm_copysign_4xf32 (_mm_sub_ps (u, jbm_erfcwc_4xf32 (ax)), x);
-  return _mm_blendv_ps (f, jbm_erfwc_4xf32 (x), _mm_cmplt_ps (ax, u));
+  ax = jbm_4xf32_abs (x);
+  f = jbm_copy4xf32_sign (_mm_sub_ps (u, jbm_4xf32_erfcwc (ax)), x);
+  return _mm_blendv_ps (f, jbm_4xf32_erfwc (x), _mm_cmplt_ps (ax, u));
 
 }
 
 /**
- * Function to calculate the function erfc(x) using jbm_erfwc_4xf32 and
- * jbm_erfcwc_4xf32
+ * Function to calculate the function erfc(x) using jbm_4xf32_erfwc and
+ * jbm_4xdbl_erfcwc.
  *
  * \return function value (__m128).
  */
 static inline __m128
-jbm_erfc_4xf32 (const __m128 x) ///< __m128 vector.
+jbm_4xf32_erfc (const __m128 x) ///< __m128 vector.
 {
   const __m128 u2 = _mm_set1_ps (2.f);
   const __m128 u = _mm_set1_ps (1.f);
   __m128 ax, cwc, wc;
-  ax = jbm_abs_4xf32 (x);
-  cwc = jbm_erfcwc_4xf32 (ax);
-  wc = _mm_sub_ps (u, jbm_erfwc_4xf32 (x));
+  ax = jbm_4xf32_abs (x);
+  cwc = jbm_4xf32_erfcwc (ax);
+  wc = _mm_sub_ps (u, jbm_4xf32_erfwc (x));
   return
     _mm_blendv_ps
     (_mm_blendv_ps (wc, _mm_sub_ps (u2, cwc), _mm_cmpgt_ps (ax, u)), cwc,
@@ -7680,7 +7680,7 @@ jbm_solve_quadratic_reduced_4xf32 (const __m128 a,
   __m128 ka, kb, k1, k2;
   k1 = _mm_set1_ps (-0.5f);
   ka = _mm_mul_ps (a, k1);
-  kb = _mm_sqrt_ps (_mm_sub_ps (jbm_sqr_4xf32 (ka), b));
+  kb = _mm_sqrt_ps (_mm_sub_ps (jbm_4xf32_sqr (ka), b));
   k1 = _mm_add_ps (ka, kb);
   k2 = _mm_sub_ps (ka, kb);
   k1 = _mm_blendv_ps (k1, k2, _mm_cmplt_ps (k1, x1));
@@ -7694,7 +7694,7 @@ jbm_solve_quadratic_reduced_4xf32 (const __m128 a,
  * \return __m128 vector of solution values.
  */
 static inline __m128
-jbm_solve_quadratic_4xf32 (const __m128 a,
+jbm_4xf32_solve_quadratic (const __m128 a,
 ///< __m128 vector of 2nd order coefficient of the equations.
                            const __m128 b,
 ///< __m128 vector of 1st order coefficient of the equations.
@@ -7708,7 +7708,7 @@ jbm_solve_quadratic_4xf32 (const __m128 a,
   __m128 k1, k2;
   k1 = jbm_solve_quadratic_reduced_4xf32 (_mm_div_ps (b, a), _mm_div_ps (c, a),
                                           x1, x2);
-  k2 = _mm_div_ps (jbm_opposite_4xf32 (c), b);
+  k2 = _mm_div_ps (jbm_4xf32_opposite (c), b);
   return _mm_blendv_ps (k1, k2, jbm_small_4xf32 (a));
 }
 
@@ -7741,21 +7741,21 @@ jbm_solve_cubic_reduced_4xf32 (const __m128 a,
   k0 = _mm_fmsub_ps (_mm_fmsub_ps (b, a3, c), c_2, _mm_mul_ps (a3, k0));
   k3 = _mm_mul_ps (k1, _mm_mul_ps (k1, k1));
   k2 = _mm_fmadd_ps (k0, k0, k3);
-  l1 = _mm_sqrt_ps (jbm_opposite_4xf32 (k1));
-  l0 = _mm_mul_ps (jbm_acos_4xf32 (_mm_div_ps (k0, k3)), c_3);
+  l1 = _mm_sqrt_ps (jbm_4xf32_opposite (k1));
+  l0 = _mm_mul_ps (jbm_4xf32_acos (_mm_div_ps (k0, k3)), c_3);
   l1 = _mm_add_ps (l1, l1);
-  l2 = _mm_fmsub_ps (l1, jbm_cos_4xf32 (k0), a3);
-  l3 = _mm_fmsub_ps (l1, jbm_cos_4xf32 (_mm_add_ps (l0, c2p_3)), a3);
+  l2 = _mm_fmsub_ps (l1, jbm_4xf32_cos (k0), a3);
+  l3 = _mm_fmsub_ps (l1, jbm_4xf32_cos (_mm_add_ps (l0, c2p_3)), a3);
   l3 = _mm_blendv_ps (l3, l2,
                       _mm_or_ps (_mm_cmplt_ps (l2, x1), _mm_cmpgt_ps (l2, x2)));
-  l4 = _mm_fmsub_ps (l1, jbm_cos_4xf32 (_mm_sub_ps (l0, c2p_3)), a);
+  l4 = _mm_fmsub_ps (l1, jbm_4xf32_cos (_mm_sub_ps (l0, c2p_3)), a);
   l4 = _mm_blendv_ps (l4, l3,
                       _mm_or_ps (_mm_cmplt_ps (l3, x1), _mm_cmpgt_ps (l3, x2)));
   k1 = _mm_sqrt_ps (k2);
   l5 = _mm_add_ps (k0, k1);
-  l5 = jbm_cbrt_4xf32 (k2);
+  l5 = jbm_4xf32_cbrt (k2);
   k0 = _mm_sub_ps (k0, k1);
-  l5 = _mm_add_ps (l5, _mm_sub_ps (jbm_cbrt_4xf32 (k0), a3));
+  l5 = _mm_add_ps (l5, _mm_sub_ps (jbm_4xf32_cbrt (k0), a3));
   return _mm_blendv_ps (l4, l5, _mm_cmplt_ps (k2, _mm_setzero_ps ()));
 }
 
@@ -7767,7 +7767,7 @@ jbm_solve_cubic_reduced_4xf32 (const __m128 a,
  * \return __m128 vector of solution values.
  */
 static inline __m128
-jbm_solve_cubic_4xf32 (const __m128 a,
+jbm_4xf32_solve_cubic (const __m128 a,
 ///< __m128 vector of 3rd order coefficient of the equations.
                        const __m128 b,
 ///< __m128 vector of 2nd order coefficient of the equations.
@@ -7784,7 +7784,7 @@ jbm_solve_cubic_4xf32 (const __m128 a,
     _mm_blendv_ps (jbm_solve_cubic_reduced_4xf32 (_mm_div_ps (b, a),
                                                   _mm_div_ps (c, a),
                                                   _mm_div_ps (d, a), x1, x2),
-                   jbm_solve_quadratic_4xf32 (b, c, d, x1, x2),
+                   jbm_4xf32_solve_quadratic (b, c, d, x1, x2),
                    jbm_small_4xf32 (a));
 }
 
@@ -7795,7 +7795,7 @@ jbm_solve_cubic_4xf32 (const __m128 a,
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_total_4xf32 (const __m128 d1 __attribute__((unused)),
+jbm_4xf32_flux_limiter_total (const __m128 d1 __attribute__((unused)),
                               ///< 1st flux limiter function parameter.
                               const __m128 d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
@@ -7810,7 +7810,7 @@ jbm_flux_limiter_total_4xf32 (const __m128 d1 __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_null_4xf32 (const __m128 d1 __attribute__((unused)),
+jbm_4xf32_flux_limiter_null (const __m128 d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
                              const __m128 d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
@@ -7825,7 +7825,7 @@ jbm_flux_limiter_null_4xf32 (const __m128 d1 __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_centred_4xf32 (const __m128 d1,
+jbm_4xf32_flux_limiter_centred (const __m128 d1,
                                 ///< 1st flux limiter function parameter.
                                 const __m128 d2)
                               ///< 2nd flux limiter function parameter.
@@ -7843,14 +7843,14 @@ jbm_flux_limiter_centred_4xf32 (const __m128 d1,
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_superbee_4xf32 (const __m128 d1,
+jbm_4xf32_flux_limiter_superbee (const __m128 d1,
                                  ///< 1st flux limiter function parameter.
                                  const __m128 d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m128 r;
   r = _mm_div_ps (d1, d2);
-  r = _mm_max_ps (_mm_min_ps (jbm_dbl_4xf32 (r), _mm_set1_ps (1.f)),
+  r = _mm_max_ps (_mm_min_ps (jbm_4xf32_dbl (r), _mm_set1_ps (1.f)),
                   _mm_min_ps (r, _mm_set1_ps (2.f)));
   return _mm_blendv_ps (_mm_setzero_ps (), r,
                         _mm_cmpgt_ps (_mm_mul_ps (d1, d2),
@@ -7865,7 +7865,7 @@ jbm_flux_limiter_superbee_4xf32 (const __m128 d1,
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_minmod_4xf32 (const __m128 d1,
+jbm_flux_limiter_min4xf32_mod (const __m128 d1,
                                ///< 1st flux limiter function parameter.
                                const __m128 d2)
                              ///< 2nd flux limiter function parameter.
@@ -7886,14 +7886,14 @@ jbm_flux_limiter_minmod_4xf32 (const __m128 d1,
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_VanLeer_4xf32 (const __m128 d1,
+jbm_4xf32_flux_limiter_VanLeer (const __m128 d1,
                                 ///< 1st flux limiter function parameter.
                                 const __m128 d2)
                               ///< 2nd flux limiter function parameter.
 {
   __m128 r, k;
   r = _mm_div_ps (d1, d2);
-  k = jbm_abs_4xf32 (r);
+  k = jbm_4xf32_abs (r);
   r = _mm_div_ps (_mm_add_ps (r, k), _mm_add_ps (_mm_set1_ps (1.f), k));
   return _mm_blendv_ps (_mm_setzero_ps (), r,
                         _mm_cmpgt_ps (_mm_mul_ps (d1, d2),
@@ -7908,14 +7908,14 @@ jbm_flux_limiter_VanLeer_4xf32 (const __m128 d1,
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_VanAlbada_4xf32 (const __m128 d1,
+jbm_4xf32_flux_limiter_VanAlbada (const __m128 d1,
                                   ///< 1st flux limiter function parameter.
                                   const __m128 d2)
                                 ///< 2nd flux limiter function parameter.
 {
   __m128 r, k;
   r = _mm_div_ps (d1, d2);
-  k = jbm_sqr_4xf32 (r);
+  k = jbm_4xf32_sqr (r);
   r = _mm_div_ps (_mm_add_ps (r, k), _mm_add_ps (_mm_set1_ps (1.f), k));
   return _mm_blendv_ps (_mm_setzero_ps (), r,
                         _mm_cmpgt_ps (_mm_mul_ps (d1, d2),
@@ -7930,7 +7930,7 @@ jbm_flux_limiter_VanAlbada_4xf32 (const __m128 d1,
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_minsuper_4xf32 (const __m128 d1,
+jbm_4xf32_flux_limiter_minsuper (const __m128 d1,
                                  ///< 1st flux limiter function parameter.
                                  const __m128 d2)
                                ///< 2nd flux limiter function parameter.
@@ -7950,14 +7950,14 @@ jbm_flux_limiter_minsuper_4xf32 (const __m128 d1,
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_supermin_4xf32 (const __m128 d1,
+jbm_4xf32_flux_limiter_supermin (const __m128 d1,
                                  ///< 1st flux limiter function parameter.
                                  const __m128 d2)
                                  ///< 2nd flux limiter function parameter.
 {
   __m128 r;
   r = _mm_div_ps (d1, d2);
-  r = _mm_min_ps (jbm_dbl_4xf32 (r), _mm_set1_ps (1.f));
+  r = _mm_min_ps (jbm_4xf32_dbl (r), _mm_set1_ps (1.f));
   return _mm_blendv_ps (_mm_setzero_ps (), r,
                         _mm_cmpgt_ps (_mm_mul_ps (d1, d2),
                                       _mm_set1_ps (FLT_EPSILON)));
@@ -7972,7 +7972,7 @@ jbm_flux_limiter_supermin_4xf32 (const __m128 d1,
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_monotonized_central_4xf32 (const __m128 d1,
+jbm_4xf32_flux_limiter_monotonized_central (const __m128 d1,
 ///< 1st flux limiter function parameter.
                                             const __m128 d2)
 ///< 2nd flux limiter function parameter.
@@ -7982,7 +7982,7 @@ jbm_flux_limiter_monotonized_central_4xf32 (const __m128 d1,
   rm = _mm_mul_ps (_mm_set1_ps (0.5f), _mm_add_ps (r, _mm_set1_ps (1.f)));
   rm = _mm_blendv_ps (_mm_set1_ps (2.f), rm,
                       _mm_cmplt_ps (r, _mm_set1_ps (3.f)));
-  rm = _mm_blendv_ps (rm, jbm_dbl_4xf32 (r),
+  rm = _mm_blendv_ps (rm, jbm_4xf32_dbl (r),
                       _mm_cmpgt_ps (r, _mm_set1_ps (1.f / 3.f)));
   return _mm_blendv_ps (_mm_setzero_ps (), rm,
                         _mm_cmpgt_ps (_mm_mul_ps (d1, d2),
@@ -7997,7 +7997,7 @@ jbm_flux_limiter_monotonized_central_4xf32 (const __m128 d1,
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_mean_4xf32 (const __m128 d1,
+jbm_4xf32_flux_limiter_mean (const __m128 d1,
                              ///< 1st flux limiter function parameter.
                              const __m128 d2)
                            ///< 2nd flux limiter function parameter.
@@ -8016,7 +8016,7 @@ jbm_flux_limiter_mean_4xf32 (const __m128 d1,
  * \return flux limiter function value.
  */
 static inline __m128
-jbm_flux_limiter_4xf32 (const __m128 d1,
+jbm_4xf32_flux_limiter (const __m128 d1,
                         ///< 1st flux limiter function parameter.
                         const __m128 d2,
                         ///< 2nd flux limiter function parameter.
@@ -8026,27 +8026,27 @@ jbm_flux_limiter_4xf32 (const __m128 d1,
   switch (type)
     {
     case JBM_FLUX_LIMITER_TYPE_TOTAL:
-      return jbm_flux_limiter_total_4xf32 (d1, d2);
+      return jbm_4xf32_flux_limiter_total (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_NULL:
-      return jbm_flux_limiter_null_4xf32 (d1, d2);
+      return jbm_4xf32_flux_limiter_null (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_CENTRED:
-      return jbm_flux_limiter_centred_4xf32 (d1, d2);
+      return jbm_4xf32_flux_limiter_centred (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
-      return jbm_flux_limiter_superbee_4xf32 (d1, d2);
+      return jbm_4xf32_flux_limiter_superbee (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_minmod_4xf32 (d1, d2);
+      return jbm_flux_limiter_min4xf32_mod (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
-      return jbm_flux_limiter_VanLeer_4xf32 (d1, d2);
+      return jbm_4xf32_flux_limiter_VanLeer (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
-      return jbm_flux_limiter_VanAlbada_4xf32 (d1, d2);
+      return jbm_4xf32_flux_limiter_VanAlbada (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINSUPER:
-      return jbm_flux_limiter_minsuper_4xf32 (d1, d2);
+      return jbm_4xf32_flux_limiter_minsuper (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
-      return jbm_flux_limiter_supermin_4xf32 (d1, d2);
+      return jbm_4xf32_flux_limiter_supermin (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
-      return jbm_flux_limiter_monotonized_central_4xf32 (d1, d2);
+      return jbm_4xf32_flux_limiter_monotonized_central (d1, d2);
     }
-  return jbm_flux_limiter_mean_4xf32 (d1, d2);
+  return jbm_4xf32_flux_limiter_mean (d1, d2);
 }
 
 /**
@@ -8056,7 +8056,7 @@ jbm_flux_limiter_4xf32 (const __m128 d1,
  * \return __m128 vector of integral values.
  */
 static inline __m128
-jbm_integral_4xf32 (__m128 (*f) (__m128),
+jbm_4xf32_integral (__m128 (*f) (__m128),
                     ///< pointer to the function to integrate.
                     const __m128 x1,    ///< left limit of the interval.
                     const __m128 x2)    ///< right limit of the interval.
@@ -8091,7 +8091,7 @@ jbm_integral_4xf32 (__m128 (*f) (__m128),
  * \return additive reduction (double).
  */
 static inline double
-jbm_reduce_add_2xf64 (const __m128d x)  ///< __m128d vector.
+jbm_2xf64_reduce_add (const __m128d x)  ///< __m128d vector.
 {
   return _mm_cvtsd_f64 (_mm_hadd_pd (x, x));
 }
@@ -8102,7 +8102,7 @@ jbm_reduce_add_2xf64 (const __m128d x)  ///< __m128d vector.
  * \return maximum reduction (double).
  */
 static inline double
-jbm_reduce_max_2xf64 (const __m128d x)  ///< __m128d vector.
+jbm_2xf64_reduce_max (const __m128d x)  ///< __m128d vector.
 {
   return _mm_cvtsd_f64 (_mm_max_pd (x, _mm_unpackhi_pd (x, x)));
 }
@@ -8113,7 +8113,7 @@ jbm_reduce_max_2xf64 (const __m128d x)  ///< __m128d vector.
  * \return minimum reduction (double).
  */
 static inline double
-jbm_reduce_min_2xf64 (const __m128d x)  ///< __m128d vector.
+jbm_2xf64_reduce_min (const __m128d x)  ///< __m128d vector.
 {
   return _mm_cvtsd_f64 (_mm_min_pd (x, _mm_unpackhi_pd (x, x)));
 }
@@ -8123,7 +8123,7 @@ jbm_reduce_min_2xf64 (const __m128d x)  ///< __m128d vector.
  * __m128d vector.
  */
 static inline void
-jbm_reduce_maxmin_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_reduce_maxmin (const __m128d x,       ///< __m128d vector.
                          double *max,
                          ///< pointer to the maximum value (double).
                          double *min)
@@ -8140,7 +8140,7 @@ jbm_reduce_maxmin_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return negative value vector (__m128d).
  */
 static inline __m128d
-jbm_opposite_2xf64 (const __m128d x)    ///< __m128d vector.
+jbm_2xf64_opposite (const __m128d x)    ///< __m128d vector.
 {
   JBM2xF64 y;
   y.i = JBM_BITS_SIGN_2xF64;
@@ -8153,7 +8153,7 @@ jbm_opposite_2xf64 (const __m128d x)    ///< __m128d vector.
  * \return reciprocal value vector (__m128d).
  */
 static inline __m128d
-jbm_reciprocal_2xf64 (const __m128d x)  ///< __m128d vector.
+jbm_2xf64_reciprocal (const __m128d x)  ///< __m128d vector.
 {
   return _mm_div_pd (_mm_set1_pd (1.), x);
 }
@@ -8164,7 +8164,7 @@ jbm_reciprocal_2xf64 (const __m128d x)  ///< __m128d vector.
  * \return sign vector (__m128d).
  */
 static inline __m128d
-jbm_sign_2xf64 (const __m128d x)        ///< __m128d vector.
+jbm_2xf64_sign (const __m128d x)        ///< __m128d vector.
 {
   JBM2xF64 y;
   y.x = x;
@@ -8179,7 +8179,7 @@ jbm_sign_2xf64 (const __m128d x)        ///< __m128d vector.
  * \return absolute value vector.
  */
 static inline __m128d
-jbm_abs_2xf64 (const __m128d x)
+jbm_2xf64_abs (const __m128d x)
 {
   JBM2xF64 y;
   y.i = JBM_BITS_SIGN_2xF64;
@@ -8192,13 +8192,13 @@ jbm_abs_2xf64 (const __m128d x)
  * \return __m128d vector with magnitud of 1st vector and sign of 2nd vector.
  */
 static inline __m128d
-jbm_copysign_2xf64 (const __m128d x,
+jbm_copy2xf64_sign (const __m128d x,
 ///< __m128 vector to preserve magnitude.
                     const __m128d y)    ///< __m128d vector to preserve sign.
 {
   JBM2xF64 m;
   m.i = JBM_BITS_SIGN_2xF64;
-  return _mm_or_pd (jbm_abs_2xf64 (x), _mm_and_pd (y, m.x));
+  return _mm_or_pd (jbm_2xf64_abs (x), _mm_and_pd (y, m.x));
 }
 
 /**
@@ -8207,7 +8207,7 @@ jbm_copysign_2xf64 (const __m128d x,
  * \return function value vector (__m128d).
  */
 static inline __m128d
-jbm_hypot_2xf64 (const __m128d x,       ///< 1st __m128d vector.
+jbm_2xf64_hypot (const __m128d x,       ///< 1st __m128d vector.
                  const __m128d y)       ///< 2nd __m128d vector.
 {
   return _mm_sqrt_pd (_mm_fmadd_pd (x, x, _mm_mul_pd (y, y)));
@@ -8219,14 +8219,14 @@ jbm_hypot_2xf64 (const __m128d x,       ///< 1st __m128d vector.
  * \return rest value (in [0,|divisor|) interval) (__m128d).
  */
 static inline __m128d
-jbm_mod_2xf64 (const __m128d x, ///< dividend (__m128d).
+jbm_2xf64_mod (const __m128d x, ///< dividend (__m128d).
                const __m128d d) ///< divisor (__m128d).
 {
   __m128d r;
   r = _mm_floor_pd (_mm_div_pd (x, d));
   return _mm_blendv_pd (_mm_fnmadd_pd (r, d, x),
                         _mm_mul_pd (d, _mm_set1_pd (0.5)),
-                        _mm_cmpgt_pd (jbm_abs_2xf64 (r),
+                        _mm_cmpgt_pd (jbm_2xf64_abs (r),
                                       _mm_set1_pd (1. / DBL_EPSILON)));
 }
 
@@ -8236,7 +8236,7 @@ jbm_mod_2xf64 (const __m128d x, ///< dividend (__m128d).
  * \return normalized fraction value in [1/2,1).
  */
 static inline __m128d
-jbm_frexp_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_frexp (const __m128d x,       ///< __m128d vector.
                  __m128i *e)    ///< pointer to the extracted exponents vector.
 {
   const __m128i zi = _mm_setzero_si128 ();
@@ -8282,7 +8282,7 @@ jbm_frexp_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_exp2n_2xf64 (const __m128i e)     ///< exponent vector (__m128i).
+jbm_2xf64_exp2n (const __m128i e)     ///< exponent vector (__m128i).
 {
   const __m128i v1023 = _mm_set1_epi64x (1023ll);
   __m128d x;
@@ -8310,10 +8310,10 @@ jbm_exp2n_2xf64 (const __m128i e)     ///< exponent vector (__m128i).
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_ldexp_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_ldexp (const __m128d x,       ///< __m128d vector.
                  const __m128i e)     ///< exponent vector (__m128i).
 {
-  return _mm_mul_pd (x, jbm_exp2n_2xf64 (e));
+  return _mm_mul_pd (x, jbm_2xf64_exp2n (e));
 }
 
 /**
@@ -8324,7 +8324,7 @@ jbm_ldexp_2xf64 (const __m128d x,       ///< __m128d vector.
 static inline __m128d
 jbm_small_2xf64 (const __m128d x)       ///< __m128d vector.
 {
-  return _mm_cmplt_pd (jbm_abs_2xf64 (x), _mm_set1_pd (FLT_EPSILON));
+  return _mm_cmplt_pd (jbm_2xf64_abs (x), _mm_set1_pd (FLT_EPSILON));
 }
 
 /**
@@ -8346,8 +8346,8 @@ jbm_modmin_2xf64 (const __m128d a,      ///< 1st __m128d vector.
   __m128d aa, ab, y;
   ab = _mm_mul_pd (a, b);
   y = _mm_blendv_pd (a, z, _mm_cmple_pd (ab, z));
-  aa = jbm_abs_2xf64 (y);
-  ab = jbm_abs_2xf64 (b);
+  aa = jbm_2xf64_abs (y);
+  ab = jbm_2xf64_abs (b);
   return _mm_blendv_pd (y, b, _mm_cmpgt_pd (aa, ab));
 }
 
@@ -8368,7 +8368,7 @@ jbm_change_2xf64 (__m128d *restrict a,  ///< 1st __m128d vector pointer.
  * \return __m128d double.
  */
 static inline __m128d
-jbm_dbl_2xf64 (const __m128d x) ///< __m128d vector.
+jbm_2xf64_dbl (const __m128d x) ///< __m128d vector.
 {
   return _mm_add_pd (x, x);
 }
@@ -8379,7 +8379,7 @@ jbm_dbl_2xf64 (const __m128d x) ///< __m128d vector.
  * \return __m128d vector square.
  */
 static inline __m128d
-jbm_sqr_2xf64 (const __m128d x) ///< __m128d vector.
+jbm_2xf64_sqr (const __m128d x) ///< __m128d vector.
 {
   return _mm_mul_pd (x, x);
 }
@@ -8390,7 +8390,7 @@ jbm_sqr_2xf64 (const __m128d x) ///< __m128d vector.
  * \return __m128d vector of y-coordinates of the extrapolated points.
  */
 static inline __m128d
-jbm_extrapolate_2xf64 (const __m128d x,
+jbm_2xf64_extrapolate (const __m128d x,
                        ///< __m128d vector of x-coordinates of the extrapolated
                        ///< points.
                        const __m128d x1,
@@ -8414,7 +8414,7 @@ jbm_extrapolate_2xf64 (const __m128d x,
  * \return __m128d vector of y-coordinates of the interpolated points.
  */
 static inline __m128d
-jbm_interpolate_2xf64 (const __m128d x,
+jbm_2xf64_interpolate (const __m128d x,
                        ///< __m128d vector of x-coordinates of the interpolated
                        ///< points.
                        const __m128d x1,
@@ -8427,7 +8427,7 @@ jbm_interpolate_2xf64 (const __m128d x,
                      ///< __m128d vector of y-coordinates of the 2nd points.
 {
   __m128d k;
-  k = jbm_extrapolate_2xf64 (x, x1, x2, y1, y2);
+  k = jbm_2xf64_extrapolate (x, x1, x2, y1, y2);
   k = _mm_blendv_pd (y1, k, _mm_cmpgt_pd (x, x1));
   return _mm_blendv_pd (y2, k, _mm_cmplt_pd (x, x2));
 }
@@ -8438,7 +8438,7 @@ jbm_interpolate_2xf64 (const __m128d x,
  * \return __m128d vector of segment lengths.
  */
 static inline __m128d
-jbm_v2_length_2xf64 (const __m128d x1,
+jbm_2xf64_v2_length (const __m128d x1,
 ///< __m128d vector of x-coordinates of the 1st points defining the segment.
                      const __m128d y1,
 ///< __m128d vector of y-coordinates of the 1st points defining the segment.
@@ -8447,7 +8447,7 @@ jbm_v2_length_2xf64 (const __m128d x1,
                      const __m128d y2)
 ///< __m128d vector of y-coordinates of the 2nd points defining the segment.
 {
-  return jbm_hypot_2xf64 (_mm_sub_pd (x2, x1), _mm_sub_pd (y2, y1));
+  return jbm_2xf64_hypot (_mm_sub_pd (x2, x1), _mm_sub_pd (y2, y1));
 }
 
 /**
@@ -8456,7 +8456,7 @@ jbm_v2_length_2xf64 (const __m128d x1,
  * \return __m128d vector of segment lengths.
  */
 static inline __m128d
-jbm_v3_length_2xf64 (const __m128d x1,
+jbm_2xf64_v3_length (const __m128d x1,
 ///< __m128d vector of x-coordinates of the 1st points defining the segments.
                      const __m128d y1,
 ///< __m128d vector of y-coordinates of the 1st points defining the segments.
@@ -8470,7 +8470,7 @@ jbm_v3_length_2xf64 (const __m128d x1,
 ///< __m128d vector of z-coordinates of the 2nd points defining the segments.
 {
   __m128d dx, dy, dz;
-  dx = jbm_sqr_2xf64 (_mm_sub_pd (x2, x1));
+  dx = jbm_2xf64_sqr (_mm_sub_pd (x2, x1));
   dy = _mm_sub_pd (y2, y1);
   dy = _mm_fmadd_pd (dy, dy, dx);
   dz = _mm_sub_pd (z2, z1);
@@ -8483,7 +8483,7 @@ jbm_v3_length_2xf64 (const __m128d x1,
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_1_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_polynomial_1 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm_fmadd_pd (x, _mm_set1_pd (p[1]), _mm_set1_pd (p[0]));
@@ -8495,10 +8495,10 @@ jbm_polynomial_1_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_2_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_polynomial_2 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8508,10 +8508,10 @@ jbm_polynomial_2_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_3_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_polynomial_3 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8521,10 +8521,10 @@ jbm_polynomial_3_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_4_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_polynomial_4 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8534,10 +8534,10 @@ jbm_polynomial_4_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_5_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_polynomial_5 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8547,10 +8547,10 @@ jbm_polynomial_5_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_6_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_polynomial_6 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8560,10 +8560,10 @@ jbm_polynomial_6_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_7_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_polynomial_7 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8573,10 +8573,10 @@ jbm_polynomial_7_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_8_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_polynomial_8 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8586,10 +8586,10 @@ jbm_polynomial_8_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_9_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_polynomial_9 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8599,10 +8599,10 @@ jbm_polynomial_9_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_10_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_10 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8612,10 +8612,10 @@ jbm_polynomial_10_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_11_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_11 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8625,10 +8625,10 @@ jbm_polynomial_11_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_12_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_12 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8638,10 +8638,10 @@ jbm_polynomial_12_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_13_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_13 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8651,10 +8651,10 @@ jbm_polynomial_13_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_14_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_14 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8664,10 +8664,10 @@ jbm_polynomial_14_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_15_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_15 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8677,10 +8677,10 @@ jbm_polynomial_15_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_16_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_16 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8690,10 +8690,10 @@ jbm_polynomial_16_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_17_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_17 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8703,10 +8703,10 @@ jbm_polynomial_17_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_18_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_18 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8716,10 +8716,10 @@ jbm_polynomial_18_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_19_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_19 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8729,10 +8729,10 @@ jbm_polynomial_19_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_20_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_20 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8742,10 +8742,10 @@ jbm_polynomial_20_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_21_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_21 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_20 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8755,10 +8755,10 @@ jbm_polynomial_21_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_22_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_22 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_21 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8768,10 +8768,10 @@ jbm_polynomial_22_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_23_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_23 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_22 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8781,10 +8781,10 @@ jbm_polynomial_23_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_24_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_24 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_23 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8794,10 +8794,10 @@ jbm_polynomial_24_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_25_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_25 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_24 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8807,10 +8807,10 @@ jbm_polynomial_25_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_26_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_26 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_25 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8820,10 +8820,10 @@ jbm_polynomial_26_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_27_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_27 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_26_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_26 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8833,10 +8833,10 @@ jbm_polynomial_27_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_28_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_28 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_27_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_27 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8846,10 +8846,10 @@ jbm_polynomial_28_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of polynomial values.
  */
 static inline __m128d
-jbm_polynomial_29_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_polynomial_29 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_fmadd_pd (x, jbm_polynomial_28_2xf64 (x, p + 1),
+  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_28 (x, p + 1),
                        _mm_set1_pd (p[0]));
 }
 
@@ -8859,7 +8859,7 @@ jbm_polynomial_29_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_1_0_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_1_0 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
@@ -8872,11 +8872,11 @@ jbm_rational_1_0_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_2_0_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_2_0 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -8886,10 +8886,10 @@ jbm_rational_2_0_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_2_1_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_2_1 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[2]), _mm_set1_pd (1.)));
 }
 
@@ -8899,11 +8899,11 @@ jbm_rational_2_1_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_3_0_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_3_0 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -8913,11 +8913,11 @@ jbm_rational_3_0_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_3_1_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_3_1 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -8927,10 +8927,10 @@ jbm_rational_3_1_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_3_2_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_3_2 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[3]), _mm_set1_pd (1.)));
 }
 
@@ -8940,11 +8940,11 @@ jbm_rational_3_2_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_4_0_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_4_0 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -8954,11 +8954,11 @@ jbm_rational_4_0_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_4_1_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_4_1 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -8968,11 +8968,11 @@ jbm_rational_4_1_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_4_2_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_4_2 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -8982,10 +8982,10 @@ jbm_rational_4_2_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_4_3_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_4_3 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[4]), _mm_set1_pd (1.)));
 }
 
@@ -8995,11 +8995,11 @@ jbm_rational_4_3_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_5_0_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_5_0 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9009,11 +9009,11 @@ jbm_rational_5_0_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_5_1_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_5_1 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9023,11 +9023,11 @@ jbm_rational_5_1_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_5_2_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_5_2 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9037,11 +9037,11 @@ jbm_rational_5_2_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_5_3_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_5_3 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9051,10 +9051,10 @@ jbm_rational_5_3_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_5_4_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_5_4 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[5]), _mm_set1_pd (1.)));
 }
 
@@ -9064,11 +9064,11 @@ jbm_rational_5_4_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_6_0_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_6_0 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9078,11 +9078,11 @@ jbm_rational_6_0_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_6_1_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_6_1 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9092,11 +9092,11 @@ jbm_rational_6_1_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_6_2_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_6_2 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9106,11 +9106,11 @@ jbm_rational_6_2_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_6_3_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_6_3 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9120,11 +9120,11 @@ jbm_rational_6_3_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_6_4_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_6_4 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9134,10 +9134,10 @@ jbm_rational_6_4_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_6_5_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_6_5 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[6]), _mm_set1_pd (1.)));
 }
 
@@ -9147,11 +9147,11 @@ jbm_rational_6_5_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_7_0_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_7_0 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9161,11 +9161,11 @@ jbm_rational_7_0_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_7_1_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_7_1 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9175,11 +9175,11 @@ jbm_rational_7_1_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_7_2_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_7_2 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9189,11 +9189,11 @@ jbm_rational_7_2_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_7_3_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_7_3 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9203,11 +9203,11 @@ jbm_rational_7_3_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_7_4_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_7_4 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9217,11 +9217,11 @@ jbm_rational_7_4_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_7_5_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_7_5 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9231,10 +9231,10 @@ jbm_rational_7_5_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_7_6_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_7_6 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[7]), _mm_set1_pd (1.)));
 }
 
@@ -9244,11 +9244,11 @@ jbm_rational_7_6_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_8_0_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_8_0 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9258,11 +9258,11 @@ jbm_rational_8_0_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_8_1_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_8_1 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9272,11 +9272,11 @@ jbm_rational_8_1_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_8_2_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_8_2 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9286,11 +9286,11 @@ jbm_rational_8_2_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_8_3_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_8_3 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9300,11 +9300,11 @@ jbm_rational_8_3_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_8_4_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_8_4 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9314,11 +9314,11 @@ jbm_rational_8_4_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_8_5_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_8_5 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9328,11 +9328,11 @@ jbm_rational_8_5_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_8_6_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_8_6 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9342,10 +9342,10 @@ jbm_rational_8_6_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_8_7_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_8_7 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[8]), _mm_set1_pd (1.)));
 }
 
@@ -9355,11 +9355,11 @@ jbm_rational_8_7_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_9_0_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_9_0 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9369,11 +9369,11 @@ jbm_rational_9_0_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_9_1_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_9_1 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9383,11 +9383,11 @@ jbm_rational_9_1_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_9_2_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_9_2 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9397,11 +9397,11 @@ jbm_rational_9_2_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_9_3_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_9_3 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9411,11 +9411,11 @@ jbm_rational_9_3_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_9_4_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_9_4 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9425,11 +9425,11 @@ jbm_rational_9_4_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_9_5_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_9_5 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9439,11 +9439,11 @@ jbm_rational_9_5_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_9_6_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_9_6 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9453,11 +9453,11 @@ jbm_rational_9_6_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_9_7_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_9_7 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9467,10 +9467,10 @@ jbm_rational_9_7_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_9_8_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_rational_9_8 (const __m128d x,        ///< __m128d vector.
                         const double *p)        ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[9]), _mm_set1_pd (1.)));
 }
 
@@ -9480,11 +9480,11 @@ jbm_rational_9_8_2xf64 (const __m128d x,        ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_10_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_10_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9494,11 +9494,11 @@ jbm_rational_10_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_10_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_10_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9508,11 +9508,11 @@ jbm_rational_10_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_10_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_10_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9522,11 +9522,11 @@ jbm_rational_10_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_10_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_10_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9536,11 +9536,11 @@ jbm_rational_10_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_10_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_10_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9550,11 +9550,11 @@ jbm_rational_10_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_10_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_10_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9564,11 +9564,11 @@ jbm_rational_10_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_10_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_10_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9578,11 +9578,11 @@ jbm_rational_10_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_10_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_10_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9592,11 +9592,11 @@ jbm_rational_10_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_10_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_10_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9606,10 +9606,10 @@ jbm_rational_10_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_10_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_10_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[10]), _mm_set1_pd (1.)));
 }
 
@@ -9619,11 +9619,11 @@ jbm_rational_10_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_11_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9633,11 +9633,11 @@ jbm_rational_11_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_11_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9647,11 +9647,11 @@ jbm_rational_11_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_11_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9661,11 +9661,11 @@ jbm_rational_11_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_11_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9675,11 +9675,11 @@ jbm_rational_11_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_11_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9689,11 +9689,11 @@ jbm_rational_11_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_11_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9703,11 +9703,11 @@ jbm_rational_11_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_11_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9717,11 +9717,11 @@ jbm_rational_11_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_11_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9731,11 +9731,11 @@ jbm_rational_11_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_11_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9745,11 +9745,11 @@ jbm_rational_11_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_11_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9759,10 +9759,10 @@ jbm_rational_11_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_11_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_11_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[11]), _mm_set1_pd (1.)));
 }
 
@@ -9772,11 +9772,11 @@ jbm_rational_11_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_12_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9786,11 +9786,11 @@ jbm_rational_12_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_12_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9800,11 +9800,11 @@ jbm_rational_12_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_12_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9814,11 +9814,11 @@ jbm_rational_12_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_12_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9828,11 +9828,11 @@ jbm_rational_12_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_12_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9842,11 +9842,11 @@ jbm_rational_12_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_12_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9856,11 +9856,11 @@ jbm_rational_12_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_12_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9870,11 +9870,11 @@ jbm_rational_12_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_12_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9884,11 +9884,11 @@ jbm_rational_12_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_12_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9898,11 +9898,11 @@ jbm_rational_12_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_12_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9912,11 +9912,11 @@ jbm_rational_12_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_12_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9926,10 +9926,10 @@ jbm_rational_12_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_12_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_12_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[12]), _mm_set1_pd (1.)));
 }
 
@@ -9939,11 +9939,11 @@ jbm_rational_12_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_13_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9953,11 +9953,11 @@ jbm_rational_13_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_13_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9967,11 +9967,11 @@ jbm_rational_13_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_13_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9981,11 +9981,11 @@ jbm_rational_13_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_13_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -9995,11 +9995,11 @@ jbm_rational_13_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_13_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10009,11 +10009,11 @@ jbm_rational_13_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_13_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10023,11 +10023,11 @@ jbm_rational_13_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_13_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10037,11 +10037,11 @@ jbm_rational_13_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_13_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10051,11 +10051,11 @@ jbm_rational_13_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_13_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10065,11 +10065,11 @@ jbm_rational_13_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_13_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10079,11 +10079,11 @@ jbm_rational_13_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_13_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10093,11 +10093,11 @@ jbm_rational_13_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_13_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10107,10 +10107,10 @@ jbm_rational_13_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_13_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_13_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[13]), _mm_set1_pd (1.)));
 }
 
@@ -10120,11 +10120,11 @@ jbm_rational_13_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_14_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10134,11 +10134,11 @@ jbm_rational_14_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_14_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10148,11 +10148,11 @@ jbm_rational_14_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_14_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10162,11 +10162,11 @@ jbm_rational_14_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_14_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10176,11 +10176,11 @@ jbm_rational_14_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_14_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10190,11 +10190,11 @@ jbm_rational_14_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_14_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10204,11 +10204,11 @@ jbm_rational_14_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_14_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10218,11 +10218,11 @@ jbm_rational_14_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_14_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10232,11 +10232,11 @@ jbm_rational_14_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_14_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10246,11 +10246,11 @@ jbm_rational_14_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_14_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10260,11 +10260,11 @@ jbm_rational_14_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_14_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10274,11 +10274,11 @@ jbm_rational_14_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_14_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10288,11 +10288,11 @@ jbm_rational_14_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_14_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10302,10 +10302,10 @@ jbm_rational_14_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_14_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_14_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[14]), _mm_set1_pd (1.)));
 }
 
@@ -10315,11 +10315,11 @@ jbm_rational_14_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_15_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10329,11 +10329,11 @@ jbm_rational_15_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_15_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10343,11 +10343,11 @@ jbm_rational_15_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_15_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10357,11 +10357,11 @@ jbm_rational_15_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_15_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10371,11 +10371,11 @@ jbm_rational_15_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_15_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10385,11 +10385,11 @@ jbm_rational_15_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_15_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10399,11 +10399,11 @@ jbm_rational_15_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_15_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10413,11 +10413,11 @@ jbm_rational_15_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_15_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10427,11 +10427,11 @@ jbm_rational_15_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_15_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10441,11 +10441,11 @@ jbm_rational_15_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_15_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10455,11 +10455,11 @@ jbm_rational_15_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_15_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10469,11 +10469,11 @@ jbm_rational_15_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_15_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10483,11 +10483,11 @@ jbm_rational_15_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_15_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10497,11 +10497,11 @@ jbm_rational_15_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_15_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10511,10 +10511,10 @@ jbm_rational_15_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_15_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_15_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[15]), _mm_set1_pd (1.)));
 }
 
@@ -10524,11 +10524,11 @@ jbm_rational_15_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_16_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10538,11 +10538,11 @@ jbm_rational_16_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_16_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10552,11 +10552,11 @@ jbm_rational_16_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_16_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10566,11 +10566,11 @@ jbm_rational_16_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_16_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10580,11 +10580,11 @@ jbm_rational_16_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_16_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10594,11 +10594,11 @@ jbm_rational_16_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_16_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10608,11 +10608,11 @@ jbm_rational_16_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_16_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10622,11 +10622,11 @@ jbm_rational_16_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_16_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10636,11 +10636,11 @@ jbm_rational_16_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_16_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10650,11 +10650,11 @@ jbm_rational_16_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_16_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10664,11 +10664,11 @@ jbm_rational_16_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_16_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10678,11 +10678,11 @@ jbm_rational_16_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_16_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10692,11 +10692,11 @@ jbm_rational_16_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_16_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10706,11 +10706,11 @@ jbm_rational_16_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_16_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10720,11 +10720,11 @@ jbm_rational_16_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_16_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10734,10 +10734,10 @@ jbm_rational_16_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_16_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_16_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[16]), _mm_set1_pd (1.)));
 }
 
@@ -10747,11 +10747,11 @@ jbm_rational_16_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_17_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10761,11 +10761,11 @@ jbm_rational_17_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_17_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10775,11 +10775,11 @@ jbm_rational_17_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_17_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10789,11 +10789,11 @@ jbm_rational_17_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_17_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10803,11 +10803,11 @@ jbm_rational_17_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_17_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10817,11 +10817,11 @@ jbm_rational_17_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_17_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10831,11 +10831,11 @@ jbm_rational_17_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_17_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10845,11 +10845,11 @@ jbm_rational_17_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_17_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10859,11 +10859,11 @@ jbm_rational_17_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_17_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10873,11 +10873,11 @@ jbm_rational_17_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_17_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10887,11 +10887,11 @@ jbm_rational_17_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_17_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10901,11 +10901,11 @@ jbm_rational_17_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_17_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10915,11 +10915,11 @@ jbm_rational_17_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_17_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10929,11 +10929,11 @@ jbm_rational_17_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_17_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10943,11 +10943,11 @@ jbm_rational_17_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_17_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10957,11 +10957,11 @@ jbm_rational_17_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_17_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10971,10 +10971,10 @@ jbm_rational_17_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_17_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_17_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[17]), _mm_set1_pd (1.)));
 }
 
@@ -10984,11 +10984,11 @@ jbm_rational_17_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_18_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -10998,11 +10998,11 @@ jbm_rational_18_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_18_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11012,11 +11012,11 @@ jbm_rational_18_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_18_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11026,11 +11026,11 @@ jbm_rational_18_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_18_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11040,11 +11040,11 @@ jbm_rational_18_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_18_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11054,11 +11054,11 @@ jbm_rational_18_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_18_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11068,11 +11068,11 @@ jbm_rational_18_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_18_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11082,11 +11082,11 @@ jbm_rational_18_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_18_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11096,11 +11096,11 @@ jbm_rational_18_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_18_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11110,11 +11110,11 @@ jbm_rational_18_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_18_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11124,11 +11124,11 @@ jbm_rational_18_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_18_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11138,11 +11138,11 @@ jbm_rational_18_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_18_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11152,11 +11152,11 @@ jbm_rational_18_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_18_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11166,11 +11166,11 @@ jbm_rational_18_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_18_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11180,11 +11180,11 @@ jbm_rational_18_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_18_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11194,11 +11194,11 @@ jbm_rational_18_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_18_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11208,11 +11208,11 @@ jbm_rational_18_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_18_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11222,10 +11222,10 @@ jbm_rational_18_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_18_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_18_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[18]), _mm_set1_pd (1.)));
 }
 
@@ -11235,11 +11235,11 @@ jbm_rational_18_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_19_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11249,11 +11249,11 @@ jbm_rational_19_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_19_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11263,11 +11263,11 @@ jbm_rational_19_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_19_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11277,11 +11277,11 @@ jbm_rational_19_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_19_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11291,11 +11291,11 @@ jbm_rational_19_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_19_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11305,11 +11305,11 @@ jbm_rational_19_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_19_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11319,11 +11319,11 @@ jbm_rational_19_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_19_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11333,11 +11333,11 @@ jbm_rational_19_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_19_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11347,11 +11347,11 @@ jbm_rational_19_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_19_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11361,11 +11361,11 @@ jbm_rational_19_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_19_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11375,11 +11375,11 @@ jbm_rational_19_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_19_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11389,11 +11389,11 @@ jbm_rational_19_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_19_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11403,11 +11403,11 @@ jbm_rational_19_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_19_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11417,11 +11417,11 @@ jbm_rational_19_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_19_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11431,11 +11431,11 @@ jbm_rational_19_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_19_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11445,11 +11445,11 @@ jbm_rational_19_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_19_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11459,11 +11459,11 @@ jbm_rational_19_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_19_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11473,11 +11473,11 @@ jbm_rational_19_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_19_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11487,10 +11487,10 @@ jbm_rational_19_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_19_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_19_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[19]), _mm_set1_pd (1.)));
 }
 
@@ -11500,11 +11500,11 @@ jbm_rational_19_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_20_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11514,11 +11514,11 @@ jbm_rational_20_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_20_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11528,11 +11528,11 @@ jbm_rational_20_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_20_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11542,11 +11542,11 @@ jbm_rational_20_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_20_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11556,11 +11556,11 @@ jbm_rational_20_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_20_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11570,11 +11570,11 @@ jbm_rational_20_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_20_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11584,11 +11584,11 @@ jbm_rational_20_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_20_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11598,11 +11598,11 @@ jbm_rational_20_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_20_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11612,11 +11612,11 @@ jbm_rational_20_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_20_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11626,11 +11626,11 @@ jbm_rational_20_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_20_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11640,11 +11640,11 @@ jbm_rational_20_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_20_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11654,11 +11654,11 @@ jbm_rational_20_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_20_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11668,11 +11668,11 @@ jbm_rational_20_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_20_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11682,11 +11682,11 @@ jbm_rational_20_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_20_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11696,11 +11696,11 @@ jbm_rational_20_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_20_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11710,11 +11710,11 @@ jbm_rational_20_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_20_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11724,11 +11724,11 @@ jbm_rational_20_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_20_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11738,11 +11738,11 @@ jbm_rational_20_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_20_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11752,11 +11752,11 @@ jbm_rational_20_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_20_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 19),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 19),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11766,10 +11766,10 @@ jbm_rational_20_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_20_19_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_20_19 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_19_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_19 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[20]), _mm_set1_pd (1.)));
 }
 
@@ -11779,11 +11779,11 @@ jbm_rational_20_19_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_21_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_20 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11793,11 +11793,11 @@ jbm_rational_21_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_21_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11807,11 +11807,11 @@ jbm_rational_21_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_21_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11821,11 +11821,11 @@ jbm_rational_21_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_21_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11835,11 +11835,11 @@ jbm_rational_21_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_21_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11849,11 +11849,11 @@ jbm_rational_21_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_21_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11863,11 +11863,11 @@ jbm_rational_21_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_21_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11877,11 +11877,11 @@ jbm_rational_21_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_21_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11891,11 +11891,11 @@ jbm_rational_21_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_21_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11905,11 +11905,11 @@ jbm_rational_21_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_21_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11919,11 +11919,11 @@ jbm_rational_21_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11933,11 +11933,11 @@ jbm_rational_21_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11947,11 +11947,11 @@ jbm_rational_21_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11961,11 +11961,11 @@ jbm_rational_21_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11975,11 +11975,11 @@ jbm_rational_21_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -11989,11 +11989,11 @@ jbm_rational_21_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12003,11 +12003,11 @@ jbm_rational_21_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12017,11 +12017,11 @@ jbm_rational_21_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12031,11 +12031,11 @@ jbm_rational_21_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 19),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 19),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12045,11 +12045,11 @@ jbm_rational_21_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_19_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_19 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 20),
+  return _mm_div_pd (jbm_2xf64_polynomial_19 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 20),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12059,10 +12059,10 @@ jbm_rational_21_19_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_21_20_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_21_20 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_20_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_20 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[21]), _mm_set1_pd (1.)));
 }
 
@@ -12072,11 +12072,11 @@ jbm_rational_21_20_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_22_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_21 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12086,11 +12086,11 @@ jbm_rational_22_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_22_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_20 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12100,11 +12100,11 @@ jbm_rational_22_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_22_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12114,11 +12114,11 @@ jbm_rational_22_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_22_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12128,11 +12128,11 @@ jbm_rational_22_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_22_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12142,11 +12142,11 @@ jbm_rational_22_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_22_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12156,11 +12156,11 @@ jbm_rational_22_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_22_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12170,11 +12170,11 @@ jbm_rational_22_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_22_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12184,11 +12184,11 @@ jbm_rational_22_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_22_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12198,11 +12198,11 @@ jbm_rational_22_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_22_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12212,11 +12212,11 @@ jbm_rational_22_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12226,11 +12226,11 @@ jbm_rational_22_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12240,11 +12240,11 @@ jbm_rational_22_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12254,11 +12254,11 @@ jbm_rational_22_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12268,11 +12268,11 @@ jbm_rational_22_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12282,11 +12282,11 @@ jbm_rational_22_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12296,11 +12296,11 @@ jbm_rational_22_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12310,11 +12310,11 @@ jbm_rational_22_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12324,11 +12324,11 @@ jbm_rational_22_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 19),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 19),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12338,11 +12338,11 @@ jbm_rational_22_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_19_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_19 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 20),
+  return _mm_div_pd (jbm_2xf64_polynomial_19 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 20),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12352,11 +12352,11 @@ jbm_rational_22_19_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_20_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_20 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 21),
+  return _mm_div_pd (jbm_2xf64_polynomial_20 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 21),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12366,10 +12366,10 @@ jbm_rational_22_20_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_22_21_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_22_21 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_21_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_21 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[22]), _mm_set1_pd (1.)));
 }
 
@@ -12379,11 +12379,11 @@ jbm_rational_22_21_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_23_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_22 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12393,11 +12393,11 @@ jbm_rational_23_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_23_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_21 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12407,11 +12407,11 @@ jbm_rational_23_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_23_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_20 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12421,11 +12421,11 @@ jbm_rational_23_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_23_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12435,11 +12435,11 @@ jbm_rational_23_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_23_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12449,11 +12449,11 @@ jbm_rational_23_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_23_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12463,11 +12463,11 @@ jbm_rational_23_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_23_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12477,11 +12477,11 @@ jbm_rational_23_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_23_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12491,11 +12491,11 @@ jbm_rational_23_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_23_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12505,11 +12505,11 @@ jbm_rational_23_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_23_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12519,11 +12519,11 @@ jbm_rational_23_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12533,11 +12533,11 @@ jbm_rational_23_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12547,11 +12547,11 @@ jbm_rational_23_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12561,11 +12561,11 @@ jbm_rational_23_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12575,11 +12575,11 @@ jbm_rational_23_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12589,11 +12589,11 @@ jbm_rational_23_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12603,11 +12603,11 @@ jbm_rational_23_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12617,11 +12617,11 @@ jbm_rational_23_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12631,11 +12631,11 @@ jbm_rational_23_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 19),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 19),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12645,11 +12645,11 @@ jbm_rational_23_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_19_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_19 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 20),
+  return _mm_div_pd (jbm_2xf64_polynomial_19 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 20),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12659,11 +12659,11 @@ jbm_rational_23_19_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_20_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_20 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 21),
+  return _mm_div_pd (jbm_2xf64_polynomial_20 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 21),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12673,11 +12673,11 @@ jbm_rational_23_20_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_21_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_21 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 22),
+  return _mm_div_pd (jbm_2xf64_polynomial_21 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 22),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12687,10 +12687,10 @@ jbm_rational_23_21_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_23_22_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_23_22 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_22_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_22 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[23]), _mm_set1_pd (1.)));
 }
 
@@ -12700,11 +12700,11 @@ jbm_rational_23_22_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_24_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_23 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12714,11 +12714,11 @@ jbm_rational_24_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_24_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_22 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12728,11 +12728,11 @@ jbm_rational_24_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_24_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_21 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12742,11 +12742,11 @@ jbm_rational_24_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_24_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_20 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12756,11 +12756,11 @@ jbm_rational_24_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_24_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12770,11 +12770,11 @@ jbm_rational_24_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_24_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12784,11 +12784,11 @@ jbm_rational_24_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_24_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12798,11 +12798,11 @@ jbm_rational_24_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_24_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12812,11 +12812,11 @@ jbm_rational_24_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_24_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12826,11 +12826,11 @@ jbm_rational_24_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_24_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12840,11 +12840,11 @@ jbm_rational_24_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12854,11 +12854,11 @@ jbm_rational_24_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12868,11 +12868,11 @@ jbm_rational_24_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12882,11 +12882,11 @@ jbm_rational_24_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12896,11 +12896,11 @@ jbm_rational_24_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12910,11 +12910,11 @@ jbm_rational_24_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12924,11 +12924,11 @@ jbm_rational_24_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12938,11 +12938,11 @@ jbm_rational_24_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12952,11 +12952,11 @@ jbm_rational_24_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 19),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 19),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12966,11 +12966,11 @@ jbm_rational_24_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_19_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_19 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 20),
+  return _mm_div_pd (jbm_2xf64_polynomial_19 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 20),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12980,11 +12980,11 @@ jbm_rational_24_19_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_20_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_20 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 21),
+  return _mm_div_pd (jbm_2xf64_polynomial_20 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 21),
                                    _mm_set1_pd (1.)));
 }
 
@@ -12994,11 +12994,11 @@ jbm_rational_24_20_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_21_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_21 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 22),
+  return _mm_div_pd (jbm_2xf64_polynomial_21 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 22),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13008,11 +13008,11 @@ jbm_rational_24_21_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_22_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_22 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 23),
+  return _mm_div_pd (jbm_2xf64_polynomial_22 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 23),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13022,10 +13022,10 @@ jbm_rational_24_22_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_24_23_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_24_23 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_23_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_23 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[24]), _mm_set1_pd (1.)));
 }
 
@@ -13035,11 +13035,11 @@ jbm_rational_24_23_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_25_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_24 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13049,11 +13049,11 @@ jbm_rational_25_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_25_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_23 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13063,11 +13063,11 @@ jbm_rational_25_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_25_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_22 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13077,11 +13077,11 @@ jbm_rational_25_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_25_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_21 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13091,11 +13091,11 @@ jbm_rational_25_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_25_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_20 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13105,11 +13105,11 @@ jbm_rational_25_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_25_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13119,11 +13119,11 @@ jbm_rational_25_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_25_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13133,11 +13133,11 @@ jbm_rational_25_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_25_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13147,11 +13147,11 @@ jbm_rational_25_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_25_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13161,11 +13161,11 @@ jbm_rational_25_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_25_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13175,11 +13175,11 @@ jbm_rational_25_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13189,11 +13189,11 @@ jbm_rational_25_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13203,11 +13203,11 @@ jbm_rational_25_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13217,11 +13217,11 @@ jbm_rational_25_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13231,11 +13231,11 @@ jbm_rational_25_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13245,11 +13245,11 @@ jbm_rational_25_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13259,11 +13259,11 @@ jbm_rational_25_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13273,11 +13273,11 @@ jbm_rational_25_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13287,11 +13287,11 @@ jbm_rational_25_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 19),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 19),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13301,11 +13301,11 @@ jbm_rational_25_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_19_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_19 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 20),
+  return _mm_div_pd (jbm_2xf64_polynomial_19 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 20),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13315,11 +13315,11 @@ jbm_rational_25_19_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_20_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_20 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 21),
+  return _mm_div_pd (jbm_2xf64_polynomial_20 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 21),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13329,11 +13329,11 @@ jbm_rational_25_20_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_21_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_21 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 22),
+  return _mm_div_pd (jbm_2xf64_polynomial_21 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 22),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13343,11 +13343,11 @@ jbm_rational_25_21_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_22_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_22 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 23),
+  return _mm_div_pd (jbm_2xf64_polynomial_22 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 23),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13357,11 +13357,11 @@ jbm_rational_25_22_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_23_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_23 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 24),
+  return _mm_div_pd (jbm_2xf64_polynomial_23 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 24),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13371,10 +13371,10 @@ jbm_rational_25_23_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_25_24_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_25_24 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_24_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_24 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[25]), _mm_set1_pd (1.)));
 }
 
@@ -13384,11 +13384,11 @@ jbm_rational_25_24_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_26_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_25 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13398,11 +13398,11 @@ jbm_rational_26_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_26_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_24 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13412,11 +13412,11 @@ jbm_rational_26_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_26_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_23 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13426,11 +13426,11 @@ jbm_rational_26_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_26_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_22 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13440,11 +13440,11 @@ jbm_rational_26_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_26_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_21 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13454,11 +13454,11 @@ jbm_rational_26_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_26_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_20 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13468,11 +13468,11 @@ jbm_rational_26_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_26_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13482,11 +13482,11 @@ jbm_rational_26_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_26_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13496,11 +13496,11 @@ jbm_rational_26_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_26_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13510,11 +13510,11 @@ jbm_rational_26_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_26_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13524,11 +13524,11 @@ jbm_rational_26_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13538,11 +13538,11 @@ jbm_rational_26_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13552,11 +13552,11 @@ jbm_rational_26_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13566,11 +13566,11 @@ jbm_rational_26_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13580,11 +13580,11 @@ jbm_rational_26_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13594,11 +13594,11 @@ jbm_rational_26_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13608,11 +13608,11 @@ jbm_rational_26_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13622,11 +13622,11 @@ jbm_rational_26_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13636,11 +13636,11 @@ jbm_rational_26_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 19),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 19),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13650,11 +13650,11 @@ jbm_rational_26_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_19_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_19 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 20),
+  return _mm_div_pd (jbm_2xf64_polynomial_19 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 20),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13664,11 +13664,11 @@ jbm_rational_26_19_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_20_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_20 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 21),
+  return _mm_div_pd (jbm_2xf64_polynomial_20 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 21),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13678,11 +13678,11 @@ jbm_rational_26_20_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_21_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_21 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 22),
+  return _mm_div_pd (jbm_2xf64_polynomial_21 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 22),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13692,11 +13692,11 @@ jbm_rational_26_21_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_22_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_22 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 23),
+  return _mm_div_pd (jbm_2xf64_polynomial_22 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 23),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13706,11 +13706,11 @@ jbm_rational_26_22_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_23_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_23 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 24),
+  return _mm_div_pd (jbm_2xf64_polynomial_23 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 24),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13720,11 +13720,11 @@ jbm_rational_26_23_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_24_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_24 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_24_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 25),
+  return _mm_div_pd (jbm_2xf64_polynomial_24 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 25),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13734,10 +13734,10 @@ jbm_rational_26_24_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_26_25_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_26_25 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_25_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_25 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[26]), _mm_set1_pd (1.)));
 }
 
@@ -13747,11 +13747,11 @@ jbm_rational_26_25_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_27_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_26_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_26 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13761,11 +13761,11 @@ jbm_rational_27_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_27_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_25 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13775,11 +13775,11 @@ jbm_rational_27_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_27_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_24 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13789,11 +13789,11 @@ jbm_rational_27_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_27_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_23 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13803,11 +13803,11 @@ jbm_rational_27_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_27_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_22 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13817,11 +13817,11 @@ jbm_rational_27_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_27_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_21 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13831,11 +13831,11 @@ jbm_rational_27_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_27_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_20 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13845,11 +13845,11 @@ jbm_rational_27_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_27_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13859,11 +13859,11 @@ jbm_rational_27_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_27_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13873,11 +13873,11 @@ jbm_rational_27_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_27_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13887,11 +13887,11 @@ jbm_rational_27_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13901,11 +13901,11 @@ jbm_rational_27_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13915,11 +13915,11 @@ jbm_rational_27_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13929,11 +13929,11 @@ jbm_rational_27_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13943,11 +13943,11 @@ jbm_rational_27_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13957,11 +13957,11 @@ jbm_rational_27_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13971,11 +13971,11 @@ jbm_rational_27_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13985,11 +13985,11 @@ jbm_rational_27_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -13999,11 +13999,11 @@ jbm_rational_27_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 19),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 19),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14013,11 +14013,11 @@ jbm_rational_27_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_19_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_19 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 20),
+  return _mm_div_pd (jbm_2xf64_polynomial_19 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 20),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14027,11 +14027,11 @@ jbm_rational_27_19_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_20_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_20 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 21),
+  return _mm_div_pd (jbm_2xf64_polynomial_20 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 21),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14041,11 +14041,11 @@ jbm_rational_27_20_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_21_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_21 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 22),
+  return _mm_div_pd (jbm_2xf64_polynomial_21 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 22),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14055,11 +14055,11 @@ jbm_rational_27_21_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_22_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_22 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 23),
+  return _mm_div_pd (jbm_2xf64_polynomial_22 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 23),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14069,11 +14069,11 @@ jbm_rational_27_22_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_23_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_23 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 24),
+  return _mm_div_pd (jbm_2xf64_polynomial_23 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 24),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14083,11 +14083,11 @@ jbm_rational_27_23_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_24_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_24 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_24_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 25),
+  return _mm_div_pd (jbm_2xf64_polynomial_24 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 25),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14097,11 +14097,11 @@ jbm_rational_27_24_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_25_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_25 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_25_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 26),
+  return _mm_div_pd (jbm_2xf64_polynomial_25 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 26),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14111,10 +14111,10 @@ jbm_rational_27_25_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_27_26_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_27_26 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_26_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_26 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[27]), _mm_set1_pd (1.)));
 }
 
@@ -14124,11 +14124,11 @@ jbm_rational_27_26_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_28_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_27_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_27 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14138,11 +14138,11 @@ jbm_rational_28_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_28_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_26_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_26 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14152,11 +14152,11 @@ jbm_rational_28_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_28_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_25 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14166,11 +14166,11 @@ jbm_rational_28_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_28_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_24 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14180,11 +14180,11 @@ jbm_rational_28_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_28_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_23 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14194,11 +14194,11 @@ jbm_rational_28_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_28_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_22 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14208,11 +14208,11 @@ jbm_rational_28_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_28_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_21 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14222,11 +14222,11 @@ jbm_rational_28_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_28_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_20 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14236,11 +14236,11 @@ jbm_rational_28_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_28_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14250,11 +14250,11 @@ jbm_rational_28_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_28_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14264,11 +14264,11 @@ jbm_rational_28_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14278,11 +14278,11 @@ jbm_rational_28_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14292,11 +14292,11 @@ jbm_rational_28_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14306,11 +14306,11 @@ jbm_rational_28_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14320,11 +14320,11 @@ jbm_rational_28_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14334,11 +14334,11 @@ jbm_rational_28_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14348,11 +14348,11 @@ jbm_rational_28_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14362,11 +14362,11 @@ jbm_rational_28_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14376,11 +14376,11 @@ jbm_rational_28_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 19),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 19),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14390,11 +14390,11 @@ jbm_rational_28_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_19_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_19 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 20),
+  return _mm_div_pd (jbm_2xf64_polynomial_19 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 20),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14404,11 +14404,11 @@ jbm_rational_28_19_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_20_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_20 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 21),
+  return _mm_div_pd (jbm_2xf64_polynomial_20 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 21),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14418,11 +14418,11 @@ jbm_rational_28_20_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_21_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_21 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 22),
+  return _mm_div_pd (jbm_2xf64_polynomial_21 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 22),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14432,11 +14432,11 @@ jbm_rational_28_21_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_22_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_22 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 23),
+  return _mm_div_pd (jbm_2xf64_polynomial_22 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 23),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14446,11 +14446,11 @@ jbm_rational_28_22_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_23_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_23 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 24),
+  return _mm_div_pd (jbm_2xf64_polynomial_23 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 24),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14460,11 +14460,11 @@ jbm_rational_28_23_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_24_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_24 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_24_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 25),
+  return _mm_div_pd (jbm_2xf64_polynomial_24 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 25),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14474,11 +14474,11 @@ jbm_rational_28_24_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_25_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_25 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_25_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 26),
+  return _mm_div_pd (jbm_2xf64_polynomial_25 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 26),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14488,11 +14488,11 @@ jbm_rational_28_25_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_26_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_26 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_26_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 27),
+  return _mm_div_pd (jbm_2xf64_polynomial_26 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 27),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14502,10 +14502,10 @@ jbm_rational_28_26_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_28_27_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_28_27 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_27_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_27 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[28]), _mm_set1_pd (1.)));
 }
 
@@ -14515,11 +14515,11 @@ jbm_rational_28_27_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_0_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_29_0 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
   return _mm_div_pd (_mm_set1_pd (p[0]),
-                     _mm_fmadd_pd (x, jbm_polynomial_28_2xf64 (x, p + 1),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_28 (x, p + 1),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14529,11 +14529,11 @@ jbm_rational_29_0_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_1_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_29_1 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_1_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_27_2xf64 (x, p + 2),
+  return _mm_div_pd (jbm_2xf64_polynomial_1 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_27 (x, p + 2),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14543,11 +14543,11 @@ jbm_rational_29_1_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_2_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_29_2 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_2_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_26_2xf64 (x, p + 3),
+  return _mm_div_pd (jbm_2xf64_polynomial_2 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_26 (x, p + 3),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14557,11 +14557,11 @@ jbm_rational_29_2_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_3_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_29_3 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_3_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_25_2xf64 (x, p + 4),
+  return _mm_div_pd (jbm_2xf64_polynomial_3 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_25 (x, p + 4),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14571,11 +14571,11 @@ jbm_rational_29_3_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_4_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_29_4 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_4_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_24_2xf64 (x, p + 5),
+  return _mm_div_pd (jbm_2xf64_polynomial_4 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_24 (x, p + 5),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14585,11 +14585,11 @@ jbm_rational_29_4_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_5_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_29_5 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_5_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_23_2xf64 (x, p + 6),
+  return _mm_div_pd (jbm_2xf64_polynomial_5 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_23 (x, p + 6),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14599,11 +14599,11 @@ jbm_rational_29_5_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_6_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_29_6 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_6_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_22_2xf64 (x, p + 7),
+  return _mm_div_pd (jbm_2xf64_polynomial_6 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_22 (x, p + 7),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14613,11 +14613,11 @@ jbm_rational_29_6_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_7_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_29_7 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_7_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_21_2xf64 (x, p + 8),
+  return _mm_div_pd (jbm_2xf64_polynomial_7 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_21 (x, p + 8),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14627,11 +14627,11 @@ jbm_rational_29_7_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_8_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_29_8 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_8_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_20_2xf64 (x, p + 9),
+  return _mm_div_pd (jbm_2xf64_polynomial_8 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_20 (x, p + 9),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14641,11 +14641,11 @@ jbm_rational_29_8_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_9_2xf64 (const __m128d x,       ///< __m128d vector.
+jbm_2xf64_rational_29_9 (const __m128d x,       ///< __m128d vector.
                          const double *p)       ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_9_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_19_2xf64 (x, p + 10),
+  return _mm_div_pd (jbm_2xf64_polynomial_9 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_19 (x, p + 10),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14655,11 +14655,11 @@ jbm_rational_29_9_2xf64 (const __m128d x,       ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_10_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_10 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_10_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_18_2xf64 (x, p + 11),
+  return _mm_div_pd (jbm_2xf64_polynomial_10 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_18 (x, p + 11),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14669,11 +14669,11 @@ jbm_rational_29_10_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_11_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_11 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_11_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_17_2xf64 (x, p + 12),
+  return _mm_div_pd (jbm_2xf64_polynomial_11 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_17 (x, p + 12),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14683,11 +14683,11 @@ jbm_rational_29_11_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_12_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_12 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_12_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_16_2xf64 (x, p + 13),
+  return _mm_div_pd (jbm_2xf64_polynomial_12 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_16 (x, p + 13),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14697,11 +14697,11 @@ jbm_rational_29_12_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_13_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_13 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_13_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_15_2xf64 (x, p + 14),
+  return _mm_div_pd (jbm_2xf64_polynomial_13 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_15 (x, p + 14),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14711,11 +14711,11 @@ jbm_rational_29_13_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_14_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_14 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_14_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_14_2xf64 (x, p + 15),
+  return _mm_div_pd (jbm_2xf64_polynomial_14 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_14 (x, p + 15),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14725,11 +14725,11 @@ jbm_rational_29_14_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_15_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_15 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_15_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_13_2xf64 (x, p + 16),
+  return _mm_div_pd (jbm_2xf64_polynomial_15 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_13 (x, p + 16),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14739,11 +14739,11 @@ jbm_rational_29_15_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_16_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_16 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_16_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_12_2xf64 (x, p + 17),
+  return _mm_div_pd (jbm_2xf64_polynomial_16 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_12 (x, p + 17),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14753,11 +14753,11 @@ jbm_rational_29_16_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_17_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_17 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_17_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_11_2xf64 (x, p + 18),
+  return _mm_div_pd (jbm_2xf64_polynomial_17 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_11 (x, p + 18),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14767,11 +14767,11 @@ jbm_rational_29_17_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_18_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_18 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_18_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_10_2xf64 (x, p + 19),
+  return _mm_div_pd (jbm_2xf64_polynomial_18 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_10 (x, p + 19),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14781,11 +14781,11 @@ jbm_rational_29_18_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_19_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_19 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_19_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_9_2xf64 (x, p + 20),
+  return _mm_div_pd (jbm_2xf64_polynomial_19 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_9 (x, p + 20),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14795,11 +14795,11 @@ jbm_rational_29_19_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_20_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_20 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_20_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_8_2xf64 (x, p + 21),
+  return _mm_div_pd (jbm_2xf64_polynomial_20 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_8 (x, p + 21),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14809,11 +14809,11 @@ jbm_rational_29_20_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_21_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_21 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_21_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_7_2xf64 (x, p + 22),
+  return _mm_div_pd (jbm_2xf64_polynomial_21 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_7 (x, p + 22),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14823,11 +14823,11 @@ jbm_rational_29_21_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_22_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_22 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_22_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_6_2xf64 (x, p + 23),
+  return _mm_div_pd (jbm_2xf64_polynomial_22 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_6 (x, p + 23),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14837,11 +14837,11 @@ jbm_rational_29_22_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_23_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_23 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_23_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_5_2xf64 (x, p + 24),
+  return _mm_div_pd (jbm_2xf64_polynomial_23 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_5 (x, p + 24),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14851,11 +14851,11 @@ jbm_rational_29_23_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_24_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_24 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_24_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_4_2xf64 (x, p + 25),
+  return _mm_div_pd (jbm_2xf64_polynomial_24 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_4 (x, p + 25),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14865,11 +14865,11 @@ jbm_rational_29_24_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_25_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_25 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_25_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_3_2xf64 (x, p + 26),
+  return _mm_div_pd (jbm_2xf64_polynomial_25 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_3 (x, p + 26),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14879,11 +14879,11 @@ jbm_rational_29_25_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_26_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_26 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_26_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_2_2xf64 (x, p + 27),
+  return _mm_div_pd (jbm_2xf64_polynomial_26 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_2 (x, p + 27),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14893,11 +14893,11 @@ jbm_rational_29_26_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_27_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_27 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_27_2xf64 (x, p),
-                     _mm_fmadd_pd (x, jbm_polynomial_1_2xf64 (x, p + 28),
+  return _mm_div_pd (jbm_2xf64_polynomial_27 (x, p),
+                     _mm_fmadd_pd (x, jbm_2xf64_polynomial_1 (x, p + 28),
                                    _mm_set1_pd (1.)));
 }
 
@@ -14907,10 +14907,10 @@ jbm_rational_29_27_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return __m128d vector of rational values.
  */
 static inline __m128d
-jbm_rational_29_28_2xf64 (const __m128d x,      ///< __m128d vector.
+jbm_2xf64_rational_29_28 (const __m128d x,      ///< __m128d vector.
                           const double *p)      ///< array of coefficients.
 {
-  return _mm_div_pd (jbm_polynomial_28_2xf64 (x, p),
+  return _mm_div_pd (jbm_2xf64_polynomial_28 (x, p),
                      _mm_fmadd_pd (x, _mm_set1_pd (p[29]), _mm_set1_pd (1.)));
 }
 
@@ -14921,20 +14921,20 @@ jbm_rational_29_28_2xf64 (const __m128d x,      ///< __m128d vector.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_cbrtwc_2xf64 (const __m128d x)
+jbm_2xf64_cbrtwc (const __m128d x)
                   ///< __m128d vector \f$\in\left[\frac12,\;1\right]\f$.
 {
-  return jbm_rational_11_6_2xf64 (x, K_CBRTWC_F64);
+  return jbm_2xf64_rational_11_6 (x, K_CBRTWC_F64);
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_abs_2xf64 and
- * jbm_pow_2xf64 functions (__m128d).
+ * Function to calculate the function cbrt(x) using the jbm_2xf64_abs and
+ * jbm_2xf64_pow functions (__m128d).
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_cbrt_2xf64 (const __m128d x)        ///< __m128d vector.
+jbm_2xf64_cbrt (const __m128d x)        ///< __m128d vector.
 {
   const __m128d cbrt2 = JBM_CBRT2_2xF64;
   const __m128d cbrt4 = JBM_CBRT4_2xF64;
@@ -14943,19 +14943,19 @@ jbm_cbrt_2xf64 (const __m128d x)        ///< __m128d vector.
   const __m128i v1 = _mm_set1_epi64x (1);
   __m128d y;
   __m128i e, e3, r, n;
-  y = jbm_frexp_2xf64 (jbm_abs_2xf64 (x), &e);
+  y = jbm_2xf64_frexp (jbm_2xf64_abs (x), &e);
   e3 = _mm_mul_epu32 (e, _mm_set1_epi32 (0x55555556));
   e3 = _mm_srli_epi64 (e3, 32);
   r = _mm_sub_epi32 (e, _mm_mullo_epi32 (e3, v3));
   n = _mm_srai_epi32 (r, 31);
   r = _mm_add_epi32 (r, _mm_and_si128 (n, v3));
   e3 = _mm_sub_epi32 (e3, _mm_and_si128 (n, _mm_set1_epi32 (1)));
-  y = jbm_ldexp_2xf64 (jbm_cbrtwc_2xf64 (y), e3);
+  y = jbm_2xf64_ldexp (jbm_2xf64_cbrtwc (y), e3);
   y = _mm_blendv_pd (y, _mm_mul_pd (y, cbrt2),
                      _mm_castsi128_pd (_mm_cmpeq_epi64 (r, v1)));
   y = _mm_blendv_pd (y, _mm_mul_pd (y, cbrt4),
                      _mm_castsi128_pd (_mm_cmpeq_epi64 (r, v2)));
-  return jbm_copysign_2xf64 (y, x);
+  return jbm_copy2xf64_sign (y, x);
 }
 
 /**
@@ -14965,10 +14965,10 @@ jbm_cbrt_2xf64 (const __m128d x)        ///< __m128d vector.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_expm1wc_2xf64 (const __m128d x)
+jbm_2xf64_expm1wc (const __m128d x)
 ///< __m128d vector \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
 {
-  return _mm_mul_pd (x, jbm_rational_8_2_2xf64 (x, K_EXPM1WC_F64));
+  return _mm_mul_pd (x, jbm_2xf64_rational_8_2 (x, K_EXPM1WC_F64));
 }
 
 /**
@@ -14978,20 +14978,20 @@ jbm_expm1wc_2xf64 (const __m128d x)
  * \return function value.
  */
 static inline __m128d
-jbm_exp2wc_2xf64 (const __m128d x)
+jbm_2xf64_exp2wc (const __m128d x)
                   ///< __m128d vector \f$\in[\frac12,1]\f$.
 {
-  return jbm_rational_9_4_2xf64 (x, K_EXP2WC_F64);
+  return jbm_2xf64_rational_9_4 (x, K_EXP2WC_F64);
 }
 
 /**
  * Function to calculate the function exp2(x) using the jbm_expwc_2xf64 and
- * jbm_exp2n_2xf64 functions.
+ * jbm_2xf64_exp2n functions.
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_exp2_2xf64 (const __m128d x)        ///< __m128d vector.
+jbm_2xf64_exp2 (const __m128d x)        ///< __m128d vector.
 {
   __m128d y, f;
   __m128i i;
@@ -15002,44 +15002,44 @@ jbm_exp2_2xf64 (const __m128d x)        ///< __m128d vector.
 #else
   i = _mm_cvtepi32_epi64 (_mm_cvttpd_epi32 (y));
 #endif
-  return _mm_mul_pd (jbm_exp2n_2xf64 (i), jbm_exp2wc_2xf64 (f));
+  return _mm_mul_pd (jbm_2xf64_exp2n (i), jbm_2xf64_exp2wc (f));
 }
 
 /**
- * Function to calculate the function exp(x) using the jbm_exp2_2xf64 function.
+ * Function to calculate the function exp(x) using the jbm_2xf64_exp2 function.
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_exp_2xf64 (const __m128d x) ///< __m128d vector.
+jbm_2xf64_exp (const __m128d x) ///< __m128d vector.
 {
-  return jbm_exp2_2xf64 (_mm_mul_pd (x, _mm_set1_pd (M_LOG2E)));
+  return jbm_2xf64_exp2 (_mm_mul_pd (x, _mm_set1_pd (M_LOG2E)));
 }
 
 /**
- * Function to calculate the function exp10(x) using the jbm_exp2_2xf64
+ * Function to calculate the function exp10(x) using the jbm_2xf64_exp2
  * function (__m128d).
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_exp10_2xf64 (const __m128d x)       ///< __m128d vector.
+jbm_2xf64_exp10 (const __m128d x)       ///< __m128d vector.
 {
-  return jbm_exp2_2xf64 (_mm_mul_pd (x, _mm_set1_pd (M_LN10 / M_LN2)));
+  return jbm_2xf64_exp2 (_mm_mul_pd (x, _mm_set1_pd (M_LN10 / M_LN2)));
 }
 
 /**
- * Function to calculate the function expm1(x) using the jbm_expm1wc_2xf64 and
- * jbm_exp_2xf64 functions (__m128d).
+ * Function to calculate the function expm1(x) using the jbm_2xf64_expm1wc and
+ * jbm_2xf64_exp functions (__m128d).
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_expm1_2xf64 (const __m128d x)       ///< __m128d vector.
+jbm_2xf64_expm1 (const __m128d x)       ///< __m128d vector.
 {
-  return _mm_blendv_pd (_mm_sub_pd (jbm_exp_2xf64 (x), _mm_set1_pd (1.)),
-                        jbm_expm1wc_2xf64 (x),
-                        _mm_cmplt_pd (jbm_abs_2xf64 (x),
+  return _mm_blendv_pd (_mm_sub_pd (jbm_2xf64_exp (x), _mm_set1_pd (1.)),
+                        jbm_2xf64_expm1wc (x),
+                        _mm_cmplt_pd (jbm_2xf64_abs (x),
                                       _mm_set1_pd (M_LN2 / 2.)));
 }
 
@@ -15050,29 +15050,29 @@ jbm_expm1_2xf64 (const __m128d x)       ///< __m128d vector.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_log2wc_2xf64 (const __m128d x)      ///< __m128d vector \f$\in[0.5,1]\f$.
+jbm_2xf64_log2wc (const __m128d x)      ///< __m128d vector \f$\in[0.5,1]\f$.
 {
-  return _mm_mul_pd (x, jbm_rational_12_6_2xf64 (x, K_LOG2WC_F64));
+  return _mm_mul_pd (x, jbm_2xf64_rational_12_6 (x, K_LOG2WC_F64));
 }
 
 /**
- * Function to calculate the function log2(x) using jbm_logwc_2xf64 and
- * jbm_frexp_2xf64
+ * Function to calculate the function log2(x) using jbm_2xf64_log2wc and
+ * jbm_2xdbl_frexp.
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_log2_2xf64 (const __m128d x)        ///< __m128d vector.
+jbm_2xf64_log2 (const __m128d x)        ///< __m128d vector.
 {
   const __m128d z = _mm_setzero_pd ();
   __m128d y, m;
   __m128i e;
-  y = jbm_frexp_2xf64 (x, &e);
+  y = jbm_2xf64_frexp (x, &e);
   m = _mm_cmplt_pd (y, _mm_set1_pd (M_SQRT1_2));
   y = _mm_add_pd (y, _mm_and_pd (m, y));
   e = _mm_sub_epi64 (e, _mm_and_si128 (_mm_castpd_si128 (m),
                                        _mm_set1_epi64x (1ll)));
-  y = _mm_add_pd (jbm_log2wc_2xf64 (_mm_sub_pd (y, _mm_set1_pd (1.))),
+  y = _mm_add_pd (jbm_2xf64_log2wc (_mm_sub_pd (y, _mm_set1_pd (1.))),
                   _mm_cvtepi64_pd (e));
   y = _mm_blendv_pd (y, _mm_set1_pd (-INFINITY), _mm_cmpeq_pd (x, z));
   y = _mm_blendv_pd (y, _mm_set1_pd (NAN), _mm_cmplt_pd (x, z));
@@ -15081,25 +15081,25 @@ jbm_log2_2xf64 (const __m128d x)        ///< __m128d vector.
 }
 
 /**
- * Function to calculate the function log(x) using jbm_log2_2xf64 (__m128d).
+ * Function to calculate the function log(x) using jbm_2xf64_log2 (__m128d).
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_log_2xf64 (const __m128d x) ///< __m128d vector.
+jbm_2xf64_log (const __m128d x) ///< __m128d vector.
 {
-  return _mm_mul_pd (jbm_log2_2xf64 (x), _mm_set1_pd (M_LN2));
+  return _mm_mul_pd (jbm_2xf64_log2 (x), _mm_set1_pd (M_LN2));
 }
 
 /**
- * Function to calculate the function log10(x) using jbm_log2_2xf64 (__m128d).
+ * Function to calculate the function log10(x) using jbm_2xf64_log2 (__m128d).
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_log10_2xf64 (const __m128d x)       ///< __m128d vector.
+jbm_2xf64_log10 (const __m128d x)       ///< __m128d vector.
 {
-  return _mm_mul_pd (jbm_log2_2xf64 (x), _mm_set1_pd (M_LN2 / M_LN10));
+  return _mm_mul_pd (jbm_2xf64_log2 (x), _mm_set1_pd (M_LN2 / M_LN10));
 }
 
 /**
@@ -15108,7 +15108,7 @@ jbm_log10_2xf64 (const __m128d x)       ///< __m128d vector.
  * \return function value (__m128d) (__m128d).
  */
 static inline __m128d
-jbm_pown_2xf64 (const __m128d x,        ///< __m128d vector.
+jbm_2xf64_pown (const __m128d x,        ///< __m128d vector.
                 const int e)    ///< exponent (int).
 {
   __m128d f, xn;
@@ -15118,23 +15118,23 @@ jbm_pown_2xf64 (const __m128d x,        ///< __m128d vector.
     xn = _mm_div_pd (f, x);
   else
     xn = x;
-  for (i = (unsigned int) abs (e); i; i >>= 1, xn = jbm_sqr_2xf64 (xn))
+  for (i = (unsigned int) abs (e); i; i >>= 1, xn = jbm_2xf64_sqr (xn))
     if (i & 1)
       f = _mm_mul_pd (f, xn);
   return f;
 }
 
 /**
- * Function to calculate the function f32 using the jbm_exp2_2xf64 and
- * jbm_log2_2xf64 functions.
+ * Function to calculate the function f64 using the jbm_2xf64_exp2 and
+ * jbm_2xf64_log2 functions.
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_pow_2xf64 (const __m128d x, ///< __m128d vector.
+jbm_2xf64_pow (const __m128d x, ///< __m128d vector.
                const double e)  ///< exponent (__m128d).
 {
-  return jbm_exp2_2xf64 (_mm_mul_pd (_mm_set1_pd (e), jbm_log2_2xf64 (x)));
+  return jbm_2xf64_exp2 (_mm_mul_pd (_mm_set1_pd (e), jbm_2xf64_log2 (x)));
 }
 
 /**
@@ -15144,11 +15144,11 @@ jbm_pow_2xf64 (const __m128d x, ///< __m128d vector.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_sinwc_2xf64 (const __m128d x)
+jbm_2xf64_sinwc (const __m128d x)
                  ///< __m128d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
   return
-    _mm_mul_pd (x, jbm_polynomial_6_2xf64 (jbm_sqr_2xf64 (x), K_SINWC_F64));
+    _mm_mul_pd (x, jbm_2xf64_polynomial_6 (jbm_2xf64_sqr (x), K_SINWC_F64));
 }
 
 /**
@@ -15158,125 +15158,125 @@ jbm_sinwc_2xf64 (const __m128d x)
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_coswc_2xf64 (const __m128d x)
+jbm_2xf64_coswc (const __m128d x)
                  ///< __m128d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
-  return jbm_polynomial_6_2xf64 (jbm_sqr_2xf64 (x), K_COSWC_F64);
+  return jbm_2xf64_polynomial_6 (jbm_2xf64_sqr (x), K_COSWC_F64);
 }
 
 /**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
- * x in [-pi/4,pi/4] from jbm_sinwc_2xf64 approximation (__m128d).
+ * x in [-pi/4,pi/4] from jbm_2xf64_sinwc approximation (__m128d).
  */
 static inline void
-jbm_sincoswc_2xf64 (const __m128d x,
+jbm_sin2xf64_coswc (const __m128d x,
                     ///< __m128d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     __m128d *s,
-                    ///< pointer to the f32 function value (__m128d).
+                    ///< pointer to the f64 function value (__m128d).
                     __m128d *c)
-                    ///< pointer to the f32 function value (__m128d).
+                    ///< pointer to the f64 function value (__m128d).
 {
-  *s = jbm_sinwc_2xf64 (x);
-  *c = jbm_coswc_2xf64 (x);
+  *s = jbm_2xf64_sinwc (x);
+  *c = jbm_2xf64_coswc (x);
 }
 
 /**
- * Function to calculate the function sin(x) from jbm_sinwc_2xf64 and
- * jbm_coswc_2xf64 approximations.
+ * Function to calculate the function sin(x) from jbm_2xf64_sinwc and
+ * jbm_2xf64_coswc approximations.
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_sin_2xf64 (const __m128d x) ///< __m128d vector.
+jbm_2xf64_sin (const __m128d x) ///< __m128d vector.
 {
   const __m128d pi2 = _mm_set1_pd (2. * M_PI);
   __m128d y, s;
-  y = jbm_mod_2xf64 (x, pi2);
-  s = jbm_sinwc_2xf64 (_mm_sub_pd (y, pi2));
+  y = jbm_2xf64_mod (x, pi2);
+  s = jbm_2xf64_sinwc (_mm_sub_pd (y, pi2));
   s = _mm_blendv_pd (s,
-                     jbm_opposite_2xf64
-                     (jbm_coswc_2xf64
+                     jbm_2xf64_opposite
+                     (jbm_2xf64_coswc
                       (_mm_sub_pd (_mm_set1_pd (3. * M_PI_2), y))),
                      _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4)));
-  s = _mm_blendv_pd (s, jbm_sinwc_2xf64 (_mm_sub_pd (_mm_set1_pd (M_PI), y)),
+  s = _mm_blendv_pd (s, jbm_2xf64_sinwc (_mm_sub_pd (_mm_set1_pd (M_PI), y)),
                      _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4)));
-  s = _mm_blendv_pd (s, jbm_coswc_2xf64 (_mm_sub_pd (_mm_set1_pd (M_PI_2), y)),
+  s = _mm_blendv_pd (s, jbm_2xf64_coswc (_mm_sub_pd (_mm_set1_pd (M_PI_2), y)),
                      _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4)));
-  return _mm_blendv_pd (s, jbm_sinwc_2xf64 (y),
+  return _mm_blendv_pd (s, jbm_2xf64_sinwc (y),
                         _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4)));
 }
 
 /**
- * Function to calculate the function cos(x) from jbm_sinwc_2xf64 and
- * jbm_coswc_2xf64 approximations (__m128d).
+ * Function to calculate the function cos(x) from jbm_2xf64_sinwc and
+ * jbm_2xf64_coswc approximations (__m128d).
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_cos_2xf64 (const __m128d x) ///< __m128d vector.
+jbm_2xf64_cos (const __m128d x) ///< __m128d vector.
 {
   const __m128d pi2 = _mm_set1_pd (2. * M_PI);
   __m128d y, c;
-  y = jbm_mod_2xf64 (x, pi2);
-  c = jbm_coswc_2xf64 (_mm_sub_pd (y, pi2));
+  y = jbm_2xf64_mod (x, pi2);
+  c = jbm_2xf64_coswc (_mm_sub_pd (y, pi2));
   c = _mm_blendv_pd (c,
-                     jbm_sinwc_2xf64
+                     jbm_2xf64_sinwc
                      (_mm_sub_pd (y, _mm_set1_pd (3. * M_PI_2))),
                      _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4)));
   c = _mm_blendv_pd (c,
-                     jbm_opposite_2xf64
-                     (jbm_coswc_2xf64 (_mm_sub_pd (_mm_set1_pd (M_PI), y))),
+                     jbm_2xf64_opposite
+                     (jbm_2xf64_coswc (_mm_sub_pd (_mm_set1_pd (M_PI), y))),
                      _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4)));
-  c = _mm_blendv_pd (c, jbm_sinwc_2xf64 (_mm_sub_pd (_mm_set1_pd (M_PI_2), y)),
+  c = _mm_blendv_pd (c, jbm_2xf64_sinwc (_mm_sub_pd (_mm_set1_pd (M_PI_2), y)),
                      _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4)));
-  return _mm_blendv_pd (c, jbm_coswc_2xf64 (y),
+  return _mm_blendv_pd (c, jbm_2xf64_coswc (y),
                         _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4)));
 }
 
 /**
- * Function to calculate the functions sin(x) and cos(x) from jbm_sinwc_2xf64
- * and jbm_coswc_2xf64 approximations (__m128d).
+ * Function to calculate the functions sin(x) and cos(x) from jbm_2xf64_sinwc
+ * and jbm_2xf64_coswc approximations (__m128d).
  */
 static inline void
-jbm_sincos_2xf64 (const __m128d x,
+jbm_sin2xf64_cos (const __m128d x,
                   ///< __m128d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                  __m128d *s,   ///< pointer to the f32 function value (__m128d).
-                  __m128d *c)   ///< pointer to the f32 function value (__m128d).
+                  __m128d *s,   ///< pointer to the f64 function value (__m128d).
+                  __m128d *c)   ///< pointer to the f64 function value (__m128d).
 {
   const __m128d pi2 = _mm_set1_pd (2. * M_PI);
   const __m128d z = _mm_setzero_pd ();
   __m128d y, m, s1, c1, s2, c2;
-  y = jbm_mod_2xf64 (x, pi2);
-  jbm_sincoswc_2xf64 (_mm_sub_pd (y, pi2), &s1, &c1);
-  jbm_sincoswc_2xf64 (_mm_sub_pd (y, _mm_set1_pd (3. * M_PI_2)), &c2, &s2);
+  y = jbm_2xf64_mod (x, pi2);
+  jbm_sin2xf64_coswc (_mm_sub_pd (y, pi2), &s1, &c1);
+  jbm_sin2xf64_coswc (_mm_sub_pd (y, _mm_set1_pd (3. * M_PI_2)), &c2, &s2);
   m = _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4));
   s1 = _mm_blendv_pd (s1, _mm_sub_pd (z, s2), m);
   c1 = _mm_blendv_pd (c1, c2, m);
-  jbm_sincoswc_2xf64 (_mm_sub_pd (_mm_set1_pd (M_PI), y), &s2, &c2);
+  jbm_sin2xf64_coswc (_mm_sub_pd (_mm_set1_pd (M_PI), y), &s2, &c2);
   m = _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4));
   s1 = _mm_blendv_pd (s1, s2, m);
   c1 = _mm_blendv_pd (c1, _mm_sub_pd (z, c2), m);
-  jbm_sincoswc_2xf64 (_mm_sub_pd (_mm_set1_pd (M_PI_2), y), &c2, &s2);
+  jbm_sin2xf64_coswc (_mm_sub_pd (_mm_set1_pd (M_PI_2), y), &c2, &s2);
   m = _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4));
   s1 = _mm_blendv_pd (s1, s2, m);
   c1 = _mm_blendv_pd (c1, c2, m);
-  jbm_sincoswc_2xf64 (y, &s2, &c2);
+  jbm_sin2xf64_coswc (y, &s2, &c2);
   m = _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4));
   *s = _mm_blendv_pd (s1, s2, m);
   *c = _mm_blendv_pd (c1, c2, m);
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sinwc_2xf64 and
- * jbm_coswc_2xf64 approximations.
+ * Function to calculate the function tan(x) from jbm_2xf64_sinwc and
+ * jbm_2xf64_coswc approximations.
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_tan_2xf64 (const __m128d x) ///< __m128d vector.
+jbm_2xf64_tan (const __m128d x) ///< __m128d vector.
 {
   __m128d s, c;
-  jbm_sincos_2xf64 (x, &s, &c);
+  jbm_sin2xf64_cos (x, &s, &c);
   return _mm_div_pd (s, c);
 }
 
@@ -15287,75 +15287,75 @@ jbm_tan_2xf64 (const __m128d x) ///< __m128d vector.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_atanwc_2xf64 (const __m128d x)
+jbm_2xf64_atanwc (const __m128d x)
                   ///< __m128d vector \f$\in\left[-1,1\right]\f$.
 {
   return
-    _mm_mul_pd (x, jbm_rational_11_5_2xf64 (jbm_sqr_2xf64 (x), K_ATANWC_F64));
+    _mm_mul_pd (x, jbm_2xf64_rational_11_5 (jbm_2xf64_sqr (x), K_ATANWC_F64));
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc_2xf64
+ * Function to calculate the function atan(x) using the jbm_2xf64_atanwc
  * function (__m128d).
  *
  * \return function value (__m128d in [-pi/2,pi/2]).
  */
 static inline __m128d
-jbm_atan_2xf64 (const __m128d x)        ///< double number.
+jbm_2xf64_atan (const __m128d x)        ///< double number.
 {
   __m128d f, ax, m;
-  ax = jbm_abs_2xf64 (x);
+  ax = jbm_2xf64_abs (x);
   m = _mm_cmpgt_pd (ax, _mm_set1_pd (1.));
-  ax = _mm_blendv_pd (ax, jbm_reciprocal_2xf64 (ax), m);
-  f = jbm_atanwc_2xf64 (ax);
+  ax = _mm_blendv_pd (ax, jbm_2xf64_reciprocal (ax), m);
+  f = jbm_2xf64_atanwc (ax);
   f = _mm_blendv_pd (f, _mm_sub_pd (_mm_set1_pd (M_PI_2), f), m);
-  return jbm_copysign_2xf64 (f, x);
+  return jbm_copy2xf64_sign (f, x);
 }
 
 /**
- * Function to calculate the function atan2(y,x) using the jbm_atan_2xf64
+ * Function to calculate the function atan2(y,x) using the jbm_2xf64_atan
  * function (__m128d).
  *
  * \return function value (__m128d in [-pi,pi]).
  */
 static inline __m128d
-jbm_atan2_2xf64 (const __m128d y,       ///< __m128d y component.
+jbm_2xf64_atan2 (const __m128d y,       ///< __m128d y component.
                  const __m128d x)       ///< __m128d x component.
 {
   const __m128d pi = _mm_set1_pd (M_PI);
   const __m128d z = _mm_setzero_pd ();
   __m128d f, g;
-  f = jbm_atan_2xf64 (_mm_div_pd (y, x));
-  g = _mm_add_pd (f, jbm_copysign_2xf64 (pi, y));
+  f = jbm_2xf64_atan (_mm_div_pd (y, x));
+  g = _mm_add_pd (f, jbm_copy2xf64_sign (pi, y));
   return _mm_blendv_pd (f, g, _mm_cmplt_pd (x, z));
 }
 
 /**
- * Function to calculate the function asin(x) using the jbm_atan_2xf64 function
+ * Function to calculate the function asin(x) using the jbm_2xf64_atan function
  * (__m128d).
  *
  * \return function value (__m128d in [-pi/2,pi/2]).
  */
 static inline __m128d
-jbm_asin_2xf64 (const __m128d x)        ///< __m128d number.
+jbm_2xf64_asin (const __m128d x)        ///< __m128d number.
 {
   return
-    jbm_atan_2xf64 (_mm_div_pd
+    jbm_2xf64_atan (_mm_div_pd
                     (x, _mm_sqrt_pd (_mm_fnmadd_pd (x, x, _mm_set1_pd (1.)))));
 }
 
 /**
- * Function to calculate the function acos(x) using the jbm_atan_2xf64 function
+ * Function to calculate the function acos(x) using the jbm_2xf64_atan function
  * (__m128d).
  *
  * \return function value (__m128d in [0,pi]).
  */
 static inline __m128d
-jbm_acos_2xf64 (const __m128d x)        ///< __m128d number.
+jbm_2xf64_acos (const __m128d x)        ///< __m128d number.
 {
   __m128d f;
   f =
-    jbm_atan_2xf64 (_mm_div_pd
+    jbm_2xf64_atan (_mm_div_pd
                     (_mm_sqrt_pd (_mm_fnmadd_pd (x, x, _mm_set1_pd (1.))), x));
   return _mm_blendv_pd (f, _mm_add_pd (f, _mm_set1_pd (M_PI)),
                         _mm_cmplt_pd (x, _mm_setzero_pd ()));
@@ -15367,12 +15367,12 @@ jbm_acos_2xf64 (const __m128d x)        ///< __m128d number.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_sinh_2xf64 (const __m128d x)        ///< __m128d number.
+jbm_2xf64_sinh (const __m128d x)        ///< __m128d number.
 {
   __m128d f;
-  f = jbm_exp_2xf64 (x);
+  f = jbm_2xf64_exp (x);
   return _mm_mul_pd (_mm_set1_pd (0.5),
-                     _mm_sub_pd (f, jbm_reciprocal_2xf64 (f)));
+                     _mm_sub_pd (f, jbm_2xf64_reciprocal (f)));
 }
 
 /**
@@ -15381,12 +15381,12 @@ jbm_sinh_2xf64 (const __m128d x)        ///< __m128d number.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_cosh_2xf64 (const __m128d x)        ///< __m128d number.
+jbm_2xf64_cosh (const __m128d x)        ///< __m128d number.
 {
   __m128d f;
-  f = jbm_exp_2xf64 (x);
+  f = jbm_2xf64_exp (x);
   return _mm_mul_pd (_mm_set1_pd (0.5),
-                     _mm_add_pd (f, jbm_reciprocal_2xf64 (f)));
+                     _mm_add_pd (f, jbm_2xf64_reciprocal (f)));
 }
 
 /**
@@ -15395,11 +15395,11 @@ jbm_cosh_2xf64 (const __m128d x)        ///< __m128d number.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_tanh_2xf64 (const __m128d x)        ///< __m128d number.
+jbm_2xf64_tanh (const __m128d x)        ///< __m128d number.
 {
   __m128d f, fi;
-  f = jbm_exp_2xf64 (x);
-  fi = jbm_reciprocal_2xf64 (f);
+  f = jbm_2xf64_exp (x);
+  fi = jbm_2xf64_reciprocal (f);
   f = _mm_div_pd (_mm_sub_pd (f, fi), _mm_add_pd (f, fi));
   f = _mm_blendv_pd (f, _mm_set1_pd (1.),
                      _mm_cmpgt_pd (x, _mm_set1_pd (JBM_DBL_MAX_E_EXP)));
@@ -15413,10 +15413,10 @@ jbm_tanh_2xf64 (const __m128d x)        ///< __m128d number.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_asinh_2xf64 (const __m128d x)       ///< __m128d number.
+jbm_2xf64_asinh (const __m128d x)       ///< __m128d number.
 {
   return
-    jbm_log_2xf64 (_mm_add_pd
+    jbm_2xf64_log (_mm_add_pd
                    (x, _mm_sqrt_pd (_mm_fmadd_pd (x, x, _mm_set1_pd (1.)))));
 }
 
@@ -15426,10 +15426,10 @@ jbm_asinh_2xf64 (const __m128d x)       ///< __m128d number.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_acosh_2xf64 (const __m128d x)       ///< __m128d number.
+jbm_2xf64_acosh (const __m128d x)       ///< __m128d number.
 {
   return
-    jbm_log_2xf64 (_mm_add_pd
+    jbm_2xf64_log (_mm_add_pd
                    (x, _mm_sqrt_pd (_mm_fmsub_pd (x, x, _mm_set1_pd (1.)))));
 }
 
@@ -15439,11 +15439,11 @@ jbm_acosh_2xf64 (const __m128d x)       ///< __m128d number.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_atanh_2xf64 (const __m128d x)       ///< __m128d number.
+jbm_2xf64_atanh (const __m128d x)       ///< __m128d number.
 {
   const __m128d u = _mm_set1_pd (1.);
   return _mm_mul_pd (_mm_set1_pd (0.5),
-                     jbm_log_2xf64 (_mm_div_pd (_mm_add_pd (u, x),
+                     jbm_2xf64_log (_mm_div_pd (_mm_add_pd (u, x),
                                                 _mm_sub_pd (u, x))));
 }
 
@@ -15454,11 +15454,11 @@ jbm_atanh_2xf64 (const __m128d x)       ///< __m128d number.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_erfwc_2xf64 (const __m128d x)
+jbm_2xf64_erfwc (const __m128d x)
                  ///< __m128d vector \f$\in\left[-1,1\right]\f$.
 {
   return
-    _mm_mul_pd (x, jbm_rational_9_4_2xf64 (jbm_sqr_2xf64 (x), K_ERFWC_F64));
+    _mm_mul_pd (x, jbm_2xf64_rational_9_4 (jbm_2xf64_sqr (x), K_ERFWC_F64));
 }
 
 /**
@@ -15468,51 +15468,51 @@ jbm_erfwc_2xf64 (const __m128d x)
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_erfcwc_2xf64 (const __m128d x)
+jbm_2xf64_erfcwc (const __m128d x)
                   ///< __m128d vector \f$\in\left[1,\infty\right]\f$.
 {
   __m128d f, x2;
-  x2 = jbm_sqr_2xf64 (x);
-  f = _mm_mul_pd (jbm_rational_18_10_2xf64 (jbm_reciprocal_2xf64 (x),
+  x2 = jbm_2xf64_sqr (x);
+  f = _mm_mul_pd (jbm_2xf64_rational_18_10 (jbm_2xf64_reciprocal (x),
                                             K_ERFCWC_F64),
-                  _mm_div_pd (x, jbm_exp_2xf64 (x2)));
+                  _mm_div_pd (x, jbm_2xf64_exp (x2)));
   return
     _mm_blendv_pd (f, _mm_setzero_pd (),
                    _mm_cmpgt_pd (x, _mm_set1_pd (K_ERFC_MAX_F64)));
 }
 
 /**
- * Function to calculate the function erf(x) using jbm_erfwc_2xf64 and
- * jbm_erfcwc_2xf64
+ * Function to calculate the function erf(x) using jbm_2xf64_erfwc and
+ * jbm_2xf64_erfcwc.
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_erf_2xf64 (const __m128d x) ///< __m128d vector.
+jbm_2xf64_erf (const __m128d x) ///< __m128d vector.
 {
   const __m128d u = _mm_set1_pd (1.);
   __m128d ax, f;
-  ax = jbm_abs_2xf64 (x);
-  f = jbm_copysign_2xf64 (_mm_sub_pd (u, jbm_erfcwc_2xf64 (ax)), x);
-  return _mm_blendv_pd (f, jbm_erfwc_2xf64 (x), _mm_cmplt_pd (ax, u));
+  ax = jbm_2xf64_abs (x);
+  f = jbm_copy2xf64_sign (_mm_sub_pd (u, jbm_2xf64_erfcwc (ax)), x);
+  return _mm_blendv_pd (f, jbm_2xf64_erfwc (x), _mm_cmplt_pd (ax, u));
 
 }
 
 /**
- * Function to calculate the function erfc(x) using jbm_erfwc_2xf64 and
- * jbm_erfcwc_2xf64
+ * Function to calculate the function erfc(x) using jbm_2xf64_erfwc and
+ * jbm_2xf64_erfcwc.
  *
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_erfc_2xf64 (const __m128d x)        ///< __m128d vector.
+jbm_2xf64_erfc (const __m128d x)        ///< __m128d vector.
 {
   const __m128d u2 = _mm_set1_pd (2.);
   const __m128d u = _mm_set1_pd (1.);
   __m128d ax, cwc, wc;
-  ax = jbm_abs_2xf64 (x);
-  cwc = jbm_erfcwc_2xf64 (ax);
-  wc = _mm_sub_pd (u, jbm_erfwc_2xf64 (x));
+  ax = jbm_2xf64_abs (x);
+  cwc = jbm_2xf64_erfcwc (ax);
+  wc = _mm_sub_pd (u, jbm_2xf64_erfwc (x));
   return
     _mm_blendv_pd
     (_mm_blendv_pd (wc, _mm_sub_pd (u2, cwc), _mm_cmpgt_pd (ax, u)), cwc,
@@ -15539,7 +15539,7 @@ jbm_solve_quadratic_reduced_2xf64 (const __m128d a,
   __m128d ka, kb, k1, k2;
   k1 = _mm_set1_pd (-0.5);
   ka = _mm_mul_pd (a, k1);
-  kb = _mm_sqrt_pd (_mm_sub_pd (jbm_sqr_2xf64 (ka), b));
+  kb = _mm_sqrt_pd (_mm_sub_pd (jbm_2xf64_sqr (ka), b));
   k1 = _mm_add_pd (ka, kb);
   k2 = _mm_sub_pd (ka, kb);
   k1 = _mm_blendv_pd (k1, k2, _mm_cmplt_pd (k1, x1));
@@ -15553,7 +15553,7 @@ jbm_solve_quadratic_reduced_2xf64 (const __m128d a,
  * \return __m128d vector of solution values.
  */
 static inline __m128d
-jbm_solve_quadratic_2xf64 (const __m128d a,
+jbm_2xf64_solve_quadratic (const __m128d a,
 ///< __m128d vector of 2nd order coefficient of the equations.
                            const __m128d b,
 ///< __m128d vector of 1st order coefficient of the equations.
@@ -15567,7 +15567,7 @@ jbm_solve_quadratic_2xf64 (const __m128d a,
   __m128d k1, k2;
   k1 = jbm_solve_quadratic_reduced_2xf64 (_mm_div_pd (b, a), _mm_div_pd (c, a),
                                           x1, x2);
-  k2 = _mm_div_pd (jbm_opposite_2xf64 (c), b);
+  k2 = _mm_div_pd (jbm_2xf64_opposite (c), b);
   return _mm_blendv_pd (k1, k2, jbm_small_2xf64 (a));
 }
 
@@ -15600,21 +15600,21 @@ jbm_solve_cubic_reduced_2xf64 (const __m128d a,
   k0 = _mm_fmsub_pd (_mm_fmsub_pd (b, a3, c), c_2, _mm_mul_pd (a3, k0));
   k3 = _mm_mul_pd (k1, _mm_mul_pd (k1, k1));
   k2 = _mm_fmadd_pd (k0, k0, k3);
-  l1 = _mm_sqrt_pd (jbm_opposite_2xf64 (k1));
-  l0 = _mm_mul_pd (jbm_acos_2xf64 (_mm_div_pd (k0, k3)), c_3);
+  l1 = _mm_sqrt_pd (jbm_2xf64_opposite (k1));
+  l0 = _mm_mul_pd (jbm_2xf64_acos (_mm_div_pd (k0, k3)), c_3);
   l1 = _mm_add_pd (l1, l1);
-  l2 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (k0), a3);
-  l3 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (_mm_add_pd (l0, c2p_3)), a3);
+  l2 = _mm_fmsub_pd (l1, jbm_2xf64_cos (k0), a3);
+  l3 = _mm_fmsub_pd (l1, jbm_2xf64_cos (_mm_add_pd (l0, c2p_3)), a3);
   l3 = _mm_blendv_pd (l3, l2,
                       _mm_or_pd (_mm_cmplt_pd (l2, x1), _mm_cmpgt_pd (l2, x2)));
-  l4 = _mm_fmsub_pd (l1, jbm_cos_2xf64 (_mm_sub_pd (l0, c2p_3)), a);
+  l4 = _mm_fmsub_pd (l1, jbm_2xf64_cos (_mm_sub_pd (l0, c2p_3)), a);
   l4 = _mm_blendv_pd (l4, l3,
                       _mm_or_pd (_mm_cmplt_pd (l3, x1), _mm_cmpgt_pd (l3, x2)));
   k1 = _mm_sqrt_pd (k2);
   l5 = _mm_add_pd (k0, k1);
-  l5 = jbm_cbrt_2xf64 (k2);
+  l5 = jbm_2xf64_cbrt (k2);
   k0 = _mm_sub_pd (k0, k1);
-  l5 = _mm_add_pd (l5, _mm_sub_pd (jbm_cbrt_2xf64 (k0), a3));
+  l5 = _mm_add_pd (l5, _mm_sub_pd (jbm_2xf64_cbrt (k0), a3));
   return _mm_blendv_pd (l4, l5, _mm_cmplt_pd (k2, _mm_setzero_pd ()));
 }
 
@@ -15626,7 +15626,7 @@ jbm_solve_cubic_reduced_2xf64 (const __m128d a,
  * \return __m128d vector of solution values.
  */
 static inline __m128d
-jbm_solve_cubic_2xf64 (const __m128d a,
+jbm_2xf64_solve_cubic (const __m128d a,
 ///< __m128d vector of 3rd order coefficient of the equations.
                        const __m128d b,
 ///< __m128d vector of 2nd order coefficient of the equations.
@@ -15643,7 +15643,7 @@ jbm_solve_cubic_2xf64 (const __m128d a,
     _mm_blendv_pd (jbm_solve_cubic_reduced_2xf64 (_mm_div_pd (b, a),
                                                   _mm_div_pd (c, a),
                                                   _mm_div_pd (d, a), x1, x2),
-                   jbm_solve_quadratic_2xf64 (b, c, d, x1, x2),
+                   jbm_2xf64_solve_quadratic (b, c, d, x1, x2),
                    jbm_small_2xf64 (a));
 }
 
@@ -15654,7 +15654,7 @@ jbm_solve_cubic_2xf64 (const __m128d a,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_total_2xf64 (const __m128d d1 __attribute__((unused)),
+jbm_2xf64_flux_limiter_total (const __m128d d1 __attribute__((unused)),
                               ///< 1st flux limiter function parameter.
                               const __m128d d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
@@ -15669,7 +15669,7 @@ jbm_flux_limiter_total_2xf64 (const __m128d d1 __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_null_2xf64 (const __m128d d1 __attribute__((unused)),
+jbm_2xf64_flux_limiter_null (const __m128d d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
                              const __m128d d2 __attribute__((unused)))
   ///< 2nd flux limiter function parameter.
@@ -15684,7 +15684,7 @@ jbm_flux_limiter_null_2xf64 (const __m128d d1 __attribute__((unused)),
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_centred_2xf64 (const __m128d d1,
+jbm_2xf64_flux_limiter_centred (const __m128d d1,
                                 ///< 1st flux limiter function parameter.
                                 const __m128d d2)
                               ///< 2nd flux limiter function parameter.
@@ -15702,14 +15702,14 @@ jbm_flux_limiter_centred_2xf64 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_superbee_2xf64 (const __m128d d1,
+jbm_2xf64_flux_limiter_superbee (const __m128d d1,
                                  ///< 1st flux limiter function parameter.
                                  const __m128d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m128d r;
   r = _mm_div_pd (d1, d2);
-  r = _mm_max_pd (_mm_min_pd (jbm_dbl_2xf64 (r), _mm_set1_pd (1.)),
+  r = _mm_max_pd (_mm_min_pd (jbm_2xf64_dbl (r), _mm_set1_pd (1.)),
                   _mm_min_pd (r, _mm_set1_pd (2.)));
   return _mm_blendv_pd (_mm_setzero_pd (), r,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
@@ -15724,7 +15724,7 @@ jbm_flux_limiter_superbee_2xf64 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_minmod_2xf64 (const __m128d d1,
+jbm_flux_limiter_min2xf64_mod (const __m128d d1,
                                ///< 1st flux limiter function parameter.
                                const __m128d d2)
                              ///< 2nd flux limiter function parameter.
@@ -15745,14 +15745,14 @@ jbm_flux_limiter_minmod_2xf64 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_VanLeer_2xf64 (const __m128d d1,
+jbm_2xf64_flux_limiter_VanLeer (const __m128d d1,
                                 ///< 1st flux limiter function parameter.
                                 const __m128d d2)
                               ///< 2nd flux limiter function parameter.
 {
   __m128d r, k;
   r = _mm_div_pd (d1, d2);
-  k = jbm_abs_2xf64 (r);
+  k = jbm_2xf64_abs (r);
   r = _mm_div_pd (_mm_add_pd (r, k), _mm_add_pd (_mm_set1_pd (1.), k));
   return _mm_blendv_pd (_mm_setzero_pd (), r,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
@@ -15767,14 +15767,14 @@ jbm_flux_limiter_VanLeer_2xf64 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_VanAlbada_2xf64 (const __m128d d1,
+jbm_2xf64_flux_limiter_VanAlbada (const __m128d d1,
                                   ///< 1st flux limiter function parameter.
                                   const __m128d d2)
                                 ///< 2nd flux limiter function parameter.
 {
   __m128d r, k;
   r = _mm_div_pd (d1, d2);
-  k = jbm_sqr_2xf64 (r);
+  k = jbm_2xf64_sqr (r);
   r = _mm_div_pd (_mm_add_pd (r, k), _mm_add_pd (_mm_set1_pd (1.), k));
   return _mm_blendv_pd (_mm_setzero_pd (), r,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
@@ -15789,7 +15789,7 @@ jbm_flux_limiter_VanAlbada_2xf64 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_minsuper_2xf64 (const __m128d d1,
+jbm_2xf64_flux_limiter_minsuper (const __m128d d1,
                                  ///< 1st flux limiter function parameter.
                                  const __m128d d2)
                                ///< 2nd flux limiter function parameter.
@@ -15809,14 +15809,14 @@ jbm_flux_limiter_minsuper_2xf64 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_supermin_2xf64 (const __m128d d1,
+jbm_2xf64_flux_limiter_supermin (const __m128d d1,
                                  ///< 1st flux limiter function parameter.
                                  const __m128d d2)
                                ///< 2nd flux limiter function parameter.
 {
   __m128d r;
   r = _mm_div_pd (d1, d2);
-  r = _mm_min_pd (jbm_dbl_2xf64 (r), _mm_set1_pd (1.));
+  r = _mm_min_pd (jbm_2xf64_dbl (r), _mm_set1_pd (1.));
   return _mm_blendv_pd (_mm_setzero_pd (), r,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
                                       _mm_set1_pd (DBL_EPSILON)));
@@ -15831,7 +15831,7 @@ jbm_flux_limiter_supermin_2xf64 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_monotonized_central_2xf64 (const __m128d d1,
+jbm_2xf64_flux_limiter_monotonized_central (const __m128d d1,
 ///< 1st flux limiter function parameter.
                                             const __m128d d2)
 ///< 2nd flux limiter function parameter.
@@ -15840,7 +15840,7 @@ jbm_flux_limiter_monotonized_central_2xf64 (const __m128d d1,
   r = _mm_div_pd (d1, d2);
   rm = _mm_mul_pd (_mm_set1_pd (0.5), _mm_add_pd (r, _mm_set1_pd (1.)));
   rm = _mm_blendv_pd (_mm_set1_pd (2.), rm, _mm_cmplt_pd (r, _mm_set1_pd (3.)));
-  rm = _mm_blendv_pd (rm, jbm_dbl_2xf64 (r),
+  rm = _mm_blendv_pd (rm, jbm_2xf64_dbl (r),
                       _mm_cmpgt_pd (r, _mm_set1_pd (1. / 3.)));
   return _mm_blendv_pd (_mm_setzero_pd (), rm,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
@@ -15855,7 +15855,7 @@ jbm_flux_limiter_monotonized_central_2xf64 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_mean_2xf64 (const __m128d d1,
+jbm_2xf64_flux_limiter_mean (const __m128d d1,
                              ///< 1st flux limiter function parameter.
                              const __m128d d2)
                            ///< 2nd flux limiter function parameter.
@@ -15874,7 +15874,7 @@ jbm_flux_limiter_mean_2xf64 (const __m128d d1,
  * \return flux limiter function value.
  */
 static inline __m128d
-jbm_flux_limiter_2xf64 (const __m128d d1,
+jbm_2xf64_flux_limiter (const __m128d d1,
                         ///< 1st flux limiter function parameter.
                         const __m128d d2,
                         ///< 2nd flux limiter function parameter.
@@ -15884,27 +15884,27 @@ jbm_flux_limiter_2xf64 (const __m128d d1,
   switch (type)
     {
     case JBM_FLUX_LIMITER_TYPE_TOTAL:
-      return jbm_flux_limiter_total_2xf64 (d1, d2);
+      return jbm_2xf64_flux_limiter_total (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_NULL:
-      return jbm_flux_limiter_null_2xf64 (d1, d2);
+      return jbm_2xf64_flux_limiter_null (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_CENTRED:
-      return jbm_flux_limiter_centred_2xf64 (d1, d2);
+      return jbm_2xf64_flux_limiter_centred (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
-      return jbm_flux_limiter_superbee_2xf64 (d1, d2);
+      return jbm_2xf64_flux_limiter_superbee (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_minmod_2xf64 (d1, d2);
+      return jbm_flux_limiter_min2xf64_mod (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
-      return jbm_flux_limiter_VanLeer_2xf64 (d1, d2);
+      return jbm_2xf64_flux_limiter_VanLeer (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
-      return jbm_flux_limiter_VanAlbada_2xf64 (d1, d2);
+      return jbm_2xf64_flux_limiter_VanAlbada (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINSUPER:
-      return jbm_flux_limiter_minsuper_2xf64 (d1, d2);
+      return jbm_2xf64_flux_limiter_minsuper (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
-      return jbm_flux_limiter_supermin_2xf64 (d1, d2);
+      return jbm_2xf64_flux_limiter_supermin (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
-      return jbm_flux_limiter_monotonized_central_2xf64 (d1, d2);
+      return jbm_2xf64_flux_limiter_monotonized_central (d1, d2);
     }
-  return jbm_flux_limiter_mean_2xf64 (d1, d2);
+  return jbm_2xf64_flux_limiter_mean (d1, d2);
 }
 
 /**
@@ -15914,7 +15914,7 @@ jbm_flux_limiter_2xf64 (const __m128d d1,
  * \return __m128d vector of integral values.
  */
 static inline __m128d
-jbm_integral_2xf64 (__m128d (*f) (__m128d),
+jbm_2xf64_integral (__m128d (*f) (__m128d),
                     ///< pointer to the function to integrate.
                     const __m128d x1,   ///< left limit of the interval.
                     const __m128d x2)   ///< right limit of the interval.
@@ -15949,7 +15949,7 @@ jbm_integral_2xf64 (__m128d (*f) (__m128d),
  * Function to add 2 float arrays.
  */
 static inline void
-jbm_array_add_f32 (float *xr,   ///< result float array.
+jbm_array_f32_add (float *xr,   ///< result float array.
                    const float *x1,     ///< 1st addend float array.
                    const float *x2,     ///< 1st addend float array.
                    const unsigned int n)        ///< number of array elements.
@@ -15966,7 +15966,7 @@ jbm_array_add_f32 (float *xr,   ///< result float array.
  * Function to subtract 2 float arrays.
  */
 static inline void
-jbm_array_sub_f32 (float *xr,   ///< result float array.
+jbm_array_f32_sub (float *xr,   ///< result float array.
                    const float *x1,     ///< minuend float array.
                    const float *x2,     ///< subtrahend float array.
                    const unsigned int n)        ///< number of array elements.
@@ -15983,7 +15983,7 @@ jbm_array_sub_f32 (float *xr,   ///< result float array.
  * Function to multiply a float array by a float number.
  */
 static inline void
-jbm_array_mul1_f32 (float *xr,  ///< result float array.
+jbm_array_f32_mul1 (float *xr,  ///< result float array.
                     const float *x1,    ///< multiplier float array.
                     const float x2,     ///< multiplicand float number.
                     const unsigned int n)       ///< number of array elements.
@@ -16006,7 +16006,7 @@ jbm_array_mul1_f32 (float *xr,  ///< result float array.
  * Function to divide a float array by a float number.
  */
 static inline void
-jbm_array_div1_f32 (float *xr,  ///< result float array.
+jbm_array_f32_div1 (float *xr,  ///< result float array.
                     const float *x1,    ///< dividend float array.
                     const float x2,     ///< divisor float number.
                     const unsigned int n)       ///< number of array elements.
@@ -16029,7 +16029,7 @@ jbm_array_div1_f32 (float *xr,  ///< result float array.
  * Function to multiply 2 float arrays.
  */
 static inline void
-jbm_array_mul_f32 (float *xr,   ///< result float array.
+jbm_array_f32_mul (float *xr,   ///< result float array.
                    const float *x1,     ///< multiplier float array.
                    const float *x2,     ///< multiplicand float array.
                    const unsigned int n)        ///< number of array elements.
@@ -16046,7 +16046,7 @@ jbm_array_mul_f32 (float *xr,   ///< result float array.
  * Function to divide 2 float arrays.
  */
 static inline void
-jbm_array_div_f32 (float *xr,   ///< result float array.
+jbm_array_f32_div (float *xr,   ///< result float array.
                    const float *x1,     ///< dividend float array.
                    const float *x2,     ///< divisor float array.
                    const unsigned int n)        ///< number of array elements.
@@ -16063,30 +16063,30 @@ jbm_array_div_f32 (float *xr,   ///< result float array.
  * Function to calculate the float of a float array.
  */
 static inline void
-jbm_array_dbl_f32 (float *xr,   ///< result float array.
+jbm_array_f32_dbl (float *xr,   ///< result float array.
                    const float *xd,     ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
   for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    _mm_store_ps (xr + i, jbm_dbl_4xf32 (_mm_load_ps (xd + i)));
+    _mm_store_ps (xr + i, jbm_4xf32_dbl (_mm_load_ps (xd + i)));
   for (; i < n; ++i)
-    xr[i] = jbm_dbl_f32 (xd[i]);
+    xr[i] = jbm_f32_dbl (xd[i]);
 }
 
 /**
  * Function to calculate the square of a float array.
  */
 static inline void
-jbm_array_sqr_f32 (float *xr,   ///< result float array.
+jbm_array_f32_sqr (float *xr,   ///< result float array.
                    const float *xd,     ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
   for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    _mm_store_ps (xr + i, jbm_sqr_4xf32 (_mm_load_ps (xd + i)));
+    _mm_store_ps (xr + i, jbm_4xf32_sqr (_mm_load_ps (xd + i)));
   for (; i < n; ++i)
-    xr[i] = jbm_sqr_f32 (xd[i]);
+    xr[i] = jbm_f32_sqr (xd[i]);
 }
 
 /**
@@ -16095,7 +16095,7 @@ jbm_array_sqr_f32 (float *xr,   ///< result float array.
  * \return the highest value.
  */
 static inline float
-jbm_array_max_f32 (const float *xx,     ///< float array.
+jbm_array_f32_max (const float *xx,     ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
   float ax[4] JB_ALIGNED;
@@ -16131,7 +16131,7 @@ jbm_array_max_f32 (const float *xx,     ///< float array.
  * \return the lowest value.
  */
 static inline float
-jbm_array_min_f32 (const float *xx,     ///< float array.
+jbm_array_f32_min (const float *xx,     ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
   float ax[4] JB_ALIGNED;
@@ -16165,7 +16165,7 @@ jbm_array_min_f32 (const float *xx,     ///< float array.
  * Function to find the highest and the lowest elements of a float array.
  */
 static inline void
-jbm_array_maxmin_f32 (const float *xx,  ///< float array.
+jbm_array_f32_maxmin (const float *xx,  ///< float array.
                       float *max,       ///< the highest value.
                       float *min,       ///< the lowest value.
                       const unsigned int n)     ///< number of array elements.
@@ -16205,7 +16205,7 @@ jbm_array_maxmin_f32 (const float *xx,  ///< float array.
  * Function to add 2 double arrays.
  */
 static inline void
-jbm_array_add_f64 (double *xr,  ///< result double array.
+jbm_array_f64_add (double *xr,  ///< result double array.
                    const double *x1,    ///< 1st addend double array.
                    const double *x2,    ///< 1st addend double array.
                    const unsigned int n)        ///< number of array elements.
@@ -16222,7 +16222,7 @@ jbm_array_add_f64 (double *xr,  ///< result double array.
  * Function to subtract 2 double arrays.
  */
 static inline void
-jbm_array_sub_f64 (double *xr,  ///< result double array.
+jbm_array_f64_sub (double *xr,  ///< result double array.
                    const double *x1,    ///< minuend double array.
                    const double *x2,    ///< subtrahend double array.
                    const unsigned int n)        ///< number of array elements.
@@ -16239,7 +16239,7 @@ jbm_array_sub_f64 (double *xr,  ///< result double array.
  * Function to multiply a double array by a double number.
  */
 static inline void
-jbm_array_mul1_f64 (double *xr, ///< result double array.
+jbm_array_f64_mul1 (double *xr, ///< result double array.
                     const double *x1,   ///< multiplier double array.
                     const double x2,    ///< multiplicand double number.
                     const unsigned int n)       ///< number of array elements.
@@ -16262,7 +16262,7 @@ jbm_array_mul1_f64 (double *xr, ///< result double array.
  * Function to divide a double array by a double number.
  */
 static inline void
-jbm_array_div1_f64 (double *xr, ///< result double array.
+jbm_array_f64_div1 (double *xr, ///< result double array.
                     const double *x1,   ///< dividend double array.
                     const double x2,    ///< divisor double number.
                     const unsigned int n)       ///< number of array elements.
@@ -16285,7 +16285,7 @@ jbm_array_div1_f64 (double *xr, ///< result double array.
  * Function to multiply 2 double arrays.
  */
 static inline void
-jbm_array_mul_f64 (double *xr,  ///< result double array.
+jbm_array_f64_mul (double *xr,  ///< result double array.
                    const double *x1,    ///< multiplier double array.
                    const double *x2,    ///< multiplicand double array.
                    const unsigned int n)        ///< number of array elements.
@@ -16302,7 +16302,7 @@ jbm_array_mul_f64 (double *xr,  ///< result double array.
  * Function to divide 2 double arrays.
  */
 static inline void
-jbm_array_div_f64 (double *xr,  ///< result double array.
+jbm_array_f64_div (double *xr,  ///< result double array.
                    const double *x1,    ///< dividend double array.
                    const double *x2,    ///< divisor double array.
                    const unsigned int n)        ///< number of array elements.
@@ -16319,30 +16319,30 @@ jbm_array_div_f64 (double *xr,  ///< result double array.
  * Function to calculate the double of a double array.
  */
 static inline void
-jbm_array_dbl_f64 (double *xr,  ///< result double array.
+jbm_array_f64_dbl (double *xr,  ///< result double array.
                    const double *xd,    ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
   for (i = 0, j = n >> 1; j > 0; --j, i += 2)
-    _mm_store_pd (xr + i, jbm_dbl_2xf64 (_mm_load_pd (xd + i)));
+    _mm_store_pd (xr + i, jbm_2xf64_dbl (_mm_load_pd (xd + i)));
   for (; i < n; ++i)
-    xr[i] = jbm_dbl_f64 (xd[i]);
+    xr[i] = jbm_f64_dbl (xd[i]);
 }
 
 /**
  * Function to calculate the square of a double array.
  */
 static inline void
-jbm_array_sqr_f64 (double *xr,  ///< result double array.
+jbm_array_f64_sqr (double *xr,  ///< result double array.
                    const double *xd,    ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i, j;
   for (i = 0, j = n >> 1; j > 0; --j, i += 2)
-    _mm_store_pd (xr + i, jbm_sqr_2xf64 (_mm_load_pd (xd + i)));
+    _mm_store_pd (xr + i, jbm_2xf64_sqr (_mm_load_pd (xd + i)));
   for (; i < n; ++i)
-    xr[i] = jbm_sqr_f64 (xd[i]);
+    xr[i] = jbm_f64_sqr (xd[i]);
 }
 
 /**
@@ -16351,7 +16351,7 @@ jbm_array_sqr_f64 (double *xr,  ///< result double array.
  * \return the highest value.
  */
 static inline double
-jbm_array_max_f64 (const double *xx,    ///< double array.
+jbm_array_f64_max (const double *xx,    ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
   double ax[2] JB_ALIGNED;
@@ -16387,7 +16387,7 @@ jbm_array_max_f64 (const double *xx,    ///< double array.
  * \return the lowest value.
  */
 static inline double
-jbm_array_min_f64 (const double *xx,    ///< double array.
+jbm_array_f64_min (const double *xx,    ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
   double ax[2] JB_ALIGNED;
@@ -16421,7 +16421,7 @@ jbm_array_min_f64 (const double *xx,    ///< double array.
  * Function to find the highest and the lowest elements of a double array.
  */
 static inline void
-jbm_array_maxmin_f64 (const double *xx, ///< double array.
+jbm_array_f64_maxmin (const double *xx, ///< double array.
                       double *max,      ///< the highest value.
                       double *min,      ///< the lowest value.
                       const unsigned int n)     ///< number of array elements.

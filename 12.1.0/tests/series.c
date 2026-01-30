@@ -799,11 +799,11 @@ main (int argn, char **argc __attribute__((unused)))
 
   // precision
   number_print (stdout, "FLT_EPSILON", (FLOAT) FLT_EPSILON);
-  number_print (stdout, "f32 precision", EXP2 (-K23));
+  number_print (stdout, "dbl precision", EXP2 (-K23));
   number_print (stdout, "FLT_MIN", (FLOAT) FLT_MIN);
 #if PRECISION > 1
   number_print (stdout, "DBL_EPSILON", (FLOAT) DBL_EPSILON);
-  number_print (stdout, "f64 precision", EXP2 (-K52));
+  number_print (stdout, "dbl precision", EXP2 (-K52));
   number_print (stdout, "DBL_MIN", (FLOAT) DBL_MIN);
 #endif
 #if PRECISION > 2

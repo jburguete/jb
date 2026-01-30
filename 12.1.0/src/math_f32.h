@@ -198,7 +198,7 @@ static const float JBM_INTEGRAL_GAUSS_B_F32[JBM_INTEGRAL_GAUSS_N] = {
  * \return float double.
  */
 static inline float
-jbm_dbl_f32 (const float x)     ///< float number.
+jbm_f32_dbl (const float x)     ///< float number.
 {
   return JBM_DBL (x);
 }
@@ -209,9 +209,31 @@ jbm_dbl_f32 (const float x)     ///< float number.
  * \return float square.
  */
 static inline float
-jbm_sqr_f32 (const float x)     ///< float number.
+jbm_f32_sqr (const float x)     ///< float number.
 {
   return JBM_SQR (x);
+}
+
+/**
+ * Function to calculate the opposite of a float number.
+ *
+ * \return float opposite.
+ */
+static inline float
+jbm_f32_opposite (const float x)        ///< float number.
+{
+  return -x;
+}
+
+/**
+ * Function to calculate the reciprocal of a float number.
+ *
+ * \return float reciprocal.
+ */
+static inline float
+jbm_f32_reciprocal (const float x)        ///< float number.
+{
+  return 1.f / x;
 }
 
 /**
@@ -220,7 +242,7 @@ jbm_sqr_f32 (const float x)     ///< float number.
  * \return float sign.
  */
 static inline float
-jbm_sign_f32 (const float x)    ///< float number.
+jbm_f32_sign (const float x)    ///< float number.
 {
   JBMF32 y;
   y.x = x;
@@ -235,7 +257,7 @@ jbm_sign_f32 (const float x)    ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_abs_f32 (const float x)     ///< float number.
+jbm_f32_abs (const float x)     ///< float number.
 {
   JBMF32 y;
   y.x = x;
@@ -249,11 +271,11 @@ jbm_abs_f32 (const float x)     ///< float number.
  * \return float number with magnitud of 1st number and sign of 2nd number.
  */
 static inline float
-jbm_copysign_f32 (const float x,        ///< float number to preserve magnitude.
+jbm_copyf32_sign (const float x,        ///< float number to preserve magnitude.
                   const float y)        ///< float number to preserve sign.
 {
   JBMF32 ax, sy;
-  ax.x = jbm_abs_f32 (x);
+  ax.x = jbm_f32_abs (x);
   sy.x = y;
   ax.i |= sy.i & JBM_BITS_SIGN_F32;
   return ax.x;
@@ -265,7 +287,7 @@ jbm_copysign_f32 (const float x,        ///< float number to preserve magnitude.
  * \return function value (float).
  */
 static inline float
-jbm_hypot_f32 (const float x,   ///< 1st float number.
+jbm_f32_hypot (const float x,   ///< 1st float number.
                const float y)   ///< 2nd float number.
 {
   return sqrtf (x * x + y * y);
@@ -277,12 +299,12 @@ jbm_hypot_f32 (const float x,   ///< 1st float number.
  * \return rest value (in [0,|divisor|) interval) (float).
  */
 static inline float
-jbm_mod_f32 (const float x,     ///< dividend (float).
+jbm_f32_mod (const float x,     ///< dividend (float).
              const float d)     ///< divisor (float).
 {
   float r;
   r = floorf (x / d);
-  return (jbm_abs_f32 (r) > 1.f / FLT_EPSILON) ? 0.5f * d : x - d * r;
+  return (jbm_f32_abs (r) > 1.f / FLT_EPSILON) ? 0.5f * d : x - d * r;
 }
 
 /**
@@ -291,7 +313,7 @@ jbm_mod_f32 (const float x,     ///< dividend (float).
  * \return normalize fraction value in [1/2,1) (float).
  */
 static inline float
-jbm_frexp_f32 (const float x,   ///< float number.
+jbm_f32_frexp (const float x,   ///< float number.
                int *e)          ///< pointer to the extracted exponent.
 {
   JBMF32 y;
@@ -325,7 +347,7 @@ jbm_frexp_f32 (const float x,   ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_exp2n_f32 (int e)           ///< exponent number (int).
+jbm_f32_exp2n (int e)           ///< exponent number (int).
 {
   JBMF32 x;
   if (e > 127)
@@ -345,10 +367,10 @@ jbm_exp2n_f32 (int e)           ///< exponent number (int).
  * \return function value (float).
  */
 static inline float
-jbm_ldexp_f32 (const float x,   ///< float number.
+jbm_f32_ldexp (const float x,   ///< float number.
                int e)           ///< exponent number (int).
 {
-  return x * jbm_exp2n_f32 (e);
+  return x * jbm_f32_exp2n (e);
 }
 
 /**
@@ -357,7 +379,7 @@ jbm_ldexp_f32 (const float x,   ///< float number.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_1_f32 (const float x,    ///< float value.
+jbm_f32_polynomial_1 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return p[0] + x * p[1];
@@ -369,10 +391,10 @@ jbm_polynomial_1_f32 (const float x,    ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_2_f32 (const float x,    ///< float value.
+jbm_f32_polynomial_2 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_1_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_1 (x, p + 1);
 }
 
 /**
@@ -381,10 +403,10 @@ jbm_polynomial_2_f32 (const float x,    ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_3_f32 (const float x,    ///< float value.
+jbm_f32_polynomial_3 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_2_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_2 (x, p + 1);
 }
 
 /**
@@ -393,10 +415,10 @@ jbm_polynomial_3_f32 (const float x,    ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_4_f32 (const float x,    ///< float value.
+jbm_f32_polynomial_4 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_3_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_3 (x, p + 1);
 }
 
 /**
@@ -405,10 +427,10 @@ jbm_polynomial_4_f32 (const float x,    ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_5_f32 (const float x,    ///< float value.
+jbm_f32_polynomial_5 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_4_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_4 (x, p + 1);
 }
 
 /**
@@ -417,10 +439,10 @@ jbm_polynomial_5_f32 (const float x,    ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_6_f32 (const float x,    ///< float value.
+jbm_f32_polynomial_6 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_5_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_5 (x, p + 1);
 }
 
 /**
@@ -429,10 +451,10 @@ jbm_polynomial_6_f32 (const float x,    ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_7_f32 (const float x,    ///< float value.
+jbm_f32_polynomial_7 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_6_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_6 (x, p + 1);
 }
 
 /**
@@ -441,10 +463,10 @@ jbm_polynomial_7_f32 (const float x,    ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_8_f32 (const float x,    ///< float value.
+jbm_f32_polynomial_8 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_7_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_7 (x, p + 1);
 }
 
 /**
@@ -453,10 +475,10 @@ jbm_polynomial_8_f32 (const float x,    ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_9_f32 (const float x,    ///< float value.
+jbm_f32_polynomial_9 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_8_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_8 (x, p + 1);
 }
 
 /**
@@ -465,10 +487,10 @@ jbm_polynomial_9_f32 (const float x,    ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_10_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_10 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_9_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_9 (x, p + 1);
 }
 
 /**
@@ -477,10 +499,10 @@ jbm_polynomial_10_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_11_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_11 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_10_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_10 (x, p + 1);
 }
 
 /**
@@ -489,10 +511,10 @@ jbm_polynomial_11_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_12_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_12 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_11_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_11 (x, p + 1);
 }
 
 /**
@@ -501,10 +523,10 @@ jbm_polynomial_12_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_13_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_13 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_12_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_12 (x, p + 1);
 }
 
 /**
@@ -513,10 +535,10 @@ jbm_polynomial_13_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_14_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_14 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_13_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_13 (x, p + 1);
 }
 
 /**
@@ -525,10 +547,10 @@ jbm_polynomial_14_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_15_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_15 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_14_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_14 (x, p + 1);
 }
 
 /**
@@ -537,10 +559,10 @@ jbm_polynomial_15_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_16_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_16 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_15_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_15 (x, p + 1);
 }
 
 /**
@@ -549,10 +571,10 @@ jbm_polynomial_16_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_17_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_17 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_16_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_16 (x, p + 1);
 }
 
 /**
@@ -561,10 +583,10 @@ jbm_polynomial_17_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_18_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_18 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_17_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_17 (x, p + 1);
 }
 
 /**
@@ -573,10 +595,10 @@ jbm_polynomial_18_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_19_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_19 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_18_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_18 (x, p + 1);
 }
 
 /**
@@ -585,10 +607,10 @@ jbm_polynomial_19_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_20_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_20 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_19_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_19 (x, p + 1);
 }
 
 /**
@@ -597,10 +619,10 @@ jbm_polynomial_20_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_21_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_21 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_20_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_20 (x, p + 1);
 }
 
 /**
@@ -609,10 +631,10 @@ jbm_polynomial_21_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_22_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_22 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_21_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_21 (x, p + 1);
 }
 
 /**
@@ -621,10 +643,10 @@ jbm_polynomial_22_f32 (const float x,   ///< float value.
  * \return polynomial value (float).
  */
 static inline float
-jbm_polynomial_23_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_23 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_22_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_22 (x, p + 1);
 }
 
 /**
@@ -633,10 +655,10 @@ jbm_polynomial_23_f32 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_polynomial_24_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_24 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_23_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_23 (x, p + 1);
 }
 
 /**
@@ -645,10 +667,10 @@ jbm_polynomial_24_f32 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_polynomial_25_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_25 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_24_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_24 (x, p + 1);
 }
 
 /**
@@ -657,10 +679,10 @@ jbm_polynomial_25_f32 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_polynomial_26_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_26 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_25_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_25 (x, p + 1);
 }
 
 /**
@@ -669,10 +691,10 @@ jbm_polynomial_26_f32 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_polynomial_27_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_27 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_26_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_26 (x, p + 1);
 }
 
 /**
@@ -681,10 +703,10 @@ jbm_polynomial_27_f32 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_polynomial_28_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_28 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_27_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_27 (x, p + 1);
 }
 
 /**
@@ -693,10 +715,10 @@ jbm_polynomial_28_f32 (const float x,   ///< float value.
  * \return polynomial value.
  */
 static inline float
-jbm_polynomial_29_f32 (const float x,   ///< float value.
+jbm_f32_polynomial_29 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] + x * jbm_polynomial_28_f32 (x, p + 1);
+  return p[0] + x * jbm_f32_polynomial_28 (x, p + 1);
 }
 
 /**
@@ -705,7 +727,7 @@ jbm_polynomial_29_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_1_0_f32 (const float x,    ///< float value.
+jbm_f32_rational_1_0 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return p[0] / (1.f + x * p[1]);
@@ -717,10 +739,10 @@ jbm_rational_1_0_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_2_0_f32 (const float x,    ///< float value.
+jbm_f32_rational_2_0 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_1_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_1 (x, p + 1));
 }
 
 /**
@@ -729,10 +751,10 @@ jbm_rational_2_0_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_2_1_f32 (const float x,    ///< float value.
+jbm_f32_rational_2_1 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return jbm_polynomial_1_f32 (x, p) / (1.f + x * p[2]);
+  return jbm_f32_polynomial_1 (x, p) / (1.f + x * p[2]);
 }
 
 /**
@@ -741,10 +763,10 @@ jbm_rational_2_1_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_3_0_f32 (const float x,    ///< float value.
+jbm_f32_rational_3_0 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_2_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_2 (x, p + 1));
 }
 
 /**
@@ -753,11 +775,11 @@ jbm_rational_3_0_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_3_1_f32 (const float x,    ///< float value.
+jbm_f32_rational_3_1 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 2));
 }
 
 /**
@@ -766,10 +788,10 @@ jbm_rational_3_1_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_3_2_f32 (const float x,    ///< float value.
+jbm_f32_rational_3_2 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return jbm_polynomial_2_f32 (x, p) / (1.f + x * p[3]);
+  return jbm_f32_polynomial_2 (x, p) / (1.f + x * p[3]);
 }
 
 /**
@@ -778,10 +800,10 @@ jbm_rational_3_2_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_4_0_f32 (const float x,    ///< float value.
+jbm_f32_rational_4_0 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_3_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_3 (x, p + 1));
 }
 
 /**
@@ -790,11 +812,11 @@ jbm_rational_4_0_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_4_1_f32 (const float x,    ///< float value.
+jbm_f32_rational_4_1 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 2));
 }
 
 /**
@@ -803,11 +825,11 @@ jbm_rational_4_1_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_4_2_f32 (const float x,    ///< float value.
+jbm_f32_rational_4_2 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 3));
 }
 
 /**
@@ -816,10 +838,10 @@ jbm_rational_4_2_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_4_3_f32 (const float x,    ///< float value.
+jbm_f32_rational_4_3 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return jbm_polynomial_3_f32 (x, p) / (1.f + x * p[4]);
+  return jbm_f32_polynomial_3 (x, p) / (1.f + x * p[4]);
 }
 
 /**
@@ -828,10 +850,10 @@ jbm_rational_4_3_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_5_0_f32 (const float x,    ///< float value.
+jbm_f32_rational_5_0 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_4_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_4 (x, p + 1));
 }
 
 /**
@@ -840,11 +862,11 @@ jbm_rational_5_0_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_5_1_f32 (const float x,    ///< float value.
+jbm_f32_rational_5_1 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 2));
 }
 
 /**
@@ -853,11 +875,11 @@ jbm_rational_5_1_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_5_2_f32 (const float x,    ///< float value.
+jbm_f32_rational_5_2 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 3));
 }
 
 /**
@@ -866,11 +888,11 @@ jbm_rational_5_2_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_5_3_f32 (const float x,    ///< float value.
+jbm_f32_rational_5_3 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 4));
 }
 
 /**
@@ -879,10 +901,10 @@ jbm_rational_5_3_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_5_4_f32 (const float x,    ///< float value.
+jbm_f32_rational_5_4 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return jbm_polynomial_4_f32 (x, p) / (1.f + x * p[5]);
+  return jbm_f32_polynomial_4 (x, p) / (1.f + x * p[5]);
 }
 
 /**
@@ -891,10 +913,10 @@ jbm_rational_5_4_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_6_0_f32 (const float x,    ///< float value.
+jbm_f32_rational_6_0 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_5_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_5 (x, p + 1));
 }
 
 /**
@@ -903,11 +925,11 @@ jbm_rational_6_0_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_6_1_f32 (const float x,    ///< float value.
+jbm_f32_rational_6_1 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 2));
 }
 
 /**
@@ -916,11 +938,11 @@ jbm_rational_6_1_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_6_2_f32 (const float x,    ///< float value.
+jbm_f32_rational_6_2 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 3));
 }
 
 /**
@@ -929,11 +951,11 @@ jbm_rational_6_2_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_6_3_f32 (const float x,    ///< float value.
+jbm_f32_rational_6_3 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 4));
 }
 
 /**
@@ -942,11 +964,11 @@ jbm_rational_6_3_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_6_4_f32 (const float x,    ///< float value.
+jbm_f32_rational_6_4 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 5));
 }
 
 /**
@@ -955,10 +977,10 @@ jbm_rational_6_4_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_6_5_f32 (const float x,    ///< float value.
+jbm_f32_rational_6_5 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return jbm_polynomial_5_f32 (x, p) / (1.f + x * p[6]);
+  return jbm_f32_polynomial_5 (x, p) / (1.f + x * p[6]);
 }
 
 /**
@@ -967,10 +989,10 @@ jbm_rational_6_5_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_7_0_f32 (const float x,    ///< float value.
+jbm_f32_rational_7_0 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_6_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_6 (x, p + 1));
 }
 
 /**
@@ -979,11 +1001,11 @@ jbm_rational_7_0_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_7_1_f32 (const float x,    ///< float value.
+jbm_f32_rational_7_1 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 2));
 }
 
 /**
@@ -992,11 +1014,11 @@ jbm_rational_7_1_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_7_2_f32 (const float x,    ///< float value.
+jbm_f32_rational_7_2 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 3));
 }
 
 /**
@@ -1005,11 +1027,11 @@ jbm_rational_7_2_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_7_3_f32 (const float x,    ///< float value.
+jbm_f32_rational_7_3 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 4));
 }
 
 /**
@@ -1018,11 +1040,11 @@ jbm_rational_7_3_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_7_4_f32 (const float x,    ///< float value.
+jbm_f32_rational_7_4 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 5));
 }
 
 /**
@@ -1031,11 +1053,11 @@ jbm_rational_7_4_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_7_5_f32 (const float x,    ///< float value.
+jbm_f32_rational_7_5 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 6));
 }
 
 /**
@@ -1044,10 +1066,10 @@ jbm_rational_7_5_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_7_6_f32 (const float x,    ///< float value.
+jbm_f32_rational_7_6 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return jbm_polynomial_6_f32 (x, p) / (1.f + x * p[7]);
+  return jbm_f32_polynomial_6 (x, p) / (1.f + x * p[7]);
 }
 
 /**
@@ -1056,10 +1078,10 @@ jbm_rational_7_6_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_8_0_f32 (const float x,    ///< float value.
+jbm_f32_rational_8_0 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_7_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_7 (x, p + 1));
 }
 
 /**
@@ -1068,11 +1090,11 @@ jbm_rational_8_0_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_8_1_f32 (const float x,    ///< float value.
+jbm_f32_rational_8_1 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 2));
 }
 
 /**
@@ -1081,11 +1103,11 @@ jbm_rational_8_1_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_8_2_f32 (const float x,    ///< float value.
+jbm_f32_rational_8_2 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 3));
 }
 
 /**
@@ -1094,11 +1116,11 @@ jbm_rational_8_2_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_8_3_f32 (const float x,    ///< float value.
+jbm_f32_rational_8_3 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 4));
 }
 
 /**
@@ -1107,11 +1129,11 @@ jbm_rational_8_3_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_8_4_f32 (const float x,    ///< float value.
+jbm_f32_rational_8_4 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 5));
 }
 
 /**
@@ -1120,11 +1142,11 @@ jbm_rational_8_4_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_8_5_f32 (const float x,    ///< float value.
+jbm_f32_rational_8_5 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 6));
 }
 
 /**
@@ -1133,11 +1155,11 @@ jbm_rational_8_5_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_8_6_f32 (const float x,    ///< float value.
+jbm_f32_rational_8_6 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 7));
 }
 
 /**
@@ -1146,10 +1168,10 @@ jbm_rational_8_6_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_8_7_f32 (const float x,    ///< float value.
+jbm_f32_rational_8_7 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return jbm_polynomial_7_f32 (x, p) / (1.f + x * p[8]);
+  return jbm_f32_polynomial_7 (x, p) / (1.f + x * p[8]);
 }
 
 /**
@@ -1158,10 +1180,10 @@ jbm_rational_8_7_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_9_0_f32 (const float x,    ///< float value.
+jbm_f32_rational_9_0 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_8_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_8 (x, p + 1));
 }
 
 /**
@@ -1170,11 +1192,11 @@ jbm_rational_9_0_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_9_1_f32 (const float x,    ///< float value.
+jbm_f32_rational_9_1 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 2));
 }
 
 /**
@@ -1183,11 +1205,11 @@ jbm_rational_9_1_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_9_2_f32 (const float x,    ///< float value.
+jbm_f32_rational_9_2 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 3));
 }
 
 /**
@@ -1196,11 +1218,11 @@ jbm_rational_9_2_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_9_3_f32 (const float x,    ///< float value.
+jbm_f32_rational_9_3 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 4));
 }
 
 /**
@@ -1209,11 +1231,11 @@ jbm_rational_9_3_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_9_4_f32 (const float x,    ///< float value.
+jbm_f32_rational_9_4 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 5));
 }
 
 /**
@@ -1222,11 +1244,11 @@ jbm_rational_9_4_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_9_5_f32 (const float x,    ///< float value.
+jbm_f32_rational_9_5 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 6));
 }
 
 /**
@@ -1235,11 +1257,11 @@ jbm_rational_9_5_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_9_6_f32 (const float x,    ///< float value.
+jbm_f32_rational_9_6 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 7));
 }
 
 /**
@@ -1248,11 +1270,11 @@ jbm_rational_9_6_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_9_7_f32 (const float x,    ///< float value.
+jbm_f32_rational_9_7 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 8));
 }
 
 /**
@@ -1261,10 +1283,10 @@ jbm_rational_9_7_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_9_8_f32 (const float x,    ///< float value.
+jbm_f32_rational_9_8 (const float x,    ///< float value.
                       const float *p)   ///< array of coefficients (float).
 {
-  return jbm_polynomial_8_f32 (x, p) / (1.f + x * p[9]);
+  return jbm_f32_polynomial_8 (x, p) / (1.f + x * p[9]);
 }
 
 /**
@@ -1273,10 +1295,10 @@ jbm_rational_9_8_f32 (const float x,    ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_10_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_10_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_9_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_9 (x, p + 1));
 }
 
 /**
@@ -1285,11 +1307,11 @@ jbm_rational_10_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_10_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_10_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 2));
 }
 
 /**
@@ -1298,11 +1320,11 @@ jbm_rational_10_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_10_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_10_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 3));
 }
 
 /**
@@ -1311,11 +1333,11 @@ jbm_rational_10_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_10_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_10_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 4));
 }
 
 /**
@@ -1324,11 +1346,11 @@ jbm_rational_10_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_10_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_10_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 5));
 }
 
 /**
@@ -1337,11 +1359,11 @@ jbm_rational_10_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_10_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_10_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 6));
 }
 
 /**
@@ -1350,11 +1372,11 @@ jbm_rational_10_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_10_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_10_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 7));
 }
 
 /**
@@ -1363,11 +1385,11 @@ jbm_rational_10_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_10_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_10_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 8));
 }
 
 /**
@@ -1376,11 +1398,11 @@ jbm_rational_10_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_10_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_10_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 9));
 }
 
 /**
@@ -1389,10 +1411,10 @@ jbm_rational_10_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_10_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_10_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return jbm_polynomial_9_f32 (x, p) / (1.f + x * p[10]);
+  return jbm_f32_polynomial_9 (x, p) / (1.f + x * p[10]);
 }
 
 /**
@@ -1401,10 +1423,10 @@ jbm_rational_10_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_11_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_10_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_10 (x, p + 1));
 }
 
 /**
@@ -1413,11 +1435,11 @@ jbm_rational_11_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_11_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 2));
 }
 
 /**
@@ -1426,11 +1448,11 @@ jbm_rational_11_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_11_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 3));
 }
 
 /**
@@ -1439,11 +1461,11 @@ jbm_rational_11_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_11_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 4));
 }
 
 /**
@@ -1452,11 +1474,11 @@ jbm_rational_11_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_11_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 5));
 }
 
 /**
@@ -1465,11 +1487,11 @@ jbm_rational_11_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_11_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 6));
 }
 
 /**
@@ -1478,11 +1500,11 @@ jbm_rational_11_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_11_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 7));
 }
 
 /**
@@ -1491,11 +1513,11 @@ jbm_rational_11_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_11_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 8));
 }
 
 /**
@@ -1504,11 +1526,11 @@ jbm_rational_11_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_11_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 9));
 }
 
 /**
@@ -1517,11 +1539,11 @@ jbm_rational_11_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_11_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 10));
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 10));
 }
 
 /**
@@ -1530,10 +1552,10 @@ jbm_rational_11_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_11_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_11_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_10_f32 (x, p) / (1.f + x * p[11]);
+  return jbm_f32_polynomial_10 (x, p) / (1.f + x * p[11]);
 }
 
 /**
@@ -1542,10 +1564,10 @@ jbm_rational_11_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_12_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_11_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_11 (x, p + 1));
 }
 
 /**
@@ -1554,11 +1576,11 @@ jbm_rational_12_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_12_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_10 (x, p + 2));
 }
 
 /**
@@ -1567,11 +1589,11 @@ jbm_rational_12_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_12_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 3));
 }
 
 /**
@@ -1580,11 +1602,11 @@ jbm_rational_12_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_12_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 4));
 }
 
 /**
@@ -1593,11 +1615,11 @@ jbm_rational_12_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_12_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 5));
 }
 
 /**
@@ -1606,11 +1628,11 @@ jbm_rational_12_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_12_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 6));
 }
 
 /**
@@ -1619,11 +1641,11 @@ jbm_rational_12_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_12_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 7));
 }
 
 /**
@@ -1632,11 +1654,11 @@ jbm_rational_12_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_12_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 8));
 }
 
 /**
@@ -1645,11 +1667,11 @@ jbm_rational_12_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_12_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 9));
 }
 
 /**
@@ -1658,11 +1680,11 @@ jbm_rational_12_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_12_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 10));
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 10));
 }
 
 /**
@@ -1671,11 +1693,11 @@ jbm_rational_12_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_12_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 11));
+    jbm_f32_polynomial_10 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 11));
 }
 
 /**
@@ -1684,10 +1706,10 @@ jbm_rational_12_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_12_11_f32 (const float x,  ///< float value.
+jbm_f32_rational_12_11 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_11_f32 (x, p) / (1.f + x * p[12]);
+  return jbm_f32_polynomial_11 (x, p) / (1.f + x * p[12]);
 }
 
 /**
@@ -1696,10 +1718,10 @@ jbm_rational_12_11_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_13_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_12_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_12 (x, p + 1));
 }
 
 /**
@@ -1708,11 +1730,11 @@ jbm_rational_13_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_13_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_11 (x, p + 2));
 }
 
 /**
@@ -1721,11 +1743,11 @@ jbm_rational_13_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_13_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_10 (x, p + 3));
 }
 
 /**
@@ -1734,11 +1756,11 @@ jbm_rational_13_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_13_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 4));
 }
 
 /**
@@ -1747,11 +1769,11 @@ jbm_rational_13_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_13_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 5));
 }
 
 /**
@@ -1760,11 +1782,11 @@ jbm_rational_13_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_13_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 6));
 }
 
 /**
@@ -1773,11 +1795,11 @@ jbm_rational_13_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_13_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 7));
 }
 
 /**
@@ -1786,11 +1808,11 @@ jbm_rational_13_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_13_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 8));
 }
 
 /**
@@ -1799,11 +1821,11 @@ jbm_rational_13_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_13_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 9));
 }
 
 /**
@@ -1812,11 +1834,11 @@ jbm_rational_13_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_13_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 10));
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 10));
 }
 
 /**
@@ -1825,11 +1847,11 @@ jbm_rational_13_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_13_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 11));
+    jbm_f32_polynomial_10 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 11));
 }
 
 /**
@@ -1838,11 +1860,11 @@ jbm_rational_13_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_11_f32 (const float x,  ///< float value.
+jbm_f32_rational_13_11 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 12));
+    jbm_f32_polynomial_11 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 12));
 }
 
 /**
@@ -1851,10 +1873,10 @@ jbm_rational_13_11_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_13_12_f32 (const float x,  ///< float value.
+jbm_f32_rational_13_12 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_12_f32 (x, p) / (1.f + x * p[13]);
+  return jbm_f32_polynomial_12 (x, p) / (1.f + x * p[13]);
 }
 
 /**
@@ -1863,10 +1885,10 @@ jbm_rational_13_12_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_14_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_13_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_13 (x, p + 1));
 }
 
 /**
@@ -1875,11 +1897,11 @@ jbm_rational_14_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_14_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_12 (x, p + 2));
 }
 
 /**
@@ -1888,11 +1910,11 @@ jbm_rational_14_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_14_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_11 (x, p + 3));
 }
 
 /**
@@ -1901,11 +1923,11 @@ jbm_rational_14_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_14_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_10 (x, p + 4));
 }
 
 /**
@@ -1914,11 +1936,11 @@ jbm_rational_14_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_14_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 5));
 }
 
 /**
@@ -1927,11 +1949,11 @@ jbm_rational_14_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_14_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 6));
 }
 
 /**
@@ -1940,11 +1962,11 @@ jbm_rational_14_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_14_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 7));
 }
 
 /**
@@ -1953,11 +1975,11 @@ jbm_rational_14_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_14_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 8));
 }
 
 /**
@@ -1966,11 +1988,11 @@ jbm_rational_14_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_14_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 9));
 }
 
 /**
@@ -1979,11 +2001,11 @@ jbm_rational_14_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_14_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 10));
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 10));
 }
 
 /**
@@ -1992,11 +2014,11 @@ jbm_rational_14_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_14_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 11));
+    jbm_f32_polynomial_10 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 11));
 }
 
 /**
@@ -2005,11 +2027,11 @@ jbm_rational_14_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_11_f32 (const float x,  ///< float value.
+jbm_f32_rational_14_11 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 12));
+    jbm_f32_polynomial_11 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 12));
 }
 
 /**
@@ -2018,11 +2040,11 @@ jbm_rational_14_11_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_12_f32 (const float x,  ///< float value.
+jbm_f32_rational_14_12 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 13));
+    jbm_f32_polynomial_12 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 13));
 }
 
 /**
@@ -2031,10 +2053,10 @@ jbm_rational_14_12_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_14_13_f32 (const float x,  ///< float value.
+jbm_f32_rational_14_13 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_13_f32 (x, p) / (1.f + x * p[14]);
+  return jbm_f32_polynomial_13 (x, p) / (1.f + x * p[14]);
 }
 
 /**
@@ -2043,10 +2065,10 @@ jbm_rational_14_13_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_15_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_14_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_14 (x, p + 1));
 }
 
 /**
@@ -2055,11 +2077,11 @@ jbm_rational_15_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_15_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_13 (x, p + 2));
 }
 
 /**
@@ -2068,11 +2090,11 @@ jbm_rational_15_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_15_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_12 (x, p + 3));
 }
 
 /**
@@ -2081,11 +2103,11 @@ jbm_rational_15_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_15_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_11 (x, p + 4));
 }
 
 /**
@@ -2094,11 +2116,11 @@ jbm_rational_15_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_15_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_10 (x, p + 5));
 }
 
 /**
@@ -2107,11 +2129,11 @@ jbm_rational_15_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_15_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 6));
 }
 
 /**
@@ -2120,11 +2142,11 @@ jbm_rational_15_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_15_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 7));
 }
 
 /**
@@ -2133,11 +2155,11 @@ jbm_rational_15_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_15_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 8));
 }
 
 /**
@@ -2146,11 +2168,11 @@ jbm_rational_15_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_15_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 9));
 }
 
 /**
@@ -2159,11 +2181,11 @@ jbm_rational_15_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_15_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 10));
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 10));
 }
 
 /**
@@ -2172,11 +2194,11 @@ jbm_rational_15_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_15_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 11));
+    jbm_f32_polynomial_10 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 11));
 }
 
 /**
@@ -2185,11 +2207,11 @@ jbm_rational_15_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_11_f32 (const float x,  ///< float value.
+jbm_f32_rational_15_11 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 12));
+    jbm_f32_polynomial_11 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 12));
 }
 
 /**
@@ -2198,11 +2220,11 @@ jbm_rational_15_11_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_12_f32 (const float x,  ///< float value.
+jbm_f32_rational_15_12 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 13));
+    jbm_f32_polynomial_12 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 13));
 }
 
 /**
@@ -2211,11 +2233,11 @@ jbm_rational_15_12_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_13_f32 (const float x,  ///< float value.
+jbm_f32_rational_15_13 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 14));
+    jbm_f32_polynomial_13 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 14));
 }
 
 /**
@@ -2224,10 +2246,10 @@ jbm_rational_15_13_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_15_14_f32 (const float x,  ///< float value.
+jbm_f32_rational_15_14 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_14_f32 (x, p) / (1.f + x * p[15]);
+  return jbm_f32_polynomial_14 (x, p) / (1.f + x * p[15]);
 }
 
 /**
@@ -2236,10 +2258,10 @@ jbm_rational_15_14_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_16_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_15_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_15 (x, p + 1));
 }
 
 /**
@@ -2248,11 +2270,11 @@ jbm_rational_16_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_16_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_14 (x, p + 2));
 }
 
 /**
@@ -2261,11 +2283,11 @@ jbm_rational_16_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_16_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_13 (x, p + 3));
 }
 
 /**
@@ -2274,11 +2296,11 @@ jbm_rational_16_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_16_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_12 (x, p + 4));
 }
 
 /**
@@ -2287,11 +2309,11 @@ jbm_rational_16_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_16_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_11 (x, p + 5));
 }
 
 /**
@@ -2300,11 +2322,11 @@ jbm_rational_16_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_16_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_10 (x, p + 6));
 }
 
 /**
@@ -2313,11 +2335,11 @@ jbm_rational_16_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_16_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 7));
 }
 
 /**
@@ -2326,11 +2348,11 @@ jbm_rational_16_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_16_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 8));
 }
 
 /**
@@ -2339,11 +2361,11 @@ jbm_rational_16_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_16_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 9));
 }
 
 /**
@@ -2352,11 +2374,11 @@ jbm_rational_16_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_16_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 10));
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 10));
 }
 
 /**
@@ -2365,11 +2387,11 @@ jbm_rational_16_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_16_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 11));
+    jbm_f32_polynomial_10 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 11));
 }
 
 /**
@@ -2378,11 +2400,11 @@ jbm_rational_16_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_11_f32 (const float x,  ///< float value.
+jbm_f32_rational_16_11 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 12));
+    jbm_f32_polynomial_11 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 12));
 }
 
 /**
@@ -2391,11 +2413,11 @@ jbm_rational_16_11_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_12_f32 (const float x,  ///< float value.
+jbm_f32_rational_16_12 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 13));
+    jbm_f32_polynomial_12 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 13));
 }
 
 /**
@@ -2404,11 +2426,11 @@ jbm_rational_16_12_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_13_f32 (const float x,  ///< float value.
+jbm_f32_rational_16_13 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 14));
+    jbm_f32_polynomial_13 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 14));
 }
 
 /**
@@ -2417,11 +2439,11 @@ jbm_rational_16_13_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_14_f32 (const float x,  ///< float value.
+jbm_f32_rational_16_14 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 15));
+    jbm_f32_polynomial_14 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 15));
 }
 
 /**
@@ -2430,10 +2452,10 @@ jbm_rational_16_14_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_16_15_f32 (const float x,  ///< float value.
+jbm_f32_rational_16_15 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_15_f32 (x, p) / (1.f + x * p[16]);
+  return jbm_f32_polynomial_15 (x, p) / (1.f + x * p[16]);
 }
 
 /**
@@ -2442,10 +2464,10 @@ jbm_rational_16_15_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_17_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_16_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_16 (x, p + 1));
 }
 
 /**
@@ -2454,11 +2476,11 @@ jbm_rational_17_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_17_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_15_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_15 (x, p + 2));
 }
 
 /**
@@ -2467,11 +2489,11 @@ jbm_rational_17_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_17_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_14 (x, p + 3));
 }
 
 /**
@@ -2480,11 +2502,11 @@ jbm_rational_17_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_17_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_13 (x, p + 4));
 }
 
 /**
@@ -2493,11 +2515,11 @@ jbm_rational_17_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_17_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_12 (x, p + 5));
 }
 
 /**
@@ -2506,11 +2528,11 @@ jbm_rational_17_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_17_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_11 (x, p + 6));
 }
 
 /**
@@ -2519,11 +2541,11 @@ jbm_rational_17_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_17_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_10 (x, p + 7));
 }
 
 /**
@@ -2532,11 +2554,11 @@ jbm_rational_17_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_17_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 8));
 }
 
 /**
@@ -2545,11 +2567,11 @@ jbm_rational_17_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_17_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 9));
 }
 
 /**
@@ -2558,11 +2580,11 @@ jbm_rational_17_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_17_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 10));
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 10));
 }
 
 /**
@@ -2571,11 +2593,11 @@ jbm_rational_17_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_17_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 11));
+    jbm_f32_polynomial_10 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 11));
 }
 
 /**
@@ -2584,11 +2606,11 @@ jbm_rational_17_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_11_f32 (const float x,  ///< float value.
+jbm_f32_rational_17_11 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 12));
+    jbm_f32_polynomial_11 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 12));
 }
 
 /**
@@ -2597,11 +2619,11 @@ jbm_rational_17_11_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_12_f32 (const float x,  ///< float value.
+jbm_f32_rational_17_12 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 13));
+    jbm_f32_polynomial_12 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 13));
 }
 
 /**
@@ -2610,11 +2632,11 @@ jbm_rational_17_12_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_13_f32 (const float x,  ///< float value.
+jbm_f32_rational_17_13 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 14));
+    jbm_f32_polynomial_13 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 14));
 }
 
 /**
@@ -2623,11 +2645,11 @@ jbm_rational_17_13_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_14_f32 (const float x,  ///< float value.
+jbm_f32_rational_17_14 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 15));
+    jbm_f32_polynomial_14 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 15));
 }
 
 /**
@@ -2636,11 +2658,11 @@ jbm_rational_17_14_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_15_f32 (const float x,  ///< float value.
+jbm_f32_rational_17_15 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_15_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 16));
+    jbm_f32_polynomial_15 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 16));
 }
 
 /**
@@ -2649,10 +2671,10 @@ jbm_rational_17_15_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_17_16_f32 (const float x,  ///< float value.
+jbm_f32_rational_17_16 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_16_f32 (x, p) / (1.f + x * p[17]);
+  return jbm_f32_polynomial_16 (x, p) / (1.f + x * p[17]);
 }
 
 /**
@@ -2661,10 +2683,10 @@ jbm_rational_17_16_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_18_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_17_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_17 (x, p + 1));
 }
 
 /**
@@ -2673,11 +2695,11 @@ jbm_rational_18_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_18_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_16_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_16 (x, p + 2));
 }
 
 /**
@@ -2686,11 +2708,11 @@ jbm_rational_18_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_18_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_15_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_15 (x, p + 3));
 }
 
 /**
@@ -2699,11 +2721,11 @@ jbm_rational_18_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_18_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_14 (x, p + 4));
 }
 
 /**
@@ -2712,11 +2734,11 @@ jbm_rational_18_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_18_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_13 (x, p + 5));
 }
 
 /**
@@ -2725,11 +2747,11 @@ jbm_rational_18_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_18_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_12 (x, p + 6));
 }
 
 /**
@@ -2738,11 +2760,11 @@ jbm_rational_18_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_18_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_11 (x, p + 7));
 }
 
 /**
@@ -2751,11 +2773,11 @@ jbm_rational_18_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_18_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_10 (x, p + 8));
 }
 
 /**
@@ -2764,11 +2786,11 @@ jbm_rational_18_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_18_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 9));
 }
 
 /**
@@ -2777,11 +2799,11 @@ jbm_rational_18_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_18_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 10));
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 10));
 }
 
 /**
@@ -2790,11 +2812,11 @@ jbm_rational_18_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_18_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 11));
+    jbm_f32_polynomial_10 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 11));
 }
 
 /**
@@ -2803,11 +2825,11 @@ jbm_rational_18_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_11_f32 (const float x,  ///< float value.
+jbm_f32_rational_18_11 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 12));
+    jbm_f32_polynomial_11 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 12));
 }
 
 /**
@@ -2816,11 +2838,11 @@ jbm_rational_18_11_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_12_f32 (const float x,  ///< float value.
+jbm_f32_rational_18_12 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 13));
+    jbm_f32_polynomial_12 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 13));
 }
 
 /**
@@ -2829,11 +2851,11 @@ jbm_rational_18_12_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_13_f32 (const float x,  ///< float value.
+jbm_f32_rational_18_13 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 14));
+    jbm_f32_polynomial_13 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 14));
 }
 
 /**
@@ -2842,11 +2864,11 @@ jbm_rational_18_13_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_14_f32 (const float x,  ///< float value.
+jbm_f32_rational_18_14 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 15));
+    jbm_f32_polynomial_14 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 15));
 }
 
 /**
@@ -2855,11 +2877,11 @@ jbm_rational_18_14_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_15_f32 (const float x,  ///< float value.
+jbm_f32_rational_18_15 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_15_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 16));
+    jbm_f32_polynomial_15 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 16));
 }
 
 /**
@@ -2868,11 +2890,11 @@ jbm_rational_18_15_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_16_f32 (const float x,  ///< float value.
+jbm_f32_rational_18_16 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_16_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 17));
+    jbm_f32_polynomial_16 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 17));
 }
 
 /**
@@ -2881,10 +2903,10 @@ jbm_rational_18_16_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_18_17_f32 (const float x,  ///< float value.
+jbm_f32_rational_18_17 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_17_f32 (x, p) / (1.f + x * p[18]);
+  return jbm_f32_polynomial_17 (x, p) / (1.f + x * p[18]);
 }
 
 /**
@@ -2893,10 +2915,10 @@ jbm_rational_18_17_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_19_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_18_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_18 (x, p + 1));
 }
 
 /**
@@ -2905,11 +2927,11 @@ jbm_rational_19_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_19_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_17_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_17 (x, p + 2));
 }
 
 /**
@@ -2918,11 +2940,11 @@ jbm_rational_19_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_19_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_16_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_16 (x, p + 3));
 }
 
 /**
@@ -2931,11 +2953,11 @@ jbm_rational_19_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_19_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_15_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_15 (x, p + 4));
 }
 
 /**
@@ -2944,11 +2966,11 @@ jbm_rational_19_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_19_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_14 (x, p + 5));
 }
 
 /**
@@ -2957,11 +2979,11 @@ jbm_rational_19_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_19_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_13 (x, p + 6));
 }
 
 /**
@@ -2970,11 +2992,11 @@ jbm_rational_19_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_19_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_12 (x, p + 7));
 }
 
 /**
@@ -2983,11 +3005,11 @@ jbm_rational_19_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_19_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_11 (x, p + 8));
 }
 
 /**
@@ -2996,11 +3018,11 @@ jbm_rational_19_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_19_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_10 (x, p + 9));
 }
 
 /**
@@ -3009,11 +3031,11 @@ jbm_rational_19_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_19_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 10));
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 10));
 }
 
 /**
@@ -3022,11 +3044,11 @@ jbm_rational_19_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_19_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 11));
+    jbm_f32_polynomial_10 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 11));
 }
 
 /**
@@ -3035,11 +3057,11 @@ jbm_rational_19_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_11_f32 (const float x,  ///< float value.
+jbm_f32_rational_19_11 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 12));
+    jbm_f32_polynomial_11 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 12));
 }
 
 /**
@@ -3048,11 +3070,11 @@ jbm_rational_19_11_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_12_f32 (const float x,  ///< float value.
+jbm_f32_rational_19_12 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 13));
+    jbm_f32_polynomial_12 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 13));
 }
 
 /**
@@ -3061,11 +3083,11 @@ jbm_rational_19_12_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_13_f32 (const float x,  ///< float value.
+jbm_f32_rational_19_13 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 14));
+    jbm_f32_polynomial_13 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 14));
 }
 
 /**
@@ -3074,11 +3096,11 @@ jbm_rational_19_13_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_14_f32 (const float x,  ///< float value.
+jbm_f32_rational_19_14 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 15));
+    jbm_f32_polynomial_14 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 15));
 }
 
 /**
@@ -3087,11 +3109,11 @@ jbm_rational_19_14_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_15_f32 (const float x,  ///< float value.
+jbm_f32_rational_19_15 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_15_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 16));
+    jbm_f32_polynomial_15 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 16));
 }
 
 /**
@@ -3100,11 +3122,11 @@ jbm_rational_19_15_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_16_f32 (const float x,  ///< float value.
+jbm_f32_rational_19_16 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_16_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 17));
+    jbm_f32_polynomial_16 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 17));
 }
 
 /**
@@ -3113,11 +3135,11 @@ jbm_rational_19_16_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_17_f32 (const float x,  ///< float value.
+jbm_f32_rational_19_17 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_17_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 18));
+    jbm_f32_polynomial_17 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 18));
 }
 
 /**
@@ -3126,10 +3148,10 @@ jbm_rational_19_17_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_19_18_f32 (const float x,  ///< float value.
+jbm_f32_rational_19_18 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_18_f32 (x, p) / (1.f + x * p[19]);
+  return jbm_f32_polynomial_18 (x, p) / (1.f + x * p[19]);
 }
 
 /**
@@ -3138,10 +3160,10 @@ jbm_rational_19_18_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_20_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_19_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_19 (x, p + 1));
 }
 
 /**
@@ -3150,11 +3172,11 @@ jbm_rational_20_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_1_f32 (const float x,   ///< float value.
+jbm_f32_rational_20_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_18_f32 (x, p + 2));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_18 (x, p + 2));
 }
 
 /**
@@ -3163,11 +3185,11 @@ jbm_rational_20_1_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_20_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_17_f32 (x, p + 3));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_17 (x, p + 3));
 }
 
 /**
@@ -3176,11 +3198,11 @@ jbm_rational_20_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_20_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_16_f32 (x, p + 4));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_16 (x, p + 4));
 }
 
 /**
@@ -3189,11 +3211,11 @@ jbm_rational_20_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_20_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_15_f32 (x, p + 5));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_15 (x, p + 5));
 }
 
 /**
@@ -3202,11 +3224,11 @@ jbm_rational_20_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_20_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 6));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_14 (x, p + 6));
 }
 
 /**
@@ -3215,11 +3237,11 @@ jbm_rational_20_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_20_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 7));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_13 (x, p + 7));
 }
 
 /**
@@ -3228,11 +3250,11 @@ jbm_rational_20_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_20_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 8));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_12 (x, p + 8));
 }
 
 /**
@@ -3241,11 +3263,11 @@ jbm_rational_20_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_20_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 9));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_11 (x, p + 9));
 }
 
 /**
@@ -3254,11 +3276,11 @@ jbm_rational_20_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_20_9 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 10));
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_10 (x, p + 10));
 }
 
 /**
@@ -3267,11 +3289,11 @@ jbm_rational_20_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_20_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_10_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 11));
+    jbm_f32_polynomial_10 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 11));
 }
 
 /**
@@ -3280,11 +3302,11 @@ jbm_rational_20_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_11_f32 (const float x,  ///< float value.
+jbm_f32_rational_20_11 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 12));
+    jbm_f32_polynomial_11 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 12));
 }
 
 /**
@@ -3293,11 +3315,11 @@ jbm_rational_20_11_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_12_f32 (const float x,  ///< float value.
+jbm_f32_rational_20_12 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 13));
+    jbm_f32_polynomial_12 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 13));
 }
 
 /**
@@ -3306,11 +3328,11 @@ jbm_rational_20_12_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_13_f32 (const float x,  ///< float value.
+jbm_f32_rational_20_13 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 14));
+    jbm_f32_polynomial_13 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 14));
 }
 
 /**
@@ -3319,11 +3341,11 @@ jbm_rational_20_13_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_14_f32 (const float x,  ///< float value.
+jbm_f32_rational_20_14 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 15));
+    jbm_f32_polynomial_14 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 15));
 }
 
 /**
@@ -3332,11 +3354,11 @@ jbm_rational_20_14_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_15_f32 (const float x,  ///< float value.
+jbm_f32_rational_20_15 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_15_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 16));
+    jbm_f32_polynomial_15 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 16));
 }
 
 /**
@@ -3345,11 +3367,11 @@ jbm_rational_20_15_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_16_f32 (const float x,  ///< float value.
+jbm_f32_rational_20_16 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_16_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 17));
+    jbm_f32_polynomial_16 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 17));
 }
 
 /**
@@ -3358,11 +3380,11 @@ jbm_rational_20_16_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_17_f32 (const float x,  ///< float value.
+jbm_f32_rational_20_17 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_17_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 18));
+    jbm_f32_polynomial_17 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 18));
 }
 
 /**
@@ -3371,11 +3393,11 @@ jbm_rational_20_17_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_18_f32 (const float x,  ///< float value.
+jbm_f32_rational_20_18 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_18_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 19));
+    jbm_f32_polynomial_18 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 19));
 }
 
 /**
@@ -3384,10 +3406,10 @@ jbm_rational_20_18_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_20_19_f32 (const float x,  ///< float value.
+jbm_f32_rational_20_19 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_19_f32 (x, p) / (1.f + x * p[20]);
+  return jbm_f32_polynomial_19 (x, p) / (1.f + x * p[20]);
 }
 
 /**
@@ -3396,10 +3418,10 @@ jbm_rational_20_19_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_0_f32 (const float x,   ///< float value.
+jbm_f32_rational_21_0 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
-  return p[0] / (1.f + x * jbm_polynomial_20_f32 (x, p + 1));
+  return p[0] / (1.f + x * jbm_f32_polynomial_20 (x, p + 1));
 }
 
 /**
@@ -3408,24 +3430,11 @@ jbm_rational_21_0_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_1_f32 (const float x,   ///< float value.
-                       const float *p)  ///< array of coefficients (float).
-{
-  return
-    jbm_polynomial_1_f32 (x, p) / (1.f + x * jbm_polynomial_19_f32 (x, p + 2));
-}
-
-/**
- * Function to calculate a 21th order rational (float).
- *
- * \return rational value (float).
- */
-static inline float
-jbm_rational_21_2_f32 (const float x,   ///< float value.
+jbm_f32_rational_21_1 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_2_f32 (x, p) / (1.f + x * jbm_polynomial_18_f32 (x, p + 3));
+    jbm_f32_polynomial_1 (x, p) / (1.f + x * jbm_f32_polynomial_19 (x, p + 2));
 }
 
 /**
@@ -3434,11 +3443,11 @@ jbm_rational_21_2_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_3_f32 (const float x,   ///< float value.
+jbm_f32_rational_21_2 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_3_f32 (x, p) / (1.f + x * jbm_polynomial_17_f32 (x, p + 4));
+    jbm_f32_polynomial_2 (x, p) / (1.f + x * jbm_f32_polynomial_18 (x, p + 3));
 }
 
 /**
@@ -3447,11 +3456,11 @@ jbm_rational_21_3_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_4_f32 (const float x,   ///< float value.
+jbm_f32_rational_21_3 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_4_f32 (x, p) / (1.f + x * jbm_polynomial_16_f32 (x, p + 5));
+    jbm_f32_polynomial_3 (x, p) / (1.f + x * jbm_f32_polynomial_17 (x, p + 4));
 }
 
 /**
@@ -3460,11 +3469,11 @@ jbm_rational_21_4_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_5_f32 (const float x,   ///< float value.
+jbm_f32_rational_21_4 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_5_f32 (x, p) / (1.f + x * jbm_polynomial_15_f32 (x, p + 6));
+    jbm_f32_polynomial_4 (x, p) / (1.f + x * jbm_f32_polynomial_16 (x, p + 5));
 }
 
 /**
@@ -3473,11 +3482,11 @@ jbm_rational_21_5_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_6_f32 (const float x,   ///< float value.
+jbm_f32_rational_21_5 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_6_f32 (x, p) / (1.f + x * jbm_polynomial_14_f32 (x, p + 7));
+    jbm_f32_polynomial_5 (x, p) / (1.f + x * jbm_f32_polynomial_15 (x, p + 6));
 }
 
 /**
@@ -3486,11 +3495,11 @@ jbm_rational_21_6_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_7_f32 (const float x,   ///< float value.
+jbm_f32_rational_21_6 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_7_f32 (x, p) / (1.f + x * jbm_polynomial_13_f32 (x, p + 8));
+    jbm_f32_polynomial_6 (x, p) / (1.f + x * jbm_f32_polynomial_14 (x, p + 7));
 }
 
 /**
@@ -3499,11 +3508,11 @@ jbm_rational_21_7_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_8_f32 (const float x,   ///< float value.
+jbm_f32_rational_21_7 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_8_f32 (x, p) / (1.f + x * jbm_polynomial_12_f32 (x, p + 9));
+    jbm_f32_polynomial_7 (x, p) / (1.f + x * jbm_f32_polynomial_13 (x, p + 8));
 }
 
 /**
@@ -3512,11 +3521,11 @@ jbm_rational_21_8_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_9_f32 (const float x,   ///< float value.
+jbm_f32_rational_21_8 (const float x,   ///< float value.
                        const float *p)  ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_9_f32 (x, p) / (1.f + x * jbm_polynomial_11_f32 (x, p + 10));
+    jbm_f32_polynomial_8 (x, p) / (1.f + x * jbm_f32_polynomial_12 (x, p + 9));
 }
 
 /**
@@ -3525,12 +3534,25 @@ jbm_rational_21_9_f32 (const float x,   ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_10_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_9 (const float x,   ///< float value.
+                       const float *p)  ///< array of coefficients (float).
+{
+  return
+    jbm_f32_polynomial_9 (x, p) / (1.f + x * jbm_f32_polynomial_11 (x, p + 10));
+}
+
+/**
+ * Function to calculate a 21th order rational (float).
+ *
+ * \return rational value (float).
+ */
+static inline float
+jbm_f32_rational_21_10 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_10_f32 (x,
-                           p) / (1.f + x * jbm_polynomial_10_f32 (x, p + 11));
+    jbm_f32_polynomial_10 (x,
+                           p) / (1.f + x * jbm_f32_polynomial_10 (x, p + 11));
 }
 
 /**
@@ -3539,11 +3561,11 @@ jbm_rational_21_10_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_11_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_11 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_11_f32 (x, p) / (1.f + x * jbm_polynomial_9_f32 (x, p + 12));
+    jbm_f32_polynomial_11 (x, p) / (1.f + x * jbm_f32_polynomial_9 (x, p + 12));
 }
 
 /**
@@ -3552,11 +3574,11 @@ jbm_rational_21_11_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_12_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_12 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_12_f32 (x, p) / (1.f + x * jbm_polynomial_8_f32 (x, p + 13));
+    jbm_f32_polynomial_12 (x, p) / (1.f + x * jbm_f32_polynomial_8 (x, p + 13));
 }
 
 /**
@@ -3565,11 +3587,11 @@ jbm_rational_21_12_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_13_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_13 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_13_f32 (x, p) / (1.f + x * jbm_polynomial_7_f32 (x, p + 14));
+    jbm_f32_polynomial_13 (x, p) / (1.f + x * jbm_f32_polynomial_7 (x, p + 14));
 }
 
 /**
@@ -3578,11 +3600,11 @@ jbm_rational_21_13_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_14_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_14 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_14_f32 (x, p) / (1.f + x * jbm_polynomial_6_f32 (x, p + 15));
+    jbm_f32_polynomial_14 (x, p) / (1.f + x * jbm_f32_polynomial_6 (x, p + 15));
 }
 
 /**
@@ -3591,11 +3613,11 @@ jbm_rational_21_14_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_15_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_15 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_15_f32 (x, p) / (1.f + x * jbm_polynomial_5_f32 (x, p + 16));
+    jbm_f32_polynomial_15 (x, p) / (1.f + x * jbm_f32_polynomial_5 (x, p + 16));
 }
 
 /**
@@ -3604,11 +3626,11 @@ jbm_rational_21_15_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_16_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_16 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_16_f32 (x, p) / (1.f + x * jbm_polynomial_4_f32 (x, p + 17));
+    jbm_f32_polynomial_16 (x, p) / (1.f + x * jbm_f32_polynomial_4 (x, p + 17));
 }
 
 /**
@@ -3617,11 +3639,11 @@ jbm_rational_21_16_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_17_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_17 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_17_f32 (x, p) / (1.f + x * jbm_polynomial_3_f32 (x, p + 18));
+    jbm_f32_polynomial_17 (x, p) / (1.f + x * jbm_f32_polynomial_3 (x, p + 18));
 }
 
 /**
@@ -3630,11 +3652,11 @@ jbm_rational_21_17_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_18_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_18 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_18_f32 (x, p) / (1.f + x * jbm_polynomial_2_f32 (x, p + 19));
+    jbm_f32_polynomial_18 (x, p) / (1.f + x * jbm_f32_polynomial_2 (x, p + 19));
 }
 
 /**
@@ -3643,11 +3665,11 @@ jbm_rational_21_18_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_19_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_19 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
   return
-    jbm_polynomial_19_f32 (x, p) / (1.f + x * jbm_polynomial_1_f32 (x, p + 20));
+    jbm_f32_polynomial_19 (x, p) / (1.f + x * jbm_f32_polynomial_1 (x, p + 20));
 }
 
 /**
@@ -3656,10 +3678,10 @@ jbm_rational_21_19_f32 (const float x,  ///< float value.
  * \return rational value (float).
  */
 static inline float
-jbm_rational_21_20_f32 (const float x,  ///< float value.
+jbm_f32_rational_21_20 (const float x,  ///< float value.
                         const float *p) ///< array of coefficients (float).
 {
-  return jbm_polynomial_20_f32 (x, p) / (1.f + x * p[21]);
+  return jbm_f32_polynomial_20 (x, p) / (1.f + x * p[21]);
 }
 
 /**
@@ -3669,35 +3691,35 @@ jbm_rational_21_20_f32 (const float x,  ///< float value.
  * \return function value (float).
  */
 static inline float
-jbm_cbrtwc_f32 (const float x)
+jbm_f32_cbrtwc (const float x)
                 ///< float number \f$\in\left[\frac12,\;1\right]\f$.
 {
-  return jbm_rational_5_3_f32 (x, K_CBRTWC_F32);
+  return jbm_f32_rational_5_3 (x, K_CBRTWC_F32);
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_cbrtwc_f32 and
- * jbm_ldexp_f32 functions (float).
+ * Function to calculate the function cbrt(x) using the jbm_f32_cbrtwc and
+ * jbm_f32_ldexp functions (float).
  *
  * \return function value (float).
  */
 static inline float
-jbm_cbrt_f32 (const float x)    ///< float number.
+jbm_f32_cbrt (const float x)    ///< float number.
 {
   float m;
   int e, e3, r;
-  m = jbm_frexp_f32 (jbm_abs_f32 (x), &e);
+  m = jbm_f32_frexp (jbm_f32_abs (x), &e);
   e3 = e / 3;
   r = e - 3 * e3;
   e = r >> 31;
   r += e & 3;
   e3 -= e & 1;
-  m = jbm_ldexp_f32 (jbm_cbrtwc_f32 (m), e3);
+  m = jbm_f32_ldexp (jbm_f32_cbrtwc (m), e3);
   if (r & 1)
     m *= JBM_CBRT2_F32;
   if (r & 2)
     m *= JBM_CBRT4_F32;
-  return jbm_copysign_f32 (m, x);
+  return jbm_copyf32_sign (m, x);
 }
 
 /**
@@ -3707,52 +3729,52 @@ jbm_cbrt_f32 (const float x)    ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_exp2wc_f32 (const float x)
+jbm_f32_exp2wc (const float x)
                 ///< float number \f$\in\left[\frac12,\;1\right]\f$.
 {
-  return jbm_polynomial_5_f32 (x, K_EXP2WC_F32);
+  return jbm_f32_polynomial_5 (x, K_EXP2WC_F32);
 }
 
 /**
  * Function to calculate the function exp2(x) using the jbm_expwc_f32 and
- * jbm_exp2n_f32 functions (float).
+ * jbm_f32_exp2n functions (float).
  *
  * \return function value (float).
  */
 static inline float
-jbm_exp2_f32 (const float x)    ///< float number.
+jbm_f32_exp2 (const float x)    ///< float number.
 {
   float y, f;
   if (x >= FLT_MAX_EXP)
     return INFINITY;
   y = floorf (x);
   f = x - y;
-  y = jbm_exp2n_f32 ((int) y);
-  return y * jbm_exp2wc_f32 (f);
+  y = jbm_f32_exp2n ((int) y);
+  return y * jbm_f32_exp2wc (f);
 }
 
 /**
- * Function to calculate the function exp(x) using the jbm_exp2_f32 function
+ * Function to calculate the function exp(x) using the jbm_f32_exp2 function
  * (float).
  *
  * \return function value (float).
  */
 static inline float
-jbm_exp_f32 (const float x)     ///< float number.
+jbm_f32_exp (const float x)     ///< float number.
 {
-  return jbm_exp2_f32 (x * M_LOG2Ef);
+  return jbm_f32_exp2 (x * M_LOG2Ef);
 }
 
 /**
- * Function to calculate the function exp10(x) using the jbm_exp2_f32 function
+ * Function to calculate the function exp10(x) using the jbm_f32_exp2 function
  * (float).
  *
  * \return function value (float).
  */
 static inline float
-jbm_exp10_f32 (const float x)   ///< float number.
+jbm_f32_exp10 (const float x)   ///< float number.
 {
-  return jbm_exp2_f32 (x * M_LN10f / M_LN2f);
+  return jbm_f32_exp2 (x * M_LN10f / M_LN2f);
 }
 
 /**
@@ -3762,7 +3784,7 @@ jbm_exp10_f32 (const float x)   ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_expm1wc_f32 (const float x)
+jbm_f32_expm1wc (const float x)
                  ///< float number \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
 {
   const float a1 = K_EXPM1WC_F32[0];
@@ -3773,17 +3795,17 @@ jbm_expm1wc_f32 (const float x)
 }
 
 /**
- * Function to calculate the function expm1(x) using the jbm_expm1wc_f32 and
- * jbm_exp_f32 functions.
+ * Function to calculate the function expm1(x) using the jbm_f32_expm1wc and
+ * jbm_f32_exp functions.
  *
  * \return function value (float).
  */
 static inline float
-jbm_expm1_f32 (const float x)   ///< float number.
+jbm_f32_expm1 (const float x)   ///< float number.
 {
-  if (jbm_abs_f32 (x) < M_LN2f / 2.f)
-    return jbm_expm1wc_f32 (x);
-  return jbm_exp_f32 (x) - 1.f;
+  if (jbm_f32_abs (x) < M_LN2f / 2.f)
+    return jbm_f32_expm1wc (x);
+  return jbm_f32_exp (x) - 1.f;
 }
 
 /**
@@ -3793,19 +3815,19 @@ jbm_expm1_f32 (const float x)   ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_log2wc_f32 (const float x)  ///< float number.
+jbm_f32_log2wc (const float x)  ///< float number.
 {
-  return x * jbm_rational_5_2_f32 (x, K_LOG2WC_F32);
+  return x * jbm_f32_rational_5_2 (x, K_LOG2WC_F32);
 }
 
 /**
  * Function to calculate the function log2(x) using jbm_log2wc0_f32,
- * jbm_log2wc1_f32 and jbm_frexp_f32 (float).
+ * jbm_log2wc1_f32 and jbm_f32_frexp (float).
  *
  * \return function value (float).
  */
 static inline float
-jbm_log2_f32 (const float x)    ///< float number.
+jbm_f32_log2 (const float x)    ///< float number.
 {
   float y;
   int e, m;
@@ -3815,33 +3837,33 @@ jbm_log2_f32 (const float x)    ///< float number.
     return -INFINITY;
   if (!finitef (x))
     return x;
-  y = jbm_frexp_f32 (x, &e);
+  y = jbm_f32_frexp (x, &e);
   m = y < M_SQRT1_2f;
   y += (float) m * y;
   e -= m;
-  return jbm_log2wc_f32 (y - 1.f) + (float) e;
+  return jbm_f32_log2wc (y - 1.f) + (float) e;
 }
 
 /**
- * Function to calculate the function log(x) using jbm_log2_f32 (float).
+ * Function to calculate the function log(x) using jbm_f32_log2 (float).
  *
  * \return function value (float).
  */
 static inline float
-jbm_log_f32 (const float x)     ///< float number.
+jbm_f32_log (const float x)     ///< float number.
 {
-  return jbm_log2_f32 (x) * M_LN2f;
+  return jbm_f32_log2 (x) * M_LN2f;
 }
 
 /**
- * Function to calculate the function log10(x) using jbm_log2_f32 (float).
+ * Function to calculate the function log10(x) using jbm_f32_log2 (float).
  *
  * \return function value (float).
  */
 static inline float
-jbm_log10_f32 (const float x)   ///< float number.
+jbm_f32_log10 (const float x)   ///< float number.
 {
-  return jbm_log2_f32 (x) * M_LN2f / M_LN10f;
+  return jbm_f32_log2 (x) * M_LN2f / M_LN10f;
 }
 
 /**
@@ -3850,7 +3872,7 @@ jbm_log10_f32 (const float x)   ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_pown_f32 (const float x,    ///< float number.
+jbm_f32_pown (const float x,    ///< float number.
               const int e)      ///< exponent (int).
 {
   float f, xn;
@@ -3870,16 +3892,16 @@ jbm_pown_f32 (const float x,    ///< float number.
 }
 
 /**
- * Function to calculate the function pow using the jbm_exp2_f32 and
- * jbm_log2_f32 functions.
+ * Function to calculate the function pow using the jbm_f32_exp2 and
+ * jbm_f32_log2 functions.
  *
  * \return function value (float).
  */
 static inline float
-jbm_pow_f32 (const float x,     ///< float number.
+jbm_f32_pow (const float x,     ///< float number.
              const float e)     ///< exponent (float).
 {
-  return jbm_exp2_f32 (e * jbm_log2_f32 (x));
+  return jbm_f32_exp2 (e * jbm_f32_log2 (x));
 }
 
 /**
@@ -3889,10 +3911,10 @@ jbm_pow_f32 (const float x,     ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_sinwc_f32 (const float x)
+jbm_f32_sinwc (const float x)
                ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
-  return x * jbm_polynomial_3_f32 (x * x, K_SINWC_F32);
+  return x * jbm_f32_polynomial_3 (x * x, K_SINWC_F32);
 }
 
 /**
@@ -3902,10 +3924,10 @@ jbm_sinwc_f32 (const float x)
  * \return function value (float).
  */
 static inline float
-jbm_coswc_f32 (const float x)
+jbm_f32_coswc (const float x)
                ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
-  return jbm_polynomial_3_f32 (x * x, K_COSWC_F32);
+  return jbm_f32_polynomial_3 (x * x, K_COSWC_F32);
 }
 
 /**
@@ -3915,34 +3937,34 @@ jbm_coswc_f32 (const float x)
  * \return function value (float).
  */
 static inline float
-jbm_tanwc_f32 (const float x)
+jbm_f32_tanwc (const float x)
                ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
-  return x * jbm_rational_3_1_f32 (x * x, K_TANWC_F32);
+  return x * jbm_f32_rational_3_1 (x * x, K_TANWC_F32);
 }
 
 /**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
- * x in [-pi/4,pi/4] from jbm_sinwc_f32 approximation (float).
+ * x in [-pi/4,pi/4] from jbm_f32_sinwc approximation (float).
  */
 static inline void
-jbm_sincoswc_f32 (const float x,
+jbm_sinf32_coswc (const float x,
                   ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   float *s,     ///< pointer to the sin function value (float).
                   float *c)     ///< pointer to the cos function value (float).
 {
-  *s = jbm_sinwc_f32 (x);
-  *c = jbm_coswc_f32 (x);
+  *s = jbm_f32_sinwc (x);
+  *c = jbm_f32_coswc (x);
 }
 
 /**
- * Function to calculate the function sin(x) from jbm_sinwc_f32 and
- * jbm_coswc_f32 approximations (float).
+ * Function to calculate the function sin(x) from jbm_f32_sinwc and
+ * jbm_f32_coswc approximations (float).
  *
  * \return function value (float).
  */
 static inline float
-jbm_sin_f32 (const float x)     ///< float number.
+jbm_f32_sin (const float x)     ///< float number.
 {
   float y;
   int q;
@@ -3950,18 +3972,18 @@ jbm_sin_f32 (const float x)     ///< float number.
   q = (int) nearbyintf (y);
   y = x - (float) q *M_PI_2f;
   q &= 3;
-  y = (q & 1) ? jbm_coswc_f32 (y) : jbm_sinwc_f32 (y);
+  y = (q & 1) ? jbm_f32_coswc (y) : jbm_f32_sinwc (y);
   return (q & 2) ? -y : y;
 }
 
 /**
- * Function to calculate the function cos(x) from jbm_sinwc_f32 and
- * jbm_coswc_f32 approximations (float).
+ * Function to calculate the function cos(x) from jbm_f32_sinwc and
+ * jbm_f32_coswc approximations (float).
  *
  * \return function value (float).
  */
 static inline float
-jbm_cos_f32 (const float x)     ///< float number.
+jbm_f32_cos (const float x)     ///< float number.
 {
   float y;
   int q;
@@ -3969,16 +3991,16 @@ jbm_cos_f32 (const float x)     ///< float number.
   q = (int) nearbyintf (y);
   y = x - (float) q *M_PI_2f;
   q &= 3;
-  y = (q & 1) ? jbm_sinwc_f32 (y) : jbm_coswc_f32 (y);
+  y = (q & 1) ? jbm_f32_sinwc (y) : jbm_f32_coswc (y);
   return ((q + 1) & 2) ? -y : y;
 }
 
 /**
- * Function to calculate the functions sin(x) and cos(x) from jbm_sincoswc_f32
+ * Function to calculate the functions sin(x) and cos(x) from jbm_sinf32_coswc
  * approximation (float).
  */
 static inline void
-jbm_sincos_f32 (const float x,
+jbm_sinf32_cos (const float x,
                 ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                 float *s,       ///< pointer to the sin function value (float).
                 float *c)       ///< pointer to the cos function value (float).
@@ -3986,10 +4008,10 @@ jbm_sincos_f32 (const float x,
   float y, sr, cr;
   int q;
   y = x * 1.f / M_PI_2f;
-  q = (int) (y + jbm_copysign_f32 (0.5f, x));
+  q = (int) (y + jbm_copyf32_sign (0.5f, x));
   y = x - (float) q *M_PI_2f;
   q &= 3;
-  jbm_sincoswc_f32 (y, &sr, &cr);
+  jbm_sinf32_coswc (y, &sr, &cr);
   switch (q)
     {
     case 0:
@@ -4011,19 +4033,19 @@ jbm_sincos_f32 (const float x,
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sincos_f32 function
+ * Function to calculate the function tan(x) from jbm_sinf32_cos function
  * (float).
  *
  * \return function value (float).
  */
 static inline float
-jbm_tan_f32 (const float x)     ///< float number.
+jbm_f32_tan (const float x)     ///< float number.
 {
   float y;
   int q;
   y = x * 1.f / M_PI_2f;
   q = (int) nearbyintf (y);
-  y = jbm_tanwc_f32 (x - (float) q * M_PI_2f);
+  y = jbm_f32_tanwc (x - (float) q * M_PI_2f);
   return (q & 1) ? -1.f / y : y;
 }
 
@@ -4034,70 +4056,70 @@ jbm_tan_f32 (const float x)     ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_atanwc_f32 (const float x)
+jbm_f32_atanwc (const float x)
                 ///< float number \f$\in\left[-1,1\right]\f$.
 {
-  return x * jbm_rational_5_2_f32 (x * x, K_ATANWC_F32);
+  return x * jbm_f32_rational_5_2 (x * x, K_ATANWC_F32);
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc_f32 functions
+ * Function to calculate the function atan(x) using the jbm_f32_atanwc functions
  * (float).
  *
  * \return function value (in [-pi/2,pi/2]) (float).
  */
 static inline float
-jbm_atan_f32 (const float x)    ///< float number.
+jbm_f32_atan (const float x)    ///< float number.
 {
   float f, ax;
-  ax = jbm_abs_f32 (x);
+  ax = jbm_f32_abs (x);
   if (ax > 1.f)
-    f = M_PI_2f - jbm_atanwc_f32 (1.f / ax);
+    f = M_PI_2f - jbm_f32_atanwc (1.f / ax);
   else
-    f = jbm_atanwc_f32 (ax);
-  return jbm_copysign_f32 (f, x);
+    f = jbm_f32_atanwc (ax);
+  return jbm_copyf32_sign (f, x);
 }
 
 /**
- * Function to calculate the function atan2(y,x) using the jbm_atan_f32
+ * Function to calculate the function atan2(y,x) using the jbm_f32_atan
  * function (float).
  *
  * \return function value (in [-pi,pi]) (float).
  */
 static inline float
-jbm_atan2_f32 (const float y,   ///< float y component.
+jbm_f32_atan2 (const float y,   ///< float y component.
                const float x)   ///< float x component.
 {
   float f;
-  f = jbm_atan_f32 (y / x);
+  f = jbm_f32_atan (y / x);
   if (x < 0.f)
-    f += jbm_copysign_f32 (M_PIf, y);
+    f += jbm_copyf32_sign (M_PIf, y);
   return f;
 }
 
 /**
- * Function to calculate the function asin(x) using the jbm_atan_f32 function
+ * Function to calculate the function asin(x) using the jbm_f32_atan function
  * (float).
  *
  * \return function value (in [-pi/2,pi/2]) (float).
  */
 static inline float
-jbm_asin_f32 (const float x)    ///< float number.
+jbm_f32_asin (const float x)    ///< float number.
 {
-  return jbm_atan_f32 (x / sqrtf (1.f - x * x));
+  return jbm_f32_atan (x / sqrtf (1.f - x * x));
 }
 
 /**
- * Function to calculate the function acos(x) using the jbm_atan_f32 function
+ * Function to calculate the function acos(x) using the jbm_f32_atan function
  * (float).
  *
  * \return function value (in [0,pi]) (float).
  */
 static inline float
-jbm_acos_f32 (const float x)    ///< float number.
+jbm_f32_acos (const float x)    ///< float number.
 {
   float f;
-  f = jbm_atan_f32 (sqrtf (1.f - x * x) / x);
+  f = jbm_f32_atan (sqrtf (1.f - x * x) / x);
   if (x < 0.f)
     f += M_PIf;
   return f;
@@ -4109,10 +4131,10 @@ jbm_acos_f32 (const float x)    ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_sinh_f32 (const float x)    ///< float number.
+jbm_f32_sinh (const float x)    ///< float number.
 {
   float f;
-  f = jbm_exp_f32 (x);
+  f = jbm_f32_exp (x);
   return 0.5f * (f - 1.f / f);
 }
 
@@ -4122,10 +4144,10 @@ jbm_sinh_f32 (const float x)    ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_cosh_f32 (const float x)    ///< float number.
+jbm_f32_cosh (const float x)    ///< float number.
 {
   float f;
-  f = jbm_exp_f32 (x);
+  f = jbm_f32_exp (x);
   return 0.5f * (f + 1.f / f);
 }
 
@@ -4135,14 +4157,14 @@ jbm_cosh_f32 (const float x)    ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_tanh_f32 (const float x)    ///< float number.
+jbm_f32_tanh (const float x)    ///< float number.
 {
   float f, fi;
   if (x > JBM_FLT_MAX_E_EXP)
     return 1.f;
   if (x < -JBM_FLT_MAX_E_EXP)
     return -1.f;
-  f = jbm_exp_f32 (x);
+  f = jbm_f32_exp (x);
   fi = 1.f / f;
   return (f - fi) / (f + fi);
 }
@@ -4153,9 +4175,9 @@ jbm_tanh_f32 (const float x)    ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_asinh_f32 (const float x)   ///< float number.
+jbm_f32_asinh (const float x)   ///< float number.
 {
-  return jbm_log_f32 (x + sqrtf (x * x + 1.f));
+  return jbm_f32_log (x + sqrtf (x * x + 1.f));
 }
 
 /**
@@ -4164,9 +4186,9 @@ jbm_asinh_f32 (const float x)   ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_acosh_f32 (const float x)   ///< float number.
+jbm_f32_acosh (const float x)   ///< float number.
 {
-  return jbm_log_f32 (x + sqrtf (x * x - 1.f));
+  return jbm_f32_log (x + sqrtf (x * x - 1.f));
 }
 
 /**
@@ -4175,9 +4197,9 @@ jbm_acosh_f32 (const float x)   ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_atanh_f32 (const float x)   ///< float number.
+jbm_f32_atanh (const float x)   ///< float number.
 {
-  return 0.5f * jbm_log_f32 ((1.f + x) / (1.f - x));
+  return 0.5f * jbm_f32_log ((1.f + x) / (1.f - x));
 }
 
 /**
@@ -4187,10 +4209,10 @@ jbm_atanh_f32 (const float x)   ///< float number.
  * \return function value (float).
  */
 static inline float
-jbm_erfwc_f32 (const float x)
+jbm_f32_erfwc (const float x)
                ///< float number \f$\in\left[-1,1\right]\f$.
 {
-  return x * jbm_polynomial_5_f32 (x * x, K_ERFWC_F32);
+  return x * jbm_f32_polynomial_5 (x * x, K_ERFWC_F32);
 }
 
 /**
@@ -4200,44 +4222,44 @@ jbm_erfwc_f32 (const float x)
  * \return function value (float).
  */
 static inline float
-jbm_erfcwc_f32 (const float x)
+jbm_f32_erfcwc (const float x)
                 ///< float number \f$\in\left[1,\infty\right]\f$.
 {
   if (x > K_ERFC_MAX_F32)
     return 0.f;
-  return jbm_rational_8_4_f32 (1.f / x, K_ERFCWC_F32) * x / jbm_exp_f32 (x * x);
+  return jbm_f32_rational_8_4 (1.f / x, K_ERFCWC_F32) * x / jbm_f32_exp (x * x);
 }
 
 /**
- * Function to calculate the function erf(x) using jbm_erfwc_f32 and
- * jbm_erfcwc_f32
+ * Function to calculate the function erf(x) using jbm_f32_erfwc and
+ * jbm_f32_erfcwc
  *
  * \return function value (float).
  */
 static inline float
-jbm_erf_f32 (const float x)     ///< float number.
+jbm_f32_erf (const float x)     ///< float number.
 {
   float ax;
-  ax = jbm_abs_f32 (x);
+  ax = jbm_f32_abs (x);
   if (ax > 1.f)
-    return jbm_copysign_f32 (1.f - jbm_erfcwc_f32 (ax), x);
-  return jbm_erfwc_f32 (x);
+    return jbm_copyf32_sign (1.f - jbm_f32_erfcwc (ax), x);
+  return jbm_f32_erfwc (x);
 }
 
 /**
- * Function to calculate the function erfc(x) using jbm_erfwc_f32 and
- * jbm_erfcwc_f32
+ * Function to calculate the function erfc(x) using jbm_f32_erfwc and
+ * jbm_f32_erfcwc.
  *
  * \return function value (float).
  */
 static inline float
-jbm_erfc_f32 (const float x)    ///< float number.
+jbm_f32_erfc (const float x)    ///< float number.
 {
   if (x > 1.f)
-    return jbm_erfcwc_f32 (x);
+    return jbm_f32_erfcwc (x);
   if (x < -1.f)
-    return 2.f - jbm_erfcwc_f32 (-x);
-  return 1.f - jbm_erfwc_f32 (x);
+    return 2.f - jbm_f32_erfcwc (-x);
+  return 1.f - jbm_f32_erfwc (x);
 }
 
 /**
@@ -4247,7 +4269,7 @@ jbm_erfc_f32 (const float x)    ///< float number.
  * \return integral value (float).
  */
 static inline float
-jbm_integral_f32 (float (*f) (float),
+jbm_f32_integral (float (*f) (float),
                   ///< pointer to the function to integrate.
                   const float x1,       ///< left limit of the interval.
                   const float x2)       ///< right limit of the interval.
@@ -4276,7 +4298,7 @@ jbm_integral_f32 (float (*f) (float),
  * Function to add 2 float arrays.
  */
 static inline void
-jbm_array_add_f32 (float *xr,   ///< result float array.
+jbm_array_f32_add (float *xr,   ///< result float array.
                    const float *x1,     ///< 1st addend float array.
                    const float *x2,     ///< 1st addend float array.
                    const unsigned int n)        ///< number of array elements.
@@ -4290,7 +4312,7 @@ jbm_array_add_f32 (float *xr,   ///< result float array.
  * Function to subtract 2 float arrays.
  */
 static inline void
-jbm_array_sub_f32 (float *xr,   ///< result float array.
+jbm_array_f32_sub (float *xr,   ///< result float array.
                    const float *x1,     ///< minuend float array.
                    const float *x2,     ///< subtrahend float array.
                    const unsigned int n)        ///< number of array elements.
@@ -4304,7 +4326,7 @@ jbm_array_sub_f32 (float *xr,   ///< result float array.
  * Function to multiply a float array by a float number.
  */
 static inline void
-jbm_array_mul1_f32 (float *xr,  ///< result float array.
+jbm_array_f32_mul1 (float *xr,  ///< result float array.
                     const float *x1,    ///< multiplier float array.
                     const float x2,     ///< multiplicand float number.
                     const unsigned int n)       ///< number of array elements.
@@ -4318,7 +4340,7 @@ jbm_array_mul1_f32 (float *xr,  ///< result float array.
  * Function to divide a float array by a float number.
  */
 static inline void
-jbm_array_div1_f32 (float *xr,  ///< result float array.
+jbm_array_f32_div1 (float *xr,  ///< result float array.
                     const float *x1,    ///< dividend float array.
                     const float x2,     ///< divisor float number.
                     const unsigned int n)       ///< number of array elements.
@@ -4332,7 +4354,7 @@ jbm_array_div1_f32 (float *xr,  ///< result float array.
  * Function to multiply 2 float arrays.
  */
 static inline void
-jbm_array_mul_f32 (float *xr,   ///< result float array.
+jbm_array_f32_mul (float *xr,   ///< result float array.
                    const float *x1,     ///< multiplier float array.
                    const float *x2,     ///< multiplicand float array.
                    const unsigned int n)        ///< number of array elements.
@@ -4346,7 +4368,7 @@ jbm_array_mul_f32 (float *xr,   ///< result float array.
  * Function to divide 2 float arrays.
  */
 static inline void
-jbm_array_div_f32 (float *xr,   ///< result float array.
+jbm_array_f32_div (float *xr,   ///< result float array.
                    const float *x1,     ///< dividend float array.
                    const float *x2,     ///< divisor float array.
                    const unsigned int n)        ///< number of array elements.
@@ -4360,26 +4382,26 @@ jbm_array_div_f32 (float *xr,   ///< result float array.
  * Function to calculate the float of a float array.
  */
 static inline void
-jbm_array_dbl_f32 (float *xr,   ///< result float array.
+jbm_array_f32_dbl (float *xr,   ///< result float array.
                    const float *xd,     ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
   for (i = 0; i < n; ++i)
-    xr[i] = jbm_dbl_f32 (xd[i]);
+    xr[i] = jbm_f32_dbl (xd[i]);
 }
 
 /**
  * Function to calculate the square of a float array.
  */
 static inline void
-jbm_array_sqr_f32 (float *xr,   ///< result float array.
+jbm_array_f32_sqr (float *xr,   ///< result float array.
                    const float *xd,     ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
   for (i = 0; i < n; ++i)
-    xr[i] = jbm_sqr_f32 (xd[i]);
+    xr[i] = jbm_f32_sqr (xd[i]);
 }
 
 /**
@@ -4388,7 +4410,7 @@ jbm_array_sqr_f32 (float *xr,   ///< result float array.
  * \return the highest value.
  */
 static inline float
-jbm_array_max_f32 (const float *xx,     ///< float array.
+jbm_array_f32_max (const float *xx,     ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
   float k;
@@ -4405,7 +4427,7 @@ jbm_array_max_f32 (const float *xx,     ///< float array.
  * \return the lowest value.
  */
 static inline float
-jbm_array_min_f32 (const float *xx,     ///< float array.
+jbm_array_f32_min (const float *xx,     ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
   float k;
@@ -4420,7 +4442,7 @@ jbm_array_min_f32 (const float *xx,     ///< float array.
  * Function to find the highest and the lowest elements of a float array.
  */
 static inline void
-jbm_array_maxmin_f32 (const float *xx,  ///< float array.
+jbm_array_f32_maxmin (const float *xx,  ///< float array.
                       float *max,       ///< the highest value.
                       float *min,       ///< the lowest value.
                       const unsigned int n)     ///< number of array elements.

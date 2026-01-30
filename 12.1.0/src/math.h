@@ -179,10 +179,6 @@
 #define JBM_DBL_MAX_E_EXP 7.0978271289338386e+02
 ///< maximum exponent for an exponential function on double precision.
 
-///> macro to define types for SIMD
-#define JBM_SIMD_SELECT(type, float_case, double_case) \
-  _Generic((type){0}, float: float_case, double: double_case)
-
 #if !HAVE_EXP10
 
 static inline float
@@ -597,6 +593,14 @@ exp10l (long double x)
 ///> macro calculating a linear extrapolation.
 #define JBM_EXTRAPOLATE(x, x1, x2, y1, y2) \
   ((y1) + (x - (x1)) * ((y2) - (y1)) / ((x2) - (x1)))
+///> macro to do a sum.
+#define JBM_ADD(x, y) ((x) + (y))
+///> macro to do a subtraction.
+#define JBM_SUB(x, y) ((x) - (y))
+///> macro to do a multiplication.
+#define JBM_MUL(x, y) ((x) * (y))
+///> macro to do a division.
+#define JBM_DIV(x, y) ((x) / (y))
 
 #define JBM_FACT0 1.            ///< 0!.
 #define JBM_FACT1 1.            ///< 1!.
@@ -3045,21 +3049,21 @@ jbm_farray_dbl (JBMFarray *fr,  ///< result JBMFarray struct.
 #ifdef __AVX512F__
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xr + i, jbm_dbl_8xf64 (_mm512_load_pd (xd + i)));
+    _mm512_store_pd (xr + i, jbm_8xf64_dbl (_mm512_load_pd (xd + i)));
 #endif
 #ifdef __AVX__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xr + i, jbm_dbl_4xf64 (_mm256_load_pd (xd + i)));
+    _mm256_store_pd (xr + i, jbm_4xf64_dbl (_mm256_load_pd (xd + i)));
 #endif
 #ifdef __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xr + i, jbm_dbl_2xf64 (_mm_load_pd (xd + i)));
+    _mm_store_pd (xr + i, jbm_2xf64_dbl (_mm_load_pd (xd + i)));
 #endif
 #endif
   for (; i < n; ++i)
-    xr[i] = jbm_fdbl (xd[i]);
+    xr[i] = jbm_f64_dbl (xd[i]);
 }
 
 /**
@@ -3090,17 +3094,17 @@ jbm_farray_sqr (JBMFarray *fr,  ///< result JBMFarray struct.
 #ifdef __AVX512F__
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xr + i, jbm_sqr_8xf64 (_mm512_load_pd (xd + i)));
+    _mm512_store_pd (xr + i, jbm_8xf64_sqr (_mm512_load_pd (xd + i)));
 #endif
 #ifdef __AVX__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xr + i, jbm_sqr_4xf64 (_mm256_load_pd (xd + i)));
+    _mm256_store_pd (xr + i, jbm_4xf64_sqr (_mm256_load_pd (xd + i)));
 #endif
 #ifdef __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xr + i, jbm_sqr_2xf64 (_mm_load_pd (xd + i)));
+    _mm_store_pd (xr + i, jbm_2xf64_sqr (_mm_load_pd (xd + i)));
 #endif
 #endif
   for (; i < n; ++i)

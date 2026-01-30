@@ -1201,15 +1201,15 @@ min_f32 (const float x)
 }
 
 static inline float
-mod_f32 (const float x)
+f32_mod (const float x)
 {
   return fmodf (x, M_PIf);
 }
 
 static inline float
-mod_f32_jbm (const float x)
+f32_mod_jbm (const float x)
 {
-  return jbm_mod_f32 (x, M_PIf);
+  return jbm_f32_mod (x, M_PIf);
 }
 
 static inline float
@@ -1612,15 +1612,15 @@ pol15_f32 (const float x)
 }
 
 static inline float
-pow_f32 (const float x)
+f32_pow (const float x)
 {
   return powf (x, M_PIf);
 }
 
 static inline float
-pow_f32_jbm (const float x)
+f32_pow_jbm (const float x)
 {
-  return jbm_pow_f32 (x, M_PIf);
+  return jbm_f32_pow (x, M_PIf);
 }
 
 static inline float
@@ -1653,7 +1653,7 @@ f32 (unsigned int type, float x)
     case TYPE_ABS:
       return fabsf (x);
     case TYPE_MOD:
-      return mod_f32 (x);
+      return f32_mod (x);
     case TYPE_EXP2:
       return exp2f (x);
     case TYPE_EXP:
@@ -1669,7 +1669,7 @@ f32 (unsigned int type, float x)
     case TYPE_LOG10:
       return log10f (x);
     case TYPE_POW:
-      return pow_f32 (x);
+      return f32_pow (x);
     case TYPE_CBRT:
       return cbrtf (x);
     case TYPE_SIN:
@@ -1695,49 +1695,49 @@ f32 (unsigned int type, float x)
     case TYPE_ERFC:
       return erfcf (x);
     case TYPE_JBM_ABS:
-      return jbm_abs_f32 (x);
+      return jbm_f32_abs (x);
     case TYPE_JBM_MOD:
-      return mod_f32_jbm (x);
+      return f32_mod_jbm (x);
     case TYPE_JBM_EXP2:
-      return jbm_exp2_f32 (x);
+      return jbm_f32_exp2 (x);
     case TYPE_JBM_EXP:
-      return jbm_exp_f32 (x);
+      return jbm_f32_exp (x);
     case TYPE_JBM_EXP10:
-      return jbm_exp10_f32 (x);
+      return jbm_f32_exp10 (x);
     case TYPE_JBM_EXPM1:
-      return jbm_expm1_f32 (x);
+      return jbm_f32_expm1 (x);
     case TYPE_JBM_LOG2:
-      return jbm_log2_f32 (x);
+      return jbm_f32_log2 (x);
     case TYPE_JBM_LOG:
-      return jbm_log_f32 (x);
+      return jbm_f32_log (x);
     case TYPE_JBM_LOG10:
-      return jbm_log10_f32 (x);
+      return jbm_f32_log10 (x);
     case TYPE_JBM_POW:
-      return pow_f32_jbm (x);
+      return f32_pow_jbm (x);
     case TYPE_JBM_CBRT:
-      return jbm_cbrt_f32 (x);
+      return jbm_f32_cbrt (x);
     case TYPE_JBM_SIN:
-      return jbm_sin_f32 (x);
+      return jbm_f32_sin (x);
     case TYPE_JBM_COS:
-      return jbm_cos_f32 (x);
+      return jbm_f32_cos (x);
     case TYPE_JBM_TAN:
-      return jbm_tan_f32 (x);
+      return jbm_f32_tan (x);
     case TYPE_JBM_ATAN:
-      return jbm_atan_f32 (x);
+      return jbm_f32_atan (x);
     case TYPE_JBM_ASIN:
-      return jbm_asin_f32 (x);
+      return jbm_f32_asin (x);
     case TYPE_JBM_ACOS:
-      return jbm_acos_f32 (x);
+      return jbm_f32_acos (x);
     case TYPE_JBM_SINH:
-      return jbm_sinh_f32 (x);
+      return jbm_f32_sinh (x);
     case TYPE_JBM_COSH:
-      return jbm_cosh_f32 (x);
+      return jbm_f32_cosh (x);
     case TYPE_JBM_TANH:
-      return jbm_tanh_f32 (x);
+      return jbm_f32_tanh (x);
     case TYPE_JBM_ERF:
-      return jbm_erf_f32 (x);
+      return jbm_f32_erf (x);
     case TYPE_JBM_ERFC:
-      return jbm_erfc_f32 (x);
+      return jbm_f32_erfc (x);
     case TYPE_JBM_POL1:
       return pol1_f32 (x);
     case TYPE_JBM_POL2:
@@ -1919,7 +1919,7 @@ thread_f32 (void *data, void *user_data __attribute__((unused)))
       BUCLE_FUNCTION (fabsf);
       break;
     case TYPE_MOD:
-      BUCLE_FUNCTION (mod_f32);
+      BUCLE_FUNCTION (f32_mod);
       break;
     case TYPE_EXP2:
       BUCLE_FUNCTION (exp2f);
@@ -1943,7 +1943,7 @@ thread_f32 (void *data, void *user_data __attribute__((unused)))
       BUCLE_FUNCTION (log10f);
       break;
     case TYPE_POW:
-      BUCLE_FUNCTION (pow_f32);
+      BUCLE_FUNCTION (f32_pow);
       break;
     case TYPE_CBRT:
       BUCLE_FUNCTION (cbrtf);
@@ -1982,70 +1982,70 @@ thread_f32 (void *data, void *user_data __attribute__((unused)))
       BUCLE_FUNCTION (erfcf);
       break;
     case TYPE_JBM_ABS:
-      BUCLE_FUNCTION (jbm_abs_f32);
+      BUCLE_FUNCTION (jbm_f32_abs);
       break;
     case TYPE_JBM_MOD:
-      BUCLE_FUNCTION (mod_f32_jbm);
+      BUCLE_FUNCTION (f32_mod_jbm);
       break;
     case TYPE_JBM_EXP2:
-      BUCLE_FUNCTION (jbm_exp2_f32);
+      BUCLE_FUNCTION (jbm_f32_exp2);
       break;
     case TYPE_JBM_EXP:
-      BUCLE_FUNCTION (jbm_exp_f32);
+      BUCLE_FUNCTION (jbm_f32_exp);
       break;
     case TYPE_JBM_EXP10:
-      BUCLE_FUNCTION (jbm_exp10_f32);
+      BUCLE_FUNCTION (jbm_f32_exp10);
       break;
     case TYPE_JBM_EXPM1:
-      BUCLE_FUNCTION (jbm_expm1_f32);
+      BUCLE_FUNCTION (jbm_f32_expm1);
       break;
     case TYPE_JBM_LOG2:
-      BUCLE_FUNCTION (jbm_log2_f32);
+      BUCLE_FUNCTION (jbm_f32_log2);
       break;
     case TYPE_JBM_LOG:
-      BUCLE_FUNCTION (jbm_log_f32);
+      BUCLE_FUNCTION (jbm_f32_log);
       break;
     case TYPE_JBM_LOG10:
-      BUCLE_FUNCTION (jbm_log10_f32);
+      BUCLE_FUNCTION (jbm_f32_log10);
       break;
     case TYPE_JBM_POW:
-      BUCLE_FUNCTION (pow_f32_jbm);
+      BUCLE_FUNCTION (f32_pow_jbm);
       break;
     case TYPE_JBM_CBRT:
-      BUCLE_FUNCTION (jbm_cbrt_f32);
+      BUCLE_FUNCTION (jbm_f32_cbrt);
       break;
     case TYPE_JBM_SIN:
-      BUCLE_FUNCTION (jbm_sin_f32);
+      BUCLE_FUNCTION (jbm_f32_sin);
       break;
     case TYPE_JBM_COS:
-      BUCLE_FUNCTION (jbm_cos_f32);
+      BUCLE_FUNCTION (jbm_f32_cos);
       break;
     case TYPE_JBM_TAN:
-      BUCLE_FUNCTION (jbm_tan_f32);
+      BUCLE_FUNCTION (jbm_f32_tan);
       break;
     case TYPE_JBM_ATAN:
-      BUCLE_FUNCTION (jbm_atan_f32);
+      BUCLE_FUNCTION (jbm_f32_atan);
       break;
     case TYPE_JBM_ASIN:
-      BUCLE_FUNCTION (jbm_asin_f32);
+      BUCLE_FUNCTION (jbm_f32_asin);
       break;
     case TYPE_JBM_ACOS:
-      BUCLE_FUNCTION (jbm_acos_f32);
+      BUCLE_FUNCTION (jbm_f32_acos);
       break;
     case TYPE_JBM_SINH:
-      BUCLE_FUNCTION (jbm_sinh_f32);
+      BUCLE_FUNCTION (jbm_f32_sinh);
       break;
     case TYPE_JBM_COSH:
-      BUCLE_FUNCTION (jbm_cosh_f32);
+      BUCLE_FUNCTION (jbm_f32_cosh);
       break;
     case TYPE_JBM_TANH:
-      BUCLE_FUNCTION (jbm_tanh_f32);
+      BUCLE_FUNCTION (jbm_f32_tanh);
       break;
     case TYPE_JBM_ERF:
-      BUCLE_FUNCTION (jbm_erf_f32);
+      BUCLE_FUNCTION (jbm_f32_erf);
       break;
     case TYPE_JBM_ERFC:
-      BUCLE_FUNCTION (jbm_erfc_f32);
+      BUCLE_FUNCTION (jbm_f32_erfc);
       break;
     case TYPE_JBM_POL1:
       BUCLE_FUNCTION (pol1_f32);
@@ -2134,15 +2134,15 @@ min_f64 (const double x)
 }
 
 static inline double
-mod_f64 (const double x)
+f64_mod (const double x)
 {
   return fmod (x, M_PI);
 }
 
 static inline double
-mod_f64_jbm (const double x)
+f64_mod_jbm (const double x)
 {
-  return jbm_mod_f64 (x, M_PI);
+  return jbm_f64_mod (x, M_PI);
 }
 
 static inline double
@@ -2545,15 +2545,15 @@ pol15_f64 (const double x)
 }
 
 static inline double
-pow_f64 (const double x)
+f64_pow (const double x)
 {
   return powf (x, M_PI);
 }
 
 static inline double
-pow_f64_jbm (const double x)
+f64_pow_jbm (const double x)
 {
-  return jbm_pow_f64 (x, M_PI);
+  return jbm_f64_pow (x, M_PI);
 }
 
 static inline double
@@ -2586,7 +2586,7 @@ f64 (unsigned int type, double x)
     case TYPE_ABS:
       return fabs (x);
     case TYPE_MOD:
-      return mod_f64 (x);
+      return f64_mod (x);
     case TYPE_EXP2:
       return exp2 (x);
     case TYPE_EXP:
@@ -2602,7 +2602,7 @@ f64 (unsigned int type, double x)
     case TYPE_LOG10:
       return log10 (x);
     case TYPE_POW:
-      return pow_f64 (x);
+      return f64_pow (x);
     case TYPE_CBRT:
       return cbrt (x);
     case TYPE_SIN:
@@ -2628,49 +2628,49 @@ f64 (unsigned int type, double x)
     case TYPE_ERFC:
       return erfc (x);
     case TYPE_JBM_ABS:
-      return jbm_abs_f64 (x);
+      return jbm_f64_abs (x);
     case TYPE_JBM_MOD:
-      return mod_f64_jbm (x);
+      return f64_mod_jbm (x);
     case TYPE_JBM_EXP2:
-      return jbm_exp2_f64 (x);
+      return jbm_f64_exp2 (x);
     case TYPE_JBM_EXP:
-      return jbm_exp_f64 (x);
+      return jbm_f64_exp (x);
     case TYPE_JBM_EXP10:
-      return jbm_exp10_f64 (x);
+      return jbm_f64_exp10 (x);
     case TYPE_JBM_EXPM1:
-      return jbm_expm1_f64 (x);
+      return jbm_f64_expm1 (x);
     case TYPE_JBM_LOG2:
-      return jbm_log2_f64 (x);
+      return jbm_f64_log2 (x);
     case TYPE_JBM_LOG:
-      return jbm_log_f64 (x);
+      return jbm_f64_log (x);
     case TYPE_JBM_LOG10:
-      return jbm_log10_f64 (x);
+      return jbm_f64_log10 (x);
     case TYPE_JBM_POW:
-      return pow_f64_jbm (x);
+      return f64_pow_jbm (x);
     case TYPE_JBM_CBRT:
-      return jbm_cbrt_f64 (x);
+      return jbm_f64_cbrt (x);
     case TYPE_JBM_SIN:
-      return jbm_sin_f64 (x);
+      return jbm_f64_sin (x);
     case TYPE_JBM_COS:
-      return jbm_cos_f64 (x);
+      return jbm_f64_cos (x);
     case TYPE_JBM_TAN:
-      return jbm_tan_f64 (x);
+      return jbm_f64_tan (x);
     case TYPE_JBM_ATAN:
-      return jbm_atan_f64 (x);
+      return jbm_f64_atan (x);
     case TYPE_JBM_ASIN:
-      return jbm_asin_f64 (x);
+      return jbm_f64_asin (x);
     case TYPE_JBM_ACOS:
-      return jbm_acos_f64 (x);
+      return jbm_f64_acos (x);
     case TYPE_JBM_SINH:
-      return jbm_sinh_f64 (x);
+      return jbm_f64_sinh (x);
     case TYPE_JBM_COSH:
-      return jbm_cosh_f64 (x);
+      return jbm_f64_cosh (x);
     case TYPE_JBM_TANH:
-      return jbm_tanh_f64 (x);
+      return jbm_f64_tanh (x);
     case TYPE_JBM_ERF:
-      return jbm_erf_f64 (x);
+      return jbm_f64_erf (x);
     case TYPE_JBM_ERFC:
-      return jbm_erfc_f64 (x);
+      return jbm_f64_erfc (x);
     case TYPE_JBM_POL1:
       return pol1_f64 (x);
     case TYPE_JBM_POL2:
@@ -2852,7 +2852,7 @@ thread_f64 (void *data, void *user_data __attribute__((unused)))
       BUCLE_FUNCTION (fabs);
       break;
     case TYPE_MOD:
-      BUCLE_FUNCTION (mod_f64);
+      BUCLE_FUNCTION (f64_mod);
       break;
     case TYPE_EXP2:
       BUCLE_FUNCTION (exp2);
@@ -2876,7 +2876,7 @@ thread_f64 (void *data, void *user_data __attribute__((unused)))
       BUCLE_FUNCTION (log10);
       break;
     case TYPE_POW:
-      BUCLE_FUNCTION (pow_f64);
+      BUCLE_FUNCTION (f64_pow);
       break;
     case TYPE_CBRT:
       BUCLE_FUNCTION (cbrt);
@@ -2915,70 +2915,70 @@ thread_f64 (void *data, void *user_data __attribute__((unused)))
       BUCLE_FUNCTION (erfc);
       break;
     case TYPE_JBM_ABS:
-      BUCLE_FUNCTION (jbm_abs_f64);
+      BUCLE_FUNCTION (jbm_f64_abs);
       break;
     case TYPE_JBM_MOD:
-      BUCLE_FUNCTION (mod_f64_jbm);
+      BUCLE_FUNCTION (f64_mod_jbm);
       break;
     case TYPE_JBM_EXP2:
-      BUCLE_FUNCTION (jbm_exp2_f64);
+      BUCLE_FUNCTION (jbm_f64_exp2);
       break;
     case TYPE_JBM_EXP:
-      BUCLE_FUNCTION (jbm_exp_f64);
+      BUCLE_FUNCTION (jbm_f64_exp);
       break;
     case TYPE_JBM_EXP10:
-      BUCLE_FUNCTION (jbm_exp10_f64);
+      BUCLE_FUNCTION (jbm_f64_exp10);
       break;
     case TYPE_JBM_EXPM1:
-      BUCLE_FUNCTION (jbm_expm1_f64);
+      BUCLE_FUNCTION (jbm_f64_expm1);
       break;
     case TYPE_JBM_LOG2:
-      BUCLE_FUNCTION (jbm_log2_f64);
+      BUCLE_FUNCTION (jbm_f64_log2);
       break;
     case TYPE_JBM_LOG:
-      BUCLE_FUNCTION (jbm_log_f64);
+      BUCLE_FUNCTION (jbm_f64_log);
       break;
     case TYPE_JBM_LOG10:
-      BUCLE_FUNCTION (jbm_log10_f64);
+      BUCLE_FUNCTION (jbm_f64_log10);
       break;
     case TYPE_JBM_POW:
-      BUCLE_FUNCTION (pow_f64_jbm);
+      BUCLE_FUNCTION (f64_pow_jbm);
       break;
     case TYPE_JBM_CBRT:
-      BUCLE_FUNCTION (jbm_cbrt_f64);
+      BUCLE_FUNCTION (jbm_f64_cbrt);
       break;
     case TYPE_JBM_SIN:
-      BUCLE_FUNCTION (jbm_sin_f64);
+      BUCLE_FUNCTION (jbm_f64_sin);
       break;
     case TYPE_JBM_COS:
-      BUCLE_FUNCTION (jbm_cos_f64);
+      BUCLE_FUNCTION (jbm_f64_cos);
       break;
     case TYPE_JBM_TAN:
-      BUCLE_FUNCTION (jbm_tan_f64);
+      BUCLE_FUNCTION (jbm_f64_tan);
       break;
     case TYPE_JBM_ATAN:
-      BUCLE_FUNCTION (jbm_atan_f64);
+      BUCLE_FUNCTION (jbm_f64_atan);
       break;
     case TYPE_JBM_ASIN:
-      BUCLE_FUNCTION (jbm_asin_f64);
+      BUCLE_FUNCTION (jbm_f64_asin);
       break;
     case TYPE_JBM_ACOS:
-      BUCLE_FUNCTION (jbm_acos_f64);
+      BUCLE_FUNCTION (jbm_f64_acos);
       break;
     case TYPE_JBM_SINH:
-      BUCLE_FUNCTION (jbm_sinh_f64);
+      BUCLE_FUNCTION (jbm_f64_sinh);
       break;
     case TYPE_JBM_COSH:
-      BUCLE_FUNCTION (jbm_cosh_f64);
+      BUCLE_FUNCTION (jbm_f64_cosh);
       break;
     case TYPE_JBM_TANH:
-      BUCLE_FUNCTION (jbm_tanh_f64);
+      BUCLE_FUNCTION (jbm_f64_tanh);
       break;
     case TYPE_JBM_ERF:
-      BUCLE_FUNCTION (jbm_erf_f64);
+      BUCLE_FUNCTION (jbm_f64_erf);
       break;
     case TYPE_JBM_ERFC:
-      BUCLE_FUNCTION (jbm_erfc_f64);
+      BUCLE_FUNCTION (jbm_f64_erfc);
       break;
     case TYPE_JBM_POL1:
       BUCLE_FUNCTION (pol1_f64);
@@ -3083,13 +3083,13 @@ min_4xf32 (__m128 x)
 static inline __m128
 mod_4xf32 (__m128 x)
 {
-  return jbm_mod_4xf32 (x, _mm_set1_ps (M_PIf));
+  return jbm_4xf32_mod (x, _mm_set1_ps (M_PIf));
 }
 
 static inline __m128
 pow_4xf32 (__m128 x)
 {
-  return jbm_pow_4xf32 (x, M_PIf);
+  return jbm_4xf32_pow (x, M_PIf);
 }
 
 static inline void
@@ -3128,70 +3128,70 @@ thread_4xf32 (void *data, void *user_data __attribute__((unused)))
       BUCLE_4XF32 (min_4xf32);
       break;
     case TYPE_JBM_ABS:
-      BUCLE_4XF32 (jbm_abs_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_abs);
       break;
     case TYPE_JBM_MOD:
       BUCLE_4XF32 (mod_4xf32);
       break;
     case TYPE_JBM_EXP2:
-      BUCLE_4XF32 (jbm_exp2_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_exp2);
       break;
     case TYPE_JBM_EXP:
-      BUCLE_4XF32 (jbm_exp_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_exp);
       break;
     case TYPE_JBM_EXP10:
-      BUCLE_4XF32 (jbm_exp10_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_exp10);
       break;
     case TYPE_JBM_EXPM1:
-      BUCLE_4XF32 (jbm_expm1_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_expm1);
       break;
     case TYPE_JBM_LOG2:
-      BUCLE_4XF32 (jbm_log2_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_log2);
       break;
     case TYPE_JBM_LOG:
-      BUCLE_4XF32 (jbm_log_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_log);
       break;
     case TYPE_JBM_LOG10:
-      BUCLE_4XF32 (jbm_log10_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_log10);
       break;
     case TYPE_JBM_POW:
       BUCLE_4XF32 (pow_4xf32);
       break;
     case TYPE_JBM_CBRT:
-      BUCLE_4XF32 (jbm_cbrt_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_cbrt);
       break;
     case TYPE_JBM_SIN:
-      BUCLE_4XF32 (jbm_sin_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_sin);
       break;
     case TYPE_JBM_COS:
-      BUCLE_4XF32 (jbm_cos_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_cos);
       break;
     case TYPE_JBM_TAN:
-      BUCLE_4XF32 (jbm_tan_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_tan);
       break;
     case TYPE_JBM_ATAN:
-      BUCLE_4XF32 (jbm_atan_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_atan);
       break;
     case TYPE_JBM_ASIN:
-      BUCLE_4XF32 (jbm_asin_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_asin);
       break;
     case TYPE_JBM_ACOS:
-      BUCLE_4XF32 (jbm_acos_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_acos);
       break;
     case TYPE_JBM_SINH:
-      BUCLE_4XF32 (jbm_sinh_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_sinh);
       break;
     case TYPE_JBM_COSH:
-      BUCLE_4XF32 (jbm_cosh_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_cosh);
       break;
     case TYPE_JBM_TANH:
-      BUCLE_4XF32 (jbm_tanh_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_tanh);
       break;
     case TYPE_JBM_ERF:
-      BUCLE_4XF32 (jbm_erf_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_erf);
       break;
     case TYPE_JBM_ERFC:
-      BUCLE_4XF32 (jbm_erfc_4xf32);
+      BUCLE_4XF32 (jbm_4xf32_erfc);
       break;
     }
 }
@@ -3249,13 +3249,13 @@ min_2xf64 (__m128d x)
 static inline __m128d
 mod_2xf64 (__m128d x)
 {
-  return jbm_mod_2xf64 (x, _mm_set1_pd (M_PI));
+  return jbm_2xf64_mod (x, _mm_set1_pd (M_PI));
 }
 
 static inline __m128d
 pow_2xf64 (__m128d x)
 {
-  return jbm_pow_2xf64 (x, M_PI);
+  return jbm_2xf64_pow (x, M_PI);
 }
 
 static inline void
@@ -3294,70 +3294,70 @@ thread_2xf64 (void *data, void *user_data __attribute__((unused)))
       BUCLE_2XF64 (min_2xf64);
       break;
     case TYPE_JBM_ABS:
-      BUCLE_2XF64 (jbm_abs_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_abs);
       break;
     case TYPE_JBM_MOD:
       BUCLE_2XF64 (mod_2xf64);
       break;
     case TYPE_JBM_EXP2:
-      BUCLE_2XF64 (jbm_exp2_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_exp2);
       break;
     case TYPE_JBM_EXP:
-      BUCLE_2XF64 (jbm_exp_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_exp);
       break;
     case TYPE_JBM_EXP10:
-      BUCLE_2XF64 (jbm_exp10_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_exp10);
       break;
     case TYPE_JBM_EXPM1:
-      BUCLE_2XF64 (jbm_expm1_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_expm1);
       break;
     case TYPE_JBM_LOG2:
-      BUCLE_2XF64 (jbm_log2_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_log2);
       break;
     case TYPE_JBM_LOG:
-      BUCLE_2XF64 (jbm_log_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_log);
       break;
     case TYPE_JBM_LOG10:
-      BUCLE_2XF64 (jbm_log10_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_log10);
       break;
     case TYPE_JBM_POW:
       BUCLE_2XF64 (pow_2xf64);
       break;
     case TYPE_JBM_CBRT:
-      BUCLE_2XF64 (jbm_cbrt_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_cbrt);
       break;
     case TYPE_JBM_SIN:
-      BUCLE_2XF64 (jbm_sin_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_sin);
       break;
     case TYPE_JBM_COS:
-      BUCLE_2XF64 (jbm_cos_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_cos);
       break;
     case TYPE_JBM_TAN:
-      BUCLE_2XF64 (jbm_tan_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_tan);
       break;
     case TYPE_JBM_ATAN:
-      BUCLE_2XF64 (jbm_atan_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_atan);
       break;
     case TYPE_JBM_ASIN:
-      BUCLE_2XF64 (jbm_asin_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_asin);
       break;
     case TYPE_JBM_ACOS:
-      BUCLE_2XF64 (jbm_acos_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_acos);
       break;
     case TYPE_JBM_SINH:
-      BUCLE_2XF64 (jbm_sinh_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_sinh);
       break;
     case TYPE_JBM_COSH:
-      BUCLE_2XF64 (jbm_cosh_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_cosh);
       break;
     case TYPE_JBM_TANH:
-      BUCLE_2XF64 (jbm_tanh_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_tanh);
       break;
     case TYPE_JBM_ERF:
-      BUCLE_2XF64 (jbm_erf_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_erf);
       break;
     case TYPE_JBM_ERFC:
-      BUCLE_2XF64 (jbm_erfc_2xf64);
+      BUCLE_2XF64 (jbm_2xf64_erfc);
       break;
     }
 }
@@ -3419,13 +3419,13 @@ min_8xf32 (__m256 x)
 static inline __m256
 mod_8xf32 (__m256 x)
 {
-  return jbm_mod_8xf32 (x, _mm256_set1_ps (M_PIf));
+  return jbm_8xf32_mod (x, _mm256_set1_ps (M_PIf));
 }
 
 static inline __m256
 pow_8xf32 (__m256 x)
 {
-  return jbm_pow_8xf32 (x, M_PIf);
+  return jbm_8xf32_pow (x, M_PIf);
 }
 
 static inline void
@@ -3464,70 +3464,70 @@ thread_8xf32 (void *data, void *user_data __attribute__((unused)))
       BUCLE_8XF32 (min_8xf32);
       break;
     case TYPE_JBM_ABS:
-      BUCLE_8XF32 (jbm_abs_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_abs);
       break;
     case TYPE_JBM_MOD:
       BUCLE_8XF32 (mod_8xf32);
       break;
     case TYPE_JBM_EXP2:
-      BUCLE_8XF32 (jbm_exp2_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_exp2);
       break;
     case TYPE_JBM_EXP:
-      BUCLE_8XF32 (jbm_exp_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_exp);
       break;
     case TYPE_JBM_EXP10:
-      BUCLE_8XF32 (jbm_exp10_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_exp10);
       break;
     case TYPE_JBM_EXPM1:
-      BUCLE_8XF32 (jbm_expm1_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_expm1);
       break;
     case TYPE_JBM_LOG2:
-      BUCLE_8XF32 (jbm_log2_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_log2);
       break;
     case TYPE_JBM_LOG:
-      BUCLE_8XF32 (jbm_log_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_log);
       break;
     case TYPE_JBM_LOG10:
-      BUCLE_8XF32 (jbm_log10_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_log10);
       break;
     case TYPE_JBM_POW:
       BUCLE_8XF32 (pow_8xf32);
       break;
     case TYPE_JBM_CBRT:
-      BUCLE_8XF32 (jbm_cbrt_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_cbrt);
       break;
     case TYPE_JBM_SIN:
-      BUCLE_8XF32 (jbm_sin_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_sin);
       break;
     case TYPE_JBM_COS:
-      BUCLE_8XF32 (jbm_cos_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_cos);
       break;
     case TYPE_JBM_TAN:
-      BUCLE_8XF32 (jbm_tan_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_tan);
       break;
     case TYPE_JBM_ATAN:
-      BUCLE_8XF32 (jbm_atan_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_atan);
       break;
     case TYPE_JBM_ASIN:
-      BUCLE_8XF32 (jbm_asin_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_asin);
       break;
     case TYPE_JBM_ACOS:
-      BUCLE_8XF32 (jbm_acos_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_acos);
       break;
     case TYPE_JBM_SINH:
-      BUCLE_8XF32 (jbm_sinh_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_sinh);
       break;
     case TYPE_JBM_COSH:
-      BUCLE_8XF32 (jbm_cosh_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_cosh);
       break;
     case TYPE_JBM_TANH:
-      BUCLE_8XF32 (jbm_tanh_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_tanh);
       break;
     case TYPE_JBM_ERF:
-      BUCLE_8XF32 (jbm_erf_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_erf);
       break;
     case TYPE_JBM_ERFC:
-      BUCLE_8XF32 (jbm_erfc_8xf32);
+      BUCLE_8XF32 (jbm_8xf32_erfc);
       break;
     }
 }
@@ -3585,13 +3585,13 @@ min_4xf64 (__m256d x)
 static inline __m256d
 mod_4xf64 (__m256d x)
 {
-  return jbm_mod_4xf64 (x, _mm256_set1_pd (M_PI));
+  return jbm_4xf64_mod (x, _mm256_set1_pd (M_PI));
 }
 
 static inline __m256d
 pow_4xf64 (__m256d x)
 {
-  return jbm_pow_4xf64 (x, M_PI);
+  return jbm_4xf64_pow (x, M_PI);
 }
 
 static inline void
@@ -3630,70 +3630,70 @@ thread_4xf64 (void *data, void *user_data __attribute__((unused)))
       BUCLE_4XF64 (min_4xf64);
       break;
     case TYPE_JBM_ABS:
-      BUCLE_4XF64 (jbm_abs_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_abs);
       break;
     case TYPE_JBM_MOD:
       BUCLE_4XF64 (mod_4xf64);
       break;
     case TYPE_JBM_EXP2:
-      BUCLE_4XF64 (jbm_exp2_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_exp2);
       break;
     case TYPE_JBM_EXP:
-      BUCLE_4XF64 (jbm_exp_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_exp);
       break;
     case TYPE_JBM_EXP10:
-      BUCLE_4XF64 (jbm_exp10_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_exp10);
       break;
     case TYPE_JBM_EXPM1:
-      BUCLE_4XF64 (jbm_expm1_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_expm1);
       break;
     case TYPE_JBM_LOG2:
-      BUCLE_4XF64 (jbm_log2_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_log2);
       break;
     case TYPE_JBM_LOG:
-      BUCLE_4XF64 (jbm_log_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_log);
       break;
     case TYPE_JBM_LOG10:
-      BUCLE_4XF64 (jbm_log10_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_log10);
       break;
     case TYPE_JBM_POW:
       BUCLE_4XF64 (pow_4xf64);
       break;
     case TYPE_JBM_CBRT:
-      BUCLE_4XF64 (jbm_cbrt_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_cbrt);
       break;
     case TYPE_JBM_SIN:
-      BUCLE_4XF64 (jbm_sin_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_sin);
       break;
     case TYPE_JBM_COS:
-      BUCLE_4XF64 (jbm_cos_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_cos);
       break;
     case TYPE_JBM_TAN:
-      BUCLE_4XF64 (jbm_tan_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_tan);
       break;
     case TYPE_JBM_ATAN:
-      BUCLE_4XF64 (jbm_atan_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_atan);
       break;
     case TYPE_JBM_ASIN:
-      BUCLE_4XF64 (jbm_asin_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_asin);
       break;
     case TYPE_JBM_ACOS:
-      BUCLE_4XF64 (jbm_acos_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_acos);
       break;
     case TYPE_JBM_SINH:
-      BUCLE_4XF64 (jbm_sinh_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_sinh);
       break;
     case TYPE_JBM_COSH:
-      BUCLE_4XF64 (jbm_cosh_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_cosh);
       break;
     case TYPE_JBM_TANH:
-      BUCLE_4XF64 (jbm_tanh_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_tanh);
       break;
     case TYPE_JBM_ERF:
-      BUCLE_4XF64 (jbm_erf_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_erf);
       break;
     case TYPE_JBM_ERFC:
-      BUCLE_4XF64 (jbm_erfc_4xf64);
+      BUCLE_4XF64 (jbm_4xf64_erfc);
       break;
     }
 }
@@ -3755,13 +3755,13 @@ min_16xf32 (__m512 x)
 static inline __m512
 mod_16xf32 (__m512 x)
 {
-  return jbm_mod_16xf32 (x, _mm512_set1_ps (M_PIf));
+  return jbm_16xf32_mod (x, _mm512_set1_ps (M_PIf));
 }
 
 static inline __m512
 pow_16xf32 (__m512 x)
 {
-  return jbm_pow_16xf32 (x, M_PIf);
+  return jbm_16xf32_pow (x, M_PIf);
 }
 
 static inline void
@@ -3800,70 +3800,70 @@ thread_16xf32 (void *data, void *user_data __attribute__((unused)))
       BUCLE_16XF32 (min_16xf32);
       break;
     case TYPE_JBM_ABS:
-      BUCLE_16XF32 (jbm_abs_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_abs);
       break;
     case TYPE_JBM_MOD:
       BUCLE_16XF32 (mod_16xf32);
       break;
     case TYPE_JBM_EXP2:
-      BUCLE_16XF32 (jbm_exp2_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_exp2);
       break;
     case TYPE_JBM_EXP:
-      BUCLE_16XF32 (jbm_exp_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_exp);
       break;
     case TYPE_JBM_EXP10:
-      BUCLE_16XF32 (jbm_exp10_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_exp10);
       break;
     case TYPE_JBM_EXPM1:
-      BUCLE_16XF32 (jbm_expm1_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_expm1);
       break;
     case TYPE_JBM_LOG2:
-      BUCLE_16XF32 (jbm_log2_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_log2);
       break;
     case TYPE_JBM_LOG:
-      BUCLE_16XF32 (jbm_log_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_log);
       break;
     case TYPE_JBM_LOG10:
-      BUCLE_16XF32 (jbm_log10_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_log10);
       break;
     case TYPE_JBM_POW:
       BUCLE_16XF32 (pow_16xf32);
       break;
     case TYPE_JBM_CBRT:
-      BUCLE_16XF32 (jbm_cbrt_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_cbrt);
       break;
     case TYPE_JBM_SIN:
-      BUCLE_16XF32 (jbm_sin_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_sin);
       break;
     case TYPE_JBM_COS:
-      BUCLE_16XF32 (jbm_cos_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_cos);
       break;
     case TYPE_JBM_TAN:
-      BUCLE_16XF32 (jbm_tan_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_tan);
       break;
     case TYPE_JBM_ATAN:
-      BUCLE_16XF32 (jbm_atan_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_atan);
       break;
     case TYPE_JBM_ASIN:
-      BUCLE_16XF32 (jbm_asin_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_asin);
       break;
     case TYPE_JBM_ACOS:
-      BUCLE_16XF32 (jbm_acos_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_acos);
       break;
     case TYPE_JBM_SINH:
-      BUCLE_16XF32 (jbm_sinh_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_sinh);
       break;
     case TYPE_JBM_COSH:
-      BUCLE_16XF32 (jbm_cosh_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_cosh);
       break;
     case TYPE_JBM_TANH:
-      BUCLE_16XF32 (jbm_tanh_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_tanh);
       break;
     case TYPE_JBM_ERF:
-      BUCLE_16XF32 (jbm_erf_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_erf);
       break;
     case TYPE_JBM_ERFC:
-      BUCLE_16XF32 (jbm_erfc_16xf32);
+      BUCLE_16XF32 (jbm_16xf32_erfc);
       break;
     }
 }
@@ -3921,13 +3921,13 @@ min_8xf64 (__m512d x)
 static inline __m512d
 mod_8xf64 (__m512d x)
 {
-  return jbm_mod_8xf64 (x, _mm512_set1_pd (M_PI));
+  return jbm_8xf64_mod (x, _mm512_set1_pd (M_PI));
 }
 
 static inline __m512d
 pow_8xf64 (__m512d x)
 {
-  return jbm_pow_8xf64 (x, M_PI);
+  return jbm_8xf64_pow (x, M_PI);
 }
 
 static inline void
@@ -3966,75 +3966,155 @@ thread_8xf64 (void *data, void *user_data __attribute__((unused)))
       BUCLE_8XF64 (min_8xf64);
       break;
     case TYPE_JBM_ABS:
-      BUCLE_8XF64 (jbm_abs_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_abs);
       break;
     case TYPE_JBM_MOD:
       BUCLE_8XF64 (mod_8xf64);
       break;
     case TYPE_JBM_EXP2:
-      BUCLE_8XF64 (jbm_exp2_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_exp2);
       break;
     case TYPE_JBM_EXP:
-      BUCLE_8XF64 (jbm_exp_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_exp);
       break;
     case TYPE_JBM_EXP10:
-      BUCLE_8XF64 (jbm_exp10_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_exp10);
       break;
     case TYPE_JBM_EXPM1:
-      BUCLE_8XF64 (jbm_expm1_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_expm1);
       break;
     case TYPE_JBM_LOG2:
-      BUCLE_8XF64 (jbm_log2_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_log2);
       break;
     case TYPE_JBM_LOG:
-      BUCLE_8XF64 (jbm_log_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_log);
       break;
     case TYPE_JBM_LOG10:
-      BUCLE_8XF64 (jbm_log10_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_log10);
       break;
     case TYPE_JBM_POW:
       BUCLE_8XF64 (pow_8xf64);
       break;
     case TYPE_JBM_CBRT:
-      BUCLE_8XF64 (jbm_cbrt_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_cbrt);
       break;
     case TYPE_JBM_SIN:
-      BUCLE_8XF64 (jbm_sin_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_sin);
       break;
     case TYPE_JBM_COS:
-      BUCLE_8XF64 (jbm_cos_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_cos);
       break;
     case TYPE_JBM_TAN:
-      BUCLE_8XF64 (jbm_tan_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_tan);
       break;
     case TYPE_JBM_ATAN:
-      BUCLE_8XF64 (jbm_atan_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_atan);
       break;
     case TYPE_JBM_ASIN:
-      BUCLE_8XF64 (jbm_asin_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_asin);
       break;
     case TYPE_JBM_ACOS:
-      BUCLE_8XF64 (jbm_acos_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_acos);
       break;
     case TYPE_JBM_SINH:
-      BUCLE_8XF64 (jbm_sinh_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_sinh);
       break;
     case TYPE_JBM_COSH:
-      BUCLE_8XF64 (jbm_cosh_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_cosh);
       break;
     case TYPE_JBM_TANH:
-      BUCLE_8XF64 (jbm_tanh_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_tanh);
       break;
     case TYPE_JBM_ERF:
-      BUCLE_8XF64 (jbm_erf_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_erf);
       break;
     case TYPE_JBM_ERFC:
-      BUCLE_8XF64 (jbm_erfc_8xf64);
+      BUCLE_8XF64 (jbm_8xf64_erfc);
       break;
     }
 }
 
 #endif
+
+static inline void
+thread_array_f64 (void *data, void *user_data __attribute__((unused)))
+{
+  Parallel_f64 *p;
+  double *x, *y;
+  unsigned long int imin, imax, n;
+  p = (Parallel_f64 *) data;
+  imin = p->imin;
+  imax = p->imax;
+  x = p->x + imin;
+  y = p->y + imin;
+  n = imax - imin;
+  switch (p->type)
+    {
+    case TYPE_ADD:
+      jbm_array_f64_add1 (y, x, M_PI, n);
+      break;
+    case TYPE_SUB:
+      jbm_array_f64_sub1 (y, x, M_PI, n);
+      break;
+    case TYPE_MUL:
+      jbm_array_f64_mul1 (y, x, M_PI, n);
+      break;
+    case TYPE_DIV:
+      jbm_array_f64_div1 (y, x, M_PI, n);
+      break;
+    case TYPE_SQRT:
+      jbm_array_f64_sqrt (y, x, n);
+      break;
+    case TYPE_MAX:
+      break;
+    case TYPE_MIN:
+      break;
+    case TYPE_JBM_ABS:
+      break;
+    case TYPE_JBM_MOD:
+      break;
+    case TYPE_JBM_EXP2:
+      break;
+    case TYPE_JBM_EXP:
+      break;
+    case TYPE_JBM_EXP10:
+      break;
+    case TYPE_JBM_EXPM1:
+      break;
+    case TYPE_JBM_LOG2:
+      break;
+    case TYPE_JBM_LOG:
+      break;
+    case TYPE_JBM_LOG10:
+      break;
+    case TYPE_JBM_POW:
+      break;
+    case TYPE_JBM_CBRT:
+      break;
+    case TYPE_JBM_SIN:
+      break;
+    case TYPE_JBM_COS:
+      break;
+    case TYPE_JBM_TAN:
+      break;
+    case TYPE_JBM_ATAN:
+      break;
+    case TYPE_JBM_ASIN:
+      break;
+    case TYPE_JBM_ACOS:
+      break;
+    case TYPE_JBM_SINH:
+      break;
+    case TYPE_JBM_COSH:
+      break;
+    case TYPE_JBM_TANH:
+      break;
+    case TYPE_JBM_ERF:
+      break;
+    case TYPE_JBM_ERFC:
+      break;
+    }
+}
 
 static inline void
 efficiency_f32 (const unsigned int type, void (*thread) (void *, void *),
@@ -4127,7 +4207,7 @@ efficiency_f64 (const unsigned int type, void (*thread) (void *, void *),
     }
   else
     {
-      pool = g_thread_pool_new (init_f32, NULL, nthreads, FALSE, NULL);
+      pool = g_thread_pool_new (init_f64, NULL, nthreads, FALSE, NULL);
       for (i = 0; i < (unsigned long int) nthreads; ++i)
         {
           p[i].type = type;
@@ -4225,92 +4305,92 @@ main (int argn, char **argc)
   efficiency_f32 (TYPE_ABS, thread_f32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
                   nthreads, "fabsf");
   efficiency_f32 (TYPE_JBM_ABS, thread_f32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_abs_f32");
+                  FLT_MAX, nthreads, "jbm_f32_abs");
   efficiency_f32 (TYPE_MOD, thread_f32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
-                  nthreads, "mod_f32");
+                  nthreads, "f32_mod");
   efficiency_f32 (TYPE_JBM_MOD, thread_f32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_mod_f32");
+                  FLT_MAX, nthreads, "jbm_f32_mod");
   efficiency_f32 (TYPE_CBRT, thread_f32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
                   nthreads, "cbrtf");
   efficiency_f32 (TYPE_JBM_CBRT, thread_f32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_cbrt_f32");
+                  FLT_MAX, nthreads, "jbm_f32_cbrt");
   efficiency_f32 (TYPE_EXP2, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "exp2f");
   efficiency_f32 (TYPE_JBM_EXP2, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_exp2_f32");
+                  FLT_MAX_EXP, nthreads, "jbm_f32_exp2");
   efficiency_f32 (TYPE_EXP, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
                   JBM_FLT_MAX_E_EXP, nthreads, "expf");
   efficiency_f32 (TYPE_JBM_EXP, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
-                  JBM_FLT_MAX_E_EXP, nthreads, "jbm_exp_f32");
+                  JBM_FLT_MAX_E_EXP, nthreads, "jbm_f32_exp");
   efficiency_f32 (TYPE_EXP10, thread_f32, x32, y32, r, n, -FLT_MAX_10_EXP,
                   FLT_MAX_10_EXP, nthreads, "exp10f");
   efficiency_f32 (TYPE_JBM_EXP10, thread_f32, x32, y32, r, n, -FLT_MAX_10_EXP,
-                  FLT_MAX_10_EXP, nthreads, "jbm_exp10_f32");
+                  FLT_MAX_10_EXP, nthreads, "jbm_f32_exp10");
   efficiency_f32 (TYPE_EXPM1, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
                   JBM_FLT_MAX_E_EXP, nthreads, "expm1f");
   efficiency_f32 (TYPE_JBM_EXPM1, thread_f32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_expm1_f32");
+                  "jbm_f32_expm1");
   efficiency_f32 (TYPE_LOG2, thread_f32, x32, y32, r, n, FLT_MIN, FLT_MAX,
                   nthreads, "log2f");
   efficiency_f32 (TYPE_JBM_LOG2, thread_f32, x32, y32, r, n, FLT_MIN, FLT_MAX,
-                  nthreads, "jbm_log2_f32");
+                  nthreads, "jbm_f32_log2");
   efficiency_f32 (TYPE_LOG, thread_f32, x32, y32, r, n, FLT_MIN, FLT_MAX,
                   nthreads, "logf");
   efficiency_f32 (TYPE_JBM_LOG, thread_f32, x32, y32, r, n, FLT_MIN, FLT_MAX,
-                  nthreads, "jbm_log_f32");
+                  nthreads, "jbm_f32_log");
   efficiency_f32 (TYPE_LOG10, thread_f32, x32, y32, r, n, FLT_MIN, FLT_MAX,
                   nthreads, "log10f");
   efficiency_f32 (TYPE_JBM_LOG10, thread_f32, x32, y32, r, n, FLT_MIN, FLT_MAX,
-                  nthreads, "jbm_log10_f32");
+                  nthreads, "jbm_f32_log10");
   efficiency_f32 (TYPE_POW, thread_f32, x32, y32, r, n, 0.f, 100.f, nthreads,
                   "pow");
   efficiency_f32 (TYPE_JBM_POW, thread_f32, x32, y32, r, n, 0.f, 100.f,
-                  nthreads, "jbm_pow_f32");
+                  nthreads, "jbm_f32_pow");
   efficiency_f32 (TYPE_SIN, thread_f32, x32, y32, r, n, -4.f * M_PIf,
                   4.f * M_PIf, nthreads, "sinf");
   efficiency_f32 (TYPE_JBM_SIN, thread_f32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_sin_f32");
+                  4.f * M_PIf, nthreads, "jbm_f32_sin");
   efficiency_f32 (TYPE_COS, thread_f32, x32, y32, r, n, -4.f * M_PIf,
                   4.f * M_PIf, nthreads, "cosf");
   efficiency_f32 (TYPE_JBM_COS, thread_f32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_cos_f32");
+                  4.f * M_PIf, nthreads, "jbm_f32_cos");
   efficiency_f32 (TYPE_TAN, thread_f32, x32, y32, r, n, -4.f * M_PIf,
                   4.f * M_PIf, nthreads, "tanf");
   efficiency_f32 (TYPE_JBM_TAN, thread_f32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_tan_f32");
+                  4.f * M_PIf, nthreads, "jbm_f32_tan");
   efficiency_f32 (TYPE_ATAN, thread_f32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
                   nthreads, "atanf");
   efficiency_f32 (TYPE_JBM_ATAN, thread_f32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_atan_f32");
+                  FLT_MAX, nthreads, "jbm_f32_atan");
   efficiency_f32 (TYPE_ASIN, thread_f32, x32, y32, r, n, -1.f, 1.f, nthreads,
                   "asinf");
   efficiency_f32 (TYPE_JBM_ASIN, thread_f32, x32, y32, r, n, -1.f, 1.f,
-                  nthreads, "jbm_asin_f32");
+                  nthreads, "jbm_f32_asin");
   efficiency_f32 (TYPE_ACOS, thread_f32, x32, y32, r, n, -1.f, 1.f, nthreads,
                   "acosf");
   efficiency_f32 (TYPE_JBM_ACOS, thread_f32, x32, y32, r, n, -1.f, 1.f,
-                  nthreads, "jbm_acos_f32");
+                  nthreads, "jbm_f32_acos");
   efficiency_f32 (TYPE_SINH, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
                   JBM_FLT_MAX_E_EXP, nthreads, "sinhf");
   efficiency_f32 (TYPE_JBM_SINH, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
-                  JBM_FLT_MAX_E_EXP, nthreads, "jbm_sinh_f32");
+                  JBM_FLT_MAX_E_EXP, nthreads, "jbm_f32_sinh");
   efficiency_f32 (TYPE_COSH, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
                   JBM_FLT_MAX_E_EXP, nthreads, "coshf");
   efficiency_f32 (TYPE_JBM_COSH, thread_f32, x32, y32, r, n, -JBM_FLT_MAX_E_EXP,
-                  JBM_FLT_MAX_E_EXP, nthreads, "jbm_cosh_f32");
+                  JBM_FLT_MAX_E_EXP, nthreads, "jbm_f32_cosh");
   efficiency_f32 (TYPE_TANH, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "tanhf");
   efficiency_f32 (TYPE_JBM_TANH, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_tanh_f32");
+                  FLT_MAX_EXP, nthreads, "jbm_f32_tanh");
   efficiency_f32 (TYPE_ERF, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "erff");
   efficiency_f32 (TYPE_JBM_ERF, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_erf_f32");
+                  FLT_MAX_EXP, nthreads, "jbm_f32_erf");
   efficiency_f32 (TYPE_ERFC, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
                   FLT_MAX_EXP, nthreads, "erfcf");
   efficiency_f32 (TYPE_JBM_ERFC, thread_f32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_erfc_f32");
+                  FLT_MAX_EXP, nthreads, "jbm_f32_erfc");
   efficiency_f32 (TYPE_JBM_POL1, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
                   "pol1_f32");
   efficiency_f32 (TYPE_JBM_POL2, thread_f32, x32, y32, r, n, 0.f, 1.f, nthreads,
@@ -4371,95 +4451,95 @@ main (int argn, char **argc)
   efficiency_f64 (TYPE_ABS, thread_f64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
                   nthreads, "fabs");
   efficiency_f64 (TYPE_JBM_ABS, thread_f64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_abs_f64");
+                  DBL_MAX, nthreads, "jbm_f64_abs");
   efficiency_f64 (TYPE_MOD, thread_f64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
-                  nthreads, "mod_f64");
+                  nthreads, "f64_mod");
   efficiency_f64 (TYPE_JBM_MOD, thread_f64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_mod_f64");
+                  DBL_MAX, nthreads, "jbm_f64_mod");
   efficiency_f64 (TYPE_CBRT, thread_f64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
                   nthreads, "cbrt");
   efficiency_f64 (TYPE_JBM_CBRT, thread_f64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_cbrt_f64");
+                  DBL_MAX, nthreads, "jbm_f64_cbrt");
   efficiency_f64 (TYPE_EXP2, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
                   DBL_MAX_EXP, nthreads, "exp2");
   efficiency_f64 (TYPE_JBM_EXP2, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_exp2_f64");
+                  DBL_MAX_EXP, nthreads, "jbm_f64_exp2");
   efficiency_f64 (TYPE_EXP, thread_f64, x64, y64, r, n, -JBM_DBL_MAX_E_EXP,
                   JBM_DBL_MAX_E_EXP, nthreads, "exp");
   efficiency_f64 (TYPE_JBM_EXP, thread_f64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_exp_f64");
+                  "jbm_f64_exp");
   efficiency_f64 (TYPE_EXP10, thread_f64, x64, y64, r, n, -DBL_MAX_10_EXP,
                   DBL_MAX_10_EXP, nthreads, "exp10");
   efficiency_f64 (TYPE_JBM_EXP10, thread_f64, x64, y64, r, n,
-                  -DBL_MAX_10_EXP, DBL_MAX_10_EXP, nthreads, "jbm_exp10_f64");
+                  -DBL_MAX_10_EXP, DBL_MAX_10_EXP, nthreads, "jbm_f64_exp10");
   efficiency_f64 (TYPE_EXPM1, thread_f64, x64, y64, r, n, -JBM_DBL_MAX_E_EXP,
                   JBM_DBL_MAX_E_EXP, nthreads, "expm1");
   efficiency_f64 (TYPE_JBM_EXPM1, thread_f64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_expm1_f64");
+                  "jbm_f64_expm1");
   efficiency_f64 (TYPE_LOG2, thread_f64, x64, y64, r, n, DBL_MIN, DBL_MAX,
                   nthreads, "log2");
   efficiency_f64 (TYPE_JBM_LOG2, thread_f64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log2_f64");
+                  DBL_MAX, nthreads, "jbm_f64_log2");
   efficiency_f64 (TYPE_LOG, thread_f64, x64, y64, r, n, DBL_MIN, DBL_MAX,
                   nthreads, "log");
   efficiency_f64 (TYPE_JBM_LOG, thread_f64, x64, y64, r, n, DBL_MIN, DBL_MAX,
-                  nthreads, "jbm_log_f64");
+                  nthreads, "jbm_f64_log");
   efficiency_f64 (TYPE_LOG10, thread_f64, x64, y64, r, n, DBL_MIN, DBL_MAX,
                   nthreads, "log10");
   efficiency_f64 (TYPE_JBM_LOG10, thread_f64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log10_f64");
+                  DBL_MAX, nthreads, "jbm_f64_log10");
   efficiency_f64 (TYPE_POW, thread_f64, x64, y64, r, n, 0., 100., nthreads,
                   "pow");
   efficiency_f64 (TYPE_JBM_POW, thread_f64, x64, y64, r, n, 0., 100.,
-                  nthreads, "jbm_pow_f64");
+                  nthreads, "jbm_f64_pow");
   efficiency_f64 (TYPE_SIN, thread_f64, x64, y64, r, n, -4. * M_PI,
                   4. * M_PI, nthreads, "sin");
   efficiency_f64 (TYPE_JBM_SIN, thread_f64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_sin_f64");
+                  4. * M_PI, nthreads, "jbm_f64_sin");
   efficiency_f64 (TYPE_COS, thread_f64, x64, y64, r, n, -4. * M_PI,
                   4. * M_PI, nthreads, "cos");
   efficiency_f64 (TYPE_JBM_COS, thread_f64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_cos_f64");
+                  4. * M_PI, nthreads, "jbm_f64_cos");
   efficiency_f64 (TYPE_TAN, thread_f64, x64, y64, r, n, -4. * M_PI,
                   4. * M_PI, nthreads, "tan");
   efficiency_f64 (TYPE_JBM_TAN, thread_f64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_tan_f64");
+                  4. * M_PI, nthreads, "jbm_f64_tan");
   efficiency_f64 (TYPE_ATAN, thread_f64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
                   nthreads, "atan");
   efficiency_f64 (TYPE_JBM_ATAN, thread_f64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_atan_f64");
+                  DBL_MAX, nthreads, "jbm_f64_atan");
   efficiency_f64 (TYPE_ASIN, thread_f64, x64, y64, r, n, -1., 1., nthreads,
                   "asin");
   efficiency_f64 (TYPE_JBM_ASIN, thread_f64, x64, y64, r, n, -1., 1.,
-                  nthreads, "jbm_asin_f64");
+                  nthreads, "jbm_f64_asin");
   efficiency_f64 (TYPE_ACOS, thread_f64, x64, y64, r, n, -1., 1., nthreads,
                   "acos");
   efficiency_f64 (TYPE_JBM_ACOS, thread_f64, x64, y64, r, n, -1., 1.,
-                  nthreads, "jbm_acos_f64");
+                  nthreads, "jbm_f64_acos");
   efficiency_f64 (TYPE_SINH, thread_f64, x64, y64, r, n, -JBM_DBL_MAX_E_EXP,
                   JBM_DBL_MAX_E_EXP, nthreads, "sinh");
   efficiency_f64 (TYPE_JBM_SINH, thread_f64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_sinh_f64");
+                  "jbm_f64_sinh");
   efficiency_f64 (TYPE_COSH, thread_f64, x64, y64, r, n, -JBM_DBL_MAX_E_EXP,
                   JBM_DBL_MAX_E_EXP, nthreads, "cosh");
   efficiency_f64 (TYPE_JBM_COSH, thread_f64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_cosh_f64");
+                  "jbm_f64_cosh");
   efficiency_f64 (TYPE_TANH, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
                   DBL_MAX_EXP, nthreads, "tanh");
   efficiency_f64 (TYPE_JBM_TANH, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_tanh_f64");
+                  DBL_MAX_EXP, nthreads, "jbm_f64_tanh");
   efficiency_f64 (TYPE_ERF, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
                   DBL_MAX_EXP, nthreads, "erf");
   efficiency_f64 (TYPE_JBM_ERF, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_erf_f64");
+                  DBL_MAX_EXP, nthreads, "jbm_f64_erf");
   efficiency_f64 (TYPE_ERFC, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
                   DBL_MAX_EXP, nthreads, "erfc");
   efficiency_f64 (TYPE_JBM_ERFC, thread_f64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_erfc_f64");
+                  DBL_MAX_EXP, nthreads, "jbm_f64_erfc");
   efficiency_f64 (TYPE_JBM_POL1, thread_f64, x64, y64, r, n, 0., 1.,
                   nthreads, "pol1_f64");
   efficiency_f64 (TYPE_JBM_POL2, thread_f64, x64, y64, r, n, 0., 1.,
@@ -4510,53 +4590,53 @@ main (int argn, char **argc)
   efficiency_f32 (TYPE_MIN, thread_4xf32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
                   nthreads, "min_4xf32");
   efficiency_f32 (TYPE_JBM_ABS, thread_4xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_abs_4xf32");
+                  FLT_MAX, nthreads, "jbm_4xf32_abs");
   efficiency_f32 (TYPE_JBM_MOD, thread_4xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_mod_4xf32");
+                  FLT_MAX, nthreads, "jbm_4xf32_mod");
   efficiency_f32 (TYPE_JBM_CBRT, thread_4xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_cbrt_4xf32");
+                  FLT_MAX, nthreads, "jbm_4xf32_cbrt");
   efficiency_f32 (TYPE_JBM_EXP2, thread_4xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_exp2_4xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_4xf32_exp2");
   efficiency_f32 (TYPE_JBM_EXP, thread_4xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_exp_4xf32");
+                  "jbm_4xf32_exp");
   efficiency_f32 (TYPE_JBM_EXP10, thread_4xf32, x32, y32, r, n,
-                  -FLT_MAX_10_EXP, FLT_MAX_10_EXP, nthreads, "jbm_exp10_4xf32");
+                  -FLT_MAX_10_EXP, FLT_MAX_10_EXP, nthreads, "jbm_4xf32_exp10");
   efficiency_f32 (TYPE_JBM_EXPM1, thread_4xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_expm1_4xf32");
+                  "jbm_4xf32_expm1");
   efficiency_f32 (TYPE_JBM_LOG2, thread_4xf32, x32, y32, r, n, FLT_MIN,
-                  FLT_MAX, nthreads, "jbm_log2_4xf32");
+                  FLT_MAX, nthreads, "jbm_4xf32_log2");
   efficiency_f32 (TYPE_JBM_LOG, thread_4xf32, x32, y32, r, n, FLT_MIN,
-                  FLT_MAX, nthreads, "jbm_log_4xf32");
+                  FLT_MAX, nthreads, "jbm_4xf32_log");
   efficiency_f32 (TYPE_JBM_LOG10, thread_4xf32, x32, y32, r, n, FLT_MIN,
-                  FLT_MAX, nthreads, "jbm_log10_4xf32");
+                  FLT_MAX, nthreads, "jbm_4xf32_log10");
   efficiency_f32 (TYPE_JBM_POW, thread_4xf32, x32, y32, r, n, 0., 100.,
-                  nthreads, "jbm_pow_4xf32");
+                  nthreads, "jbm_4xf32_pow");
   efficiency_f32 (TYPE_JBM_SIN, thread_4xf32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_sin_4xf32");
+                  4.f * M_PIf, nthreads, "jbm_4xf32_sin");
   efficiency_f32 (TYPE_JBM_COS, thread_4xf32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_cos_4xf32");
+                  4.f * M_PIf, nthreads, "jbm_4xf32_cos");
   efficiency_f32 (TYPE_JBM_TAN, thread_4xf32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_tan_4xf32");
+                  4.f * M_PIf, nthreads, "jbm_4xf32_tan");
   efficiency_f32 (TYPE_JBM_ATAN, thread_4xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_atan_4xf32");
+                  FLT_MAX, nthreads, "jbm_4xf32_atan");
   efficiency_f32 (TYPE_JBM_ASIN, thread_4xf32, x32, y32, r, n, -1.f, 1.f,
-                  nthreads, "jbm_asin_4xf32");
+                  nthreads, "jbm_4xf32_asin");
   efficiency_f32 (TYPE_JBM_ACOS, thread_4xf32, x32, y32, r, n, -1.f, 1.f,
-                  nthreads, "jbm_acos_4xf32");
+                  nthreads, "jbm_4xf32_acos");
   efficiency_f32 (TYPE_JBM_SINH, thread_4xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_sinh_4xf32");
+                  "jbm_4xf32_sinh");
   efficiency_f32 (TYPE_JBM_COSH, thread_4xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_cosh_4xf32");
+                  "jbm_4xf32_cosh");
   efficiency_f32 (TYPE_JBM_TANH, thread_4xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_tanh_4xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_4xf32_tanh");
   efficiency_f32 (TYPE_JBM_ERF, thread_4xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_erf_4xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_4xf32_erf");
   efficiency_f32 (TYPE_JBM_ERFC, thread_4xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_erfc_4xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_4xf32_erfc");
 
   // 2xf64 functions
   printf ("\n2xf64 functions\n");
@@ -4575,53 +4655,53 @@ main (int argn, char **argc)
   efficiency_f64 (TYPE_MIN, thread_2xf64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
                   nthreads, "min_2xf64");
   efficiency_f64 (TYPE_JBM_ABS, thread_2xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_abs_2xf64");
+                  DBL_MAX, nthreads, "jbm_2xf64_abs");
   efficiency_f64 (TYPE_JBM_MOD, thread_2xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_mod_2xf64");
+                  DBL_MAX, nthreads, "jbm_2xf64_mod");
   efficiency_f64 (TYPE_JBM_CBRT, thread_2xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_cbrt_2xf64");
+                  DBL_MAX, nthreads, "jbm_2xf64_cbrt");
   efficiency_f64 (TYPE_JBM_EXP2, thread_2xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_exp2_2xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_2xf64_exp2");
   efficiency_f64 (TYPE_JBM_EXP, thread_2xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_exp_2xf64");
+                  "jbm_2xf64_exp");
   efficiency_f64 (TYPE_JBM_EXP10, thread_2xf64, x64, y64, r, n,
-                  -DBL_MAX_10_EXP, DBL_MAX_10_EXP, nthreads, "jbm_exp10_2xf64");
+                  -DBL_MAX_10_EXP, DBL_MAX_10_EXP, nthreads, "jbm_2xf64_exp10");
   efficiency_f64 (TYPE_JBM_EXPM1, thread_2xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_expm1_2xf64");
+                  "jbm_2xf64_expm1");
   efficiency_f64 (TYPE_JBM_LOG2, thread_2xf64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log2_2xf64");
+                  DBL_MAX, nthreads, "jbm_2xf64_log2");
   efficiency_f64 (TYPE_JBM_LOG, thread_2xf64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log_2xf64");
+                  DBL_MAX, nthreads, "jbm_2xf64_log");
   efficiency_f64 (TYPE_JBM_LOG10, thread_2xf64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log10_2xf64");
+                  DBL_MAX, nthreads, "jbm_2xf64_log10");
   efficiency_f64 (TYPE_JBM_POW, thread_2xf64, x64, y64, r, n, 0., 100.,
-                  nthreads, "jbm_pow_2xf64");
+                  nthreads, "jbm_2xf64_pow");
   efficiency_f64 (TYPE_JBM_SIN, thread_2xf64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_sin_2xf64");
+                  4. * M_PI, nthreads, "jbm_2xf64_sin");
   efficiency_f64 (TYPE_JBM_COS, thread_2xf64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_cos_2xf64");
+                  4. * M_PI, nthreads, "jbm_2xf64_cos");
   efficiency_f64 (TYPE_JBM_TAN, thread_2xf64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_tan_2xf64");
+                  4. * M_PI, nthreads, "jbm_2xf64_tan");
   efficiency_f64 (TYPE_JBM_ATAN, thread_2xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_atan_2xf64");
+                  DBL_MAX, nthreads, "jbm_2xf64_atan");
   efficiency_f64 (TYPE_JBM_ASIN, thread_2xf64, x64, y64, r, n, -1., 1.,
-                  nthreads, "jbm_asin_2xf64");
+                  nthreads, "jbm_2xf64_asin");
   efficiency_f64 (TYPE_JBM_ACOS, thread_2xf64, x64, y64, r, n, -1., 1.,
-                  nthreads, "jbm_acos_2xf64");
+                  nthreads, "jbm_2xf64_acos");
   efficiency_f64 (TYPE_JBM_SINH, thread_2xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_sinh_2xf64");
+                  "jbm_2xf64_sinh");
   efficiency_f64 (TYPE_JBM_COSH, thread_2xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_cosh_2xf64");
+                  "jbm_2xf64_cosh");
   efficiency_f64 (TYPE_JBM_TANH, thread_2xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_tanh_2xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_2xf64_tanh");
   efficiency_f64 (TYPE_JBM_ERF, thread_2xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_erf_2xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_2xf64_erf");
   efficiency_f64 (TYPE_JBM_ERFC, thread_2xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_erfc_2xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_2xf64_erfc");
 
 #endif
 
@@ -4644,53 +4724,53 @@ main (int argn, char **argc)
   efficiency_f32 (TYPE_MIN, thread_8xf32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
                   nthreads, "min_8xf32");
   efficiency_f32 (TYPE_JBM_ABS, thread_8xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_abs_8xf32");
+                  FLT_MAX, nthreads, "jbm_8xf32_abs");
   efficiency_f32 (TYPE_JBM_MOD, thread_8xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_mod_8xf32");
+                  FLT_MAX, nthreads, "jbm_8xf32_mod");
   efficiency_f32 (TYPE_JBM_CBRT, thread_8xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_cbrt_8xf32");
+                  FLT_MAX, nthreads, "jbm_8xf32_cbrt");
   efficiency_f32 (TYPE_JBM_EXP2, thread_8xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_exp2_8xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_8xf32_exp2");
   efficiency_f32 (TYPE_JBM_EXP, thread_8xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_exp_8xf32");
+                  "jbm_8xf32_exp");
   efficiency_f32 (TYPE_JBM_EXP10, thread_8xf32, x32, y32, r, n,
-                  -FLT_MAX_10_EXP, FLT_MAX_10_EXP, nthreads, "jbm_exp10_8xf32");
+                  -FLT_MAX_10_EXP, FLT_MAX_10_EXP, nthreads, "jbm_8xf32_exp10");
   efficiency_f32 (TYPE_JBM_EXPM1, thread_8xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_expm1_8xf32");
+                  "jbm_8xf32_expm1");
   efficiency_f32 (TYPE_JBM_LOG2, thread_8xf32, x32, y32, r, n, FLT_MIN,
-                  FLT_MAX, nthreads, "jbm_log2_8xf32");
+                  FLT_MAX, nthreads, "jbm_8xf32_log2");
   efficiency_f32 (TYPE_JBM_LOG, thread_8xf32, x32, y32, r, n, FLT_MIN,
-                  FLT_MAX, nthreads, "jbm_log_8xf32");
+                  FLT_MAX, nthreads, "jbm_8xf32_log");
   efficiency_f32 (TYPE_JBM_LOG10, thread_8xf32, x32, y32, r, n, FLT_MIN,
-                  FLT_MAX, nthreads, "jbm_log10_8xf32");
+                  FLT_MAX, nthreads, "jbm_8xf32_log10");
   efficiency_f32 (TYPE_JBM_POW, thread_8xf32, x32, y32, r, n, 0., 100.,
-                  nthreads, "jbm_pow_8xf32");
+                  nthreads, "jbm_8xf32_pow");
   efficiency_f32 (TYPE_JBM_SIN, thread_8xf32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_sin_8xf32");
+                  4.f * M_PIf, nthreads, "jbm_8xf32_sin");
   efficiency_f32 (TYPE_JBM_COS, thread_8xf32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_cos_8xf32");
+                  4.f * M_PIf, nthreads, "jbm_8xf32_cos");
   efficiency_f32 (TYPE_JBM_TAN, thread_8xf32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_tan_8xf32");
+                  4.f * M_PIf, nthreads, "jbm_8xf32_tan");
   efficiency_f32 (TYPE_JBM_ATAN, thread_8xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_atan_8xf32");
+                  FLT_MAX, nthreads, "jbm_8xf32_atan");
   efficiency_f32 (TYPE_JBM_ASIN, thread_8xf32, x32, y32, r, n, -1.f, 1.f,
-                  nthreads, "jbm_asin_8xf32");
+                  nthreads, "jbm_8xf32_asin");
   efficiency_f32 (TYPE_JBM_ACOS, thread_8xf32, x32, y32, r, n, -1.f, 1.f,
-                  nthreads, "jbm_acos_8xf32");
+                  nthreads, "jbm_8xf32_acos");
   efficiency_f32 (TYPE_JBM_SINH, thread_8xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_sinh_8xf32");
+                  "jbm_8xf32_sinh");
   efficiency_f32 (TYPE_JBM_COSH, thread_8xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_cosh_8xf32");
+                  "jbm_8xf32_cosh");
   efficiency_f32 (TYPE_JBM_TANH, thread_8xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_tanh_8xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_8xf32_tanh");
   efficiency_f32 (TYPE_JBM_ERF, thread_8xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_erf_8xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_8xf32_erf");
   efficiency_f32 (TYPE_JBM_ERFC, thread_8xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_erfc_8xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_8xf32_erfc");
 
   // 4xf64 functions
   printf ("\n4xf64 functions\n");
@@ -4709,53 +4789,53 @@ main (int argn, char **argc)
   efficiency_f64 (TYPE_MIN, thread_4xf64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
                   nthreads, "min_4xf64");
   efficiency_f64 (TYPE_JBM_ABS, thread_4xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_abs_4xf64");
+                  DBL_MAX, nthreads, "jbm_4xf64_abs");
   efficiency_f64 (TYPE_JBM_MOD, thread_4xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_mod_4xf64");
+                  DBL_MAX, nthreads, "jbm_4xf64_mod");
   efficiency_f64 (TYPE_JBM_CBRT, thread_4xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_cbrt_4xf64");
+                  DBL_MAX, nthreads, "jbm_4xf64_cbrt");
   efficiency_f64 (TYPE_JBM_EXP2, thread_4xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_exp2_4xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_4xf64_exp2");
   efficiency_f64 (TYPE_JBM_EXP, thread_4xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_exp_4xf64");
+                  "jbm_4xf64_exp");
   efficiency_f64 (TYPE_JBM_EXP10, thread_4xf64, x64, y64, r, n,
-                  -DBL_MAX_10_EXP, DBL_MAX_10_EXP, nthreads, "jbm_exp10_4xf64");
+                  -DBL_MAX_10_EXP, DBL_MAX_10_EXP, nthreads, "jbm_4xf64_exp10");
   efficiency_f64 (TYPE_JBM_EXPM1, thread_4xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_expm1_4xf64");
+                  "jbm_4xf64_expm1");
   efficiency_f64 (TYPE_JBM_LOG2, thread_4xf64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log2_4xf64");
+                  DBL_MAX, nthreads, "jbm_4xf64_log2");
   efficiency_f64 (TYPE_JBM_LOG, thread_4xf64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log_4xf64");
+                  DBL_MAX, nthreads, "jbm_4xf64_log");
   efficiency_f64 (TYPE_JBM_LOG10, thread_4xf64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log10_4xf64");
+                  DBL_MAX, nthreads, "jbm_4xf64_log10");
   efficiency_f64 (TYPE_JBM_POW, thread_4xf64, x64, y64, r, n, 0., 100.,
-                  nthreads, "jbm_pow_4xf64");
+                  nthreads, "jbm_4xf64_pow");
   efficiency_f64 (TYPE_JBM_SIN, thread_4xf64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_sin_4xf64");
+                  4. * M_PI, nthreads, "jbm_4xf64_sin");
   efficiency_f64 (TYPE_JBM_COS, thread_4xf64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_cos_4xf64");
+                  4. * M_PI, nthreads, "jbm_4xf64_cos");
   efficiency_f64 (TYPE_JBM_TAN, thread_4xf64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_tan_4xf64");
+                  4. * M_PI, nthreads, "jbm_4xf64_tan");
   efficiency_f64 (TYPE_JBM_ATAN, thread_4xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_atan_4xf64");
+                  DBL_MAX, nthreads, "jbm_4xf64_atan");
   efficiency_f64 (TYPE_JBM_ASIN, thread_4xf64, x64, y64, r, n, -1., 1.,
-                  nthreads, "jbm_asin_4xf64");
+                  nthreads, "jbm_4xf64_asin");
   efficiency_f64 (TYPE_JBM_ACOS, thread_4xf64, x64, y64, r, n, -1., 1.,
-                  nthreads, "jbm_acos_4xf64");
+                  nthreads, "jbm_4xf64_acos");
   efficiency_f64 (TYPE_JBM_SINH, thread_4xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_sinh_4xf64");
+                  "jbm_4xf64_sinh");
   efficiency_f64 (TYPE_JBM_COSH, thread_4xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_cosh_4xf64");
+                  "jbm_4xf64_cosh");
   efficiency_f64 (TYPE_JBM_TANH, thread_4xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_tanh_4xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_4xf64_tanh");
   efficiency_f64 (TYPE_JBM_ERF, thread_4xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_erf_4xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_4xf64_erf");
   efficiency_f64 (TYPE_JBM_ERFC, thread_4xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_erfc_4xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_4xf64_erfc");
 
 #endif
 
@@ -4778,54 +4858,54 @@ main (int argn, char **argc)
   efficiency_f32 (TYPE_MIN, thread_16xf32, x32, y32, r, n, -FLT_MAX,
                   FLT_MAX, nthreads, "min_16xf32");
   efficiency_f32 (TYPE_JBM_ABS, thread_16xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_abs_16xf32");
+                  FLT_MAX, nthreads, "jbm_16xf32_abs");
   efficiency_f32 (TYPE_JBM_MOD, thread_16xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_mod_16xf32");
+                  FLT_MAX, nthreads, "jbm_16xf32_mod");
   efficiency_f32 (TYPE_JBM_CBRT, thread_16xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_cbrt_16xf32");
+                  FLT_MAX, nthreads, "jbm_16xf32_cbrt");
   efficiency_f32 (TYPE_JBM_EXP2, thread_16xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_exp2_16xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_16xf32_exp2");
   efficiency_f32 (TYPE_JBM_EXP, thread_16xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_exp_16xf32");
+                  "jbm_16xf32_exp");
   efficiency_f32 (TYPE_JBM_EXP10, thread_16xf32, x32, y32, r, n,
                   -FLT_MAX_10_EXP, FLT_MAX_10_EXP, nthreads,
-                  "jbm_exp10_16xf32");
+                  "jbm_16xf32_exp10");
   efficiency_f32 (TYPE_JBM_EXPM1, thread_16xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_expm1_16xf32");
+                  "jbm_16xf32_expm1");
   efficiency_f32 (TYPE_JBM_LOG2, thread_16xf32, x32, y32, r, n, FLT_MIN,
-                  FLT_MAX, nthreads, "jbm_log2_16xf32");
+                  FLT_MAX, nthreads, "jbm_16xf32_log2");
   efficiency_f32 (TYPE_JBM_LOG, thread_16xf32, x32, y32, r, n, FLT_MIN, FLT_MAX,
-                  nthreads, "jbm_log_16xf32");
+                  nthreads, "jbm_16xf32_log");
   efficiency_f32 (TYPE_JBM_LOG10, thread_16xf32, x32, y32, r, n, FLT_MIN,
-                  FLT_MAX, nthreads, "jbm_log10_16xf32");
+                  FLT_MAX, nthreads, "jbm_16xf32_log10");
   efficiency_f32 (TYPE_JBM_POW, thread_16xf32, x32, y32, r, n, 0., 100.,
-                  nthreads, "jbm_pow_16xf32");
+                  nthreads, "jbm_16xf32_pow");
   efficiency_f32 (TYPE_JBM_SIN, thread_16xf32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_sin_16xf32");
+                  4.f * M_PIf, nthreads, "jbm_16xf32_sin");
   efficiency_f32 (TYPE_JBM_COS, thread_16xf32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_cos_16xf32");
+                  4.f * M_PIf, nthreads, "jbm_16xf32_cos");
   efficiency_f32 (TYPE_JBM_TAN, thread_16xf32, x32, y32, r, n, -4.f * M_PIf,
-                  4.f * M_PIf, nthreads, "jbm_tan_16xf32");
+                  4.f * M_PIf, nthreads, "jbm_16xf32_tan");
   efficiency_f32 (TYPE_JBM_ATAN, thread_16xf32, x32, y32, r, n, -FLT_MAX,
-                  FLT_MAX, nthreads, "jbm_atan_16xf32");
+                  FLT_MAX, nthreads, "jbm_16xf32_atan");
   efficiency_f32 (TYPE_JBM_ASIN, thread_16xf32, x32, y32, r, n, -1.f, 1.f,
-                  nthreads, "jbm_asin_16xf32");
+                  nthreads, "jbm_16xf32_asin");
   efficiency_f32 (TYPE_JBM_ACOS, thread_16xf32, x32, y32, r, n, -1.f, 1.f,
-                  nthreads, "jbm_acos_16xf32");
+                  nthreads, "jbm_16xf32_acos");
   efficiency_f32 (TYPE_JBM_SINH, thread_16xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_sinh_16xf32");
+                  "jbm_16xf32_sinh");
   efficiency_f32 (TYPE_JBM_COSH, thread_16xf32, x32, y32, r, n,
                   -JBM_FLT_MAX_E_EXP, JBM_FLT_MAX_E_EXP, nthreads,
-                  "jbm_cosh_16xf32");
+                  "jbm_16xf32_cosh");
   efficiency_f32 (TYPE_JBM_TANH, thread_16xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_tanh_16xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_16xf32_tanh");
   efficiency_f32 (TYPE_JBM_ERF, thread_16xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_erf_16xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_16xf32_erf");
   efficiency_f32 (TYPE_JBM_ERFC, thread_16xf32, x32, y32, r, n, -FLT_MAX_EXP,
-                  FLT_MAX_EXP, nthreads, "jbm_erfc_16xf32");
+                  FLT_MAX_EXP, nthreads, "jbm_16xf32_erfc");
 
   // 8xf64 functions
   printf ("\n8xf64 functions\n");
@@ -4844,53 +4924,53 @@ main (int argn, char **argc)
   efficiency_f64 (TYPE_MIN, thread_8xf64, x64, y64, r, n, -DBL_MAX, DBL_MAX,
                   nthreads, "min_8xf64");
   efficiency_f64 (TYPE_JBM_ABS, thread_8xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_abs_8xf64");
+                  DBL_MAX, nthreads, "jbm_8xf64_abs");
   efficiency_f64 (TYPE_JBM_MOD, thread_8xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_abs_8xf64");
+                  DBL_MAX, nthreads, "jbm_8xf64_abs");
   efficiency_f64 (TYPE_JBM_CBRT, thread_8xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_cbrt_8xf64");
+                  DBL_MAX, nthreads, "jbm_8xf64_cbrt");
   efficiency_f64 (TYPE_JBM_EXP2, thread_8xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_exp2_8xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_8xf64_exp2");
   efficiency_f64 (TYPE_JBM_EXP, thread_8xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_exp_8xf64");
+                  "jbm_8xf64_exp");
   efficiency_f64 (TYPE_JBM_EXP10, thread_8xf64, x64, y64, r, n,
-                  -DBL_MAX_10_EXP, DBL_MAX_10_EXP, nthreads, "jbm_exp10_8xf64");
+                  -DBL_MAX_10_EXP, DBL_MAX_10_EXP, nthreads, "jbm_8xf64_exp10");
   efficiency_f64 (TYPE_JBM_EXPM1, thread_8xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_expm1_8xf64");
+                  "jbm_8xf64_expm1");
   efficiency_f64 (TYPE_JBM_LOG2, thread_8xf64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log2_8xf64");
+                  DBL_MAX, nthreads, "jbm_8xf64_log2");
   efficiency_f64 (TYPE_JBM_LOG, thread_8xf64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log_8xf64");
+                  DBL_MAX, nthreads, "jbm_8xf64_log");
   efficiency_f64 (TYPE_JBM_LOG10, thread_8xf64, x64, y64, r, n, DBL_MIN,
-                  DBL_MAX, nthreads, "jbm_log10_8xf64");
+                  DBL_MAX, nthreads, "jbm_8xf64_log10");
   efficiency_f64 (TYPE_JBM_POW, thread_8xf64, x64, y64, r, n, 0., 100.,
-                  nthreads, "jbm_pow_8xf64");
+                  nthreads, "jbm_8xf64_pow");
   efficiency_f64 (TYPE_JBM_SIN, thread_8xf64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_sin_8xf64");
+                  4. * M_PI, nthreads, "jbm_8xf64_sin");
   efficiency_f64 (TYPE_JBM_COS, thread_8xf64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_cos_8xf64");
+                  4. * M_PI, nthreads, "jbm_8xf64_cos");
   efficiency_f64 (TYPE_JBM_TAN, thread_8xf64, x64, y64, r, n, -4. * M_PI,
-                  4. * M_PI, nthreads, "jbm_tan_8xf64");
+                  4. * M_PI, nthreads, "jbm_8xf64_tan");
   efficiency_f64 (TYPE_JBM_ATAN, thread_8xf64, x64, y64, r, n, -DBL_MAX,
-                  DBL_MAX, nthreads, "jbm_atan_8xf64");
+                  DBL_MAX, nthreads, "jbm_8xf64_atan");
   efficiency_f64 (TYPE_JBM_ASIN, thread_8xf64, x64, y64, r, n, -1., 1.,
-                  nthreads, "jbm_asin_8xf64");
+                  nthreads, "jbm_8xf64_asin");
   efficiency_f64 (TYPE_JBM_ACOS, thread_8xf64, x64, y64, r, n, -1., 1.,
-                  nthreads, "jbm_acos_8xf64");
+                  nthreads, "jbm_8xf64_acos");
   efficiency_f64 (TYPE_JBM_SINH, thread_8xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_sinh_8xf64");
+                  "jbm_8xf64_sinh");
   efficiency_f64 (TYPE_JBM_COSH, thread_8xf64, x64, y64, r, n,
                   -JBM_DBL_MAX_E_EXP, JBM_DBL_MAX_E_EXP, nthreads,
-                  "jbm_cosh_8xf64");
+                  "jbm_8xf64_cosh");
   efficiency_f64 (TYPE_JBM_TANH, thread_8xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_tanh_8xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_8xf64_tanh");
   efficiency_f64 (TYPE_JBM_ERF, thread_8xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_erf_8xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_8xf64_erf");
   efficiency_f64 (TYPE_JBM_ERFC, thread_8xf64, x64, y64, r, n, -DBL_MAX_EXP,
-                  DBL_MAX_EXP, nthreads, "jbm_erfc_8xf64");
+                  DBL_MAX_EXP, nthreads, "jbm_8xf64_erfc");
 
 #endif
 

@@ -1663,16 +1663,19 @@ check_uni_f32 (float (*f) (const float), float (*g) (const float),
                const float prec, const float xmin, const float xmax,
                const unsigned int n)
 {
-  float x, dx, f0, g0;
-  unsigned int i, n1;
+  float x, xm, dx, f0, g0;
+  int i, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (float) n1;
+  xm = 0.5f * (xmin + xmax);
+  dx = (xmax - xm) / (float) n1;
   for (i = 0; i < n; ++i)
     {
-      if (i < n1)
-        x = xmin + i * dx;
-      else
+      if (i == 0)
+        x = xmin;
+      else if (i == n1)
         x = xmax;
+      else
+        x = xm + (float) (2 * i - n1) * dx;
       f0 = f (x);
       g0 = g (x);
       if (!check_f32 (x, f0, g0, prec))
@@ -1708,7 +1711,7 @@ check_logn_f32 (float (*f) (const float), float (*g) (const float),
 }
 
 int
-check_log_f32 (float (*f) (const float), float (*g) (const float),
+check_f32_log (float (*f) (const float), float (*g) (const float),
                const float prec)
 {
   if (!check_logn_f32 (f, g, prec, 1.f))
@@ -1738,11 +1741,11 @@ test_uni_f32 (float (*f) (const float), float (*g) (const float),
 }
 
 unsigned int
-test_log_f32 (float (*f) (const float), float (*g) (const float))
+test_f32_log (float (*f) (const float), float (*g) (const float))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_f32 (f, g, n * FLT_EPSILON))
+    if (check_f32_log (f, g, n * FLT_EPSILON))
       break;
   return n;
 }
@@ -1776,16 +1779,19 @@ check_uni_f64 (double (*f) (const double), double (*g) (const double),
                const double prec, const double xmin, const double xmax,
                const unsigned int n)
 {
-  double x, dx, f0, g0;
-  unsigned int i, n1;
+  double x, xm, dx, f0, g0;
+  int i, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (double) n1;
+  xm = 0.5 * (xmin + xmax);
+  dx = (xmax - xm) / (double) n1;
   for (i = 0; i < n; ++i)
     {
-      if (i < n1)
-        x = xmin + i * dx;
-      else
+      if (i == 0)
+        x = xmin;
+      else if (i == n1)
         x = xmax;
+      else
+        x = xm + (double) (2 *  i - n1) * dx;
       f0 = f (x);
       g0 = g (x);
       if (!check_f64 (x, f0, g0, prec))
@@ -1821,7 +1827,7 @@ check_logn_f64 (double (*f) (const double), double (*g) (const double),
 }
 
 int
-check_log_f64 (double (*f) (const double), double (*g) (const double),
+check_f64_log (double (*f) (const double), double (*g) (const double),
                const double prec)
 {
   if (!check_logn_f64 (f, g, prec, 1.))
@@ -1851,11 +1857,11 @@ test_uni_f64 (double (*f) (const double), double (*g) (const double),
 }
 
 unsigned int
-test_log_f64 (double (*f) (const double), double (*g) (const double))
+test_f64_log (double (*f) (const double), double (*g) (const double))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_f64 (f, g, n * DBL_EPSILON))
+    if (check_f64_log (f, g, n * DBL_EPSILON))
       break;
   return n;
 }
@@ -1879,18 +1885,21 @@ check_uni_4xf32 (__m128 (*f) (const __m128), float (*g) (const float),
                  const unsigned int n)
 {
   float x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
-  float dx;
-  unsigned int i, j, n1;
+  float xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (float) n1;
+  xm = 0.5f * (xmin + xmax);
+  dx = (xmax - xm) / (float) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 4; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm_store_ps (f0, f (_mm_load_ps (x)));
@@ -1945,7 +1954,7 @@ break1:
 }
 
 int
-check_log_4xf32 (__m128 (*f) (const __m128), float (*g) (const float),
+check_4xf32_log (__m128 (*f) (const __m128), float (*g) (const float),
                  const float prec)
 {
   if (!check_logn_4xf32 (f, g, prec, 1.f))
@@ -1965,11 +1974,11 @@ test_uni_4xf32 (__m128 (*f) (const __m128), float (*g) (const float),
 }
 
 unsigned int
-test_log_4xf32 (__m128 (*f) (const __m128), float (*g) (const float))
+test_4xf32_log (__m128 (*f) (const __m128), float (*g) (const float))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_4xf32 (f, g, n * FLT_EPSILON))
+    if (check_4xf32_log (f, g, n * FLT_EPSILON))
       break;
   return n;
 }
@@ -1991,18 +2000,21 @@ check_uni_2xf64 (__m128d (*f) (const __m128d), double (*g) (const double),
                  const unsigned int n)
 {
   double x[2] JB_ALIGNED, f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
-  double dx;
-  unsigned int i, j, n1;
+  double xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (double) n1;
+  xm = 0.5 * (xmin + xmax);
+  dx = (xmax - xm) / (double) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 2; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm_store_pd (f0, f (_mm_load_pd (x)));
@@ -2057,7 +2069,7 @@ break1:
 }
 
 int
-check_log_2xf64 (__m128d (*f) (const __m128d), double (*g) (const double),
+check_2xf64_log (__m128d (*f) (const __m128d), double (*g) (const double),
                  const double prec)
 {
   if (!check_logn_2xf64 (f, g, prec, 1.))
@@ -2077,11 +2089,11 @@ test_uni_2xf64 (__m128d (*f) (const __m128d), double (*g) (const double),
 }
 
 unsigned int
-test_log_2xf64 (__m128d (*f) (const __m128d), double (*g) (const double))
+test_2xf64_log (__m128d (*f) (const __m128d), double (*g) (const double))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_2xf64 (f, g, n * DBL_EPSILON))
+    if (check_2xf64_log (f, g, n * DBL_EPSILON))
       break;
   return n;
 }
@@ -2107,18 +2119,21 @@ check_uni_8xf32 (__m256 (*f) (const __m256), float (*g) (const float),
                  const unsigned int n)
 {
   float x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
-  float dx;
-  unsigned int i, j, n1;
+  float xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (float) n1;
+  xm = 0.5f * (xmin + xmax);
+  dx = (xmax - xm) / (float) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 8; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm256_store_ps (f0, f (_mm256_load_ps (x)));
@@ -2173,7 +2188,7 @@ break1:
 }
 
 int
-check_log_8xf32 (__m256 (*f) (const __m256), float (*g) (const float),
+check_8xf32_log (__m256 (*f) (const __m256), float (*g) (const float),
                  const float prec)
 {
   if (!check_logn_8xf32 (f, g, prec, 1.f))
@@ -2193,11 +2208,11 @@ test_uni_8xf32 (__m256 (*f) (const __m256), float (*g) (const float),
 }
 
 unsigned int
-test_log_8xf32 (__m256 (*f) (const __m256), float (*g) (const float))
+test_8xf32_log (__m256 (*f) (const __m256), float (*g) (const float))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_8xf32 (f, g, n * FLT_EPSILON))
+    if (check_8xf32_log (f, g, n * FLT_EPSILON))
       break;
   return n;
 }
@@ -2219,18 +2234,21 @@ check_uni_4xf64 (__m256d (*f) (const __m256d), double (*g) (const double),
                  const unsigned int n)
 {
   double x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
-  double dx;
-  unsigned int i, j, n1;
+  double xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (double) n1;
+  xm = 0.5 * (xmin + xmax);
+  dx = (xmax - xm) / (double) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 4; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm256_store_pd (f0, f (_mm256_load_pd (x)));
@@ -2285,7 +2303,7 @@ break1:
 }
 
 int
-check_log_4xf64 (__m256d (*f) (const __m256d), double (*g) (const double),
+check_4xf64_log (__m256d (*f) (const __m256d), double (*g) (const double),
                  const double prec)
 {
   if (!check_logn_4xf64 (f, g, prec, 1.))
@@ -2305,11 +2323,11 @@ test_uni_4xf64 (__m256d (*f) (const __m256d), double (*g) (const double),
 }
 
 unsigned int
-test_log_4xf64 (__m256d (*f) (const __m256d), double (*g) (const double))
+test_4xf64_log (__m256d (*f) (const __m256d), double (*g) (const double))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_4xf64 (f, g, n * DBL_EPSILON))
+    if (check_4xf64_log (f, g, n * DBL_EPSILON))
       break;
   return n;
 }
@@ -2335,18 +2353,21 @@ check_uni_16xf32 (__m512 (*f) (const __m512), float (*g) (const float),
                   const unsigned int n)
 {
   float x[16] JB_ALIGNED, f0[16] JB_ALIGNED, g0[16] JB_ALIGNED;
-  float dx;
-  unsigned int i, j, n1;
+  float xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (float) n1;
+  xm = 0.5f * (xmin + xmax);
+  dx = (xmax - xm) / (float) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 16; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm512_store_ps (f0, f (_mm512_load_ps (x)));
@@ -2401,7 +2422,7 @@ break1:
 }
 
 int
-check_log_16xf32 (__m512 (*f) (const __m512), float (*g) (const float),
+check_16xf32_log (__m512 (*f) (const __m512), float (*g) (const float),
                   const float prec)
 {
   if (!check_logn_16xf32 (f, g, prec, 1.f))
@@ -2421,11 +2442,11 @@ test_uni_16xf32 (__m512 (*f) (const __m512), float (*g) (const float),
 }
 
 unsigned int
-test_log_16xf32 (__m512 (*f) (const __m512), float (*g) (const float))
+test_16xf32_log (__m512 (*f) (const __m512), float (*g) (const float))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_16xf32 (f, g, n * FLT_EPSILON))
+    if (check_16xf32_log (f, g, n * FLT_EPSILON))
       break;
   return n;
 }
@@ -2447,18 +2468,21 @@ check_uni_8xf64 (__m512d (*f) (const __m512d), double (*g) (const double),
                  const unsigned int n)
 {
   double x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
-  double dx;
-  unsigned int i, j, n1;
+  double xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (double) n1;
+  xm = 0.5 * (xmin + xmax);
+  dx = (xmax - xm) / (double) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 8; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm512_store_pd (f0, f (_mm512_load_pd (x)));
@@ -2513,7 +2537,7 @@ break1:
 }
 
 int
-check_log_8xf64 (__m512d (*f) (const __m512d), double (*g) (const double),
+check_8xf64_log (__m512d (*f) (const __m512d), double (*g) (const double),
                  const double prec)
 {
   if (!check_logn_8xf64 (f, g, prec, 1.))
@@ -2533,11 +2557,11 @@ test_uni_8xf64 (__m512d (*f) (const __m512d), double (*g) (const double),
 }
 
 unsigned int
-test_log_8xf64 (__m512d (*f) (const __m512d), double (*g) (const double))
+test_8xf64_log (__m512d (*f) (const __m512d), double (*g) (const double))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_8xf64 (f, g, n * DBL_EPSILON))
+    if (check_8xf64_log (f, g, n * DBL_EPSILON))
       break;
   return n;
 }
@@ -2563,18 +2587,21 @@ check_uni_4xf32 (float32x4_t (*f) (const float32x4_t), float (*g) (const float),
                  const unsigned int n)
 {
   float x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
-  float dx;
-  unsigned int i, j, n1;
+  float xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (float) n1;
+  xm = 0.5f * (xmin + xmax);
+  dx = (xmax - xm) / (float) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 4; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       vst1q_f32 (f0, f (vld1q_f32 (x)));
@@ -2629,7 +2656,7 @@ break1:
 }
 
 int
-check_log_4xf32 (float32x4_t (*f) (const float32x4_t), float (*g) (const float),
+check_4xf32_log (float32x4_t (*f) (const float32x4_t), float (*g) (const float),
                  const float prec)
 {
   if (!check_logn_4xf32 (f, g, prec, 1.f))
@@ -2649,11 +2676,11 @@ test_uni_4xf32 (float32x4_t (*f) (const float32x4_t), float (*g) (const float),
 }
 
 unsigned int
-test_log_4xf32 (float32x4_t (*f) (const float32x4_t), float (*g) (const float))
+test_4xf32_log (float32x4_t (*f) (const float32x4_t), float (*g) (const float))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_4xf32 (f, g, n * FLT_EPSILON))
+    if (check_4xf32_log (f, g, n * FLT_EPSILON))
       break;
   return n;
 }
@@ -2675,18 +2702,21 @@ check_uni_2xf64 (float64x2_t (*f) (const float64x2_t),
                  const double xmin, const double xmax, const unsigned int n)
 {
   double x[2] JB_ALIGNED, f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
-  double dx;
-  unsigned int i, j, n1;
+  double xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (double) n1;
+  xm = 0.5 * (xmin + xmax);
+  dx = (xmax - xm) / (double) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 2; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       vst1q_f64 (f0, f (vld1q_f64 (x)));
@@ -2742,7 +2772,7 @@ break1:
 }
 
 int
-check_log_2xf64 (float64x2_t (*f) (const float64x2_t),
+check_2xf64_log (float64x2_t (*f) (const float64x2_t),
                  double (*g) (const double), const double prec)
 {
   if (!check_logn_2xf64 (f, g, prec, 1.))
@@ -2763,12 +2793,12 @@ test_uni_2xf64 (float64x2_t (*f) (const float64x2_t),
 }
 
 unsigned int
-test_log_2xf64 (float64x2_t (*f) (const float64x2_t),
+test_2xf64_log (float64x2_t (*f) (const float64x2_t),
                 double (*g) (const double))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_2xf64 (f, g, n * DBL_EPSILON))
+    if (check_2xf64_log (f, g, n * DBL_EPSILON))
       break;
   return n;
 }
@@ -2794,18 +2824,21 @@ check_uni_4xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
                  const float xmin, const float xmax, const unsigned int n)
 {
   float x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
-  float dx;
-  unsigned int i, j, n1;
+  float xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (float) n1;
+  xm = 0.5f * (xmin + xmax);
+  dx = (xmax - xm) / (float) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 4; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 4)), 4);
@@ -2860,7 +2893,7 @@ break1:
 }
 
 int
-check_log_4xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
+check_4xf32_log (vfloat32m1_t (*f) (const vfloat32m1_t),
                  float (*g) (const float), const float prec)
 {
   if (!check_logn_4xf32 (f, g, prec, 1.f))
@@ -2880,12 +2913,12 @@ test_uni_4xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
 }
 
 unsigned int
-test_log_4xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
+test_4xf32_log (vfloat32m1_t (*f) (const vfloat32m1_t),
                 float (*g) (const float))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_4xf32 (f, g, n * FLT_EPSILON))
+    if (check_4xf32_log (f, g, n * FLT_EPSILON))
       break;
   return n;
 }
@@ -2907,18 +2940,21 @@ check_uni_2xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
                  const double xmin, const double xmax, const unsigned int n)
 {
   double x[2] JB_ALIGNED, f0[2] JB_ALIGNED, g0[2] JB_ALIGNED;
-  double dx;
-  unsigned int i, j, n1;
+  double xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (double) n1;
+  xm = 0.5 * (xmin + xmax);
+  dx = (xmax - xm) / (double) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 2; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 2)), 2);
@@ -2974,7 +3010,7 @@ break1:
 }
 
 int
-check_log_2xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
+check_2xf64_log (vfloat64m1_t (*f) (const vfloat64m1_t),
                  double (*g) (const double), const double prec)
 {
   if (!check_logn_2xf64 (f, g, prec, 1.))
@@ -2995,12 +3031,12 @@ test_uni_2xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
 }
 
 unsigned int
-test_log_2xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
+test_2xf64_log (vfloat64m1_t (*f) (const vfloat64m1_t),
                 double (*g) (const double))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_2xf64 (f, g, n * DBL_EPSILON))
+    if (check_2xf64_log (f, g, n * DBL_EPSILON))
       break;
   return n;
 }
@@ -3022,18 +3058,21 @@ check_uni_8xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
                  const float xmin, const float xmax, const unsigned int n)
 {
   float x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
-  float dx;
-  unsigned int i, j, n1;
+  float xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (float) n1;
+  xm = 0.5f * (xmin + xmax);
+  dx = (xmax - xm) / (float) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 8; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 8)), 8);
@@ -3088,7 +3127,7 @@ break1:
 }
 
 int
-check_log_8xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
+check_8xf32_log (vfloat32m1_t (*f) (const vfloat32m1_t),
                  float (*g) (const float), const float prec)
 {
   if (!check_logn_8xf32 (f, g, prec, 1.f))
@@ -3108,12 +3147,12 @@ test_uni_8xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
 }
 
 unsigned int
-test_log_8xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
+test_8xf32_log (vfloat32m1_t (*f) (const vfloat32m1_t),
                 float (*g) (const float))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_8xf32 (f, g, n * FLT_EPSILON))
+    if (check_8xf32_log (f, g, n * FLT_EPSILON))
       break;
   return n;
 }
@@ -3135,18 +3174,21 @@ check_uni_4xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
                  const double xmin, const double xmax, const unsigned int n)
 {
   double x[4] JB_ALIGNED, f0[4] JB_ALIGNED, g0[4] JB_ALIGNED;
-  double dx;
-  unsigned int i, j, n1;
+  double xm, dx;
+  int i, j, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (double) n1;
+  xm = 0.5 * (xmin + xmax);
+  dx = (xmax - xm) / (double) n1;
   for (i = 0; i < n;)
     {
       for (j = 0; j < 4; ++j, ++i)
         {
-          if (i < n1)
-            x[j] = xmin + i * dx;
-          else
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
             x[j] = xmax;
+          else
+            x[j] = xm + (2 *  i - n1) * dx;
           g0[j] = g (x[j]);
         }
       __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 4)), 4);
@@ -3202,7 +3244,7 @@ break1:
 }
 
 int
-check_log_4xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
+check_4xf64_log (vfloat64m1_t (*f) (const vfloat64m1_t),
                  double (*g) (const double), const double prec)
 {
   if (!check_logn_4xf64 (f, g, prec, 1.))
@@ -3223,12 +3265,12 @@ test_uni_4xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
 }
 
 unsigned int
-test_log_4xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
+test_4xf64_log (vfloat64m1_t (*f) (const vfloat64m1_t),
                 double (*g) (const double))
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_log_4xf64 (f, g, n * DBL_EPSILON))
+    if (check_4xf64_log (f, g, n * DBL_EPSILON))
       break;
   return n;
 }
@@ -3251,16 +3293,19 @@ check_uni (JBFLOAT (*f) (const JBFLOAT), JBFLOAT (*g) (const JBFLOAT),
            const JBFLOAT prec, const JBFLOAT xmin, const JBFLOAT xmax,
            const unsigned int n)
 {
-  JBFLOAT x, dx, f0, g0;
-  unsigned int i, n1;
+  JBFLOAT x, xm, dx, f0, g0;
+  int i, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (JBFLOAT) n1;
-  for (i = 0, x = xmin; i < n; ++i)
+  xm = (JBFLOAT) 0.5 * (xmin + xmax);
+  dx = (xmax - xm) / (JBFLOAT) n1;
+  for (i = 0; i < n; ++i)
     {
-      if (i < n1)
-        x = xmin + i * dx;
-      else
+      if (i == 0)
+        x = xmin;
+      else if (i == n1)
         x = xmax;
+      else
+        x = xm + (JBFLOAT) (2 *  i - n1) * dx;
       f0 = f (x);
       g0 = g (x);
       if (FABS (f0 / g0 - (JBFLOAT) 1.) > prec && FABS (f0 - g0) > prec)
@@ -3324,16 +3369,19 @@ check_unil (JBDOUBLE (*f) (const JBDOUBLE), JBDOUBLE (*g) (const JBDOUBLE),
             const JBDOUBLE prec, const JBDOUBLE xmin, const JBDOUBLE xmax,
             const unsigned int n)
 {
-  JBDOUBLE x, dx, f0, g0;
-  unsigned int i, n1;
+  JBDOUBLE x, xm, dx, f0, g0;
+  int i, n1;
   n1 = n - 1;
-  dx = (xmax - xmin) / (JBDOUBLE) n1;
-  for (i = 0, x = xmin; i < n; ++i)
+  xm = (JBDOUBLE) 0.5 * (xmin + xmax);
+  dx = (xmax - xm) / (JBDOUBLE) n1;
+  for (i = 0; i < n; ++i)
     {
-      if (i < n1)
-        x = xmin + i * dx;
-      else
+      if (i == 0)
+        x = xmin;
+      else if (i == n1)
         x = xmax;
+      else
+        x = xm + (JBDOUBLE) (2 *  i - n1) * dx;
       f0 = f (x);
       g0 = g (x);
       if (FABSL (f0 / g0 - (JBDOUBLE) 1.) > prec && FABSL (f0 - g0) > prec)
@@ -3645,194 +3693,194 @@ main (void)
 
   // extreme values
   printf ("max x for exp2=%.7e=%.7e\n",
-          number_max_f32 (jbm_exp2_f32), (float) FLT_MAX_EXP);
+          number_max_f32 (jbm_f32_exp2), (float) FLT_MAX_EXP);
 
-  printf ("max x for exp=%.7e\n", number_max_f32 (jbm_exp_f32));
+  printf ("max x for exp=%.7e\n", number_max_f32 (jbm_f32_exp));
   printf ("max x for exp10=%.7e=%.7e\n",
-          number_max_f32 (jbm_exp10_f32), (float) FLT_MAX_10_EXP);
-  printf ("max x for expm1=%.7e\n", number_max_f32 (jbm_expm1_f32));
-  printf ("min x for log2=%.7e\n", number_min_f32 (jbm_log2_f32));
-  printf ("min x for log=%.7e\n", number_min_f32 (jbm_log_f32));
-  printf ("min x for log10=%.7e\n", number_min_f32 (jbm_log10_f32));
-  printf ("max x for sinh=%.7e\n", number_max_f32 (jbm_sinh_f32));
-  printf ("max x for cosh=%.7e\n", number_max_f32 (jbm_cosh_f32));
+          number_max_f32 (jbm_f32_exp10), (float) FLT_MAX_10_EXP);
+  printf ("max x for expm1=%.7e\n", number_max_f32 (jbm_f32_expm1));
+  printf ("min x for log2=%.7e\n", number_min_f32 (jbm_f32_log2));
+  printf ("min x for log=%.7e\n", number_min_f32 (jbm_f32_log));
+  printf ("min x for log10=%.7e\n", number_min_f32 (jbm_f32_log10));
+  printf ("max x for sinh=%.7e\n", number_max_f32 (jbm_f32_sinh));
+  printf ("max x for cosh=%.7e\n", number_max_f32 (jbm_f32_cosh));
   x = number_find_f64 (erfc, (double) JBM_FLT_MIN, 1., 100.);
-  printf ("erfc(x)=JBM_FLT_MIN => x=%.7le\n", x);
-  printf ("max x for exp2=%.16le=%.16le\n",
-          number_max_f64 (jbm_exp2_f64), (double) DBL_MAX_EXP);
+  printf ("erfc(x)=JBM_FLT_MIN => x=%.16le\n", x);
 
-  printf ("max x for exp=%.16le\n", number_max_f64 (jbm_exp_f64));
+  printf ("max x for exp2=%.16le=%.16le\n",
+          number_max_f64 (jbm_f64_exp2), (double) DBL_MAX_EXP);
+  printf ("max x for exp=%.16le\n", number_max_f64 (jbm_f64_exp));
   printf ("max x for exp10=%.16le=%.16le\n",
-          number_max_f64 (jbm_exp10_f64), (double) DBL_MAX_10_EXP);
-  printf ("max x for expm1=%.16le\n", number_max_f64 (jbm_expm1_f64));
-  printf ("min x for log2=%.16le\n", number_min_f64 (jbm_log2_f64));
-  printf ("min x for log=%.16le\n", number_min_f64 (jbm_log_f64));
-  printf ("min x for log10=%.16le\n", number_min_f64 (jbm_log10_f64));
-  printf ("max x for sinh=%.16le\n", number_max_f64 (jbm_sinh_f64));
-  printf ("max x for cosh=%.16le\n", number_max_f64 (jbm_cosh_f64));
+          number_max_f64 (jbm_f64_exp10), (double) DBL_MAX_10_EXP);
+  printf ("max x for expm1=%.16le\n", number_max_f64 (jbm_f64_expm1));
+  printf ("min x for log2=%.16le\n", number_min_f64 (jbm_f64_log2));
+  printf ("min x for log=%.16le\n", number_min_f64 (jbm_f64_log));
+  printf ("min x for log10=%.16le\n", number_min_f64 (jbm_f64_log10));
+  printf ("max x for sinh=%.16le\n", number_max_f64 (jbm_f64_sinh));
+  printf ("max x for cosh=%.16le\n", number_max_f64 (jbm_f64_cosh));
   x = number_find_f64 (erfc, (double) JBM_DBL_MIN, 1., 100.);
   printf ("erfc(x)=JBM_DBL_MIN => x=%.16le\n", x);
 
   // checks
 
   printf ("checking float functions\n");
-  n = test_uni_f32 (jbm_abs_f32, fabsf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  n = test_uni_f32 (jbm_f32_abs, fabsf, -FLT_MAX, FLT_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
-  n = test_uni_f32 (jbm_cbrt_f32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  n = test_uni_f32 (jbm_f32_cbrt, cbrtf, -FLT_MAX, FLT_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cbrt: OK(%u)\n", n);
-  n = test_log_f32 (jbm_exp2_f32, exp2f);
+  n = test_f32_log (jbm_f32_exp2, exp2f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp2: OK(%u)\n", n);
-  n = test_log_f32 (jbm_exp_f32, expf);
+  n = test_f32_log (jbm_f32_exp, expf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp: OK(%u)\n", n);
-  n = test_log_f32 (jbm_exp10_f32, exp10f);
+  n = test_f32_log (jbm_f32_exp10, exp10f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp10: OK(%u)\n", n);
-  n = test_log_f32 (jbm_expm1_f32, expm1f);
+  n = test_f32_log (jbm_f32_expm1, expm1f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check expm1: OK(%u)\n", n);
-  n = test_logn_f32 (jbm_log2_f32, log2f, 1.f);
+  n = test_logn_f32 (jbm_f32_log2, log2f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log2: OK(%u)\n", n);
-  n = test_logn_f32 (jbm_log_f32, logf, 1.f);
+  n = test_logn_f32 (jbm_f32_log, logf, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log: OK(%u)\n", n);
-  n = test_logn_f32 (jbm_log10_f32, log10f, 1.f);
+  n = test_logn_f32 (jbm_f32_log10, log10f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_f32 (jbm_sin_f32, sinf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_f32 (jbm_f32_sin, sinf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sin: OK(%u)\n", n);
-  n = test_uni_f32 (jbm_cos_f32, cosf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_f32 (jbm_f32_cos, cosf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cos: OK(%u)\n", n);
-  n = test_uni_f32 (jbm_tan_f32, tanf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_f32 (jbm_f32_tan, tanf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     printf ("check tan: No\n");
-  n = test_log_f32 (jbm_atan_f32, atanf);
+  n = test_f32_log (jbm_f32_atan, atanf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check atan: OK(%u)\n", n);
-  n = test_uni_f32 (jbm_asin_f32, asinf, -1.f, 1.f);
+  n = test_uni_f32 (jbm_f32_asin, asinf, -1.f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check asin: OK(%u)\n", n);
-  n = test_uni_f32 (jbm_acos_f32, acosf, -1.f, 1.f);
+  n = test_uni_f32 (jbm_f32_acos, acosf, -1.f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check acos: OK(%u)\n", n);
-  n = test_log_f32 (jbm_sinh_f32, sinhf);
+  n = test_f32_log (jbm_f32_sinh, sinhf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sinh: OK(%u)\n", n);
-  n = test_log_f32 (jbm_cosh_f32, coshf);
+  n = test_f32_log (jbm_f32_cosh, coshf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cosh: OK(%u)\n", n);
-  n = test_log_f32 (jbm_tanh_f32, tanhf);
+  n = test_f32_log (jbm_f32_tanh, tanhf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check tanh: OK(%u)\n", n);
-  n = test_uni_f32 (jbm_erf_f32, erff, -0.5f * FLT_MAX_EXP, 0.5f * FLT_MAX_EXP);
+  n = test_uni_f32 (jbm_f32_erf, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erf: OK(%u)\n", n);
-  n = test_uni_f32 (jbm_erfc_f32, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
+  n = test_uni_f32 (jbm_f32_erfc, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
 
   printf ("checking double functions\n");
-  n = test_uni_f64 (jbm_abs_f64, fabs, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  n = test_uni_f64 (jbm_f64_abs, fabs, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
-  n = test_uni_f64 (jbm_cbrt_f64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  n = test_uni_f64 (jbm_f64_cbrt, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cbrt: OK(%u)\n", n);
-  n = test_log_f64 (jbm_exp2_f64, exp2);
+  n = test_f64_log (jbm_f64_exp2, exp2);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp2: OK(%u)\n", n);
-  n = test_log_f64 (jbm_exp_f64, exp);
+  n = test_f64_log (jbm_f64_exp, exp);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp: OK(%u)\n", n);
-  n = test_log_f64 (jbm_exp10_f64, exp10);
+  n = test_f64_log (jbm_f64_exp10, exp10);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp10: OK(%u)\n", n);
-  n = test_log_f64 (jbm_expm1_f64, expm1);
+  n = test_f64_log (jbm_f64_expm1, expm1);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check expm1: OK(%u)\n", n);
-  n = test_logn_f64 (jbm_log2_f64, log2, 1.);
+  n = test_logn_f64 (jbm_f64_log2, log2, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log2: OK(%u)\n", n);
-  n = test_logn_f64 (jbm_log_f64, log, 1.);
+  n = test_logn_f64 (jbm_f64_log, log, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log: OK(%u)\n", n);
-  n = test_logn_f64 (jbm_log10_f64, log10, 1.);
+  n = test_logn_f64 (jbm_f64_log10, log10, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_f64 (jbm_sin_f64, sin, -2. * M_PI, 2. * M_PI);
+  n = test_uni_f64 (jbm_f64_sin, sin, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sin: OK(%u)\n", n);
-  n = test_uni_f64 (jbm_cos_f64, cos, -2. * M_PI, 2. * M_PI);
+  n = test_uni_f64 (jbm_f64_cos, cos, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cos: OK(%u)\n", n);
-  n = test_uni_f64 (jbm_tan_f64, tan, -2. * M_PI, 2. * M_PI);
+  n = test_uni_f64 (jbm_f64_tan, tan, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     printf ("check tan: No\n");
-  n = test_log_f64 (jbm_atan_f64, atan);
+  n = test_f64_log (jbm_f64_atan, atan);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check atan: OK(%u)\n", n);
-  n = test_uni_f64 (jbm_asin_f64, asin, -1., 1.);
+  n = test_uni_f64 (jbm_f64_asin, asin, -1., 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check asin: OK(%u)\n", n);
-  n = test_uni_f64 (jbm_acos_f64, acos, -1., 1.);
+  n = test_uni_f64 (jbm_f64_acos, acos, -1., 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check acos: OK(%u)\n", n);
-  n = test_log_f64 (jbm_sinh_f64, sinh);
+  n = test_f64_log (jbm_f64_sinh, sinh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sinh: OK(%u)\n", n);
-  n = test_log_f64 (jbm_cosh_f64, cosh);
+  n = test_f64_log (jbm_f64_cosh, cosh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cosh: OK(%u)\n", n);
-  n = test_log_f64 (jbm_tanh_f64, tanh);
+  n = test_f64_log (jbm_f64_tanh, tanh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check tanh: OK(%u)\n", n);
-  n = test_uni_f64 (jbm_erf_f64, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
+  n = test_uni_f64 (jbm_f64_erf, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erf: OK(%u)\n", n);
-  n = test_uni_f64 (jbm_erfc_f64, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
+  n = test_uni_f64 (jbm_f64_erfc, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
@@ -3856,82 +3904,82 @@ main (void)
   printf ("checking vfloat32m1_t functions (128 bits)\n");
 #endif
 
-  n = test_uni_4xf32 (jbm_abs_4xf32, fabsf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  n = test_uni_4xf32 (jbm_4xf32_abs, fabsf, -FLT_MAX, FLT_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_cbrt_4xf32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  n = test_uni_4xf32 (jbm_4xf32_cbrt, cbrtf, -FLT_MAX, FLT_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cbrt: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_exp2_4xf32, exp2f);
+  n = test_4xf32_log (jbm_4xf32_exp2, exp2f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp2: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_exp_4xf32, expf);
+  n = test_4xf32_log (jbm_4xf32_exp, expf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_exp10_4xf32, exp10f);
+  n = test_4xf32_log (jbm_4xf32_exp10, exp10f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp10: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_expm1_4xf32, expm1f);
+  n = test_4xf32_log (jbm_4xf32_expm1, expm1f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check expm1: OK(%u)\n", n);
-  n = test_logn_4xf32 (jbm_log2_4xf32, log2f, 1.f);
+  n = test_logn_4xf32 (jbm_4xf32_log2, log2f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log2: OK(%u)\n", n);
-  n = test_logn_4xf32 (jbm_log_4xf32, logf, 1.f);
+  n = test_logn_4xf32 (jbm_4xf32_log, logf, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log: OK(%u)\n", n);
-  n = test_logn_4xf32 (jbm_log10_4xf32, log10f, 1.f);
+  n = test_logn_4xf32 (jbm_4xf32_log10, log10f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_sin_4xf32, sinf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_4xf32 (jbm_4xf32_sin, sinf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sin: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_cos_4xf32, cosf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_4xf32 (jbm_4xf32_cos, cosf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cos: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_tan_4xf32, tanf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_4xf32 (jbm_4xf32_tan, tanf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     printf ("check tan: No\n");
-  n = test_log_4xf32 (jbm_atan_4xf32, atanf);
+  n = test_4xf32_log (jbm_4xf32_atan, atanf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check atan: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_asin_4xf32, asinf, -1.f, 1.f);
+  n = test_uni_4xf32 (jbm_4xf32_asin, asinf, -1.f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check asin: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_acos_4xf32, acosf, -1.f, 1.f);
+  n = test_uni_4xf32 (jbm_4xf32_acos, acosf, -1.f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check acos: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_sinh_4xf32, sinhf);
+  n = test_4xf32_log (jbm_4xf32_sinh, sinhf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sinh: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_cosh_4xf32, coshf);
+  n = test_4xf32_log (jbm_4xf32_cosh, coshf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cosh: OK(%u)\n", n);
-  n = test_log_4xf32 (jbm_tanh_4xf32, tanhf);
+  n = test_4xf32_log (jbm_4xf32_tanh, tanhf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check tanh: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_erf_4xf32, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
+  n = test_uni_4xf32 (jbm_4xf32_erf, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erf: OK(%u)\n", n);
-  n = test_uni_4xf32 (jbm_erfc_4xf32, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
+  n = test_uni_4xf32 (jbm_4xf32_erfc, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
@@ -3946,82 +3994,82 @@ main (void)
   printf ("checking vfloat64m1_t functions (128 bits)\n");
 #endif
 
-  n = test_uni_2xf64 (jbm_abs_2xf64, fabs, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  n = test_uni_2xf64 (jbm_2xf64_abs, fabs, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
-  n = test_uni_2xf64 (jbm_cbrt_2xf64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  n = test_uni_2xf64 (jbm_2xf64_cbrt, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cbrt: OK(%u)\n", n);
-  n = test_log_2xf64 (jbm_exp2_2xf64, exp2);
+  n = test_2xf64_log (jbm_2xf64_exp2, exp2);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp2: OK(%u)\n", n);
-  n = test_log_2xf64 (jbm_exp_2xf64, exp);
+  n = test_2xf64_log (jbm_2xf64_exp, exp);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp: OK(%u)\n", n);
-  n = test_log_2xf64 (jbm_exp10_2xf64, exp10);
+  n = test_2xf64_log (jbm_2xf64_exp10, exp10);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp10: OK(%u)\n", n);
-  n = test_log_2xf64 (jbm_expm1_2xf64, expm1);
+  n = test_2xf64_log (jbm_2xf64_expm1, expm1);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check expm1: OK(%u)\n", n);
-  n = test_logn_2xf64 (jbm_log2_2xf64, log2, 1.);
+  n = test_logn_2xf64 (jbm_2xf64_log2, log2, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log2: OK(%u)\n", n);
-  n = test_logn_2xf64 (jbm_log_2xf64, log, 1.);
+  n = test_logn_2xf64 (jbm_2xf64_log, log, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log: OK(%u)\n", n);
-  n = test_logn_2xf64 (jbm_log10_2xf64, log10, 1.);
+  n = test_logn_2xf64 (jbm_2xf64_log10, log10, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_2xf64 (jbm_sin_2xf64, sin, -2. * M_PI, 2. * M_PI);
+  n = test_uni_2xf64 (jbm_2xf64_sin, sin, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sin: OK(%u)\n", n);
-  n = test_uni_2xf64 (jbm_cos_2xf64, cos, -2. * M_PI, 2. * M_PI);
+  n = test_uni_2xf64 (jbm_2xf64_cos, cos, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cos: OK(%u)\n", n);
-  n = test_uni_2xf64 (jbm_tan_2xf64, tan, -2. * M_PI, 2. * M_PI);
+  n = test_uni_2xf64 (jbm_2xf64_tan, tan, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     printf ("check tan: No\n");
-  n = test_log_2xf64 (jbm_atan_2xf64, atan);
+  n = test_2xf64_log (jbm_2xf64_atan, atan);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check atan: OK(%u)\n", n);
-  n = test_uni_2xf64 (jbm_asin_2xf64, asin, -1., 1.);
+  n = test_uni_2xf64 (jbm_2xf64_asin, asin, -1., 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check asin: OK(%u)\n", n);
-  n = test_uni_2xf64 (jbm_acos_2xf64, acos, -1., 1.);
+  n = test_uni_2xf64 (jbm_2xf64_acos, acos, -1., 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check acos: OK(%u)\n", n);
-  n = test_log_2xf64 (jbm_sinh_2xf64, sinh);
+  n = test_2xf64_log (jbm_2xf64_sinh, sinh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sinh: OK(%u)\n", n);
-  n = test_log_2xf64 (jbm_cosh_2xf64, cosh);
+  n = test_2xf64_log (jbm_2xf64_cosh, cosh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cosh: OK(%u)\n", n);
-  n = test_log_2xf64 (jbm_tanh_2xf64, tanh);
+  n = test_2xf64_log (jbm_2xf64_tanh, tanh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check tanh: OK(%u)\n", n);
-  n = test_uni_2xf64 (jbm_erf_2xf64, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
+  n = test_uni_2xf64 (jbm_2xf64_erf, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erf: OK(%u)\n", n);
-  n = test_uni_2xf64 (jbm_erfc_2xf64, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
+  n = test_uni_2xf64 (jbm_2xf64_erfc, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
@@ -4037,82 +4085,82 @@ main (void)
   printf ("checking vfloat32m1_t functions (256 bits)\n");
 #endif
 
-  n = test_uni_8xf32 (jbm_abs_8xf32, fabsf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  n = test_uni_8xf32 (jbm_8xf32_abs, fabsf, -FLT_MAX, FLT_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
-  n = test_uni_8xf32 (jbm_cbrt_8xf32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  n = test_uni_8xf32 (jbm_8xf32_cbrt, cbrtf, -FLT_MAX, FLT_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cbrt: OK(%u)\n", n);
-  n = test_log_8xf32 (jbm_exp2_8xf32, exp2f);
+  n = test_8xf32_log (jbm_8xf32_exp2, exp2f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp2: OK(%u)\n", n);
-  n = test_log_8xf32 (jbm_exp_8xf32, expf);
+  n = test_8xf32_log (jbm_8xf32_exp, expf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp: OK(%u)\n", n);
-  n = test_log_8xf32 (jbm_exp10_8xf32, exp10f);
+  n = test_8xf32_log (jbm_8xf32_exp10, exp10f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp10: OK(%u)\n", n);
-  n = test_log_8xf32 (jbm_expm1_8xf32, expm1f);
+  n = test_8xf32_log (jbm_8xf32_expm1, expm1f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check expm1: OK(%u)\n", n);
-  n = test_logn_8xf32 (jbm_log2_8xf32, log2f, 1.f);
+  n = test_logn_8xf32 (jbm_8xf32_log2, log2f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log2: OK(%u)\n", n);
-  n = test_logn_8xf32 (jbm_log_8xf32, logf, 1.f);
+  n = test_logn_8xf32 (jbm_8xf32_log, logf, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log: OK(%u)\n", n);
-  n = test_logn_8xf32 (jbm_log10_8xf32, log10f, 1.f);
+  n = test_logn_8xf32 (jbm_8xf32_log10, log10f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_8xf32 (jbm_sin_8xf32, sinf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_8xf32 (jbm_8xf32_sin, sinf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sin: OK(%u)\n", n);
-  n = test_uni_8xf32 (jbm_cos_8xf32, cosf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_8xf32 (jbm_8xf32_cos, cosf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cos: OK(%u)\n", n);
-  n = test_uni_8xf32 (jbm_tan_8xf32, tanf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_8xf32 (jbm_8xf32_tan, tanf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     printf ("check tan: No\n");
-  n = test_log_8xf32 (jbm_atan_8xf32, atanf);
+  n = test_8xf32_log (jbm_8xf32_atan, atanf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check atan: OK(%u)\n", n);
-  n = test_uni_8xf32 (jbm_asin_8xf32, asinf, -1.f, 1.f);
+  n = test_uni_8xf32 (jbm_8xf32_asin, asinf, -1.f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check asin: OK(%u)\n", n);
-  n = test_uni_8xf32 (jbm_acos_8xf32, acosf, -1.f, 1.f);
+  n = test_uni_8xf32 (jbm_8xf32_acos, acosf, -1.f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check acos: OK(%u)\n", n);
-  n = test_log_8xf32 (jbm_sinh_8xf32, sinhf);
+  n = test_8xf32_log (jbm_8xf32_sinh, sinhf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sinh: OK(%u)\n", n);
-  n = test_log_8xf32 (jbm_cosh_8xf32, coshf);
+  n = test_8xf32_log (jbm_8xf32_cosh, coshf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cosh: OK(%u)\n", n);
-  n = test_log_8xf32 (jbm_tanh_8xf32, tanhf);
+  n = test_8xf32_log (jbm_8xf32_tanh, tanhf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check tanh: OK(%u)\n", n);
-  n = test_uni_8xf32 (jbm_erf_8xf32, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
+  n = test_uni_8xf32 (jbm_8xf32_erf, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erf: OK(%u)\n", n);
-  n = test_uni_8xf32 (jbm_erfc_8xf32, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
+  n = test_uni_8xf32 (jbm_8xf32_erfc, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
@@ -4124,82 +4172,82 @@ main (void)
   printf ("checking vfloat64m1_t functions (256 bits)\n");
 #endif
 
-  n = test_uni_4xf64 (jbm_abs_4xf64, fabs, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  n = test_uni_4xf64 (jbm_4xf64_abs, fabs, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
-  n = test_uni_4xf64 (jbm_cbrt_4xf64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  n = test_uni_4xf64 (jbm_4xf64_cbrt, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cbrt: OK(%u)\n", n);
-  n = test_log_4xf64 (jbm_exp2_4xf64, exp2);
+  n = test_4xf64_log (jbm_4xf64_exp2, exp2);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp2: OK(%u)\n", n);
-  n = test_log_4xf64 (jbm_exp_4xf64, exp);
+  n = test_4xf64_log (jbm_4xf64_exp, exp);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp: OK(%u)\n", n);
-  n = test_log_4xf64 (jbm_exp10_4xf64, exp10);
+  n = test_4xf64_log (jbm_4xf64_exp10, exp10);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp10: OK(%u)\n", n);
-  n = test_log_4xf64 (jbm_expm1_4xf64, expm1);
+  n = test_4xf64_log (jbm_4xf64_expm1, expm1);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check expm1: OK(%u)\n", n);
-  n = test_logn_4xf64 (jbm_log2_4xf64, log2, 1.);
+  n = test_logn_4xf64 (jbm_4xf64_log2, log2, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log2: OK(%u)\n", n);
-  n = test_logn_4xf64 (jbm_log_4xf64, log, 1.);
+  n = test_logn_4xf64 (jbm_4xf64_log, log, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log: OK(%u)\n", n);
-  n = test_logn_4xf64 (jbm_log10_4xf64, log10, 1.);
+  n = test_logn_4xf64 (jbm_4xf64_log10, log10, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_4xf64 (jbm_sin_4xf64, sin, -2. * M_PI, 2. * M_PI);
+  n = test_uni_4xf64 (jbm_4xf64_sin, sin, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sin: OK(%u)\n", n);
-  n = test_uni_4xf64 (jbm_cos_4xf64, cos, -2. * M_PI, 2. * M_PI);
+  n = test_uni_4xf64 (jbm_4xf64_cos, cos, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cos: OK(%u)\n", n);
-  n = test_uni_4xf64 (jbm_tan_4xf64, tan, -2. * M_PI, 2. * M_PI);
+  n = test_uni_4xf64 (jbm_4xf64_tan, tan, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     printf ("check tan: No\n");
-  n = test_log_4xf64 (jbm_atan_4xf64, atan);
+  n = test_4xf64_log (jbm_4xf64_atan, atan);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check atan: OK(%u)\n", n);
-  n = test_uni_4xf64 (jbm_asin_4xf64, asin, -1., 1.);
+  n = test_uni_4xf64 (jbm_4xf64_asin, asin, -1., 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check asin: OK(%u)\n", n);
-  n = test_uni_4xf64 (jbm_acos_4xf64, acos, -1., 1.);
+  n = test_uni_4xf64 (jbm_4xf64_acos, acos, -1., 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check acos: OK(%u)\n", n);
-  n = test_log_4xf64 (jbm_sinh_4xf64, sinh);
+  n = test_4xf64_log (jbm_4xf64_sinh, sinh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sinh: OK(%u)\n", n);
-  n = test_log_4xf64 (jbm_cosh_4xf64, cosh);
+  n = test_4xf64_log (jbm_4xf64_cosh, cosh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cosh: OK(%u)\n", n);
-  n = test_log_4xf64 (jbm_tanh_4xf64, tanh);
+  n = test_4xf64_log (jbm_4xf64_tanh, tanh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check tanh: OK(%u)\n", n);
-  n = test_uni_4xf64 (jbm_erf_4xf64, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
+  n = test_uni_4xf64 (jbm_4xf64_erf, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erf: OK(%u)\n", n);
-  n = test_uni_4xf64 (jbm_erfc_4xf64, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
+  n = test_uni_4xf64 (jbm_4xf64_erfc, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
@@ -4209,163 +4257,163 @@ main (void)
 #if __AVX512F__
 
   printf ("checking __m512 functions\n");
-  n = test_uni_16xf32 (jbm_abs_16xf32, fabsf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  n = test_uni_16xf32 (jbm_16xf32_abs, fabsf, -FLT_MAX, FLT_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
-  n = test_uni_16xf32 (jbm_cbrt_16xf32, cbrtf, -0.5f * FLT_MAX, 0.5f * FLT_MAX);
+  n = test_uni_16xf32 (jbm_16xf32_cbrt, cbrtf, -FLT_MAX, FLT_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cbrt: OK(%u)\n", n);
-  n = test_log_16xf32 (jbm_exp2_16xf32, exp2f);
+  n = test_16xf32_log (jbm_16xf32_exp2, exp2f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp2: OK(%u)\n", n);
-  n = test_log_16xf32 (jbm_exp_16xf32, expf);
+  n = test_16xf32_log (jbm_16xf32_exp, expf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp: OK(%u)\n", n);
-  n = test_log_16xf32 (jbm_exp10_16xf32, exp10f);
+  n = test_16xf32_log (jbm_16xf32_exp10, exp10f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp10: OK(%u)\n", n);
-  n = test_log_16xf32 (jbm_expm1_16xf32, expm1f);
+  n = test_16xf32_log (jbm_16xf32_expm1, expm1f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check expm1: OK(%u)\n", n);
-  n = test_logn_16xf32 (jbm_log2_16xf32, log2f, 1.f);
+  n = test_logn_16xf32 (jbm_16xf32_log2, log2f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log2: OK(%u)\n", n);
-  n = test_logn_16xf32 (jbm_log_16xf32, logf, 1.f);
+  n = test_logn_16xf32 (jbm_16xf32_log, logf, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log: OK(%u)\n", n);
-  n = test_logn_16xf32 (jbm_log10_16xf32, log10f, 1.f);
+  n = test_logn_16xf32 (jbm_16xf32_log10, log10f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_16xf32 (jbm_sin_16xf32, sinf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_16xf32 (jbm_16xf32_sin, sinf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sin: OK(%u)\n", n);
-  n = test_uni_16xf32 (jbm_cos_16xf32, cosf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_16xf32 (jbm_16xf32_cos, cosf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cos: OK(%u)\n", n);
-  n = test_uni_16xf32 (jbm_tan_16xf32, tanf, -2.f * M_PIf, 2.f * M_PIf);
+  n = test_uni_16xf32 (jbm_16xf32_tan, tanf, -2.f * M_PIf, 2.f * M_PIf);
   if (n == MAX_ITERATIONS)
     printf ("check tan: No\n");
-  n = test_log_16xf32 (jbm_atan_16xf32, atanf);
+  n = test_16xf32_log (jbm_16xf32_atan, atanf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check atan: OK(%u)\n", n);
-  n = test_uni_16xf32 (jbm_asin_16xf32, asinf, -1.f, 1.f);
+  n = test_uni_16xf32 (jbm_16xf32_asin, asinf, -1.f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check asin: OK(%u)\n", n);
-  n = test_uni_16xf32 (jbm_acos_16xf32, acosf, -1.f, 1.f);
+  n = test_uni_16xf32 (jbm_16xf32_acos, acosf, -1.f, 1.f);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check acos: OK(%u)\n", n);
-  n = test_log_16xf32 (jbm_sinh_16xf32, sinhf);
+  n = test_16xf32_log (jbm_16xf32_sinh, sinhf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sinh: OK(%u)\n", n);
-  n = test_log_16xf32 (jbm_cosh_16xf32, coshf);
+  n = test_16xf32_log (jbm_16xf32_cosh, coshf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cosh: OK(%u)\n", n);
-  n = test_log_16xf32 (jbm_tanh_16xf32, tanhf);
+  n = test_16xf32_log (jbm_16xf32_tanh, tanhf);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check tanh: OK(%u)\n", n);
-  n = test_uni_16xf32 (jbm_erf_16xf32, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
+  n = test_uni_16xf32 (jbm_16xf32_erf, erff, -FLT_MAX_EXP, FLT_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erf: OK(%u)\n", n);
-  n = test_uni_16xf32 (jbm_erfc_16xf32, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
+  n = test_uni_16xf32 (jbm_16xf32_erfc, erfcf, -FLT_MAX_EXP, FLT_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
 
   printf ("checking __m512d functions\n");
-  n = test_uni_8xf64 (jbm_abs_8xf64, fabs, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  n = test_uni_8xf64 (jbm_8xf64_abs, fabs, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check abs: OK(%u)\n", n);
-  n = test_uni_8xf64 (jbm_cbrt_8xf64, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
+  n = test_uni_8xf64 (jbm_8xf64_cbrt, cbrt, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cbrt: OK(%u)\n", n);
-  n = test_log_8xf64 (jbm_exp2_8xf64, exp2);
+  n = test_8xf64_log (jbm_8xf64_exp2, exp2);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp2: OK(%u)\n", n);
-  n = test_log_8xf64 (jbm_exp_8xf64, exp);
+  n = test_8xf64_log (jbm_8xf64_exp, exp);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp: OK(%u)\n", n);
-  n = test_log_8xf64 (jbm_exp10_8xf64, exp10);
+  n = test_8xf64_log (jbm_8xf64_exp10, exp10);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check exp10: OK(%u)\n", n);
-  n = test_log_8xf64 (jbm_expm1_8xf64, expm1);
+  n = test_8xf64_log (jbm_8xf64_expm1, expm1);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check expm1: OK(%u)\n", n);
-  n = test_logn_8xf64 (jbm_log2_8xf64, log2, 1.);
+  n = test_logn_8xf64 (jbm_8xf64_log2, log2, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log2: OK(%u)\n", n);
-  n = test_logn_8xf64 (jbm_log_8xf64, log, 1.);
+  n = test_logn_8xf64 (jbm_8xf64_log, log, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log: OK(%u)\n", n);
-  n = test_logn_8xf64 (jbm_log10_8xf64, log10, 1.);
+  n = test_logn_8xf64 (jbm_8xf64_log10, log10, 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check log10: OK(%u)\n", n);
-  n = test_uni_8xf64 (jbm_sin_8xf64, sin, -2. * M_PI, 2. * M_PI);
+  n = test_uni_8xf64 (jbm_8xf64_sin, sin, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sin: OK(%u)\n", n);
-  n = test_uni_8xf64 (jbm_cos_8xf64, cos, -2. * M_PI, 2. * M_PI);
+  n = test_uni_8xf64 (jbm_8xf64_cos, cos, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cos: OK(%u)\n", n);
-  n = test_uni_8xf64 (jbm_tan_8xf64, tan, -2. * M_PI, 2. * M_PI);
+  n = test_uni_8xf64 (jbm_8xf64_tan, tan, -2. * M_PI, 2. * M_PI);
   if (n == MAX_ITERATIONS)
     printf ("check tan: No\n");
-  n = test_log_8xf64 (jbm_atan_8xf64, atan);
+  n = test_8xf64_log (jbm_8xf64_atan, atan);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check atan: OK(%u)\n", n);
-  n = test_uni_8xf64 (jbm_asin_8xf64, asin, -1., 1.);
+  n = test_uni_8xf64 (jbm_8xf64_asin, asin, -1., 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check asin: OK(%u)\n", n);
-  n = test_uni_8xf64 (jbm_acos_8xf64, acos, -1., 1.);
+  n = test_uni_8xf64 (jbm_8xf64_acos, acos, -1., 1.);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check acos: OK(%u)\n", n);
-  n = test_log_8xf64 (jbm_sinh_8xf64, sinh);
+  n = test_8xf64_log (jbm_8xf64_sinh, sinh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check sinh: OK(%u)\n", n);
-  n = test_log_8xf64 (jbm_cosh_8xf64, cosh);
+  n = test_8xf64_log (jbm_8xf64_cosh, cosh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check cosh: OK(%u)\n", n);
-  n = test_log_8xf64 (jbm_tanh_8xf64, tanh);
+  n = test_8xf64_log (jbm_8xf64_tanh, tanh);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check tanh: OK(%u)\n", n);
-  n = test_uni_8xf64 (jbm_erf_8xf64, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
+  n = test_uni_8xf64 (jbm_8xf64_erf, erf, -DBL_MAX_EXP, DBL_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erf: OK(%u)\n", n);
-  n = test_uni_8xf64 (jbm_erfc_8xf64, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
+  n = test_uni_8xf64 (jbm_8xf64_erfc, erfc, -DBL_MAX_EXP, DBL_MAX_EXP);
   if (n == MAX_ITERATIONS)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
@@ -4373,377 +4421,377 @@ main (void)
 #endif
 
   // tests
-  xf = jbm_mod_f32 (2.f, -2.f);
+  xf = jbm_f32_mod (2.f, -2.f);
   printf ("mod(2,-2)=%g\n", xf);
-  xf = jbm_mod_f32 (-2.f, 2.f);
+  xf = jbm_f32_mod (-2.f, 2.f);
   printf ("mod(-2,2)=%g\n", xf);
-  xf = jbm_mod_f32 (87.f, 4.f);
+  xf = jbm_f32_mod (87.f, 4.f);
   printf ("mod(87,4)=%g\n", xf);
-  xf = jbm_mod_f32 (-87.f, 4.f);
+  xf = jbm_f32_mod (-87.f, 4.f);
   printf ("mod(-87,4)=%g\n", xf);
-  xf = jbm_frexp_f32 (2.f, &i);
+  xf = jbm_f32_frexp (2.f, &i);
   yf = frexpf (2.f, &is);
   printf ("frexp(2)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
   printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
-          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
-  xf = jbm_frexp_f32 (2.5f, &i);
+          xf, i, jbm_f32_ldexp (xf, i), ldexpf (yf, is));
+  xf = jbm_f32_frexp (2.5f, &i);
   yf = frexpf (2.5f, &is);
   printf ("frexp(2.5)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
   printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
-          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
-  xf = jbm_frexp_f32 (2501.f, &i);
+          xf, i, jbm_f32_ldexp (xf, i), ldexpf (yf, is));
+  xf = jbm_f32_frexp (2501.f, &i);
   yf = frexpf (2501.f, &is);
   printf ("frexp(2501)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
   printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
-          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
-  xf = jbm_frexp_f32 (1e-16f, &i);
+          xf, i, jbm_f32_ldexp (xf, i), ldexpf (yf, is));
+  xf = jbm_f32_frexp (1e-16f, &i);
   yf = frexpf (1e-16f, &is);
   printf ("frexp(1e-16)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
   printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
-          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
-  xf = jbm_frexp_f32 (1e-40f, &i);
+          xf, i, jbm_f32_ldexp (xf, i), ldexpf (yf, is));
+  xf = jbm_f32_frexp (1e-40f, &i);
   yf = frexpf (1e-40f, &is);
   printf ("frexp(1e-40)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
   printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
-          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
-  xf = jbm_frexp_f32 (1e-45f, &i);
+          xf, i, jbm_f32_ldexp (xf, i), ldexpf (yf, is));
+  xf = jbm_f32_frexp (1e-45f, &i);
   yf = frexpf (1e-45f, &is);
   printf ("frexp(1e-45)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
   printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
-          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
-  xf = jbm_frexp_f32 (1e-44f, &i);
+          xf, i, jbm_f32_ldexp (xf, i), ldexpf (yf, is));
+  xf = jbm_f32_frexp (1e-44f, &i);
   yf = frexpf (1e-44f, &is);
   printf ("frexp(1e-44)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
   printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
-          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
-  xf = jbm_frexp_f32 (0.f, &i);
+          xf, i, jbm_f32_ldexp (xf, i), ldexpf (yf, is));
+  xf = jbm_f32_frexp (0.f, &i);
   yf = frexpf (0.f, &is);
   printf ("frexp(0)=%.8g*2^(%d)=%.8g*2^(%d)\n", xf, i, yf, is);
   printf ("ldexp(%.8g,%d)=%.8g=%.8g\n",
-          xf, i, jbm_ldexp_f32 (xf, i), ldexpf (yf, is));
-  xf = jbm_frexp_f32 (-2.f, &i);
+          xf, i, jbm_f32_ldexp (xf, i), ldexpf (yf, is));
+  xf = jbm_f32_frexp (-2.f, &i);
   printf ("frexp(-2)=%.8g*2^(%d)\n", xf, i);
-  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
-  xf = jbm_frexp_f32 (-2.5f, &i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (-2.5f, &i);
   printf ("frexp(-2.5)=%.8g*2^(%d)\n", xf, i);
-  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
-  xf = jbm_frexp_f32 (-2501.f, &i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (-2501.f, &i);
   printf ("frexp(-2501)=%.8g*2^(%d)\n", xf, i);
-  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
-  xf = jbm_frexp_f32 (-1e-16f, &i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (-1e-16f, &i);
   printf ("frexp(-1e-16)=%.8g*2^(%d)\n", xf, i);
-  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
-  xf = jbm_frexp_f32 (-1e-40f, &i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (-1e-40f, &i);
   printf ("frexp(-1e-40)=%.8g*2^(%d)\n", xf, i);
-  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
-  xf = jbm_frexp_f32 (0.f, &i);
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_f32_ldexp (xf, i));
+  xf = jbm_f32_frexp (0.f, &i);
   printf ("frexp(-0)=%.8g*2^(%d)\n", xf, i);
-  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_ldexp_f32 (xf, i));
-  printf ("exp2n(128)=%lg\n", jbm_exp2n_f32 (128));
-  printf ("exp2n(-160)=%lg\n", jbm_exp2n_f32 (-160));
-  printf ("exp2n(2)=%lg\n", jbm_exp2n_f32 (2));
-  printf ("exp2n(-140)=%lg\n", jbm_exp2n_f32 (-140));
-  printf ("exp2(-160)=%.8g\n", jbm_exp2_f32 (-150.f));
-  printf ("exp2(-130)=%.8g\n", jbm_exp2_f32 (-130.f));
-  printf ("exp2(-53)=%.8g\n", jbm_exp2_f32 (-53.f));
-  printf ("exp2(0)=%.8g\n", jbm_exp2_f32 (0.f));
-  printf ("exp2(53)=%.8g\n", jbm_exp2_f32 (53.f));
-  printf ("exp2(127)=%.8g\n", jbm_exp2_f32 (127.f));
-  printf ("exp2(128)=%.8g\n", jbm_exp2_f32 (128.f));
-  printf ("exp(-2)=%.8g\n", jbm_exp_f32 (-2.f));
-  printf ("exp(0)=%.8g\n", jbm_exp_f32 (0.f));
-  printf ("exp(2)=%.8g\n", jbm_exp_f32 (2.f));
-  printf ("exp10(-40)=%.8g\n", jbm_exp10_f32 (-40.f));
-  printf ("exp10(-2)=%.8g\n", jbm_exp10_f32 (-2.f));
-  printf ("exp10(0)=%.8g\n", jbm_exp10_f32 (0.f));
-  printf ("exp10(2)=%.8g\n", jbm_exp10_f32 (2.f));
-  printf ("expm1(-2)=%.8g\n", jbm_expm1_f32 (-2.f));
-  printf ("expm1(-0.1)=%.8g\n", jbm_expm1_f32 (-0.1f));
-  printf ("expm1(0)=%.8g\n", jbm_expm1_f32 (0.f));
-  printf ("expm1(0.01)=%.8g\n", jbm_expm1_f32 (0.01f));
-  printf ("expm1(2)=%.8g\n", jbm_expm1_f32 (2.f));
-  printf ("log2(10)=%.8g=%.8g\n", jbm_log2_f32 (10.f), M_LN10f / M_LN2f);
-  printf ("log2(e)=%.8g=%.8g\n", jbm_log2_f32 (M_Ef), M_LOG2Ef);
-  printf ("log2(1)=%.8g=0\n", jbm_log2_f32 (1.f));
-  printf ("log2(1/e)=%.8g=%.8g\n", jbm_log2_f32 (1.f / M_Ef), -M_LOG2Ef);
-  printf ("log2(1/10)=%.8g=%.8g\n", jbm_log2_f32 (0.1f), -M_LN10f / M_LN2f);
-  printf ("log2(1e-40)=%.8g=%.8g\n", jbm_log2_f32 (1e-40f), log2f (1e-40f));
-  printf ("log2(0)=%.8g\n", jbm_log2_f32 (0.f));
-  printf ("log2(-1)=%.8g\n", jbm_log2_f32 (-1.f));
-  printf ("log(e)=%.8g\n", jbm_log_f32 (M_Ef));
-  printf ("log(1)=%.8g\n", jbm_log_f32 (1.f));
-  printf ("log(1/e)=%.8g\n", jbm_log_f32 (1.f / M_Ef));
-  printf ("log10(10)=%.8g\n", jbm_log10_f32 (10.f));
-  printf ("log10(1)=%.8g\n", jbm_log10_f32 (1.f));
-  printf ("log10(1/10)=%.8g\n", jbm_log10_f32 (0.1f));
-  printf ("log10(1e-40)=%.8g\n", jbm_log10_f32 (1e-40f));
-  printf ("pown(10,31)=%.8g\n", jbm_pown_f32 (10.f, 31));
-  printf ("pown(10,0)=%.8g\n", jbm_pown_f32 (10.f, 0));
-  printf ("pown(10,-31)=%.8g\n", jbm_pown_f32 (10.f, -31));
-  printf ("pown(10,-40)=%.8g\n", jbm_pown_f32 (10.f, -51));
-  printf ("pown(10,-50)=%.8g\n", jbm_pown_f32 (10.f, -50));
-  printf ("pow(10,40.5)=%.8g\n", jbm_pow_f32 (10.f, 40.5f));
-  printf ("pow(10,31.5)=%.8g\n", jbm_pow_f32 (10.f, 31.5f));
-  printf ("pow(10,31)=%.8g\n", jbm_pow_f32 (10.f, 31.f));
-  printf ("pow(10,0)=%.8g\n", jbm_pow_f32 (10.f, 0.f));
-  printf ("pow(10,-31)=%.8g\n", jbm_pow_f32 (10.f, -31.f));
-  printf ("pow(10,-31.5)=%.8g\n", jbm_pow_f32 (10.f, -31.5f));
-  printf ("pow(10,-40)=%.8g\n", jbm_pow_f32 (10.f, -40.f));
-  printf ("pow(10,-40.5)=%.8g\n", jbm_pow_f32 (10.f, -40.5f));
-  printf ("pow(10,-50)=%.8g\n", jbm_pow_f32 (10.f, -50.f));
+  printf ("ldexp(%.8g,%d)=%.8g\n", xf, i, jbm_f32_ldexp (xf, i));
+  printf ("exp2n(128)=%.8g\n", jbm_f32_exp2n (128));
+  printf ("exp2n(-160)=%.8g\n", jbm_f32_exp2n (-160));
+  printf ("exp2n(2)=%.8g\n", jbm_f32_exp2n (2));
+  printf ("exp2n(-140)=%.8g\n", jbm_f32_exp2n (-140));
+  printf ("exp2(-160)=%.8g\n", jbm_f32_exp2 (-150.f));
+  printf ("exp2(-130)=%.8g\n", jbm_f32_exp2 (-130.f));
+  printf ("exp2(-53)=%.8g\n", jbm_f32_exp2 (-53.f));
+  printf ("exp2(0)=%.8g\n", jbm_f32_exp2 (0.f));
+  printf ("exp2(53)=%.8g\n", jbm_f32_exp2 (53.f));
+  printf ("exp2(127)=%.8g\n", jbm_f32_exp2 (127.f));
+  printf ("exp2(128)=%.8g\n", jbm_f32_exp2 (128.f));
+  printf ("exp(-2)=%.8g\n", jbm_f32_exp (-2.f));
+  printf ("exp(0)=%.8g\n", jbm_f32_exp (0.f));
+  printf ("exp(2)=%.8g\n", jbm_f32_exp (2.f));
+  printf ("exp10(-40)=%.8g\n", jbm_f32_exp10 (-40.f));
+  printf ("exp10(-2)=%.8g\n", jbm_f32_exp10 (-2.f));
+  printf ("exp10(0)=%.8g\n", jbm_f32_exp10 (0.f));
+  printf ("exp10(2)=%.8g\n", jbm_f32_exp10 (2.f));
+  printf ("expm1(-2)=%.8g\n", jbm_f32_expm1 (-2.f));
+  printf ("expm1(-0.1)=%.8g\n", jbm_f32_expm1 (-0.1f));
+  printf ("expm1(0)=%.8g\n", jbm_f32_expm1 (0.f));
+  printf ("expm1(0.01)=%.8g\n", jbm_f32_expm1 (0.01f));
+  printf ("expm1(2)=%.8g\n", jbm_f32_expm1 (2.f));
+  printf ("log2(10)=%.8g=%.8g\n", jbm_f32_log2 (10.f), M_LN10f / M_LN2f);
+  printf ("log2(e)=%.8g=%.8g\n", jbm_f32_log2 (M_Ef), M_LOG2Ef);
+  printf ("log2(1)=%.8g=0\n", jbm_f32_log2 (1.f));
+  printf ("log2(1/e)=%.8g=%.8g\n", jbm_f32_log2 (1.f / M_Ef), -M_LOG2Ef);
+  printf ("log2(1/10)=%.8g=%.8g\n", jbm_f32_log2 (0.1f), -M_LN10f / M_LN2f);
+  printf ("log2(1e-40)=%.8g=%.8g\n", jbm_f32_log2 (1e-40f), log2f (1e-40f));
+  printf ("log2(0)=%.8g\n", jbm_f32_log2 (0.f));
+  printf ("log2(-1)=%.8g\n", jbm_f32_log2 (-1.f));
+  printf ("log(e)=%.8g\n", jbm_f32_log (M_Ef));
+  printf ("log(1)=%.8g\n", jbm_f32_log (1.f));
+  printf ("log(1/e)=%.8g\n", jbm_f32_log (1.f / M_Ef));
+  printf ("log10(10)=%.8g\n", jbm_f32_log10 (10.f));
+  printf ("log10(1)=%.8g\n", jbm_f32_log10 (1.f));
+  printf ("log10(1/10)=%.8g\n", jbm_f32_log10 (0.1f));
+  printf ("log10(1e-40)=%.8g\n", jbm_f32_log10 (1e-40f));
+  printf ("pown(10,31)=%.8g\n", jbm_f32_pown (10.f, 31));
+  printf ("pown(10,0)=%.8g\n", jbm_f32_pown (10.f, 0));
+  printf ("pown(10,-31)=%.8g\n", jbm_f32_pown (10.f, -31));
+  printf ("pown(10,-40)=%.8g\n", jbm_f32_pown (10.f, -51));
+  printf ("pown(10,-50)=%.8g\n", jbm_f32_pown (10.f, -50));
+  printf ("pow(10,40.5)=%.8g\n", jbm_f32_pow (10.f, 40.5f));
+  printf ("pow(10,31.5)=%.8g\n", jbm_f32_pow (10.f, 31.5f));
+  printf ("pow(10,31)=%.8g\n", jbm_f32_pow (10.f, 31.f));
+  printf ("pow(10,0)=%.8g\n", jbm_f32_pow (10.f, 0.f));
+  printf ("pow(10,-31)=%.8g\n", jbm_f32_pow (10.f, -31.f));
+  printf ("pow(10,-31.5)=%.8g\n", jbm_f32_pow (10.f, -31.5f));
+  printf ("pow(10,-40)=%.8g\n", jbm_f32_pow (10.f, -40.f));
+  printf ("pow(10,-40.5)=%.8g\n", jbm_f32_pow (10.f, -40.5f));
+  printf ("pow(10,-50)=%.8g\n", jbm_f32_pow (10.f, -50.f));
   xf = 0.f;
-  printf ("sinwc(0)=%.8le=%.8le\n", sin (xf), jbm_sinwc_f32 (xf));
-  printf ("coswc(0)=%.8le=%.8le\n", cos (xf), jbm_coswc_f32 (xf));
+  printf ("sinwc(0)=%.8le=%.8le\n", sin (xf), jbm_f32_sinwc (xf));
+  printf ("coswc(0)=%.8le=%.8le\n", cos (xf), jbm_f32_coswc (xf));
   xf = M_PIf / 6.f;
-  printf ("sinwc(pi/6)=%.8le=%.8le\n", sin (xf), jbm_sinwc_f32 (xf));
-  printf ("coswc(pi/6)=%.8le=%.8le\n", cos (xf), jbm_coswc_f32 (xf));
+  printf ("sinwc(pi/6)=%.8le=%.8le\n", sin (xf), jbm_f32_sinwc (xf));
+  printf ("coswc(pi/6)=%.8le=%.8le\n", cos (xf), jbm_f32_coswc (xf));
   xf = -M_PIf / 6.f;
-  printf ("sinwc(-pi/6)=%.8le=%.8le\n", sin (xf), jbm_sinwc_f32 (xf));
-  printf ("coswc(-pi/6)=%.8le=%.8le\n", cos (xf), jbm_coswc_f32 (xf));
+  printf ("sinwc(-pi/6)=%.8le=%.8le\n", sin (xf), jbm_f32_sinwc (xf));
+  printf ("coswc(-pi/6)=%.8le=%.8le\n", cos (xf), jbm_f32_coswc (xf));
   for (i = 0; i < 13; ++i)
     {
       xf = i * M_PIf / 6.f;
-      printf ("sin(%upi/6)=%.8g=%.8g\n", i, sinf (xf), jbm_sin_f32 (xf));
-      printf ("cos(%upi/6)=%.8g=%.8g\n", i, cosf (xf), jbm_cos_f32 (xf));
-      printf ("tan(%upi/6)=%.8g=%.8g\n", i, tanf (xf), jbm_tan_f32 (xf));
+      printf ("sin(%upi/6)=%.8g=%.8g\n", i, sinf (xf), jbm_f32_sin (xf));
+      printf ("cos(%upi/6)=%.8g=%.8g\n", i, cosf (xf), jbm_f32_cos (xf));
+      printf ("tan(%upi/6)=%.8g=%.8g\n", i, tanf (xf), jbm_f32_tan (xf));
     }
   xf = INFINITY;
-  printf ("sin(infinity)=%.8g=%.8g\n", sinf (xf), jbm_sin_f32 (xf));
-  printf ("cos(infinity)=%.8g=%.8g\n", cosf (xf), jbm_cos_f32 (xf));
-  printf ("tan(infinity)=%.8g=%.8g\n", tanf (xf), jbm_tan_f32 (xf));
-  printf ("atan(infinity)=%.8g=%.8g\n", jbm_atan_f32 (INFINITY), M_PI_2f);
-  printf ("atan(sqrt(3))=%.8g=%.8g\n", jbm_atan_f32 (sqrt (3.f)), M_PIf / 3.f);
-  printf ("atan(1)=%.8g=%.8g\n", jbm_atan_f32 (1.f), M_PI_4f);
+  printf ("sin(infinity)=%.8g=%.8g\n", sinf (xf), jbm_f32_sin (xf));
+  printf ("cos(infinity)=%.8g=%.8g\n", cosf (xf), jbm_f32_cos (xf));
+  printf ("tan(infinity)=%.8g=%.8g\n", tanf (xf), jbm_f32_tan (xf));
+  printf ("atan(infinity)=%.8g=%.8g\n", jbm_f32_atan (INFINITY), M_PI_2f);
+  printf ("atan(sqrt(3))=%.8g=%.8g\n", jbm_f32_atan (sqrt (3.f)), M_PIf / 3.f);
+  printf ("atan(1)=%.8g=%.8g\n", jbm_f32_atan (1.f), M_PI_4f);
   printf ("atan(sqrt(1/3))=%.8g=%.8g\n",
-          jbm_atan_f32 (1.f / sqrt (3.f)), M_PIf / 6.f);
-  printf ("atan(0)=%.8g=0\n", jbm_atan_f32 (0.f));
-  printf ("atan(-0)=%.8g=-0\n", jbm_atan_f32 (-0.f));
+          jbm_f32_atan (1.f / sqrt (3.f)), M_PIf / 6.f);
+  printf ("atan(0)=%.8g=0\n", jbm_f32_atan (0.f));
+  printf ("atan(-0)=%.8g=-0\n", jbm_f32_atan (-0.f));
   printf ("atan(-sqrt(1/3))=%.8g=%.8g\n",
-          jbm_atan_f32 (-1.f / sqrt (3.f)), -M_PIf / 6.f);
-  printf ("atan(-1)=%.8g=%.8g\n", jbm_atan_f32 (-1.f), -M_PI_4f);
+          jbm_f32_atan (-1.f / sqrt (3.f)), -M_PIf / 6.f);
+  printf ("atan(-1)=%.8g=%.8g\n", jbm_f32_atan (-1.f), -M_PI_4f);
   printf ("atan(-sqrt(3))=%.8g=%.8g\n",
-          jbm_atan_f32 (-sqrt (3.f)), -M_PIf / 3.f);
-  printf ("atan(-infinity)=%.8g=%.8g\n", jbm_atan_f32 (-INFINITY), -M_PI_2f);
-  printf ("atan2(1,1)=%.8g=%.8g\n", jbm_atan2_f32 (1.f, 1.f), M_PI_4f);
-  printf ("atan2(1,-1)=%.8g=%.8g\n", jbm_atan2_f32 (1.f, -1.f), 3.f * M_PI_4f);
-  printf ("atan2(-1,1)=%.8g=%.8g\n", jbm_atan2_f32 (-1.f, 1.f), -M_PI_4f);
+          jbm_f32_atan (-sqrt (3.f)), -M_PIf / 3.f);
+  printf ("atan(-infinity)=%.8g=%.8g\n", jbm_f32_atan (-INFINITY), -M_PI_2f);
+  printf ("atan2(1,1)=%.8g=%.8g\n", jbm_f32_atan2 (1.f, 1.f), M_PI_4f);
+  printf ("atan2(1,-1)=%.8g=%.8g\n", jbm_f32_atan2 (1.f, -1.f), 3.f * M_PI_4f);
+  printf ("atan2(-1,1)=%.8g=%.8g\n", jbm_f32_atan2 (-1.f, 1.f), -M_PI_4f);
   printf ("atan2(-1,-1)=%.8g=%.8g\n",
-          jbm_atan2_f32 (-1.f, -1.f), -3.f * M_PI_4f);
-  printf ("asin(1)=%.8g=%.8g\n", jbm_asin_f32 (1.f), M_PI_2f);
-  printf ("asin(1/2)=%.8g=%.8g\n", jbm_asin_f32 (0.5f), M_PIf / 6.f);
-  printf ("asin(0)=%.8g=0\n", jbm_asin_f32 (0.f));
-  printf ("asin(-1/2)=%.8g=%.8g\n", jbm_asin_f32 (-0.5f), -M_PIf / 6.f);
-  printf ("asin(-1)=%.8g=%.8g\n", jbm_asin_f32 (-1.f), -M_PI_2f);
-  printf ("acos(1)=%.8g=0\n", jbm_acos_f32 (1.f));
-  printf ("acos(1/2)=%.8g=%.8g\n", jbm_acos_f32 (0.5f), M_PIf / 3.f);
-  printf ("acos(0)=%.8g=%.8g\n", jbm_acos_f32 (0.f), M_PI_2f);
-  printf ("acos(-1/2)=%.8g=%.8g\n", jbm_acos_f32 (-0.5f), 2.f * M_PIf / 3.);
-  printf ("acos(-1)=%.8g=%.8g\n", jbm_acos_f32 (-1.f), M_PIf);
-  printf ("sinh(-1)=%.8g\n", jbm_sinh_f32 (-1.f));
-  printf ("sinh(0)=%.8g\n", jbm_sinh_f32 (0.f));
-  printf ("sinh(1)=%.8g\n", jbm_sinh_f32 (1.f));
-  printf ("cosh(-1)=%.8g\n", jbm_cosh_f32 (-1.f));
-  printf ("cosh(0)=%.8g\n", jbm_cosh_f32 (0.f));
-  printf ("cosh(1)=%.8g\n", jbm_cosh_f32 (1.f));
-  printf ("tanh(-inf)=%.8g\n", jbm_tanh_f32 (-INFINITY));
-  printf ("tanh(-1)=%.8g\n", jbm_tanh_f32 (-1.f));
-  printf ("tanh(0)=%.8g\n", jbm_tanh_f32 (0.f));
-  printf ("tanh(1)=%.8g\n", jbm_tanh_f32 (1.f));
-  printf ("tanh(inf)=%.8g\n", jbm_tanh_f32 (INFINITY));
-  printf ("erf(10)=%.8g=%.8g\n", jbm_erf_f32 (10.f), erff (10.f));
-  printf ("erf(3/2)=%.8g=%.8g\n", jbm_erf_f32 (1.5f), erff (1.5f));
-  printf ("erf(1/2)=%.8g=%.8g\n", jbm_erf_f32 (0.5f), erff (0.5f));
-  printf ("erf(0)=%.8g=%.8g\n", jbm_erf_f32 (0.f), erff (0.f));
-  printf ("erf(-1/2)=%.8g=%.8g\n", jbm_erf_f32 (-0.5f), erff (-0.5f));
-  printf ("erf(-3/2)=%.8g=%.8g\n", jbm_erf_f32 (-1.5f), erff (-1.5f));
-  printf ("erf(-10)=%.8g=%.8g\n", jbm_erf_f32 (-10.f), erff (-10.f));
-  printf ("erfc(10)=%.8g=%.8g\n", jbm_erfc_f32 (10.f), erfcf (10.f));
-  printf ("erfc(3/2)=%.8g=%.8g\n", jbm_erfc_f32 (1.5f), erfcf (1.5f));
-  printf ("erfc(1/2)=%.8g=%.8g\n", jbm_erfc_f32 (0.5f), erfcf (0.5f));
-  printf ("erfc(0)=%.8g=%.8g\n", jbm_erfc_f32 (0.f), erfcf (0.f));
-  printf ("erfc(-1/2)=%.8g=%.8g\n", jbm_erfc_f32 (-0.5f), erfcf (-0.5f));
-  printf ("erfc(-3/2)=%.8g=%.8g\n", jbm_erfc_f32 (-1.5f), erfcf (-1.5f));
-  printf ("erfc(-10)=%.8g=%.8g\n", jbm_erfc_f32 (-10.f), erfcf (-10.f));
+          jbm_f32_atan2 (-1.f, -1.f), -3.f * M_PI_4f);
+  printf ("asin(1)=%.8g=%.8g\n", jbm_f32_asin (1.f), M_PI_2f);
+  printf ("asin(1/2)=%.8g=%.8g\n", jbm_f32_asin (0.5f), M_PIf / 6.f);
+  printf ("asin(0)=%.8g=0\n", jbm_f32_asin (0.f));
+  printf ("asin(-1/2)=%.8g=%.8g\n", jbm_f32_asin (-0.5f), -M_PIf / 6.f);
+  printf ("asin(-1)=%.8g=%.8g\n", jbm_f32_asin (-1.f), -M_PI_2f);
+  printf ("acos(1)=%.8g=0\n", jbm_f32_acos (1.f));
+  printf ("acos(1/2)=%.8g=%.8g\n", jbm_f32_acos (0.5f), M_PIf / 3.f);
+  printf ("acos(0)=%.8g=%.8g\n", jbm_f32_acos (0.f), M_PI_2f);
+  printf ("acos(-1/2)=%.8g=%.8g\n", jbm_f32_acos (-0.5f), 2.f * M_PIf / 3.);
+  printf ("acos(-1)=%.8g=%.8g\n", jbm_f32_acos (-1.f), M_PIf);
+  printf ("sinh(-1)=%.8g\n", jbm_f32_sinh (-1.f));
+  printf ("sinh(0)=%.8g\n", jbm_f32_sinh (0.f));
+  printf ("sinh(1)=%.8g\n", jbm_f32_sinh (1.f));
+  printf ("cosh(-1)=%.8g\n", jbm_f32_cosh (-1.f));
+  printf ("cosh(0)=%.8g\n", jbm_f32_cosh (0.f));
+  printf ("cosh(1)=%.8g\n", jbm_f32_cosh (1.f));
+  printf ("tanh(-inf)=%.8g\n", jbm_f32_tanh (-INFINITY));
+  printf ("tanh(-1)=%.8g\n", jbm_f32_tanh (-1.f));
+  printf ("tanh(0)=%.8g\n", jbm_f32_tanh (0.f));
+  printf ("tanh(1)=%.8g\n", jbm_f32_tanh (1.f));
+  printf ("tanh(inf)=%.8g\n", jbm_f32_tanh (INFINITY));
+  printf ("erf(10)=%.8g=%.8g\n", jbm_f32_erf (10.f), erff (10.f));
+  printf ("erf(3/2)=%.8g=%.8g\n", jbm_f32_erf (1.5f), erff (1.5f));
+  printf ("erf(1/2)=%.8g=%.8g\n", jbm_f32_erf (0.5f), erff (0.5f));
+  printf ("erf(0)=%.8g=%.8g\n", jbm_f32_erf (0.f), erff (0.f));
+  printf ("erf(-1/2)=%.8g=%.8g\n", jbm_f32_erf (-0.5f), erff (-0.5f));
+  printf ("erf(-3/2)=%.8g=%.8g\n", jbm_f32_erf (-1.5f), erff (-1.5f));
+  printf ("erf(-10)=%.8g=%.8g\n", jbm_f32_erf (-10.f), erff (-10.f));
+  printf ("erfc(10)=%.8g=%.8g\n", jbm_f32_erfc (10.f), erfcf (10.f));
+  printf ("erfc(3/2)=%.8g=%.8g\n", jbm_f32_erfc (1.5f), erfcf (1.5f));
+  printf ("erfc(1/2)=%.8g=%.8g\n", jbm_f32_erfc (0.5f), erfcf (0.5f));
+  printf ("erfc(0)=%.8g=%.8g\n", jbm_f32_erfc (0.f), erfcf (0.f));
+  printf ("erfc(-1/2)=%.8g=%.8g\n", jbm_f32_erfc (-0.5f), erfcf (-0.5f));
+  printf ("erfc(-3/2)=%.8g=%.8g\n", jbm_f32_erfc (-1.5f), erfcf (-1.5f));
+  printf ("erfc(-10)=%.8g=%.8g\n", jbm_f32_erfc (-10.f), erfcf (-10.f));
 
   printf ("Checking 64 bits functions\n");
-  x = jbm_mod_f64 (2., -2.);
+  x = jbm_f64_mod (2., -2.);
   printf ("mod(2,-2)=%lg\n", x);
-  x = jbm_mod_f64 (-2., 2.);
+  x = jbm_f64_mod (-2., 2.);
   printf ("mod(-2,2)=%lg\n", x);
-  x = jbm_mod_f64 (87., 4.);
+  x = jbm_f64_mod (87., 4.);
   printf ("mod(87,4)=%lg\n", x);
-  x = jbm_mod_f64 (-87., 4.);
+  x = jbm_f64_mod (-87., 4.);
   printf ("mod(-87,4)=%lg\n", x);
-  x = jbm_frexp_f64 (2., &i);
+  x = jbm_f64_frexp (2., &i);
   y = frexp (2., &is);
   printf ("frexp(2)=%.17lg*2^(%d)=%.17lg*2^(%d)\n", x, i, y, is);
   printf ("ldexp(%.17lg,%d)=%.17lg=%.17lg\n",
-          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
-  x = jbm_frexp_f64 (2.5, &i);
+          x, i, jbm_f64_ldexp (x, i), ldexp (y, is));
+  x = jbm_f64_frexp (2.5, &i);
   y = frexp (2.5, &is);
   printf ("frexp(2.5)=%.17lg*2^(%d)=%.17lg*2^(%d)\n", x, i, y, is);
   printf ("ldexp(%.17lg,%d)=%.17lg=%.17lg\n",
-          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
-  x = jbm_frexp_f64 (2501., &i);
+          x, i, jbm_f64_ldexp (x, i), ldexp (y, is));
+  x = jbm_f64_frexp (2501., &i);
   y = frexp (2501., &is);
   printf ("frexp(2501)=%.17lg*2^(%d)=%.17lg*2^(%d)\n", x, i, y, is);
   printf ("ldexp(%.17lg,%d)=%.17lg=%.17lg\n",
-          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
-  x = jbm_frexp_f64 (1e-16, &i);
+          x, i, jbm_f64_ldexp (x, i), ldexp (y, is));
+  x = jbm_f64_frexp (1e-16, &i);
   y = frexp (1e-16, &is);
   printf ("frexp(1e-16)=%.17lg*2^(%d)=%.17lg*2^(%d)\n", x, i, y, is);
   printf ("ldexp(%.17lg,%d)=%.17lg=%.17lg\n",
-          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
-  x = jbm_frexp_f64 (1e-320, &i);
+          x, i, jbm_f64_ldexp (x, i), ldexp (y, is));
+  x = jbm_f64_frexp (1e-320, &i);
   y = frexp (1e-320, &is);
   printf ("frexp(1e-320)=%.17lg*2^(%d)=%.17lg*2^(%d)\n", x, i, y, is);
   printf ("ldexp(%.17lg,%d)=%.17lg=%.17lg\n",
-          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
-  x = jbm_frexp_f64 (0., &i);
+          x, i, jbm_f64_ldexp (x, i), ldexp (y, is));
+  x = jbm_f64_frexp (0., &i);
   y = frexp (0., &is);
   printf ("frexp(0)=%.17lg*2^(%d)=%.17lg*2^(%d)\n", x, i, y, is);
   printf ("ldexp(%.17lg,%d)=%.17lg=%.17lg\n",
-          x, i, jbm_ldexp_f64 (x, i), ldexp (y, is));
-  x = jbm_frexp_f64 (-2., &i);
+          x, i, jbm_f64_ldexp (x, i), ldexp (y, is));
+  x = jbm_f64_frexp (-2., &i);
   printf ("frexp(-2.)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
-  x = jbm_frexp_f64 (-2.5, &i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (-2.5, &i);
   printf ("frexp(-2.5)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
-  x = jbm_frexp_f64 (-2501., &i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (-2501., &i);
   printf ("frexp(-2501)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
-  x = jbm_frexp_f64 (-1e-16, &i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (-1e-16, &i);
   printf ("frexp(-1e-16)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
-  x = jbm_frexp_f64 (-1e-320, &i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (-1e-320, &i);
   printf ("frexp(-1e-320)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
-  x = jbm_frexp_f64 (-0., &i);
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  x = jbm_f64_frexp (-0., &i);
   printf ("frexp(-0)=%lg*2^(%d)\n", x, i);
-  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_ldexp_f64 (x, i));
-  printf ("exp2n(1025)=%lg\n", jbm_exp2n_f64 (1025));
-  printf ("exp2n(-1075)=%lg\n", jbm_exp2n_f64 (-1075));
-  printf ("exp2n(2)=%lg\n", jbm_exp2n_f64 (2));
-  printf ("exp2n(-1024)=%lg\n", jbm_exp2n_f64 (-1024));
-  printf ("exp2(-1100)=%.17lg\n", jbm_exp2_f64 (-1100.));
-  printf ("exp2(-1063)=%.17lg\n", jbm_exp2_f64 (-1063.));
-  printf ("exp2(-53)=%.17lg\n", jbm_exp2_f64 (-53.));
-  printf ("exp2(0)=%.17lg\n", jbm_exp2_f64 (0.));
-  printf ("exp2(53)=%.17lg\n", jbm_exp2_f64 (53.));
-  printf ("exp2(1023)=%.17lg\n", jbm_exp2_f64 (1023.));
-  printf ("exp2(1024)=%.17lg\n", jbm_exp2_f64 (1024.));
-  printf ("exp(-2)=%.17lg\n", jbm_exp_f64 (-2.));
-  printf ("exp(0)=%.17lg\n", jbm_exp_f64 (0.));
-  printf ("exp(2)=%.17lg\n", jbm_exp_f64 (2.));
-  printf ("exp10(-320)=%.17lg\n", jbm_exp10_f64 (-320.));
-  printf ("exp10(-2)=%.17lg\n", jbm_exp10_f64 (-2.));
-  printf ("exp10(0)=%.17lg\n", jbm_exp10_f64 (0.));
-  printf ("exp10(2)=%.17lg\n", jbm_exp10_f64 (2.));
-  printf ("expm1(-2)=%.17lg\n", jbm_expm1_f64 (-2.));
-  printf ("expm1(-0.1)=%.17lg\n", jbm_expm1_f64 (-0.1));
-  printf ("expm1(0)=%.17lg\n", jbm_expm1_f64 (0.));
-  printf ("expm1(0.01)=%.17lg\n", jbm_expm1_f64 (0.01));
-  printf ("expm1(2)=%.17lg\n", jbm_expm1_f64 (2.));
-  printf ("log2(e)=%.17lg=%.17lg\n", jbm_log2_f64 (M_E), M_LOG2E);
-  printf ("log2(1)=%.17lg\n", jbm_log2_f64 (1.));
-  printf ("log2(1/e)=%.17lg=%.17lg\n", jbm_log2_f64 (1. / M_E), -M_LOG2E);
-  printf ("log2(1/10)=%.17lg=%.17lg\n", jbm_log2_f64 (0.1), -M_LN10 / M_LN2);
-  printf ("log2(1e-320)=%.17lg\n", jbm_log2_f64 (1e-320));
-  printf ("log2(0)=%.17lg\n", jbm_log2_f64 (0.));
-  printf ("log2(-1)=%.17lg\n", jbm_log2_f64 (-1.));
-  printf ("log(1)=%.17lg\n", jbm_log_f64 (1.));
-  printf ("log(1/e)=%.17lg\n", jbm_log_f64 (1. / M_E));
-  printf ("log10(1)=%.17lg\n", jbm_log10_f64 (1.));
-  printf ("log10(1/10)=%.17lg\n", jbm_log10_f64 (0.1));
-  printf ("log10(1e-320)=%.17lg\n", jbm_log10_f64 (1e-320));
-  printf ("pown(10,31)=%.17lg\n", jbm_pown_f64 (10., 31));
-  printf ("pown(10,0)=%.17lg\n", jbm_pown_f64 (10., 0));
-  printf ("pown(10,-31)=%.17lg\n", jbm_pown_f64 (10., -31));
-  printf ("pown(10,-321)=%.17lg\n", jbm_pown_f64 (10., -321));
-  printf ("pown(10,-400)=%.17lg\n", jbm_pown_f64 (10., -400));
-  printf ("pow(10,321.5)=%.17lg\n", jbm_pow_f64 (10., 321.5));
-  printf ("pow(10,31.5)=%.17lg\n", jbm_pow_f64 (10., 31.5));
-  printf ("pow(10,31)=%.17lg\n", jbm_pow_f64 (10., 31.));
-  printf ("pow(10,0)=%.17lg\n", jbm_pow_f64 (10., 0.));
-  printf ("pow(10,-31)=%.17lg\n", jbm_pow_f64 (10., -31.));
-  printf ("pow(10,-31.5)=%.17lg\n", jbm_pow_f64 (10., -31.5));
-  printf ("pow(10,-321)=%.17lg\n", jbm_pow_f64 (10., -321.));
-  printf ("pow(10,-321.5)=%.17lg\n", jbm_pow_f64 (10., -321.5));
-  printf ("pow(10,-400.5)=%.17lg\n", jbm_pow_f64 (10., -400.5));
+  printf ("ldexp(%lg,%d)=%lg\n", x, i, jbm_f64_ldexp (x, i));
+  printf ("exp2n(1025)=%lg\n", jbm_f64_exp2n (1025));
+  printf ("exp2n(-1075)=%lg\n", jbm_f64_exp2n (-1075));
+  printf ("exp2n(2)=%lg\n", jbm_f64_exp2n (2));
+  printf ("exp2n(-1024)=%lg\n", jbm_f64_exp2n (-1024));
+  printf ("exp2(-1100)=%.17lg\n", jbm_f64_exp2 (-1100.));
+  printf ("exp2(-1063)=%.17lg\n", jbm_f64_exp2 (-1063.));
+  printf ("exp2(-53)=%.17lg\n", jbm_f64_exp2 (-53.));
+  printf ("exp2(0)=%.17lg\n", jbm_f64_exp2 (0.));
+  printf ("exp2(53)=%.17lg\n", jbm_f64_exp2 (53.));
+  printf ("exp2(1023)=%.17lg\n", jbm_f64_exp2 (1023.));
+  printf ("exp2(1024)=%.17lg\n", jbm_f64_exp2 (1024.));
+  printf ("exp(-2)=%.17lg\n", jbm_f64_exp (-2.));
+  printf ("exp(0)=%.17lg\n", jbm_f64_exp (0.));
+  printf ("exp(2)=%.17lg\n", jbm_f64_exp (2.));
+  printf ("exp10(-320)=%.17lg\n", jbm_f64_exp10 (-320.));
+  printf ("exp10(-2)=%.17lg\n", jbm_f64_exp10 (-2.));
+  printf ("exp10(0)=%.17lg\n", jbm_f64_exp10 (0.));
+  printf ("exp10(2)=%.17lg\n", jbm_f64_exp10 (2.));
+  printf ("expm1(-2)=%.17lg\n", jbm_f64_expm1 (-2.));
+  printf ("expm1(-0.1)=%.17lg\n", jbm_f64_expm1 (-0.1));
+  printf ("expm1(0)=%.17lg\n", jbm_f64_expm1 (0.));
+  printf ("expm1(0.01)=%.17lg\n", jbm_f64_expm1 (0.01));
+  printf ("expm1(2)=%.17lg\n", jbm_f64_expm1 (2.));
+  printf ("log2(e)=%.17lg=%.17lg\n", jbm_f64_log2 (M_E), M_LOG2E);
+  printf ("log2(1)=%.17lg\n", jbm_f64_log2 (1.));
+  printf ("log2(1/e)=%.17lg=%.17lg\n", jbm_f64_log2 (1. / M_E), -M_LOG2E);
+  printf ("log2(1/10)=%.17lg=%.17lg\n", jbm_f64_log2 (0.1), -M_LN10 / M_LN2);
+  printf ("log2(1e-320)=%.17lg\n", jbm_f64_log2 (1e-320));
+  printf ("log2(0)=%.17lg\n", jbm_f64_log2 (0.));
+  printf ("log2(-1)=%.17lg\n", jbm_f64_log2 (-1.));
+  printf ("log(1)=%.17lg\n", jbm_f64_log (1.));
+  printf ("log(1/e)=%.17lg\n", jbm_f64_log (1. / M_E));
+  printf ("log10(1)=%.17lg\n", jbm_f64_log10 (1.));
+  printf ("log10(1/10)=%.17lg\n", jbm_f64_log10 (0.1));
+  printf ("log10(1e-320)=%.17lg\n", jbm_f64_log10 (1e-320));
+  printf ("pown(10,31)=%.17lg\n", jbm_f64_pown (10., 31));
+  printf ("pown(10,0)=%.17lg\n", jbm_f64_pown (10., 0));
+  printf ("pown(10,-31)=%.17lg\n", jbm_f64_pown (10., -31));
+  printf ("pown(10,-321)=%.17lg\n", jbm_f64_pown (10., -321));
+  printf ("pown(10,-400)=%.17lg\n", jbm_f64_pown (10., -400));
+  printf ("pow(10,321.5)=%.17lg\n", jbm_f64_pow (10., 321.5));
+  printf ("pow(10,31.5)=%.17lg\n", jbm_f64_pow (10., 31.5));
+  printf ("pow(10,31)=%.17lg\n", jbm_f64_pow (10., 31.));
+  printf ("pow(10,0)=%.17lg\n", jbm_f64_pow (10., 0.));
+  printf ("pow(10,-31)=%.17lg\n", jbm_f64_pow (10., -31.));
+  printf ("pow(10,-31.5)=%.17lg\n", jbm_f64_pow (10., -31.5));
+  printf ("pow(10,-321)=%.17lg\n", jbm_f64_pow (10., -321.));
+  printf ("pow(10,-321.5)=%.17lg\n", jbm_f64_pow (10., -321.5));
+  printf ("pow(10,-400.5)=%.17lg\n", jbm_f64_pow (10., -400.5));
   x = 0.;
-  printf ("sinwc(0)=%.17lg=%.17lg\n", sin (x), jbm_sinwc_f64 (x));
-  printf ("coswc(0)=%.17lg=%.17lg\n", cos (x), jbm_coswc_f64 (x));
+  printf ("sinwc(0)=%.17lg=%.17lg\n", sin (x), jbm_f64_sinwc (x));
+  printf ("coswc(0)=%.17lg=%.17lg\n", cos (x), jbm_f64_coswc (x));
   x = M_PI / 6.;
-  printf ("sinwc(pi/6)=%.17lg=%.17lg\n", sin (x), jbm_sinwc_f64 (x));
-  printf ("coswc(pi/6)=%.17lg=%.17lg\n", cos (x), jbm_coswc_f64 (x));
+  printf ("sinwc(pi/6)=%.17lg=%.17lg\n", sin (x), jbm_f64_sinwc (x));
+  printf ("coswc(pi/6)=%.17lg=%.17lg\n", cos (x), jbm_f64_coswc (x));
   x = -M_PI / 6.;
-  printf ("sinwc(-pi/6)=%.17lg=%.17lg\n", sin (x), jbm_sinwc_f64 (x));
-  printf ("coswc(-pi/6)=%.17lg=%.17lg\n", cos (x), jbm_coswc_f64 (x));
+  printf ("sinwc(-pi/6)=%.17lg=%.17lg\n", sin (x), jbm_f64_sinwc (x));
+  printf ("coswc(-pi/6)=%.17lg=%.17lg\n", cos (x), jbm_f64_coswc (x));
   for (i = 0; i < 13; ++i)
     {
       x = i * M_PI / 6.;
-      printf ("sin(%upi/6)=%.17lg=%.17lg\n", i, sin (x), jbm_sin_f64 (x));
-      printf ("cos(%upi/6)=%.17lg=%.17lg\n", i, cos (x), jbm_cos_f64 (x));
-      printf ("tan(%upi/6)=%.17lg=%.17lg\n", i, tan (x), jbm_tan_f64 (x));
+      printf ("sin(%upi/6)=%.17lg=%.17lg\n", i, sin (x), jbm_f64_sin (x));
+      printf ("cos(%upi/6)=%.17lg=%.17lg\n", i, cos (x), jbm_f64_cos (x));
+      printf ("tan(%upi/6)=%.17lg=%.17lg\n", i, tan (x), jbm_f64_tan (x));
     }
   x = INFINITY;
-  printf ("sin(infinity)=%.17lg=%.17lg\n", sin (x), jbm_sin_f64 (x));
-  printf ("cos(infinity)=%.17lg=%.17lg\n", cos (x), jbm_cos_f64 (x));
-  printf ("tan(infinity)=%.17lg=%.17lg\n", tan (x), jbm_tan_f64 (x));
-  printf ("atan(infinity)=%.17lg=%.17lg\n", jbm_atan_f64 (INFINITY), M_PI_2);
-  printf ("atan(sqrt(3))=%.17lg=%.17lg\n", jbm_atan_f64 (sqrt (3.)), M_PI / 3.);
-  printf ("atan(1)=%.17lg=%.17lg\n", jbm_atan_f64 (1.), M_PI_4);
+  printf ("sin(infinity)=%.17lg=%.17lg\n", sin (x), jbm_f64_sin (x));
+  printf ("cos(infinity)=%.17lg=%.17lg\n", cos (x), jbm_f64_cos (x));
+  printf ("tan(infinity)=%.17lg=%.17lg\n", tan (x), jbm_f64_tan (x));
+  printf ("atan(infinity)=%.17lg=%.17lg\n", jbm_f64_atan (INFINITY), M_PI_2);
+  printf ("atan(sqrt(3))=%.17lg=%.17lg\n", jbm_f64_atan (sqrt (3.)), M_PI / 3.);
+  printf ("atan(1)=%.17lg=%.17lg\n", jbm_f64_atan (1.), M_PI_4);
   printf ("atan(sqrt(1/3))=%.17lg=%.17lg\n",
-          jbm_atan_f64 (1. / sqrt (3.)), M_PI / 6.);
-  printf ("atan(0)=%.17lg=0\n", jbm_atan_f64 (0.));
-  printf ("atan(-0)=%.17lg=-0\n", jbm_atan_f64 (-0.));
+          jbm_f64_atan (1. / sqrt (3.)), M_PI / 6.);
+  printf ("atan(0)=%.17lg=0\n", jbm_f64_atan (0.));
+  printf ("atan(-0)=%.17lg=-0\n", jbm_f64_atan (-0.));
   printf ("atan(-sqrt(1/3))=%.17lg=%.17lg\n",
-          jbm_atan_f64 (-1. / sqrt (3.)), -M_PI / 6.);
-  printf ("atan(-1)=%.17lg=%.17lg\n", jbm_atan_f64 (-1.), -M_PI_4);
+          jbm_f64_atan (-1. / sqrt (3.)), -M_PI / 6.);
+  printf ("atan(-1)=%.17lg=%.17lg\n", jbm_f64_atan (-1.), -M_PI_4);
   printf ("atan(-sqrt(3))=%.17lg=%.17lg\n",
-          jbm_atan_f64 (-sqrt (3.)), -M_PI / 3.);
-  printf ("atan(-infinity)=%.17lg=%.17lg\n", jbm_atan_f64 (-INFINITY), -M_PI_2);
-  printf ("atan2(1,1)=%.17lg=%.17lg\n", jbm_atan2_f64 (1., 1.), M_PI_4);
-  printf ("atan2(1,-1)=%.17lg=%.17lg\n", jbm_atan2_f64 (1., -1.), 3. * M_PI_4);
-  printf ("atan2(-1,1)=%.17lg=%.17lg\n", jbm_atan2_f64 (-1., 1.), -M_PI_4);
+          jbm_f64_atan (-sqrt (3.)), -M_PI / 3.);
+  printf ("atan(-infinity)=%.17lg=%.17lg\n", jbm_f64_atan (-INFINITY), -M_PI_2);
+  printf ("atan2(1,1)=%.17lg=%.17lg\n", jbm_f64_atan2 (1., 1.), M_PI_4);
+  printf ("atan2(1,-1)=%.17lg=%.17lg\n", jbm_f64_atan2 (1., -1.), 3. * M_PI_4);
+  printf ("atan2(-1,1)=%.17lg=%.17lg\n", jbm_f64_atan2 (-1., 1.), -M_PI_4);
   printf ("atan2(-1,-1)=%.17lg=%.17lg\n",
-          jbm_atan2_f64 (-1., -1.), -3. * M_PI_4);
-  printf ("asin(1)=%.17lg=%.17lg\n", jbm_asin_f64 (1.), M_PI_2);
-  printf ("asin(1/2)=%.17lg=%.17lg\n", jbm_asin_f64 (0.5), M_PI / 6.);
-  printf ("asin(0)=%.17lg=0\n", jbm_asin_f64 (0.));
-  printf ("asin(-1/2)=%.17lg=%.17lg\n", jbm_asin_f64 (-0.5), -M_PI / 6.);
-  printf ("asin(-1)=%.17lg=%.17lg\n", jbm_asin_f64 (-1.), -M_PI_2);
-  printf ("acos(1)=%.17lg=0\n", jbm_acos_f64 (1.));
-  printf ("acos(1/2)=%.17lg=%.17lg\n", jbm_acos_f64 (0.5), M_PI / 3.);
-  printf ("acos(0)=%.17lg=%.17lg\n", jbm_acos_f64 (0.), M_PI_2);
-  printf ("acos(-1/2)=%.17lg=%.17lg\n", jbm_acos_f64 (-0.5), 2. * M_PI / 3.);
-  printf ("acos(-1)=%.17lg=%.17lg\n", jbm_acos_f64 (-1.), M_PI);
-  printf ("sinh(-1)=%.17lg\n", jbm_sinh_f64 (-1.));
-  printf ("sinh(0)=%.17lg\n", jbm_sinh_f64 (0.));
-  printf ("sinh(1)=%.17lg\n", jbm_sinh_f64 (1.));
-  printf ("cosh(-1)=%.17lg\n", jbm_cosh_f64 (-1.));
-  printf ("cosh(0)=%.17lg\n", jbm_cosh_f64 (0.));
-  printf ("cosh(1)=%.17lg\n", jbm_cosh_f64 (1.));
-  printf ("tanh(-inf)=%.17lg\n", jbm_tanh_f64 (-INFINITY));
-  printf ("tanh(-1)=%.17lg\n", jbm_tanh_f64 (-1.));
-  printf ("tanh(0)=%.17lg\n", jbm_tanh_f64 (0.));
-  printf ("tanh(1)=%.17lg\n", jbm_tanh_f64 (1.));
-  printf ("tanh(inf)=%.17lg\n", jbm_tanh_f64 (INFINITY));
-  printf ("erf(10)=%.17lg=%.17lg\n", jbm_erf_f64 (10.), erf (10.));
-  printf ("erf(3/2)=%.17lg=%.17lg\n", jbm_erf_f64 (1.5), erf (1.5));
-  printf ("erf(1/2)=%.17lg=%.17lg\n", jbm_erf_f64 (0.5), erf (0.5));
-  printf ("erf(0)=%.17lg=%.17lg\n", jbm_erf_f64 (0.), erf (0.));
-  printf ("erf(-1/2)=%.17lg=%.17lg\n", jbm_erf_f64 (-0.5), erf (-0.5));
-  printf ("erf(-3/2)=%.17lg=%.17lg\n", jbm_erf_f64 (-1.5), erf (-1.5));
-  printf ("erf(-10)=%.17lg=%.17lg\n", jbm_erf_f64 (-10.), erf (-10.));
-  printf ("erfc(10)=%.17lg=%.17lg\n", jbm_erfc_f64 (10.), erfc (10.));
-  printf ("erfc(3/2)=%.17lg=%.17lg\n", jbm_erfc_f64 (1.5), erfc (1.5));
-  printf ("erfc(1/2)=%.17lg=%.17lg\n", jbm_erfc_f64 (0.5), erfc (0.5));
-  printf ("erfc(0)=%.17lg=%.17lg\n", jbm_erfc_f64 (0.), erfc (0.));
-  printf ("erfc(-1/2)=%.17lg=%.17lg\n", jbm_erfc_f64 (-0.5), erfc (-0.5));
-  printf ("erfc(-3/2)=%.17lg=%.17lg\n", jbm_erfc_f64 (-1.5), erfc (-1.5));
-  printf ("erfc(-10)=%.17lg=%.17lg\n", jbm_erfc_f64 (-10.), erfc (-10.));
+          jbm_f64_atan2 (-1., -1.), -3. * M_PI_4);
+  printf ("asin(1)=%.17lg=%.17lg\n", jbm_f64_asin (1.), M_PI_2);
+  printf ("asin(1/2)=%.17lg=%.17lg\n", jbm_f64_asin (0.5), M_PI / 6.);
+  printf ("asin(0)=%.17lg=0\n", jbm_f64_asin (0.));
+  printf ("asin(-1/2)=%.17lg=%.17lg\n", jbm_f64_asin (-0.5), -M_PI / 6.);
+  printf ("asin(-1)=%.17lg=%.17lg\n", jbm_f64_asin (-1.), -M_PI_2);
+  printf ("acos(1)=%.17lg=0\n", jbm_f64_acos (1.));
+  printf ("acos(1/2)=%.17lg=%.17lg\n", jbm_f64_acos (0.5), M_PI / 3.);
+  printf ("acos(0)=%.17lg=%.17lg\n", jbm_f64_acos (0.), M_PI_2);
+  printf ("acos(-1/2)=%.17lg=%.17lg\n", jbm_f64_acos (-0.5), 2. * M_PI / 3.);
+  printf ("acos(-1)=%.17lg=%.17lg\n", jbm_f64_acos (-1.), M_PI);
+  printf ("sinh(-1)=%.17lg\n", jbm_f64_sinh (-1.));
+  printf ("sinh(0)=%.17lg\n", jbm_f64_sinh (0.));
+  printf ("sinh(1)=%.17lg\n", jbm_f64_sinh (1.));
+  printf ("cosh(-1)=%.17lg\n", jbm_f64_cosh (-1.));
+  printf ("cosh(0)=%.17lg\n", jbm_f64_cosh (0.));
+  printf ("cosh(1)=%.17lg\n", jbm_f64_cosh (1.));
+  printf ("tanh(-inf)=%.17lg\n", jbm_f64_tanh (-INFINITY));
+  printf ("tanh(-1)=%.17lg\n", jbm_f64_tanh (-1.));
+  printf ("tanh(0)=%.17lg\n", jbm_f64_tanh (0.));
+  printf ("tanh(1)=%.17lg\n", jbm_f64_tanh (1.));
+  printf ("tanh(inf)=%.17lg\n", jbm_f64_tanh (INFINITY));
+  printf ("erf(10)=%.17lg=%.17lg\n", jbm_f64_erf (10.), erf (10.));
+  printf ("erf(3/2)=%.17lg=%.17lg\n", jbm_f64_erf (1.5), erf (1.5));
+  printf ("erf(1/2)=%.17lg=%.17lg\n", jbm_f64_erf (0.5), erf (0.5));
+  printf ("erf(0)=%.17lg=%.17lg\n", jbm_f64_erf (0.), erf (0.));
+  printf ("erf(-1/2)=%.17lg=%.17lg\n", jbm_f64_erf (-0.5), erf (-0.5));
+  printf ("erf(-3/2)=%.17lg=%.17lg\n", jbm_f64_erf (-1.5), erf (-1.5));
+  printf ("erf(-10)=%.17lg=%.17lg\n", jbm_f64_erf (-10.), erf (-10.));
+  printf ("erfc(10)=%.17lg=%.17lg\n", jbm_f64_erfc (10.), erfc (10.));
+  printf ("erfc(3/2)=%.17lg=%.17lg\n", jbm_f64_erfc (1.5), erfc (1.5));
+  printf ("erfc(1/2)=%.17lg=%.17lg\n", jbm_f64_erfc (0.5), erfc (0.5));
+  printf ("erfc(0)=%.17lg=%.17lg\n", jbm_f64_erfc (0.), erfc (0.));
+  printf ("erfc(-1/2)=%.17lg=%.17lg\n", jbm_f64_erfc (-0.5), erfc (-0.5));
+  printf ("erfc(-3/2)=%.17lg=%.17lg\n", jbm_f64_erfc (-1.5), erfc (-1.5));
+  printf ("erfc(-10)=%.17lg=%.17lg\n", jbm_f64_erfc (-10.), erfc (-10.));
 
   for (i = 0; i < 3; ++i)
     cf[i].C = Cf[i], cf[i].E = Ef[i];
@@ -5299,9 +5347,9 @@ main (void)
   d_1 = aligned_alloc (16, 2 * sizeof (double));
   L_1 = (unsigned long long int *) d_1;
   d_2 = aligned_alloc (16, 2 * sizeof (double));
-  d_2xf64 = jbm_abs_2xf64 (_mm_set_pd (-1., 1));
+  d_2xf64 = jbm_2xf64_abs (_mm_set_pd (-1., 1));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("abs_2xf64([1,-1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_abs([1,-1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_small_2xf64 (_mm_set_pd (1., 0.));
   _mm_store_pd (d_1, d_2xf64);
   printf ("small_2xf64([0,1])=[%16llx,%16llx]\n", L_1[0], L_1[1]);
@@ -5318,225 +5366,225 @@ main (void)
   _mm_store_pd (d_2, d2_2xf64);
   printf ("change_2xf64([0,1],[1,-2])=([%.17lg,%.17lg],[%.17lg,%.17lg])\n",
           d_1[0], d_1[1], d_2[0], d_2[1]);
-  d2_2xf64 = jbm_dbl_2xf64 (d_2xf64);
+  d2_2xf64 = jbm_2xf64_dbl (d_2xf64);
   _mm_store_pd (d_1, d2_2xf64);
-  printf ("dbl_2xf64([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_sqr_2xf64 (d_2xf64);
+  printf ("2xf64_dbl([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_2xf64_sqr (d_2xf64);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("sqr_2xf64([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_extrapolate_2xf64 (_mm_set_pd (-1., 1.),
+  printf ("2xf64_sqr([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_2xf64_extrapolate (_mm_set_pd (-1., 1.),
                                    _mm_set1_pd (0.),
                                    _mm_set1_pd (2.),
                                    _mm_set1_pd (1.), _mm_set1_pd (4.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("extrapolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_extrapolate([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_interpolate_2xf64 (_mm_set_pd (-1., 1.),
+  d_2xf64 = jbm_2xf64_interpolate (_mm_set_pd (-1., 1.),
                                    _mm_set1_pd (0.),
                                    _mm_set1_pd (2.),
                                    _mm_set1_pd (1.), _mm_set1_pd (4.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("interpolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_interpolate([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_interpolate_2xf64 (_mm_set_pd (3., 1.),
+  d_2xf64 = jbm_2xf64_interpolate (_mm_set_pd (3., 1.),
                                    _mm_set_pd (0., 0.),
                                    _mm_set_pd (2., 2.),
                                    _mm_set_pd (1., 1.), _mm_set_pd (4., 4.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("interpolate_2xf64([1,3],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_interpolate([1,3],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_v2_length_2xf64 (_mm_set_pd (2., 1.),
+  d_2xf64 = jbm_2xf64_v2_length (_mm_set_pd (2., 1.),
                                  _mm_set_pd (-1., 4.),
                                  _mm_set_pd (5., -3.), _mm_set_pd (3., 1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("v2_length_2xf64([1,2],[4,-1],[-3,5],[1,3])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_v2_length([1,2],[4,-1],[-3,5],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_v3_length_2xf64 (_mm_set_pd (2., 1.),
+  d_2xf64 = jbm_2xf64_v3_length (_mm_set_pd (2., 1.),
                                  _mm_set_pd (-1., 4.),
                                  _mm_set_pd (1., 3.),
                                  _mm_set_pd (4., -1.),
                                  _mm_set_pd (2., 1.), _mm_set_pd (-5., 9.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("v3_length_2xf64([1,2],[4,-1],[3,1],[-1,4],[1,2],[9,-5])"
+  printf ("2xf64_v3_length([1,2],[4,-1],[3,1],[-1,4],[1,2],[9,-5])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_polynomial_11_2xf64 (_mm_set_pd (1., 0.5), p_1);
+  d_2xf64 = jbm_2xf64_polynomial_11 (_mm_set_pd (1., 0.5), p_1);
   _mm_store_pd (d_1, d_2xf64);
   printf
-    ("polynomial_11_2xf64([0.5,1],[1,2,4,8,16,32,64,128,256,512,1024,2048])"
+    ("2xf64_polynomial_11([0.5,1],[1,2,4,8,16,32,64,128,256,512,1024,2048])"
      "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_solve_quadratic_2xf64 (_mm_set_pd (0., 2.), _mm_set_pd (-2., -1.),
+    jbm_2xf64_solve_quadratic (_mm_set_pd (0., 2.), _mm_set_pd (-2., -1.),
                                _mm_set_pd (1., -1.), _mm_set_pd (0., 0.),
                                _mm_set_pd (2., 2.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("solve_quadratic_2xf64([2,0],[-1,-2][-1,1],[0,0],[2,2])"
+  printf ("2xf64_solve_quadratic([2,0],[-1,-2][-1,1],[0,0],[2,2])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_setzero_pd (),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_setzero_pd (),
                                     _mm_set1_pd (1.),
                                     JBM_FLUX_LIMITER_TYPE_TOTAL);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_total_2xf64([0,0],[1,1])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_total([0,0],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_setzero_pd (),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_setzero_pd (),
                                     _mm_set1_pd (1.),
                                     JBM_FLUX_LIMITER_TYPE_NULL);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_null_2xf64([0,0],[1,1])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_null([0,0],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (3., 1.),
                                     _mm_set_pd (0., 1.),
                                     JBM_FLUX_LIMITER_TYPE_CENTRED);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_centred_2xf64([1,3],[1,0])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_centred([1,3],[1,0])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (1., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_superbee_2xf64([-1,1],[1,3])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_superbee([-1,1],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 2.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (3., 2.),
                                     _mm_set_pd (2., 3.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_superbee_2xf64([2,3],[3,2])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_superbee([2,3],[3,2])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (1., 3.),
                                     _mm_set_pd (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_superbee_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_superbee([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_minmod_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  printf ("flux_limiter_min2xf64_mod([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (1., 3.),
                                     _mm_set_pd (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_minmod_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+  printf ("flux_limiter_min2xf64_mod([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_LEER);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_VanLeer_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_VanLeer([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_ALBADA);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_VanAlbada_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_VanAlbada([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINSUPER);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_minsuper_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_minsuper([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (1., 3.),
                                     _mm_set_pd (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINSUPER);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_minsuper_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_minsuper([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (1., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERMIN);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_supermin_2xf64([-1,1],[1,3])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_supermin([-1,1],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (1., 3.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (1., 3.),
                                     _mm_set_pd (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERMIN);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_supermin_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_supermin([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (0.5, -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (0.5, -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_monotonized_central_2xf64([-1,0.5],[1,3])"
+  printf ("2xf64_flux_limiter_monotonized_central([-1,0.5],[1,3])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (3., 2.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (3., 2.),
                                     _mm_set_pd (0.5, 3.),
                                     JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_monotonized_central_2xf64([2,3],[3,0.5])"
+  printf ("2xf64_flux_limiter_monotonized_central([2,3],[3,0.5])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (_mm_set_pd (2., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MEAN);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_mean_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_mean([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn0_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn0_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(1,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_integral(1,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn1_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn1_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_integral(x,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn2_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn2_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^2,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_integral(x^2,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn3_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn3_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^3,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_integral(x^3,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn4_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn4_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^4,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_integral(x^4,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn5_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn5_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^5,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_integral(x^5,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn6_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn6_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^6,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_integral(x^6,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn7_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn7_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^7,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_integral(x^7,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn8_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn8_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^8,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_integral(x^8,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn9_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn9_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^9,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  printf ("2xf64_integral(x^9,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn10_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn10_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^10,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+  printf ("2xf64_integral(x^10,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn11_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn11_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^11,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+  printf ("2xf64_integral(x^11,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn12_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn12_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^12,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+  printf ("2xf64_integral(x^12,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn13_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn13_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^13,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+  printf ("2xf64_integral(x^13,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn14_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
+    jbm_2xf64_integral (fn14_2xf64, _mm_set_pd (-1., 0.), _mm_set1_pd (1.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("integral_2xf64(x^14,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+  printf ("2xf64_integral(x^14,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   aligned_free (d_2);
   aligned_free (d_1);
@@ -5546,9 +5594,9 @@ main (void)
   d_1 = aligned_alloc (32, 4 * sizeof (double));
   L_1 = (unsigned long long int *) d_1;
   d_2 = aligned_alloc (32, 4 * sizeof (double));
-  d_4xf64 = jbm_abs_4xf64 (_mm256_set_pd (2., 0., -1., 1));
+  d_4xf64 = jbm_4xf64_abs (_mm256_set_pd (2., 0., -1., 1));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("abs_4xf64([1,-1,0,2])=[%.17lg,%.17lg,%.17lg,%.17lg]\n",
+  printf ("4xf64_abs([1,-1,0,2])=[%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_small_4xf64 (_mm256_set_pd (-1., 1., -0., 0.));
   _mm256_store_pd (d_1, d_4xf64);
@@ -5567,40 +5615,40 @@ main (void)
   printf ("change_4xf64([0,1,-1,3],[1,-2,7,-4])"
           "=([%.17lg,%.17lg,%.17lg,%.17lg],[%.17lg,%.17lg,%.17lg,%.17lg])\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_2[0], d_2[1], d_2[2], d_2[3]);
-  d2_4xf64 = jbm_dbl_4xf64 (d_4xf64);
+  d2_4xf64 = jbm_4xf64_dbl (d_4xf64);
   _mm256_store_pd (d_1, d2_4xf64);
-  printf ("dbl_4xf64([1,-2,7,-4])=[%.17lg,%.17lg,%.17lg,%.17lg]\n",
+  printf ("4xf64_dbl([1,-2,7,-4])=[%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
-  d2_4xf64 = jbm_sqr_4xf64 (d_4xf64);
+  d2_4xf64 = jbm_4xf64_sqr (d_4xf64);
   _mm256_store_pd (d_1, d2_4xf64);
-  printf ("sqr_4xf64([1,-2,7,-4])=[%.17lg,%.17lg,%.17lg,%.17lg]\n",
+  printf ("4xf64_sqr([1,-2,7,-4])=[%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_extrapolate_4xf64 (_mm256_set_pd (0., 3., -1., 1.),
+  d_4xf64 = jbm_4xf64_extrapolate (_mm256_set_pd (0., 3., -1., 1.),
                                    _mm256_set1_pd (0.),
                                    _mm256_set1_pd (2.),
                                    _mm256_set1_pd (1.), _mm256_set1_pd (4.));
   _mm256_store_pd (d_1, d_4xf64);
   printf
-    ("extrapolate_4xf64([1,-1,3,0],[0,0,0,0],[2,2,2,2],[1,1,1,1],[4,4,4,4])"
+    ("4xf64_extrapolate([1,-1,3,0],[0,0,0,0],[2,2,2,2],[1,1,1,1],[4,4,4,4])"
      "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 =
-    jbm_interpolate_4xf64 (_mm256_set_pd (0., 3., -1., 1.), _mm256_set1_pd (0.),
+    jbm_4xf64_interpolate (_mm256_set_pd (0., 3., -1., 1.), _mm256_set1_pd (0.),
                            _mm256_set1_pd (2.), _mm256_set1_pd (1.),
                            _mm256_set1_pd (4.));
   _mm256_store_pd (d_1, d_4xf64);
   printf
-    ("interpolate_4xf64([1,-1,3,0],[0,0,0,0],[2,2,2,2],[1,1,1,1],[4,4,4,4])"
+    ("4xf64_interpolate([1,-1,3,0],[0,0,0,0],[2,2,2,2],[1,1,1,1],[4,4,4,4])"
      "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 =
-    jbm_v2_length_4xf64 (_mm256_set_pd (-1., 3., 2., 1.),
+    jbm_4xf64_v2_length (_mm256_set_pd (-1., 3., 2., 1.),
                          _mm256_set_pd (2., 3., -1., 4.), _mm256_set_pd (2., 0.,
                                                                          5.,
                                                                          -3.),
                          _mm256_set_pd (6., 7., 3., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("v2_length_4xf64([1,2,3,-1],[4,-1,3,2],[-3,5,0,2],[1,3,7,6])"
+  printf ("4xf64_v2_length([1,2,3,-1],[4,-1,3,2],[-3,5,0,2],[1,3,7,6])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_v3_length_4xf64 (_mm256_set_pd (-1., 3., 2., 1.),
+  d_4xf64 = jbm_4xf64_v3_length (_mm256_set_pd (-1., 3., 2., 1.),
                                  _mm256_set_pd (2., 3., -1., 4.),
                                  _mm256_set_pd (5., 0., 1., 3.),
                                  _mm256_set_pd (1., 2., 4., -1.),
@@ -5608,169 +5656,169 @@ main (void)
                                  _mm256_set_pd (-1., 2., 5., 7.));
   _mm256_store_pd (d_1, d_4xf64);
   printf
-    ("v3_length_4xf64([1,2,3,-1],[4,-1,3,2],[3,1,0,5],[-1,4,1,1],[1,2,1,4],"
+    ("4xf64_v3_length([1,2,3,-1],[4,-1,3,2],[3,1,0,5],[-1,4,1,1],[1,2,1,4],"
      "[9,-5,2,0])=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2],
      d_1[3]);
-  d_4xf64 = jbm_polynomial_11_4xf64 (_mm256_set_pd (-1., 0., 1., 0.5), p_1);
+  d_4xf64 = jbm_4xf64_polynomial_11 (_mm256_set_pd (-1., 0., 1., 0.5), p_1);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("polynomial_11_2xf64([0.5,1,0,-1],"
+  printf ("polynomial_11_2xdbl([0.5,1,0,-1],"
           "[1,2,4,8,16,32,64,128,256,512,1024,2048])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_solve_quadratic_4xf64 (_mm256_set_pd (1., 1., 0., 2.),
+  d_4xf64 = jbm_4xf64_solve_quadratic (_mm256_set_pd (1., 1., 0., 2.),
                                        _mm256_set_pd (0., 0., -2., -1.),
                                        _mm256_set_pd (-1., -1., 1., -1.),
                                        _mm256_set_pd (-2., 0., 0., 0.),
                                        _mm256_set_pd (0., 2., 2., 2.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("solve_quadratic_4xf64([2,0,1,1],[-1,-2,0,0][-1,1,-1,-1],[0,0,0,-2],"
+  printf ("4xf64_solve_quadratic([2,0,1,1],[-1,-2,0,0][-1,1,-1,-1],[0,0,0,-2],"
           "[2,2,2,0])=[%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_setzero_pd (),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_setzero_pd (),
                                     _mm256_set1_pd (1.),
                                     JBM_FLUX_LIMITER_TYPE_TOTAL);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_total_4xf64([0,0,0,0],[1,1,1,1])"
+  printf ("4xf64_flux_limiter_total([0,0,0,0],[1,1,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_setzero_pd (),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_setzero_pd (),
                                     _mm256_set1_pd (1.),
                                     JBM_FLUX_LIMITER_TYPE_NULL);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_null_4xf64([0,0,0,0],[1,1,1,1])"
+  printf ("4xf64_flux_limiter_null([0,0,0,0],[1,1,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (0., 1., 3., 1.),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (0., 1., 3., 1.),
                                     _mm256_set_pd (0., 3., 0., 1.),
                                     JBM_FLUX_LIMITER_TYPE_CENTRED);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_centred_4xf64([1,3,1,0],[1,0,3,0])"
+  printf ("4xf64_flux_limiter_centred([1,3,1,0],[1,0,3,0])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (3., 2., 1., -1.),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (3., 2., 1., -1.),
                                     _mm256_set_pd (2., 3., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_superbee_4xf64([-1,1,2,3],[1,3,3,2])"
+  printf ("4xf64_flux_limiter_superbee([-1,1,2,3],[1,3,3,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 0., 1., 0.),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (1., 0., 1., 0.),
                                     _mm256_set_pd (1., 1., 0., 0.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_superbee_4xf64([0,1,0,1],[0,0,1,1])"
+  printf ("4xf64_flux_limiter_superbee([0,1,0,1],[0,0,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 3., 2., -1.),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (1., 3., 2., -1.),
                                     _mm256_set_pd (1., 1., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_minmod_4xf64([-1,2,3,1],[1,3,1,1])"
+  printf ("flux_limiter_min4xf64_mod([-1,2,3,1],[1,3,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 0., 2., -1.),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (1., 0., 2., -1.),
                                     _mm256_set_pd (0., 0., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_LEER);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_VanLeer_4xf64([-1,2,0,1],[1,3,0,0])"
+  printf ("4xf64_flux_limiter_VanLeer([-1,2,0,1],[1,3,0,0])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 0., 2., -1.),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (1., 0., 2., -1.),
                                     _mm256_set_pd (0., 0., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_ALBADA);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_VanAlbada_4xf64([-1,2,0,1],[1,3,0,0])"
+  printf ("4xf64_flux_limiter_VanAlbada([-1,2,0,1],[1,3,0,0])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 3., 2., -1.),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (1., 3., 2., -1.),
                                     _mm256_set_pd (1., 1., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINSUPER);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_minsuper_4xf64([-1,2,3,1],[1,3,1,1])"
+  printf ("4xf64_flux_limiter_minsuper([-1,2,3,1],[1,3,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 3., 1., -1.),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (1., 3., 1., -1.),
                                     _mm256_set_pd (1., 1., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERMIN);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_supermin_4xf64([-1,1,3,1],[1,3,1,1])"
+  printf ("4xf64_flux_limiter_supermin([-1,1,3,1],[1,3,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (3., 2., 0.5, -1.),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (3., 2., 0.5, -1.),
                                     _mm256_set_pd (0.5, 3., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_monotonized_central_4xf64([-1,0.5,2,3],[1,3,3,0.5])"
+  printf ("4xf64_flux_limiter_monotonized_central([-1,0.5,2,3],[1,3,3,0.5])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_flux_limiter_4xf64 (_mm256_set_pd (1., 0., 2., -1.),
+  d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (1., 0., 2., -1.),
                                     _mm256_set_pd (0., 0., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MEAN);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_mean_4xf64([-1,2,0,1],[1,3,0,0])"
+  printf ("4xf64_flux_limiter_mean([-1,2,0,1],[1,3,0,0])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn0_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn0_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(1,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(1,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn1_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn1_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn2_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn2_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^2,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^2,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn3_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn3_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^3,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^3,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn4_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn4_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^4,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^4,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn5_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn5_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^5,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^5,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn6_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn6_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^6,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^6,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn7_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn7_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^7,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^7,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn8_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn8_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^9,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^9,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn9_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn9_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^9,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^9,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn10_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn10_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^10,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^10,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn11_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn11_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^11,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^11,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn12_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn12_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^12,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^12,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn13_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn13_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^13,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^13,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_integral_4xf64 (fn14_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
+  d_4xf64 = jbm_4xf64_integral (fn14_4xf64, _mm256_set_pd (-2., 0., -1., 0.),
                                 _mm256_set_pd (2., 2., 1., 1.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("integral_4xf64(x^14,[0,-1,0,-2],[1,1,2,2])"
+  printf ("4xf64_integral(x^14,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   aligned_free (d_2);
   aligned_free (d_1);
@@ -5779,9 +5827,9 @@ main (void)
   printf ("check AVX512 functions\n");
   d_1 = aligned_alloc (64, 8 * sizeof (double));
   d_2 = aligned_alloc (64, 8 * sizeof (double));
-  d_8xf64 = jbm_abs_8xf64 (_mm512_set_pd (4., -3., 3., -2., 2., 0., -1., 1));
+  d_8xf64 = jbm_8xf64_abs (_mm512_set_pd (4., -3., 3., -2., 2., 0., -1., 1));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("abs_8xf64([1,-1,0,2,-2,3,-3,4])"
+  printf ("8xf64_abs([1,-1,0,2,-2,3,-3,4])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   m_8 = jbm_small_8xf64 (_mm512_set_pd (-3., 3., -2., 2., -1., 1., -0., 0.));
@@ -5803,224 +5851,224 @@ main (void)
           ",[%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7],
           d_2[0], d_2[1], d_2[2], d_2[3], d_2[4], d_2[5], d_2[6], d_2[7]);
-  d2_8xf64 = jbm_dbl_8xf64 (d_8xf64);
+  d2_8xf64 = jbm_8xf64_dbl (d_8xf64);
   _mm512_store_pd (d_1, d2_8xf64);
-  printf ("dbl_8xf64([1,-2,7,-4,-1,2,0,3])="
+  printf ("8xf64_dbl([1,-2,7,-4,-1,2,0,3])="
           "[%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
-  d2_8xf64 = jbm_sqr_8xf64 (d_8xf64);
+  d2_8xf64 = jbm_8xf64_sqr (d_8xf64);
   _mm512_store_pd (d_1, d2_8xf64);
-  printf ("sqr_8xf64([1,-2,7,-4,-1,2,0,3])="
+  printf ("8xf64_sqr([1,-2,7,-4,-1,2,0,3])="
           "[%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64
-    = jbm_extrapolate_8xf64 (_mm512_set_pd (2., -2., 4., -3., 0., 3., -1., 1.),
+    = jbm_8xf64_extrapolate (_mm512_set_pd (2., -2., 4., -3., 0., 3., -1., 1.),
                              _mm512_set1_pd (0.),
                              _mm512_set1_pd (2.),
                              _mm512_set1_pd (1.), _mm512_set1_pd (4.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("extrapolate_8xf64([1,-1,3,0,-3,4,-2,2],[0,0,0,0,0,0,0,0],"
+  printf ("8xf64_extrapolate([1,-1,3,0,-3,4,-2,2],[0,0,0,0,0,0,0,0],"
           "[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[4,4,4,4,4,4,4,4])"
           "[%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64
-    = jbm_interpolate_8xf64 (_mm512_set_pd (2., -2., 4., -3., 0., 3., -1., 1.),
+    = jbm_8xf64_interpolate (_mm512_set_pd (2., -2., 4., -3., 0., 3., -1., 1.),
                              _mm512_set1_pd (0.),
                              _mm512_set1_pd (2.),
                              _mm512_set1_pd (1.), _mm512_set1_pd (4.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("interpolate_8xf64([1,-1,3,0,-3,4,-2,2],[0,0,0,0,0,0,0,0],"
+  printf ("8xf64_interpolate([1,-1,3,0,-3,4,-2,2],[0,0,0,0,0,0,0,0],"
           "[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[4,4,4,4,4,4,4,4])"
           "[%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64 =
-    jbm_v2_length_8xf64 (_mm512_set_pd (2., 3., -1., 4., -1., 3., 2., 1.),
+    jbm_8xf64_v2_length (_mm512_set_pd (2., 3., -1., 4., -1., 3., 2., 1.),
                          _mm512_set_pd (-1., 3., 2., 1., 2., 3., -1., 4.),
                          _mm512_set_pd (6., 7., 3., 1., 2., 0., 5., -3.),
                          _mm512_set_pd (2., 0., 5., -3., 6., 7., 3., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("v2_length_8xf64([1,2,3,-1,4,-1,3,2],[4,-1,3,2,1,2,3,-1],"
+  printf ("8xf64_v2_length([1,2,3,-1,4,-1,3,2],[4,-1,3,2,1,2,3,-1],"
           "[-3,5,0,2,1,3,7,6],[1,3,7,6,-3,5,0,2])"
           "[%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64 =
-    jbm_v3_length_8xf64 (_mm512_set_pd (2., 3., -1., 4., -1., 3., 2., 1.),
+    jbm_8xf64_v3_length (_mm512_set_pd (2., 3., -1., 4., -1., 3., 2., 1.),
                          _mm512_set_pd (-1., 3., 2., 1., 2., 3., -1., 4.),
                          _mm512_set_pd (5., 0., 1., 3., 5., 0., 1., 3.),
                          _mm512_set_pd (5., 5., 3., 0., 1., 2., 4., -1.),
                          _mm512_set_pd (1., 2., 4., -1., 5., 5., 3., 0.),
                          _mm512_set_pd (-1., 2., 5., 7., -1., 2., 5., 7.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("v3_length_8xf64([1,2,3,-1,4,-1,3,2],[4,-1,3,2,1,2,3,-1],"
+  printf ("8xf64_v3_length([1,2,3,-1,4,-1,3,2],[4,-1,3,2,1,2,3,-1],"
           "[5,0,1,3,5,1,0,3],[-1,4,2,1,0,3,5,5],[0,3,5,5,-1,4,2,1],"
           "[7,5,2,-1,7,5,2,-1])="
           "[%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
   d_8xf64
     =
-    jbm_polynomial_11_8xf64 (_mm512_set_pd
+    jbm_8xf64_polynomial_11 (_mm512_set_pd
                              (-0.25, 0.25, 0., -0.5, -1., 0., 1., 0.5), p_1);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("polynomial_11_4xf64([0.5,1,0,-1,-0.5,0,0.25,-0.25],"
+  printf ("polynomial_11_4xdbl([0.5,1,0,-1,-0.5,0,0.25,-0.25],"
           "[1,2,4,8,16,32,64,128,512,512,1024,2048])="
           "[%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
 /*
-  d_8xf64 = jbm_solve_quadratic_8xf64 (_mm512_set_pd (1., 1., 0., 2.),
+  d_8xf64 = jbm_8xf64_solve_quadratic (_mm512_set_pd (1., 1., 0., 2.),
                                    _mm512_set_pd (0., 0., -2., -1.),
                                    _mm512_set_pd (-1., -1., 1., -1.),
                                    _mm512_set_pd (-2., 0., 0., 0.),
                                    _mm512_set_pd (0., 2., 2., 2.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("solve_quadratic_8xf64([2,0,1,1],[-1,-2,0,0][-1,1,-1,-1],[0,0,0,-2],"
+  printf ("8xf64_solve_quadratic([2,0,1,1],[-1,-2,0,0][-1,1,-1,-1],[0,0,0,-2],"
           "[2,2,2,0])=[%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_setzero_pd (),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_setzero_pd (),
                                 _mm512_set1_pd (1.),
                                 JBM_FLUX_LIMITER_TYPE_TOTAL);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_total_8xf64([0,0,0,0],[1,1,1,1])"
+  printf ("8xf64_flux_limiter_total([0,0,0,0],[1,1,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_setzero_pd (),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_setzero_pd (),
                                 _mm512_set1_pd (1.),
                                 JBM_FLUX_LIMITER_TYPE_NULL);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_null_8xf64([0,0,0,0],[1,1,1,1])"
+  printf ("8xf64_flux_limiter_null([0,0,0,0],[1,1,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (0., 1., 3., 1.),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (0., 1., 3., 1.),
                                 _mm512_set_pd (0., 3., 0., 1.),
                                 JBM_FLUX_LIMITER_TYPE_CENTRED);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_centred_8xf64([1,3,1,0],[1,0,3,0])"
+  printf ("8xf64_flux_limiter_centred([1,3,1,0],[1,0,3,0])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (3., 2., 1., -1.),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (3., 2., 1., -1.),
                                 _mm512_set_pd (2., 3., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_superbee_8xf64([-1,1,2,3],[1,3,3,2])"
+  printf ("8xf64_flux_limiter_superbee([-1,1,2,3],[1,3,3,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 0., 1., 0.),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (1., 0., 1., 0.),
                                 _mm512_set_pd (1., 1., 0., 0.),
                                 JBM_FLUX_LIMITER_TYPE_SUPERBEE);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_superbee_8xf64([0,1,0,1],[0,0,1,1])"
+  printf ("8xf64_flux_limiter_superbee([0,1,0,1],[0,0,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 3., 2., -1.),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (1., 3., 2., -1.),
                                 _mm512_set_pd (1., 1., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_minmod_8xf64([-1,2,3,1],[1,3,1,1])"
+  printf ("flux_limiter_min8xf64_mod([-1,2,3,1],[1,3,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 0., 2., -1.),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (1., 0., 2., -1.),
                                 _mm512_set_pd (0., 0., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_VAN_LEER);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_VanLeer_8xf64([-1,2,0,1],[1,3,0,0])"
+  printf ("8xf64_flux_limiter_VanLeer([-1,2,0,1],[1,3,0,0])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 0., 2., -1.),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (1., 0., 2., -1.),
                                 _mm512_set_pd (0., 0., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_VAN_ALBADA);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_VanAlbada_8xf64([-1,2,0,1],[1,3,0,0])"
+  printf ("8xf64_flux_limiter_VanAlbada([-1,2,0,1],[1,3,0,0])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 3., 2., -1.),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (1., 3., 2., -1.),
                                 _mm512_set_pd (1., 1., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_MINSUPER);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_minsuper_8xf64([-1,2,3,1],[1,3,1,1])"
+  printf ("8xf64_flux_limiter_minsuper([-1,2,3,1],[1,3,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 3., 1., -1.),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (1., 3., 1., -1.),
                                 _mm512_set_pd (1., 1., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_SUPERMIN);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_supermin_8xf64([-1,1,3,1],[1,3,1,1])"
+  printf ("8xf64_flux_limiter_supermin([-1,1,3,1],[1,3,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (3., 2., 0.5, -1.),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (3., 2., 0.5, -1.),
                                 _mm512_set_pd (0.5, 3., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_monotonized_central_8xf64([-1,0.5,2,3],[1,3,3,0.5])"
+  printf ("8xf64_flux_limiter_monotonized_central([-1,0.5,2,3],[1,3,3,0.5])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_flux_limiter_8xf64 (_mm512_set_pd (1., 0., 2., -1.),
+  d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (1., 0., 2., -1.),
                                 _mm512_set_pd (0., 0., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_MEAN);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_mean_8xf64([-1,2,0,1],[1,3,0,0])"
+  printf ("8xf64_flux_limiter_mean([-1,2,0,1],[1,3,0,0])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn0_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn0_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(1,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(1,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn1_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn1_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn2_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn2_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^2,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^2,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn3_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn3_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^3,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^3,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn4_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn4_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^4,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^4,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn5_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn5_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^5,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^5,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn6_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn6_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^6,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^6,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn7_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn7_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^7,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^7,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn8_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn8_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^9,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^9,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn9_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn9_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^9,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^9,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn10_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn10_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^10,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^10,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn11_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn11_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^11,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^11,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn12_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn12_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^12,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^12,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn13_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn13_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^13,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^13,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_8xf64 = jbm_integral_8xf64 (fn14_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
+  d_8xf64 = jbm_8xf64_integral (fn14_8xf64, _mm512_set_pd (-2., 0., -1., 0.),
                             _mm512_set_pd (2., 2., 1., 1.));
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("integral_8xf64(x^14,[0,-1,0,-2],[1,1,2,2])"
+  printf ("8xf64_integral(x^14,[0,-1,0,-2],[1,1,2,2])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
 */
   aligned_free (d_2);
@@ -6031,254 +6079,254 @@ main (void)
   d_1 = aligned_alloc (16, 2 * sizeof (double));
   L_1 = (unsigned long long int *) d_1;
   d_2 = aligned_alloc (16, 2 * sizeof (double));
-  d_2xf64 = jbm_abs_2xf64 (set_float64x2_t (-1., 1));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("abs_2xf64([1,-1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_2xf64_abs (set_float64x2_t (-1., 1));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_abs([1,-1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   m_2xf64 = jbm_small_2xf64 (set_float64x2_t (1., 0.));
   vst1q_u64 (L_1, m_2xf64);
   printf ("small_2xf64([0,1])=[%16llx,%16llx]\n", L_1[0], L_1[1]);
   d_2xf64
     = jbm_modmin_2xf64 (set_float64x2_t (-1., 1.), set_float64x2_t (-2., 0.5));
-  vst1q_f64 (d_1, d_2xf64);
+  vst1q_dbl (d_1, d_2xf64);
   printf ("modmin_2xf64([1,-1],[0.5,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64
     = jbm_modmin_2xf64 (set_float64x2_t (1.0, 0.), set_float64x2_t (-2., 1.));
-  vst1q_f64 (d_1, d_2xf64);
+  vst1q_dbl (d_1, d_2xf64);
   printf ("modmin_2xf64([0,1],[1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 = set_float64x2_t (1., 0.);
   d2_2xf64 = set_float64x2_t (-2., 1.);
   jbm_change_2xf64 (&d_2xf64, &d2_2xf64);
-  vst1q_f64 (d_1, d_2xf64);
-  vst1q_f64 (d_2, d2_2xf64);
+  vst1q_dbl (d_1, d_2xf64);
+  vst1q_dbl (d_2, d2_2xf64);
   printf ("change_2xf64([0,1],[1,-2])=([%.17lg,%.17lg],[%.17lg,%.17lg])\n",
           d_1[0], d_1[1], d_2[0], d_2[1]);
-  d2_2xf64 = jbm_dbl_2xf64 (d_2xf64);
-  vst1q_f64 (d_1, d2_2xf64);
-  printf ("dbl_2xf64([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_sqr_2xf64 (d_2xf64);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("sqr_2xf64([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_extrapolate_2xf64 (set_float64x2_t (-1., 1.),
-                                   vdupq_n_f64 (0.), vdupq_n_f64 (2.),
-                                   vdupq_n_f64 (1.), vdupq_n_f64 (4.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("extrapolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
+  d2_2xf64 = jbm_2xf64_dbl (d_2xf64);
+  vst1q_dbl (d_1, d2_2xf64);
+  printf ("2xf64_dbl([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_2xf64_sqr (d_2xf64);
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_sqr([1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+  d_2xf64 = jbm_2xf64_extrapolate (set_float64x2_t (-1., 1.),
+                                   vdupq_n_dbl (0.), vdupq_n_dbl (2.),
+                                   vdupq_n_dbl (1.), vdupq_n_dbl (4.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_extrapolate([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_interpolate_2xf64 (set_float64x2_t (-1., 1.),
-                                   vdupq_n_f64 (0.), vdupq_n_f64 (2.),
-                                   vdupq_n_f64 (1.), vdupq_n_f64 (4.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("interpolate_2xf64([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
+  d_2xf64 = jbm_2xf64_interpolate (set_float64x2_t (-1., 1.),
+                                   vdupq_n_dbl (0.), vdupq_n_dbl (2.),
+                                   vdupq_n_dbl (1.), vdupq_n_dbl (4.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_interpolate([1,-1],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_interpolate_2xf64 (set_float64x2_t (3., 1.),
+  d_2xf64 = jbm_2xf64_interpolate (set_float64x2_t (3., 1.),
                                    set_float64x2_t (0., 0.),
                                    set_float64x2_t (2., 2.),
                                    set_float64x2_t (1., 1.),
                                    set_float64x2_t (4., 4.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("interpolate_2xf64([1,3],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_interpolate([1,3],[0,0],[2,2],[1,1],[4,4])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_v2_length_2xf64 (set_float64x2_t (2., 1.),
+  d_2xf64 = jbm_2xf64_v2_length (set_float64x2_t (2., 1.),
                                  set_float64x2_t (-1., 4.),
                                  set_float64x2_t (5., -3.),
                                  set_float64x2_t (3., 1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("v2_length_2xf64([1,2],[4,-1],[-3,5],[1,3])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_v2_length([1,2],[4,-1],[-3,5],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_v3_length_2xf64 (set_float64x2_t (2., 1.),
+  d_2xf64 = jbm_2xf64_v3_length (set_float64x2_t (2., 1.),
                                  set_float64x2_t (-1., 4.),
                                  set_float64x2_t (1., 3.),
                                  set_float64x2_t (4., -1.),
                                  set_float64x2_t (2., 1.),
                                  set_float64x2_t (-5., 9.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("v3_length_2xf64([1,2],[4,-1],[3,1],[-1,4],[1,2],[9,-5])"
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_v3_length([1,2],[4,-1],[3,1],[-1,4],[1,2],[9,-5])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_polynomial_11_2xf64 (set_float64x2_t (1., 0.5), p_1);
-  vst1q_f64 (d_1, d_2xf64);
+  d_2xf64 = jbm_2xf64_polynomial_11 (set_float64x2_t (1., 0.5), p_1);
+  vst1q_dbl (d_1, d_2xf64);
   printf
-    ("polynomial_11_2xf64([0.5,1],[1,2,4,8,16,32,64,128,256,512,1024,2048])"
+    ("2xf64_polynomial_11([0.5,1],[1,2,4,8,16,32,64,128,256,512,1024,2048])"
      "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_solve_quadratic_2xf64 (set_float64x2_t (0., 2.),
+    jbm_2xf64_solve_quadratic (set_float64x2_t (0., 2.),
                                set_float64x2_t (-2., -1.),
                                set_float64x2_t (1., -1.),
                                set_float64x2_t (0., 0.),
                                set_float64x2_t (2., 2.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("solve_quadratic_2xf64([2,0],[-1,-2][-1,1],[0,0],[2,2])"
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_solve_quadratic([2,0],[-1,-2][-1,1],[0,0],[2,2])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (vdupq_n_f64 (0.),
-                                    vdupq_n_f64 (1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (vdupq_n_dbl (0.),
+                                    vdupq_n_dbl (1.),
                                     JBM_FLUX_LIMITER_TYPE_TOTAL);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_total_2xf64([0,0],[1,1])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_total([0,0],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (vdupq_n_f64 (0.),
-                                    vdupq_n_f64 (1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (vdupq_n_dbl (0.),
+                                    vdupq_n_dbl (1.),
                                     JBM_FLUX_LIMITER_TYPE_NULL);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_null_2xf64([0,0],[1,1])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_null([0,0],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (3., 1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (3., 1.),
                                     set_float64x2_t (0., 1.),
                                     JBM_FLUX_LIMITER_TYPE_CENTRED);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_centred_2xf64([1,3],[1,0])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_centred([1,3],[1,0])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (1., -1.),
                                     set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_superbee_2xf64([-1,1],[1,3])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_superbee([-1,1],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (3., 2.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (3., 2.),
                                     set_float64x2_t (2., 3.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_superbee_2xf64([2,3],[3,2])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_superbee([2,3],[3,2])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., 3.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (1., 3.),
                                     set_float64x2_t (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERBEE);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_superbee_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_superbee([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (2., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (2., -1.),
                                     set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_minmod_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("flux_limiter_min2xf64_mod([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., 3.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (1., 3.),
                                     set_float64x2_t (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_minmod_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("flux_limiter_min2xf64_mod([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (2., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (2., -1.),
                                     set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_LEER);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_VanLeer_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_VanLeer([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (2., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (2., -1.),
                                     set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_VAN_ALBADA);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_VanAlbada_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_VanAlbada([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (2., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (2., -1.),
                                     set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINSUPER);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_minsuper_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_minsuper([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., 3.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (1., 3.),
                                     set_float64x2_t (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINSUPER);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_minsuper_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_minsuper([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (1., -1.),
                                     set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERMIN);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_supermin_2xf64([-1,1],[1,3])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_supermin([-1,1],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (1., 3.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (1., 3.),
                                     set_float64x2_t (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_SUPERMIN);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_supermin_2xf64([3,1],[1,1])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_supermin([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (0.5, -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (0.5, -1.),
                                     set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_monotonized_central_2xf64([-1,0.5],[1,3])"
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_monotonized_central([-1,0.5],[1,3])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (3., 2.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (3., 2.),
                                     set_float64x2_t (0.5, 3.),
                                     JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_monotonized_central_2xf64([2,3],[3,0.5])"
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_monotonized_central([2,3],[3,0.5])"
           "=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_flux_limiter_2xf64 (set_float64x2_t (2., -1.),
+  d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (2., -1.),
                                     set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MEAN);
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("flux_limiter_mean_2xf64([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_flux_limiter_mean([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn0_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(1,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+    jbm_2xf64_integral (fn0_2xf64, set_float64x2_t (-1., 0.), vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(1,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn1_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+    jbm_2xf64_integral (fn1_2xf64, set_float64x2_t (-1., 0.), vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn2_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^2,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+    jbm_2xf64_integral (fn2_2xf64, set_float64x2_t (-1., 0.), vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^2,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn3_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^3,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+    jbm_2xf64_integral (fn3_2xf64, set_float64x2_t (-1., 0.), vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^3,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn4_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^4,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+    jbm_2xf64_integral (fn4_2xf64, set_float64x2_t (-1., 0.), vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^4,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn5_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^5,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+    jbm_2xf64_integral (fn5_2xf64, set_float64x2_t (-1., 0.), vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^5,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn6_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^6,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+    jbm_2xf64_integral (fn6_2xf64, set_float64x2_t (-1., 0.), vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^6,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn7_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^7,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+    jbm_2xf64_integral (fn7_2xf64, set_float64x2_t (-1., 0.), vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^7,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn8_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^8,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+    jbm_2xf64_integral (fn8_2xf64, set_float64x2_t (-1., 0.), vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^8,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn9_2xf64, set_float64x2_t (-1., 0.), vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^9,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
+    jbm_2xf64_integral (fn9_2xf64, set_float64x2_t (-1., 0.), vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^9,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn10_2xf64, set_float64x2_t (-1., 0.),
-                        vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^10,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+    jbm_2xf64_integral (fn10_2xf64, set_float64x2_t (-1., 0.),
+                        vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^10,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn11_2xf64, set_float64x2_t (-1., 0.),
-                        vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^11,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+    jbm_2xf64_integral (fn11_2xf64, set_float64x2_t (-1., 0.),
+                        vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^11,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn12_2xf64, set_float64x2_t (-1., 0.),
-                        vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^12,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+    jbm_2xf64_integral (fn12_2xf64, set_float64x2_t (-1., 0.),
+                        vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^12,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn13_2xf64, set_float64x2_t (-1., 0.),
-                        vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^13,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+    jbm_2xf64_integral (fn13_2xf64, set_float64x2_t (-1., 0.),
+                        vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^13,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   d_2xf64 =
-    jbm_integral_2xf64 (fn14_2xf64, set_float64x2_t (-1., 0.),
-                        vdupq_n_f64 (1.));
-  vst1q_f64 (d_1, d_2xf64);
-  printf ("integral_2xf64(x^14,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
+    jbm_2xf64_integral (fn14_2xf64, set_float64x2_t (-1., 0.),
+                        vdupq_n_dbl (1.));
+  vst1q_dbl (d_1, d_2xf64);
+  printf ("2xf64_integral(x^14,[0,-1],[1,1])=[%.17lg,%.17lg]\n", d_1[0],
           d_1[1]);
   aligned_free (d_2);
   aligned_free (d_1);
