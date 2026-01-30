@@ -664,9 +664,9 @@ jbm_16xf32_reduce_min (const __m512 x)  ///< __m512 vector.
  * vector.
  */
 static inline void
-jbm_16xf32_reduce_maxmin (const __m512 x,      ///< __m512 vector.
-                          float *max,  ///< pointer to the maximum value
-                          float *min)  ///< pointer to the minimum value
+jbm_16xf32_reduce_maxmin (const __m512 x,       ///< __m512 vector.
+                          float *max,   ///< pointer to the maximum value
+                          float *min)   ///< pointer to the minimum value
 {
   __m256 h, l;
   h = _mm512_extractf32x8_ps (x, 1);
@@ -804,8 +804,8 @@ jbm_16xf32_frexp (const __m512 x,       ///< __m512 vector.
   y.x = _mm512_mask_mul_ps (y.x, is_sub, y.x, _mm512_set1_ps (0x1p23f));
   exp
     = _mm512_mask_mov_epi32
-      (exp, is_sub, _mm512_sub_epi32 (_mm512_srli_epi32 (y.i, 23),
-                                      _mm512_set1_epi32 (23)));
+    (exp, is_sub, _mm512_sub_epi32 (_mm512_srli_epi32 (y.i, 23),
+                                    _mm512_set1_epi32 (23)));
   // exponent
   *e = _mm512_mask_sub_epi32 (zi, is_finite, exp, bias);
   // build mantissa in [0.5,1)
@@ -835,8 +835,7 @@ jbm_16xf32_exp2n (__m512i e)    ///< exponent vector (__m512i).
      _mm512_castsi512_ps
      (_mm512_slli_epi32 (_mm512_add_epi32 (e, _mm512_set1_epi32 (127)), 23)));
   x = _mm512_mask_mov_ps (x, _mm512_cmpgt_epi32_mask (_mm512_set1_epi32 (-150),
-                                                      e),
-                          _mm512_setzero_ps ());
+                                                      e), _mm512_setzero_ps ());
   return
     _mm512_mask_mov_ps (x, _mm512_cmpgt_epi32_mask (e, _mm512_set1_epi32 (127)),
                         _mm512_set1_ps (INFINITY));
@@ -7679,7 +7678,7 @@ jbm_16xf32_expm1 (const __m512 x)       ///< __m512 vector.
 static inline __m512
 jbm_16xf32_log2wc (const __m512 x)      ///< __m512 vector.
 {
-  return _mm512_mul_ps (x,  jbm_16xf32_rational_5_2 (x, K_LOG2WC_F32));
+  return _mm512_mul_ps (x, jbm_16xf32_rational_5_2 (x, K_LOG2WC_F32));
 }
 
 /**
@@ -7700,7 +7699,7 @@ jbm_16xf32_log2 (const __m512 x)        ///< __m512 vector.
   y = _mm512_add_ps (y, _mm512_maskz_mov_ps (m, y));
   e = _mm512_sub_epi32 (e, _mm512_maskz_set1_epi32 (m, 1));
   y = _mm512_add_ps (jbm_16xf32_log2wc (_mm512_sub_ps (y,
-                                        _mm512_set1_ps (1.f))),
+                                                       _mm512_set1_ps (1.f))),
                      _mm512_cvtepi32_ps (e));
   y = _mm512_mask_mov_ps (y, _mm512_cmpeq_ps_mask (x, z),
                           _mm512_set1_ps (-INFINITY));
@@ -7761,10 +7760,9 @@ jbm_16xf32_pown (const __m512 x,        ///< __m512 vector.
  */
 static inline __m512
 jbm_16xf32_pow (const __m512 x, ///< __m512 vector.
-                const float e)  ///< exponent (float).
+                const __m512 e) ///< exponent (__m512 vector).
 {
-  return
-    jbm_16xf32_exp2 (_mm512_mul_ps (_mm512_set1_ps (e), jbm_16xf32_log2 (x)));
+  return jbm_16xf32_exp2 (_mm512_mul_ps (e, jbm_16xf32_log2 (x)));
 }
 
 /**
@@ -8149,7 +8147,8 @@ jbm_16xf32_erf (const __m512 x) ///< __m512 vector.
   return
     _mm512_mask_blend_ps (_mm512_cmp_ps_mask (ax, u, _CMP_LT_OS),
                           jbm_copy16xf32_sign (_mm512_sub_ps (u,
-                                               jbm_16xf32_erfcwc (ax)), x),
+                                                              jbm_16xf32_erfcwc
+                                                              (ax)), x),
                           jbm_16xf32_erfwc (x));
 }
 
@@ -8264,10 +8263,10 @@ jbm_solve_cubic_reduced_16xf32 (const __m512 a,
   l2 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (k0), a3);
   l3 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (_mm512_add_ps (l0, c2p_3)), a3);
   l3 = _mm512_mask_mov_ps (l3, _mm512_cmp_ps_mask (l2, x1, _CMP_LT_OS)
-                               | _mm512_cmp_ps_mask (l2, x2, _CMP_GT_OS), l2);
+                           | _mm512_cmp_ps_mask (l2, x2, _CMP_GT_OS), l2);
   l4 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (_mm512_sub_ps (l0, c2p_3)), a);
   l4 = _mm512_mask_mov_ps (l4, _mm512_cmp_ps_mask (l3, x1, _CMP_LT_OS)
-                               | _mm512_cmp_ps_mask (l3, x2, _CMP_GT_OS), l3);
+                           | _mm512_cmp_ps_mask (l3, x2, _CMP_GT_OS), l3);
   k1 = _mm512_sqrt_ps (k2);
   l5 = _mm512_add_ps (k0, k1);
   l5 = jbm_16xf32_cbrt (k2);
@@ -8514,8 +8513,8 @@ jbm_16xf32_flux_limiter_monotonized_central (const __m512 d1,
                    _mm512_add_ps (r, _mm512_set1_ps (1.f)));
   rm =
     _mm512_mask_mov_ps (_mm512_set1_ps (2.f),
-                         _mm512_cmp_ps_mask (r, _mm512_set1_ps (3.f),
-                                              _CMP_LT_OS), rm);
+                        _mm512_cmp_ps_mask (r, _mm512_set1_ps (3.f),
+                                            _CMP_LT_OS), rm);
 
   rm =
     _mm512_mask_mov_ps (rm, _mm512_cmp_ps_mask (r, _mm512_set1_ps (1.f / 3.f),
@@ -8812,8 +8811,8 @@ jbm_8xf64_frexp (const __m512d x,       ///< __m512d vector.
   y.x = _mm512_mask_mul_pd (y.x, is_sub, y.x, _mm512_set1_pd (0x1p52));
   exp
     = _mm512_mask_mov_epi64
-      (exp, is_sub, _mm512_sub_epi64 (_mm512_srli_epi64 (y.i, 52),
-                                      _mm512_set1_epi64 (52ll)));
+    (exp, is_sub, _mm512_sub_epi64 (_mm512_srli_epi64 (y.i, 52),
+                                    _mm512_set1_epi64 (52ll)));
   // exponent
   *e = _mm512_mask_sub_epi64 (zi, is_finite, exp, bias);
   // build mantissa in [0.5,1)
@@ -8844,8 +8843,7 @@ jbm_8xf64_exp2n (__m512i e)     ///< exponent vector (__m512i).
   x =
     _mm512_mask_blend_pd
     (is_norm, _mm512_setzero_pd (),
-     _mm512_castsi512_pd (_mm512_slli_epi64 (_mm512_add_epi64 (e,
-                                                               v1023), 52)));
+     _mm512_castsi512_pd (_mm512_slli_epi64 (_mm512_add_epi64 (e, v1023), 52)));
   x =
     _mm512_mask_mov_pd
     (x, _mm512_cmpgt_epi64_mask (e, vn1074) & ~is_norm,
@@ -15652,7 +15650,7 @@ jbm_8xf64_log2 (const __m512d x)        ///< __m512d vector.
   y = _mm512_add_pd (y, _mm512_maskz_mov_pd (m, y));
   e = _mm512_sub_epi64 (e, _mm512_maskz_set1_epi64 (m, 1));
   y = _mm512_add_pd (jbm_8xf64_log2wc (_mm512_sub_pd (y,
-                                       _mm512_set1_pd (1.))),
+                                                      _mm512_set1_pd (1.))),
                      _mm512_cvtepi64_pd (e));
   y = _mm512_mask_mov_pd (y, _mm512_cmpeq_pd_mask (x, z),
                           _mm512_set1_pd (-INFINITY));
@@ -15713,10 +15711,9 @@ jbm_8xf64_pown (const __m512d x,        ///< __m512d vector.
  */
 static inline __m512d
 jbm_8xf64_pow (const __m512d x, ///< __m512d vector.
-               const double e)  ///< exponent (__m512d).
+               const __m512d e) ///< exponent (__m512d).
 {
-  return
-    jbm_8xf64_exp2 (_mm512_mul_pd (_mm512_set1_pd (e), jbm_8xf64_log2 (x)));
+  return jbm_8xf64_exp2 (_mm512_mul_pd (e, jbm_8xf64_log2 (x)));
 }
 
 /**
@@ -15780,11 +15777,10 @@ jbm_8xf64_sin (const __m512d x) ///< __m512d vector.
                                               _CMP_LT_OS),
                           jbm_8xf64_opposite
                           (jbm_8xf64_coswc
-                           (_mm512_sub_pd (_mm512_set1_pd (3. * M_PI_2),
-                                           y))));
+                           (_mm512_sub_pd (_mm512_set1_pd (3. * M_PI_2), y))));
   s =
     _mm512_mask_mov_pd (s, _mm512_cmp_pd_mask (y, _mm512_set1_pd (5. * M_PI_4),
-                                              _CMP_LT_OS),
+                                               _CMP_LT_OS),
                         jbm_8xf64_sinwc (_mm512_sub_pd (_mm512_set1_pd (M_PI),
                                                         y)));
   s =
@@ -15793,7 +15789,7 @@ jbm_8xf64_sin (const __m512d x) ///< __m512d vector.
                         jbm_8xf64_coswc (_mm512_sub_pd (_mm512_set1_pd (M_PI_2),
                                                         y)));
   return _mm512_mask_mov_pd (s, _mm512_cmp_pd_mask (y, _mm512_set1_pd (M_PI_4),
-                                                   _CMP_LT_OS),
+                                                    _CMP_LT_OS),
                              jbm_8xf64_sinwc (y));
 }
 
@@ -15826,7 +15822,7 @@ jbm_8xf64_cos (const __m512d x) ///< __m512d vector.
                           jbm_8xf64_sinwc (_mm512_sub_pd
                                            (_mm512_set1_pd (M_PI_2), y)));
   return _mm512_mask_mov_pd (c, _mm512_cmp_pd_mask (y, _mm512_set1_pd (M_PI_4),
-                                                   _CMP_LT_OS),
+                                                    _CMP_LT_OS),
                              jbm_8xf64_coswc (y));
 }
 
@@ -15965,7 +15961,7 @@ jbm_8xf64_acos (const __m512d x)        ///< __m512d number.
                     (_mm512_sqrt_pd
                      (_mm512_fnmadd_pd (x, x, _mm512_set1_pd (1.))), x));
   return _mm512_mask_mov_pd (f, _mm512_cmp_pd_mask (x, _mm512_setzero_pd (),
-                                                   _CMP_LT_OS),
+                                                    _CMP_LT_OS),
                              _mm512_add_pd (f, _mm512_set1_pd (M_PI)));
 }
 
@@ -16113,7 +16109,8 @@ jbm_8xf64_erf (const __m512d x) ///< __m512d vector.
   return
     _mm512_mask_blend_pd (_mm512_cmp_pd_mask (ax, u, _CMP_LT_OS),
                           jbm_copy8xf64_sign (_mm512_sub_pd (u,
-                                              jbm_8xf64_erfcwc (ax)), x),
+                                                             jbm_8xf64_erfcwc
+                                                             (ax)), x),
                           jbm_8xf64_erfwc (x));
 }
 
@@ -16227,10 +16224,10 @@ jbm_solve_cubic_reduced_8xf64 (const __m512d a,
   l2 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (k0), a3);
   l3 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (_mm512_add_pd (l0, c2p_3)), a3);
   l3 = _mm512_mask_mov_pd (l3, _mm512_cmp_pd_mask (l2, x1, _CMP_LT_OS)
-                               | _mm512_cmp_pd_mask (l2, x2, _CMP_GT_OS), l2);
+                           | _mm512_cmp_pd_mask (l2, x2, _CMP_GT_OS), l2);
   l4 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (_mm512_sub_pd (l0, c2p_3)), a);
   l4 = _mm512_mask_mov_pd (l4, _mm512_cmp_pd_mask (l3, x1, _CMP_LT_OS)
-                               | _mm512_cmp_pd_mask (l3, x2, _CMP_GT_OS), l3);
+                           | _mm512_cmp_pd_mask (l3, x2, _CMP_GT_OS), l3);
   k1 = _mm512_sqrt_pd (k2);
   l5 = _mm512_add_pd (k0, k1);
   l5 = jbm_8xf64_cbrt (k2);
@@ -16682,7 +16679,7 @@ jbm_array_f32_cbrt (float *restrict xr, ///< result float array.
  * Function to calculate the exp2 function a float array.
  */
 static inline void
-jbm_array_f32_exp2 (float *restrict xr,         ///< result float array.
+jbm_array_f32_exp2 (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
@@ -16696,8 +16693,8 @@ jbm_array_f32_exp2 (float *restrict xr,         ///< result float array.
  */
 static inline void
 jbm_array_f32_exp (float *restrict xr,  ///< result float array.
-                    const float *restrict xd,   ///< data float array.
-                    const unsigned int n)       ///< number of array elements.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
@@ -16750,8 +16747,8 @@ jbm_array_f32_log2 (float *restrict xr, ///< result float array.
  */
 static inline void
 jbm_array_f32_log (float *restrict xr,  ///< result float array.
-                    const float *restrict xd,   ///< data float array.
-                    const unsigned int n)       ///< number of array elements.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
@@ -16803,8 +16800,8 @@ jbm_array_f32_cos (float *restrict xr,  ///< result float array.
  */
 static inline void
 jbm_array_f32_tan (float *restrict xr,  ///< result float array.
-                   const float *restrict xd,   ///< data float array.
-                   const unsigned int n)       ///< number of array elements.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
@@ -16922,8 +16919,8 @@ jbm_array_f32_acosh (float *restrict xr,        ///< result float array.
  */
 static inline void
 jbm_array_f32_atanh (float *restrict xr,        ///< result float array.
-                    const float *restrict xd,   ///< data float array.
-                    const unsigned int n)       ///< number of array elements.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
@@ -16936,8 +16933,8 @@ jbm_array_f32_atanh (float *restrict xr,        ///< result float array.
  */
 static inline void
 jbm_array_f32_erf (float *restrict xr,  ///< result float array.
-                   const float *restrict xd,   ///< data float array.
-                   const unsigned int n)       ///< number of array elements.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
@@ -17017,7 +17014,7 @@ jbm_array_f32_reduce_maxmin (const float *x,    ///< float array.
                     _mm256_load_ps, _mm_load_ps, _mm512_max_ps, _mm256_max_ps,
                     _mm_max_ps, fmaxf, _mm512_min_ps, _mm256_min_ps, _mm_min_ps,
                     fmin, jbm_16xf32_reduce_max, jbm_8xf32_reduce_max,
-		    jbm_4xf32_reduce_max, jbm_16xf32_reduce_min,
+                    jbm_4xf32_reduce_max, jbm_16xf32_reduce_min,
                     jbm_8xf32_reduce_min, jbm_4xf32_reduce_min, mx, mn);
   *max = mx, *min = mn;
 }
@@ -17064,7 +17061,7 @@ jbm_array_f32_mul1 (float *restrict xr, ///< result float array.
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
                  _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
                  _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-		 _mm512_mul_ps, _mm256_mul_ps, _mm_mul_ps, JBM_MUL);
+                 _mm512_mul_ps, _mm256_mul_ps, _mm_mul_ps, JBM_MUL);
 }
 
 /**
@@ -17079,7 +17076,67 @@ jbm_array_f32_div1 (float *restrict xr, ///< result float array.
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
                  _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
                  _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-		 _mm512_div_ps, _mm256_div_ps, _mm_div_ps, JBM_DIV);
+                 _mm512_div_ps, _mm256_div_ps, _mm_div_ps, JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_max1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
+                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
+                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
+                 _mm512_max_ps, _mm256_max_ps, _mm_max_ps, fmaxf);
+}
+
+/**
+ * Function to calculate the minimum between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_min1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
+                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
+                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
+                 _mm512_min_ps, _mm256_min_ps, _mm_min_ps, fminf);
+}
+
+/**
+ * Function to calculate the module between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_mod1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
+                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
+                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
+                 jbm_16xf32_mod, jbm_8xf32_mod, jbm_4xf32_mod, jbm_f32_mod);
+}
+
+/**
+ * Function to calculate the pow function between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_pow1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
+                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
+                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
+                 jbm_16xf32_pow, jbm_8xf32_pow, jbm_4xf32_pow, jbm_f32_pow);
 }
 
 /**
@@ -17136,6 +17193,62 @@ jbm_array_f32_div (float *restrict xr,  ///< result float array.
   JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
                  _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
                  _mm512_div_ps, _mm256_div_ps, _mm_div_ps, JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_max (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
+                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+                 _mm512_max_ps, _mm256_max_ps, _mm_max_ps, fmax);
+}
+
+/**
+ * Function to calculate the minimum in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_min (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
+                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+                 _mm512_min_ps, _mm256_min_ps, _mm_min_ps, fmin);
+}
+
+/**
+ * Function to calculate the module in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_mod (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
+                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+                 jbm_16xf32_mod, jbm_8xf32_mod, jbm_4xf32_mod, jbm_f32_mod);
+}
+
+/**
+ * Function to do the pow function in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_pow (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
+                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+                 jbm_16xf32_pow, jbm_8xf32_pow, jbm_4xf32_pow, jbm_f32_pow);
 }
 
 /**
@@ -17228,8 +17341,8 @@ jbm_array_f64_reciprocal (double *restrict xr,  ///< result double array.
  */
 static inline void
 jbm_array_f64_abs (double *restrict xr, ///< result double array.
-                   const double *restrict xd,    ///< data double array.
-                   const unsigned int n)         ///< number of array elements.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
@@ -17266,9 +17379,9 @@ jbm_array_f64_exp2 (double *restrict xr,        ///< result double array.
  * Function to calculate the exp function a double array.
  */
 static inline void
-jbm_array_f64_exp (double *restrict xr,        ///< result double array.
-                    const double *restrict xd,  ///< data double array.
-                    const unsigned int n)       ///< number of array elements.
+jbm_array_f64_exp (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
@@ -17320,9 +17433,9 @@ jbm_array_f64_log2 (double *restrict xr,        ///< result double array.
  * Function to calculate the log function a double array.
  */
 static inline void
-jbm_array_f64_log (double *restrict xr,        ///< result double array.
-                    const double *restrict xd,  ///< data double array.
-                    const unsigned int n)       ///< number of array elements.
+jbm_array_f64_log (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
@@ -17347,9 +17460,9 @@ jbm_array_f64_log10 (double *restrict xr,       ///< result double array.
  * Function to calculate the sin function a double array.
  */
 static inline void
-jbm_array_f64_sin (double *restrict xr,        ///< result double array.
-                   const double *restrict xd,  ///< data double array.
-                   const unsigned int n)       ///< number of array elements.
+jbm_array_f64_sin (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
@@ -17360,9 +17473,9 @@ jbm_array_f64_sin (double *restrict xr,        ///< result double array.
  * Function to calculate the cos function a double array.
  */
 static inline void
-jbm_array_f64_cos (double *restrict xr,        ///< result double array.
-                   const double *restrict xd,  ///< data double array.
-                   const unsigned int n)       ///< number of array elements.
+jbm_array_f64_cos (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
@@ -17373,9 +17486,9 @@ jbm_array_f64_cos (double *restrict xr,        ///< result double array.
  * Function to calculate the tan function a double array.
  */
 static inline void
-jbm_array_f64_tan (double *restrict xr,        ///< result double array.
-                   const double *restrict xd,  ///< data double array.
-                   const unsigned int n)       ///< number of array elements.
+jbm_array_f64_tan (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
@@ -17492,9 +17605,9 @@ jbm_array_f64_acosh (double *restrict xr,       ///< result double array.
  * Function to calculate the atanh function a double array.
  */
 static inline void
-jbm_array_f64_atanh (double *restrict xr,        ///< result double array.
-                    const double *restrict xd,  ///< data double array.
-                    const unsigned int n)       ///< number of array elements.
+jbm_array_f64_atanh (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
@@ -17506,9 +17619,9 @@ jbm_array_f64_atanh (double *restrict xr,        ///< result double array.
  * Function to calculate the erf function a double array.
  */
 static inline void
-jbm_array_f64_erf (double *restrict xr,        ///< result double array.
-                   const double *restrict xd,  ///< data double array.
-                   const unsigned int n)       ///< number of array elements.
+jbm_array_f64_erf (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
@@ -17534,7 +17647,7 @@ jbm_array_f64_erfc (double *restrict xr,        ///< result double array.
  * \return the sum value.
  */
 static inline double
-jbm_array_f64_sum (const double *x,      ///< double array.
+jbm_array_f64_sum (const double *x,     ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_REDUCE_OP (x, n, __m512d, __m256d, __m128d, double, _mm512_load_pd,
@@ -17588,7 +17701,7 @@ jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
                     _mm256_load_pd, _mm_load_pd, _mm512_max_pd, _mm256_max_pd,
                     _mm_max_pd, fmaxf, _mm512_min_pd, _mm256_min_pd, _mm_min_pd,
                     fmin, jbm_8xf64_reduce_max, jbm_4xf64_reduce_max,
-		    jbm_2xf64_reduce_max, jbm_8xf64_reduce_min,
+                    jbm_2xf64_reduce_max, jbm_8xf64_reduce_min,
                     jbm_4xf64_reduce_min, jbm_2xf64_reduce_min, mx, mn);
   *max = mx, *min = mn;
 }
@@ -17597,14 +17710,14 @@ jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
  * Function to add 1 double array + 1 number.
  */
 static inline void
-jbm_array_f64_add1 (double *restrict xr, ///< result double array.
-                    const double *restrict x1,   ///< addend double array.
-                    const double x2,     ///< addend double number.
+jbm_array_f64_add1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< addend double array.
+                    const double x2,    ///< addend double number.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
                  _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
-                 _mm256_store_pd,  _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
                  _mm_set1_pd, _mm512_add_pd, _mm256_add_pd, _mm_add_pd,
                  JBM_ADD);
 }
@@ -17620,7 +17733,7 @@ jbm_array_f64_sub1 (double *restrict xr,        ///< result double array.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
                  _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
-                 _mm256_store_pd,  _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
                  _mm_set1_pd, _mm512_sub_pd, _mm256_sub_pd, _mm_sub_pd,
                  JBM_SUB);
 }
@@ -17655,6 +17768,68 @@ jbm_array_f64_div1 (double *restrict xr,        ///< result double array.
                  _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
                  _mm_set1_pd, _mm512_div_pd, _mm256_div_pd, _mm_div_pd,
                  JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_max1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
+                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm512_max_pd, _mm256_max_pd, _mm_max_pd, fmax);
+}
+
+/**
+ * Function to calculate the minimum between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_min1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
+                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm512_min_pd, _mm256_min_pd, _mm_min_pd, fmin);
+}
+
+/**
+ * Function to calculate the module between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_mod1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
+                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
+                 _mm_set1_pd, jbm_8xf64_mod, jbm_4xf64_mod, jbm_2xf64_mod,
+                 jbm_f64_mod);
+}
+
+/**
+ * Function to calculate the pow function between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_pow1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
+                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
+                 _mm_set1_pd, jbm_8xf64_pow, jbm_4xf64_pow, jbm_2xf64_pow,
+                 jbm_f64_pow);
 }
 
 /**
@@ -17711,6 +17886,62 @@ jbm_array_f64_div (double *restrict xr, ///< result double array.
   JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
                  _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
                  _mm512_div_pd, _mm256_div_pd, _mm_div_pd, JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_max (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
+                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+                 _mm512_max_pd, _mm256_max_pd, _mm_max_pd, fmax);
+}
+
+/**
+ * Function to calculate the minimum in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_min (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
+                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+                 _mm512_min_pd, _mm256_min_pd, _mm_min_pd, fmin);
+}
+
+/**
+ * Function to calculate the module in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_mod (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
+                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+                 jbm_8xf64_mod, jbm_4xf64_mod, jbm_2xf64_mod, jbm_f64_mod);
+}
+
+/**
+ * Function to do the pow function in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_pow (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
+                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+                 jbm_8xf64_pow, jbm_4xf64_pow, jbm_2xf64_pow, jbm_f64_pow);
 }
 
 /**

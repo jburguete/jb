@@ -1791,7 +1791,7 @@ check_uni_f64 (double (*f) (const double), double (*g) (const double),
       else if (i == n1)
         x = xmax;
       else
-        x = xm + (double) (2 *  i - n1) * dx;
+        x = xm + (double) (2 * i - n1) * dx;
       f0 = f (x);
       g0 = g (x);
       if (!check_f64 (x, f0, g0, prec))
@@ -1899,7 +1899,7 @@ check_uni_4xf32 (__m128 (*f) (const __m128), float (*g) (const float),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm_store_ps (f0, f (_mm_load_ps (x)));
@@ -2014,7 +2014,7 @@ check_uni_2xf64 (__m128d (*f) (const __m128d), double (*g) (const double),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm_store_pd (f0, f (_mm_load_pd (x)));
@@ -2133,7 +2133,7 @@ check_uni_8xf32 (__m256 (*f) (const __m256), float (*g) (const float),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm256_store_ps (f0, f (_mm256_load_ps (x)));
@@ -2248,7 +2248,7 @@ check_uni_4xf64 (__m256d (*f) (const __m256d), double (*g) (const double),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm256_store_pd (f0, f (_mm256_load_pd (x)));
@@ -2367,7 +2367,7 @@ check_uni_16xf32 (__m512 (*f) (const __m512), float (*g) (const float),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm512_store_ps (f0, f (_mm512_load_ps (x)));
@@ -2482,7 +2482,7 @@ check_uni_8xf64 (__m512d (*f) (const __m512d), double (*g) (const double),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       _mm512_store_pd (f0, f (_mm512_load_pd (x)));
@@ -2601,7 +2601,7 @@ check_uni_4xf32 (float32x4_t (*f) (const float32x4_t), float (*g) (const float),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       vst1q_f32 (f0, f (vld1q_f32 (x)));
@@ -2716,7 +2716,7 @@ check_uni_2xf64 (float64x2_t (*f) (const float64x2_t),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       vst1q_f64 (f0, f (vld1q_f64 (x)));
@@ -2838,7 +2838,7 @@ check_uni_4xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 4)), 4);
@@ -2954,7 +2954,7 @@ check_uni_2xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 2)), 2);
@@ -3072,7 +3072,7 @@ check_uni_8xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 8)), 8);
@@ -3188,7 +3188,7 @@ check_uni_4xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
           else if (i == n1)
             x[j] = xmax;
           else
-            x[j] = xm + (2 *  i - n1) * dx;
+            x[j] = xm + (2 * i - n1) * dx;
           g0[j] = g (x[j]);
         }
       __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 4)), 4);
@@ -3296,7 +3296,7 @@ check_uni (JBFLOAT (*f) (const JBFLOAT), JBFLOAT (*g) (const JBFLOAT),
   JBFLOAT x, xm, dx, f0, g0;
   int i, n1;
   n1 = n - 1;
-  xm = (JBFLOAT) 0.5 * (xmin + xmax);
+  xm = (JBFLOAT) 0.5 *(xmin + xmax);
   dx = (xmax - xm) / (JBFLOAT) n1;
   for (i = 0; i < n; ++i)
     {
@@ -3305,7 +3305,7 @@ check_uni (JBFLOAT (*f) (const JBFLOAT), JBFLOAT (*g) (const JBFLOAT),
       else if (i == n1)
         x = xmax;
       else
-        x = xm + (JBFLOAT) (2 *  i - n1) * dx;
+        x = xm + (JBFLOAT) (2 * i - n1) * dx;
       f0 = f (x);
       g0 = g (x);
       if (FABS (f0 / g0 - (JBFLOAT) 1.) > prec && FABS (f0 - g0) > prec)
@@ -3372,7 +3372,7 @@ check_unil (JBDOUBLE (*f) (const JBDOUBLE), JBDOUBLE (*g) (const JBDOUBLE),
   JBDOUBLE x, xm, dx, f0, g0;
   int i, n1;
   n1 = n - 1;
-  xm = (JBDOUBLE) 0.5 * (xmin + xmax);
+  xm = (JBDOUBLE) 0.5 *(xmin + xmax);
   dx = (xmax - xm) / (JBDOUBLE) n1;
   for (i = 0; i < n; ++i)
     {
@@ -3381,7 +3381,7 @@ check_unil (JBDOUBLE (*f) (const JBDOUBLE), JBDOUBLE (*g) (const JBDOUBLE),
       else if (i == n1)
         x = xmax;
       else
-        x = xm + (JBDOUBLE) (2 *  i - n1) * dx;
+        x = xm + (JBDOUBLE) (2 * i - n1) * dx;
       f0 = f (x);
       g0 = g (x);
       if (FABSL (f0 / g0 - (JBDOUBLE) 1.) > prec && FABSL (f0 - g0) > prec)

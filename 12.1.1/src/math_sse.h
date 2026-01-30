@@ -232,7 +232,7 @@ jbm_4xf32_reduce_max (const __m128 x)
 {
   __m128 y;
   y = _mm_max_ps (x, _mm_movehl_ps (x, x));
-  y = _mm_max_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE(1,0,3,2)));
+  y = _mm_max_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE (1, 0, 3, 2)));
   return _mm_cvtss_f32 (y);
 }
 
@@ -246,7 +246,7 @@ jbm_4xf32_reduce_min (const __m128 x)
 {
   __m128 y;
   y = _mm_min_ps (x, _mm_movehl_ps (x, x));
-  y = _mm_min_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE(1,0,3,2)));
+  y = _mm_min_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE (1, 0, 3, 2)));
   return _mm_cvtss_f32 (y);
 }
 
@@ -255,7 +255,7 @@ jbm_4xf32_reduce_min (const __m128 x)
  * __m128 vector.
  */
 static inline void
-jbm_4xf32_reduce_maxmin (const __m128 x,       ///< __m128 vector.
+jbm_4xf32_reduce_maxmin (const __m128 x,        ///< __m128 vector.
                          float *max,
                          ///< pointer to the maximum value (float).
                          float *min)
@@ -263,11 +263,11 @@ jbm_4xf32_reduce_maxmin (const __m128 x,       ///< __m128 vector.
 {
   __m128 y, z;
   z = _mm_movehl_ps (x, x);
-  y = _mm_max_ps (x, z); 
-  y = _mm_max_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE(1,0,3,2)));
+  y = _mm_max_ps (x, z);
+  y = _mm_max_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE (1, 0, 3, 2)));
   *max = _mm_cvtss_f32 (y);
-  y = _mm_min_ps (x, z); 
-  y = _mm_min_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE(1,0,3,2)));
+  y = _mm_min_ps (x, z);
+  y = _mm_min_ps (y, _mm_shuffle_ps (y, y, _MM_SHUFFLE (1, 0, 3, 2)));
   *min = _mm_cvtss_f32 (y);
 }
 
@@ -389,7 +389,7 @@ jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
   // masks
   is_z = _mm_cmpeq_epi32 (y.i, zi);
   is_nan = _mm_cmpgt_epi32 (y.i, _mm_set1_epi32 (JBM_BITS_EXPONENT_F32 - 1));
-  is_finite = _mm_andnot_si128 (_mm_or_si128 (is_z , is_nan),
+  is_finite = _mm_andnot_si128 (_mm_or_si128 (is_z, is_nan),
                                 _mm_set1_epi32 (-1));
   // extract exponent
   exp = _mm_srli_epi32 (y.i, 23);
@@ -400,8 +400,7 @@ jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
                      _mm_castsi128_ps (is_sub));
   exp
     = _mm_blendv_epi8 (exp, _mm_sub_epi32 (_mm_srli_epi32 (y.i, 23),
-                                           _mm_set1_epi32 (23)),
-                       is_sub);
+                                           _mm_set1_epi32 (23)), is_sub);
   // exponent
   *e = _mm_blendv_epi8 (zi, _mm_sub_epi32 (exp, bias), is_finite);
   // build mantissa in [0.5,1)
@@ -419,7 +418,7 @@ jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
  * \return function value (__m128).
  */
 static inline __m128
-jbm_4xf32_exp2n (const __m128i e)     ///< exponent vector (__m128i).
+jbm_4xf32_exp2n (const __m128i e)       ///< exponent vector (__m128i).
 {
   __m128 x;
   x = _mm_blendv_ps
@@ -7272,9 +7271,9 @@ jbm_4xf32_pown (const __m128 x, ///< __m128 vector.
  */
 static inline __m128
 jbm_4xf32_pow (const __m128 x,  ///< __m128 vector.
-               const float e)   ///< exponent (float).
+               const __m128 e)  ///< exponent (__m128).
 {
-  return jbm_4xf32_exp2 (_mm_mul_ps (_mm_set1_ps (e), jbm_4xf32_log2 (x)));
+  return jbm_4xf32_exp2 (_mm_mul_ps (e, jbm_4xf32_log2 (x)));
 }
 
 /**
@@ -8251,8 +8250,8 @@ jbm_2xf64_frexp (const __m128d x,       ///< __m128d vector.
   y.i = _mm_and_si128 (y.i, abs_mask);
   // masks
   is_z = _mm_cmpeq_epi64 (y.i, zi);
-  is_nan =_mm_cmpgt_epi64 (y.i, _mm_set1_epi64x (JBM_BITS_EXPONENT_F64 - 1ll));
-  is_finite = _mm_andnot_si128 (_mm_or_si128 (is_z , is_nan),
+  is_nan = _mm_cmpgt_epi64 (y.i, _mm_set1_epi64x (JBM_BITS_EXPONENT_F64 - 1ll));
+  is_finite = _mm_andnot_si128 (_mm_or_si128 (is_z, is_nan),
                                 _mm_set1_epi64x (-1ll));
   // extract exponent
   exp = _mm_srli_epi64 (y.i, 52);
@@ -8263,8 +8262,7 @@ jbm_2xf64_frexp (const __m128d x,       ///< __m128d vector.
                      _mm_castsi128_pd (is_sub));
   exp
     = _mm_blendv_epi8 (exp, _mm_sub_epi64 (_mm_srli_epi64 (y.i, 52),
-                                           _mm_set1_epi64x (52ll)),
-                       is_sub);
+                                           _mm_set1_epi64x (52ll)), is_sub);
   // exponent
   *e = _mm_blendv_epi8 (zi, _mm_sub_epi64 (exp, bias), is_finite);
   // build mantissa in [0.5,1)
@@ -8282,22 +8280,22 @@ jbm_2xf64_frexp (const __m128d x,       ///< __m128d vector.
  * \return function value (__m128d).
  */
 static inline __m128d
-jbm_2xf64_exp2n (const __m128i e)     ///< exponent vector (__m128i).
+jbm_2xf64_exp2n (const __m128i e)       ///< exponent vector (__m128i).
 {
   const __m128i v1023 = _mm_set1_epi64x (1023ll);
   __m128d x;
   // normal and subnormal
   x = _mm_blendv_pd
-      (_mm_castsi128_pd
-       (_mm_slli_epi64 (_mm_add_epi64 (e, v1023), 52)),
-       _mm_castsi128_pd
-       (_mm_sllv_epi64 (_mm_set1_epi64x (1),
-                        _mm_add_epi64 (e, _mm_set1_epi64x (1074ll)))),
-       _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64x (-1022ll), e)));
+    (_mm_castsi128_pd
+     (_mm_slli_epi64 (_mm_add_epi64 (e, v1023), 52)),
+     _mm_castsi128_pd
+     (_mm_sllv_epi64 (_mm_set1_epi64x (1),
+                      _mm_add_epi64 (e, _mm_set1_epi64x (1074ll)))),
+     _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64x (-1022ll), e)));
   // zero
   x = _mm_blendv_pd
-      (x, _mm_setzero_pd (),
-       _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64x (-1074ll), e)));
+    (x, _mm_setzero_pd (),
+     _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64x (-1074ll), e)));
   // infinity
   return
     _mm_blendv_pd (x, _mm_set1_pd (INFINITY),
@@ -8311,7 +8309,7 @@ jbm_2xf64_exp2n (const __m128i e)     ///< exponent vector (__m128i).
  */
 static inline __m128d
 jbm_2xf64_ldexp (const __m128d x,       ///< __m128d vector.
-                 const __m128i e)     ///< exponent vector (__m128i).
+                 const __m128i e)       ///< exponent vector (__m128i).
 {
   return _mm_mul_pd (x, jbm_2xf64_exp2n (e));
 }
@@ -15132,9 +15130,9 @@ jbm_2xf64_pown (const __m128d x,        ///< __m128d vector.
  */
 static inline __m128d
 jbm_2xf64_pow (const __m128d x, ///< __m128d vector.
-               const double e)  ///< exponent (__m128d).
+               const __m128d e) ///< exponent (__m128d).
 {
-  return jbm_2xf64_exp2 (_mm_mul_pd (_mm_set1_pd (e), jbm_2xf64_log2 (x)));
+  return jbm_2xf64_exp2 (_mm_mul_pd (e, jbm_2xf64_log2 (x)));
 }
 
 /**

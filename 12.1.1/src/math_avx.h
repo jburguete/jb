@@ -179,7 +179,7 @@ jbm_8xf32_reduce_add (const __m256 x)   ///< __m256 vector.
  * \return maximum reduction (float).
  */
 static inline float
-jbm_8xf32_reduce_max (const __m256 x)  ///< __m256 vector.
+jbm_8xf32_reduce_max (const __m256 x)   ///< __m256 vector.
 {
   __m128 h, l;
   h = _mm256_extractf128_ps (x, 1);
@@ -193,7 +193,7 @@ jbm_8xf32_reduce_max (const __m256 x)  ///< __m256 vector.
  * \return minimum reduction (float).
  */
 static inline float
-jbm_8xf32_reduce_min (const __m256 x)  ///< __m256 vector.
+jbm_8xf32_reduce_min (const __m256 x)   ///< __m256 vector.
 {
   __m128 h, l;
   h = _mm256_extractf128_ps (x, 1);
@@ -206,9 +206,9 @@ jbm_8xf32_reduce_min (const __m256 x)  ///< __m256 vector.
  * vector.
  */
 static inline void
-jbm_8xf32_reduce_maxmin (const __m256 x,       ///< __m256 vector.
-                         float *max,   ///< pointer to the maximum value
-                         float *min)   ///< pointer to the minimum value
+jbm_8xf32_reduce_maxmin (const __m256 x,        ///< __m256 vector.
+                         float *max,    ///< pointer to the maximum value
+                         float *min)    ///< pointer to the minimum value
 {
   __m128 h, l;
   h = _mm256_extractf128_ps (x, 1);
@@ -309,10 +309,10 @@ jbm_8xf32_mod (const __m256 x,  ///< dividend (__m256).
   __m256 r;
   r = _mm256_floor_ps (_mm256_div_ps (x, d));
   return _mm256_blendv_ps (_mm256_fnmadd_ps (r, d, x),
-                        _mm256_mul_ps (d, _mm256_set1_ps (0.5f)),
-                        _mm256_cmp_ps (jbm_8xf32_abs (r),
-                                       _mm256_set1_ps (1.f / FLT_EPSILON),
-				       _CMP_GT_OQ));
+                           _mm256_mul_ps (d, _mm256_set1_ps (0.5f)),
+                           _mm256_cmp_ps (jbm_8xf32_abs (r),
+                                          _mm256_set1_ps (1.f / FLT_EPSILON),
+                                          _CMP_GT_OQ));
 }
 
 /**
@@ -338,7 +338,7 @@ jbm_8xf32_frexp (const __m256 x,        ///< __m256 vector.
   is_z = _mm256_cmpeq_epi32 (y.i, zi);
   is_nan
     = _mm256_cmpgt_epi32 (y.i, _mm256_set1_epi32 (JBM_BITS_EXPONENT_F32 - 1));
-  is_finite = _mm256_andnot_si256 (_mm256_or_si256 (is_z , is_nan),
+  is_finite = _mm256_andnot_si256 (_mm256_or_si256 (is_z, is_nan),
                                    _mm256_set1_epi32 (-1));
   // extract exponent
   exp = _mm256_srli_epi32 (y.i, 23);
@@ -350,7 +350,7 @@ jbm_8xf32_frexp (const __m256 x,        ///< __m256 vector.
                         _mm256_castsi256_ps (is_sub));
   exp
     = _mm256_blendv_epi8 (exp, _mm256_sub_epi32 (_mm256_srli_epi32 (y.i, 23),
-                                                  _mm256_set1_epi32 (23)),
+                                                 _mm256_set1_epi32 (23)),
                           is_sub);
   // exponent
   *e = _mm256_blendv_epi8 (zi, _mm256_sub_epi32 (exp, bias), is_finite);
@@ -7196,7 +7196,7 @@ jbm_8xf32_log2 (const __m256 x) ///< __m256 vector.
   e = _mm256_sub_epi32 (e, _mm256_and_si256 (_mm256_castps_si256 (m),
                                              _mm256_set1_epi32 (1)));
   y = _mm256_add_ps (jbm_8xf32_log2wc (_mm256_sub_ps (y,
-                                        _mm256_set1_ps (1.f))),
+                                                      _mm256_set1_ps (1.f))),
                      _mm256_cvtepi32_ps (e));
   y = _mm256_blendv_ps (y, _mm256_set1_ps (-INFINITY),
                         _mm256_cmp_ps (x, z, _CMP_EQ_OQ));
@@ -7260,10 +7260,9 @@ jbm_8xf32_pown (const __m256 x, ///< __m256 vector.
  */
 static inline __m256
 jbm_8xf32_pow (const __m256 x,  ///< __m256 vector.
-               const float e)   ///< exponent (float).
+               const __m256 e)  ///< exponent (__m256).
 {
-  return
-    jbm_8xf32_exp2 (_mm256_mul_ps (_mm256_set1_ps (e), jbm_8xf32_log2 (x)));
+  return jbm_8xf32_exp2 (_mm256_mul_ps (e, jbm_8xf32_log2 (x)));
 }
 
 /**
@@ -8268,7 +8267,7 @@ jbm_4xf64_mod (const __m256d x, ///< dividend (__m256d).
                            _mm256_mul_pd (d, _mm256_set1_pd (0.5)),
                            _mm256_cmp_pd (jbm_4xf64_abs (r),
                                           _mm256_set1_pd (1. / DBL_EPSILON),
-					  _CMP_GT_OQ));
+                                          _CMP_GT_OQ));
 }
 
 /**
@@ -8292,21 +8291,22 @@ jbm_4xf64_frexp (const __m256d x,       ///< __m256d vector.
   y.i = _mm256_and_si256 (y.i, abs_mask);
   // masks
   is_z = _mm256_cmpeq_epi64 (y.i, zi);
-  is_nan =_mm256_cmpgt_epi64 (y.i,
-                              _mm256_set1_epi64x (JBM_BITS_EXPONENT_F64 - 1ll));
-  is_finite = _mm256_andnot_si256 (_mm256_or_si256 (is_z , is_nan),
-                                   _mm256_set1_epi64x (-1ll));
+  is_nan = _mm256_cmpgt_epi64 (y.i,
+                               _mm256_set1_epi64x (JBM_BITS_EXPONENT_F64 -
+                                                   1ll));
+  is_finite =
+    _mm256_andnot_si256 (_mm256_or_si256 (is_z, is_nan),
+                         _mm256_set1_epi64x (-1ll));
   // extract exponent
   exp = _mm256_srli_epi64 (y.i, 52);
   // subnormals
-  is_sub = _mm256_and_si256 (is_finite,
-                             _mm256_cmpeq_epi64 (exp, zi));
+  is_sub = _mm256_and_si256 (is_finite, _mm256_cmpeq_epi64 (exp, zi));
   y.x
     = _mm256_blendv_pd (y.x, _mm256_mul_pd (y.x, _mm256_set1_pd (0x1p52)),
                         _mm256_castsi256_pd (is_sub));
   exp
     = _mm256_blendv_epi8 (exp, _mm256_sub_epi64 (_mm256_srli_epi64 (y.i, 52),
-                                                  _mm256_set1_epi64x (52ll)),
+                                                 _mm256_set1_epi64x (52ll)),
                           is_sub);
   // exponent
   *e = _mm256_blendv_epi8 (zi, _mm256_sub_epi64 (exp, bias), is_finite);
@@ -8326,24 +8326,24 @@ jbm_4xf64_frexp (const __m256d x,       ///< __m256d vector.
  * \return function value (__m256d).
  */
 static inline __m256d
-jbm_4xf64_exp2n (const __m256i e)     ///< exponent vector (__m256i).
+jbm_4xf64_exp2n (const __m256i e)       ///< exponent vector (__m256i).
 {
   const __m256i v1023 = _mm256_set1_epi64x (1023ll);
   __m256d x;
   // normal and subnormal
   x = _mm256_blendv_pd
-      (_mm256_castsi256_pd
-       (_mm256_slli_epi64 (_mm256_add_epi64 (e, v1023), 52)),
-       _mm256_castsi256_pd
-       (_mm256_sllv_epi64 (_mm256_set1_epi64x (1),
-                           _mm256_add_epi64 (e, _mm256_set1_epi64x (1074ll)))),
-       _mm256_castsi256_pd (_mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1022ll),
-                            e)));
+    (_mm256_castsi256_pd
+     (_mm256_slli_epi64 (_mm256_add_epi64 (e, v1023), 52)),
+     _mm256_castsi256_pd
+     (_mm256_sllv_epi64 (_mm256_set1_epi64x (1),
+                         _mm256_add_epi64 (e, _mm256_set1_epi64x (1074ll)))),
+     _mm256_castsi256_pd (_mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1022ll),
+                                              e)));
   // zero
   x = _mm256_blendv_pd
-      (x, _mm256_setzero_pd (),
-       _mm256_castsi256_pd (_mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1074ll),
-                            e)));
+    (x, _mm256_setzero_pd (),
+     _mm256_castsi256_pd (_mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1074ll),
+                                              e)));
   // infinity
   return
     _mm256_blendv_pd (x, _mm256_set1_pd (INFINITY),
@@ -15213,10 +15213,9 @@ jbm_4xf64_pown (const __m256d x,        ///< __m256d vector.
  */
 static inline __m256d
 jbm_4xf64_pow (const __m256d x, ///< __m256d vector.
-               const double e)  ///< exponent (__m256d).
+               const __m256d e) ///< exponent (__m256d).
 {
-  return
-    jbm_4xf64_exp2 (_mm256_mul_pd (_mm256_set1_pd (e), jbm_4xf64_log2 (x)));
+  return jbm_4xf64_exp2 (_mm256_mul_pd (e, jbm_4xf64_log2 (x)));
 }
 
 /**

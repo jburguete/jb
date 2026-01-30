@@ -314,7 +314,7 @@ jbm_f64_opposite (const double x)       ///< float number.
  * \return double reciprocal.
  */
 static inline double
-jbm_f64_reciprocal (const double x)       ///< float number.
+jbm_f64_reciprocal (const double x)     ///< float number.
 {
   return 1. / x;
 }
@@ -4348,16 +4348,16 @@ jbm_f64_erfc (const double x)   ///< double number.
 static inline double
 jbm_f64_integral (double (*f) (double),
                   ///< pointer to the function to integrate.
-                  const double x1,       ///< left limit of the interval.
-                  const double x2)       ///< right limit of the interval.
+                  const double x1,      ///< left limit of the interval.
+                  const double x2)      ///< right limit of the interval.
 {
   double k, x, dx;
 #if JBM_INTEGRAL_GAUSS_N > 1
   double k2;
   unsigned int i;
 #endif
-  dx = 0.5f *(x2 - x1);
-  x = 0.5f *(x1 + x2);
+  dx = 0.5f * (x2 - x1);
+  x = 0.5f * (x1 + x2);
   k = JBM_INTEGRAL_GAUSS_A_F64[0] * f (x);
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)

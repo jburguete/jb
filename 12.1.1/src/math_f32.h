@@ -231,7 +231,7 @@ jbm_f32_opposite (const float x)        ///< float number.
  * \return float reciprocal.
  */
 static inline float
-jbm_f32_reciprocal (const float x)        ///< float number.
+jbm_f32_reciprocal (const float x)      ///< float number.
 {
   return 1.f / x;
 }
@@ -3839,7 +3839,7 @@ jbm_f32_log2 (const float x)    ///< float number.
     return x;
   y = jbm_f32_frexp (x, &e);
   m = y < M_SQRT1_2f;
-  y += (float) m * y;
+  y += (float) m *y;
   e -= m;
   return jbm_f32_log2wc (y - 1.f) + (float) e;
 }
@@ -4279,8 +4279,8 @@ jbm_f32_integral (float (*f) (float),
   float k2;
   unsigned int i;
 #endif
-  dx = 0.5f *(x2 - x1);
-  x = 0.5f *(x1 + x2);
+  dx = 0.5f * (x2 - x1);
+  x = 0.5f * (x1 + x2);
   k = JBM_INTEGRAL_GAUSS_A_F32[0] * f (x);
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
