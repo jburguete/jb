@@ -56,40 +56,40 @@ typedef union
 
 // float constants
 
-#define JBM_BIAS_8xF32 _mm256_set1_epi32 (JBM_BIAS_F32)
+#define JBM_BIAS_8xF32 _mm256_set1_epi32 (JBM_F32_BIAS)
 ///< bias for floats.
-#define JBM_BITS_1_8xF32 _mm256_set1_epi32 (JBM_BITS_1_F32)
+#define JBM_BITS_1_8xF32 _mm256_set1_epi32 (JBM_F32_BITS_1)
 ///< 1 bits for floats.
-#define JBM_BITS_ABS_8xF32 _mm256_set1_epi32 (JBM_BITS_ABS_F32)
+#define JBM_BITS_ABS_8xF32 _mm256_set1_epi32 (JBM_F32_BITS_ABS)
 ///< absolute value bits for floats.
-#define JBM_BITS_EXPONENT_8xF32 _mm256_set1_epi32 (JBM_BITS_EXPONENT_F32)
+#define JBM_BITS_EXPONENT_8xF32 _mm256_set1_epi32 (JBM_F32_BITS_EXPONENT)
 ///< exponent bits for floats.
-#define JBM_BITS_MANTISSA_8xF32 _mm256_set1_epi32 (JBM_BITS_MANTISSA_F32)
+#define JBM_BITS_MANTISSA_8xF32 _mm256_set1_epi32 (JBM_F32_BITS_MANTISSA)
 ///< mantissa bits for floats.
-#define JBM_BITS_SIGN_8xF32 _mm256_set1_epi32 (JBM_BITS_SIGN_F32)
+#define JBM_BITS_SIGN_8xF32 _mm256_set1_epi32 (JBM_F32_BITS_SIGN)
 ///< sign bits for floats.
-#define JBM_CBRT2_8xF32 _mm256_set1_ps (JBM_CBRT2_F32)
+#define JBM_CBRT2_8xF32 _mm256_set1_ps (JBM_F32_CBRT2)
 ///< cbrt(2) for floats.
-#define JBM_CBRT4_8xF32 _mm256_set1_ps (JBM_CBRT4_F32)
+#define JBM_CBRT4_8xF32 _mm256_set1_ps (JBM_F32_CBRT4)
 ///< cbrt(4) for floats.
 
 // double constants
 
-#define JBM_BIAS_4xF64 _mm256_set1_epi64x (JBM_BIAS_F64)
+#define JBM_BIAS_4xF64 _mm256_set1_epi64x (JBM_F64_BIAS)
 ///< bias for doubles.
-#define JBM_BITS_1_4xF64 _mm256_set1_epi64x (JBM_BITS_1_F64)
+#define JBM_BITS_1_4xF64 _mm256_set1_epi64x (JBM_F64_BITS_1)
 ///< 1 bits for doubles.
-#define JBM_BITS_ABS_4xF64 _mm256_set1_epi64x (JBM_BITS_ABS_F64)
+#define JBM_BITS_ABS_4xF64 _mm256_set1_epi64x (JBM_F64_BITS_ABS)
 ///< absolute value bits for doubles.
-#define JBM_BITS_EXPONENT_4xF64 _mm256_set1_epi64x (JBM_BITS_EXPONENT_F64)
+#define JBM_BITS_EXPONENT_4xF64 _mm256_set1_epi64x (JBM_F64_BITS_EXPONENT)
 ///< exponent bits for doubles.
-#define JBM_BITS_MANTISSA_4xF64 _mm256_set1_epi64x (JBM_BITS_MANTISSA_F64)
+#define JBM_BITS_MANTISSA_4xF64 _mm256_set1_epi64x (JBM_F64_BITS_MANTISSA)
 ///< mantissa bits for doubles.
-#define JBM_BITS_SIGN_4xF64 _mm256_set1_epi64x (JBM_BITS_SIGN_F64)
+#define JBM_BITS_SIGN_4xF64 _mm256_set1_epi64x (JBM_F64_BITS_SIGN)
 ///< sign bits for doubles.
-#define JBM_CBRT2_4xF64 _mm256_set1_pd (JBM_CBRT2_F64)
+#define JBM_CBRT2_4xF64 _mm256_set1_pd (JBM_F64_CBRT2)
 ///< cbrt(2) for doubles.
-#define JBM_CBRT4_4xF64 _mm256_set1_pd (JBM_CBRT4_F64)
+#define JBM_CBRT4_4xF64 _mm256_set1_pd (JBM_F64_CBRT4)
 ///< cbrt(4) for doubles.
 
 ///> macro to define types for AVX
@@ -337,7 +337,7 @@ jbm_8xf32_frexp (const __m256 x,        ///< __m256 vector.
   // masks
   is_z = _mm256_cmpeq_epi32 (y.i, zi);
   is_nan
-    = _mm256_cmpgt_epi32 (y.i, _mm256_set1_epi32 (JBM_BITS_EXPONENT_F32 - 1));
+    = _mm256_cmpgt_epi32 (y.i, _mm256_set1_epi32 (JBM_F32_BITS_EXPONENT - 1));
   is_finite = _mm256_andnot_si256 (_mm256_or_si256 (is_z, is_nan),
                                    _mm256_set1_epi32 (-1));
   // extract exponent
@@ -357,7 +357,7 @@ jbm_8xf32_frexp (const __m256 x,        ///< __m256 vector.
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm256_or_si256 (_mm256_and_si256 (z.i, sign_mask),
-                         _mm256_or_si256 (_mm256_set1_epi32 (JBM_BIAS_F32
+                         _mm256_or_si256 (_mm256_set1_epi32 (JBM_F32_BIAS
                                                              << 23),
                                           _mm256_and_si256 (y.i, mant_mask)));
   return _mm256_blendv_ps (x, y.x, _mm256_castsi256_ps (is_finite));
@@ -375,8 +375,8 @@ jbm_8xf32_exp2n (__m256i e)     ///< exponent vector (__m256i).
   __m256 x;
   x = _mm256_blendv_ps
     (_mm256_castsi256_ps
-     (_mm256_sllv_epi32 (_mm256_set1_epi32 (0x00400000),
-                         _mm256_sub_epi32 (_mm256_set1_epi32 (-127), e))),
+     (_mm256_sllv_epi32 (_mm256_set1_epi32 (1),
+                         _mm256_add_epi32 (_mm256_set1_epi32 (149), e))),
      _mm256_castsi256_ps
      (_mm256_slli_epi32 (_mm256_add_epi32 (e, _mm256_set1_epi32 (127)), 23)),
      _mm256_castsi256_ps (_mm256_cmpgt_epi32 (e, _mm256_set1_epi32 (-127))));
@@ -8292,7 +8292,7 @@ jbm_4xf64_frexp (const __m256d x,       ///< __m256d vector.
   // masks
   is_z = _mm256_cmpeq_epi64 (y.i, zi);
   is_nan = _mm256_cmpgt_epi64 (y.i,
-                               _mm256_set1_epi64x (JBM_BITS_EXPONENT_F64 -
+                               _mm256_set1_epi64x (JBM_F64_BITS_EXPONENT -
                                                    1ll));
   is_finite =
     _mm256_andnot_si256 (_mm256_or_si256 (is_z, is_nan),
@@ -8313,7 +8313,7 @@ jbm_4xf64_frexp (const __m256d x,       ///< __m256d vector.
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm256_or_si256 (_mm256_and_si256 (z.i, sign_mask),
-                         _mm256_or_si256 (_mm256_set1_epi64x (JBM_BIAS_F64
+                         _mm256_or_si256 (_mm256_set1_epi64x (JBM_F64_BIAS
                                                               << 52),
                                           _mm256_and_si256 (y.i, mant_mask)));
   return _mm256_blendv_pd (x, y.x, _mm256_castsi256_pd (is_finite));
@@ -8342,7 +8342,7 @@ jbm_4xf64_exp2n (const __m256i e)       ///< exponent vector (__m256i).
   // zero
   x = _mm256_blendv_pd
     (x, _mm256_setzero_pd (),
-     _mm256_castsi256_pd (_mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1074ll),
+     _mm256_castsi256_pd (_mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1075ll),
                                               e)));
   // infinity
   return
@@ -16082,180 +16082,761 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
 
 #ifndef __AVX512F__
 
-/**
- * Function to add 2 float arrays.
- */
-static inline void
-jbm_array_f32_add (float *xr,   ///< result float array.
-                   const float *x1,     ///< 1st addend float array.
-                   const float *x2,     ///< 1st addend float array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 3; j > 0; --j, i += 8)
-    _mm256_store_ps (xr + i, _mm256_add_ps (_mm256_load_ps (x1 + i),
-                                            _mm256_load_ps (x2 + i)));
-  for (j = (n - i) >> 2; j > 0; --j, i += 4)
-    _mm_store_ps (xr + i,
-                  _mm_add_ps (_mm_load_ps (x1 + i), _mm_load_ps (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] + x2[i];
-}
+///> macro to automatize operations on one array.
+#define JBM_ARRAY_OP(xr, xd, n, type, load256, load128, store256, store128, \
+                     op256, op128, op) \
+  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
+  unsigned int i, j; \
+  if (n > prefetch + 128 / sizeof (type)) \
+    for (i = 0, \
+         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
+	 j > 0; --j) \
+      { \
+        _mm_prefetch((const char *) (xd + i + prefetch), _MM_HINT_T0); \
+        store256 (xr + i, op256 (load256 (xd + i))); \
+        i += 32 / sizeof (type); \
+        store256 (xr + i, op256 (load256 (xd + i))); \
+        i += 32 / sizeof (type); \
+        store256 (xr + i, op256 (load256 (xd + i))); \
+        i += 32 / sizeof (type); \
+        store256 (xr + i, op256 (load256 (xd + i))); \
+        i += 32 / sizeof (type); \
+      } \
+  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store256 (xr + i, op256 (load256 (xd + i))); \
+      i += 32 / sizeof (type); \
+      store256 (xr + i, op256 (load256 (xd + i))); \
+      i += 32 / sizeof (type); \
+      store256 (xr + i, op256 (load256 (xd + i))); \
+      i += 32 / sizeof (type); \
+      store256 (xr + i, op256 (load256 (xd + i))); \
+      i += 32 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+       --j, i += 32 / sizeof (type)) \
+    store256 (xr + i, op256 (load256 (xd + i))); \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, op128 (load128 (xd + i))); \
+  for (; i < n; ++i) \
+    xr[i] = op (xd[i]);
+
+///> macro to automatize operations on one array and one number.
+#define JBM_ARRAY_OP1(xr, x1, x2, n, type256, type128, type, load256, load128, \
+                      store256, store128, set256, set128, op256, op128, op) \
+  const type256 x256 = set256 (x2); \
+  const type128 x128 = set128 (x2); \
+  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
+  unsigned int i, j; \
+  if (n > prefetch + 128 / sizeof (type)) \
+    for (i = 0, \
+         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
+	 j > 0; --j) \
+      { \
+        _mm_prefetch((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
+        store256 (xr + i, op256 (load256 (x1 + i), x256)); \
+        i += 32 / sizeof (type); \
+        store256 (xr + i, op256 (load256 (x1 + i), x256)); \
+        i += 32 / sizeof (type); \
+        store256 (xr + i, op256 (load256 (x1 + i), x256)); \
+        i += 32 / sizeof (type); \
+        store256 (xr + i, op256 (load256 (x1 + i), x256)); \
+        i += 32 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store256 (xr + i, op256 (load256 (x1 + i), x256)); \
+      i += 32 / sizeof (type); \
+      store256 (xr + i, op256 (load256 (x1 + i), x256)); \
+      i += 32 / sizeof (type); \
+      store256 (xr + i, op256 (load256 (x1 + i), x256)); \
+      i += 32 / sizeof (type); \
+      store256 (xr + i, op256 (load256 (x1 + i), x256)); \
+      i += 32 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+       --j, i += 32 / sizeof (type)) \
+    store256 (xr + i, op256 (load256 (x1 + i), x256)); \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+  for (; i < n; ++i) \
+    xr[i] = op (x1[i], x2);
+
+///> macro to automatize operations on two arrays.
+#define JBM_ARRAY_OP2(xr, x1, x2, n, type, load256, load128, store256, \
+                      store128, op256, op128, op) \
+  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
+  unsigned int i, j; \
+  if (n > prefetch + 128 / sizeof (type)) \
+    for (i = 0, \
+         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
+	 j > 0; --j) \
+      { \
+        _mm_prefetch((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
+        _mm_prefetch((const char *) (x2 + i + prefetch), _MM_HINT_T0); \
+        store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
+        i += 32 / sizeof (type); \
+        store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
+        i += 32 / sizeof (type); \
+        store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
+        i += 32 / sizeof (type); \
+        store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
+        i += 32 / sizeof (type); \
+      } \
+  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
+      i += 32 / sizeof (type); \
+      store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
+      i += 32 / sizeof (type); \
+      store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
+      i += 32 / sizeof (type); \
+      store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
+      i += 32 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+       --j, i += 32 / sizeof (type)) \
+    store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+  for (; i < n; ++i) \
+    xr[i] = op (x1[i], x2[i]);
+
+///> macro to automatize reduction operations on arrays.
+#define JBM_ARRAY_REDUCE_OP(x, n, type256, type128, type, load256, load128, \
+                            op256, op128, op, reduce256, reduce128, \
+			    initial_value) \
+  type256 a256, b256, c256, d256; \
+  type128 a128; \
+  type a = initial_value; \
+  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
+  unsigned int i, j; \
+  i = 0; \
+  if (n > prefetch + 128 / sizeof (type)) \
+    { \
+      j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
+      if (j) \
+        { \
+          _mm_prefetch ((const char *) (x + prefetch), _MM_HINT_T0); \
+          a256 = load256 (x + i); \
+          i += 32 / sizeof (type); \
+          b256 = load256 (x + i); \
+          i += 32 / sizeof (type); \
+          c256 = load256 (x + i); \
+          i += 32 / sizeof (type); \
+          d256 = load256 (x + i); \
+          i += 32 / sizeof (type); \
+          while (--j) \
+            { \
+              _mm_prefetch ((const char *) (x + i + prefetch), _MM_HINT_T0); \
+              a256 = op256 (a256, load256 (x + i)); \
+              i += 32 / sizeof (type); \
+              b256 = op256 (b256, load256 (x + i)); \
+              i += 32 / sizeof (type); \
+              c256 = op256 (c256, load256 (x + i)); \
+              i += 32 / sizeof (type); \
+              d256 = op256 (d256, load256 (x + i)); \
+              i += 32 / sizeof (type); \
+            } \
+          a256 = op256 (a256, b256); \
+          c256 = op256 (c256, d256); \
+          a = reduce256 (op256 (a256, c256)); \
+        } \
+    } \
+  j = (n - i) >> (3 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      a256 = load256 (x + i); \
+      i += 32 / sizeof (type); \
+      b256 = load256 (x + i); \
+      i += 32 / sizeof (type); \
+      c256 = load256 (x + i); \
+      i += 32 / sizeof (type); \
+      d256 = load256 (x + i); \
+      i += 32 / sizeof (type); \
+      while (--j) \
+        { \
+          a256 = op256 (a256, load256 (x + i)); \
+          i += 32 / sizeof (type); \
+          b256 = op256 (b256, load256 (x + i)); \
+          i += 32 / sizeof (type); \
+          c256 = op256 (c256, load256 (x + i)); \
+          i += 32 / sizeof (type); \
+          d256 = op256 (d256, load256 (x + i)); \
+          i += 32 / sizeof (type); \
+        } \
+      a256 = op256 (a256, b256); \
+      c256 = op256 (c256, d256); \
+      a = op (a, reduce256 (op256 (a256, c256))); \
+    } \
+  j = (n - i) >> (1 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      a256 = load256 (x + i); \
+      i += 32 / sizeof (type); \
+      while (--j) \
+        { \
+          a256 = op256 (a256, load256 (x + i)); \
+          i += 32 / sizeof (type); \
+        } \
+      a = op (a, reduce256 (a256)); \
+    } \
+  j = (n - i) >> (8 / sizeof (type)); \
+  if (j) \
+    { \
+      a128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          a128 = op128 (a128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+        } \
+      a = op (a, reduce128 (a128)); \
+    } \
+  while (i < n) \
+    a = op (a, x[i++]); \
+  return a;
+
+///> macro to automatize dot products on arrays.
+#define JBM_ARRAY_DOT(x1, x2, n, type256, type128, type, load256, load128, \
+                      mul256, mul128, add256, add128, ma256, ma128, reduce256, \
+                      reduce128) \
+  type256 a256, b256, c256, d256; \
+  type128 a128; \
+  type a = (type) 0.; \
+  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
+  unsigned int i, j; \
+  i = 0; \
+  if (n > prefetch + 128 / sizeof (type)) \
+    { \
+      j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
+      if (j) \
+        { \
+          _mm_prefetch ((const char *) (x1 + prefetch), _MM_HINT_T0); \
+          _mm_prefetch ((const char *) (x2 + prefetch), _MM_HINT_T0); \
+          a256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
+          i += 32 / sizeof (type); \
+          b256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
+          i += 32 / sizeof (type); \
+          d256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
+          i += 32 / sizeof (type); \
+          d256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
+          i += 32 / sizeof (type); \
+          while (--j) \
+            { \
+              _mm_prefetch ((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
+              _mm_prefetch ((const char *) (x2 + i + prefetch), _MM_HINT_T0); \
+              a256 = ma256 (load256 (x1 + i), load256 (x2 + i), a256); \
+              i += 32 / sizeof (type); \
+              b256 = ma256 (load256 (x1 + i), load256 (x2 + i), b256); \
+              i += 32 / sizeof (type); \
+              d256 = ma256 (load256 (x1 + i), load256 (x2 + i), c256); \
+              i += 32 / sizeof (type); \
+              d256 = ma256 (load256 (x1 + i), load256 (x2 + i), d256); \
+              i += 32 / sizeof (type); \
+            } \
+          a256 = add256 (a256, b256); \
+          c256 = add256 (c256, d256); \
+          a = reduce256 (add256 (a256, c256)); \
+        } \
+    } \
+  j = (n - i) >> (3 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      a256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
+      i += 32 / sizeof (type); \
+      b256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
+      i += 32 / sizeof (type); \
+      d256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
+      i += 32 / sizeof (type); \
+      d256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
+      i += 32 / sizeof (type); \
+      while (--j) \
+        { \
+          a256 = ma256 (load256 (x1 + i), load256 (x2 + i), a256); \
+          i += 32 / sizeof (type); \
+          b256 = ma256 (load256 (x1 + i), load256 (x2 + i), b256); \
+          i += 32 / sizeof (type); \
+          d256 = ma256 (load256 (x1 + i), load256 (x2 + i), c256); \
+          i += 32 / sizeof (type); \
+          d256 = ma256 (load256 (x1 + i), load256 (x2 + i), d256); \
+          i += 32 / sizeof (type); \
+        } \
+      a256 = add256 (a256, b256); \
+      c256 = add256 (c256, d256); \
+      a += reduce256 (add256 (a256, c256)); \
+    } \
+  j = (n - i) >> (1 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      a256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
+      i += 32 / sizeof (type); \
+      while (--j) \
+        { \
+          a256 = ma256 (load256 (x1 + i), load256 (x2 + i), a256); \
+          i += 32 / sizeof (type); \
+        } \
+      a += reduce256 (a256); \
+    } \
+  j = (n - i) >> (8 / sizeof (type)); \
+  if (j) \
+    { \
+      a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          a128 = ma128 (load128 (x1 + i), load128 (x2 + i), a128); \
+          i += 16 / sizeof (type); \
+        } \
+      a += reduce128 (a128); \
+    } \
+  for (; i < n; ++i) \
+    a += JBM_MUL (x1[i], x2[i]); \
+  return a;
+
+///> macro to automatize maxmin operations on arrays.
+#define JBM_ARRAY_MAXMIN(x, n, type256, type128, type, load256, load128, \
+                         max256, max128, max, min256, min128, min, redmax256, \
+                         redmax128, redmin256, redmin128, mx, mn) \
+  type256 x256, mxa256, mxb256, mna256, mnb256; \
+  type128 x128, mx128, mn128; \
+  type mx = -INFINITY, mn = INFINITY; \
+  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
+  unsigned int i, j; \
+  i = 0; \
+  if (n > prefetch + 64 / sizeof (type)) \
+    { \
+      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+      if (j) \
+        { \
+          _mm_prefetch ((const char *) (x + prefetch), _MM_HINT_T0); \
+          mxa256 = mna256 = load256 (x + i); \
+          i += 32 / sizeof (type); \
+          mxb256 = mnb256 = load256 (x + i); \
+          i += 32 / sizeof (type); \
+          while (--j) \
+            { \
+              _mm_prefetch ((const char *) (x + i + prefetch), _MM_HINT_T0); \
+              x256 = load256 (x + i); \
+              mxa256 = max256 (mxa256, x256); \
+              mna256 = min256 (mna256, x256); \
+              i += 32 / sizeof (type); \
+              x256 = load256 (x + i); \
+              mxb256 = max256 (mxb256, x256); \
+              mnb256 = min256 (mnb256, x256); \
+              i += 32 / sizeof (type); \
+            } \
+          mx = redmax256 (max256 (mxa256, mxb256)); \
+          mn = redmin256 (min256 (mna256, mnb256)); \
+        } \
+    } \
+  j = (n - i) >> (2 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      mxa256 = mna256 = load256 (x + i); \
+      i += 32 / sizeof (type); \
+      mxb256 = mnb256 = load256 (x + i); \
+      i += 32 / sizeof (type); \
+      while (--j) \
+        { \
+          x256 = load256 (x + i); \
+          mxa256 = max256 (mxa256, x256); \
+          mna256 = min256 (mna256, x256); \
+          i += 32 / sizeof (type); \
+          x256 = load256 (x + i); \
+          mxb256 = max256 (mxb256, x256); \
+          mnb256 = min256 (mnb256, x256); \
+          i += 32 / sizeof (type); \
+        } \
+      mx = max (mx, redmax256 (max256 (mxa256, mxb256))); \
+      mn = min (mn, redmin256 (min256 (mna256, mnb256))); \
+    } \
+  j = (n - i) >> (1 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      mx256 = mn256 = load256 (x + i); \
+      i += 32 / sizeof (type); \
+      while (--j) \
+        { \
+          x256 = load256 (x + i); \
+          mx256 = max256 (mx256, x256); \
+          mn256 = min256 (mn256, x256); \
+          i += 32 / sizeof (type); \
+        } \
+      mx = max (mx, redmax256 (mx256)); \
+      mn = min (mn, redmin256 (mn256)); \
+    } \
+  j = (n - i) >> (8 / sizeof (type)); \
+  if (j) \
+    { \
+      mx128 = mn128 = load128 (x + i); \
+      i += 32 / sizeof (type); \
+      while (--j) \
+        { \
+          x128 = load128 (x + i); \
+          mx128 = max128 (mx128, x128); \
+          mn128 = min128 (mn128, x128); \
+          i += 32 / sizeof (type); \
+        } \
+      mx = max (mx, redmax128 (mx128)); \
+      mn = min (mn, redmin128 (mn128)); \
+    } \
+  for (; i < n; ++i) \
+    mx = max (mx, x[i]), mn = min (mn, x[i]); \
 
 /**
- * Function to subtract 2 float arrays.
+ * Function to calculate the root square of a float array.
  */
 static inline void
-jbm_array_f32_sub (float *xr,   ///< result float array.
-                   const float *x1,     ///< minuend float array.
-                   const float *x2,     ///< subtrahend float array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 3; j > 0; --j, i += 8)
-    _mm256_store_ps (xr + i, _mm256_sub_ps (_mm256_load_ps (x1 + i),
-                                            _mm256_load_ps (x2 + i)));
-  for (j = (n - i) >> 2; j > 0; --j, i += 4)
-    _mm_store_ps (xr + i,
-                  _mm_sub_ps (_mm_load_ps (x1 + i), _mm_load_ps (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] - x2[i];
-}
-
-/**
- * Function to multiply a float array by a float number.
- */
-static inline void
-jbm_array_f32_mul1 (float *xr,  ///< result float array.
-                    const float *x1,    ///< multiplier float array.
-                    const float x2,     ///< multiplicand float number.
+jbm_array_f32_sqrt (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  __m256 a8;
-  __m128 s4;
-  unsigned int i, j;
-  i = 0;
-  j = n >> 3;
-  if (j)
-    {
-      a8 = _mm256_set1_ps (x2);
-      for (; j > 0; --j, i += 8)
-        _mm256_store_ps (xr + i, _mm256_mul_ps (_mm256_load_ps (x1 + i), a8));
-    }
-  j = (n - i) >> 2;
-  if (j)
-    {
-      s4 = _mm_set1_ps (x2);
-      for (; j > 0; --j, i += 4)
-        _mm_store_ps (xr + i, _mm_mul_ps (_mm_load_ps (x1 + i), s4));
-    }
-  for (; i < n; ++i)
-    xr[i] = x1[i] * x2;
-}
-
-/**
- * Function to divide a float array by a float number.
- */
-static inline void
-jbm_array_f32_div1 (float *xr,  ///< result float array.
-                    const float *x1,    ///< dividend float array.
-                    const float x2,     ///< divisor float number.
-                    const unsigned int n)       ///< number of array elements.
-{
-  __m256 a8;
-  __m128 s4;
-  unsigned int i, j;
-  i = 0;
-  j = n >> 3;
-  if (j)
-    {
-      a8 = _mm256_set1_ps (x2);
-      for (; j > 0; --j, i += 8)
-        _mm256_store_ps (xr + i, _mm256_div_ps (_mm256_load_ps (x1 + i), a8));
-    }
-  j = (n - i) >> 1;
-  if (j)
-    {
-      s4 = _mm_set1_ps (x2);
-      for (; j > 0; --j, i += 4)
-        _mm_store_ps (xr + i, _mm_div_ps (_mm_load_ps (x1 + i), s4));
-    }
-  for (; i < n; ++i)
-    xr[i] = x1[i] / x2;
-}
-
-/**
- * Function to multiply 2 float arrays.
- */
-static inline void
-jbm_array_f32_mul (float *xr,   ///< result float array.
-                   const float *x1,     ///< multiplier float array.
-                   const float *x2,     ///< multiplicand float array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 3; j > 0; --j, i += 8)
-    _mm256_store_ps (xr + i, _mm256_mul_ps (_mm256_load_ps (x1 + i),
-                                            _mm256_load_ps (x2 + i)));
-  for (j = (n - i) >> 2; j > 0; --j, i += 4)
-    _mm_store_ps (xr + i,
-                  _mm_mul_ps (_mm_load_ps (x1 + i), _mm_load_ps (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] * x2[i];
-}
-
-/**
- * Function to divide 2 float arrays.
- */
-static inline void
-jbm_array_f32_div (float *xr,   ///< result float array.
-                   const float *x1,     ///< dividend float array.
-                   const float *x2,     ///< divisor float array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 3; j > 0; --j, i += 8)
-    _mm256_store_ps (xr + i, _mm256_div_ps (_mm256_load_ps (x1 + i),
-                                            _mm256_load_ps (x2 + i)));
-  for (j = (n - i) >> 2; j > 0; --j, i += 4)
-    _mm_store_ps (xr + i,
-                  _mm_div_ps (_mm_load_ps (x1 + i), _mm_load_ps (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] / x2[i];
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, _mm256_sqrt_ps, _mm_sqrt_ps, sqrtf);
 }
 
 /**
  * Function to calculate the double of a float array.
  */
 static inline void
-jbm_array_f32_dbl (float *xr,   ///< result float array.
-                   const float *xd,     ///< data float array.
+jbm_array_f32_dbl (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 3; j > 0; --j, i += 8)
-    _mm256_store_ps (xr + i, jbm_8xf32_dbl (_mm256_load_ps (xd + i)));
-  for (j = (n - i) >> 2; j > 0; --j, i += 4)
-    _mm_store_ps (xr + i, jbm_4xf32_dbl (_mm_load_ps (xd + i)));
-  for (; i < n; ++i)
-    xr[i] = jbm_f32_dbl (xd[i]);
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_dbl, jbm_4xf32_dbl, jbm_f32_dbl);
 }
 
 /**
  * Function to calculate the square of a float array.
  */
 static inline void
-jbm_array_f32_sqr (float *xr,   ///< result float array.
-                   const float *xd,     ///< data float array.
+jbm_array_f32_sqr (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 3; j > 0; --j, i += 8)
-    _mm256_store_ps (xr + i, jbm_8xf32_sqr (_mm256_load_ps (xd + i)));
-  for (j = (n - i) >> 2; j > 0; --j, i += 4)
-    _mm_store_ps (xr + i, jbm_4xf32_sqr (_mm_load_ps (xd + i)));
-  for (; i < n; ++i)
-    xr[i] = jbm_f32_sqr (xd[i]);
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_sqr, jbm_4xf32_sqr, jbm_f32_sqr);
+}
+
+/**
+ * Function to calculate the square of a float array.
+ */
+static inline void
+jbm_array_f32_opposite (float *restrict xr,     ///< result float array.
+                        const float *restrict xd,       ///< data float array.
+                        const unsigned int n)   ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_opposite, jbm_4xf32_opposite,
+                jbm_f32_opposite);
+}
+
+/**
+ * Function to calculate the square of a float array.
+ */
+static inline void
+jbm_array_f32_reciprocal (float *restrict xr,   ///< result float array.
+                          const float *restrict xd,     ///< data float array.
+                          const unsigned int n) ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_reciprocal, jbm_4xf32_reciprocal,
+                jbm_f32_reciprocal);
+}
+
+/**
+ * Function to calculate the abs function of a float array.
+ */
+static inline void
+jbm_array_f32_abs (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_abs, jbm_4xf32_abs, jbm_f32_abs);
+}
+
+/**
+ * Function to calculate the cbrt function of a float array.
+ */
+static inline void
+jbm_array_f32_cbrt (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_cbrt, jbm_4xf32_cbrt, jbm_f32_cbrt);
+}
+
+/**
+ * Function to calculate the exp2 function a float array.
+ */
+static inline void
+jbm_array_f32_exp2 (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_exp2, jbm_4xf32_exp2, jbm_f32_exp2);
+}
+
+/**
+ * Function to calculate the exp function a float array.
+ */
+static inline void
+jbm_array_f32_exp (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_exp, jbm_4xf32_exp, jbm_f32_exp);
+}
+
+/**
+ * Function to calculate the exp10 function a float array.
+ */
+static inline void
+jbm_array_f32_exp10 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_exp10, jbm_4xf32_exp10, jbm_f32_exp10);
+}
+
+/**
+ * Function to calculate the expm1 function a float array.
+ */
+static inline void
+jbm_array_f32_expm1 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_expm1, jbm_4xf32_expm1, jbm_f32_expm1);
+}
+
+/**
+ * Function to calculate the log2 function a float array.
+ */
+static inline void
+jbm_array_f32_log2 (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_log2, jbm_4xf32_log2, jbm_f32_log2);
+}
+
+/**
+ * Function to calculate the log function a float array.
+ */
+static inline void
+jbm_array_f32_log (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_log, jbm_4xf32_log, jbm_f32_log);
+}
+
+/**
+ * Function to calculate the log10 function a float array.
+ */
+static inline void
+jbm_array_f32_log10 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_log10, jbm_4xf32_log10, jbm_f32_log10);
+}
+
+/**
+ * Function to calculate the sin function a float array.
+ */
+static inline void
+jbm_array_f32_sin (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_sin, jbm_4xf32_sin, jbm_f32_sin);
+}
+
+/**
+ * Function to calculate the cos function a float array.
+ */
+static inline void
+jbm_array_f32_cos (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_cos, jbm_4xf32_cos, jbm_f32_cos);
+}
+
+/**
+ * Function to calculate the tan function a float array.
+ */
+static inline void
+jbm_array_f32_tan (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_tan, jbm_4xf32_tan, jbm_f32_tan);
+}
+
+/**
+ * Function to calculate the asin function a float array.
+ */
+static inline void
+jbm_array_f32_asin (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_asin, jbm_4xf32_asin, jbm_f32_asin);
+}
+
+/**
+ * Function to calculate the acos function a float array.
+ */
+static inline void
+jbm_array_f32_acos (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_acos, jbm_4xf32_acos, jbm_f32_acos);
+}
+
+/**
+ * Function to calculate the atan function a float array.
+ */
+static inline void
+jbm_array_f32_atan (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_atan, jbm_4xf32_atan, jbm_f32_atan);
+}
+
+/**
+ * Function to calculate the sinh function a float array.
+ */
+static inline void
+jbm_array_f32_sinh (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_sinh, jbm_4xf32_sinh, jbm_f32_sinh);
+}
+
+/**
+ * Function to calculate the cosh function a float array.
+ */
+static inline void
+jbm_array_f32_cosh (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_cosh, jbm_4xf32_cosh, jbm_f32_cosh);
+}
+
+/**
+ * Function to calculate the tanh function a float array.
+ */
+static inline void
+jbm_array_f32_tanh (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_tanh, jbm_4xf32_tanh, jbm_f32_tanh);
+}
+
+/**
+ * Function to calculate the asinh function a float array.
+ */
+static inline void
+jbm_array_f32_asinh (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_asinh, jbm_4xf32_asinh, jbm_f32_asinh);
+}
+
+/**
+ * Function to calculate the acosh function a float array.
+ */
+static inline void
+jbm_array_f32_acosh (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_acosh, jbm_4xf32_acosh, jbm_f32_acosh);
+}
+
+/**
+ * Function to calculate the atanh function a float array.
+ */
+static inline void
+jbm_array_f32_atanh (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_atanh, jbm_4xf32_atanh, jbm_f32_atanh);
+}
+
+/**
+ * Function to calculate the erf function a float array.
+ */
+static inline void
+jbm_array_f32_erf (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_erf, jbm_4xf32_erf, jbm_f32_erf);
+}
+
+/**
+ * Function to calculate the erfc function a float array.
+ */
+static inline void
+jbm_array_f32_erfc (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, _mm256_load_ps, _mm_load_ps, _mm256_store_ps,
+                _mm_store_ps, jbm_8xf32_erfc, jbm_4xf32_erfc, jbm_f32_erfc);
+}
+
+/**
+ * Function to calculate the sum of the elements of a float array.
+ *
+ * \return the sum value.
+ */
+static inline float
+jbm_array_f32_sum (const float *x,      ///< float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_REDUCE_OP (x, n, __m256, __m128, float, _mm256_load_ps, _mm_load_ps,
+                       _mm256_add_ps, _mm_add_ps, JBM_ADD, jbm_8xf32_reduce_add,
+                       jbm_4xf32_reduce_add, 0.f);
 }
 
 /**
@@ -16264,40 +16845,12 @@ jbm_array_f32_sqr (float *xr,   ///< result float array.
  * \return the highest value.
  */
 static inline float
-jbm_array_f32_max (const float *xx,     ///< float array.
-                   const unsigned int n)        ///< number of array elements.
+jbm_array_f32_reduce_max (const float *x,       ///< float array.
+                          const unsigned int n) ///< number of array elements.
 {
-  float ax[8] JB_ALIGNED;
-  __m256 a8;
-  float k;
-  unsigned int i, j;
-  j = n >> 2;
-  if (j)
-    {
-      a8 = _mm256_load_ps (xx);
-      i = 8;
-      while (--j > 0)
-        {
-          a8 = _mm256_max_ps (a8, _mm256_load_ps (xx + i));
-          i += 8;
-        }
-      _mm256_store_ps (ax, a8);
-      k = fmaxf (ax[0], ax[1]);
-      k = fmaxf (k, ax[2]);
-      k = fmaxf (k, ax[3]);
-      k = fmaxf (k, ax[4]);
-      k = fmaxf (k, ax[5]);
-      k = fmaxf (k, ax[6]);
-      k = fmaxf (k, ax[7]);
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    k = fmaxf (k, xx[i++]);
-  return k;
+  JBM_ARRAY_REDUCE_OP (x, n, __m256, __m128, float, _mm256_load_ps, _mm_load_ps,
+                       _mm256_max_ps, _mm_max_ps, fmaxf, jbm_8xf32_reduce_max,
+                       jbm_4xf32_reduce_max, -INFINITY);
 }
 
 /**
@@ -16306,268 +16859,621 @@ jbm_array_f32_max (const float *xx,     ///< float array.
  * \return the lowest value.
  */
 static inline float
-jbm_array_f32_min (const float *xx,     ///< float array.
-                   const unsigned int n)        ///< number of array elements.
+jbm_array_f32_reduce_min (const float *x,       ///< float array.
+                          const unsigned int n) ///< number of array elements.
 {
-  float ax[8] JB_ALIGNED;
-  __m256 a8;
-  float k;
-  unsigned int i, j;
-  j = n >> 3;
-  if (j)
-    {
-      a8 = _mm256_load_ps (xx);
-      i = 8;
-      while (--j > 0)
-        {
-          a8 = _mm256_min_ps (a8, _mm256_load_ps (xx + i));
-          i += 8;
-        }
-      _mm256_store_ps (ax, a8);
-      k = fminf (ax[0], ax[1]);
-      k = fminf (k, ax[2]);
-      k = fminf (k, ax[3]);
-      k = fminf (k, ax[4]);
-      k = fminf (k, ax[5]);
-      k = fminf (k, ax[6]);
-      k = fminf (k, ax[7]);
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    k = fminf (k, xx[i++]);
-  return k;
+  JBM_ARRAY_REDUCE_OP (x, n, __m256, __m128, float, _mm256_load_ps, _mm_load_ps,
+                       _mm256_min_ps, _mm_min_ps, fminf, jbm_8xf32_reduce_min,
+                       jbm_4xf32_reduce_min, INFINITY);
 }
 
 /**
  * Function to find the highest and the lowest elements of a float array.
  */
 static inline void
-jbm_array_f32_maxmin (const float *xx,  ///< float array.
-                      float *max,       ///< the highest value.
-                      float *min,       ///< the lowest value.
-                      const unsigned int n)     ///< number of array elements.
+jbm_array_f32_reduce_maxmin (const float *x,    ///< float array.
+                             float *max,        ///< the highest value.
+                             float *min,        ///< the lowest value.
+                             const unsigned int n)
+                             ///< number of array elements.
 {
-  float ax[8] JB_ALIGNED;
-  __m256 a8, amax8, amin8;
-  float kmax, kmin;
-  unsigned int i, j;
-  j = n >> 3;
-  if (j)
-    {
-      amax8 = amin8 = _mm256_load_ps (xx);
-      i = 8;
-      while (--j > 0)
-        {
-          a8 = _mm256_load_ps (xx + i);
-          amax8 = _mm256_max_ps (amax8, a8);
-          amin8 = _mm256_min_ps (amin8, a8);
-          i += 8;
-        }
-      _mm256_store_ps (ax, amax8);
-      kmax = fmaxf (ax[0], ax[1]);
-      kmax = fmaxf (kmax, ax[2]);
-      kmax = fmaxf (kmax, ax[3]);
-      kmax = fmaxf (kmax, ax[4]);
-      kmax = fmaxf (kmax, ax[5]);
-      kmax = fmaxf (kmax, ax[6]);
-      kmax = fmaxf (kmax, ax[7]);
-      _mm256_store_ps (ax, amin8);
-      kmin = fminf (ax[0], ax[1]);
-      kmin = fminf (kmin, ax[2]);
-      kmin = fminf (kmin, ax[3]);
-      kmin = fminf (kmin, ax[4]);
-      kmin = fminf (kmin, ax[5]);
-      kmin = fminf (kmin, ax[6]);
-      kmin = fminf (kmin, ax[7]);
-    }
-  else
-    {
-      kmax = kmin = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    kmax = fmaxf (kmax, xx[i]), kmin = fminf (kmin, xx[i++]);
-  *max = kmax, *min = kmin;
+  JBM_ARRAY_MAXMIN (x, n, __m256, __m128, float, _mm256_load_ps, _mm_load_ps,
+                    _mm256_max_ps, _mm_max_ps, fmaxf, _mm256_min_ps, _mm_min_ps,
+                    fmin, jbm_8xf32_reduce_max, jbm_4xf32_reduce_max,
+                    jbm_8xf32_reduce_min, jbm_4xf32_reduce_min, mx, mn);
+  *max = mx, *min = mn;
 }
 
 /**
- * Function to add 2 double arrays.
+ * Function to add 1 float array + 1 number.
  */
 static inline void
-jbm_array_f64_add (double *xr,  ///< result double array.
-                   const double *x1,    ///< 1st addend double array.
-                   const double *x2,    ///< 1st addend double array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    _mm256_store_pd (xr + i, _mm256_add_pd (_mm256_load_pd (x1 + i),
-                                            _mm256_load_pd (x2 + i)));
-  for (j = (n - i) >> 1; j > 0; --j, i += 2)
-    _mm_store_pd (xr + i,
-                  _mm_add_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] + x2[i];
-}
-
-/**
- * Function to subtract 2 double arrays.
- */
-static inline void
-jbm_array_f64_sub (double *xr,  ///< result double array.
-                   const double *x1,    ///< minuend double array.
-                   const double *x2,    ///< subtrahend double array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    _mm256_store_pd (xr + i, _mm256_sub_pd (_mm256_load_pd (x1 + i),
-                                            _mm256_load_pd (x2 + i)));
-  for (j = (n - i) >> 1; j > 0; --j, i += 2)
-    _mm_store_pd (xr + i,
-                  _mm_sub_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] - x2[i];
-}
-
-/**
- * Function to multiply a double array by a double number.
- */
-static inline void
-jbm_array_f64_mul1 (double *xr, ///< result double array.
-                    const double *x1,   ///< multiplier double array.
-                    const double x2,    ///< multiplicand double number.
+jbm_array_f32_add1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< addend float array.
+                    const float x2,     ///< addend float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  __m256d a4;
-  __m128d s2;
-  unsigned int i, j;
-  i = 0;
-  j = n >> 2;
-  if (j)
-    {
-      a4 = _mm256_set1_pd (x2);
-      for (; j > 0; --j, i += 4)
-        _mm256_store_pd (xr + i, _mm256_mul_pd (_mm256_load_pd (x1 + i), a4));
-    }
-  j = (n - i) >> 1;
-  if (j)
-    {
-      s2 = _mm_set1_pd (x2);
-      for (; j > 0; --j, i += 2)
-        _mm_store_pd (xr + i, _mm_mul_pd (_mm_load_pd (x1 + i), s2));
-    }
-  for (; i < n; ++i)
-    xr[i] = x1[i] * x2;
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256, __m128, float, _mm256_load_ps,
+                 _mm_load_ps, _mm256_store_ps, _mm_store_ps, _mm256_set1_ps,
+                 _mm_set1_ps, _mm256_add_ps, _mm_add_ps, JBM_ADD);
 }
 
 /**
- * Function to divide a double array by a double number.
+ * Function to subtract 1 float array + 1 number.
  */
 static inline void
-jbm_array_f64_div1 (double *xr, ///< result double array.
-                    const double *x1,   ///< dividend double array.
-                    const double x2,    ///< divisor double number.
+jbm_array_f32_sub1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< minuend float array.
+                    const float x2,     ///< subtrahend float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  __m256d a4;
-  __m128d s2;
-  unsigned int i, j;
-  i = 0;
-  j = n >> 2;
-  if (j)
-    {
-      a4 = _mm256_set1_pd (x2);
-      for (; j > 0; --j, i += 4)
-        _mm256_store_pd (xr + i, _mm256_div_pd (_mm256_load_pd (x1 + i), a4));
-    }
-  j = (n - i) >> 1;
-  if (j)
-    {
-      s2 = _mm_set1_pd (x2);
-      for (; j > 0; --j, i += 2)
-        _mm_store_pd (xr + i, _mm_div_pd (_mm_load_pd (x1 + i), s2));
-    }
-  for (; i < n; ++i)
-    xr[i] = x1[i] / x2;
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256, __m128, float, _mm256_load_ps,
+                 _mm_load_ps, _mm256_store_ps, _mm_store_ps, _mm256_set1_ps,
+                 _mm_set1_ps, _mm256_sub_ps, _mm_sub_ps, JBM_SUB);
 }
 
 /**
- * Function to multiply 2 double arrays.
+ * Function to multiply a float array by a float number.
  */
 static inline void
-jbm_array_f64_mul (double *xr,  ///< result double array.
-                   const double *x1,    ///< multiplier double array.
-                   const double *x2,    ///< multiplicand double array.
-                   const unsigned int n)        ///< number of array elements.
+jbm_array_f32_mul1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< multiplier float array.
+                    const float x2,     ///< multiplicand float number.
+                    const unsigned int n)       ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    _mm256_store_pd (xr + i, _mm256_mul_pd (_mm256_load_pd (x1 + i),
-                                            _mm256_load_pd (x2 + i)));
-  for (j = (n - i) >> 1; j > 0; --j, i += 2)
-    _mm_store_pd (xr + i,
-                  _mm_mul_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] * x2[i];
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256, __m128, float, _mm256_load_ps,
+                 _mm_load_ps, _mm256_store_ps, _mm_store_ps, _mm256_set1_ps,
+                 _mm_set1_ps, _mm256_mul_ps, _mm_mul_ps, JBM_MUL);
 }
 
 /**
- * Function to divide 2 double arrays.
+ * Function to divide a float array by a float number.
  */
 static inline void
-jbm_array_f64_div (double *xr,  ///< result double array.
-                   const double *x1,    ///< dividend double array.
-                   const double *x2,    ///< divisor double array.
+jbm_array_f32_div1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< dividend float array.
+                    const float x2,     ///< divisor float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256, __m128, float, _mm256_load_ps,
+                 _mm_load_ps, _mm256_store_ps, _mm_store_ps, _mm256_set1_ps,
+                 _mm_set1_ps, _mm256_div_ps, _mm_div_ps, JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_max1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256, __m128, float, _mm256_load_ps,
+                 _mm_load_ps, _mm256_store_ps, _mm_store_ps, _mm256_set1_ps,
+                 _mm_set1_ps, _mm256_max_ps, _mm_max_ps, fmaxf);
+}
+
+/**
+ * Function to calculate the minimum between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_min1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256, __m128, float, _mm256_load_ps,
+                 _mm_load_ps, _mm256_store_ps, _mm_store_ps, _mm256_set1_ps,
+                 _mm_set1_ps, _mm256_min_ps, _mm_min_ps, fminf);
+}
+
+/**
+ * Function to calculate the module between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_mod1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256, __m128, float, _mm256_load_ps,
+                 _mm_load_ps, _mm256_store_ps, _mm_store_ps, _mm256_set1_ps,
+                 _mm_set1_ps, jbm_8xf32_mod, jbm_4xf32_mod, jbm_f32_mod);
+}
+
+/**
+ * Function to calculate the pow function between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_pow1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256, __m128, float, _mm256_load_ps,
+                 _mm_load_ps, _mm256_store_ps, _mm_store_ps, _mm256_set1_ps,
+                 _mm_set1_ps, jbm_8xf32_pow, jbm_4xf32_pow, jbm_f32_pow);
+}
+
+/**
+ * Function to add 2 float arrays.
+ */
+static inline void
+jbm_array_f32_add (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st addend float array.
+                   const float *restrict x2,    ///< 2nd addend float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    _mm256_store_pd (xr + i, _mm256_div_pd (_mm256_load_pd (x1 + i),
-                                            _mm256_load_pd (x2 + i)));
-  for (j = (n - i) >> 1; j > 0; --j, i += 2)
-    _mm_store_pd (xr + i,
-                  _mm_div_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] / x2[i];
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm256_load_ps, _mm_load_ps,
+                 _mm256_store_ps, _mm_store_ps, _mm256_add_ps, _mm_add_ps,
+                 JBM_ADD);
+}
+
+/**
+ * Function to subtract 2 float arrays.
+ */
+static inline void
+jbm_array_f32_sub (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< minuend float array.
+                   const float *restrict x2,    ///< subtrahend float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm256_load_ps, _mm_load_ps,
+                 _mm256_store_ps, _mm_store_ps, _mm256_sub_ps, _mm_sub_ps,
+                 JBM_SUB);
+}
+
+/**
+ * Function to multiply 2 float arrays.
+ */
+static inline void
+jbm_array_f32_mul (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< multiplier float array.
+                   const float *restrict x2,    ///< multiplicand float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm256_load_ps, _mm_load_ps,
+                 _mm256_store_ps, _mm_store_ps, _mm256_mul_ps, _mm_mul_ps,
+                 JBM_MUL);
+}
+
+/**
+ * Function to divide 2 float arrays.
+ */
+static inline void
+jbm_array_f32_div (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< dividend float array.
+                   const float *restrict x2,    ///< divisor float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm256_load_ps, _mm_load_ps,
+                 _mm256_store_ps, _mm_store_ps, _mm256_div_ps, _mm_div_ps,
+                 JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_max (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm256_load_ps, _mm_load_ps,
+                 _mm256_store_ps, _mm_store_ps, _mm256_max_ps, _mm_max_ps,
+                 fmax);
+}
+
+/**
+ * Function to calculate the minimum in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_min (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm256_load_ps, _mm_load_ps,
+                 _mm256_store_ps, _mm_store_ps, _mm256_min_ps, _mm_min_ps,
+                 fmin);
+}
+
+/**
+ * Function to calculate the module in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_mod (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm256_load_ps, _mm_load_ps,
+                 _mm256_store_ps, _mm_store_ps, jbm_8xf32_mod, jbm_4xf32_mod,
+                 jbm_f32_mod);
+}
+
+/**
+ * Function to do the pow function in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_pow (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm256_load_ps, _mm_load_ps,
+                 _mm256_store_ps, _mm_store_ps, jbm_8xf32_pow, jbm_4xf32_pow,
+                 jbm_f32_pow);
+}
+
+/**
+ * Function to do the dot product of 2 float arrays.
+ *
+ * \return dot product (float).
+ */
+static inline float
+jbm_array_f32_dot (const float *restrict x1,    ///< multiplier float array.
+                   const float *restrict x2,    ///< multiplicand float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_DOT (x1, x2, n, __m256, __m128, float, _mm256_load_ps, _mm_load_ps,
+                 _mm256_mul_ps, _mm_mul_ps, _mm256_add_ps, _mm_add_ps,
+                 _mm256_fmadd_ps, _mm_fmadd_ps, jbm_8xf32_reduce_add,
+                 jbm_4xf32_reduce_add);
+}
+
+/**
+ * Function to calculate the root square of a double array.
+ */
+static inline void
+jbm_array_f64_sqrt (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, _mm256_sqrt_pd, _mm_sqrt_pd, sqrt);
 }
 
 /**
  * Function to calculate the double of a double array.
  */
 static inline void
-jbm_array_f64_dbl (double *xr,  ///< result double array.
-                   const double *xd,    ///< data double array.
+jbm_array_f64_dbl (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    _mm256_store_pd (xr + i, jbm_4xf64_dbl (_mm256_load_pd (xd + i)));
-  for (j = (n - i) >> 1; j > 0; --j, i += 2)
-    _mm_store_pd (xr + i, jbm_2xf64_dbl (_mm_load_pd (xd + i)));
-  for (; i < n; ++i)
-    xr[i] = jbm_f64_dbl (xd[i]);
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_dbl, jbm_2xf64_dbl, jbm_f64_dbl);
 }
 
 /**
  * Function to calculate the square of a double array.
  */
 static inline void
-jbm_array_f64_sqr (double *xr,  ///< result double array.
-                   const double *xd,    ///< data double array.
+jbm_array_f64_sqr (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    _mm256_store_pd (xr + i, jbm_4xf64_sqr (_mm256_load_pd (xd + i)));
-  for (j = (n - i) >> 1; j > 0; --j, i += 2)
-    _mm_store_pd (xr + i, jbm_2xf64_sqr (_mm_load_pd (xd + i)));
-  for (; i < n; ++i)
-    xr[i] = jbm_f64_sqr (xd[i]);
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_sqr, jbm_2xf64_sqr, jbm_f64_sqr);
+}
+
+/**
+ * Function to calculate the opposite of a double array.
+ */
+static inline void
+jbm_array_f64_opposite (double *restrict xr,    ///< result double array.
+                        const double *restrict xd,      ///< data double array.
+                        const unsigned int n)   ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_opposite, jbm_2xf64_opposite,
+                jbm_f64_opposite);
+}
+
+/**
+ * Function to calculate the reciprocal of a double array.
+ */
+static inline void
+jbm_array_f64_reciprocal (double *restrict xr,  ///< result double array.
+                          const double *restrict xd,    ///< data double array.
+                          const unsigned int n) ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_reciprocal, jbm_2xf64_reciprocal,
+                jbm_f64_reciprocal);
+}
+
+/**
+ * Function to calculate the abs function of a double array.
+ */
+static inline void
+jbm_array_f64_abs (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_abs, jbm_2xf64_abs, jbm_f64_abs);
+}
+
+/**
+ * Function to calculate the cbrt function of a double array.
+ */
+static inline void
+jbm_array_f64_cbrt (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_cbrt, jbm_2xf64_cbrt, jbm_f64_cbrt);
+}
+
+/**
+ * Function to calculate the exp2 function a double array.
+ */
+static inline void
+jbm_array_f64_exp2 (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_exp2, jbm_2xf64_exp2, jbm_f64_exp2);
+}
+
+/**
+ * Function to calculate the exp function a double array.
+ */
+static inline void
+jbm_array_f64_exp (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_exp, jbm_2xf64_exp, jbm_f64_exp);
+}
+
+/**
+ * Function to calculate the exp10 function a double array.
+ */
+static inline void
+jbm_array_f64_exp10 (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_exp10, jbm_2xf64_exp10, jbm_f64_exp10);
+}
+
+/**
+ * Function to calculate the expm1 function a double array.
+ */
+static inline void
+jbm_array_f64_expm1 (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_expm1, jbm_2xf64_expm1, jbm_f64_expm1);
+}
+
+/**
+ * Function to calculate the log2 function a double array.
+ */
+static inline void
+jbm_array_f64_log2 (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_log2, jbm_2xf64_log2, jbm_f64_log2);
+}
+
+/**
+ * Function to calculate the log function a double array.
+ */
+static inline void
+jbm_array_f64_log (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_log, jbm_2xf64_log, jbm_f64_log);
+}
+
+/**
+ * Function to calculate the log10 function a double array.
+ */
+static inline void
+jbm_array_f64_log10 (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_log10, jbm_2xf64_log10, jbm_f64_log10);
+}
+
+/**
+ * Function to calculate the sin function a double array.
+ */
+static inline void
+jbm_array_f64_sin (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_sin, jbm_2xf64_sin, jbm_f64_sin);
+}
+
+/**
+ * Function to calculate the cos function a double array.
+ */
+static inline void
+jbm_array_f64_cos (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_cos, jbm_2xf64_cos, jbm_f64_cos);
+}
+
+/**
+ * Function to calculate the tan function a double array.
+ */
+static inline void
+jbm_array_f64_tan (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_tan, jbm_2xf64_tan, jbm_f64_tan);
+}
+
+/**
+ * Function to calculate the asin function a double array.
+ */
+static inline void
+jbm_array_f64_asin (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_asin, jbm_2xf64_asin, jbm_f64_asin);
+}
+
+/**
+ * Function to calculate the acos function a double array.
+ */
+static inline void
+jbm_array_f64_acos (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_acos, jbm_2xf64_acos, jbm_f64_acos);
+}
+
+/**
+ * Function to calculate the atan function a double array.
+ */
+static inline void
+jbm_array_f64_atan (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_atan, jbm_2xf64_atan, jbm_f64_atan);
+}
+
+/**
+ * Function to calculate the sinh function a double array.
+ */
+static inline void
+jbm_array_f64_sinh (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_sinh, jbm_2xf64_sinh, jbm_f64_sinh);
+}
+
+/**
+ * Function to calculate the cosh function a double array.
+ */
+static inline void
+jbm_array_f64_cosh (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_cosh, jbm_2xf64_cosh, jbm_f64_cosh);
+}
+
+/**
+ * Function to calculate the tanh function a double array.
+ */
+static inline void
+jbm_array_f64_tanh (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_tanh, jbm_2xf64_tanh, jbm_f64_tanh);
+}
+
+/**
+ * Function to calculate the asinh function a double array.
+ */
+static inline void
+jbm_array_f64_asinh (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_asinh, jbm_2xf64_asinh, jbm_f64_asinh);
+}
+
+/**
+ * Function to calculate the acosh function a double array.
+ */
+static inline void
+jbm_array_f64_acosh (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_acosh, jbm_2xf64_acosh, jbm_f64_acosh);
+}
+
+/**
+ * Function to calculate the atanh function a double array.
+ */
+static inline void
+jbm_array_f64_atanh (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_atanh, jbm_2xf64_atanh, jbm_f64_atanh);
+}
+
+/**
+ * Function to calculate the erf function a double array.
+ */
+static inline void
+jbm_array_f64_erf (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_erf, jbm_2xf64_erf, jbm_f64_erf);
+}
+
+/**
+ * Function to calculate the erfc function a double array.
+ */
+static inline void
+jbm_array_f64_erfc (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, _mm256_load_pd, _mm_load_pd, _mm256_store_pd,
+                _mm_store_pd, jbm_4xf64_erfc, jbm_2xf64_erfc, jbm_f64_erfc);
+}
+
+/**
+ * Function to calculate the sum of the elements of a double array.
+ *
+ * \return the sum value.
+ */
+static inline double
+jbm_array_f64_sum (const double *x,     ///< double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_REDUCE_OP (x, n, __m256d, __m128d, double, _mm256_load_pd,
+                       _mm_load_pd, _mm256_add_pd, _mm_add_pd, JBM_ADD,
+                       jbm_4xf64_reduce_add, jbm_2xf64_reduce_add, 0.);
 }
 
 /**
@@ -16576,34 +17482,12 @@ jbm_array_f64_sqr (double *xr,  ///< result double array.
  * \return the highest value.
  */
 static inline double
-jbm_array_f64_max (const double *xx,    ///< double array.
-                   const unsigned int n)        ///< number of array elements.
+jbm_array_f64_reduce_max (const double *x,      ///< double array.
+                          const unsigned int n) ///< number of array elements.
 {
-  double ax[4] JB_ALIGNED;
-  __m256d a4;
-  double k;
-  unsigned int i, j;
-  j = n >> 2;
-  if (j)
-    {
-      a4 = _mm256_load_pd (xx);
-      i = 4;
-      while (--j > 0)
-        {
-          a4 = _mm256_max_pd (a4, _mm256_load_pd (xx + i));
-          i += 4;
-        }
-      _mm256_store_pd (ax, a4);
-      k = fmax (fmax (ax[0], ax[1]), fmax (ax[2], ax[3]));
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    k = fmax (k, xx[i++]);
-  return k;
+  JBM_ARRAY_REDUCE_OP (x, n, __m256d, __m128d, double, _mm256_load_pd,
+                       _mm_load_pd, _mm256_max_pd, _mm_max_pd, fmaxf,
+                       jbm_4xf64_reduce_max, jbm_2xf64_reduce_max, -INFINITY);
 }
 
 /**
@@ -16612,74 +17496,280 @@ jbm_array_f64_max (const double *xx,    ///< double array.
  * \return the lowest value.
  */
 static inline double
-jbm_array_f64_min (const double *xx,    ///< double array.
-                   const unsigned int n)        ///< number of array elements.
+jbm_array_f64_reduce_min (const double *x,      ///< double array.
+                          const unsigned int n) ///< number of array elements.
 {
-  double ax[4] JB_ALIGNED;
-  __m256d a4;
-  double k;
-  unsigned int i, j;
-  j = n >> 2;
-  if (j)
-    {
-      a4 = _mm256_load_pd (xx);
-      i = 4;
-      while (--j > 0)
-        {
-          a4 = _mm256_min_pd (a4, _mm256_load_pd (xx + i));
-          i += 4;
-        }
-      _mm256_store_pd (ax, a4);
-      k = fmin (fmin (ax[0], ax[1]), fmin (ax[2], ax[3]));
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    k = fmin (k, xx[i++]);
-  return k;
+  JBM_ARRAY_REDUCE_OP (x, n, __m256d, __m128d, double,
+                       _mm256_load_pd, _mm_load_pd,
+                       _mm256_min_pd, _mm_min_pd, fminf,
+                       jbm_4xf64_reduce_min, jbm_2xf64_reduce_min, INFINITY);
 }
 
 /**
  * Function to find the highest and the lowest elements of a double array.
  */
 static inline void
-jbm_array_f64_maxmin (const double *xx, ///< double array.
-                      double *max,      ///< the highest value.
-                      double *min,      ///< the lowest value.
-                      const unsigned int n)     ///< number of array elements.
+jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
+                             double *max,       ///< the highest value.
+                             double *min,       ///< the lowest value.
+                             const unsigned int n)
+                             ///< number of array elements.
 {
-  double ax[4] JB_ALIGNED;
-  __m256d a4, amax4, amin4;
-  double kmax, kmin;
-  unsigned int i, j;
-  j = n >> 2;
-  if (j)
-    {
-      amax4 = amin4 = _mm256_load_pd (xx);
-      i = 4;
-      while (--j > 0)
-        {
-          a4 = _mm256_load_pd (xx + i);
-          amax4 = _mm256_max_pd (amax4, a4);
-          amin4 = _mm256_min_pd (amin4, a4);
-          i += 4;
-        }
-      _mm256_store_pd (ax, amax4);
-      kmax = fmax (fmax (ax[0], ax[1]), fmax (ax[2], ax[3]));
-      _mm256_store_pd (ax, amin4);
-      kmin = fmin (fmin (ax[0], ax[1]), fmin (ax[2], ax[3]));
-    }
-  else
-    {
-      kmax = kmin = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    kmax = fmax (kmax, xx[i]), kmin = fmin (kmin, xx[i++]);
-  *max = kmax, *min = kmin;
+  JBM_ARRAY_MAXMIN (x, n, __m256d, __m128d, double,
+                    _mm256_load_pd, _mm_load_pd, _mm256_max_pd,
+                    _mm_max_pd, fmaxf, _mm256_min_pd, _mm_min_pd,
+                    fmin, jbm_4xf64_reduce_max,
+                    jbm_2xf64_reduce_max,
+                    jbm_4xf64_reduce_min, jbm_2xf64_reduce_min, mx, mn);
+  *max = mx, *min = mn;
+}
+
+/**
+ * Function to add 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_add1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< addend double array.
+                    const double x2,    ///< addend double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256d, __m128d, double,
+                 _mm256_load_pd, _mm_load_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm256_add_pd, _mm_add_pd, JBM_ADD);
+}
+
+/**
+ * Function to subtract 1 double array - 1 double number.
+ */
+static inline void
+jbm_array_f64_sub1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< minuend double array.
+                    const double x2,    ///< subtrahend double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256d, __m128d, double,
+                 _mm256_load_pd, _mm_load_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm256_sub_pd, _mm_sub_pd, JBM_SUB);
+}
+
+/**
+ * Function to multiply a double array by a double number.
+ */
+static inline void
+jbm_array_f64_mul1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< multiplier double array.
+                    const double x2,    ///< multiplicand double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256d, __m128d, double,
+                 _mm256_load_pd, _mm_load_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm256_mul_pd, _mm_mul_pd, JBM_MUL);
+}
+
+/**
+ * Function to divide a double array by a double number.
+ */
+static inline void
+jbm_array_f64_div1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< dividend double array.
+                    const double x2,    ///< divisor double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256d, __m128d, double,
+                 _mm256_load_pd, _mm_load_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm256_div_pd, _mm_div_pd, JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_max1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256d, __m128d, double,
+                 _mm256_load_pd, _mm_load_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm256_max_pd, _mm_max_pd, fmax);
+}
+
+/**
+ * Function to calculate the minimum between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_min1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256d, __m128d, double,
+                 _mm256_load_pd, _mm_load_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm256_min_pd, _mm_min_pd, fmin);
+}
+
+/**
+ * Function to calculate the module between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_mod1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256d, __m128d, double,
+                 _mm256_load_pd, _mm_load_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm256_set1_pd,
+                 _mm_set1_pd, jbm_4xf64_mod, jbm_2xf64_mod, jbm_f64_mod);
+}
+
+/**
+ * Function to calculate the pow function between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_pow1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m256d, __m128d, double,
+                 _mm256_load_pd, _mm_load_pd,
+                 _mm256_store_pd, _mm_store_pd, _mm256_set1_pd,
+                 _mm_set1_pd, jbm_4xf64_pow, jbm_2xf64_pow, jbm_f64_pow);
+}
+
+/**
+ * Function to add 2 double arrays.
+ */
+static inline void
+jbm_array_f64_add (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st addend double array.
+                   const double *restrict x2,   ///< 2nd addend double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm256_load_pd,
+                 _mm_load_pd, _mm256_store_pd, _mm_store_pd,
+                 _mm256_add_pd, _mm_add_pd, JBM_ADD);
+}
+
+/**
+ * Function to subtract 2 double arrays.
+ */
+static inline void
+jbm_array_f64_sub (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< minuend double array.
+                   const double *restrict x2,   ///< subtrahend double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm256_load_pd,
+                 _mm_load_pd, _mm256_store_pd, _mm_store_pd,
+                 _mm256_sub_pd, _mm_sub_pd, JBM_SUB);
+}
+
+/**
+ * Function to multiply 2 double arrays.
+ */
+static inline void
+jbm_array_f64_mul (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< multiplier double array.
+                   const double *restrict x2,   ///< multiplicand double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm256_load_pd,
+                 _mm_load_pd, _mm256_store_pd, _mm_store_pd,
+                 _mm256_mul_pd, _mm_mul_pd, JBM_MUL);
+}
+
+/**
+ * Function to divide 2 double arrays.
+ */
+static inline void
+jbm_array_f64_div (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< dividend double array.
+                   const double *restrict x2,   ///< divisor double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm256_load_pd,
+                 _mm_load_pd, _mm256_store_pd, _mm_store_pd,
+                 _mm256_div_pd, _mm_div_pd, JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_max (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm256_load_pd,
+                 _mm_load_pd, _mm256_store_pd, _mm_store_pd,
+                 _mm256_max_pd, _mm_max_pd, fmax);
+}
+
+/**
+ * Function to calculate the minimum in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_min (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm256_load_pd,
+                 _mm_load_pd, _mm256_store_pd, _mm_store_pd,
+                 _mm256_min_pd, _mm_min_pd, fmin);
+}
+
+/**
+ * Function to calculate the module in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_mod (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm256_load_pd,
+                 _mm_load_pd, _mm256_store_pd, _mm_store_pd,
+                 jbm_4xf64_mod, jbm_2xf64_mod, jbm_f64_mod);
+}
+
+/**
+ * Function to do the pow function in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_pow (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm256_load_pd,
+                 _mm_load_pd, _mm256_store_pd, _mm_store_pd,
+                 jbm_4xf64_pow, jbm_2xf64_pow, jbm_f64_pow);
+}
+
+/**
+ * Function to do the dot product of 2 double arrays.
+ *
+ * \return dot product (double).
+ */
+static inline double
+jbm_array_f64_dot (const double *restrict x1,   ///< multiplier double array.
+                   const double *restrict x2,   ///< multiplicand double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_DOT (x1, x2, n, __m256d, __m128d, double, _mm256_load_pd,
+                 _mm_load_pd, _mm256_mul_pd, _mm_mul_pd, _mm256_add_pd,
+                 _mm_add_pd, _mm256_fmadd_pd, _mm_fmadd_pd,
+                 jbm_4xf64_reduce_add, jbm_2xf64_reduce_add);
 }
 
 #endif

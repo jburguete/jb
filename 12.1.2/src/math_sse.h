@@ -56,40 +56,40 @@ typedef union
 
 // float constants
 
-#define JBM_BIAS_4xF32 _mm_set1_epi32 (JBM_BIAS_F32)
+#define JBM_BIAS_4xF32 _mm_set1_epi32 (JBM_F32_BIAS)
 ///< bias for floats.
-#define JBM_BITS_1_4xF32 _mm_set1_epi32 (JBM_BITS_1_F32)
+#define JBM_BITS_1_4xF32 _mm_set1_epi32 (JBM_F32_BITS_1)
 ///< 1 bits for floats.
-#define JBM_BITS_ABS_4xF32 _mm_set1_epi32 (JBM_BITS_ABS_F32)
+#define JBM_BITS_ABS_4xF32 _mm_set1_epi32 (JBM_F32_BITS_ABS)
 ///< absolute value bits for floats.
-#define JBM_BITS_EXPONENT_4xF32 _mm_set1_epi32 (JBM_BITS_EXPONENT_F32)
+#define JBM_BITS_EXPONENT_4xF32 _mm_set1_epi32 (JBM_F32_BITS_EXPONENT)
 ///< exponent bits for floats.
-#define JBM_BITS_MANTISSA_4xF32 _mm_set1_epi32 (JBM_BITS_MANTISSA_F32)
+#define JBM_BITS_MANTISSA_4xF32 _mm_set1_epi32 (JBM_F32_BITS_MANTISSA)
 ///< mantissa bits for floats.
-#define JBM_BITS_SIGN_4xF32 _mm_set1_epi32 (JBM_BITS_SIGN_F32)
+#define JBM_BITS_SIGN_4xF32 _mm_set1_epi32 (JBM_F32_BITS_SIGN)
 ///< sign bits for floats.
-#define JBM_CBRT2_4xF32 _mm_set1_ps (JBM_CBRT2_F32)
+#define JBM_CBRT2_4xF32 _mm_set1_ps (JBM_F32_CBRT2)
 ///< cbrt(2) for floats.
-#define JBM_CBRT4_4xF32 _mm_set1_ps (JBM_CBRT4_F32)
+#define JBM_CBRT4_4xF32 _mm_set1_ps (JBM_F32_CBRT4)
 ///< cbrt(4) for floats.
 
 // double constants
 
-#define JBM_BIAS_2xF64 _mm_set1_epi64x (JBM_BIAS_F64)
+#define JBM_BIAS_2xF64 _mm_set1_epi64x (JBM_F64_BIAS)
 ///< bias for doubles.
-#define JBM_BITS_1_2xF64 _mm_set1_epi64x (JBM_BITS_1_F64)
+#define JBM_BITS_1_2xF64 _mm_set1_epi64x (JBM_F64_BITS_1)
 ///< 1 bits for doubles.
-#define JBM_BITS_ABS_2xF64 _mm_set1_epi64x (JBM_BITS_ABS_F64)
+#define JBM_BITS_ABS_2xF64 _mm_set1_epi64x (JBM_F64_BITS_ABS)
 ///< absolute value bits for doubles.
-#define JBM_BITS_EXPONENT_2xF64 _mm_set1_epi64x (JBM_BITS_EXPONENT_F64)
+#define JBM_BITS_EXPONENT_2xF64 _mm_set1_epi64x (JBM_F64_BITS_EXPONENT)
 ///< exponent bits for doubles.
-#define JBM_BITS_MANTISSA_2xF64 _mm_set1_epi64x (JBM_BITS_MANTISSA_F64)
+#define JBM_BITS_MANTISSA_2xF64 _mm_set1_epi64x (JBM_F64_BITS_MANTISSA)
 ///< mantissa bits for doubles.
-#define JBM_BITS_SIGN_2xF64 _mm_set1_epi64x (JBM_BITS_SIGN_F64)
+#define JBM_BITS_SIGN_2xF64 _mm_set1_epi64x (JBM_F64_BITS_SIGN)
 ///< sign bits for floats.
-#define JBM_CBRT2_2xF64 _mm_set1_pd (JBM_CBRT2_F64)
+#define JBM_CBRT2_2xF64 _mm_set1_pd (JBM_F64_CBRT2)
 ///< cbrt(2) for doubles.
-#define JBM_CBRT4_2xF64 _mm_set1_pd (JBM_CBRT4_F64)
+#define JBM_CBRT4_2xF64 _mm_set1_pd (JBM_F64_CBRT4)
 ///< cbrt(4) for doubles.
 
 ///> macro to define types for SSE
@@ -388,7 +388,7 @@ jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
   y.i = _mm_and_si128 (y.i, abs_mask);
   // masks
   is_z = _mm_cmpeq_epi32 (y.i, zi);
-  is_nan = _mm_cmpgt_epi32 (y.i, _mm_set1_epi32 (JBM_BITS_EXPONENT_F32 - 1));
+  is_nan = _mm_cmpgt_epi32 (y.i, _mm_set1_epi32 (JBM_F32_BITS_EXPONENT - 1));
   is_finite = _mm_andnot_si128 (_mm_or_si128 (is_z, is_nan),
                                 _mm_set1_epi32 (-1));
   // extract exponent
@@ -406,7 +406,7 @@ jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm_or_si128 (_mm_and_si128 (z.i, sign_mask),
-                      _mm_or_si128 (_mm_set1_epi32 (JBM_BIAS_F32 << 23),
+                      _mm_or_si128 (_mm_set1_epi32 (JBM_F32_BIAS << 23),
                                     _mm_and_si128 (y.i, mant_mask)));
   return _mm_blendv_ps (x, y.x, _mm_castsi128_ps (is_finite));
 }
@@ -420,22 +420,20 @@ jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
 static inline __m128
 jbm_4xf32_exp2n (const __m128i e)       ///< exponent vector (__m128i).
 {
+  const __m128i v127 = _mm_set1_epi32 (127);
   __m128 x;
   x = _mm_blendv_ps
-    (_mm_castsi128_ps (_mm_sllv_epi32 (_mm_set1_epi32 ((int) 0x00400000),
-                                       _mm_sub_epi32 (_mm_set1_epi32 (-127),
+    (_mm_castsi128_ps (_mm_sllv_epi32 (_mm_set1_epi32 (1),
+                                       _mm_add_epi32 (_mm_set1_epi32 (149),
                                                       e))),
-     _mm_castsi128_ps (_mm_slli_epi32 (_mm_add_epi32 (e,
-                                                      _mm_set1_epi32 (127)),
-                                       23)),
+     _mm_castsi128_ps (_mm_slli_epi32 (_mm_add_epi32 (e, v127), 23)),
      _mm_castsi128_ps (_mm_cmpgt_epi32 (e, _mm_set1_epi32 (-127))));
   x = _mm_blendv_ps (x, _mm_setzero_ps (),
                      _mm_castsi128_ps (_mm_cmplt_epi32 (e,
                                                         _mm_set1_epi32
                                                         (-150))));
   return _mm_blendv_ps (x, _mm_set1_ps (INFINITY),
-                        _mm_castsi128_ps (_mm_cmpgt_epi32
-                                          (e, _mm_set1_epi32 (127))));
+                        _mm_castsi128_ps (_mm_cmpgt_epi32 (e, v127)));
 }
 
 /**
@@ -8250,7 +8248,7 @@ jbm_2xf64_frexp (const __m128d x,       ///< __m128d vector.
   y.i = _mm_and_si128 (y.i, abs_mask);
   // masks
   is_z = _mm_cmpeq_epi64 (y.i, zi);
-  is_nan = _mm_cmpgt_epi64 (y.i, _mm_set1_epi64x (JBM_BITS_EXPONENT_F64 - 1ll));
+  is_nan = _mm_cmpgt_epi64 (y.i, _mm_set1_epi64x (JBM_F64_BITS_EXPONENT - 1ll));
   is_finite = _mm_andnot_si128 (_mm_or_si128 (is_z, is_nan),
                                 _mm_set1_epi64x (-1ll));
   // extract exponent
@@ -8268,7 +8266,7 @@ jbm_2xf64_frexp (const __m128d x,       ///< __m128d vector.
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm_or_si128 (_mm_and_si128 (z.i, sign_mask),
-                      _mm_or_si128 (_mm_set1_epi64x (JBM_BIAS_F64 << 52),
+                      _mm_or_si128 (_mm_set1_epi64x (JBM_F64_BIAS << 52),
                                     _mm_and_si128 (y.i, mant_mask)));
   return _mm_blendv_pd (x, y.x, _mm_castsi128_pd (is_finite));
 }
@@ -8295,7 +8293,7 @@ jbm_2xf64_exp2n (const __m128i e)       ///< exponent vector (__m128i).
   // zero
   x = _mm_blendv_pd
     (x, _mm_setzero_pd (),
-     _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64x (-1074ll), e)));
+     _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64x (-1075ll), e)));
   // infinity
   return
     _mm_blendv_pd (x, _mm_set1_pd (INFINITY),

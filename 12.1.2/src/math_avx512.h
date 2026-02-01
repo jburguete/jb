@@ -56,40 +56,40 @@ typedef union
 
 // float constants
 
-#define JBM_BIAS_16xF32 _mm512_set1_epi32 (JBM_BIAS_F32)
+#define JBM_BIAS_16xF32 _mm512_set1_epi32 (JBM_F32_BIAS)
 ///< bias for floats.
-#define JBM_BITS_1_16xF32 _mm512_set1_epi32 (JBM_BITS_1_F32)
+#define JBM_BITS_1_16xF32 _mm512_set1_epi32 (JBM_F32_BITS_1)
 ///< 1 bits for floats.
-#define JBM_BITS_ABS_16xF32 _mm512_set1_epi32 (JBM_BITS_ABS_F32)
+#define JBM_BITS_ABS_16xF32 _mm512_set1_epi32 (JBM_F32_BITS_ABS)
 ///< absolute value bits for floats.
-#define JBM_BITS_EXPONENT_16xF32 _mm512_set1_epi32 (JBM_BITS_EXPONENT_F32)
+#define JBM_BITS_EXPONENT_16xF32 _mm512_set1_epi32 (JBM_F32_BITS_EXPONENT)
 ///< exponent bits for floats.
-#define JBM_BITS_MANTISSA_16xF32 _mm512_set1_epi32 (JBM_BITS_MANTISSA_F32)
+#define JBM_BITS_MANTISSA_16xF32 _mm512_set1_epi32 (JBM_F32_BITS_MANTISSA)
 ///< mantissa bits for floats.
-#define JBM_BITS_SIGN_16xF32 _mm512_set1_epi32 (JBM_BITS_SIGN_F32)
+#define JBM_BITS_SIGN_16xF32 _mm512_set1_epi32 (JBM_F32_BITS_SIGN)
 ///< sign bits for floats.
-#define JBM_CBRT2_16xF32 _mm512_set1_ps (JBM_CBRT2_F32)
+#define JBM_CBRT2_16xF32 _mm512_set1_ps (JBM_F32_CBRT2)
 ///< cbrt(2) for floats.
-#define JBM_CBRT4_16xF32 _mm512_set1_ps (JBM_CBRT4_F32)
+#define JBM_CBRT4_16xF32 _mm512_set1_ps (JBM_F32_CBRT4)
 ///< cbrt(4) for floats.
 
 // double constants
 
-#define JBM_BIAS_8xF64 _mm512_set1_epi64 (JBM_BIAS_F64)
+#define JBM_BIAS_8xF64 _mm512_set1_epi64 (JBM_F64_BIAS)
 ///< bias for doubles.
-#define JBM_BITS_1_8xF64 _mm512_set1_epi64 (JBM_BITS_1_F64)
+#define JBM_BITS_1_8xF64 _mm512_set1_epi64 (JBM_F64_BITS_1)
 ///< 1 bits for doubles.
-#define JBM_BITS_ABS_8xF64 _mm512_set1_epi64 (JBM_BITS_ABS_F64)
+#define JBM_BITS_ABS_8xF64 _mm512_set1_epi64 (JBM_F64_BITS_ABS)
 ///< absolute value bits for doubles.
-#define JBM_BITS_EXPONENT_8xF64 _mm512_set1_epi64 (JBM_BITS_EXPONENT_F64)
+#define JBM_BITS_EXPONENT_8xF64 _mm512_set1_epi64 (JBM_F64_BITS_EXPONENT)
 ///< exponent bits for doubles.
-#define JBM_BITS_MANTISSA_8xF64 _mm512_set1_epi64 (JBM_BITS_MANTISSA_F64)
+#define JBM_BITS_MANTISSA_8xF64 _mm512_set1_epi64 (JBM_F64_BITS_MANTISSA)
 ///< mantissa bits for doubles.
-#define JBM_BITS_SIGN_8xF64 _mm512_set1_epi64 (JBM_BITS_SIGN_F64)
+#define JBM_BITS_SIGN_8xF64 _mm512_set1_epi64 (JBM_F64_BITS_SIGN)
 ///< sign bits for doubles.
-#define JBM_CBRT2_8xF64 _mm512_set1_pd (JBM_CBRT2_F64)
+#define JBM_CBRT2_8xF64 _mm512_set1_pd (JBM_F64_CBRT2)
 ///< cbrt(2) for doubles.
-#define JBM_CBRT4_8xF64 _mm512_set1_pd (JBM_CBRT4_F64)
+#define JBM_CBRT4_8xF64 _mm512_set1_pd (JBM_F64_CBRT4)
 ///< cbrt(4) for doubles.
 
 ///> macro to automatize operations on one array.
@@ -114,8 +114,6 @@ typedef union
       } \
   for (j = (n - i) >> (4 + 8 / sizeof (type)); j > 0; --j) \
     { \
-      if (i + prefetch + (256 / sizeof (type)) < n) \
-        _mm_prefetch((const char *) (xd + i + prefetch), _MM_HINT_T0); \
       store512 (xr + i, op512 (load512 (xd + i))); \
       i += 64 / sizeof (type); \
       store512 (xr + i, op512 (load512 (xd + i))); \
@@ -554,7 +552,6 @@ typedef union
   for (; i < n; ++i) \
     mx = max (mx, x[i]), mn = min (mn, x[i]); \
 
-
 // Debug functions
 
 static inline void
@@ -811,7 +808,7 @@ jbm_16xf32_frexp (const __m512 x,       ///< __m512 vector.
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm512_or_epi32 (_mm512_and_epi32 (z.i, sign_mask),
-                         _mm512_or_epi32 (_mm512_set1_epi32 (JBM_BIAS_F32
+                         _mm512_or_epi32 (_mm512_set1_epi32 (JBM_F32_BIAS
                                                              << 23),
                                           _mm512_and_epi32 (y.i, mant_mask)));
   return _mm512_mask_mov_ps (x, is_finite, y.x);
@@ -830,8 +827,8 @@ jbm_16xf32_exp2n (__m512i e)    ///< exponent vector (__m512i).
   x = _mm512_mask_blend_ps
     (_mm512_cmpgt_epi32_mask (e, _mm512_set1_epi32 (-127)),
      _mm512_castsi512_ps
-     (_mm512_sllv_epi32 (_mm512_set1_epi32 (0x00400000),
-                         _mm512_sub_epi32 (_mm512_set1_epi32 (-127), e))),
+     (_mm512_sllv_epi32 (_mm512_set1_epi32 (1),
+                         _mm512_add_epi32 (_mm512_set1_epi32 (149), e))),
      _mm512_castsi512_ps
      (_mm512_slli_epi32 (_mm512_add_epi32 (e, _mm512_set1_epi32 (127)), 23)));
   x = _mm512_mask_mov_ps (x, _mm512_cmpgt_epi32_mask (_mm512_set1_epi32 (-150),
@@ -8818,7 +8815,7 @@ jbm_8xf64_frexp (const __m512d x,       ///< __m512d vector.
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm512_or_epi64 (_mm512_and_epi64 (z.i, sign_mask),
-                         _mm512_or_epi64 (_mm512_set1_epi64 (JBM_BIAS_F64
+                         _mm512_or_epi64 (_mm512_set1_epi64 (JBM_F64_BIAS
                                                              << 52),
                                           _mm512_and_epi64 (y.i, mant_mask)));
   return _mm512_mask_mov_pd (x, is_finite, y.x);
@@ -8836,7 +8833,7 @@ jbm_8xf64_exp2n (__m512i e)     ///< exponent vector (__m512i).
   const __m512i v1074 = _mm512_set1_epi64 (1074ll);
   const __m512i v1023 = _mm512_set1_epi64 (1023ll);
   const __m512i vn1023 = _mm512_set1_epi64 (-1023ll);
-  const __m512i vn1074 = _mm512_set1_epi64 (-1074ll);
+  const __m512i vn1075 = _mm512_set1_epi64 (-1075ll);
   __m512d x;
   __mmask16 is_norm;
   is_norm = _mm512_cmpgt_epi64_mask (e, vn1023);
@@ -8846,7 +8843,7 @@ jbm_8xf64_exp2n (__m512i e)     ///< exponent vector (__m512i).
      _mm512_castsi512_pd (_mm512_slli_epi64 (_mm512_add_epi64 (e, v1023), 52)));
   x =
     _mm512_mask_mov_pd
-    (x, _mm512_cmpgt_epi64_mask (e, vn1074) & ~is_norm,
+    (x, _mm512_cmpgt_epi64_mask (e, vn1075) & ~is_norm,
      _mm512_castsi512_pd
      (_mm512_sllv_epi64 (_mm512_set1_epi64 (1ll),
                          _mm512_add_epi64 (e, v1074))));
