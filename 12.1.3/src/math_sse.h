@@ -210,6 +210,23 @@ _mm_cvtepi64_pd (__m128i x)
 #endif
 
 /**
+ * Function to do an integer division by 3 for 32 bits (__m128i).
+ *
+ * \return divided by 3 vector (__m128i).
+ */
+static inline __m128i
+jbm_4xf32_div3 (__m128i x)      ///< __m128i vector.
+{
+  const __m128i magic = _mm_set1_epi32 (0x55555556);
+  __m128i even, odd;
+  even = _mm_srli_epi64 (_mm_mul_epi32 (x, magic), 32);
+  odd = _mm_shuffle_epi32 (x, _MM_SHUFFLE (2, 3, 0, 1));
+  odd = _mm_srli_epi64 (_mm_mul_epi32 (odd, magic), 32);
+  return _mm_unpacklo_epi32 (_mm_shuffle_epi32 (even, _MM_SHUFFLE (0, 0, 2, 0)),
+                             _mm_shuffle_epi32 (odd, _MM_SHUFFLE (0, 0, 2, 0)));
+}
+
+/**
  * Function to calculate the additive reduction value of a __m128 vector.
  *
  * \return additive reduction (float).
@@ -7073,11 +7090,9 @@ jbm_4xf32_cbrt (const __m128 x) ///< __m128 vector.
   const __m128i v2 = _mm_set1_epi32 (2);
   const __m128i v1 = _mm_set1_epi32 (1);
   __m128 y;
-  __m128i e, e3, r, n, e16;
+  __m128i e, e3, r, n;
   y = jbm_4xf32_frexp (jbm_4xf32_abs (x), &e);
-  e16 = _mm_cvtepi32_epi16 (e);
-  e16 = _mm_mulhi_epi16 (e16, _mm_set1_epi16 (0x5556));
-  e3 = _mm_cvtepi16_epi32 (e16);
+  e3 = jbm_4xf32_div3 (e);
   r = _mm_sub_epi32 (e, _mm_mullo_epi32 (e3, v3));
   n = _mm_srai_epi32 (r, 31);
   r = _mm_add_epi32 (r, _mm_and_si128 (n, v3));

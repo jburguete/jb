@@ -159,6 +159,39 @@ print_m256d (FILE *file, const char *label, __m256d x)
     fprintf (file, "%s[%u]=%.17lg\n", label, i, y[i]);
 }
 
+#ifndef __AVX512F__
+
+static inline __m256d
+_mm256_cvtepi64_pd (__m256i x)
+{
+  const __m256i i = _mm256_setr_epi32 (0, 2, 4, 6, 0, 0, 0, 0);
+  return
+    _mm256_cvtepi32_pd
+    (_mm256_castsi256_si128 (_mm256_permutevar8x32_epi32 (x, i)));
+}
+
+#endif
+
+/**
+ * Function to do an integer division by 3 for 32 bits (__m256i).
+ *
+ * \return divided by 3 vector (__m256i).
+ */
+static inline __m256i
+jbm_8xf32_div3 (__m256i x)      ///< __m256i vector.
+{
+  const __m256i magic = _mm256_set1_epi32 (0x55555556);
+  __m256i even, odd;
+  even = _mm256_srli_epi64 (_mm256_mul_epi32 (x, magic), 32);
+  odd = _mm256_shuffle_epi32 (x, _MM_SHUFFLE (2, 3, 0, 1));
+  odd = _mm256_srli_epi64 (_mm256_mul_epi32 (odd, magic), 32);
+  return
+    _mm256_unpacklo_epi32 (_mm256_shuffle_epi32 (even,
+                                                 _MM_SHUFFLE (0, 0, 2, 0)),
+                           _mm256_shuffle_epi32 (odd,
+                                                 _MM_SHUFFLE (0, 0, 2, 0)));
+}
+
 /**
  * Function to calculate the additive reduction value of a __m256 vector.
  *
@@ -7057,11 +7090,8 @@ jbm_8xf32_cbrt (const __m256 x) ///< __m256 vector.
   const __m256i v1 = _mm256_set1_epi32 (1);
   __m256 y;
   __m256i e, e3, r, n;
-  __m128i e16;
   y = jbm_8xf32_frexp (jbm_8xf32_abs (x), &e);
-  e16 = _mm256_cvtepi32_epi16 (e);
-  e16 = _mm_mulhi_epi16 (e16, _mm_set1_epi16 (0x5556));
-  e3 = _mm256_cvtepi16_epi32 (e16);
+  e3 = jbm_8xf32_div3 (e);
   r = _mm256_sub_epi32 (e, _mm256_mullo_epi32 (e3, v3));
   n = _mm256_srai_epi32 (r, 31);
   r = _mm256_add_epi32 (r, _mm256_and_si256 (n, v3));
@@ -15149,6 +15179,8 @@ jbm_4xf64_log2 (const __m256d x)        ///< __m256d vector.
   y = _mm256_add_pd (y, _mm256_and_pd (m, y));
   e = _mm256_sub_epi64 (e, _mm256_and_si256 (_mm256_castpd_si256 (m),
                                              _mm256_set1_epi64x (1ll)));
+print_m256i64 (stderr, "e", e);
+print_m256d (stderr, "e", _mm256_cvtepi64_pd (e));
   y = _mm256_add_pd (jbm_4xf64_log2wc (_mm256_sub_pd (y, _mm256_set1_pd (1.))),
                      _mm256_cvtepi64_pd (e));
   y = _mm256_blendv_pd (y, _mm256_set1_pd (-INFINITY),
@@ -16457,17 +16489,17 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
   j = (n - i) >> (1 + 8 / sizeof (type)); \
   if (j) \
     { \
-      mx256 = mn256 = load256 (x + i); \
+      mxa256 = mna256 = load256 (x + i); \
       i += 32 / sizeof (type); \
       while (--j) \
         { \
           x256 = load256 (x + i); \
-          mx256 = max256 (mx256, x256); \
-          mn256 = min256 (mn256, x256); \
+          mxa256 = max256 (mxa256, x256); \
+          mna256 = min256 (mna256, x256); \
           i += 32 / sizeof (type); \
         } \
-      mx = max (mx, redmax256 (mx256)); \
-      mn = min (mn, redmin256 (mn256)); \
+      mx = max (mx, redmax256 (mxa256)); \
+      mn = min (mn, redmin256 (mna256)); \
     } \
   j = (n - i) >> (8 / sizeof (type)); \
   if (j) \
