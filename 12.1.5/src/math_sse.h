@@ -190,10 +190,38 @@ _mm_fnmadd_pd (const __m128d x, const __m128d y, const __m128d z)
 
 #endif
 
+#ifndef __AVX2__
+
+static inline __m128i
+_mm_sllv_epi32 (const __m128i x, const __m128i y)
+{
+  int32_t ix[4] JB_ALIGNED, iy[4] JB_ALIGNED;
+  _mm_store_si128 ((__m128i *) ix, x);
+  _mm_store_si128 ((__m128i *) iy, y);
+  ix[0] <<= iy[0];
+  ix[1] <<= iy[1];
+  ix[2] <<= iy[2];
+  ix[3] <<= iy[3];
+  return _mm_load_si128 ((__m128i *) ix);
+}
+
+static inline __m128i
+_mm_sllv_epi64 (const __m128i x, const __m128i y)
+{
+  int64_t ix[2] JB_ALIGNED, iy[2] JB_ALIGNED;
+  _mm_store_si128 ((__m128i *) ix, x);
+  _mm_store_si128 ((__m128i *) iy, y);
+  ix[0] <<= iy[0];
+  ix[1] <<= iy[1];
+  return _mm_load_si128 ((__m128i *) ix);
+}
+
+#endif
+
 #ifndef __AVX512F__
 
 static inline __m128d
-_mm_cvtepi64_pd (__m128i x)
+_mm_cvtepi64_pd (const __m128i x)
 {
   return _mm_cvtepi32_pd (_mm_shuffle_epi32 (x, _MM_SHUFFLE (0, 0, 2, 0)));
 }
@@ -16861,7 +16889,7 @@ jbm_array_f32_max (float *restrict xr,  ///< result float array.
                    const float *restrict x2,    ///< 2nd float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm_load_ps, _mm_store_ps, _mm256_max_ps,
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm_load_ps, _mm_store_ps,
                  _mm_max_ps, fmax);
 }
 
@@ -16874,7 +16902,7 @@ jbm_array_f32_min (float *restrict xr,  ///< result float array.
                    const float *restrict x2,    ///< 2nd float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm_load_ps, _mm_store_ps, _mm256_min_ps,
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm_load_ps, _mm_store_ps,
                  _mm_min_ps, fmin);
 }
 
