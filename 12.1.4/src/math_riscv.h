@@ -22812,7 +22812,7 @@ jbm_4xf32_ldexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline vbool32_t
-jbm_small_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+jbm_4xf32_small (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_small_nxf32 (x, 4);
 }
@@ -22829,7 +22829,7 @@ jbm_small_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
  * \return modmin 4x vfloat32m1_t vector.
  */
 static inline vfloat32m1_t
-jbm_modmin_4xf32 (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
+jbm_4xf32_modmin (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat32m1_t b) ///< 2nd vfloat64m1_t vector.
 {
   return jbm_modmin_nxf32 (a, b, 4);
@@ -28704,7 +28704,7 @@ jbm_4xf32_coswc (const vfloat32m1_t x)
  * x in [-pi/4,pi/4] from jbm_4xf32_sinwc approximation (4x vfloat32m1_t).
  */
 static inline void
-jbm_sin4xf32_coswc (const vfloat32m1_t x,
+jbm_4xf32_sincoswc (const vfloat32m1_t x,
                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     vfloat32m1_t *s,
                     ///< pointer to the sin function value (4x vfloat32m1_t).
@@ -28743,7 +28743,7 @@ jbm_4xf32_cos (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
  * jbm_4xf32_sinwc and jbm_nxf32_coswc approximations (4x vfloat32m1_t).
  */
 static inline void
-jbm_sin4xf32_cos (const vfloat32m1_t x,
+jbm_4xf32_sincos (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   vfloat32m1_t *s,
                   ///< pointer to the sin function value (4x vfloat32m1_t).
@@ -28754,7 +28754,7 @@ jbm_sin4xf32_cos (const vfloat32m1_t x,
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sin4xf32_cos function
+ * Function to calculate the function tan(x) from jbm_4xf32_sincos function
  * (4x vfloat32m1_t).
  *
  * \return function value (4x vfloat32m1_t).
@@ -29115,7 +29115,7 @@ jbm_4xf32_flux_limiter_superbee (const vfloat32m1_t d1,
  * \return flux limiter function value.
  */
 static inline vfloat32m1_t
-jbm_flux_limiter_min4xf32_mod (const vfloat32m1_t d1,
+jbm_4xf32_flux_limiter_minmod (const vfloat32m1_t d1,
                                ///< 1st flux limiter function parameter.
                                const vfloat32m1_t d2)
                                ///< 2nd flux limiter function parameter.
@@ -29245,7 +29245,7 @@ jbm_4xf32_flux_limiter (const vfloat32m1_t d1,
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
       return jbm_4xf32_flux_limiter_superbee (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_min4xf32_mod (d1, d2);
+      return jbm_4xf32_flux_limiter_minmod (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
       return jbm_4xf32_flux_limiter_VanLeer (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
@@ -29420,7 +29420,7 @@ jbm_2xf64_ldexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline vbool64_t
-jbm_small_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+jbm_2xf64_small (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_small_nxf64 (x, 2);
 }
@@ -29437,7 +29437,7 @@ jbm_small_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
  * \return modmin 2x vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
-jbm_modmin_2xf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
+jbm_2xf64_modmin (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat64m1_t b) ///< 2nd vfloat64m1_t vector.
 {
   return jbm_modmin_nxf64 (a, b, 2);
@@ -35312,7 +35312,7 @@ jbm_2xf64_coswc (const vfloat64m1_t x)
  * x in [-pi/4,pi/4] from jbm_2xf64_sinwc approximation (2x vfloat64m1_t).
  */
 static inline void
-jbm_sin2xf64_coswc (const vfloat64m1_t x,
+jbm_2xf64_sincoswc (const vfloat64m1_t x,
                     ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     vfloat64m1_t *s,
                     ///< pointer to the sin function value (2x vfloat64m1_t).
@@ -35351,7 +35351,7 @@ jbm_2xf64_cos (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
  * jbm_2xf64_sinwc and jbm_nxf64_coswc approximations (2x vfloat64m1_t).
  */
 static inline void
-jbm_sin2xf64_cos (const vfloat64m1_t x,
+jbm_2xf64_sincos (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   vfloat64m1_t *s,
                   ///< pointer to the sin function value (2x vfloat64m1_t).
@@ -35362,7 +35362,7 @@ jbm_sin2xf64_cos (const vfloat64m1_t x,
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sin2xf64_cos function
+ * Function to calculate the function tan(x) from jbm_2xf64_sincos function
  * (2x vfloat64m1_t).
  *
  * \return function value (2x vfloat64m1_t).
@@ -35723,7 +35723,7 @@ jbm_2xf64_flux_limiter_superbee (const vfloat64m1_t d1,
  * \return flux limiter function value.
  */
 static inline vfloat64m1_t
-jbm_flux_limiter_min2xf64_mod (const vfloat64m1_t d1,
+jbm_2xf64_flux_limiter_minmod (const vfloat64m1_t d1,
                                ///< 1st flux limiter function parameter.
                                const vfloat64m1_t d2)
                                ///< 2nd flux limiter function parameter.
@@ -35853,7 +35853,7 @@ jbm_2xf64_flux_limiter (const vfloat64m1_t d1,
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
       return jbm_2xf64_flux_limiter_superbee (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_min2xf64_mod (d1, d2);
+      return jbm_2xf64_flux_limiter_minmod (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
       return jbm_2xf64_flux_limiter_VanLeer (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
@@ -36028,7 +36028,7 @@ jbm_8xf32_ldexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline vbool32_t
-jbm_small_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+jbm_8xf32_small (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_small_nxf32 (x, 8);
 }
@@ -36045,7 +36045,7 @@ jbm_small_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
  * \return modmin 8x vfloat32m1_t vector.
  */
 static inline vfloat32m1_t
-jbm_modmin_8xf32 (const vfloat32m1_t a, ///< 1st vfloat32m1_t vector.
+jbm_8xf32_modmin (const vfloat32m1_t a, ///< 1st vfloat32m1_t vector.
                   const vfloat32m1_t b) ///< 2nd vfloat32m1_t vector.
 {
   return jbm_modmin_nxf32 (a, b, 8);
@@ -41920,7 +41920,7 @@ jbm_8xf32_coswc (const vfloat32m1_t x)
  * x in [-pi/4,pi/4] from jbm_8xf32_sinwc approximation (8x vfloat32m1_t).
  */
 static inline void
-jbm_sin8xf32_coswc (const vfloat32m1_t x,
+jbm_8xf32_sincoswc (const vfloat32m1_t x,
                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     vfloat32m1_t *s,
                     ///< pointer to the sin function value (8x vfloat32m1_t).
@@ -41959,7 +41959,7 @@ jbm_8xf32_cos (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
  * jbm_8xf32_sinwc and jbm_nxf32_coswc approximations (8x vfloat32m1_t).
  */
 static inline void
-jbm_sin8xf32_cos (const vfloat32m1_t x,
+jbm_8xf32_sincos (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   vfloat32m1_t *s,
                   ///< pointer to the sin function value (8x vfloat32m1_t).
@@ -41970,7 +41970,7 @@ jbm_sin8xf32_cos (const vfloat32m1_t x,
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sin8xf32_cos function
+ * Function to calculate the function tan(x) from jbm_8xf32_sincos function
  * (8x vfloat32m1_t).
  *
  * \return function value (8x vfloat32m1_t).
@@ -42331,7 +42331,7 @@ jbm_8xf32_flux_limiter_superbee (const vfloat32m1_t d1,
  * \return flux limiter function value.
  */
 static inline vfloat32m1_t
-jbm_flux_limiter_min8xf32_mod (const vfloat32m1_t d1,
+jbm_8xf32_flux_limiter_minmod (const vfloat32m1_t d1,
                                ///< 1st flux limiter function parameter.
                                const vfloat32m1_t d2)
                                ///< 2nd flux limiter function parameter.
@@ -42461,7 +42461,7 @@ jbm_8xf32_flux_limiter (const vfloat32m1_t d1,
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
       return jbm_8xf32_flux_limiter_superbee (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_min8xf32_mod (d1, d2);
+      return jbm_8xf32_flux_limiter_minmod (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
       return jbm_8xf32_flux_limiter_VanLeer (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
@@ -42636,7 +42636,7 @@ jbm_4xf64_ldexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline vbool64_t
-jbm_small_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+jbm_4xf64_small (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_small_nxf64 (x, 4);
 }
@@ -42653,7 +42653,7 @@ jbm_small_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
  * \return modmin 4x vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
-jbm_modmin_4xf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
+jbm_4xf64_modmin (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat64m1_t b) ///< 2nd vfloat64m1_t vector.
 {
   return jbm_modmin_nxf64 (a, b, 4);
@@ -48528,7 +48528,7 @@ jbm_4xf64_coswc (const vfloat64m1_t x)
  * x in [-pi/4,pi/4] from jbm_4xf64_sinwc approximation (4x vfloat64m1_t).
  */
 static inline void
-jbm_sin4xf64_coswc (const vfloat64m1_t x,
+jbm_4xf64_sincoswc (const vfloat64m1_t x,
                     ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     vfloat64m1_t *s,
                     ///< pointer to the sin function value (4x vfloat64m1_t).
@@ -48567,7 +48567,7 @@ jbm_4xf64_cos (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
  * jbm_4xf64_sinwc and jbm_nxf64_coswc approximations (4x vfloat64m1_t).
  */
 static inline void
-jbm_sin4xf64_cos (const vfloat64m1_t x,
+jbm_4xf64_sincos (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   vfloat64m1_t *s,
                   ///< pointer to the sin function value (4x vfloat64m1_t).
@@ -48578,7 +48578,7 @@ jbm_sin4xf64_cos (const vfloat64m1_t x,
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sin4xf64_cos function
+ * Function to calculate the function tan(x) from jbm_4xf64_sincos function
  * (4x vfloat64m1_t).
  *
  * \return function value (4x vfloat64m1_t).
@@ -48939,7 +48939,7 @@ jbm_4xf64_flux_limiter_superbee (const vfloat64m1_t d1,
  * \return flux limiter function value.
  */
 static inline vfloat64m1_t
-jbm_flux_limiter_min4xf64_mod (const vfloat64m1_t d1,
+jbm_4xf64_flux_limiter_minmod (const vfloat64m1_t d1,
                                ///< 1st flux limiter function parameter.
                                const vfloat64m1_t d2)
                                ///< 2nd flux limiter function parameter.
@@ -49069,7 +49069,7 @@ jbm_4xf64_flux_limiter (const vfloat64m1_t d1,
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
       return jbm_4xf64_flux_limiter_superbee (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_min4xf64_mod (d1, d2);
+      return jbm_4xf64_flux_limiter_minmod (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
       return jbm_4xf64_flux_limiter_VanLeer (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:

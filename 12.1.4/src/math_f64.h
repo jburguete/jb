@@ -33,18 +33,18 @@
 #ifndef JB_MATH_F64__H
 #define JB_MATH_F64__H 1
 
-#define JBM_BIAS_F64 1022ull    ///< bias for doubles.
-#define JBM_BITS_1_F64 0x3ff0000000000000ull    ///< 1 bits for doubles.
-#define JBM_BITS_ABS_F64 0x7fffffffffffffffull
+#define JBM_F64_BIAS 1022ull    ///< bias for doubles.
+#define JBM_F64_BITS_1 0x3ff0000000000000ull    ///< 1 bits for doubles.
+#define JBM_F64_BITS_ABS 0x7fffffffffffffffull
 ///< absolute value bits for doubles.
-#define JBM_BITS_EXPONENT_F64 0x7ff0000000000000ull
+#define JBM_F64_BITS_EXPONENT 0x7ff0000000000000ull
 ///< exponent bits for doubles.
-#define JBM_BITS_MANTISSA_F64 0x000fffffffffffffull
+#define JBM_F64_BITS_MANTISSA 0x000fffffffffffffull
 ///< mantissa bits for doubles.
-#define JBM_BITS_SIGN_F64 0x8000000000000000ull ///< sign bits for doubles.
-#define JBM_CBRT2_F64 1.2599210498948731647672106072782284
+#define JBM_F64_BITS_SIGN 0x8000000000000000ull ///< sign bits for doubles.
+#define JBM_F64_CBRT2 1.2599210498948731647672106072782284
 ///< cbrt(2) for doubles.
-#define JBM_CBRT4_F64 1.5874010519681994747517056392723083
+#define JBM_F64_CBRT4 1.5874010519681994747517056392723083
 ///< cbrt(4) for doubles.
 #define JBM_SQRT_DBL_MIN 1.4916681462400413486581930630925868e-154
 ///< root square of standard DBL_MIN.
@@ -329,8 +329,8 @@ jbm_f64_sign (const double x)   ///< double number.
 {
   JBMF64 y;
   y.x = x;
-  y.i &= JBM_BITS_SIGN_F64;
-  y.i |= JBM_BITS_1_F64;
+  y.i &= JBM_F64_BITS_SIGN;
+  y.i |= JBM_F64_BITS_1;
   return y.x;
 }
 
@@ -344,7 +344,7 @@ jbm_f64_abs (const double x)    ///< double number.
 {
   JBMF64 y;
   y.x = x;
-  y.i &= JBM_BITS_ABS_F64;
+  y.i &= JBM_F64_BITS_ABS;
   return y.x;
 }
 
@@ -354,14 +354,14 @@ jbm_f64_abs (const double x)    ///< double number.
  * \return double number with magnitud of 1st number and sign of 2nd number.
  */
 static inline double
-jbm_copyf64_sign (const double x,
+jbm_f64_copysign (const double x,
 ///< double number to preserve magnitude.
                   const double y)       ///< double number to preserve sign.
 {
   JBMF64 ax, sy;
   ax.x = jbm_f64_abs (x);
   sy.x = y;
-  ax.i |= sy.i & JBM_BITS_SIGN_F64;
+  ax.i |= sy.i & JBM_F64_BITS_SIGN;
   return ax.x;
 }
 
@@ -404,8 +404,8 @@ jbm_f64_frexp (const double x,  ///< double number.
   uint64_t exp;
   y.x = x;
   // check NaN or 0
-  exp = y.i & JBM_BITS_ABS_F64;
-  if (exp >= JBM_BITS_EXPONENT_F64 || !exp)
+  exp = y.i & JBM_F64_BITS_ABS;
+  if (exp >= JBM_F64_BITS_EXPONENT || !exp)
     {
       *e = 0;
       return x;
@@ -419,9 +419,9 @@ jbm_f64_frexp (const double x,  ///< double number.
       exp = (y.i >> 52u) - 52u;
     }
   // exponent
-  *e = (int) exp - JBM_BIAS_F64;
+  *e = (int) exp - JBM_F64_BIAS;
   // mantissa in [0.5,1)
-  y.i = (JBM_BIAS_F64 << 52u) | (y.i & 0x800fffffffffffffull);
+  y.i = (JBM_F64_BIAS << 52u) | (y.i & 0x800fffffffffffffull);
   return y.x;
 }
 
@@ -439,9 +439,9 @@ jbm_f64_exp2n (int e)           ///< exponent number (int).
   if (e < -1074)
     return 0.;
   if (e > -1023)
-    x.i = (1023ll + e) << 52ll;
+    x.i = (1023ll + e) << 52;
   else
-    x.i = 0x0008000000000000ull >> (-e - 1023ll);
+    x.i = 1ull << (e + 1074);
   return x.x;
 }
 
@@ -3799,10 +3799,10 @@ jbm_f64_cbrt (const double x)   ///< double number.
   e3 -= e & 1;
   m = jbm_f64_ldexp (jbm_f64_cbrtwc (m), e3);
   if (r & 1)
-    m *= JBM_CBRT2_F64;
+    m *= JBM_F64_CBRT2;
   if (r & 2)
-    m *= JBM_CBRT4_F64;
-  return jbm_copyf64_sign (m, x);
+    m *= JBM_F64_CBRT4;
+  return jbm_f64_copysign (m, x);
 }
 
 /**
@@ -4029,7 +4029,7 @@ jbm_f64_tanwc (const double x)
  * x in [-pi/4,pi/4] from jbm_f64_sinwc approximation (double).
  */
 static inline void
-jbm_sinf64_coswc (const double x,
+jbm_f64_sincoswc (const double x,
                   ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   double *s,    ///< pointer to the sin function value (double).
                   double *c)    ///< pointer to the cos function value (double).
@@ -4080,7 +4080,7 @@ jbm_f64_cos (const double x)    ///< double number.
  * jbm_f64_coswc approximations (double).
  */
 static inline void
-jbm_sinf64_cos (const double x,
+jbm_f64_sincos (const double x,
                 ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                 double *s,      ///< pointer to the sin function value (double).
                 double *c)      ///< pointer to the cos function value (double).
@@ -4090,7 +4090,7 @@ jbm_sinf64_cos (const double x,
   y = x * 1. / M_PI_2;
   q = (int) nearbyint (y);
   y = x - (double) q *M_PI_2;
-  jbm_sinf64_coswc (y, &sr, &cr);
+  jbm_f64_sincoswc (y, &sr, &cr);
   switch (q)
     {
     case 0:
@@ -4112,7 +4112,7 @@ jbm_sinf64_cos (const double x,
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sinf64_cos.
+ * Function to calculate the function tan(x) from jbm_f64_sincos.
  *
  * \return function value (double).
  */
@@ -4155,7 +4155,7 @@ jbm_f64_atan (const double x)   ///< double number.
     f = M_PI_2 - jbm_f64_atanwc (1. / ax);
   else
     f = jbm_f64_atanwc (ax);
-  return jbm_copyf64_sign (f, x);
+  return jbm_f64_copysign (f, x);
 }
 
 /**
@@ -4171,7 +4171,7 @@ jbm_f64_atan2 (const double y,  ///< double y component.
   double f;
   f = jbm_f64_atan (y / x);
   if (x < 0.)
-    f += jbm_copyf64_sign (M_PI, y);
+    f += jbm_f64_copysign (M_PI, y);
   return f;
 }
 
@@ -4376,7 +4376,7 @@ jbm_f64_integral (double (*f) (double),
  * \return interval number.
  */
 static inline unsigned int
-jbm_array_search_f64 (const double *xx, ///< double array.
+jbm_array_f64_search (const double *xx, ///< double array.
                       const double x,   ///< number to search.
                       const unsigned int n)     ///< number of array elements.
 {
@@ -4399,7 +4399,7 @@ jbm_array_search_f64 (const double *xx, ///< double array.
  * \return interval number, -1 if x<fa[0] or n-1 if x>fa[n-1].
  */
 static inline int
-jbm_array_search_extended_f64 (const double *xx,        ///< double array.
+jbm_array_f64_search_extended (const double *xx,        ///< double array.
                                const double x,  ///< number to search.
                                const unsigned int n)
                                ///< number of array elements.
@@ -4410,14 +4410,14 @@ jbm_array_search_extended_f64 (const double *xx,        ///< double array.
   n1 = n - 1;
   if (x >= xx[n1])
     return (int) n1;
-  return (int) jbm_array_search_f64 (xx, x, n);
+  return (int) jbm_array_f64_search (xx, x, n);
 }
 
 /**
  * Function to interchange 2 double arrays.
  */
 static inline void
-jbm_array_change_f64 (double **restrict fa,     ///< 1st double array.
+jbm_array_f64_change (double **restrict fa,     ///< 1st double array.
                       double **restrict fb)     ///< 2nd double array.
 {
   double *fc;
@@ -4432,7 +4432,7 @@ jbm_array_change_f64 (double **restrict fa,     ///< 1st double array.
  * \return resulting double array.
  */
 static inline double *
-jbm_array_merge_f64 (const double *xa,
+jbm_array_f64_merge (const double *xa,
                      ///< pointer to the 1st increasingly sorted double array.
                      const unsigned int na,
                      ///< number of elements of the 1st array.

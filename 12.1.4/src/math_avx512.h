@@ -56,40 +56,36 @@ typedef union
 
 // float constants
 
-#define JBM_BIAS_16xF32 _mm512_set1_epi32 (JBM_BIAS_F32)
+#define JBM_16XF32_BIAS _mm512_set1_epi32 (JBM_F32_BIAS)
 ///< bias for floats.
-#define JBM_BITS_1_16xF32 _mm512_set1_epi32 (JBM_BITS_1_F32)
+#define JBM_16XF32_BITS_1 _mm512_set1_epi32 (JBM_F32_BITS_1)
 ///< 1 bits for floats.
-#define JBM_BITS_ABS_16xF32 _mm512_set1_epi32 (JBM_BITS_ABS_F32)
-///< absolute value bits for floats.
-#define JBM_BITS_EXPONENT_16xF32 _mm512_set1_epi32 (JBM_BITS_EXPONENT_F32)
+#define JBM_16XF32_BITS_EXPONENT _mm512_set1_epi32 (JBM_F32_BITS_EXPONENT)
 ///< exponent bits for floats.
-#define JBM_BITS_MANTISSA_16xF32 _mm512_set1_epi32 (JBM_BITS_MANTISSA_F32)
+#define JBM_16XF32_BITS_MANTISSA _mm512_set1_epi32 (JBM_F32_BITS_MANTISSA)
 ///< mantissa bits for floats.
-#define JBM_BITS_SIGN_16xF32 _mm512_set1_epi32 (JBM_BITS_SIGN_F32)
+#define JBM_16XF32_BITS_SIGN _mm512_set1_epi32 (JBM_F32_BITS_SIGN)
 ///< sign bits for floats.
-#define JBM_CBRT2_16xF32 _mm512_set1_ps (JBM_CBRT2_F32)
+#define JBM_16XF32_CBRT2 _mm512_set1_ps (JBM_F32_CBRT2)
 ///< cbrt(2) for floats.
-#define JBM_CBRT4_16xF32 _mm512_set1_ps (JBM_CBRT4_F32)
+#define JBM_16XF32_CBRT4 _mm512_set1_ps (JBM_F32_CBRT4)
 ///< cbrt(4) for floats.
 
 // double constants
 
-#define JBM_BIAS_8xF64 _mm512_set1_epi64 (JBM_BIAS_F64)
+#define JBM_8xF64_BIAS _mm512_set1_epi64 (JBM_F64_BIAS)
 ///< bias for doubles.
-#define JBM_BITS_1_8xF64 _mm512_set1_epi64 (JBM_BITS_1_F64)
+#define JBM_8xF64_BITS_1 _mm512_set1_epi64 (JBM_F64_BITS_1)
 ///< 1 bits for doubles.
-#define JBM_BITS_ABS_8xF64 _mm512_set1_epi64 (JBM_BITS_ABS_F64)
-///< absolute value bits for doubles.
-#define JBM_BITS_EXPONENT_8xF64 _mm512_set1_epi64 (JBM_BITS_EXPONENT_F64)
+#define JBM_8xF64_BITS_EXPONENT _mm512_set1_epi64 (JBM_F64_BITS_EXPONENT)
 ///< exponent bits for doubles.
-#define JBM_BITS_MANTISSA_8xF64 _mm512_set1_epi64 (JBM_BITS_MANTISSA_F64)
+#define JBM_8xF64_BITS_MANTISSA _mm512_set1_epi64 (JBM_F64_BITS_MANTISSA)
 ///< mantissa bits for doubles.
-#define JBM_BITS_SIGN_8xF64 _mm512_set1_epi64 (JBM_BITS_SIGN_F64)
+#define JBM_8xF64_BITS_SIGN _mm512_set1_epi64 (JBM_F64_BITS_SIGN)
 ///< sign bits for doubles.
-#define JBM_CBRT2_8xF64 _mm512_set1_pd (JBM_CBRT2_F64)
+#define JBM_8xF64_CBRT2 _mm512_set1_pd (JBM_F64_CBRT2)
 ///< cbrt(2) for doubles.
-#define JBM_CBRT4_8xF64 _mm512_set1_pd (JBM_CBRT4_F64)
+#define JBM_8xF64_CBRT4 _mm512_set1_pd (JBM_F64_CBRT4)
 ///< cbrt(4) for doubles.
 
 ///> macro to automatize operations on one array.
@@ -114,8 +110,6 @@ typedef union
       } \
   for (j = (n - i) >> (4 + 8 / sizeof (type)); j > 0; --j) \
     { \
-      if (i + prefetch + (256 / sizeof (type)) < n) \
-        _mm_prefetch((const char *) (xd + i + prefetch), _MM_HINT_T0); \
       store512 (xr + i, op512 (load512 (xd + i))); \
       i += 64 / sizeof (type); \
       store512 (xr + i, op512 (load512 (xd + i))); \
@@ -236,7 +230,7 @@ typedef union
   type256 a256; \
   type128 a128; \
   type a = initial_value; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
+  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
   i = 0; \
   if (n > prefetch + 256 / sizeof (type)) \
@@ -554,7 +548,6 @@ typedef union
   for (; i < n; ++i) \
     mx = max (mx, x[i]), mn = min (mn, x[i]); \
 
-
 // Debug functions
 
 static inline void
@@ -684,7 +677,7 @@ static inline __m512
 jbm_16xf32_opposite (const __m512 x)    ///< __m512 vector.
 {
   JBM16xF32 y;
-  y.i = JBM_BITS_SIGN_16xF32;
+  y.i = JBM_16XF32_BITS_SIGN;
   return _mm512_xor_ps (x, y.x);
 }
 
@@ -709,8 +702,8 @@ jbm_16xf32_sign (const __m512 x)        ///< __m512 vector.
 {
   JBM16xF32 y;
   y.x = x;
-  y.i = _mm512_and_epi32 (y.i, JBM_BITS_SIGN_16xF32);
-  y.i = _mm512_or_epi32 (y.i, JBM_BITS_1_16xF32);
+  y.i = _mm512_and_epi32 (y.i, JBM_16XF32_BITS_SIGN);
+  y.i = _mm512_or_epi32 (y.i, JBM_16XF32_BITS_1);
   return y.x;
 }
 
@@ -723,7 +716,7 @@ static inline __m512
 jbm_16xf32_abs (const __m512 x) ///< __m512 vector.
 {
   JBM16xF32 y;
-  y.i = JBM_BITS_SIGN_16xF32;
+  y.i = JBM_16XF32_BITS_SIGN;
   return _mm512_andnot_ps (y.x, x);
 }
 
@@ -733,12 +726,12 @@ jbm_16xf32_abs (const __m512 x) ///< __m512 vector.
  * \return __m512 vector with magnitud of 1st vector and sign of 2nd vector.
  */
 static inline __m512
-jbm_copy16xf32_sign (const __m512 x,
+jbm_16xf32_copysign (const __m512 x,
 ///< __m512 vector to preserve magnitude.
                      const __m512 y)    ///< __m512 vector to preserve sign.
 {
   JBM16xF32 m;
-  m.i = JBM_BITS_SIGN_16xF32;
+  m.i = JBM_16XF32_BITS_SIGN;
   return _mm512_or_ps (jbm_16xf32_abs (x), _mm512_and_ps (y, m.x));
 }
 
@@ -782,17 +775,15 @@ jbm_16xf32_frexp (const __m512 x,       ///< __m512 vector.
                   __m512i *e)   ///< pointer to the extracted exponents vector.
 {
   const __m512i zi = _mm512_setzero_epi32 ();
-  const __m512i bias = JBM_BIAS_16xF32;
-  const __m512i abs_mask = JBM_BITS_ABS_16xF32;
-  const __m512i exp_mask = JBM_BITS_EXPONENT_16xF32;
-  const __m512i sign_mask = JBM_BITS_SIGN_16xF32;
-  const __m512i mant_mask = JBM_BITS_MANTISSA_16xF32;
+  const __m512i bias = JBM_16XF32_BIAS;
+  const __m512i exp_mask = JBM_16XF32_BITS_EXPONENT;
+  const __m512i sign_mask = JBM_16XF32_BITS_SIGN;
+  const __m512i mant_mask = JBM_16XF32_BITS_MANTISSA;
   JBM16xF32 y, z;
   __m512i exp;
   __mmask16 is_z, is_sub, is_nan, is_finite;
-  // y(x)=abs(x)
-  y.x = x;
-  y.i = _mm512_and_si512 (y.i, abs_mask);
+  // y=abs(x)
+  y.x = jbm_16xf32_abs (x);
   // masks
   is_z = _mm512_cmpeq_epu32_mask (y.i, zi);
   is_nan = _mm512_cmpge_epu32_mask (y.i, exp_mask);
@@ -811,7 +802,7 @@ jbm_16xf32_frexp (const __m512 x,       ///< __m512 vector.
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm512_or_epi32 (_mm512_and_epi32 (z.i, sign_mask),
-                         _mm512_or_epi32 (_mm512_set1_epi32 (JBM_BIAS_F32
+                         _mm512_or_epi32 (_mm512_set1_epi32 (JBM_F32_BIAS
                                                              << 23),
                                           _mm512_and_epi32 (y.i, mant_mask)));
   return _mm512_mask_mov_ps (x, is_finite, y.x);
@@ -830,8 +821,8 @@ jbm_16xf32_exp2n (__m512i e)    ///< exponent vector (__m512i).
   x = _mm512_mask_blend_ps
     (_mm512_cmpgt_epi32_mask (e, _mm512_set1_epi32 (-127)),
      _mm512_castsi512_ps
-     (_mm512_sllv_epi32 (_mm512_set1_epi32 (0x00400000),
-                         _mm512_sub_epi32 (_mm512_set1_epi32 (-127), e))),
+     (_mm512_sllv_epi32 (_mm512_set1_epi32 (1),
+                         _mm512_add_epi32 (_mm512_set1_epi32 (149), e))),
      _mm512_castsi512_ps
      (_mm512_slli_epi32 (_mm512_add_epi32 (e, _mm512_set1_epi32 (127)), 23)));
   x = _mm512_mask_mov_ps (x, _mm512_cmpgt_epi32_mask (_mm512_set1_epi32 (-150),
@@ -859,7 +850,7 @@ jbm_16xf32_ldexp (const __m512 x,       ///< __m512 vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline __mmask16
-jbm_small_16xf32 (const __m512 x)       ///< __m512d vector.
+jbm_16xf32_small (const __m512 x)       ///< __m512d vector.
 {
   return _mm512_cmp_ps_mask (jbm_16xf32_abs (x), _mm512_set1_ps (FLT_EPSILON),
                              _CMP_LT_OS);
@@ -877,7 +868,7 @@ jbm_small_16xf32 (const __m512 x)       ///< __m512d vector.
  * \return modmin __m512 vector.
  */
 static inline __m512
-jbm_modmin_16xf32 (const __m512 a,      ///< 1st __m512d vector.
+jbm_16xf32_modmin (const __m512 a,      ///< 1st __m512d vector.
                    const __m512 b)      ///< 2nd __m512d vector.
 {
   const __m512 z = _mm512_setzero_ps ();
@@ -7557,8 +7548,8 @@ jbm_16xf32_cbrtwc (const __m512 x)
 static inline __m512
 jbm_16xf32_cbrt (const __m512 x)        ///< __m512 vector.
 {
-  const __m512 cbrt2 = JBM_CBRT2_16xF32;
-  const __m512 cbrt4 = JBM_CBRT4_16xF32;
+  const __m512 cbrt2 = JBM_16XF32_CBRT2;
+  const __m512 cbrt4 = JBM_16XF32_CBRT4;
   const __m256i v3 = _mm256_set1_epi16 (3);
   const __m512i v2 = _mm512_set1_epi16 (2);
   const __m512i v1 = _mm512_set1_epi16 (1);
@@ -7573,7 +7564,7 @@ jbm_16xf32_cbrt (const __m512 x)        ///< __m512 vector.
   y = jbm_16xf32_ldexp (jbm_16xf32_cbrtwc (y), _mm512_cvtepi16_epi32 (e3));
   y = _mm512_mask_mul_ps (y, _mm512_test_epi16_mask (r512, v1), y, cbrt2);
   y = _mm512_mask_mul_ps (y, _mm512_test_epi16_mask (r512, v2), y, cbrt4);
-  return jbm_copy16xf32_sign (y, x);
+  return jbm_16xf32_copysign (y, x);
 }
 
 /**
@@ -7671,7 +7662,7 @@ jbm_16xf32_expm1 (const __m512 x)       ///< __m512 vector.
 
 /**
  * Function to calculate the well conditionated function log2(x) for x in
- * [0.5,1] (__m512).
+ * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (__m512).
  *
  * \return function value (__m512).
  */
@@ -7794,11 +7785,25 @@ jbm_16xf32_coswc (const __m512 x)
 }
 
 /**
+ * Function to calculate the well conditionated function tan(x) for x in
+ * [-pi/4,pi/4].
+ *
+ * \return function value (__m512).
+ */
+static inline __m512
+jbm_16xf32_tanwc (const __m512 x)
+                  ///< __m512 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  return _mm512_mul_ps (x, jbm_16xf32_rational_3_1 (jbm_16xf32_sqr (x),
+                                                    K_TANWC_F32));
+}
+
+/**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_16xf32_sinwc approximation (__m512).
  */
 static inline void
-jbm_sin16xf32_coswc (const __m512 x,
+jbm_16xf32_sincoswc (const __m512 x,
                      ///< __m512 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                      __m512 *s, ///< pointer to the sin function value (__m512).
                      __m512 *c) ///< pointer to the cos function value (__m512).
@@ -7872,7 +7877,7 @@ jbm_16xf32_cos (const __m512 x) ///< __m512 vector.
  * jbm_16xf32_sinwc and jbm_16xf32_coswc approximations (__m512).
  */
 static inline void
-jbm_sin16xf32_cos (const __m512 x,
+jbm_16xf32_sincos (const __m512 x,
                    ///< __m512 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                    __m512 *s,   ///< pointer to the sin function value (__m512).
                    __m512 *c)   ///< pointer to the cos function value (__m512).
@@ -7882,28 +7887,28 @@ jbm_sin16xf32_cos (const __m512 x,
   __m512 y, s1, c1, s2, c2;
   __mmask16 m;
   y = jbm_16xf32_mod (x, pi2);
-  jbm_sin16xf32_coswc (_mm512_sub_ps (y, pi2), &s1, &c1);
-  jbm_sin16xf32_coswc (_mm512_sub_ps (y, _mm512_set1_ps (3.f * M_PI_2f)), &c2,
+  jbm_16xf32_sincoswc (_mm512_sub_ps (y, pi2), &s1, &c1);
+  jbm_16xf32_sincoswc (_mm512_sub_ps (y, _mm512_set1_ps (3.f * M_PI_2f)), &c2,
                        &s2);
   m = _mm512_cmp_ps_mask (y, _mm512_set1_ps (7.f * M_PI_4f), _CMP_LT_OS);
   s1 = _mm512_mask_mov_ps (s1, m, _mm512_sub_ps (z, s2));
   c1 = _mm512_mask_mov_ps (c1, m, c2);
-  jbm_sin16xf32_coswc (_mm512_sub_ps (_mm512_set1_ps (M_PIf), y), &s2, &c2);
+  jbm_16xf32_sincoswc (_mm512_sub_ps (_mm512_set1_ps (M_PIf), y), &s2, &c2);
   m = _mm512_cmp_ps_mask (y, _mm512_set1_ps (5.f * M_PI_4f), _CMP_LT_OS);
   s1 = _mm512_mask_mov_ps (s1, m, s2);
   c1 = _mm512_mask_mov_ps (c1, m, _mm512_sub_ps (z, c2));
-  jbm_sin16xf32_coswc (_mm512_sub_ps (_mm512_set1_ps (M_PI_2f), y), &c2, &s2);
+  jbm_16xf32_sincoswc (_mm512_sub_ps (_mm512_set1_ps (M_PI_2f), y), &c2, &s2);
   m = _mm512_cmp_ps_mask (y, _mm512_set1_ps (3.f * M_PI_4f), _CMP_LT_OS);
   s1 = _mm512_mask_mov_ps (s1, m, s2);
   c1 = _mm512_mask_mov_ps (c1, m, c2);
-  jbm_sin16xf32_coswc (y, &s2, &c2);
+  jbm_16xf32_sincoswc (y, &s2, &c2);
   m = _mm512_cmp_ps_mask (y, _mm512_set1_ps (M_PI_4f), _CMP_LT_OS);
   *s = _mm512_mask_mov_ps (s1, m, s2);
   *c = _mm512_mask_mov_ps (c1, m, c2);
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sin16xf32_cos function
+ * Function to calculate the function tan(x) from jbm_16xf32_sincos function
  * (__m512).
  *
  * \return function value (__m512).
@@ -7912,7 +7917,7 @@ static inline __m512
 jbm_16xf32_tan (const __m512 x) ///< __m512 vector.
 {
   __m512 s, c;
-  jbm_sin16xf32_cos (x, &s, &c);
+  jbm_16xf32_sincos (x, &s, &c);
   return _mm512_div_ps (s, c);
 }
 
@@ -7947,7 +7952,7 @@ jbm_16xf32_atan (const __m512 x)        ///< __m512 vector.
   ax = _mm512_mask_mov_ps (ax, m, jbm_16xf32_reciprocal (ax));
   f = jbm_16xf32_atanwc (ax);
   f = _mm512_mask_mov_ps (f, m, _mm512_sub_ps (_mm512_set1_ps (M_PI_2f), f));
-  return jbm_copy16xf32_sign (f, x);
+  return jbm_16xf32_copysign (f, x);
 }
 
 /**
@@ -7962,7 +7967,7 @@ jbm_16xf32_atan2 (const __m512 y,       ///< __m512 y component.
 {
   __m512 f, g;
   f = jbm_16xf32_atan (_mm512_div_ps (y, x));
-  g = _mm512_add_ps (f, jbm_copy16xf32_sign (_mm512_set1_ps (M_PIf), y));
+  g = _mm512_add_ps (f, jbm_16xf32_copysign (_mm512_set1_ps (M_PIf), y));
   return
     _mm512_mask_mov_ps (f, _mm512_cmp_ps_mask (x, _mm512_setzero_ps (),
                                                _CMP_LT_OS), g);
@@ -8146,7 +8151,7 @@ jbm_16xf32_erf (const __m512 x) ///< __m512 vector.
   const __m512 ax = jbm_16xf32_abs (x);
   return
     _mm512_mask_blend_ps (_mm512_cmp_ps_mask (ax, u, _CMP_LT_OS),
-                          jbm_copy16xf32_sign (_mm512_sub_ps (u,
+                          jbm_16xf32_copysign (_mm512_sub_ps (u,
                                                               jbm_16xf32_erfcwc
                                                               (ax)), x),
                           jbm_16xf32_erfwc (x));
@@ -8224,7 +8229,7 @@ jbm_16xf32_solve_quadratic (const __m512 a,
     jbm_solve_quadratic_reduced_16xf32 (_mm512_div_ps (b, a),
                                         _mm512_div_ps (c, a), x1, x2);
   k2 = _mm512_div_ps (jbm_16xf32_opposite (c), b);
-  return _mm512_mask_mov_ps (k1, jbm_small_16xf32 (a), k2);
+  return _mm512_mask_mov_ps (k1, jbm_16xf32_small (a), k2);
 }
 
 /**
@@ -8298,7 +8303,7 @@ jbm_16xf32_solve_cubic (const __m512 a,
 ///< __m512 vector of right limits of the solution intervals.
 {
   return
-    _mm512_mask_blend_ps (jbm_small_16xf32 (a),
+    _mm512_mask_blend_ps (jbm_16xf32_small (a),
                           jbm_solve_cubic_reduced_16xf32 (_mm512_div_ps (b, a),
                                                           _mm512_div_ps (c, a),
                                                           _mm512_div_ps (d, a),
@@ -8348,7 +8353,7 @@ jbm_16xf32_flux_limiter_centred (const __m512 d1,
                                  const __m512 d2)
                               ///< 2nd flux limiter function parameter.
 {
-  return _mm512_mask_blend_ps (jbm_small_16xf32 (d2),
+  return _mm512_mask_blend_ps (jbm_16xf32_small (d2),
                                _mm512_div_ps (d1, d2), _mm512_setzero_ps ());
 
 }
@@ -8691,7 +8696,7 @@ static inline __m512d
 jbm_8xf64_opposite (const __m512d x)    ///< __m512d vector.
 {
   JBM8xF64 y;
-  y.i = JBM_BITS_SIGN_8xF64;
+  y.i = JBM_8xF64_BITS_SIGN;
   return _mm512_xor_pd (x, y.x);
 }
 
@@ -8716,8 +8721,8 @@ jbm_8xf64_sign (const __m512d x)        ///< __m512d vector.
 {
   JBM8xF64 y;
   y.x = x;
-  y.i = _mm512_and_epi64 (y.i, JBM_BITS_SIGN_8xF64);
-  y.i = _mm512_or_epi64 (y.i, JBM_BITS_1_8xF64);
+  y.i = _mm512_and_epi64 (y.i, JBM_8xF64_BITS_SIGN);
+  y.i = _mm512_or_epi64 (y.i, JBM_8xF64_BITS_1);
   return y.x;
 }
 
@@ -8730,7 +8735,7 @@ static inline __m512d
 jbm_8xf64_abs (const __m512d x)
 {
   JBM8xF64 y;
-  y.i = JBM_BITS_SIGN_8xF64;
+  y.i = JBM_8xF64_BITS_SIGN;
   return _mm512_andnot_pd (y.x, x);
 }
 
@@ -8740,12 +8745,12 @@ jbm_8xf64_abs (const __m512d x)
  * \return __m512d vector with magnitud of 1st vector and sign of 2nd vector.
  */
 static inline __m512d
-jbm_copy8xf64_sign (const __m512d x,
+jbm_8xf64_copysign (const __m512d x,
 ///< __m512d vector to preserve magnitude.
                     const __m512d y)    ///< __m512d vector to preserve sign.
 {
   JBM8xF64 m;
-  m.i = JBM_BITS_SIGN_8xF64;
+  m.i = JBM_8xF64_BITS_SIGN;
   return _mm512_or_pd (jbm_8xf64_abs (x), _mm512_and_pd (y, m.x));
 }
 
@@ -8789,17 +8794,15 @@ jbm_8xf64_frexp (const __m512d x,       ///< __m512d vector.
                  __m512i *e)    ///< pointer to the extracted exponents vector.
 {
   const __m512i zi = _mm512_setzero_si512 ();
-  const __m512i bias = JBM_BIAS_8xF64;
-  const __m512i abs_mask = JBM_BITS_ABS_8xF64;
-  const __m512i exp_mask = JBM_BITS_EXPONENT_8xF64;
-  const __m512i sign_mask = JBM_BITS_SIGN_8xF64;
-  const __m512i mant_mask = JBM_BITS_MANTISSA_8xF64;
+  const __m512i bias = JBM_8xF64_BIAS;
+  const __m512i exp_mask = JBM_8xF64_BITS_EXPONENT;
+  const __m512i sign_mask = JBM_8xF64_BITS_SIGN;
+  const __m512i mant_mask = JBM_8xF64_BITS_MANTISSA;
   JBM8xF64 y, z;
   __m512i exp;
   __mmask16 is_z, is_sub, is_nan, is_finite;
-  // y(x)=abs(x)
-  y.x = x;
-  y.i = _mm512_and_si512 (y.i, abs_mask);
+  // y=abs(x)
+  y.x = jbm_8xf64_abs (x);
   // masks
   is_z = _mm512_cmpeq_epu64_mask (y.i, zi);
   is_nan = _mm512_cmpge_epu64_mask (y.i, exp_mask);
@@ -8818,7 +8821,7 @@ jbm_8xf64_frexp (const __m512d x,       ///< __m512d vector.
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm512_or_epi64 (_mm512_and_epi64 (z.i, sign_mask),
-                         _mm512_or_epi64 (_mm512_set1_epi64 (JBM_BIAS_F64
+                         _mm512_or_epi64 (_mm512_set1_epi64 (JBM_F64_BIAS
                                                              << 52),
                                           _mm512_and_epi64 (y.i, mant_mask)));
   return _mm512_mask_mov_pd (x, is_finite, y.x);
@@ -8836,7 +8839,7 @@ jbm_8xf64_exp2n (__m512i e)     ///< exponent vector (__m512i).
   const __m512i v1074 = _mm512_set1_epi64 (1074ll);
   const __m512i v1023 = _mm512_set1_epi64 (1023ll);
   const __m512i vn1023 = _mm512_set1_epi64 (-1023ll);
-  const __m512i vn1074 = _mm512_set1_epi64 (-1074ll);
+  const __m512i vn1075 = _mm512_set1_epi64 (-1075ll);
   __m512d x;
   __mmask16 is_norm;
   is_norm = _mm512_cmpgt_epi64_mask (e, vn1023);
@@ -8846,7 +8849,7 @@ jbm_8xf64_exp2n (__m512i e)     ///< exponent vector (__m512i).
      _mm512_castsi512_pd (_mm512_slli_epi64 (_mm512_add_epi64 (e, v1023), 52)));
   x =
     _mm512_mask_mov_pd
-    (x, _mm512_cmpgt_epi64_mask (e, vn1074) & ~is_norm,
+    (x, _mm512_cmpgt_epi64_mask (e, vn1075) & ~is_norm,
      _mm512_castsi512_pd
      (_mm512_sllv_epi64 (_mm512_set1_epi64 (1ll),
                          _mm512_add_epi64 (e, v1074))));
@@ -8873,7 +8876,7 @@ jbm_8xf64_ldexp (const __m512d x,       ///< __m512d vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline __mmask16
-jbm_small_8xf64 (const __m512d x)       ///< __m512d vector.
+jbm_8xf64_small (const __m512d x)       ///< __m512d vector.
 {
   return _mm512_cmp_pd_mask (jbm_8xf64_abs (x), _mm512_set1_pd (DBL_EPSILON),
                              _CMP_LT_OS);
@@ -8891,7 +8894,7 @@ jbm_small_8xf64 (const __m512d x)       ///< __m512d vector.
  * \return modmin __m512d vector.
  */
 static inline __m512d
-jbm_modmin_8xf64 (const __m512d a,      ///< 1st __m512d vector.
+jbm_8xf64_modmin (const __m512d a,      ///< 1st __m512d vector.
                   const __m512d b)      ///< 2nd __m512d vector.
 {
   __m512d aa, ab, y, z;
@@ -15517,8 +15520,8 @@ jbm_8xf64_cbrtwc (const __m512d x)
 static inline __m512d
 jbm_8xf64_cbrt (const __m512d x)        ///< __m512d vector.
 {
-  const __m512d cbrt2 = JBM_CBRT2_8xF64;
-  const __m512d cbrt4 = JBM_CBRT4_8xF64;
+  const __m512d cbrt2 = JBM_8xF64_CBRT2;
+  const __m512d cbrt4 = JBM_8xF64_CBRT4;
   const __m512i v3 = _mm512_set1_epi32 (3);
   const __m512i v2 = _mm512_set1_epi64 (2);
   const __m512i v1 = _mm512_set1_epi64 (1);
@@ -15534,7 +15537,7 @@ jbm_8xf64_cbrt (const __m512d x)        ///< __m512d vector.
   y = jbm_8xf64_ldexp (jbm_8xf64_cbrtwc (y), e3);
   y = _mm512_mask_mul_pd (y, _mm512_cmpeq_epi64_mask (r, v1), y, cbrt2);
   y = _mm512_mask_mul_pd (y, _mm512_cmpeq_epi64_mask (r, v2), y, cbrt4);
-  return jbm_copy8xf64_sign (y, x);
+  return jbm_8xf64_copysign (y, x);
 }
 
 /**
@@ -15748,7 +15751,7 @@ jbm_8xf64_coswc (const __m512d x)
  * x in [-pi/4,pi/4] from jbm_8xf64_sinwc approximation (__m512d).
  */
 static inline void
-jbm_sin8xf64_coswc (const __m512d x,
+jbm_8xf64_sincoswc (const __m512d x,
                     ///< __m512d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     __m512d *s,
                     ///< pointer to the sin function value (__m512d).
@@ -15831,7 +15834,7 @@ jbm_8xf64_cos (const __m512d x) ///< __m512d vector.
  * and jbm_8xf64_coswc approximations (__m512d).
  */
 static inline void
-jbm_sin8xf64_cos (const __m512d x,
+jbm_8xf64_sincos (const __m512d x,
                   ///< __m512d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   __m512d *s,
                   ///< pointer to the sin function value (__m512d).
@@ -15843,21 +15846,21 @@ jbm_sin8xf64_cos (const __m512d x,
   __m512d y, s1, c1, s2, c2;
   __mmask16 m;
   y = jbm_8xf64_mod (x, pi2);
-  jbm_sin8xf64_coswc (_mm512_sub_pd (y, pi2), &s1, &c1);
-  jbm_sin8xf64_coswc (_mm512_sub_pd (y, _mm512_set1_pd (3. * M_PI_2)), &c2,
+  jbm_8xf64_sincoswc (_mm512_sub_pd (y, pi2), &s1, &c1);
+  jbm_8xf64_sincoswc (_mm512_sub_pd (y, _mm512_set1_pd (3. * M_PI_2)), &c2,
                       &s2);
   m = _mm512_cmp_pd_mask (y, _mm512_set1_pd (7. * M_PI_4), _CMP_LT_OS);
   s1 = _mm512_mask_mov_pd (s1, m, _mm512_sub_pd (z, s2));
   c1 = _mm512_mask_mov_pd (c1, m, c2);
-  jbm_sin8xf64_coswc (_mm512_sub_pd (_mm512_set1_pd (M_PI), y), &s2, &c2);
+  jbm_8xf64_sincoswc (_mm512_sub_pd (_mm512_set1_pd (M_PI), y), &s2, &c2);
   m = _mm512_cmp_pd_mask (y, _mm512_set1_pd (5. * M_PI_4), _CMP_LT_OS);
   s1 = _mm512_mask_mov_pd (s1, m, s2);
   c1 = _mm512_mask_mov_pd (c1, m, _mm512_sub_pd (z, c2));
-  jbm_sin8xf64_coswc (_mm512_sub_pd (_mm512_set1_pd (M_PI_2), y), &c2, &s2);
+  jbm_8xf64_sincoswc (_mm512_sub_pd (_mm512_set1_pd (M_PI_2), y), &c2, &s2);
   m = _mm512_cmp_pd_mask (y, _mm512_set1_pd (3. * M_PI_4), _CMP_LT_OS);
   s1 = _mm512_mask_mov_pd (s1, m, s2);
   c1 = _mm512_mask_mov_pd (c1, m, c2);
-  jbm_sin8xf64_coswc (y, &s2, &c2);
+  jbm_8xf64_sincoswc (y, &s2, &c2);
   m = _mm512_cmp_pd_mask (y, _mm512_set1_pd (M_PI_4), _CMP_LT_OS);
   *s = _mm512_mask_mov_pd (s1, m, s2);
   *c = _mm512_mask_mov_pd (c1, m, c2);
@@ -15873,7 +15876,7 @@ static inline __m512d
 jbm_8xf64_tan (const __m512d x) ///< __m512d vector.
 {
   __m512d s, c;
-  jbm_sin8xf64_cos (x, &s, &c);
+  jbm_8xf64_sincos (x, &s, &c);
   return _mm512_div_pd (s, c);
 }
 
@@ -15908,7 +15911,7 @@ jbm_8xf64_atan (const __m512d x)        ///< double number.
   ax = _mm512_mask_mov_pd (ax, m, jbm_8xf64_reciprocal (ax));
   f = jbm_8xf64_atanwc (ax);
   f = _mm512_mask_mov_pd (f, m, _mm512_sub_pd (_mm512_set1_pd (M_PI_2), f));
-  return jbm_copy8xf64_sign (f, x);
+  return jbm_8xf64_copysign (f, x);
 
 }
 
@@ -15926,7 +15929,7 @@ jbm_8xf64_atan2 (const __m512d y,       ///< __m512d y component.
   const __m512d z = _mm512_setzero_pd ();
   __m512d f, g;
   f = jbm_8xf64_atan (_mm512_div_pd (y, x));
-  g = _mm512_add_pd (f, jbm_copy8xf64_sign (pi, y));
+  g = _mm512_add_pd (f, jbm_8xf64_copysign (pi, y));
   return _mm512_mask_mov_pd (f, _mm512_cmp_pd_mask (x, z, _CMP_LT_OS), g);
 }
 
@@ -16108,7 +16111,7 @@ jbm_8xf64_erf (const __m512d x) ///< __m512d vector.
   ax = jbm_8xf64_abs (x);
   return
     _mm512_mask_blend_pd (_mm512_cmp_pd_mask (ax, u, _CMP_LT_OS),
-                          jbm_copy8xf64_sign (_mm512_sub_pd (u,
+                          jbm_8xf64_copysign (_mm512_sub_pd (u,
                                                              jbm_8xf64_erfcwc
                                                              (ax)), x),
                           jbm_8xf64_erfwc (x));
@@ -16185,7 +16188,7 @@ jbm_8xf64_solve_quadratic (const __m512d a,
   k1 = jbm_solve_quadratic_reduced_8xf64 (_mm512_div_pd (b, a),
                                           _mm512_div_pd (c, a), x1, x2);
   k2 = _mm512_div_pd (jbm_8xf64_opposite (c), b);
-  return _mm512_mask_mov_pd (k1, jbm_small_8xf64 (a), k2);
+  return _mm512_mask_mov_pd (k1, jbm_8xf64_small (a), k2);
 }
 
 /**
@@ -16260,7 +16263,7 @@ jbm_8xf64_solve_cubic (const __m512d a,
 ///< __m512d vector of right limits of the solution intervals.
 {
   return
-    _mm512_mask_blend_pd (jbm_small_8xf64 (a),
+    _mm512_mask_blend_pd (jbm_8xf64_small (a),
                           jbm_solve_cubic_reduced_8xf64 (_mm512_div_pd (b, a),
                                                          _mm512_div_pd (c, a),
                                                          _mm512_div_pd (d, a),
@@ -16311,7 +16314,7 @@ jbm_8xf64_flux_limiter_centred (const __m512d d1,
                                 const __m512d d2)
     ///< 2nd flux limiter function parameter.
 {
-  return _mm512_mask_blend_pd (jbm_small_8xf64 (d2),
+  return _mm512_mask_blend_pd (jbm_8xf64_small (d2),
                                _mm512_div_pd (d1, d2), _mm512_setzero_pd ());
 
 }

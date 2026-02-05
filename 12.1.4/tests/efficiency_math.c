@@ -639,10 +639,10 @@ bits_32 (const float x)
   memcpy (&i, &x, 4l);
   if (!(i & 0x7f800000u))
     i = 0u;
-  if (i & JBM_BITS_SIGN_F32)
-    i = JBM_BITS_SIGN_F32 - i;
+  if (i & JBM_F32_BITS_SIGN)
+    i = JBM_F32_BITS_SIGN - i;
   else
-    i -= JBM_BITS_SIGN_F32;
+    i -= JBM_F32_BITS_SIGN;
   return i;
 }
 
@@ -904,10 +904,10 @@ bits_64 (const double x)
   memcpy (&i, &x, 8l);
   if (!(i & 0x7ff0000000000000ull))
     i = 0ull;
-  if (i & JBM_BITS_SIGN_F64)
-    i = JBM_BITS_SIGN_F64 - i;
+  if (i & JBM_F64_BITS_SIGN)
+    i = JBM_F64_BITS_SIGN - i;
   else
-    i -= JBM_BITS_SIGN_F64;
+    i -= JBM_F64_BITS_SIGN;
   return i;
 }
 

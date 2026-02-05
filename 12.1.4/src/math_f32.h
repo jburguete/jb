@@ -33,15 +33,15 @@
 #ifndef JB_MATH_F32__H
 #define JB_MATH_F32__H 1
 
-#define JBM_BIAS_F32 126u       ///< bias for doubles.
-#define JBM_BITS_1_F32 0x3f800000u      ///< 1 bits for floats.
-#define JBM_BITS_ABS_F32 0x7fffffffu    ///< absolute value bits for floats.
-#define JBM_BITS_EXPONENT_F32 0x7f800000u       ///< exponent bits for floats.
-#define JBM_BITS_MANTISSA_F32 0x007fffffu       ///< mantissa bits for floats.
-#define JBM_BITS_SIGN_F32 0x80000000u   ///< sign bits for floats.
-#define JBM_CBRT2_F32 1.2599210498948731647672106072782284f
+#define JBM_F32_BIAS 126u       ///< bias for doubles.
+#define JBM_F32_BITS_1 0x3f800000u      ///< 1 bits for floats.
+#define JBM_F32_BITS_ABS 0x7fffffffu    ///< absolute value bits for floats.
+#define JBM_F32_BITS_EXPONENT 0x7f800000u       ///< exponent bits for floats.
+#define JBM_F32_BITS_MANTISSA 0x007fffffu       ///< mantissa bits for floats.
+#define JBM_F32_BITS_SIGN 0x80000000u   ///< sign bits for floats.
+#define JBM_F32_CBRT2 1.2599210498948731647672106072782284f
 ///< cbrt(2) for floats.
-#define JBM_CBRT4_F32 1.5874010519681994747517056392723083f
+#define JBM_F32_CBRT4 1.5874010519681994747517056392723083f
 ///< cbrt(4) for floats.
 #define JBM_SQRT_FLT_MIN 1.0842021724855044340074528008699417e-19
 ///< root square of standard FLT_MIN.
@@ -246,8 +246,8 @@ jbm_f32_sign (const float x)    ///< float number.
 {
   JBMF32 y;
   y.x = x;
-  y.i &= JBM_BITS_SIGN_F32;
-  y.i |= JBM_BITS_1_F32;
+  y.i &= JBM_F32_BITS_SIGN;
+  y.i |= JBM_F32_BITS_1;
   return y.x;
 }
 
@@ -261,7 +261,7 @@ jbm_f32_abs (const float x)     ///< float number.
 {
   JBMF32 y;
   y.x = x;
-  y.i &= JBM_BITS_ABS_F32;
+  y.i &= JBM_F32_BITS_ABS;
   return y.x;
 }
 
@@ -271,13 +271,13 @@ jbm_f32_abs (const float x)     ///< float number.
  * \return float number with magnitud of 1st number and sign of 2nd number.
  */
 static inline float
-jbm_copyf32_sign (const float x,        ///< float number to preserve magnitude.
+jbm_f32_copysign (const float x,        ///< float number to preserve magnitude.
                   const float y)        ///< float number to preserve sign.
 {
   JBMF32 ax, sy;
   ax.x = jbm_f32_abs (x);
   sy.x = y;
-  ax.i |= sy.i & JBM_BITS_SIGN_F32;
+  ax.i |= sy.i & JBM_F32_BITS_SIGN;
   return ax.x;
 }
 
@@ -335,9 +335,9 @@ jbm_f32_frexp (const float x,   ///< float number.
       exp = (y.i >> 23u) - 23u;
     }
   // exponent
-  *e = (int) (exp - JBM_BIAS_F32);
+  *e = (int) (exp - JBM_F32_BIAS);
   // mantissa in [0.5,1)
-  y.i = (JBM_BIAS_F32 << 23u) | (y.i & 0x807fffffu);
+  y.i = (JBM_F32_BIAS << 23u) | (y.i & 0x807fffffu);
   return y.x;
 }
 
@@ -352,12 +352,12 @@ jbm_f32_exp2n (int e)           ///< exponent number (int).
   JBMF32 x;
   if (e > 127)
     return INFINITY;
-  if (e < -150)
+  if (e < -149)
     return 0.f;
   if (e > -127)
     x.i = (127 + e) << 23;
   else
-    x.i = 0x00400000u >> (-e - 127);
+    x.i = 1u << (e + 149);
   return x.x;
 }
 
@@ -3716,10 +3716,10 @@ jbm_f32_cbrt (const float x)    ///< float number.
   e3 -= e & 1;
   m = jbm_f32_ldexp (jbm_f32_cbrtwc (m), e3);
   if (r & 1)
-    m *= JBM_CBRT2_F32;
+    m *= JBM_F32_CBRT2;
   if (r & 2)
-    m *= JBM_CBRT4_F32;
-  return jbm_copyf32_sign (m, x);
+    m *= JBM_F32_CBRT4;
+  return jbm_f32_copysign (m, x);
 }
 
 /**
@@ -3736,7 +3736,7 @@ jbm_f32_exp2wc (const float x)
 }
 
 /**
- * Function to calculate the function exp2(x) using the jbm_expwc_f32 and
+ * Function to calculate the function exp2(x) using the jbm_f32_expwc and
  * jbm_f32_exp2n functions (float).
  *
  * \return function value (float).
@@ -3822,7 +3822,7 @@ jbm_f32_log2wc (const float x)  ///< float number.
 
 /**
  * Function to calculate the function log2(x) using jbm_log2wc0_f32,
- * jbm_log2wc1_f32 and jbm_f32_frexp (float).
+ * jbm_f32_log2wc and jbm_f32_frexp (float).
  *
  * \return function value (float).
  */
@@ -3948,7 +3948,7 @@ jbm_f32_tanwc (const float x)
  * x in [-pi/4,pi/4] from jbm_f32_sinwc approximation (float).
  */
 static inline void
-jbm_sinf32_coswc (const float x,
+jbm_f32_sincoswc (const float x,
                   ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   float *s,     ///< pointer to the sin function value (float).
                   float *c)     ///< pointer to the cos function value (float).
@@ -3970,7 +3970,7 @@ jbm_f32_sin (const float x)     ///< float number.
   int q;
   y = x * 1.f / M_PI_2f;
   q = (int) nearbyintf (y);
-  y = x - (float) q *M_PI_2f;
+  y = x - (float) q * M_PI_2f;
   q &= 3;
   y = (q & 1) ? jbm_f32_coswc (y) : jbm_f32_sinwc (y);
   return (q & 2) ? -y : y;
@@ -3996,11 +3996,11 @@ jbm_f32_cos (const float x)     ///< float number.
 }
 
 /**
- * Function to calculate the functions sin(x) and cos(x) from jbm_sinf32_coswc
+ * Function to calculate the functions sin(x) and cos(x) from jbm_f32_sincoswc
  * approximation (float).
  */
 static inline void
-jbm_sinf32_cos (const float x,
+jbm_f32_sincos (const float x,
                 ///< float number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                 float *s,       ///< pointer to the sin function value (float).
                 float *c)       ///< pointer to the cos function value (float).
@@ -4008,10 +4008,10 @@ jbm_sinf32_cos (const float x,
   float y, sr, cr;
   int q;
   y = x * 1.f / M_PI_2f;
-  q = (int) (y + jbm_copyf32_sign (0.5f, x));
+  q = (int) (y + jbm_f32_copysign (0.5f, x));
   y = x - (float) q *M_PI_2f;
   q &= 3;
-  jbm_sinf32_coswc (y, &sr, &cr);
+  jbm_f32_sincoswc (y, &sr, &cr);
   switch (q)
     {
     case 0:
@@ -4033,7 +4033,7 @@ jbm_sinf32_cos (const float x,
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sinf32_cos function
+ * Function to calculate the function tan(x) from jbm_f32_sincos function
  * (float).
  *
  * \return function value (float).
@@ -4077,7 +4077,7 @@ jbm_f32_atan (const float x)    ///< float number.
     f = M_PI_2f - jbm_f32_atanwc (1.f / ax);
   else
     f = jbm_f32_atanwc (ax);
-  return jbm_copyf32_sign (f, x);
+  return jbm_f32_copysign (f, x);
 }
 
 /**
@@ -4093,7 +4093,7 @@ jbm_f32_atan2 (const float y,   ///< float y component.
   float f;
   f = jbm_f32_atan (y / x);
   if (x < 0.f)
-    f += jbm_copyf32_sign (M_PIf, y);
+    f += jbm_f32_copysign (M_PIf, y);
   return f;
 }
 
@@ -4242,7 +4242,7 @@ jbm_f32_erf (const float x)     ///< float number.
   float ax;
   ax = jbm_f32_abs (x);
   if (ax > 1.f)
-    return jbm_copyf32_sign (1.f - jbm_f32_erfcwc (ax), x);
+    return jbm_f32_copysign (1.f - jbm_f32_erfcwc (ax), x);
   return jbm_f32_erfwc (x);
 }
 
@@ -4290,6 +4290,103 @@ jbm_f32_integral (float (*f) (float),
     }
 #endif
   return k * dx;
+}
+
+/**
+ * Function to search the interval where a number is in a increasingly sorted
+ * float.
+ *
+ * \return interval number.
+ */
+static inline unsigned int
+jbm_array_f32_search (const float *xx,  ///< float array.
+                      const float x,    ///< number to search.
+                      const unsigned int n)     ///< number of array elements.
+{
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  for (i = 0; n1 - i > 1;)
+    {
+      j = (i + n1) >> 1;
+      if (x < xx[j])
+        n1 = j;
+      else
+        i = j;
+    }
+  return i;
+}
+
+/**
+ * Function to search the interval where a number is in a increasingly sorted
+ * array of float numbers.
+ * \return interval number, -1 if x<fa[0] or n-1 if x>fa[n-1].
+ */
+static inline int
+jbm_array_f32_search_extended (const float *xx, ///< float array.
+                               const float x,   ///< number to search.
+                               const unsigned int n)
+                               ///< number of array elements.
+{
+  unsigned int n1;
+  if (x < xx[0])
+    return -1;
+  n1 = n - 1;
+  if (x >= xx[n1])
+    return (int) n1;
+  return (int) jbm_array_f32_search (xx, x, n);
+}
+
+/**
+ * Function to interchange 2 float arrays.
+ */
+static inline void
+jbm_array_f32_change (float **restrict fa,      ///< 1st float array.
+                      float **restrict fb)      ///< 2nd float array.
+{
+  float *fc;
+  fc = *fa;
+  *fa = *fb;
+  *fb = fc;
+}
+
+/**
+ * Function to merge 2 increasingly sorted float arrays.
+ *
+ * \return resulting float array.
+ */
+static inline float *
+jbm_array_f32_merge (const float *xa,
+                     ///< pointer to the 1st increasingly sorted float array.
+                     const unsigned int na,
+                     ///< number of elements of the 1st array.
+                     const float *xb,
+                     ///< pointer to the 2nd increasingly sorted float array.
+                     const unsigned int nb,
+                     ///< number of elements of the 2nd array.
+                     unsigned int *nc)
+                     ///< pointer to the number of elements of the new array.
+{
+  float *xc;
+  unsigned int i, j, k;
+  xc = (float *) malloc ((na + nb) * sizeof (float));
+  if (!xc)
+    return NULL;
+  for (i = j = k = 0; i < na || j < nb; ++k)
+    {
+      if (i >= na)
+        xc[k] = xb[j++];
+      else if (j >= nb)
+        xc[k] = xa[i++];
+      else if (xa[i] > xb[j])
+        xc[k] = xb[j++];
+      else if (xa[i] < xb[j])
+        xc[k] = xa[i++];
+      else
+        xc[k] = xa[i++], j++;
+    }
+  xc = (float *) realloc (xc, k * sizeof (float));
+  *nc = k;
+  return xc;
 }
 
 #if !defined(__SSE4_2__) && !defined(__ARM_NEON__) && !defined(__riscv_vector)
