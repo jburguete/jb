@@ -5350,13 +5350,13 @@ main (void)
   d_2xf64 = jbm_2xf64_abs (_mm_set_pd (-1., 1));
   _mm_store_pd (d_1, d_2xf64);
   printf ("2xf64_abs([1,-1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_small_2xf64 (_mm_set_pd (1., 0.));
+  d_2xf64 = jbm_2xf64_small (_mm_set_pd (1., 0.));
   _mm_store_pd (d_1, d_2xf64);
   printf ("small_2xf64([0,1])=[%16llx,%16llx]\n", L_1[0], L_1[1]);
-  d_2xf64 = jbm_modmin_2xf64 (_mm_set_pd (-1., 1.), _mm_set_pd (-2., 0.5));
+  d_2xf64 = jbm_2xf64_modmin (_mm_set_pd (-1., 1.), _mm_set_pd (-2., 0.5));
   _mm_store_pd (d_1, d_2xf64);
   printf ("modmin_2xf64([1,-1],[0.5,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  d_2xf64 = jbm_modmin_2xf64 (_mm_set_pd (1.0, 0.), _mm_set_pd (-2., 1.));
+  d_2xf64 = jbm_2xf64_modmin (_mm_set_pd (1.0, 0.), _mm_set_pd (-2., 1.));
   _mm_store_pd (d_1, d_2xf64);
   printf ("modmin_2xf64([0,1],[1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 = _mm_set_pd (1., 0.);
@@ -5459,13 +5459,13 @@ main (void)
                                     _mm_set_pd (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_min2xf64_mod([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_minmod([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (1., 3.),
                                     _mm_set_pd (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm_store_pd (d_1, d_2xf64);
-  printf ("flux_limiter_min2xf64_mod([3,1],[1,1])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_minmod([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_2xf64_flux_limiter (_mm_set_pd (2., -1.),
                                     _mm_set_pd (3., 1.),
@@ -5598,11 +5598,11 @@ main (void)
   _mm256_store_pd (d_1, d_4xf64);
   printf ("4xf64_abs([1,-1,0,2])=[%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3]);
-  d_4xf64 = jbm_small_4xf64 (_mm256_set_pd (-1., 1., -0., 0.));
+  d_4xf64 = jbm_4xf64_small (_mm256_set_pd (-1., 1., -0., 0.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("small_4xf64([0,-0,1,-1])=[%16llx,%16llx,%16llx,%16llx]\n",
           L_1[0], L_1[1], L_1[2], L_1[3]);
-  d_4xf64 = jbm_modmin_4xf64 (_mm256_set_pd (1., 0., -1., 1.),
+  d_4xf64 = jbm_4xf64_modmin (_mm256_set_pd (1., 0., -1., 1.),
                               _mm256_set_pd (-2., 1., -2., 0.5));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("modmin_4xf64([1,-1,0,1],[0.5,-2,1,-2])"
@@ -5707,7 +5707,7 @@ main (void)
                                     _mm256_set_pd (1., 1., 3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("flux_limiter_min4xf64_mod([-1,2,3,1],[1,3,1,1])"
+  printf ("4xf64_flux_limiter_minmod([-1,2,3,1],[1,3,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_4xf64_flux_limiter (_mm256_set_pd (1., 0., 2., -1.),
                                     _mm256_set_pd (0., 0., 3., 1.),
@@ -5832,9 +5832,9 @@ main (void)
   printf ("8xf64_abs([1,-1,0,2,-2,3,-3,4])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg,%.17lg]\n",
           d_1[0], d_1[1], d_1[2], d_1[3], d_1[4], d_1[5], d_1[6], d_1[7]);
-  m_8 = jbm_small_8xf64 (_mm512_set_pd (-3., 3., -2., 2., -1., 1., -0., 0.));
+  m_8 = jbm_8xf64_small (_mm512_set_pd (-3., 3., -2., 2., -1., 1., -0., 0.));
   printf ("small_8xf64([0,-0,1,-1,2,-2,3,-3])=%08b\n", (unsigned int) m_8);
-  d_8xf64 = jbm_modmin_8xf64 (_mm512_set_pd (-2., 0., 0., 3., 1., 0., -1., 1.),
+  d_8xf64 = jbm_8xf64_modmin (_mm512_set_pd (-2., 0., 0., 3., 1., 0., -1., 1.),
                               _mm512_set_pd (-1., 2., 3., 1., -2., 1., -2.,
                                              0.5));
   _mm512_store_pd (d_1, d_8xf64);
@@ -5957,7 +5957,7 @@ main (void)
                                 _mm512_set_pd (1., 1., 3., 1.),
                                 JBM_FLUX_LIMITER_TYPE_MINMOD);
   _mm512_store_pd (d_1, d_8xf64);
-  printf ("flux_limiter_min8xf64_mod([-1,2,3,1],[1,3,1,1])"
+  printf ("8xf64_flux_limiter_minmod([-1,2,3,1],[1,3,1,1])"
           "=[%.17lg,%.17lg,%.17lg,%.17lg]\n", d_1[0], d_1[1], d_1[2], d_1[3]);
   d_8xf64 = jbm_8xf64_flux_limiter (_mm512_set_pd (1., 0., 2., -1.),
                                 _mm512_set_pd (0., 0., 3., 1.),
@@ -6082,15 +6082,15 @@ main (void)
   d_2xf64 = jbm_2xf64_abs (set_float64x2_t (-1., 1));
   vst1q_dbl (d_1, d_2xf64);
   printf ("2xf64_abs([1,-1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
-  m_2xf64 = jbm_small_2xf64 (set_float64x2_t (1., 0.));
+  m_2xf64 = jbm_2xf64_small (set_float64x2_t (1., 0.));
   vst1q_u64 (L_1, m_2xf64);
   printf ("small_2xf64([0,1])=[%16llx,%16llx]\n", L_1[0], L_1[1]);
   d_2xf64
-    = jbm_modmin_2xf64 (set_float64x2_t (-1., 1.), set_float64x2_t (-2., 0.5));
+    = jbm_2xf64_modmin (set_float64x2_t (-1., 1.), set_float64x2_t (-2., 0.5));
   vst1q_dbl (d_1, d_2xf64);
   printf ("modmin_2xf64([1,-1],[0.5,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64
-    = jbm_modmin_2xf64 (set_float64x2_t (1.0, 0.), set_float64x2_t (-2., 1.));
+    = jbm_2xf64_modmin (set_float64x2_t (1.0, 0.), set_float64x2_t (-2., 1.));
   vst1q_dbl (d_1, d_2xf64);
   printf ("modmin_2xf64([0,1],[1,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 = set_float64x2_t (1., 0.);
@@ -6196,13 +6196,13 @@ main (void)
                                     set_float64x2_t (3., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   vst1q_dbl (d_1, d_2xf64);
-  printf ("flux_limiter_min2xf64_mod([-1,2],[1,3])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_minmod([-1,2],[1,3])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (1., 3.),
                                     set_float64x2_t (1., 1.),
                                     JBM_FLUX_LIMITER_TYPE_MINMOD);
   vst1q_dbl (d_1, d_2xf64);
-  printf ("flux_limiter_min2xf64_mod([3,1],[1,1])=[%.17lg,%.17lg]\n",
+  printf ("2xf64_flux_limiter_minmod([3,1],[1,1])=[%.17lg,%.17lg]\n",
           d_1[0], d_1[1]);
   d_2xf64 = jbm_2xf64_flux_limiter (set_float64x2_t (2., -1.),
                                     set_float64x2_t (3., 1.),

@@ -54,6 +54,40 @@ typedef union
   uint64x2_t i;                 ///< bits.
 } JBM2xF64;
 
+// float constants
+
+#define JBM_4xF32_BIAS vdupq_n_u32 (JBM_F32_BIAS)
+///< bias for floats.
+#define JBM_4xF32_BITS_1 vdupq_n_u32 (JBM_F32_BITS_1)
+///< 1 bits for floats.
+#define JBM_4xF32_BITS_EXPONENT vdupq_n_u32 (JBM_F32_BITS_EXPONENT)
+///< exponent bits for floats.
+#define JBM_4xF32_BITS_MANTISSA vdupq_n_u32 (JBM_F32_BITS_MANTISSA)
+///< mantissa bits for floats.
+#define JBM_4xF32_BITS_SIGN vdupq_n_u32 (JBM_F32_BITS_SIGN)
+///< sign bits for floats.
+#define JBM_4xF32_CBRT2 vdupq_n_f32 (JBM_F32_CBRT2)
+///< cbrt(2) for floats.
+#define JBM_4xF32_CBRT4 vdupq_n_f32 (JBM_F32_CBRT4)
+///< cbrt(4) for floats.
+
+// double constants
+
+#define JBM_2xF64_BIAS vdupq_n_u64 (JBM_F64_BIAS)
+///< bias for doubles.
+#define JBM_2xF64_BITS_1 vdupq_n_u64 (JBM_F64_BITS_1)
+///< 1 bits for doubles.
+#define JBM_2xF64_BITS_EXPONENT vdupq_n_u64 (JBM_F64_BITS_EXPONENT)
+///< exponent bits for doubles.
+#define JBM_2xF64_BITS_MANTISSA vdupq_n_u64 (JBM_F64_BITS_MANTISSA)
+///< mantissa bits for doubles.
+#define JBM_2xF64_BITS_SIGN vdupq_n_u64 (JBM_F64_BITS_SIGN)
+///< sign bits for floats.
+#define JBM_2xF64_CBRT2 vdupq_n_f64 (JBM_F64_CBRT2)
+///< cbrt(2) for doubles.
+#define JBM_2xF64_CBRT4 vdupq_n_f64 (JBM_F64_CBRT4)
+///< cbrt(4) for doubles.
+
 // Debug functions
 
 /*
@@ -139,6 +173,40 @@ print_float64x2_t (FILE *file, const char *label, float64x2_t x)
 */
 
 /**
+ * Function to do an integer division by 3 for 32 bits (int32x4_t).
+ *
+ * \return divided by 3 vector (int32x4_t).
+ */
+static inline int32x4_t
+jbm_4xf32_div3 (int32x4_t x)    ///< int32x4_t vector.
+{
+  const int32x4_t magic = vdupq_n_s32 (0x55555556);
+  int32x4_t even, odd;
+  even = vshrn_n_s64 (vmull_s32 (vget_low_s32 (x), vget_low_s32 (magic)), 32);
+  odd = vshrn_n_s64 (vmull_s32 (vget_high_s32 (x), vget_high_s32 (magic)), 32);
+  return vcombine_s32 (even, odd);
+}
+
+#define jbm_4xf32_reduce_add vaddvq_f32
+#define jbm_4xf32_reduce_max vmaxvq_f32
+#define jbm_4xf32_reduce_min vminvq_f32
+
+/**
+ * Function to calculate the maximum and minimum reduction value of a
+ * float32x4_t vector.
+ */
+static inline void
+jbm_4xf32_reduce_maxmin (const float32x4_t x,   ///< float32x4_t vector.
+                         float *max,
+                         ///< pointer to the maximum value (float).
+                         float *min)
+                         ///< pointer to the minimum value (float).
+{
+  *max = vmaxvq_f32 (x);
+  *min = vminvq_f32 (x);
+}
+
+/**
  * Function to calculate the additive inverse value of a float32x4_t vector.
  *
  * \return opposite value vector (float32x4_t).
@@ -162,6 +230,21 @@ jbm_4xf32_reciprocal (const float32x4_t x)      ///< float32x4_t vector.
 }
 
 /**
+ * Function to calculate the sign of a float32x4_t vector.
+ *
+ * \return sign vector (float32x4_t).
+ */
+static inline float32x4_t
+jbm_4xf32_sign (const float32x4_t x)    ///< float32x4_t vector.
+{
+  JBM4xF32 y;
+  y.x = x;
+  y.i = vandq_u32 (y.i, JBM_4xF32_BITS_SIGN);
+  y.i = vorrq_u32 (y.i, JBM_4xF32_BITS_1);
+  return y.x;
+}
+
+/**
  * Function to calculate the absolute value of a float32x4_t vector.
  *
  * \return absolute value vector (float32x4_t).
@@ -170,6 +253,27 @@ static inline float32x4_t
 jbm_4xf32_abs (const float32x4_t x)     ///< float32x4_t vector.
 {
   return vabsq_f32 (x);
+}
+
+/**
+ * Function to copy the sign of a float32x4_t vector to another float32x4_t
+ * vector.
+ *
+ * \return float32x4_t vector with magnitud of 1st vector and sign of 2nd
+ * vector.
+ */
+static inline float32x4_t
+jbm_4xf32_copysign (const float32x4_t x,
+                    ///< float32x4_t vector to preserve magnitude.
+                    const float32x4_t y)
+                    ///< float32x4_t vector to preserve sign.
+{
+  JBM4xF32 mx, my;
+  my.x = y;
+  my.i = vandq_u32 (my.i, JBM_4xF32_BITS_SIGN);
+  mx.x = jbm_4xf32_abs (x);
+  mx.i = vorrq_u32 (mx.i, my.i);
+  return mx.x;
 }
 
 /**
@@ -185,6 +289,22 @@ jbm_4xf32_hypot (const float32x4_t x,   ///< 1st float32x4_t vector.
 }
 
 /**
+ * Function to calculate the rest of a division (float32x4_t) by a float.
+ *
+ * \return rest value vector (in [0,|divisor|) interval).
+ */
+static inline float32x4_t
+jbm_4xf32_mod1 (const float32x4_t x,    ///< dividend (float32x4_t).
+                const float d)  ///< divisor (float).
+{
+  float32x4_t r;
+  r = vrndmq_f32 (vmulq_f32 (x, 1.f / d));
+  return
+    vbslq_f32 (vcgtq_f32 (jbm_4xf32_abs (r), vdupq_n_f32 (1.f / FLT_EPSILON)),
+               vmulq_n_f32 (d, 0.5f), vfmsq_f32 (x, r, d));
+}
+
+/**
  * Function to calculate the rest of a division (float32x4_t).
  *
  * \return rest value vector (in [0,|divisor|) interval).
@@ -193,7 +313,11 @@ static inline float32x4_t
 jbm_4xf32_mod (const float32x4_t x,     ///< dividend (float32x4_t).
                const float32x4_t d)     ///< divisor (float32x4_t).
 {
-  return vmlsq_f32 (x, vrndmq_f32 (vdivq_f32 (x, d)), d);
+  float32x4_t r;
+  r = vrndmq_f32 (vdivq_f32 (x, d));
+  return
+    vbslq_f32 (vcgtq_f32 (jbm_4xf32_abs (r), vdupq_n_f32 (1.f / FLT_EPSILON)),
+               vmulq_n_f32 (d, 0.5f), vfmsq_f32 (x, r, d));
 }
 
 /**
@@ -205,29 +329,32 @@ static inline float32x4_t
 jbm_4xf32_frexp (const float32x4_t x,   ///< float32x4_t vector.
                  int32x4_t *e)  ///< pointer to the extracted exponents vector.
 {
-  JBM4xF32 a, y, y2, z;
-  uint32x4_t b, m1, m2, m3;
-  int32x4_t e4;
-  a.x = x;
-  b = vdupq_n_u32 (0x7f800000);
-  y.i = vandq_u32 (a.i, b);
-  m1 = vceqq_u32 (y.i, b);
-  m2 = vceqzq_u32 (y.i);
-  y2.x = x;
-  y2.i = vandq_u32 (y2.i, vdupq_n_u32 (0x007fffff));
-  m3 = vceqzq_u32 (y2.i);
-  y2.i = vdupq_n_u32 (0x00400000);
-  z.x = vdivq_f32 (x, y2.x);
-  z.i = vandq_u32 (z.i, b);
-  e4 = vbslq_s32 (m2,
-                  vsubq_s32 (vshrq_n_s32 (vreinterpretq_s32_u32 (z.i), 23),
-                             vdupq_n_s32 (253)),
-                  vsubq_s32 (vshrq_n_s32 (vreinterpretq_s32_u32 (y.i), 23),
-                             vdupq_n_s32 (126)));
-  y.x = vbslq_f32 (m2, vmulq_f32 (y2.x, z.x), y.x);
-  e4 = vbslq_s32 (vorrq_u32 (m1, vandq_u32 (m2, m3)), vdupq_n_s32 (0), e4);
-  *e = e4;
-  return vbslq_f32 (m1, x, vmulq_f32 (vdupq_n_f32 (0.5f), vdivq_f32 (x, y.x)));
+  const int32x4_t zi = vdupq_n_u32 (0);
+  const int32x4_t bias = JBM_4xF32_BIAS;
+  const int32x4_t sign_mask = JBM_4xF32_BITS_SIGN;
+  const int32x4_t mant_mask = JBM_4xF32_BITS_MANTISSA;
+  JBM4xF32 y, z;
+  uint32x4_t exp, is_z, is_sub, is_nan, is_finite;
+  // y=abs(x)
+  y.x = jbm_4xf32_abs (x);
+  // masks
+  is_z = vceqq_u32 (y.i, zi);
+  is_nan = vcgt_u32 (y.i, vdupq_u32 (JBM_F32_BITS_EXPONENT - 1));
+  is_finite = vbicq_u32 (vdupq_n_u32 (0xffffffff), vorrq_u128 (is_z, is_nan));
+  // extract exponent
+  exp = vshrq_n_u32 (y.i, 23);
+  // subnormals
+  is_sub = vandq_u32 (is_finite, vceqq_u32 (exp, zi));
+  y.x = vbslq_f32 (is_sub, vmulq_f32 (y.x, vdupq_n_f32 (0x1p23f)), y.x);
+  exp = vbslq_u32 (is_sub, vsubq_u32 (vshrq_n_u32 (y.i, 23), vdupq_n_u32 (23)));
+  // exponent
+  *e = vbslq_u32 (is_finite, vsubq_u32 (exp, bias), zi);
+  // build mantissa in [0.5,1)
+  z.x = x;
+  y.i = vorrq_u32 (vandq_u32 (z.i, sign_mask),
+                   vorrq_u32 (vdupq_n_u32 (JBM_F32_BIAS << 23),
+                              vandq_u32 (y.i, mant_mask)));
+  return vbslq_f32 (is_finite, y.x, x);
 }
 
 /**
@@ -239,14 +366,13 @@ jbm_4xf32_frexp (const float32x4_t x,   ///< float32x4_t vector.
 static inline float32x4_t
 jbm_4xf32_exp2n (int32x4_t e)   ///< exponent vector (int32x4_t).
 {
+  const int32x4_t v127 = vdupq_n_s32 (127);
+  const int32x4_t v149 = vdupq_n_s32 (149);
   float32x4_t x;
-  int32x4_t k127, kn127;
-  k127 = vdupq_n_s32 (127);
-  kn127 = vdupq_n_s32 (-127);
   x = vbslq_f32 (vcgtq_s32 (e, kn127),
                  vreinterpretq_f32_s32 (vshlq_n_s32 (vaddq_s32 (e, k127), 23)),
-                 vreinterpretq_f32_s32 (vshlq_s32 (vdupq_n_s32 (0x00400000),
-                                                   vsubq_s32 (kn127, e))));
+                 vreinterpretq_f32_s32 (vshlq_s32 (vdupq_n_s32 (1),
+                                                   vaddq_s32 (k149, e))));
   x = vbslq_f32 (vcltq_s32 (e, vdupq_n_s32 (-150)), vdupq_n_f32 (0.f), x);
   return vbslq_f32 (vcgtq_s32 (e, k127), vdupq_n_f32 (INFINITY), x);
 }
@@ -269,7 +395,7 @@ jbm_4xf32_ldexp (const float32x4_t x,   ///< float32x4_t vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline uint32x4_t
-jbm_small_4xf32 (const float32x4_t x)   ///< float64x2_t vector.
+jbm_4xf32_small (const float32x4_t x)   ///< float64x2_t vector.
 {
   return vcltq_f32 (jbm_4xf32_abs (x), vdupq_n_f32 (FLT_EPSILON));
 }
@@ -286,7 +412,7 @@ jbm_small_4xf32 (const float32x4_t x)   ///< float64x2_t vector.
  * \return modmin float32x4_t vector.
  */
 static inline float32x4_t
-jbm_modmin_4xf32 (const float32x4_t a,  ///< 1st float64x2_t vector.
+jbm_4xf32_modmin (const float32x4_t a,  ///< 1st float64x2_t vector.
                   const float32x4_t b)  ///< 2nd float64x2_t vector.
 {
   float32x4_t aa, ab, y, z;
@@ -6839,6 +6965,47 @@ jbm_4xf32_rational_29_28 (const float32x4_t x,  ///< float32x4_t vector.
 }
 
 /**
+ * Function to calculate the well conditionated function cbrt(x) for x
+ * \f$\in\left[\frac12\;,1\right]\f$ (float32x4_t).
+ *
+ * \return function value (float32x4_t).
+ */
+static inline float32x4_t
+jbm_4xf32_cbrtwc (const float32x4_t x)
+                  ///< float32x4_t vector \f$\in\left[\frac12,\;1\right]\f$.
+{
+  return jbm_4xf32_rational_5_3 (x, K_CBRTWC_F32);
+}
+
+/**
+ * Function to calculate the function cbrt(x) using the jbm_cbrtwc_4xdbl
+ * function (float32x4_t).
+ *
+ * \return function value (float32x4_t).
+ */
+static inline float32x4_t
+jbm_4xf32_cbrt (const float32x4_t x)    ///< float32x4_t vector.
+{
+  const float32x4_t cbrt2 = JBM_4xF32_CBRT2;
+  const float32x4_t cbrt4 = JBM_4xF32_CBRT4;
+  const int32x4_t v3 = vdupq_n_s32 (3);
+  const int32x4_t v2 = vdupq_n_s32 (2);
+  const int32x4_t v1 = vdupq_n_s32 (1);
+  float32x4_t y;
+  int32x4_t e, e3, r, n;
+  y = jbm_4xf32_frexp (jbm_4xf32_abs (x), &e);
+  e3 = jbm_4xf32_div3 (e);
+  r = vsubq_s32 (e, vmulq_s32 (e3, v3));
+  n = vshrq_s32 (r, 31);
+  r = vaddq_s32 (r, vandq_s32 (n, v3));
+  e3 = vsubq_s32 (e3, vandq_s32 (n, v1));
+  y = jbm_4xf32_ldexp (jbm_4xf32_cbrtwc (y), e3);
+  y = vblsq_f32 (vceqq_s32 (r, v1), vmulq_f32 (y, cbrt2), y);
+  y = vblsq_f32 (vceqq_s32 (r, v2), vmulq_f32 (y, cbrt4), y);
+  return jbm_4xf32_copysign (y, x);
+}
+
+/**
  * Function to calculate the well conditionated function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (float32x4_t).
  *
@@ -6930,7 +7097,7 @@ jbm_4xf32_expm1 (const float32x4_t x)   ///< float32x4_t vector.
 
 /**
  * Function to calculate the well conditionated function log2(x) for x in
- * [0.5,1] (float32x4_t).
+ * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (float32x4_t).
  *
  * \return function value (float32x4_t).
  */
@@ -6938,7 +7105,7 @@ static inline float32x4_t
 jbm_4xf32_log2wc (const float32x4_t x)
 ///< float32x4_t vector \f$\in[0.5,1]\f$.
 {
-  return jbm_4xf32_rational_6_3 (x, K_LOG2WC_F32);
+  return jbm_4xf32_rational_5_2 (x, K_LOG2WC_F32);
 }
 
 /**
@@ -6950,12 +7117,19 @@ jbm_4xf32_log2wc (const float32x4_t x)
 static inline float32x4_t
 jbm_4xf32_log2 (const float32x4_t x)    ///< float32x4_t vector.
 {
+  const float32x4_t z = vdupq_n_f32 (0.f);
   float32x4_t y;
-  int32x4_t e;
+  int32x4_t e, m;
   y = jbm_4xf32_frexp (x, &e);
-  y = vaddq_f32 (jbm_4xf32_log2wc (y), vcvtq_f32_s32 (e));
-  y = vbslq_f32 (vcgtzq_f32 (x), y, vdupq_n_f32 (-INFINITY));
-  return vbslq_f32 (vcltzq_f32 (x), vdupq_n_f32 (NAN), y);
+  m = vreinterpretq_u32_f32 (vcltq_f32 (y, vdupq_n_f32 (M_SQRT1_2f)));
+  y = vbslq_f32 (m, vaddq_f32 (y, y), y);
+  e = vbslq_s32 (m, vsubq_s32 (e, vdupq_n_s32 (1)), e);
+  y = vaddq_f32 (jbm_4xf32_log2wc (vsubq_f32 (y, vdupq_n_f32 (1.f))),
+                 vcvtq_f32_s32 (e));
+  y = vbslq_f32 (vceqq_f32 (x, z), vdupq_n_f32 (-INFINITY), y);
+  y = vbslq_f32 (vctlq_f32 (x, z), vdupq_n_f32 (NAN), y);
+  y = vbslq_f32 (vceqq_f32 (x, vdupq_n_f32 (-INFINITY)), x, y);
+  return vbslq_f32 (vceqq_f32 (x, x), y, x);
 }
 
 /**
@@ -7012,25 +7186,7 @@ static inline float32x4_t
 jbm_4xf32_pow (const float32x4_t x,     ///< float32x4_t vector.
                const float e)   ///< exponent (float).
 {
-  float f;
-  f = floorf (e);
-  if (f == e)
-    return jbm_4xf32_pown (x, (int) e);
   return jbm_4xf32_exp2 (vmulq_f32 (vdupq_n_f32 (e), jbm_4xf32_log2 (x)));
-}
-
-/**
- * Function to calculate the function cbrt(x) using the jbm_4xf32_abs and
- * jbm_4xf32_pow functions (float32x4_t).
- *
- * \return function value (float32x4_t).
- */
-static inline float32x4_t
-jbm_4xf32_cbrt (const float32x4_t x)    ///< float32x4_t vector.
-{
-  float32x4_t f;
-  f = jbm_4xf32_pow (jbm_4xf32_abs (x), 1.f / 3.f);
-  return vbslq_f32 (vcltzq_f32 (x), f, jbm_4xf32_opposite (f));
 }
 
 /**
@@ -7060,18 +7216,32 @@ jbm_4xf32_coswc (const float32x4_t x)
 }
 
 /**
+ * Function to calculate the well conditionated function tan(x) for x in
+ * [-pi/4,pi/4].
+ *
+ * \return function value (float32x4_t).
+ */
+static inline float32x4_t
+jbm_4xf32_tanwc (const float32x4_t x)
+                 ///< float32x4_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  return vmulq_f32 (x, jbm_4xf32_rational_3_1 (jbm_4xf32_sqr (x), K_TANWC_F32));
+}
+
+/**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_4xf32_sinwc approximation (float32x4_t).
  */
 static inline void
-jbm_sin4xf32_coswc (const float32x4_t x,
+jbm_4xf32_sincoswc (const float32x4_t x,
                     ///< float32x4_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
-                    float32x4_t *s,     ///< pointer to the sin function value (float32x4_t).
-                    float32x4_t *c)     ///< pointer to the cos function value (float32x4_t).
+                    float32x4_t *s,
+                    ///< pointer to the sin function value (float32x4_t).
+                    float32x4_t *c)
+                    ///< pointer to the cos function value (float32x4_t).
 {
-  float32x4_t s0;
-  *s = s0 = jbm_4xf32_sinwc (x);
-  *c = vsqrtq_f32 (vmlsq_f32 (vdupq_n_f32 (1.f), s0, s0));
+  *s = jbm_4xf32_sinwc (x);
+  *c = jbm_4xf32_coswc (x);
 }
 
 /**
@@ -7083,9 +7253,9 @@ jbm_sin4xf32_coswc (const float32x4_t x,
 static inline float32x4_t
 jbm_4xf32_sin (const float32x4_t x)     ///< float32x4_t vector.
 {
-  float32x4_t y, s, pi2;
-  pi2 = vdupq_n_f32 (2.f * M_PIf);
-  y = jbm_4xf32_mod (x, pi2);
+  const float32x4_t pi2 = vdupq_n_f32 (2.f * M_PIf);
+  float32x4_t y, s;
+  y = jbm_4xf32_mod1 (x, 2.f * M_PIf);
   s = jbm_4xf32_sinwc (vsubq_f32 (y, pi2));
   s = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f)),
                  jbm_4xf32_opposite
@@ -7108,9 +7278,9 @@ jbm_4xf32_sin (const float32x4_t x)     ///< float32x4_t vector.
 static inline float32x4_t
 jbm_4xf32_cos (const float32x4_t x)     ///< float32x4_t vector.
 {
-  float32x4_t y, c, pi2;
-  pi2 = vdupq_n_f32 (2.f * M_PIf);
-  y = jbm_4xf32_mod (x, pi2);
+  const float32x4_t pi2 = vdupq_n_f32 (2.f * M_PIf);
+  float32x4_t y, c;
+  y = jbm_4xf32_mod1 (x, 2.f * M_PIf);
   c = jbm_4xf32_coswc (vsubq_f32 (y, pi2));
   c = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f)),
                  jbm_4xf32_sinwc (vsubq_f32 (y, vdupq_n_f32 (3.f * M_PI_2f))),
@@ -7130,38 +7300,38 @@ jbm_4xf32_cos (const float32x4_t x)     ///< float32x4_t vector.
  * jbm_4xf32_sinwc and jbm_4xf32_coswc approximations (float32x4_t).
  */
 static inline void
-jbm_sin4xf32_cos (const float32x4_t x,
+jbm_4xf32_sincos (const float32x4_t x,
                   ///< float32x4_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   float32x4_t *s,
                   ///< pointer to the sin function value (float32x4_t).
                   float32x4_t *c)
                   ///< pointer to the cos function value (float32x4_t).
 {
-  float32x4_t y, pi2, s1, c1, s2, c2;
+  const float32x4_t pi2 = vdupq_n_f32 (2.f * M_PIf);
+  float32x4_t y, s1, c1, s2, c2;
   uint32x4_t m;
-  pi2 = vdupq_n_f32 (2.f * M_PIf);
-  y = jbm_4xf32_mod (x, pi2);
-  jbm_sin4xf32_coswc (vsubq_f32 (y, pi2), &s1, &c1);
-  jbm_sin4xf32_coswc (vsubq_f32 (y, vdupq_n_f32 (3.f * M_PI_2f)), &c2, &s2);
+  y = jbm_4xf32_mod1 (x, 2.f * M_PIf);
+  jbm_4xf32_sincoswc (vsubq_f32 (y, pi2), &s1, &c1);
+  jbm_4xf32_sincoswc (vsubq_f32 (y, vdupq_n_f32 (3.f * M_PI_2f)), &c2, &s2);
   m = vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f));
   s1 = vbslq_f32 (m, jbm_4xf32_opposite (s2), s1);
   c1 = vbslq_f32 (m, c2, c1);
-  jbm_sin4xf32_coswc (vsubq_f32 (vdupq_n_f32 (M_PIf), y), &s2, &c2);
+  jbm_4xf32_sincoswc (vsubq_f32 (vdupq_n_f32 (M_PIf), y), &s2, &c2);
   m = vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f));
   s1 = vbslq_f32 (m, s2, s1);
   c1 = vbslq_f32 (m, jbm_4xf32_opposite (c2), c1);
-  jbm_sin4xf32_coswc (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y), &c2, &s2);
+  jbm_4xf32_sincoswc (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y), &c2, &s2);
   m = vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f));
   s1 = vbslq_f32 (m, s2, s1);
   c1 = vbslq_f32 (m, c2, c1);
-  jbm_sin4xf32_coswc (y, &s2, &c2);
+  jbm_4xf32_sincoswc (y, &s2, &c2);
   m = vcltq_f32 (y, vdupq_n_f32 (M_PI_4f));
   *s = vbslq_f32 (m, s2, s1);
   *c = vbslq_f32 (m, c2, c1);
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sin4xf32_cos function
+ * Function to calculate the function tan(x) from jbm_4xf32_sincos function
  * (float32x4_t).
  *
  * \return function value (float32x4_t).
@@ -7170,7 +7340,7 @@ static inline float32x4_t
 jbm_4xf32_tan (const float32x4_t x)     ///< float32x4_t vector.
 {
   float32x4_t s, c;
-  jbm_sin4xf32_cos (x, &s, &c);
+  jbm_4xf32_sincos (x, &s, &c);
   return vdivq_f32 (s, c);
 }
 
@@ -7204,7 +7374,7 @@ jbm_4xf32_atan (const float32x4_t x)    ///< float32x4_t vector.
   ax = vbslq_f32 (m, jbm_4xf32_reciprocal (ax), ax);
   f = jbm_4xf32_atanwc (ax);
   f = vbslq_f32 (m, vsubq_f32 (vdupq_n_f32 (M_PI_2f), f), f);
-  return jbm_copy4xf32_sign (f, x);
+  return jbm_4xf32_copysign (f, x);
 }
 
 /**
@@ -7464,7 +7634,7 @@ jbm_4xf32_solve_quadratic (const float32x4_t a,
   k1 = jbm_solve_quadratic_reduced_4xf32 (vdivq_f32 (b, a), vdivq_f32 (c, a),
                                           x1, x2);
   k2 = vdivq_f32 (jbm_4xf32_opposite (c), b);
-  return vbslq_f32 (jbm_small_4xf32 (a), k2, k1);
+  return vbslq_f32 (jbm_4xf32_small (a), k2, k1);
 }
 
 /**
@@ -7534,7 +7704,7 @@ jbm_4xf32_solve_cubic (float32x4_t a,
 ///< float32x4_t vector of right limits of the solution intervals.
 {
   return
-    vbslq_f32 (jbm_small_4xf32 (a),
+    vbslq_f32 (jbm_4xf32_small (a),
                jbm_4xf32_solve_quadratic (b, c, d, x1, x2),
                jbm_solve_cubic_reduced_4xf32 (vdivq_f32 (b, a),
                                               vdivq_f32 (c, a),
@@ -7584,7 +7754,7 @@ jbm_4xf32_flux_limiter_centred (const float32x4_t d1,
                                 const float32x4_t d2)
                               ///< 2nd flux limiter function parameter.
 {
-  return vbslq_f32 (jbm_small_4xf32 (d2),
+  return vbslq_f32 (jbm_4xf32_small (d2),
                     vdupq_n_f32 (0.f), vdivq_f32 (d1, d2));
 
 }
@@ -7619,7 +7789,7 @@ jbm_4xf32_flux_limiter_superbee (const float32x4_t d1,
  * \return flux limiter function value.
  */
 static inline float32x4_t
-jbm_flux_limiter_min4xf32_mod (const float32x4_t d1,
+jbm_4xf32_flux_limiter_minmod (const float32x4_t d1,
                                ///< 1st flux limiter function parameter.
                                const float32x4_t d2)
                              ///< 2nd flux limiter function parameter.
@@ -7780,7 +7950,7 @@ jbm_4xf32_flux_limiter (const float32x4_t d1,
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
       return jbm_4xf32_flux_limiter_superbee (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_min4xf32_mod (d1, d2);
+      return jbm_4xf32_flux_limiter_minmod (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
       return jbm_4xf32_flux_limiter_VanLeer (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
@@ -7906,6 +8076,22 @@ jbm_2xf64_hypot (const float64x2_t x,   ///< 1st float64x2_t vector.
 }
 
 /**
+ * Function to calculate the rest of a division (float64x2_t) by a double.
+ *
+ * \return rest value (in [0,|divisor|) interval) (float64x2_t).
+ */
+static inline float64x2_t
+jbm_2xf64_mod1 (const float64x2_t x,    ///< dividend (float64x2_t).
+                const double d) ///< divisor (float64x2_t).
+{
+  float64x2_t r;
+  r = vrndmq_f64 (vmulq_f64 (x, 1. / d));
+  return
+    vbslq_f64 (vcgtq_f64 (jbm_2xf64_abs (r), vdupq_n_f64 (1. / DBL_EPSILON)),
+               vmulq_n_f64 (d, 0.5), vfmsq_f64 (x, r, d));
+}
+
+/**
  * Function to calculate the rest of a division (float64x2_t).
  *
  * \return rest value (in [0,|divisor|) interval) (float64x2_t).
@@ -7990,7 +8176,7 @@ jbm_2xf64_ldexp (const float64x2_t x,   ///< float64x2_t vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline uint64x2_t
-jbm_small_2xf64 (const float64x2_t x)   ///< float64x2_t vector.
+jbm_2xf64_small (const float64x2_t x)   ///< float64x2_t vector.
 {
   return vcltq_f64 (jbm_2xf64_abs (x), vdupq_n_f64 (DBL_EPSILON));
 }
@@ -8007,7 +8193,7 @@ jbm_small_2xf64 (const float64x2_t x)   ///< float64x2_t vector.
  * \return modmin float64x2_t vector.
  */
 static inline float64x2_t
-jbm_modmin_2xf64 (const float64x2_t a,  ///< 1st float64x2_t vector.
+jbm_2xf64_modmin (const float64x2_t a,  ///< 1st float64x2_t vector.
                   const float64x2_t b)  ///< 2nd float64x2_t vector.
 {
   float64x2_t aa, ab, y, z;
@@ -14770,16 +14956,15 @@ jbm_2xf64_coswc (const float64x2_t x)
  * x in [-pi/4,pi/4] from jbm_2xf64_sinwc approximation (float64x2_t).
  */
 static inline void
-jbm_sin2xf64_coswc (const float64x2_t x,
+jbm_2xf64_sincoswc (const float64x2_t x,
                     ///< float64x2_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     float64x2_t *s,
                     ///< pointer to the f64 function value (float64x2_t).
                     float64x2_t *c)
                     ///< pointer to the f64 function value (float64x2_t).
 {
-  float64x2_t s0;
-  *s = s0 = jbm_2xf64_sinwc (x);
-  *c = vsqrtq_f64 (vmlsq_f64 (vdupq_n_f64 (1.), x, x));
+  *s = jbm_2xf64_sinwc (x);
+  *c = jbm_2xf64_coswc (x);
 }
 
 /**
@@ -14791,9 +14976,9 @@ jbm_sin2xf64_coswc (const float64x2_t x,
 static inline float64x2_t
 jbm_2xf64_sin (const float64x2_t x)     ///< float64x2_t vector.
 {
-  float64x2_t y, s, pi2;
-  pi2 = vdupq_n_f64 (2. * M_PI);
-  y = jbm_2xf64_mod (x, pi2);
+  const float64x2_t pi2 = vdupq_n_f64 (2. * M_PI);
+  float64x2_t y, s;
+  y = jbm_2xf64_mod1 (x, 2. * M_PI);
   s = jbm_2xf64_sinwc (vsubq_f64 (y, pi2));
   s = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4)),
                  jbm_2xf64_opposite
@@ -14816,9 +15001,9 @@ jbm_2xf64_sin (const float64x2_t x)     ///< float64x2_t vector.
 static inline float64x2_t
 jbm_2xf64_cos (const float64x2_t x)     ///< float64x2_t vector.
 {
-  float64x2_t y, c, pi2;
-  pi2 = vdupq_n_f64 (2. * M_PI);
-  y = jbm_2xf64_mod (x, pi2);
+  const float64x2_t pi2 = vdupq_n_f64 (2. * M_PI);
+  float64x2_t y, c;
+  y = jbm_2xf64_mod1 (x, 2. * M_PI);
   c = jbm_2xf64_coswc (vsubq_f64 (y, pi2));
   c = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4)),
                  jbm_2xf64_sinwc (vsubq_f64 (y, vdupq_n_f64 (3. * M_PI_2))), c);
@@ -14837,31 +15022,31 @@ jbm_2xf64_cos (const float64x2_t x)     ///< float64x2_t vector.
  * and jbm_2xf64_coswc approximations (float64x2_t).
  */
 static inline void
-jbm_sin2xf64_cos (const float64x2_t x,
+jbm_2xf64_sincos (const float64x2_t x,
                   ///< float64x2_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   float64x2_t *s,
                   ///< pointer to the f64 function value (float64x2_t).
                   float64x2_t *c)
                   ///< pointer to the f64 function value (float64x2_t).
 {
-  float64x2_t y, pi2, s1, c1, s2, c2;
+  const float64x2_t pi2 = vdupq_n_f64 (2. * M_PI);
+  float64x2_t y, s1, c1, s2, c2;
   uint64x2_t m;
-  pi2 = vdupq_n_f64 (2. * M_PI);
-  y = jbm_2xf64_mod (x, pi2);
-  jbm_sin2xf64_coswc (vsubq_f64 (y, pi2), &s1, &c1);
-  jbm_sin2xf64_coswc (vsubq_f64 (y, vdupq_n_f64 (3. * M_PI_2)), &c2, &s2);
+  y = jbm_2xf64_mod1 (x, 2. * M_PI);
+  jbm_2xf64_sincoswc (vsubq_f64 (y, pi2), &s1, &c1);
+  jbm_2xf64_sincoswc (vsubq_f64 (y, vdupq_n_f64 (3. * M_PI_2)), &c2, &s2);
   m = vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4));
   s1 = vbslq_f64 (m, jbm_2xf64_opposite (s2), s1);
   c1 = vbslq_f64 (m, c2, c1);
-  jbm_sin2xf64_coswc (vsubq_f64 (vdupq_n_f64 (M_PI), y), &s2, &c2);
+  jbm_2xf64_sincoswc (vsubq_f64 (vdupq_n_f64 (M_PI), y), &s2, &c2);
   m = vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4));
   s1 = vbslq_f64 (m, s2, s1);
   c1 = vbslq_f64 (m, jbm_2xf64_opposite (c2), c1);
-  jbm_sin2xf64_coswc (vsubq_f64 (vdupq_n_f64 (M_PI_2), y), &c2, &s2);
+  jbm_2xf64_sincoswc (vsubq_f64 (vdupq_n_f64 (M_PI_2), y), &c2, &s2);
   m = vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4));
   s1 = vbslq_f64 (m, s2, s1);
   c1 = vbslq_f64 (m, c2, c1);
-  jbm_sin2xf64_coswc (y, &s2, &c2);
+  jbm_2xf64_sincoswc (y, &s2, &c2);
   m = vcltq_f64 (y, vdupq_n_f64 (M_PI_4));
   *s = vbslq_f64 (m, s2, s1);
   *c = vbslq_f64 (m, c2, c1);
@@ -14877,7 +15062,7 @@ static inline float64x2_t
 jbm_2xf64_tan (const float64x2_t x)     ///< float64x2_t vector.
 {
   float64x2_t s, c;
-  jbm_sin2xf64_cos (x, &s, &c);
+  jbm_2xf64_sincos (x, &s, &c);
   return vdivq_f64 (s, c);
 }
 
@@ -15169,7 +15354,7 @@ jbm_2xf64_solve_quadratic (const float64x2_t a,
   k1 = jbm_solve_quadratic_reduced_2xf64 (vdivq_f64 (b, a), vdivq_f64 (c, a),
                                           x1, x2);
   k2 = vdivq_f64 (jbm_2xf64_opposite (c), b);
-  return vbslq_f64 (jbm_small_2xf64 (a), k2, k1);
+  return vbslq_f64 (jbm_2xf64_small (a), k2, k1);
 }
 
 /**
@@ -15239,7 +15424,7 @@ jbm_2xf64_solve_cubic (float64x2_t a,
 ///< float64x2_t vector of right limits of the solution intervals.
 {
   return
-    vbslq_f64 (jbm_small_2xf64 (a),
+    vbslq_f64 (jbm_2xf64_small (a),
                jbm_2xf64_solve_quadratic (b, c, d, x1, x2),
                jbm_solve_cubic_reduced_2xf64 (vdivq_f64 (b, a),
                                               vdivq_f64 (c, a),
@@ -15289,7 +15474,7 @@ jbm_2xf64_flux_limiter_centred (const float64x2_t d1,
                                 const float64x2_t d2)
                               ///< 2nd flux limiter function parameter.
 {
-  return vbslq_f64 (jbm_small_2xf64 (d2), vdupq_n_f64 (0.), vdivq_f64 (d1, d2));
+  return vbslq_f64 (jbm_2xf64_small (d2), vdupq_n_f64 (0.), vdivq_f64 (d1, d2));
 
 }
 
@@ -15323,7 +15508,7 @@ jbm_2xf64_flux_limiter_superbee (const float64x2_t d1,
  * \return flux limiter function value.
  */
 static inline float64x2_t
-jbm_flux_limiter_min2xf64_mod (const float64x2_t d1,
+jbm_2xf64_flux_limiter_minmod (const float64x2_t d1,
                                ///< 1st flux limiter function parameter.
                                const float64x2_t d2)
                              ///< 2nd flux limiter function parameter.
@@ -15483,7 +15668,7 @@ jbm_2xf64_flux_limiter (const float64x2_t d1,
     case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
       return jbm_2xf64_flux_limiter_superbee (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_MINMOD:
-      return jbm_flux_limiter_min2xf64_mod (d1, d2);
+      return jbm_2xf64_flux_limiter_minmod (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
       return jbm_2xf64_flux_limiter_VanLeer (d1, d2);
     case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
@@ -15563,144 +15748,700 @@ jbm_2xf64_integral (float64x2_t (*f) (float64x2_t),
   return k;
 }
 
-/**
- * Function to add 2 float arrays.
- */
-static inline void
-jbm_array_f32_add (float *xr,   ///< result float array.
-                   const float *x1,     ///< 1st addend float array.
-                   const float *x2,     ///< 1st addend float array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    vst1q_f32 (xr + i, vaddq_f32 (vld1q_f32 (x1 + i), vld1q_f32 (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] + x2[i];
-}
+///> macro to automatize operations on one array.
+#define JBM_ARRAY_OP(xr, xd, n, type, load128, store128, op128, op) \
+  const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
+  unsigned int i, j; \
+  if (n > prefetch + 64 / sizeof (type)) \
+    for (i = 0, \
+         j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+         j > 0; --j) \
+      { \
+        __builtin_prefetch((const char *) (xd + i + prefetch)); \
+        store128 (xr + i, op128 (load128 (xd + i))); \
+        i += 16 / sizeof (type); \
+        store128 (xr + i, op128 (load128 (xd + i))); \
+        i += 16 / sizeof (type); \
+        store128 (xr + i, op128 (load128 (xd + i))); \
+        i += 16 / sizeof (type); \
+        store128 (xr + i, op128 (load128 (xd + i))); \
+        i += 16 / sizeof (type); \
+      } \
+  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, op128 (load128 (xd + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (xd + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (xd + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (xd + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, op128 (load128 (xd + i))); \
+  for (; i < n; ++i) \
+    xr[i] = op (xd[i]);
+
+///> macro to automatize operations on one array and one number.
+#define JBM_ARRAY_OP1(xr, x1, x2, n, type128, type, load128, store128, set128, \
+                      op128, op) \
+  const type128 x128 = set128 (x2); \
+  const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
+  unsigned int i, j; \
+  if (n > prefetch + 64 / sizeof (type)) \
+    for (i = 0, \
+         j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+         j > 0; --j) \
+      { \
+        __builtin_prefetch((const char *) (x1 + i + prefetch)); \
+        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+        i += 16 / sizeof (type); \
+        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+        i += 16 / sizeof (type); \
+        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+        i += 16 / sizeof (type); \
+        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+        i += 16 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+  for (; i < n; ++i) \
+    xr[i] = op (x1[i], x2);
+
+///> macro to automatize operations on two arrays.
+#define JBM_ARRAY_OP2(xr, x1, x2, n, type, load128, store128, op128, op) \
+  const unsigned int prefetch = sizeof (type) == 4 ? 32 : 16; \
+  unsigned int i, j; \
+  if (n > prefetch + 64 / sizeof (type)) \
+    for (i = 0, \
+         j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+         j > 0; --j) \
+      { \
+        __builtin_prefetch((const char *) (x1 + i + prefetch)); \
+        __builtin_prefetch((const char *) (x2 + i + prefetch)); \
+        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+        i += 16 / sizeof (type); \
+        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+        i += 16 / sizeof (type); \
+        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+        i += 16 / sizeof (type); \
+        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+        i += 16 / sizeof (type); \
+      } \
+  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+  for (; i < n; ++i) \
+    xr[i] = op (x1[i], x2[i]);
+
+///> macro to automatize reduction operations on arrays.
+#define JBM_ARRAY_REDUCE_OP(x, n, type128, type, load128, op128, op, \
+                            reduce128, initial_value) \
+  type128 a128, b128, c128, d128; \
+  type a = initial_value; \
+  const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
+  unsigned int i, j; \
+  i = 0; \
+  if (n > prefetch + 64 / sizeof (type)) \
+    { \
+      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+      if (j) \
+        { \
+          __builtin_prefetch ((const char *) (x + prefetch)); \
+          a128 = load128 (x + i); \
+          i += 16 / sizeof (type); \
+          b128 = load128 (x + i); \
+          i += 16 / sizeof (type); \
+          c128 = load128 (x + i); \
+          i += 16 / sizeof (type); \
+          d128 = load128 (x + i); \
+          i += 16 / sizeof (type); \
+          while (--j) \
+            { \
+              __builtin_prefetch ((const char *) (x + i + prefetch)); \
+              a128 = op128 (a128, load128 (x + i)); \
+              i += 16 / sizeof (type); \
+              b128 = op128 (b128, load128 (x + i)); \
+              i += 16 / sizeof (type); \
+              c128 = op128 (c128, load128 (x + i)); \
+              i += 16 / sizeof (type); \
+              d128 = op128 (d128, load128 (x + i)); \
+              i += 16 / sizeof (type); \
+            } \
+          a128 = op128 (a128, b128); \
+          c128 = op128 (c128, d128); \
+          a = reduce128 (op128 (a128, c128)); \
+        } \
+    } \
+  j = (n - i) >> (2 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      a128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      b128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      c128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      d128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          a128 = op128 (a128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+          b128 = op128 (b128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+          c128 = op128 (c128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+          d128 = op128 (d128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+        } \
+      a128 = op128 (a128, b128); \
+      c128 = op128 (c128, d128); \
+      a = op (a, reduce128 (op128 (a128, c128))); \
+    } \
+  j = (n - i) >> (8 / sizeof (type)); \
+  if (j) \
+    { \
+      a128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          a128 = op128 (a128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+        } \
+      a = op (a, reduce128 (a128)); \
+    } \
+  while (i < n) \
+    a = op (a, x[i++]); \
+  return a;
+
+///> macro to automatize dot products on arrays.
+#define JBM_ARRAY_DOT(x1, x2, n, type128, type, load128, mul128, add128, \
+                      ma128, reduce128) \
+  type128 a128, b128, c128, d128; \
+  type a = (type) 0.; \
+  const unsigned int prefetch = sizeof (type) == 4 ? 32 : 16; \
+  unsigned int i, j; \
+  i = 0; \
+  if (n > prefetch + 64 / sizeof (type)) \
+    { \
+      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+      if (j) \
+        { \
+          __builtin_prefetch ((const char *) (x1 + prefetch)); \
+          __builtin_prefetch ((const char *) (x2 + prefetch)); \
+          a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+          i += 16 / sizeof (type); \
+          b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+          i += 16 / sizeof (type); \
+          d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+          i += 16 / sizeof (type); \
+          d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+          i += 16 / sizeof (type); \
+          while (--j) \
+            { \
+              __builtin_prefetch ((const char *) (x1 + i + prefetch)); \
+              __builtin_prefetch ((const char *) (x2 + i + prefetch)); \
+              a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
+              i += 16 / sizeof (type); \
+              b128 = ma128 (b128, load128 (x1 + i), load128 (x2 + i)); \
+              i += 16 / sizeof (type); \
+              d128 = ma128 (c128, load128 (x1 + i), load128 (x2 + i)); \
+              i += 16 / sizeof (type); \
+              d128 = ma128 (d128, load128 (x1 + i), load128 (x2 + i)); \
+              i += 16 / sizeof (type); \
+            } \
+          a128 = add128 (a128, b128); \
+          c128 = add128 (c128, d128); \
+          a = reduce128 (add128 (a128, c128)); \
+        } \
+    } \
+  j = (n - i) >> (2 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
+          i += 16 / sizeof (type); \
+          b128 = ma128 (b128, load128 (x1 + i), load128 (x2 + i)); \
+          i += 16 / sizeof (type); \
+          d128 = ma128 (c128, load128 (x1 + i), load128 (x2 + i)); \
+          i += 16 / sizeof (type); \
+          d128 = ma128 (d128, load128 (x1 + i), load128 (x2 + i)); \
+          i += 16 / sizeof (type); \
+        } \
+      a128 = add128 (a128, b128); \
+      c128 = add128 (c128, d128); \
+      a += reduce128 (add128 (a128, c128)); \
+    } \
+  j = (n - i) >> (8 / sizeof (type)); \
+  if (j) \
+    { \
+      a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
+          i += 16 / sizeof (type); \
+        } \
+      a += reduce128 (a128); \
+    } \
+  for (; i < n; ++i) \
+    a += JBM_MUL (x1[i], x2[i]); \
+  return a;
+
+///> macro to automatize maxmin operations on arrays.
+#define JBM_ARRAY_MAXMIN(x, n, type128, type, load128, max128, max, min128, \
+                         min, redmax128, redmin128, mx, mn) \
+  type128 x128, mxa128, mxb128, mna128, mnb128; \
+  type mx = -INFINITY, mn = INFINITY; \
+  const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
+  unsigned int i, j; \
+  i = 0; \
+  if (n > prefetch + 64 / sizeof (type)) \
+    { \
+      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+      if (j) \
+        { \
+          __builtin_prefetch ((const char *) (x + prefetch)); \
+          mxa128 = mna128 = load128 (x + i); \
+          i += 16 / sizeof (type); \
+          mxb128 = mnb128 = load128 (x + i); \
+          i += 16 / sizeof (type); \
+          while (--j) \
+            { \
+              __builtin_prefetch ((const char *) (x + i + prefetch)); \
+              x128 = load128 (x + i); \
+              mxa128 = max128 (mxa128, x128); \
+              mna128 = min128 (mna128, x128); \
+              i += 16 / sizeof (type); \
+              x128 = load128 (x + i); \
+              mxb128 = max128 (mxb128, x128); \
+              mnb128 = min128 (mnb128, x128); \
+              i += 16 / sizeof (type); \
+            } \
+          mx = redmax128 (max128 (mxa128, mxb128)); \
+          mn = redmin128 (min128 (mna128, mnb128)); \
+        } \
+    } \
+  j = (n - i) >> (2 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      mxa128 = mna128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      mxb128 = mnb128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          x128 = load128 (x + i); \
+          mxa128 = max128 (mxa128, x128); \
+          mna128 = min128 (mna128, x128); \
+          i += 16 / sizeof (type); \
+          x128 = load128 (x + i); \
+          mxb128 = max128 (mxb128, x128); \
+          mnb128 = min128 (mnb128, x128); \
+          i += 16 / sizeof (type); \
+        } \
+      mx = max (mx, redmax128 (max128 (mxa128, mxb128))); \
+      mn = min (mn, redmin128 (min128 (mna128, mnb128))); \
+    } \
+  j = (n - i) >> (8 / sizeof (type)); \
+  if (j) \
+    { \
+      mxa128 = mna128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          x128 = load128 (x + i); \
+          mxa128 = max128 (mxa128, x128); \
+          mna128 = min128 (mna128, x128); \
+          i += 16 / sizeof (type); \
+        } \
+      mx = max (mx, redmax128 (mxa128)); \
+      mn = min (mn, redmin128 (mna128)); \
+    } \
+  for (; i < n; ++i) \
+    mx = max (mx, x[i]), mn = min (mn, x[i]); \
 
 /**
- * Function to subtract 2 float arrays.
+ * Function to calculate the root square of a float array.
  */
 static inline void
-jbm_array_f32_sub (float *xr,   ///< result float array.
-                   const float *x1,     ///< minuend float array.
-                   const float *x2,     ///< subtrahend float array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    vst1q_f32 (xr + i, vsubq_f32 (vld1q_f32 (x1 + i), vld1q_f32 (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] - x2[i];
-}
-
-/**
- * Function to multiply a float array by a float number.
- */
-static inline void
-jbm_array_f32_mul1 (float *xr,  ///< result float array.
-                    const float *x1,    ///< multiplier float array.
-                    const float x2,     ///< multiplicand float number.
+jbm_array_f32_sqrt (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  float32x4_t s4;
-  unsigned int i, j;
-  i = 0;
-  j = n >> 2;
-  if (j)
-    {
-      s4 = vdupq_n_f32 (x2);
-      for (; j > 0; --j, i += 4)
-        vst1q_f32 (xr + i, vmulq_f32 (vld1q_f32 (x1 + i), s4));
-    }
-  for (; i < n; ++i)
-    xr[i] = x1[i] * x2;
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, vsqrtq_f32, sqrtf);
 }
 
 /**
- * Function to divide a float array by a float number.
+ * Function to calculate the double of a float array.
  */
 static inline void
-jbm_array_f32_div1 (float *xr,  ///< result float array.
-                    const float *x1,    ///< dividend float array.
-                    const float x2,     ///< divisor float number.
-                    const unsigned int n)       ///< number of array elements.
-{
-  float32x4_t s4;
-  unsigned int i, j;
-  i = 0;
-  j = n >> 2;
-  if (j)
-    {
-      s4 = vdupq_n_f32 (x2);
-      for (; j > 0; --j, i += 2)
-        vst1q_f32 (xr + i, vdivq_f32 (vld1q_f32 (x1 + i), s4));
-    }
-  for (; i < n; ++i)
-    xr[i] = x1[i] / x2;
-}
-
-/**
- * Function to multiply 2 float arrays.
- */
-static inline void
-jbm_array_f32_mul (float *xr,   ///< result float array.
-                   const float *x1,     ///< multiplier float array.
-                   const float *x2,     ///< multiplicand float array.
+jbm_array_f32_dbl (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    vst1q_f32 (xr + i, vmulq_f32 (vld1q_f32 (x1 + i), vld1q_f32 (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] * x2[i];
-}
-
-/**
- * Function to divide 2 float arrays.
- */
-static inline void
-jbm_array_f32_div (float *xr,   ///< result float array.
-                   const float *x1,     ///< dividend float array.
-                   const float *x2,     ///< divisor float array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    vst1q_f32 (xr + i, vdivq_f32 (vld1q_f32 (x1 + i), vld1q_f32 (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] / x2[i];
-}
-
-/**
- * Function to calculate the float of a float array.
- */
-static inline void
-jbm_array_f32_dbl (float *xr,   ///< result float array.
-                   const float *xd,     ///< data float array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    vst1q_f32 (xr + i, jbm_4xf32_dbl (vld1q_f32 (xd + i)));
-  for (; i < n; ++i)
-    xr[i] = jbm_f32_dbl (xd[i]);
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_dbl,
+                jbm_f32_dbl);
 }
 
 /**
  * Function to calculate the square of a float array.
  */
 static inline void
-jbm_array_f32_sqr (float *xr,   ///< result float array.
-                   const float *xd,     ///< data float array.
+jbm_array_f32_sqr (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 2; j > 0; --j, i += 4)
-    vst1q_f32 (xr + i, jbm_4xf32_sqr (vld1q_f32 (xd + i)));
-  for (; i < n; ++i)
-    xr[i] = jbm_f32_sqr (xd[i]);
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_sqr,
+                jbm_f32_sqr);
+}
+
+/**
+ * Function to calculate the square of a float array.
+ */
+static inline void
+jbm_array_f32_opposite (float *restrict xr,     ///< result float array.
+                        const float *restrict xd,       ///< data float array.
+                        const unsigned int n)   ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_opposite,
+                jbm_f32_opposite);
+}
+
+/**
+ * Function to calculate the square of a float array.
+ */
+static inline void
+jbm_array_f32_reciprocal (float *restrict xr,   ///< result float array.
+                          const float *restrict xd,     ///< data float array.
+                          const unsigned int n) ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_reciprocal,
+                jbm_f32_reciprocal);
+}
+
+/**
+ * Function to calculate the abs function of a float array.
+ */
+static inline void
+jbm_array_f32_abs (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_abs,
+                jbm_f32_abs);
+}
+
+/**
+ * Function to calculate the cbrt function of a float array.
+ */
+static inline void
+jbm_array_f32_cbrt (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_cbrt,
+                jbm_f32_cbrt);
+}
+
+/**
+ * Function to calculate the exp2 function a float array.
+ */
+static inline void
+jbm_array_f32_exp2 (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_exp2,
+                jbm_f32_exp2);
+}
+
+/**
+ * Function to calculate the exp function a float array.
+ */
+static inline void
+jbm_array_f32_exp (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_exp,
+                jbm_f32_exp);
+}
+
+/**
+ * Function to calculate the exp10 function a float array.
+ */
+static inline void
+jbm_array_f32_exp10 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_exp10,
+                jbm_f32_exp10);
+}
+
+/**
+ * Function to calculate the expm1 function a float array.
+ */
+static inline void
+jbm_array_f32_expm1 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_expm1,
+                jbm_f32_expm1);
+}
+
+/**
+ * Function to calculate the log2 function a float array.
+ */
+static inline void
+jbm_array_f32_log2 (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_log2,
+                jbm_f32_log2);
+}
+
+/**
+ * Function to calculate the log function a float array.
+ */
+static inline void
+jbm_array_f32_log (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_log,
+                jbm_f32_log);
+}
+
+/**
+ * Function to calculate the log10 function a float array.
+ */
+static inline void
+jbm_array_f32_log10 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_log10,
+                jbm_f32_log10);
+}
+
+/**
+ * Function to calculate the sin function a float array.
+ */
+static inline void
+jbm_array_f32_sin (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_sin,
+                jbm_f32_sin);
+}
+
+/**
+ * Function to calculate the cos function a float array.
+ */
+static inline void
+jbm_array_f32_cos (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_cos,
+                jbm_f32_cos);
+}
+
+/**
+ * Function to calculate the tan function a float array.
+ */
+static inline void
+jbm_array_f32_tan (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_tan,
+                jbm_f32_tan);
+}
+
+/**
+ * Function to calculate the asin function a float array.
+ */
+static inline void
+jbm_array_f32_asin (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_asin,
+                jbm_f32_asin);
+}
+
+/**
+ * Function to calculate the acos function a float array.
+ */
+static inline void
+jbm_array_f32_acos (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_acos,
+                jbm_f32_acos);
+}
+
+/**
+ * Function to calculate the atan function a float array.
+ */
+static inline void
+jbm_array_f32_atan (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_atan,
+                jbm_f32_atan);
+}
+
+/**
+ * Function to calculate the sinh function a float array.
+ */
+static inline void
+jbm_array_f32_sinh (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_sinh,
+                jbm_f32_sinh);
+}
+
+/**
+ * Function to calculate the cosh function a float array.
+ */
+static inline void
+jbm_array_f32_cosh (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_cosh,
+                jbm_f32_cosh);
+}
+
+/**
+ * Function to calculate the tanh function a float array.
+ */
+static inline void
+jbm_array_f32_tanh (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_tanh,
+                jbm_f32_tanh);
+}
+
+/**
+ * Function to calculate the asinh function a float array.
+ */
+static inline void
+jbm_array_f32_asinh (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_asinh,
+                jbm_f32_asinh);
+}
+
+/**
+ * Function to calculate the acosh function a float array.
+ */
+static inline void
+jbm_array_f32_acosh (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_acosh,
+                jbm_f32_acosh);
+}
+
+/**
+ * Function to calculate the atanh function a float array.
+ */
+static inline void
+jbm_array_f32_atanh (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_atanh,
+                jbm_f32_atanh);
+}
+
+/**
+ * Function to calculate the erf function a float array.
+ */
+static inline void
+jbm_array_f32_erf (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_erf,
+                jbm_f32_erf);
+}
+
+/**
+ * Function to calculate the erfc function a float array.
+ */
+static inline void
+jbm_array_f32_erfc (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_erfc,
+                jbm_f32_erfc);
+}
+
+/**
+ * Function to calculate the sum of the elements of a float array.
+ *
+ * \return the sum value.
+ */
+static inline float
+jbm_array_f32_sum (const float *x,      ///< float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_REDUCE_OP (x, n, float32x4_t, float, vld1q_f32, vaddq_f32, JBM_ADD,
+                       jbm_4xf32_reduce_add, 0.f);
 }
 
 /**
@@ -15709,34 +16450,11 @@ jbm_array_f32_sqr (float *xr,   ///< result float array.
  * \return the highest value.
  */
 static inline float
-jbm_array_f32_max (const float *xx,     ///< float array.
-                   const unsigned int n)        ///< number of array elements.
+jbm_array_f32_reduce_max (const float *x,       ///< float array.
+                          const unsigned int n) ///< number of array elements.
 {
-  float ax[4] JB_ALIGNED;
-  float32x4_t s4;
-  float k;
-  unsigned int i, j;
-  j = n >> 1;
-  if (j)
-    {
-      s4 = vld1q_f32 (xx);
-      i = 4;
-      while (--j > 0)
-        {
-          s4 = vmaxq_f32 (s4, vld1q_f32 (xx + i));
-          i += 4;
-        }
-      vst1q_f32 (ax, s4);
-      k = fmaxf (fmaxf (ax[0], ax[1]), fmaxf (ax[2], ax[3]));
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    k = fmaxf (k, xx[i++]);
-  return k;
+  JBM_ARRAY_REDUCE_OP (x, n, float32x4_t, float, vld1q_f32, vmaxq_f32, fmaxf,
+                       jbm_4xf32_reduce_max, -INFINITY);
 }
 
 /**
@@ -15745,214 +16463,595 @@ jbm_array_f32_max (const float *xx,     ///< float array.
  * \return the lowest value.
  */
 static inline float
-jbm_array_f32_min (const float *xx,     ///< float array.
-                   const unsigned int n)        ///< number of array elements.
+jbm_array_f32_reduce_min (const float *x,       ///< float array.
+                          const unsigned int n) ///< number of array elements.
 {
-  float ax[4] JB_ALIGNED;
-  float32x4_t s4;
-  float k;
-  unsigned int i, j;
-  j = n >> 2;
-  if (j)
-    {
-      s4 = vld1q_f32 (xx);
-      i = 4;
-      while (--j > 0)
-        {
-          s4 = vminq_f32 (s4, vld1q_f32 (xx + i));
-          i += 4;
-        }
-      vst1q_f32 (ax, s4);
-      k = fminf (fminf (ax[0], ax[1]), fminf (ax[2], ax[3]));
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    k = fminf (k, xx[i++]);
-  return k;
+  JBM_ARRAY_REDUCE_OP (x, n, float32x4_t, float, vld1q_f32, vminq_f32, fminf,
+                       jbm_4xf32_reduce_min, INFINITY);
 }
 
 /**
  * Function to find the highest and the lowest elements of a float array.
  */
 static inline void
-jbm_array_f32_maxmin (const float *xx,  ///< float array.
-                      float *max,       ///< the highest value.
-                      float *min,       ///< the lowest value.
-                      const unsigned int n)     ///< number of array elements.
+jbm_array_f32_reduce_maxmin (const float *x,    ///< float array.
+                             float *max,        ///< the highest value.
+                             float *min,        ///< the lowest value.
+                             const unsigned int n)
+                             ///< number of array elements.
 {
-  float ax[4] JB_ALIGNED;
-  float32x4_t s4, smax4, smin4;
-  float kmax, kmin;
-  unsigned int i, j;
-  j = n >> 2;
-  if (j)
-    {
-      smax4 = smin4 = vld1q_f32 (xx);
-      i = 4;
-      while (--j > 0)
-        {
-          s4 = vld1q_f32 (xx + i);
-          smax4 = vmaxq_f32 (smax4, s4);
-          smin4 = vminq_f32 (smin4, s4);
-          i += 4;
-        }
-      vst1q_f32 (ax, smax4);
-      kmax = fmaxf (fmaxf (ax[0], ax[1]), fmaxf (ax[2], ax[3]));
-      vst1q_f32 (ax, smin4);
-      kmin = fminf (fminf (ax[0], ax[1]), fminf (ax[2], ax[3]));
-    }
-  else
-    {
-      kmax = kmin = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    kmax = fmaxf (kmax, xx[i]), kmin = fminf (kmin, xx[i++]);
-  *max = kmax, *min = kmin;
+  JBM_ARRAY_MAXMIN (x, n, float32x4_t, float, vld1q_f32, vmaxq_f32, fmaxf,
+                    vminq_f32, fmin, jbm_4xf32_reduce_max, jbm_4xf32_reduce_min,
+                    mx, mn);
+  *max = mx, *min = mn;
 }
 
 /**
- * Function to add 2 double arrays.
+ * Function to add 1 float array + 1 number.
  */
 static inline void
-jbm_array_f64_add (double *xr,  ///< result double array.
-                   const double *x1,    ///< 1st addend double array.
-                   const double *x2,    ///< 1st addend double array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
-    vst1q_f64 (xr + i, vaddq_f64 (vld1q_f64 (x1 + i), vld1q_f64 (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] + x2[i];
-}
-
-/**
- * Function to subtract 2 double arrays.
- */
-static inline void
-jbm_array_f64_sub (double *xr,  ///< result double array.
-                   const double *x1,    ///< minuend double array.
-                   const double *x2,    ///< subtrahend double array.
-                   const unsigned int n)        ///< number of array elements.
-{
-  unsigned int i, j;
-  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
-    vst1q_f64 (xr + i, vsubq_f64 (vld1q_f64 (x1 + i), vld1q_f64 (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] - x2[i];
-}
-
-/**
- * Function to multiply a double array by a double number.
- */
-static inline void
-jbm_array_f64_mul1 (double *xr, ///< result double array.
-                    const double *x1,   ///< multiplier double array.
-                    const double x2,    ///< multiplicand double number.
+jbm_array_f32_add1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< addend float array.
+                    const float x2,     ///< addend float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  float64x2_t s2;
-  unsigned int i, j;
-  i = 0;
-  j = n >> 1;
-  if (j)
-    {
-      s2 = vdupq_n_f64 (x2);
-      for (; j > 0; --j, i += 2)
-        vst1q_f64 (xr + i, vmulq_f64 (vld1q_f64 (x1 + i), s2));
-    }
-  for (; i < n; ++i)
-    xr[i] = x1[i] * x2;
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, vaddq_f32, JBM_ADD);
 }
 
 /**
- * Function to divide a double array by a double number.
+ * Function to subtract 1 float array + 1 number.
  */
 static inline void
-jbm_array_f64_div1 (double *xr, ///< result double array.
-                    const double *x1,   ///< dividend double array.
-                    const double x2,    ///< divisor double number.
+jbm_array_f32_sub1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< minuend float array.
+                    const float x2,     ///< subtrahend float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  float64x2_t s2;
-  unsigned int i, j;
-  i = 0;
-  j = n >> 1;
-  if (j)
-    {
-      s2 = vdupq_n_f64 (x2);
-      for (; j > 0; --j, i += 2)
-        vst1q_f64 (xr + i, vdivq_f64 (vld1q_f64 (x1 + i), s2));
-    }
-  for (; i < n; ++i)
-    xr[i] = x1[i] / x2;
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, vsubq_f32, JBM_SUB);
 }
 
 /**
- * Function to multiply 2 double arrays.
+ * Function to multiply a float array by a float number.
  */
 static inline void
-jbm_array_f64_mul (double *xr,  ///< result double array.
-                   const double *x1,    ///< multiplier double array.
-                   const double *x2,    ///< multiplicand double array.
-                   const unsigned int n)        ///< number of array elements.
+jbm_array_f32_mul1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< multiplier float array.
+                    const float x2,     ///< multiplicand float number.
+                    const unsigned int n)       ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
-    vst1q_f64 (xr + i, vmulq_f64 (vld1q_f64 (x1 + i), vld1q_f64 (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] * x2[i];
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, vmulq_f32, JBM_MUL);
 }
 
 /**
- * Function to divide 2 double arrays.
+ * Function to divide a float array by a float number.
  */
 static inline void
-jbm_array_f64_div (double *xr,  ///< result double array.
-                   const double *x1,    ///< dividend double array.
-                   const double *x2,    ///< divisor double array.
+jbm_array_f32_div1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< dividend float array.
+                    const float x2,     ///< divisor float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, vdivq_f32, JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_max1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, vmaxq_f32, fmaxf);
+}
+
+/**
+ * Function to calculate the minimum between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_min1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, vminq_f32, fminf);
+}
+
+/**
+ * Function to calculate the module between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_mod1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, jbm_4xf32_mod, jbm_f32_mod);
+}
+
+/**
+ * Function to calculate the pow function between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_pow1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, jbm_4xf32_pow, jbm_f32_pow);
+}
+
+/**
+ * Function to add 2 float arrays.
+ */
+static inline void
+jbm_array_f32_add (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st addend float array.
+                   const float *restrict x2,    ///< 2nd addend float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
-    vst1q_f64 (xr + i, vdivq_f64 (vld1q_f64 (x1 + i), vld1q_f64 (x2 + i)));
-  for (; i < n; ++i)
-    xr[i] = x1[i] / x2[i];
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, vld1q_f32, vst1q_f32, vaddq_f32,
+                 JBM_ADD);
+}
+
+/**
+ * Function to subtract 2 float arrays.
+ */
+static inline void
+jbm_array_f32_sub (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< minuend float array.
+                   const float *restrict x2,    ///< subtrahend float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, vld1q_f32, vst1q_f32, vsubq_f32,
+                 JBM_SUB);
+}
+
+/**
+ * Function to multiply 2 float arrays.
+ */
+static inline void
+jbm_array_f32_mul (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< multiplier float array.
+                   const float *restrict x2,    ///< multiplicand float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, vld1q_f32, vst1q_f32, vmulq_f32,
+                 JBM_MUL);
+}
+
+/**
+ * Function to divide 2 float arrays.
+ */
+static inline void
+jbm_array_f32_div (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< dividend float array.
+                   const float *restrict x2,    ///< divisor float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, vld1q_f32, vst1q_f32, vdivq_f32,
+                 JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_max (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, vld1q_f32, vst1q_f32, vmaxq_f32, fmax);
+}
+
+/**
+ * Function to calculate the minimum in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_min (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, vld1q_f32, vst1q_f32, vminq_f32, fmin);
+}
+
+/**
+ * Function to calculate the module in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_mod (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_mod,
+                 jbm_f32_mod);
+}
+
+/**
+ * Function to do the pow function in 2 float arrays.
+ */
+static inline void
+jbm_array_f32_pow (float *restrict xr,  ///< result float array.
+                   const float *restrict x1,    ///< 1st float array.
+                   const float *restrict x2,    ///< 2nd float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, vld1q_f32, vst1q_f32, jbm_4xf32_pow,
+                 jbm_f32_pow);
+}
+
+/**
+ * Function to do the dot product of 2 float arrays.
+ *
+ * \return dot product (float).
+ */
+static inline float
+jbm_array_f32_dot (const float *restrict x1,    ///< multiplier float array.
+                   const float *restrict x2,    ///< multiplicand float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_DOT (x1, x2, n, float32x4_t, float, vld1q_f32, vmulq_f32, vaddq_f32,
+                 vmlaq_f32, jbm_4xf32_reduce_add);
+}
+
+/**
+ * Function to calculate the root square of a double array.
+ */
+static inline void
+jbm_array_f64_sqrt (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, vsqrtq_f64, sqrt);
 }
 
 /**
  * Function to calculate the double of a double array.
  */
 static inline void
-jbm_array_f64_dbl (double *xr,  ///< result double array.
-                   const double *xd,    ///< data double array.
+jbm_array_f64_dbl (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
-    vst1q_f64 (xr + i, jbm_2xf64_dbl (vld1q_f64 (xd + i)));
-  for (; i < n; ++i)
-    xr[i] = jbm_f64_dbl (xd[i]);
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_dbl,
+                jbm_f64_dbl);
 }
 
 /**
  * Function to calculate the square of a double array.
  */
 static inline void
-jbm_array_f64_sqr (double *xr,  ///< result double array.
-                   const double *xd,    ///< data double array.
+jbm_array_f64_sqr (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  unsigned int i, j;
-  for (i = 0, j = n >> 1; j > 0; --j, i += 2)
-    vst1q_f64 (xr + i, jbm_2xf64_sqr (vld1q_f64 (xd + i)));
-  for (; i < n; ++i)
-    xr[i] = jbm_f64_sqr (xd[i]);
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_sqr,
+                jbm_f64_sqr);
+}
+
+/**
+ * Function to calculate the opposite of a double array.
+ */
+static inline void
+jbm_array_f64_opposite (double *restrict xr,    ///< result double array.
+                        const double *restrict xd,      ///< data double array.
+                        const unsigned int n)   ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_opposite,
+                jbm_f64_opposite);
+}
+
+/**
+ * Function to calculate the reciprocal of a double array.
+ */
+static inline void
+jbm_array_f64_reciprocal (double *restrict xr,  ///< result double array.
+                          const double *restrict xd,    ///< data double array.
+                          const unsigned int n) ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_reciprocal,
+                jbm_f64_reciprocal);
+}
+
+/**
+ * Function to calculate the abs function of a double array.
+ */
+static inline void
+jbm_array_f64_abs (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_abs,
+                jbm_f64_abs);
+}
+
+/**
+ * Function to calculate the cbrt function of a double array.
+ */
+static inline void
+jbm_array_f64_cbrt (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_cbrt,
+                jbm_f64_cbrt);
+}
+
+/**
+ * Function to calculate the exp2 function a double array.
+ */
+static inline void
+jbm_array_f64_exp2 (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_exp2,
+                jbm_f64_exp2);
+}
+
+/**
+ * Function to calculate the exp function a double array.
+ */
+static inline void
+jbm_array_f64_exp (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_exp,
+                jbm_f64_exp);
+}
+
+/**
+ * Function to calculate the exp10 function a double array.
+ */
+static inline void
+jbm_array_f64_exp10 (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_exp10,
+                jbm_f64_exp10);
+}
+
+/**
+ * Function to calculate the expm1 function a double array.
+ */
+static inline void
+jbm_array_f64_expm1 (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_expm1,
+                jbm_f64_expm1);
+}
+
+/**
+ * Function to calculate the log2 function a double array.
+ */
+static inline void
+jbm_array_f64_log2 (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_log2,
+                jbm_f64_log2);
+}
+
+/**
+ * Function to calculate the log function a double array.
+ */
+static inline void
+jbm_array_f64_log (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_log,
+                jbm_f64_log);
+}
+
+/**
+ * Function to calculate the log10 function a double array.
+ */
+static inline void
+jbm_array_f64_log10 (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_log10,
+                jbm_f64_log10);
+}
+
+/**
+ * Function to calculate the sin function a double array.
+ */
+static inline void
+jbm_array_f64_sin (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_sin,
+                jbm_f64_sin);
+}
+
+/**
+ * Function to calculate the cos function a double array.
+ */
+static inline void
+jbm_array_f64_cos (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_cos,
+                jbm_f64_cos);
+}
+
+/**
+ * Function to calculate the tan function a double array.
+ */
+static inline void
+jbm_array_f64_tan (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_tan,
+                jbm_f64_tan);
+}
+
+/**
+ * Function to calculate the asin function a double array.
+ */
+static inline void
+jbm_array_f64_asin (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_asin,
+                jbm_f64_asin);
+}
+
+/**
+ * Function to calculate the acos function a double array.
+ */
+static inline void
+jbm_array_f64_acos (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_acos,
+                jbm_f64_acos);
+}
+
+/**
+ * Function to calculate the atan function a double array.
+ */
+static inline void
+jbm_array_f64_atan (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_atan,
+                jbm_f64_atan);
+}
+
+/**
+ * Function to calculate the sinh function a double array.
+ */
+static inline void
+jbm_array_f64_sinh (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_sinh,
+                jbm_f64_sinh);
+}
+
+/**
+ * Function to calculate the cosh function a double array.
+ */
+static inline void
+jbm_array_f64_cosh (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_cosh,
+                jbm_f64_cosh);
+}
+
+/**
+ * Function to calculate the tanh function a double array.
+ */
+static inline void
+jbm_array_f64_tanh (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_tanh,
+                jbm_f64_tanh);
+}
+
+/**
+ * Function to calculate the asinh function a double array.
+ */
+static inline void
+jbm_array_f64_asinh (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_asinh,
+                jbm_f64_asinh);
+}
+
+/**
+ * Function to calculate the acosh function a double array.
+ */
+static inline void
+jbm_array_f64_acosh (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_acosh,
+                jbm_f64_acosh);
+}
+
+/**
+ * Function to calculate the atanh function a double array.
+ */
+static inline void
+jbm_array_f64_atanh (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_atanh,
+                jbm_f64_atanh);
+}
+
+/**
+ * Function to calculate the erf function a double array.
+ */
+static inline void
+jbm_array_f64_erf (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_erf,
+                jbm_f64_erf);
+}
+
+/**
+ * Function to calculate the erfc function a double array.
+ */
+static inline void
+jbm_array_f64_erfc (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_erfc,
+                jbm_f64_erfc);
+}
+
+/**
+ * Function to calculate the sum of the elements of a double array.
+ *
+ * \return the sum value.
+ */
+static inline double
+jbm_array_f64_sum (const double *x,     ///< double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_REDUCE_OP (x, n, float64x2_t, double, vld1q_f64, vaddq_f64, JBM_ADD,
+                       jbm_2xf64_reduce_add, 0.);
 }
 
 /**
@@ -15961,34 +17060,11 @@ jbm_array_f64_sqr (double *xr,  ///< result double array.
  * \return the highest value.
  */
 static inline double
-jbm_array_f64_max (const double *xx,    ///< double array.
-                   const unsigned int n)        ///< number of array elements.
+jbm_array_f64_reduce_max (const double *x,      ///< double array.
+                          const unsigned int n) ///< number of array elements.
 {
-  double ax[2] JB_ALIGNED;
-  float64x2_t s2;
-  double k;
-  unsigned int i, j;
-  j = n >> 1;
-  if (j)
-    {
-      s2 = vld1q_f64 (xx);
-      i = 2;
-      while (--j > 0)
-        {
-          s2 = vmaxq_f64 (s2, vld1q_f64 (xx + i));
-          i += 2;
-        }
-      vst1q_f64 (ax, s2);
-      k = fmax (ax[0], ax[1]);
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    k = fmax (k, xx[i++]);
-  return k;
+  JBM_ARRAY_REDUCE_OP (x, n, float64x2_t, double, vld1q_f64, vmaxq_f64, fmaxf,
+                       jbm_2xf64_reduce_max, -INFINITY);
 }
 
 /**
@@ -15997,74 +17073,247 @@ jbm_array_f64_max (const double *xx,    ///< double array.
  * \return the lowest value.
  */
 static inline double
-jbm_array_f64_min (const double *xx,    ///< double array.
-                   const unsigned int n)        ///< number of array elements.
+jbm_array_f64_reduce_min (const double *x,      ///< double array.
+                          const unsigned int n) ///< number of array elements.
 {
-  double ax[2] JB_ALIGNED;
-  float64x2_t s2;
-  double k;
-  unsigned int i, j;
-  j = n >> 1;
-  if (j)
-    {
-      s2 = vld1q_f64 (xx);
-      i = 2;
-      while (--j > 0)
-        {
-          s2 = vminq_f64 (s2, vld1q_f64 (xx + i));
-          i += 2;
-        }
-      vst1q_f64 (ax, s2);
-      k = fmin (ax[0], ax[1]);
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    k = fmin (k, xx[i++]);
-  return k;
+  JBM_ARRAY_REDUCE_OP (x, n, float64x2_t, double, vld1q_f64, vminq_f64, fminf,
+                       jbm_2xf64_reduce_min, INFINITY);
 }
 
 /**
  * Function to find the highest and the lowest elements of a double array.
  */
 static inline void
-jbm_array_f64_maxmin (const double *xx, ///< double array.
-                      double *max,      ///< the highest value.
-                      double *min,      ///< the lowest value.
-                      const unsigned int n)     ///< number of array elements.
+jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
+                             double *max,       ///< the highest value.
+                             double *min,       ///< the lowest value.
+                             const unsigned int n)
+                             ///< number of array elements.
 {
-  double ax[2] JB_ALIGNED;
-  float64x2_t s2, smax2, smin2;
-  double kmax, kmin;
-  unsigned int i, j;
-  j = n >> 1;
-  if (j)
-    {
-      smax2 = smin2 = vld1q_f64 (xx);
-      i = 2;
-      while (--j > 0)
-        {
-          s2 = vld1q_f64 (xx + i);
-          smax2 = vmaxq_f64 (smax2, s2);
-          smin2 = vminq_f64 (smin2, s2);
-          i += 2;
-        }
-      vst1q_f64 (ax, smax2);
-      kmax = fmax (ax[0], ax[1]);
-      vst1q_f64 (ax, smin2);
-      kmin = fmin (ax[0], ax[1]);
-    }
-  else
-    {
-      kmax = kmin = xx[0];
-      i = 1;
-    }
-  while (i < n)
-    kmax = fmax (kmax, xx[i]), kmin = fmin (kmin, xx[i++]);
-  *max = kmax, *min = kmin;
+  JBM_ARRAY_MAXMIN (x, n, float64x2_t, double, vld1q_f64, vmaxq_f64, fmaxf,
+                    vminq_f64, fmin, jbm_2xf64_reduce_max, jbm_2xf64_reduce_min,
+                    mx, mn);
+  *max = mx, *min = mn;
+}
+
+/**
+ * Function to add 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_add1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< addend double array.
+                    const double x2,    ///< addend double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, vaddq_f64, JBM_ADD);
+}
+
+/**
+ * Function to subtract 1 double array - 1 double number.
+ */
+static inline void
+jbm_array_f64_sub1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< minuend double array.
+                    const double x2,    ///< subtrahend double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, vsubq_f64, JBM_SUB);
+}
+
+/**
+ * Function to multiply a double array by a double number.
+ */
+static inline void
+jbm_array_f64_mul1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< multiplier double array.
+                    const double x2,    ///< multiplicand double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, vmulq_f64, JBM_MUL);
+}
+
+/**
+ * Function to divide a double array by a double number.
+ */
+static inline void
+jbm_array_f64_div1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< dividend double array.
+                    const double x2,    ///< divisor double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, vdivq_f64, JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_max1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, vmaxq_f64, fmax);
+}
+
+/**
+ * Function to calculate the minimum between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_min1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, vminq_f64, fmin);
+}
+
+/**
+ * Function to calculate the module between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_mod1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, jbm_2xf64_mod, jbm_f64_mod);
+}
+
+/**
+ * Function to calculate the pow function between 1 double array + 1 number.
+ */
+static inline void
+jbm_array_f64_pow1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, jbm_2xf64_pow, jbm_f64_pow);
+}
+
+/**
+ * Function to add 2 double arrays.
+ */
+static inline void
+jbm_array_f64_add (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st addend double array.
+                   const double *restrict x2,   ///< 2nd addend double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, vld1q_f64, vst1q_f64, vaddq_f64,
+                 JBM_ADD);
+}
+
+/**
+ * Function to subtract 2 double arrays.
+ */
+static inline void
+jbm_array_f64_sub (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< minuend double array.
+                   const double *restrict x2,   ///< subtrahend double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, vld1q_f64, vst1q_f64, vsubq_f64,
+                 JBM_SUB);
+}
+
+/**
+ * Function to multiply 2 double arrays.
+ */
+static inline void
+jbm_array_f64_mul (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< multiplier double array.
+                   const double *restrict x2,   ///< multiplicand double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, vld1q_f64, vst1q_f64, vmulq_f64,
+                 JBM_MUL);
+}
+
+/**
+ * Function to divide 2 double arrays.
+ */
+static inline void
+jbm_array_f64_div (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< dividend double array.
+                   const double *restrict x2,   ///< divisor double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, vld1q_f64, vst1q_f64, vdivq_f64,
+                 JBM_DIV);
+}
+
+/**
+ * Function to calculate the maximum in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_max (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, vld1q_f64, vst1q_f64, vmaxq_f64, fmax);
+}
+
+/**
+ * Function to calculate the minimum in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_min (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, vld1q_f64, vst1q_f64, vminq_f64, fmin);
+}
+
+/**
+ * Function to calculate the module in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_mod (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_mod,
+                 jbm_f64_mod);
+}
+
+/**
+ * Function to do the pow function in 2 double arrays.
+ */
+static inline void
+jbm_array_f64_pow (double *restrict xr, ///< result double array.
+                   const double *restrict x1,   ///< 1st double array.
+                   const double *restrict x2,   ///< 2nd double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, vld1q_f64, vst1q_f64, jbm_2xf64_pow,
+                 jbm_f64_pow);
+}
+
+/**
+ * Function to do the dot product of 2 double arrays.
+ *
+ * \return dot product (double).
+ */
+static inline double
+jbm_array_f64_dot (const double *restrict x1,   ///< multiplier double array.
+                   const double *restrict x2,   ///< multiplicand double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_DOT (x1, x2, n, float64x2_t, double, vld1q_f64, vmulq_f64,
+                 vaddq_f64, vmlaq_f64, jbm_2xf64_reduce_add);
 }
 
 #endif

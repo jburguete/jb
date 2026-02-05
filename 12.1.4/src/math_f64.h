@@ -354,7 +354,7 @@ jbm_f64_abs (const double x)    ///< double number.
  * \return double number with magnitud of 1st number and sign of 2nd number.
  */
 static inline double
-jbm_copyf64_sign (const double x,
+jbm_f64_copysign (const double x,
 ///< double number to preserve magnitude.
                   const double y)       ///< double number to preserve sign.
 {
@@ -3802,7 +3802,7 @@ jbm_f64_cbrt (const double x)   ///< double number.
     m *= JBM_F64_CBRT2;
   if (r & 2)
     m *= JBM_F64_CBRT4;
-  return jbm_copyf64_sign (m, x);
+  return jbm_f64_copysign (m, x);
 }
 
 /**
@@ -4029,7 +4029,7 @@ jbm_f64_tanwc (const double x)
  * x in [-pi/4,pi/4] from jbm_f64_sinwc approximation (double).
  */
 static inline void
-jbm_sinf64_coswc (const double x,
+jbm_f64_sincoswc (const double x,
                   ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   double *s,    ///< pointer to the sin function value (double).
                   double *c)    ///< pointer to the cos function value (double).
@@ -4080,7 +4080,7 @@ jbm_f64_cos (const double x)    ///< double number.
  * jbm_f64_coswc approximations (double).
  */
 static inline void
-jbm_sinf64_cos (const double x,
+jbm_f64_sincos (const double x,
                 ///< double number \f$\in\left[-\pi/4,\pi/4\right]\f$.
                 double *s,      ///< pointer to the sin function value (double).
                 double *c)      ///< pointer to the cos function value (double).
@@ -4090,7 +4090,7 @@ jbm_sinf64_cos (const double x,
   y = x * 1. / M_PI_2;
   q = (int) nearbyint (y);
   y = x - (double) q *M_PI_2;
-  jbm_sinf64_coswc (y, &sr, &cr);
+  jbm_f64_sincoswc (y, &sr, &cr);
   switch (q)
     {
     case 0:
@@ -4112,7 +4112,7 @@ jbm_sinf64_cos (const double x,
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sinf64_cos.
+ * Function to calculate the function tan(x) from jbm_f64_sincos.
  *
  * \return function value (double).
  */
@@ -4155,7 +4155,7 @@ jbm_f64_atan (const double x)   ///< double number.
     f = M_PI_2 - jbm_f64_atanwc (1. / ax);
   else
     f = jbm_f64_atanwc (ax);
-  return jbm_copyf64_sign (f, x);
+  return jbm_f64_copysign (f, x);
 }
 
 /**
@@ -4171,7 +4171,7 @@ jbm_f64_atan2 (const double y,  ///< double y component.
   double f;
   f = jbm_f64_atan (y / x);
   if (x < 0.)
-    f += jbm_copyf64_sign (M_PI, y);
+    f += jbm_f64_copysign (M_PI, y);
   return f;
 }
 

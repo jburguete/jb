@@ -56,46 +56,37 @@ typedef union
 
 // float constants
 
-#define JBM_BIAS_8xF32 _mm256_set1_epi32 (JBM_F32_BIAS)
+#define JBM_8xF32_BIAS _mm256_set1_epi32 (JBM_F32_BIAS)
 ///< bias for floats.
-#define JBM_BITS_1_8xF32 _mm256_set1_epi32 (JBM_F32_BITS_1)
+#define JBM_8xF32_BITS_1 _mm256_set1_epi32 (JBM_F32_BITS_1)
 ///< 1 bits for floats.
-#define JBM_BITS_ABS_8xF32 _mm256_set1_epi32 (JBM_F32_BITS_ABS)
-///< absolute value bits for floats.
-#define JBM_BITS_EXPONENT_8xF32 _mm256_set1_epi32 (JBM_F32_BITS_EXPONENT)
+#define JBM_8xF32_BITS_EXPONENT _mm256_set1_epi32 (JBM_F32_BITS_EXPONENT)
 ///< exponent bits for floats.
-#define JBM_BITS_MANTISSA_8xF32 _mm256_set1_epi32 (JBM_F32_BITS_MANTISSA)
+#define JBM_8xF32_BITS_MANTISSA _mm256_set1_epi32 (JBM_F32_BITS_MANTISSA)
 ///< mantissa bits for floats.
-#define JBM_BITS_SIGN_8xF32 _mm256_set1_epi32 (JBM_F32_BITS_SIGN)
+#define JBM_8xF32_BITS_SIGN _mm256_set1_epi32 (JBM_F32_BITS_SIGN)
 ///< sign bits for floats.
-#define JBM_CBRT2_8xF32 _mm256_set1_ps (JBM_F32_CBRT2)
+#define JBM_8xF32_CBRT2 _mm256_set1_ps (JBM_F32_CBRT2)
 ///< cbrt(2) for floats.
-#define JBM_CBRT4_8xF32 _mm256_set1_ps (JBM_F32_CBRT4)
+#define JBM_8xF32_CBRT4 _mm256_set1_ps (JBM_F32_CBRT4)
 ///< cbrt(4) for floats.
 
 // double constants
 
-#define JBM_BIAS_4xF64 _mm256_set1_epi64x (JBM_F64_BIAS)
+#define JBM_4xF64_BIAS _mm256_set1_epi64x (JBM_F64_BIAS)
 ///< bias for doubles.
-#define JBM_BITS_1_4xF64 _mm256_set1_epi64x (JBM_F64_BITS_1)
+#define JBM_4xF64_BITS_1 _mm256_set1_epi64x (JBM_F64_BITS_1)
 ///< 1 bits for doubles.
-#define JBM_BITS_ABS_4xF64 _mm256_set1_epi64x (JBM_F64_BITS_ABS)
-///< absolute value bits for doubles.
-#define JBM_BITS_EXPONENT_4xF64 _mm256_set1_epi64x (JBM_F64_BITS_EXPONENT)
+#define JBM_4xF64_BITS_EXPONENT _mm256_set1_epi64x (JBM_F64_BITS_EXPONENT)
 ///< exponent bits for doubles.
-#define JBM_BITS_MANTISSA_4xF64 _mm256_set1_epi64x (JBM_F64_BITS_MANTISSA)
+#define JBM_4xF64_BITS_MANTISSA _mm256_set1_epi64x (JBM_F64_BITS_MANTISSA)
 ///< mantissa bits for doubles.
-#define JBM_BITS_SIGN_4xF64 _mm256_set1_epi64x (JBM_F64_BITS_SIGN)
+#define JBM_4xF64_BITS_SIGN _mm256_set1_epi64x (JBM_F64_BITS_SIGN)
 ///< sign bits for doubles.
-#define JBM_CBRT2_4xF64 _mm256_set1_pd (JBM_F64_CBRT2)
+#define JBM_4xF64_CBRT2 _mm256_set1_pd (JBM_F64_CBRT2)
 ///< cbrt(2) for doubles.
-#define JBM_CBRT4_4xF64 _mm256_set1_pd (JBM_F64_CBRT4)
+#define JBM_4xF64_CBRT4 _mm256_set1_pd (JBM_F64_CBRT4)
 ///< cbrt(4) for doubles.
-
-///> macro to define types for AVX
-#define JBM_TYPE_256(type) JBM_SIMD_SELECT(type, __m256, __m256d)
-///> macro to define loads for AVX
-#define JBM_LOAD_256(type) JBM_SIMD_SELECT(type, _mm256_load_ps, _mm256_load_pd)
 
 // Debug functions
 
@@ -250,7 +241,6 @@ jbm_8xf32_reduce_maxmin (const __m256 x,        ///< __m256 vector.
   *min = jbm_4xf32_reduce_min (_mm_min_ps (h, l));
 }
 
-
 /**
  * Function to calculate the additive inverse value of a __m256 vector.
  *
@@ -260,7 +250,7 @@ static inline __m256
 jbm_8xf32_opposite (const __m256 x)     ///< __m256 vector.
 {
   JBM8xF32 y;
-  y.i = JBM_BITS_SIGN_8xF32;
+  y.i = JBM_8xF32_BITS_SIGN;
   return _mm256_xor_ps (x, y.x);
 }
 
@@ -285,8 +275,8 @@ jbm_8xf32_sign (const __m256 x) ///< __m256 vector.
 {
   JBM8xF32 y;
   y.x = x;
-  y.i = _mm256_and_si256 (y.i, JBM_BITS_SIGN_8xF32);
-  y.i = _mm256_or_si256 (y.i, JBM_BITS_1_8xF32);
+  y.i = _mm256_and_si256 (y.i, JBM_8xF32_BITS_SIGN);
+  y.i = _mm256_or_si256 (y.i, JBM_8xF32_BITS_1);
   return y.x;
 }
 
@@ -299,7 +289,7 @@ static inline __m256
 jbm_8xf32_abs (const __m256 x)  ///< __m256 vector.
 {
   JBM8xF32 y;
-  y.i = JBM_BITS_SIGN_8xF32;
+  y.i = JBM_8xF32_BITS_SIGN;
   return _mm256_andnot_ps (y.x, x);
 }
 
@@ -309,12 +299,12 @@ jbm_8xf32_abs (const __m256 x)  ///< __m256 vector.
  * \return __m256 vector with magnitud of 1st vector and sign of 2nd vector.
  */
 static inline __m256
-jbm_copy8xf32_sign (const __m256 x,
+jbm_8xf32_copysign (const __m256 x,
 ///< __m256 vector to preserve magnitude.
                     const __m256 y)     ///< __m256 vector to preserve sign.
 {
   JBM8xF32 m;
-  m.i = JBM_BITS_SIGN_8xF32;
+  m.i = JBM_8xF32_BITS_SIGN;
   return _mm256_or_ps (jbm_8xf32_abs (x), _mm256_and_ps (y, m.x));
 }
 
@@ -358,15 +348,13 @@ jbm_8xf32_frexp (const __m256 x,        ///< __m256 vector.
                  __m256i *e)    ///< pointer to the extracted exponents vector.
 {
   const __m256i zi = _mm256_setzero_si256 ();
-  const __m256i bias = JBM_BIAS_8xF32;
-  const __m256i abs_mask = JBM_BITS_ABS_8xF32;
-  const __m256i sign_mask = JBM_BITS_SIGN_8xF32;
-  const __m256i mant_mask = JBM_BITS_MANTISSA_8xF32;
+  const __m256i bias = JBM_8xF32_BIAS;
+  const __m256i sign_mask = JBM_8xF32_BITS_SIGN;
+  const __m256i mant_mask = JBM_8xF32_BITS_MANTISSA;
   JBM8xF32 y, z;
   __m256i exp, is_z, is_sub, is_nan, is_finite;
-  // y(x)=abs(x)
-  y.x = x;
-  y.i = _mm256_and_si256 (y.i, abs_mask);
+  // y=abs(x)
+  y.x = jbm_8xf32_abs (x);
   // masks
   is_z = _mm256_cmpeq_epi32 (y.i, zi);
   is_nan
@@ -440,7 +428,7 @@ jbm_8xf32_ldexp (const __m256 x,        ///< __m256 vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline __m256
-jbm_small_8xf32 (const __m256 x)        ///< __m256d vector.
+jbm_8xf32_small (const __m256 x)        ///< __m256d vector.
 {
   return _mm256_cmp_ps (jbm_8xf32_abs (x), _mm256_set1_ps (FLT_EPSILON),
                         _CMP_LT_OS);
@@ -458,7 +446,7 @@ jbm_small_8xf32 (const __m256 x)        ///< __m256d vector.
  * \return modmin __m256 vector.
  */
 static inline __m256
-jbm_modmin_8xf32 (const __m256 a,       ///< 1st __m256d vector.
+jbm_8xf32_modmin (const __m256 a,       ///< 1st __m256d vector.
                   const __m256 b)       ///< 2nd __m256d vector.
 {
   const __m256 z = _mm256_setzero_ps ();
@@ -7083,8 +7071,8 @@ jbm_8xf32_cbrtwc (const __m256 x)
 static inline __m256
 jbm_8xf32_cbrt (const __m256 x) ///< __m256 vector.
 {
-  const __m256 cbrt2 = JBM_CBRT2_8xF32;
-  const __m256 cbrt4 = JBM_CBRT4_8xF32;
+  const __m256 cbrt2 = JBM_8xF32_CBRT2;
+  const __m256 cbrt4 = JBM_8xF32_CBRT4;
   const __m256i v3 = _mm256_set1_epi32 (3);
   const __m256i v2 = _mm256_set1_epi32 (2);
   const __m256i v1 = _mm256_set1_epi32 (1);
@@ -7101,7 +7089,7 @@ jbm_8xf32_cbrt (const __m256 x) ///< __m256 vector.
                         _mm256_castsi256_ps (_mm256_cmpeq_epi32 (r, v1)));
   y = _mm256_blendv_ps (y, _mm256_mul_ps (y, cbrt4),
                         _mm256_castsi256_ps (_mm256_cmpeq_epi32 (r, v2)));
-  return jbm_copy8xf32_sign (y, x);
+  return jbm_8xf32_copysign (y, x);
 }
 
 /**
@@ -7198,7 +7186,7 @@ jbm_8xf32_expm1 (const __m256 x)        ///< __m128 vector.
 
 /**
  * Function to calculate the well conditionated function log2(x) for x in
- * [0.5,1] (__m256).
+ * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (__m256).
  *
  * \return function value (__m256).
  */
@@ -7323,11 +7311,25 @@ jbm_8xf32_coswc (const __m256 x)
 }
 
 /**
+ * Function to calculate the well conditionated function tan(x) for x in
+ * [-pi/4,pi/4].
+ *
+ * \return function value (__m256).
+ */
+static inline __m256
+jbm_8xf32_tanwc (const __m256 x)
+                  ///< __m256 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  return _mm256_mul_ps (x, jbm_8xf32_rational_3_1 (jbm_8xf32_sqr (x),
+                                                   K_TANWC_F32));
+}
+
+/**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_8xf32_sinwc approximation (__m256).
  */
 static inline void
-jbm_sin8xf32_coswc (const __m256 x,
+jbm_8xf32_sincoswc (const __m256 x,
                     ///< __m256 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     __m256 *s,  ///< pointer to the sin function value (__m256).
                     __m256 *c)  ///< pointer to the cos function value (__m256).
@@ -7400,7 +7402,7 @@ jbm_8xf32_cos (const __m256 x)  ///< __m256 vector.
  * jbm_8xf32_sinwc and jbm_8xf32_coswc approximations (__m256).
  */
 static inline void
-jbm_sin8xf32_cos (const __m256 x,
+jbm_8xf32_sincos (const __m256 x,
                   ///< __m256 vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   __m256 *s,    ///< pointer to the sin function value (__m256).
                   __m256 *c)    ///< pointer to the cos function value (__m256).
@@ -7409,28 +7411,28 @@ jbm_sin8xf32_cos (const __m256 x,
   const __m256 z = _mm256_setzero_ps ();
   __m256 y, m, s1, c1, s2, c2;
   y = jbm_8xf32_mod (x, pi2);
-  jbm_sin8xf32_coswc (_mm256_sub_ps (y, pi2), &s1, &c1);
-  jbm_sin8xf32_coswc (_mm256_sub_ps (y, _mm256_set1_ps (3.f * M_PI_2f)), &c2,
+  jbm_8xf32_sincoswc (_mm256_sub_ps (y, pi2), &s1, &c1);
+  jbm_8xf32_sincoswc (_mm256_sub_ps (y, _mm256_set1_ps (3.f * M_PI_2f)), &c2,
                       &s2);
   m = _mm256_cmp_ps (y, _mm256_set1_ps (7.f * M_PI_4f), _CMP_LT_OS);
   s1 = _mm256_blendv_ps (s1, _mm256_sub_ps (z, s2), m);
   c1 = _mm256_blendv_ps (c1, c2, m);
-  jbm_sin8xf32_coswc (_mm256_sub_ps (_mm256_set1_ps (M_PIf), y), &s2, &c2);
+  jbm_8xf32_sincoswc (_mm256_sub_ps (_mm256_set1_ps (M_PIf), y), &s2, &c2);
   m = _mm256_cmp_ps (y, _mm256_set1_ps (5.f * M_PI_4f), _CMP_LT_OS);
   s1 = _mm256_blendv_ps (s1, s2, m);
   c1 = _mm256_blendv_ps (c1, _mm256_sub_ps (z, c2), m);
-  jbm_sin8xf32_coswc (_mm256_sub_ps (_mm256_set1_ps (M_PI_2f), y), &c2, &s2);
+  jbm_8xf32_sincoswc (_mm256_sub_ps (_mm256_set1_ps (M_PI_2f), y), &c2, &s2);
   m = _mm256_cmp_ps (y, _mm256_set1_ps (3.f * M_PI_4f), _CMP_LT_OS);
   s1 = _mm256_blendv_ps (s1, s2, m);
   c1 = _mm256_blendv_ps (c1, c2, m);
-  jbm_sin8xf32_coswc (y, &s2, &c2);
+  jbm_8xf32_sincoswc (y, &s2, &c2);
   m = _mm256_cmp_ps (y, _mm256_set1_ps (M_PI_4f), _CMP_LT_OS);
   *s = _mm256_blendv_ps (s1, s2, m);
   *c = _mm256_blendv_ps (c1, c2, m);
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sin8xf32_cos function
+ * Function to calculate the function tan(x) from jbm_8xf32_sincos function
  * (__m256).
  *
  * \return function value (__m256).
@@ -7439,7 +7441,7 @@ static inline __m256
 jbm_8xf32_tan (const __m256 x)  ///< __m256 vector.
 {
   __m256 s, c;
-  jbm_sin8xf32_cos (x, &s, &c);
+  jbm_8xf32_sincos (x, &s, &c);
   return _mm256_div_ps (s, c);
 }
 
@@ -7472,7 +7474,7 @@ jbm_8xf32_atan (const __m256 x) ///< __m256 vector.
   ax = _mm256_blendv_ps (ax, jbm_8xf32_reciprocal (ax), m);
   f = jbm_8xf32_atanwc (ax);
   f = _mm256_blendv_ps (f, _mm256_sub_ps (_mm256_set1_ps (M_PI_2f), f), m);
-  return jbm_copy8xf32_sign (f, x);
+  return jbm_8xf32_copysign (f, x);
 }
 
 /**
@@ -7487,7 +7489,7 @@ jbm_8xf32_atan2 (const __m256 y,        ///< __m256 y component.
 {
   __m256 f, g;
   f = jbm_8xf32_atan (_mm256_div_ps (y, x));
-  g = _mm256_add_ps (f, jbm_copy8xf32_sign (_mm256_set1_ps (M_PIf), y));
+  g = _mm256_add_ps (f, jbm_8xf32_copysign (_mm256_set1_ps (M_PIf), y));
   return
     _mm256_blendv_ps (f, g,
                       _mm256_cmp_ps (x, _mm256_setzero_ps (), _CMP_LT_OS));
@@ -7667,7 +7669,7 @@ jbm_8xf32_erf (const __m256 x)  ///< __m256 vector.
   const __m256 u = _mm256_set1_ps (1.f);
   __m256 ax, f;
   ax = jbm_8xf32_abs (x);
-  f = jbm_copy8xf32_sign (_mm256_sub_ps (u, jbm_8xf32_erfcwc (ax)), x);
+  f = jbm_8xf32_copysign (_mm256_sub_ps (u, jbm_8xf32_erfcwc (ax)), x);
   return _mm256_blendv_ps (f, jbm_8xf32_erfwc (x),
                            _mm256_cmp_ps (ax, u, _CMP_LT_OS));
 
@@ -7745,7 +7747,7 @@ jbm_8xf32_solve_quadratic (const __m256 a,
     jbm_solve_quadratic_reduced_8xf32 (_mm256_div_ps (b, a),
                                        _mm256_div_ps (c, a), x1, x2);
   k2 = _mm256_div_ps (jbm_8xf32_opposite (c), b);
-  return _mm256_blendv_ps (k1, k2, jbm_small_8xf32 (a));
+  return _mm256_blendv_ps (k1, k2, jbm_8xf32_small (a));
 }
 
 /**
@@ -7827,7 +7829,7 @@ jbm_8xf32_solve_cubic (const __m256 a,
                                                      _mm256_div_ps (d, a), x1,
                                                      x2),
                       jbm_8xf32_solve_quadratic (b, c, d, x1, x2),
-                      jbm_small_8xf32 (a));
+                      jbm_8xf32_small (a));
 }
 
 /**
@@ -7873,7 +7875,7 @@ jbm_8xf32_flux_limiter_centred (const __m256 d1,
                               ///< 2nd flux limiter function parameter.
 {
   return _mm256_blendv_ps (_mm256_div_ps (d1, d2), _mm256_setzero_ps (),
-                           jbm_small_8xf32 (d2));
+                           jbm_8xf32_small (d2));
 }
 
 /**
@@ -8212,7 +8214,7 @@ static inline __m256d
 jbm_4xf64_opposite (const __m256d x)    ///< __m256d vector.
 {
   JBM4xF64 y;
-  y.i = JBM_BITS_SIGN_4xF64;
+  y.i = JBM_4xF64_BITS_SIGN;
   return _mm256_xor_pd (x, y.x);
 }
 
@@ -8237,8 +8239,8 @@ jbm_4xf64_sign (const __m256d x)        ///< __m256d vector.
 {
   JBM4xF64 y;
   y.x = x;
-  y.i = _mm256_and_si256 (y.i, JBM_BITS_SIGN_4xF64);
-  y.i = _mm256_and_si256 (y.i, JBM_BITS_1_4xF64);
+  y.i = _mm256_and_si256 (y.i, JBM_4xF64_BITS_SIGN);
+  y.i = _mm256_and_si256 (y.i, JBM_4xF64_BITS_1);
   return y.x;
 }
 
@@ -8251,7 +8253,7 @@ static inline __m256d
 jbm_4xf64_abs (const __m256d x)
 {
   JBM4xF64 y;
-  y.i = JBM_BITS_SIGN_4xF64;
+  y.i = JBM_4xF64_BITS_SIGN;
   return _mm256_andnot_pd (y.x, x);
 }
 
@@ -8261,12 +8263,12 @@ jbm_4xf64_abs (const __m256d x)
  * \return __m256d vector with magnitud of 1st vector and sign of 2nd vector.
  */
 static inline __m256d
-jbm_copy4xf64_sign (const __m256d x,
+jbm_4xf64_copysign (const __m256d x,
 ///< __m256d vector to preserve magnitude.
                     const __m256d y)    ///< __m256d vector to preserve sign.
 {
   JBM4xF64 m;
-  m.i = JBM_BITS_SIGN_4xF64;
+  m.i = JBM_4xF64_BITS_SIGN;
   return _mm256_or_pd (jbm_4xf64_abs (x), _mm256_and_pd (y, m.x));
 }
 
@@ -8310,15 +8312,13 @@ jbm_4xf64_frexp (const __m256d x,       ///< __m256d vector.
                  __m256i *e)    ///< pointer to the extracted exponents vector.
 {
   const __m256i zi = _mm256_setzero_si256 ();
-  const __m256i bias = JBM_BIAS_4xF64;
-  const __m256i abs_mask = JBM_BITS_ABS_4xF64;
-  const __m256i sign_mask = JBM_BITS_SIGN_4xF64;
-  const __m256i mant_mask = JBM_BITS_MANTISSA_4xF64;
+  const __m256i bias = JBM_4xF64_BIAS;
+  const __m256i sign_mask = JBM_4xF64_BITS_SIGN;
+  const __m256i mant_mask = JBM_4xF64_BITS_MANTISSA;
   JBM4xF64 y, z;
   __m256i exp, is_z, is_sub, is_nan, is_finite;
-  // y(x)=abs(x)
-  y.x = x;
-  y.i = _mm256_and_si256 (y.i, abs_mask);
+  // y=abs(x)
+  y.x = jbm_4xf64_abs (x);
   // masks
   is_z = _mm256_cmpeq_epi64 (y.i, zi);
   is_nan = _mm256_cmpgt_epi64 (y.i,
@@ -8398,7 +8398,7 @@ jbm_4xf64_ldexp (const __m256d x,       ///< __m256d vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline __m256d
-jbm_small_4xf64 (const __m256d x)       ///< __m256d vector.
+jbm_4xf64_small (const __m256d x)       ///< __m256d vector.
 {
   return _mm256_cmp_pd (jbm_4xf64_abs (x), _mm256_set1_pd (DBL_EPSILON),
                         _CMP_LT_OS);
@@ -8416,7 +8416,7 @@ jbm_small_4xf64 (const __m256d x)       ///< __m256d vector.
  * \return modmin __m256d vector.
  */
 static inline __m256d
-jbm_modmin_4xf64 (const __m256d a,      ///< 1st __m256d vector.
+jbm_4xf64_modmin (const __m256d a,      ///< 1st __m256d vector.
                   const __m256d b)      ///< 2nd __m256d vector.
 {
   const __m256d z = _mm256_setzero_pd ();
@@ -15042,8 +15042,8 @@ jbm_4xf64_cbrtwc (const __m256d x)
 static inline __m256d
 jbm_4xf64_cbrt (const __m256d x)        ///< __m256d vector.
 {
-  const __m256d cbrt2 = JBM_CBRT2_4xF64;
-  const __m256d cbrt4 = JBM_CBRT4_4xF64;
+  const __m256d cbrt2 = JBM_4xF64_CBRT2;
+  const __m256d cbrt4 = JBM_4xF64_CBRT4;
   const __m256i v3 = _mm256_set1_epi32 (3);
   const __m256i v2 = _mm256_set1_epi64x (2);
   const __m256i v1 = _mm256_set1_epi64x (1);
@@ -15061,7 +15061,7 @@ jbm_4xf64_cbrt (const __m256d x)        ///< __m256d vector.
                         _mm256_castsi256_pd (_mm256_cmpeq_epi64 (r, v1)));
   y = _mm256_blendv_pd (y, _mm256_mul_pd (y, cbrt4),
                         _mm256_castsi256_pd (_mm256_cmpeq_epi64 (r, v2)));
-  return jbm_copy4xf64_sign (y, x);
+  return jbm_4xf64_copysign (y, x);
 }
 
 /**
@@ -15179,8 +15179,8 @@ jbm_4xf64_log2 (const __m256d x)        ///< __m256d vector.
   y = _mm256_add_pd (y, _mm256_and_pd (m, y));
   e = _mm256_sub_epi64 (e, _mm256_and_si256 (_mm256_castpd_si256 (m),
                                              _mm256_set1_epi64x (1ll)));
-print_m256i64 (stderr, "e", e);
-print_m256d (stderr, "e", _mm256_cvtepi64_pd (e));
+  print_m256i64 (stderr, "e", e);
+  print_m256d (stderr, "e", _mm256_cvtepi64_pd (e));
   y = _mm256_add_pd (jbm_4xf64_log2wc (_mm256_sub_pd (y, _mm256_set1_pd (1.))),
                      _mm256_cvtepi64_pd (e));
   y = _mm256_blendv_pd (y, _mm256_set1_pd (-INFINITY),
@@ -15282,7 +15282,7 @@ jbm_4xf64_coswc (const __m256d x)
  * x in [-pi/4,pi/4] from jbm_4xf64_sinwc approximation (__m256d).
  */
 static inline void
-jbm_sin4xf64_coswc (const __m256d x,
+jbm_4xf64_sincoswc (const __m256d x,
                     ///< __m256d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     __m256d *s,
                     ///< pointer to the f32 function value (__m256d).
@@ -15369,7 +15369,7 @@ jbm_4xf64_cos (const __m256d x) ///< __m256d vector.
  * and jbm_4xf64_coswc approximations (__m256d).
  */
 static inline void
-jbm_sin4xf64_cos (const __m256d x,
+jbm_4xf64_sincos (const __m256d x,
                   ///< __m256d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   __m256d *s,   ///< pointer to the f32 function value (__m256d).
                   __m256d *c)   ///< pointer to the f32 function value (__m256d).
@@ -15378,21 +15378,21 @@ jbm_sin4xf64_cos (const __m256d x,
   const __m256d z = _mm256_setzero_pd ();
   __m256d y, m, s1, c1, s2, c2;
   y = jbm_4xf64_mod (x, pi2);
-  jbm_sin4xf64_coswc (_mm256_sub_pd (y, pi2), &s1, &c1);
-  jbm_sin4xf64_coswc (_mm256_sub_pd (y, _mm256_set1_pd (3. * M_PI_2)), &c2,
+  jbm_4xf64_sincoswc (_mm256_sub_pd (y, pi2), &s1, &c1);
+  jbm_4xf64_sincoswc (_mm256_sub_pd (y, _mm256_set1_pd (3. * M_PI_2)), &c2,
                       &s2);
   m = _mm256_cmp_pd (y, _mm256_set1_pd (7. * M_PI_4), _CMP_LT_OS);
   s1 = _mm256_blendv_pd (s1, _mm256_sub_pd (z, s2), m);
   c1 = _mm256_blendv_pd (c1, c2, m);
-  jbm_sin4xf64_coswc (_mm256_sub_pd (_mm256_set1_pd (M_PI), y), &s2, &c2);
+  jbm_4xf64_sincoswc (_mm256_sub_pd (_mm256_set1_pd (M_PI), y), &s2, &c2);
   m = _mm256_cmp_pd (y, _mm256_set1_pd (5. * M_PI_4), _CMP_LT_OS);
   s1 = _mm256_blendv_pd (s1, s2, m);
   c1 = _mm256_blendv_pd (c1, _mm256_sub_pd (z, c2), m);
-  jbm_sin4xf64_coswc (_mm256_sub_pd (_mm256_set1_pd (M_PI_2), y), &c2, &s2);
+  jbm_4xf64_sincoswc (_mm256_sub_pd (_mm256_set1_pd (M_PI_2), y), &c2, &s2);
   m = _mm256_cmp_pd (y, _mm256_set1_pd (3. * M_PI_4), _CMP_LT_OS);
   s1 = _mm256_blendv_pd (s1, s2, m);
   c1 = _mm256_blendv_pd (c1, c2, m);
-  jbm_sin4xf64_coswc (y, &s2, &c2);
+  jbm_4xf64_sincoswc (y, &s2, &c2);
   m = _mm256_cmp_pd (y, _mm256_set1_pd (M_PI_4), _CMP_LT_OS);
   *s = _mm256_blendv_pd (s1, s2, m);
   *c = _mm256_blendv_pd (c1, c2, m);
@@ -15408,7 +15408,7 @@ static inline __m256d
 jbm_4xf64_tan (const __m256d x) ///< __m256d vector.
 {
   __m256d s, c;
-  jbm_sin4xf64_cos (x, &s, &c);
+  jbm_4xf64_sincos (x, &s, &c);
   return _mm256_div_pd (s, c);
 }
 
@@ -15442,7 +15442,7 @@ jbm_4xf64_atan (const __m256d x)        ///< __m256d vector.
   ax = _mm256_blendv_pd (ax, jbm_4xf64_reciprocal (ax), m);
   f = jbm_4xf64_atanwc (ax);
   f = _mm256_blendv_pd (f, _mm256_sub_pd (_mm256_set1_pd (M_PI_2), f), m);
-  return jbm_copy4xf64_sign (f, x);
+  return jbm_4xf64_copysign (f, x);
 }
 
 /**
@@ -15459,7 +15459,7 @@ jbm_4xf64_atan2 (const __m256d y,       ///< __m256d y component.
   const __m256d z = _mm256_setzero_pd ();
   __m256d f, g;
   f = jbm_4xf64_atan (_mm256_div_pd (y, x));
-  g = _mm256_add_pd (f, jbm_copy4xf64_sign (pi, y));
+  g = _mm256_add_pd (f, jbm_4xf64_copysign (pi, y));
   return _mm256_blendv_pd (f, g, _mm256_cmp_pd (x, z, _CMP_LT_OS));
 }
 
@@ -15638,7 +15638,7 @@ jbm_4xf64_erf (const __m256d x) ///< __m256d vector.
   const __m256d u = _mm256_set1_pd (1.);
   __m256d ax, f;
   ax = jbm_4xf64_abs (x);
-  f = jbm_copy4xf64_sign (_mm256_sub_pd (u, jbm_4xf64_erfcwc (ax)), x);
+  f = jbm_4xf64_copysign (_mm256_sub_pd (u, jbm_4xf64_erfcwc (ax)), x);
   return _mm256_blendv_pd (f, jbm_4xf64_erfwc (x),
                            _mm256_cmp_pd (ax, u, _CMP_LT_OS));
 
@@ -15715,7 +15715,7 @@ jbm_4xf64_solve_quadratic (const __m256d a,
   k1 = jbm_solve_quadratic_reduced_4xf64 (_mm256_div_pd (b, a),
                                           _mm256_div_pd (c, a), x1, x2);
   k2 = _mm256_div_pd (jbm_4xf64_opposite (c), b);
-  return _mm256_blendv_pd (k1, k2, jbm_small_4xf64 (a));
+  return _mm256_blendv_pd (k1, k2, jbm_4xf64_small (a));
 }
 
 /**
@@ -15797,7 +15797,7 @@ jbm_4xf64_solve_cubic (const __m256d a,
                                                      _mm256_div_pd (d, a), x1,
                                                      x2),
                       jbm_4xf64_solve_quadratic (b, c, d, x1, x2),
-                      jbm_small_4xf64 (a));
+                      jbm_4xf64_small (a));
 }
 
 /**
@@ -15843,7 +15843,7 @@ jbm_4xf64_flux_limiter_centred (const __m256d d1,
     ///< 2nd flux limiter function parameter.
 {
   return _mm256_blendv_pd (_mm256_div_pd (d1, d2), _mm256_setzero_pd (),
-                           jbm_small_4xf64 (d2));
+                           jbm_4xf64_small (d2));
 }
 
 /**
@@ -16244,7 +16244,7 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
   type256 a256, b256, c256, d256; \
   type128 a128; \
   type a = initial_value; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
+  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
   i = 0; \
   if (n > prefetch + 128 / sizeof (type)) \
