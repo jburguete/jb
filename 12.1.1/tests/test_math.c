@@ -1668,7 +1668,7 @@ check_uni_f32 (float (*f) (const float), float (*g) (const float),
   n1 = n - 1;
   xm = 0.5f * (xmin + xmax);
   dx = (xmax - xm) / (float) n1;
-  for (i = 0; i < n; ++i)
+  for (i = 0; (unsigned int) i < n; ++i)
     {
       if (i == 0)
         x = xmin;
@@ -1784,7 +1784,7 @@ check_uni_f64 (double (*f) (const double), double (*g) (const double),
   n1 = n - 1;
   xm = 0.5 * (xmin + xmax);
   dx = (xmax - xm) / (double) n1;
-  for (i = 0; i < n; ++i)
+  for (i = 0; (unsigned int) i < n; ++i)
     {
       if (i == 0)
         x = xmin;
@@ -1890,7 +1890,7 @@ check_uni_4xf32 (__m128 (*f) (const __m128), float (*g) (const float),
   n1 = n - 1;
   xm = 0.5f * (xmin + xmax);
   dx = (xmax - xm) / (float) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 4; ++j, ++i)
         {
@@ -2005,7 +2005,7 @@ check_uni_2xf64 (__m128d (*f) (const __m128d), double (*g) (const double),
   n1 = n - 1;
   xm = 0.5 * (xmin + xmax);
   dx = (xmax - xm) / (double) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 2; ++j, ++i)
         {
@@ -2124,7 +2124,7 @@ check_uni_8xf32 (__m256 (*f) (const __m256), float (*g) (const float),
   n1 = n - 1;
   xm = 0.5f * (xmin + xmax);
   dx = (xmax - xm) / (float) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 8; ++j, ++i)
         {
@@ -2239,7 +2239,7 @@ check_uni_4xf64 (__m256d (*f) (const __m256d), double (*g) (const double),
   n1 = n - 1;
   xm = 0.5 * (xmin + xmax);
   dx = (xmax - xm) / (double) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 4; ++j, ++i)
         {
@@ -2358,7 +2358,7 @@ check_uni_16xf32 (__m512 (*f) (const __m512), float (*g) (const float),
   n1 = n - 1;
   xm = 0.5f * (xmin + xmax);
   dx = (xmax - xm) / (float) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 16; ++j, ++i)
         {
@@ -2473,7 +2473,7 @@ check_uni_8xf64 (__m512d (*f) (const __m512d), double (*g) (const double),
   n1 = n - 1;
   xm = 0.5 * (xmin + xmax);
   dx = (xmax - xm) / (double) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 8; ++j, ++i)
         {
@@ -2592,7 +2592,7 @@ check_uni_4xf32 (float32x4_t (*f) (const float32x4_t), float (*g) (const float),
   n1 = n - 1;
   xm = 0.5f * (xmin + xmax);
   dx = (xmax - xm) / (float) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 4; ++j, ++i)
         {
@@ -2707,7 +2707,7 @@ check_uni_2xf64 (float64x2_t (*f) (const float64x2_t),
   n1 = n - 1;
   xm = 0.5 * (xmin + xmax);
   dx = (xmax - xm) / (double) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 2; ++j, ++i)
         {
@@ -2829,7 +2829,7 @@ check_uni_4xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
   n1 = n - 1;
   xm = 0.5f * (xmin + xmax);
   dx = (xmax - xm) / (float) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 4; ++j, ++i)
         {
@@ -2945,7 +2945,7 @@ check_uni_2xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
   n1 = n - 1;
   xm = 0.5 * (xmin + xmax);
   dx = (xmax - xm) / (double) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 2; ++j, ++i)
         {
@@ -3063,7 +3063,7 @@ check_uni_8xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
   n1 = n - 1;
   xm = 0.5f * (xmin + xmax);
   dx = (xmax - xm) / (float) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 8; ++j, ++i)
         {
@@ -3179,7 +3179,7 @@ check_uni_4xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
   n1 = n - 1;
   xm = 0.5 * (xmin + xmax);
   dx = (xmax - xm) / (double) n1;
-  for (i = 0; i < n;)
+  for (i = 0; (unsigned int) i < n;)
     {
       for (j = 0; j < 4; ++j, ++i)
         {
@@ -3298,7 +3298,7 @@ check_uni (JBFLOAT (*f) (const JBFLOAT), JBFLOAT (*g) (const JBFLOAT),
   n1 = n - 1;
   xm = (JBFLOAT) 0.5 *(xmin + xmax);
   dx = (xmax - xm) / (JBFLOAT) n1;
-  for (i = 0; i < n; ++i)
+  for (i = 0; (unsigned int) i < n; ++i)
     {
       if (i == 0)
         x = xmin;
@@ -3374,7 +3374,7 @@ check_unil (JBDOUBLE (*f) (const JBDOUBLE), JBDOUBLE (*g) (const JBDOUBLE),
   n1 = n - 1;
   xm = (JBDOUBLE) 0.5 *(xmin + xmax);
   dx = (xmax - xm) / (JBDOUBLE) n1;
-  for (i = 0; i < n; ++i)
+  for (i = 0; (unsigned int) i < n; ++i)
     {
       if (i == 0)
         x = xmin;
@@ -6334,7 +6334,7 @@ main (void)
 
   printf ("check farray functions\n");
   fa = jbm_farray_create (pf, 11);
-  printf ("fa=%llu fa->x=%llu\n", (size_t) fa, (size_t) fa->x);
+  printf ("fa=%zu fa->x=%zu\n", (size_t) fa, (size_t) fa->x);
   fa2 = jbm_farray_new (11);
   fa3 = jbm_farray_new (11);
   for (i = 0; i < 11; ++i)
