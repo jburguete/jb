@@ -4387,7 +4387,7 @@ main (int argn, char **argc)
   // init variables
   nthreads = (unsigned int) atoi (argc[2]);
   n = 64l * (unsigned long int) nthreads;
-  n = ((unsigned long int) atol (argc[1]) / n) * n;
+  n = (1ul + ((unsigned long int) atol (argc[1])) / n) * n;
   printf ("calculations number=%lu threads=%u\n", n, nthreads);
   x64 = (double *) JB_MALLOC (n * sizeof (double));
   y64 = (double *) JB_MALLOC (n * sizeof (double));
@@ -5102,6 +5102,7 @@ main (int argn, char **argc)
 
 #endif
 
+  --n;
   printf ("\narray_f32 functions\n");
   efficiency_f32 (TYPE_ADD, thread_array_f32, x32, y32, r, n, -FLT_MAX, FLT_MAX,
                   nthreads, "add_array_f32");

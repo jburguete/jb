@@ -7813,6 +7813,23 @@ jbm_16xf32_sincoswc (const __m512 x,
 }
 
 /**
+ * Function to calculate reduction to \f$2\,\pi\f$ in trigonometric functions
+ * (__m512).
+ *
+ * \return reduced vector (__m512).
+ */
+static inline __m512
+jbm_16xf32_trig (const __m512 x,        ///< __m512 vector.
+                 __m512i *q)    ///< quadrant (__m512i).
+{
+  __m512 y;
+  y = _mm512_roundscale_ps (_mm512_mul_ps (x, _mm512_set1_ps (1.f / M_PI_2f)),
+                            _MM_FROUND_TO_NEAREST_INT);
+  *q = _mm512_cvtps_epi32 (y);
+  return _mm512_fnmadd_ps (y, _mm512_set1_ps (M_PI_2f), x);
+}
+
+/**
  * Function to calculate the function sin(x) from jbm_16xf32_sinwc and
  * jbm_16xf32_coswc approximations (__m512).
  *
@@ -7933,7 +7950,7 @@ jbm_16xf32_atanwc (const __m512 x)
 {
   return
     _mm512_mul_ps (x,
-                   jbm_16xf32_rational_5_2 (jbm_16xf32_sqr (x), K_ATANWC_F32));
+                   jbm_16xf32_rational_4_2 (jbm_16xf32_sqr (x), K_ATANWC_F32));
 }
 
 /**
@@ -8128,7 +8145,7 @@ jbm_16xf32_erfcwc (const __m512 x)
 {
   __m512 f, x2;
   x2 = jbm_16xf32_sqr (x);
-  f = _mm512_mul_ps (jbm_16xf32_rational_8_4 (jbm_16xf32_reciprocal (x),
+  f = _mm512_mul_ps (jbm_16xf32_rational_7_4 (jbm_16xf32_reciprocal (x),
                                               K_ERFCWC_F32),
                      _mm512_div_ps (x, jbm_16xf32_exp (x2)));
   return
@@ -15632,7 +15649,7 @@ jbm_8xf64_expm1 (const __m512d x)       ///< __m512d vector.
 static inline __m512d
 jbm_8xf64_log2wc (const __m512d x)      ///< __m512d vector.
 {
-  return _mm512_mul_pd (x, jbm_8xf64_rational_12_6 (x, K_LOG2WC_F64));
+  return _mm512_mul_pd (x, jbm_8xf64_rational_11_5 (x, K_LOG2WC_F64));
 }
 
 /**
@@ -15760,6 +15777,23 @@ jbm_8xf64_sincoswc (const __m512d x,
 {
   *s = jbm_8xf64_sinwc (x);
   *c = jbm_8xf64_coswc (x);
+}
+
+/**
+ * Function to calculate reduction to \f$2\,\pi\f$ in trigonometric functions
+ * (__m512d).
+ *
+ * \return reduced vector (__m512d).
+ */
+static inline __m512d
+jbm_8xf64_trig (const __m512d x,        ///< __m512d vector.
+                __m512i *q)     ///< quadrant (__m512i).
+{
+  __m512d y;
+  y = _mm512_roundscale_pd (_mm512_mul_pd (x, _mm512_set1_pd (1. / M_PI_2)),
+                            _MM_FROUND_TO_NEAREST_INT);
+  *q = _mm512_cvtpd_epi64 (y);
+  return _mm512_fnmadd_pd (y, _mm512_set1_pd (M_PI_2), x);
 }
 
 /**
@@ -16087,8 +16121,8 @@ jbm_8xf64_erfcwc (const __m512d x)
 {
   __m512d f, x2;
   x2 = jbm_8xf64_sqr (x);
-  f = _mm512_mul_pd (jbm_8xf64_rational_18_10 (jbm_8xf64_reciprocal (x),
-                                               K_ERFCWC_F64),
+  f = _mm512_mul_pd (jbm_8xf64_rational_16_8 (jbm_8xf64_reciprocal (x),
+                                              K_ERFCWC_F64),
                      _mm512_div_pd (x, jbm_8xf64_exp (x2)));
   return
     _mm512_mask_mov_pd (f, _mm512_cmp_pd_mask (x,
@@ -16593,8 +16627,8 @@ jbm_array_f32_sqrt (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 _mm512_sqrt_ps, _mm256_sqrt_ps, _mm_sqrt_ps, sqrtf);
 }
 
@@ -16606,8 +16640,8 @@ jbm_array_f32_dbl (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_dbl, jbm_8xf32_dbl, jbm_4xf32_dbl, jbm_f32_dbl);
 }
 
@@ -16619,8 +16653,8 @@ jbm_array_f32_sqr (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_sqr, jbm_8xf32_sqr, jbm_4xf32_sqr, jbm_f32_sqr);
 }
 
@@ -16632,8 +16666,8 @@ jbm_array_f32_opposite (float *restrict xr,     ///< result float array.
                         const float *restrict xd,       ///< data float array.
                         const unsigned int n)   ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_opposite, jbm_8xf32_opposite, jbm_4xf32_opposite,
                 jbm_f32_opposite);
 }
@@ -16646,8 +16680,8 @@ jbm_array_f32_reciprocal (float *restrict xr,   ///< result float array.
                           const float *restrict xd,     ///< data float array.
                           const unsigned int n) ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_reciprocal, jbm_8xf32_reciprocal,
                 jbm_4xf32_reciprocal, jbm_f32_reciprocal);
 }
@@ -16660,8 +16694,8 @@ jbm_array_f32_abs (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_abs, jbm_8xf32_abs, jbm_4xf32_abs, jbm_f32_abs);
 }
 
@@ -16673,8 +16707,8 @@ jbm_array_f32_cbrt (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_cbrt, jbm_8xf32_cbrt, jbm_4xf32_cbrt, jbm_f32_cbrt);
 }
 
@@ -16686,8 +16720,8 @@ jbm_array_f32_exp2 (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_exp2, jbm_8xf32_exp2, jbm_4xf32_exp2, jbm_f32_exp2);
 }
 
@@ -16699,8 +16733,8 @@ jbm_array_f32_exp (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_exp, jbm_8xf32_exp, jbm_4xf32_exp, jbm_f32_exp);
 }
 
@@ -16712,8 +16746,8 @@ jbm_array_f32_exp10 (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_exp10, jbm_8xf32_exp10, jbm_4xf32_exp10,
                 jbm_f32_exp10);
 }
@@ -16726,8 +16760,8 @@ jbm_array_f32_expm1 (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_expm1, jbm_8xf32_expm1, jbm_4xf32_expm1,
                 jbm_f32_expm1);
 }
@@ -16740,8 +16774,8 @@ jbm_array_f32_log2 (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_log2, jbm_8xf32_log2, jbm_4xf32_log2, jbm_f32_log2);
 }
 
@@ -16753,8 +16787,8 @@ jbm_array_f32_log (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_log, jbm_8xf32_log, jbm_4xf32_log, jbm_f32_log);
 }
 
@@ -16766,8 +16800,8 @@ jbm_array_f32_log10 (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_log10, jbm_8xf32_log10, jbm_4xf32_log10,
                 jbm_f32_log10);
 }
@@ -16780,8 +16814,8 @@ jbm_array_f32_sin (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_sin, jbm_8xf32_sin, jbm_4xf32_sin, jbm_f32_sin);
 }
 
@@ -16793,8 +16827,8 @@ jbm_array_f32_cos (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_cos, jbm_8xf32_cos, jbm_4xf32_cos, jbm_f32_cos);
 }
 
@@ -16806,8 +16840,8 @@ jbm_array_f32_tan (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_tan, jbm_8xf32_tan, jbm_4xf32_tan, jbm_f32_tan);
 }
 
@@ -16819,8 +16853,8 @@ jbm_array_f32_asin (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_asin, jbm_8xf32_asin, jbm_4xf32_asin, jbm_f32_asin);
 }
 
@@ -16832,8 +16866,8 @@ jbm_array_f32_acos (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_acos, jbm_8xf32_acos, jbm_4xf32_acos, jbm_f32_acos);
 }
 
@@ -16845,8 +16879,8 @@ jbm_array_f32_atan (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_atan, jbm_8xf32_atan, jbm_4xf32_atan, jbm_f32_atan);
 }
 
@@ -16858,8 +16892,8 @@ jbm_array_f32_sinh (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_sinh, jbm_8xf32_sinh, jbm_4xf32_sinh, jbm_f32_sinh);
 }
 
@@ -16871,8 +16905,8 @@ jbm_array_f32_cosh (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_cosh, jbm_8xf32_cosh, jbm_4xf32_cosh, jbm_f32_cosh);
 }
 
@@ -16884,8 +16918,8 @@ jbm_array_f32_tanh (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_tanh, jbm_8xf32_tanh, jbm_4xf32_tanh, jbm_f32_tanh);
 }
 
@@ -16897,8 +16931,8 @@ jbm_array_f32_asinh (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_asinh, jbm_8xf32_asinh, jbm_4xf32_asinh,
                 jbm_f32_asinh);
 }
@@ -16911,8 +16945,8 @@ jbm_array_f32_acosh (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_acosh, jbm_8xf32_acosh, jbm_4xf32_acosh,
                 jbm_f32_acosh);
 }
@@ -16925,8 +16959,8 @@ jbm_array_f32_atanh (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_atanh, jbm_8xf32_atanh, jbm_4xf32_atanh,
                 jbm_f32_atanh);
 }
@@ -16939,8 +16973,8 @@ jbm_array_f32_erf (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_erf, jbm_8xf32_erf, jbm_4xf32_erf, jbm_f32_erf);
 }
 
@@ -16952,8 +16986,8 @@ jbm_array_f32_erfc (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, _mm512_load_ps, _mm256_load_ps,
-                _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
+  JBM_ARRAY_OP (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps,
                 jbm_16xf32_erfc, jbm_8xf32_erfc, jbm_4xf32_erfc, jbm_f32_erfc);
 }
 
@@ -16966,8 +17000,8 @@ static inline float
 jbm_array_f32_sum (const float *x,      ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP (x, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                       _mm256_load_ps, _mm_load_ps, _mm512_add_ps,
+  JBM_ARRAY_REDUCE_OP (x, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                       _mm256_loadu_ps, _mm_loadu_ps, _mm512_add_ps,
                        _mm256_add_ps, _mm_add_ps, JBM_ADD,
                        jbm_16xf32_reduce_add, jbm_8xf32_reduce_add,
                        jbm_4xf32_reduce_add, 0.f);
@@ -16982,8 +17016,8 @@ static inline float
 jbm_array_f32_reduce_max (const float *x,       ///< float array.
                           const unsigned int n) ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP (x, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                       _mm256_load_ps, _mm_load_ps, _mm512_max_ps,
+  JBM_ARRAY_REDUCE_OP (x, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                       _mm256_loadu_ps, _mm_loadu_ps, _mm512_max_ps,
                        _mm256_max_ps, _mm_max_ps, fmaxf, jbm_16xf32_reduce_max,
                        jbm_8xf32_reduce_max, jbm_4xf32_reduce_max, -INFINITY);
 }
@@ -16997,8 +17031,8 @@ static inline float
 jbm_array_f32_reduce_min (const float *x,       ///< float array.
                           const unsigned int n) ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP (x, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                       _mm256_load_ps, _mm_load_ps, _mm512_min_ps,
+  JBM_ARRAY_REDUCE_OP (x, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                       _mm256_loadu_ps, _mm_loadu_ps, _mm512_min_ps,
                        _mm256_min_ps, _mm_min_ps, fminf, jbm_16xf32_reduce_min,
                        jbm_8xf32_reduce_min, jbm_4xf32_reduce_min, INFINITY);
 }
@@ -17013,8 +17047,8 @@ jbm_array_f32_reduce_maxmin (const float *x,    ///< float array.
                              const unsigned int n)
                              ///< number of array elements.
 {
-  JBM_ARRAY_MAXMIN (x, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                    _mm256_load_ps, _mm_load_ps, _mm512_max_ps, _mm256_max_ps,
+  JBM_ARRAY_MAXMIN (x, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                    _mm256_loadu_ps, _mm_loadu_ps, _mm512_max_ps, _mm256_max_ps,
                     _mm_max_ps, fmaxf, _mm512_min_ps, _mm256_min_ps, _mm_min_ps,
                     fmin, jbm_16xf32_reduce_max, jbm_8xf32_reduce_max,
                     jbm_4xf32_reduce_max, jbm_16xf32_reduce_min,
@@ -17031,10 +17065,11 @@ jbm_array_f32_add1 (float *restrict xr, ///< result float array.
                     const float x2,     ///< addend float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
-                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-                 _mm512_add_ps, _mm256_add_ps, _mm_add_ps, JBM_ADD);
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                 _mm256_loadu_ps, _mm_loadu_ps, _mm512_storeu_ps,
+                 _mm256_storeu_ps, _mm_storeu_ps, _mm512_set1_ps,
+                 _mm256_set1_ps, _mm_set1_ps, _mm512_add_ps, _mm256_add_ps,
+                 _mm_add_ps, JBM_ADD);
 }
 
 /**
@@ -17046,10 +17081,11 @@ jbm_array_f32_sub1 (float *restrict xr, ///< result float array.
                     const float x2,     ///< subtrahend float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
-                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-                 _mm512_sub_ps, _mm256_sub_ps, _mm_sub_ps, JBM_SUB);
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                 _mm256_loadu_ps, _mm_loadu_ps, _mm512_storeu_ps,
+                 _mm256_storeu_ps, _mm_storeu_ps, _mm512_set1_ps,
+                 _mm256_set1_ps, _mm_set1_ps, _mm512_sub_ps, _mm256_sub_ps,
+                 _mm_sub_ps, JBM_SUB);
 }
 
 /**
@@ -17061,10 +17097,11 @@ jbm_array_f32_mul1 (float *restrict xr, ///< result float array.
                     const float x2,     ///< multiplicand float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
-                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-                 _mm512_mul_ps, _mm256_mul_ps, _mm_mul_ps, JBM_MUL);
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                 _mm256_loadu_ps, _mm_loadu_ps, _mm512_storeu_ps,
+                 _mm256_storeu_ps, _mm_storeu_ps, _mm512_set1_ps,
+                 _mm256_set1_ps, _mm_set1_ps, _mm512_mul_ps, _mm256_mul_ps,
+                 _mm_mul_ps, JBM_MUL);
 }
 
 /**
@@ -17076,10 +17113,11 @@ jbm_array_f32_div1 (float *restrict xr, ///< result float array.
                     const float x2,     ///< divisor float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
-                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-                 _mm512_div_ps, _mm256_div_ps, _mm_div_ps, JBM_DIV);
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                 _mm256_loadu_ps, _mm_loadu_ps, _mm512_storeu_ps,
+                 _mm256_storeu_ps, _mm_storeu_ps, _mm512_set1_ps,
+                 _mm256_set1_ps, _mm_set1_ps, _mm512_div_ps, _mm256_div_ps,
+                 _mm_div_ps, JBM_DIV);
 }
 
 /**
@@ -17091,10 +17129,11 @@ jbm_array_f32_max1 (float *restrict xr, ///< result float array.
                     const float x2,     ///< float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
-                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-                 _mm512_max_ps, _mm256_max_ps, _mm_max_ps, fmaxf);
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                 _mm256_loadu_ps, _mm_loadu_ps, _mm512_storeu_ps,
+                 _mm256_storeu_ps, _mm_storeu_ps, _mm512_set1_ps,
+                 _mm256_set1_ps, _mm_set1_ps, _mm512_max_ps, _mm256_max_ps,
+                 _mm_max_ps, fmaxf);
 }
 
 /**
@@ -17106,10 +17145,11 @@ jbm_array_f32_min1 (float *restrict xr, ///< result float array.
                     const float x2,     ///< float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
-                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-                 _mm512_min_ps, _mm256_min_ps, _mm_min_ps, fminf);
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                 _mm256_loadu_ps, _mm_loadu_ps, _mm512_storeu_ps,
+                 _mm256_storeu_ps, _mm_storeu_ps, _mm512_set1_ps,
+                 _mm256_set1_ps, _mm_set1_ps, _mm512_min_ps, _mm256_min_ps,
+                 _mm_min_ps, fminf);
 }
 
 /**
@@ -17121,10 +17161,11 @@ jbm_array_f32_mod1 (float *restrict xr, ///< result float array.
                     const float x2,     ///< float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
-                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-                 jbm_16xf32_mod, jbm_8xf32_mod, jbm_4xf32_mod, jbm_f32_mod);
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                 _mm256_loadu_ps, _mm_loadu_ps, _mm512_storeu_ps,
+                 _mm256_storeu_ps, _mm_storeu_ps, _mm512_set1_ps,
+                 _mm256_set1_ps, _mm_set1_ps, jbm_16xf32_mod, jbm_8xf32_mod,
+                 jbm_4xf32_mod, jbm_f32_mod);
 }
 
 /**
@@ -17136,10 +17177,11 @@ jbm_array_f32_pow1 (float *restrict xr, ///< result float array.
                     const float x2,     ///< float number.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                 _mm256_load_ps, _mm_load_ps, _mm512_store_ps, _mm256_store_ps,
-                 _mm_store_ps, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
-                 jbm_16xf32_pow, jbm_8xf32_pow, jbm_4xf32_pow, jbm_f32_pow);
+  JBM_ARRAY_OP1 (xr, x1, x2, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                 _mm256_loadu_ps, _mm_loadu_ps, _mm512_storeu_ps,
+                 _mm256_storeu_ps, _mm_storeu_ps, _mm512_set1_ps,
+                 _mm256_set1_ps, _mm_set1_ps, jbm_16xf32_pow, jbm_8xf32_pow,
+                 jbm_4xf32_pow, jbm_f32_pow);
 }
 
 /**
@@ -17151,9 +17193,10 @@ jbm_array_f32_add (float *restrict xr,  ///< result float array.
                    const float *restrict x2,    ///< 2nd addend float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
-                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
-                 _mm512_add_ps, _mm256_add_ps, _mm_add_ps, JBM_ADD);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                 _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
+                 _mm_storeu_ps, _mm512_add_ps, _mm256_add_ps, _mm_add_ps,
+                 JBM_ADD);
 }
 
 /**
@@ -17165,9 +17208,10 @@ jbm_array_f32_sub (float *restrict xr,  ///< result float array.
                    const float *restrict x2,    ///< subtrahend float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
-                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
-                 _mm512_sub_ps, _mm256_sub_ps, _mm_sub_ps, JBM_SUB);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                 _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
+                 _mm_storeu_ps, _mm512_sub_ps, _mm256_sub_ps, _mm_sub_ps,
+                 JBM_SUB);
 }
 
 /**
@@ -17179,9 +17223,10 @@ jbm_array_f32_mul (float *restrict xr,  ///< result float array.
                    const float *restrict x2,    ///< multiplicand float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
-                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
-                 _mm512_mul_ps, _mm256_mul_ps, _mm_mul_ps, JBM_MUL);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                 _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
+                 _mm_storeu_ps, _mm512_mul_ps, _mm256_mul_ps, _mm_mul_ps,
+                 JBM_MUL);
 }
 
 /**
@@ -17193,9 +17238,10 @@ jbm_array_f32_div (float *restrict xr,  ///< result float array.
                    const float *restrict x2,    ///< divisor float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
-                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
-                 _mm512_div_ps, _mm256_div_ps, _mm_div_ps, JBM_DIV);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                 _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
+                 _mm_storeu_ps, _mm512_div_ps, _mm256_div_ps, _mm_div_ps,
+                 JBM_DIV);
 }
 
 /**
@@ -17207,9 +17253,9 @@ jbm_array_f32_max (float *restrict xr,  ///< result float array.
                    const float *restrict x2,    ///< 2nd float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
-                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
-                 _mm512_max_ps, _mm256_max_ps, _mm_max_ps, fmax);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                 _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
+                 _mm_storeu_ps, _mm512_max_ps, _mm256_max_ps, _mm_max_ps, fmax);
 }
 
 /**
@@ -17221,9 +17267,9 @@ jbm_array_f32_min (float *restrict xr,  ///< result float array.
                    const float *restrict x2,    ///< 2nd float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
-                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
-                 _mm512_min_ps, _mm256_min_ps, _mm_min_ps, fmin);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                 _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
+                 _mm_storeu_ps, _mm512_min_ps, _mm256_min_ps, _mm_min_ps, fmin);
 }
 
 /**
@@ -17235,9 +17281,10 @@ jbm_array_f32_mod (float *restrict xr,  ///< result float array.
                    const float *restrict x2,    ///< 2nd float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
-                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
-                 jbm_16xf32_mod, jbm_8xf32_mod, jbm_4xf32_mod, jbm_f32_mod);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                 _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
+                 _mm_storeu_ps, jbm_16xf32_mod, jbm_8xf32_mod, jbm_4xf32_mod,
+                 jbm_f32_mod);
 }
 
 /**
@@ -17249,9 +17296,10 @@ jbm_array_f32_pow (float *restrict xr,  ///< result float array.
                    const float *restrict x2,    ///< 2nd float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_load_ps, _mm256_load_ps,
-                 _mm_load_ps, _mm512_store_ps, _mm256_store_ps, _mm_store_ps,
-                 jbm_16xf32_pow, jbm_8xf32_pow, jbm_4xf32_pow, jbm_f32_pow);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                 _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
+                 _mm_storeu_ps, jbm_16xf32_pow, jbm_8xf32_pow, jbm_4xf32_pow,
+                 jbm_f32_pow);
 }
 
 /**
@@ -17264,8 +17312,8 @@ jbm_array_f32_dot (const float *restrict x1,    ///< multiplier float array.
                    const float *restrict x2,    ///< multiplicand float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_DOT (x1, x2, n, __m512, __m256, __m128, float, _mm512_load_ps,
-                 _mm256_load_ps, _mm_load_ps, _mm512_mul_ps, _mm256_mul_ps,
+  JBM_ARRAY_DOT (x1, x2, n, __m512, __m256, __m128, float, _mm512_loadu_ps,
+                 _mm256_loadu_ps, _mm_loadu_ps, _mm512_mul_ps, _mm256_mul_ps,
                  _mm_mul_ps, _mm512_add_ps, _mm256_add_ps, _mm_add_ps,
                  _mm512_fmadd_ps, _mm256_fmadd_ps, _mm_fmadd_ps,
                  jbm_16xf32_reduce_add, jbm_8xf32_reduce_add,
@@ -17280,8 +17328,8 @@ jbm_array_f64_sqrt (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 _mm512_sqrt_pd, _mm256_sqrt_pd, _mm_sqrt_pd, sqrt);
 }
 
@@ -17293,8 +17341,8 @@ jbm_array_f64_dbl (double *restrict xr, ///< result double array.
                    const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_dbl, jbm_4xf64_dbl, jbm_2xf64_dbl, jbm_f64_dbl);
 }
 
@@ -17306,8 +17354,8 @@ jbm_array_f64_sqr (double *restrict xr, ///< result double array.
                    const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_sqr, jbm_4xf64_sqr, jbm_2xf64_sqr, jbm_f64_sqr);
 }
 
@@ -17319,8 +17367,8 @@ jbm_array_f64_opposite (double *restrict xr,    ///< result double array.
                         const double *restrict xd,      ///< data double array.
                         const unsigned int n)   ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_opposite, jbm_4xf64_opposite, jbm_2xf64_opposite,
                 jbm_f64_opposite);
 }
@@ -17333,8 +17381,8 @@ jbm_array_f64_reciprocal (double *restrict xr,  ///< result double array.
                           const double *restrict xd,    ///< data double array.
                           const unsigned int n) ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_reciprocal, jbm_4xf64_reciprocal,
                 jbm_2xf64_reciprocal, jbm_f64_reciprocal);
 }
@@ -17347,8 +17395,8 @@ jbm_array_f64_abs (double *restrict xr, ///< result double array.
                    const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_abs, jbm_4xf64_abs, jbm_2xf64_abs, jbm_f64_abs);
 }
 
@@ -17360,8 +17408,8 @@ jbm_array_f64_cbrt (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_cbrt, jbm_4xf64_cbrt, jbm_2xf64_cbrt, jbm_f64_cbrt);
 }
 
@@ -17373,8 +17421,8 @@ jbm_array_f64_exp2 (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_exp2, jbm_4xf64_exp2, jbm_2xf64_exp2, jbm_f64_exp2);
 }
 
@@ -17386,8 +17434,8 @@ jbm_array_f64_exp (double *restrict xr, ///< result double array.
                    const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_exp, jbm_4xf64_exp, jbm_2xf64_exp, jbm_f64_exp);
 }
 
@@ -17399,8 +17447,8 @@ jbm_array_f64_exp10 (double *restrict xr,       ///< result double array.
                      const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_exp10, jbm_4xf64_exp10, jbm_2xf64_exp10,
                 jbm_f64_exp10);
 }
@@ -17413,8 +17461,8 @@ jbm_array_f64_expm1 (double *restrict xr,       ///< result double array.
                      const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_expm1, jbm_4xf64_expm1, jbm_2xf64_expm1,
                 jbm_f64_expm1);
 }
@@ -17427,8 +17475,8 @@ jbm_array_f64_log2 (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_log2, jbm_4xf64_log2, jbm_2xf64_log2, jbm_f64_log2);
 }
 
@@ -17440,8 +17488,8 @@ jbm_array_f64_log (double *restrict xr, ///< result double array.
                    const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_log, jbm_4xf64_log, jbm_2xf64_log, jbm_f64_log);
 }
 
@@ -17453,8 +17501,8 @@ jbm_array_f64_log10 (double *restrict xr,       ///< result double array.
                      const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_log10, jbm_4xf64_log10, jbm_2xf64_log10,
                 jbm_f64_log10);
 }
@@ -17467,8 +17515,8 @@ jbm_array_f64_sin (double *restrict xr, ///< result double array.
                    const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_sin, jbm_4xf64_sin, jbm_2xf64_sin, jbm_f64_sin);
 }
 
@@ -17480,8 +17528,8 @@ jbm_array_f64_cos (double *restrict xr, ///< result double array.
                    const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_cos, jbm_4xf64_cos, jbm_2xf64_cos, jbm_f64_cos);
 }
 
@@ -17493,8 +17541,8 @@ jbm_array_f64_tan (double *restrict xr, ///< result double array.
                    const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_tan, jbm_4xf64_tan, jbm_2xf64_tan, jbm_f64_tan);
 }
 
@@ -17506,8 +17554,8 @@ jbm_array_f64_asin (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_asin, jbm_4xf64_asin, jbm_2xf64_asin, jbm_f64_asin);
 }
 
@@ -17519,8 +17567,8 @@ jbm_array_f64_acos (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_acos, jbm_4xf64_acos, jbm_2xf64_acos, jbm_f64_acos);
 }
 
@@ -17532,8 +17580,8 @@ jbm_array_f64_atan (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_atan, jbm_4xf64_atan, jbm_2xf64_atan, jbm_f64_atan);
 }
 
@@ -17545,8 +17593,8 @@ jbm_array_f64_sinh (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_sinh, jbm_4xf64_sinh, jbm_2xf64_sinh, jbm_f64_sinh);
 }
 
@@ -17558,8 +17606,8 @@ jbm_array_f64_cosh (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_cosh, jbm_4xf64_cosh, jbm_2xf64_cosh, jbm_f64_cosh);
 }
 
@@ -17571,8 +17619,8 @@ jbm_array_f64_tanh (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_tanh, jbm_4xf64_tanh, jbm_2xf64_tanh, jbm_f64_tanh);
 }
 
@@ -17584,8 +17632,8 @@ jbm_array_f64_asinh (double *restrict xr,       ///< result double array.
                      const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_asinh, jbm_4xf64_asinh, jbm_2xf64_asinh,
                 jbm_f64_asinh);
 }
@@ -17598,8 +17646,8 @@ jbm_array_f64_acosh (double *restrict xr,       ///< result double array.
                      const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_acosh, jbm_4xf64_acosh, jbm_2xf64_acosh,
                 jbm_f64_acosh);
 }
@@ -17612,8 +17660,8 @@ jbm_array_f64_atanh (double *restrict xr,       ///< result double array.
                      const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_atanh, jbm_4xf64_atanh, jbm_2xf64_atanh,
                 jbm_f64_atanh);
 }
@@ -17626,8 +17674,8 @@ jbm_array_f64_erf (double *restrict xr, ///< result double array.
                    const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_erf, jbm_4xf64_erf, jbm_2xf64_erf, jbm_f64_erf);
 }
 
@@ -17639,8 +17687,8 @@ jbm_array_f64_erfc (double *restrict xr,        ///< result double array.
                     const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, double, _mm512_load_pd, _mm256_load_pd,
-                _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
+  JBM_ARRAY_OP (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
                 jbm_8xf64_erfc, jbm_4xf64_erfc, jbm_2xf64_erfc, jbm_f64_erfc);
 }
 
@@ -17653,8 +17701,8 @@ static inline double
 jbm_array_f64_sum (const double *x,     ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP (x, n, __m512d, __m256d, __m128d, double, _mm512_load_pd,
-                       _mm256_load_pd, _mm_load_pd, _mm512_add_pd,
+  JBM_ARRAY_REDUCE_OP (x, n, __m512d, __m256d, __m128d, double, _mm512_loadu_pd,
+                       _mm256_loadu_pd, _mm_loadu_pd, _mm512_add_pd,
                        _mm256_add_pd, _mm_add_pd, JBM_ADD,
                        jbm_8xf64_reduce_add, jbm_4xf64_reduce_add,
                        jbm_2xf64_reduce_add, 0.);
@@ -17669,8 +17717,8 @@ static inline double
 jbm_array_f64_reduce_max (const double *x,      ///< double array.
                           const unsigned int n) ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP (x, n, __m512d, __m256d, __m128d, double, _mm512_load_pd,
-                       _mm256_load_pd, _mm_load_pd, _mm512_max_pd,
+  JBM_ARRAY_REDUCE_OP (x, n, __m512d, __m256d, __m128d, double, _mm512_loadu_pd,
+                       _mm256_loadu_pd, _mm_loadu_pd, _mm512_max_pd,
                        _mm256_max_pd, _mm_max_pd, fmaxf, jbm_8xf64_reduce_max,
                        jbm_4xf64_reduce_max, jbm_2xf64_reduce_max, -INFINITY);
 }
@@ -17684,8 +17732,8 @@ static inline double
 jbm_array_f64_reduce_min (const double *x,      ///< double array.
                           const unsigned int n) ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP (x, n, __m512d, __m256d, __m128d, double, _mm512_load_pd,
-                       _mm256_load_pd, _mm_load_pd, _mm512_min_pd,
+  JBM_ARRAY_REDUCE_OP (x, n, __m512d, __m256d, __m128d, double, _mm512_loadu_pd,
+                       _mm256_loadu_pd, _mm_loadu_pd, _mm512_min_pd,
                        _mm256_min_pd, _mm_min_pd, fminf, jbm_8xf64_reduce_min,
                        jbm_4xf64_reduce_min, jbm_2xf64_reduce_min, INFINITY);
 }
@@ -17700,8 +17748,8 @@ jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
                              const unsigned int n)
                              ///< number of array elements.
 {
-  JBM_ARRAY_MAXMIN (x, n, __m512d, __m256d, __m128d, double, _mm512_load_pd,
-                    _mm256_load_pd, _mm_load_pd, _mm512_max_pd, _mm256_max_pd,
+  JBM_ARRAY_MAXMIN (x, n, __m512d, __m256d, __m128d, double, _mm512_loadu_pd,
+                    _mm256_loadu_pd, _mm_loadu_pd, _mm512_max_pd, _mm256_max_pd,
                     _mm_max_pd, fmaxf, _mm512_min_pd, _mm256_min_pd, _mm_min_pd,
                     fmin, jbm_8xf64_reduce_max, jbm_4xf64_reduce_max,
                     jbm_2xf64_reduce_max, jbm_8xf64_reduce_min,
@@ -17719,10 +17767,10 @@ jbm_array_f64_add1 (double *restrict xr,        ///< result double array.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
-                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
-                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
-                 _mm_set1_pd, _mm512_add_pd, _mm256_add_pd, _mm_add_pd,
-                 JBM_ADD);
+                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_add_pd,
+                 _mm256_add_pd, _mm_add_pd, JBM_ADD);
 }
 
 /**
@@ -17735,10 +17783,10 @@ jbm_array_f64_sub1 (double *restrict xr,        ///< result double array.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
-                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
-                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
-                 _mm_set1_pd, _mm512_sub_pd, _mm256_sub_pd, _mm_sub_pd,
-                 JBM_SUB);
+                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_sub_pd,
+                 _mm256_sub_pd, _mm_sub_pd, JBM_SUB);
 }
 
 /**
@@ -17751,10 +17799,10 @@ jbm_array_f64_mul1 (double *restrict xr,        ///< result double array.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
-                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
-                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
-                 _mm_set1_pd, _mm512_mul_pd, _mm256_mul_pd, _mm_mul_pd,
-                 JBM_MUL);
+                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_mul_pd,
+                 _mm256_mul_pd, _mm_mul_pd, JBM_MUL);
 }
 
 /**
@@ -17767,10 +17815,10 @@ jbm_array_f64_div1 (double *restrict xr,        ///< result double array.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
-                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
-                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
-                 _mm_set1_pd, _mm512_div_pd, _mm256_div_pd, _mm_div_pd,
-                 JBM_DIV);
+                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_div_pd,
+                 _mm256_div_pd, _mm_div_pd, JBM_DIV);
 }
 
 /**
@@ -17783,9 +17831,10 @@ jbm_array_f64_max1 (double *restrict xr,        ///< result double array.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
-                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
-                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
-                 _mm_set1_pd, _mm512_max_pd, _mm256_max_pd, _mm_max_pd, fmax);
+                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_max_pd,
+                 _mm256_max_pd, _mm_max_pd, fmax);
 }
 
 /**
@@ -17798,9 +17847,10 @@ jbm_array_f64_min1 (double *restrict xr,        ///< result double array.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
-                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
-                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
-                 _mm_set1_pd, _mm512_min_pd, _mm256_min_pd, _mm_min_pd, fmin);
+                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, _mm512_min_pd,
+                 _mm256_min_pd, _mm_min_pd, fmin);
 }
 
 /**
@@ -17813,10 +17863,10 @@ jbm_array_f64_mod1 (double *restrict xr,        ///< result double array.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
-                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
-                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
-                 _mm_set1_pd, jbm_8xf64_mod, jbm_4xf64_mod, jbm_2xf64_mod,
-                 jbm_f64_mod);
+                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, jbm_8xf64_mod,
+                 jbm_4xf64_mod, jbm_2xf64_mod, jbm_f64_mod);
 }
 
 /**
@@ -17829,10 +17879,10 @@ jbm_array_f64_pow1 (double *restrict xr,        ///< result double array.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, __m512d, __m256d, __m128d, double,
-                 _mm512_load_pd, _mm256_load_pd, _mm_load_pd, _mm512_store_pd,
-                 _mm256_store_pd, _mm_store_pd, _mm512_set1_pd, _mm256_set1_pd,
-                 _mm_set1_pd, jbm_8xf64_pow, jbm_4xf64_pow, jbm_2xf64_pow,
-                 jbm_f64_pow);
+                 _mm512_loadu_pd, _mm256_loadu_pd, _mm_loadu_pd,
+                 _mm512_storeu_pd, _mm256_storeu_pd, _mm_storeu_pd,
+                 _mm512_set1_pd, _mm256_set1_pd, _mm_set1_pd, jbm_8xf64_pow,
+                 jbm_4xf64_pow, jbm_2xf64_pow, jbm_f64_pow);
 }
 
 /**
@@ -17844,9 +17894,10 @@ jbm_array_f64_add (double *restrict xr, ///< result double array.
                    const double *restrict x2,   ///< 2nd addend double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
-                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
-                 _mm512_add_pd, _mm256_add_pd, _mm_add_pd, JBM_ADD);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                 _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
+                 _mm_storeu_pd, _mm512_add_pd, _mm256_add_pd, _mm_add_pd,
+                 JBM_ADD);
 }
 
 /**
@@ -17858,9 +17909,10 @@ jbm_array_f64_sub (double *restrict xr, ///< result double array.
                    const double *restrict x2,   ///< subtrahend double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
-                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
-                 _mm512_sub_pd, _mm256_sub_pd, _mm_sub_pd, JBM_SUB);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                 _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
+                 _mm_storeu_pd, _mm512_sub_pd, _mm256_sub_pd, _mm_sub_pd,
+                 JBM_SUB);
 }
 
 /**
@@ -17872,9 +17924,10 @@ jbm_array_f64_mul (double *restrict xr, ///< result double array.
                    const double *restrict x2,   ///< multiplicand double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
-                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
-                 _mm512_mul_pd, _mm256_mul_pd, _mm_mul_pd, JBM_MUL);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                 _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
+                 _mm_storeu_pd, _mm512_mul_pd, _mm256_mul_pd, _mm_mul_pd,
+                 JBM_MUL);
 }
 
 /**
@@ -17886,9 +17939,10 @@ jbm_array_f64_div (double *restrict xr, ///< result double array.
                    const double *restrict x2,   ///< divisor double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
-                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
-                 _mm512_div_pd, _mm256_div_pd, _mm_div_pd, JBM_DIV);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                 _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
+                 _mm_storeu_pd, _mm512_div_pd, _mm256_div_pd, _mm_div_pd,
+                 JBM_DIV);
 }
 
 /**
@@ -17900,9 +17954,9 @@ jbm_array_f64_max (double *restrict xr, ///< result double array.
                    const double *restrict x2,   ///< 2nd double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
-                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
-                 _mm512_max_pd, _mm256_max_pd, _mm_max_pd, fmax);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                 _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
+                 _mm_storeu_pd, _mm512_max_pd, _mm256_max_pd, _mm_max_pd, fmax);
 }
 
 /**
@@ -17914,9 +17968,9 @@ jbm_array_f64_min (double *restrict xr, ///< result double array.
                    const double *restrict x2,   ///< 2nd double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
-                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
-                 _mm512_min_pd, _mm256_min_pd, _mm_min_pd, fmin);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                 _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
+                 _mm_storeu_pd, _mm512_min_pd, _mm256_min_pd, _mm_min_pd, fmin);
 }
 
 /**
@@ -17928,9 +17982,10 @@ jbm_array_f64_mod (double *restrict xr, ///< result double array.
                    const double *restrict x2,   ///< 2nd double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
-                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
-                 jbm_8xf64_mod, jbm_4xf64_mod, jbm_2xf64_mod, jbm_f64_mod);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                 _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
+                 _mm_storeu_pd, jbm_8xf64_mod, jbm_4xf64_mod, jbm_2xf64_mod,
+                 jbm_f64_mod);
 }
 
 /**
@@ -17942,9 +17997,10 @@ jbm_array_f64_pow (double *restrict xr, ///< result double array.
                    const double *restrict x2,   ///< 2nd double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_load_pd, _mm256_load_pd,
-                 _mm_load_pd, _mm512_store_pd, _mm256_store_pd, _mm_store_pd,
-                 jbm_8xf64_pow, jbm_4xf64_pow, jbm_2xf64_pow, jbm_f64_pow);
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                 _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
+                 _mm_storeu_pd, jbm_8xf64_pow, jbm_4xf64_pow, jbm_2xf64_pow,
+                 jbm_f64_pow);
 }
 
 /**
@@ -17957,8 +18013,8 @@ jbm_array_f64_dot (const double *restrict x1,   ///< multiplier double array.
                    const double *restrict x2,   ///< multiplicand double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_DOT (x1, x2, n, __m512d, __m256d, __m128d, double, _mm512_load_pd,
-                 _mm256_load_pd, _mm_load_pd, _mm512_mul_pd, _mm256_mul_pd,
+  JBM_ARRAY_DOT (x1, x2, n, __m512d, __m256d, __m128d, double, _mm512_loadu_pd,
+                 _mm256_loadu_pd, _mm_loadu_pd, _mm512_mul_pd, _mm256_mul_pd,
                  _mm_mul_pd, _mm512_add_pd, _mm256_add_pd, _mm_add_pd,
                  _mm512_fmadd_pd, _mm256_fmadd_pd, _mm_fmadd_pd,
                  jbm_8xf64_reduce_add, jbm_4xf64_reduce_add,

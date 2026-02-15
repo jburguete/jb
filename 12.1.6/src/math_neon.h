@@ -7245,6 +7245,22 @@ jbm_4xf32_sincoswc (const float32x4_t x,
 }
 
 /**
+ * Function to calculate reduction to \f$2\,\pi\f$ in trigonometric functions
+ * (float32x4_t).
+ *
+ * \return reduced vector (float32x4_t).
+ */
+static inline float
+jbm_4xf32_trig (const float32x4_t x,    ///< float32x4_t vector.
+                int32x4_t *q)   ///< quadrant (float32x4_ti).
+{
+  float32x4_t y;
+  y = vrndnq_f32 (vmulq_f32 (x, vdupq_n_f32 (1.f / M_PI_2f)));
+  *q = vcvtq_s32_f32 (y);
+  return vfmsq_f32 (x, y, vdupq_n_f32 (M_PI_2f));
+}
+
+/**
  * Function to calculate the function sin(x) from jbm_4xf32_sinwc and
  * jbm_4xf32_coswc approximations (float32x4_t).
  *
@@ -7355,7 +7371,7 @@ jbm_4xf32_atanwc (const float32x4_t x)
                   ///< float32x4_t vector \f$\in\left[-1,1\right]\f$.
 {
   return
-    vmulq_f32 (x, jbm_4xf32_rational_5_2 (jbm_4xf32_sqr (x), K_ATANWC_F32));
+    vmulq_f32 (x, jbm_4xf32_rational_4_2 (jbm_4xf32_sqr (x), K_ATANWC_F32));
 }
 
 /**
@@ -7542,7 +7558,7 @@ jbm_4xf32_erfcwc (const float32x4_t x)
 {
   float32x4_t f, x2;
   x2 = jbm_4xf32_sqr (x);
-  f = vmulq_f32 (jbm_4xf32_rational_8_4 (jbm_4xf32_reciprocal (x),
+  f = vmulq_f32 (jbm_4xf32_rational_7_4 (jbm_4xf32_reciprocal (x),
                                          K_ERFCWC_F32),
                  vdivq_f32 (x, jbm_4xf32_exp (x2)));
   return vbslq_f32 (vcgtq_f32 (x, vdupq_n_f32 (K_ERFC_MAX_F32)),
@@ -14821,16 +14837,16 @@ jbm_2xf64_expm1 (const float64x2_t x)   ///< float64x2_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
- * [0.5,1] (float64x2_t).
+ * Function to calculate the well conditionated function log2(1+x) for x in
+ * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (float64x2_t).
  *
  * \return function value (float64x2_t).
  */
 static inline float64x2_t
 jbm_2xf64_log2wc (const float64x2_t x)
-///< float64x2_t vector \f$\in[0.5,1]\f$.
+///< float64x2_t vector \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$.
 {
-  return jbm_2xf64_rational_12_6 (x, K_LOG2WC_F64);
+  return vmulq_f64 (x, jbm_2xf64_rational_11_5 (x, K_LOG2WC_F64));
 }
 
 /**
@@ -14965,6 +14981,22 @@ jbm_2xf64_sincoswc (const float64x2_t x,
 {
   *s = jbm_2xf64_sinwc (x);
   *c = jbm_2xf64_coswc (x);
+}
+
+/**
+ * Function to calculate reduction to \f$2\,\pi\f$ in trigonometric functions
+ * (float64x2_t).
+ *
+ * \return reduced vector (float64x2_t).
+ */
+static inline float
+jbm_2xf64_trig (const float64x2_t x,    ///< float64x2_t vector.
+                int64x2_t *q)   ///< quadrant (float64x2_ti).
+{
+  float64x2_t y;
+  y = vrndnq_f64 (vmulq_f64 (x, vdupq_n_f64 (1. / M_PI_2)));
+  *q = vcvtq_s64_f64 (y);
+  return vfmsq_f64 (x, y, vdupq_n_f64 (M_PI_2));
 }
 
 /**
@@ -15263,8 +15295,8 @@ jbm_2xf64_erfcwc (const float64x2_t x)
 {
   float64x2_t f, x2;
   x2 = jbm_2xf64_sqr (x);
-  f = vmulq_f64 (jbm_2xf64_rational_18_10 (jbm_2xf64_reciprocal (x),
-                                           K_ERFCWC_F64),
+  f = vmulq_f64 (jbm_2xf64_rational_16_8 (jbm_2xf64_reciprocal (x),
+                                          K_ERFCWC_F64),
                  vdivq_f64 (x, jbm_2xf64_exp (x2)));
   return vbslq_f64 (vcgtq_f64 (x, vdupq_n_f64 (K_ERFC_MAX_F64)),
                     vdupq_n_f64 (0.), f);

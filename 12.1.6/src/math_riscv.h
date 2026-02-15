@@ -10571,18 +10571,18 @@ jbm_nxf32_tan (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_anxf32_tanwc (const vfloat32m1_t x,
+jbm_nxf32_atanwc (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-1,1\right]\f$.
                   const size_t vl)      ///< array size.
 {
   return
     __riscv_vfmul_vv_f32m1 (x,
-                            jbm_nxf32_rational_5_2 (jbm_nxf32_sqr (x, vl),
+                            jbm_nxf32_rational_4_2 (jbm_nxf32_sqr (x, vl),
                                                     K_ATANWC_F32, vl), vl);
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_anxf32_tanwc
+ * Function to calculate the function atan(x) using the jbm_nxf32_atanwc
  * function (vfloat32m1_t).
  *
  * \return function value (in [-pi/2,pi/2]) (vfloat32m1_t).
@@ -10596,7 +10596,7 @@ jbm_nxf32_atan (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   ax = jbm_nxf32_abs (x, vl);
   m = __riscv_vmfgt_vf_f32m1_b32 (ax, 1.f, vl);
   ax = __riscv_vmerge_vvm_f32m1 (ax, jbm_nxf32_reciprocal (ax, vl), m, vl);
-  f = jbm_anxf32_tanwc (ax, vl);
+  f = jbm_nxf32_atanwc (ax, vl);
   f =
     __riscv_vmerge_vvm_f32m1 (f, __riscv_vfsub_vv_f32m1
                               (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), f, vl),
@@ -10764,7 +10764,7 @@ jbm_anxf32_cosh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_anxf32_tanh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
+jbm_nxf32_atanh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
                  const size_t vl)       ///< array size.
 {
   vfloat32m1_t u;
@@ -10808,7 +10808,7 @@ jbm_nxf32_erfcwc (const vfloat32m1_t x,
   vfloat32m1_t f, x2;
   x2 = jbm_nxf32_sqr (x, vl);
   f =
-    __riscv_vfmul_vv_f32m1 (jbm_nxf32_rational_8_4
+    __riscv_vfmul_vv_f32m1 (jbm_nxf32_rational_7_4
                             (jbm_nxf32_reciprocal (x, vl), K_ERFCWC_F32, vl),
                             __riscv_vfdiv_vv_f32m1 (x, jbm_nxf32_exp (x2, vl),
                                                     vl), vl);
@@ -22053,7 +22053,7 @@ jbm_nxf64_erfcwc (const vfloat64m1_t x,
   vfloat64m1_t f, x2;
   x2 = jbm_nxf64_sqr (x, vl);
   f =
-    __riscv_vfmul_vv_f64m1 (jbm_nxf64_rational_18_10
+    __riscv_vfmul_vv_f64m1 (jbm_nxf64_rational_16_8
                             (jbm_nxf64_reciprocal (x, vl), K_ERFCWC_F64, vl),
                             __riscv_vfdiv_vv_f64m1 (x, jbm_nxf64_exp (x2, vl),
                                                     vl), vl);
@@ -28903,7 +28903,7 @@ jbm_4xf32_acosh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
 static inline vfloat32m1_t
 jbm_4xf32_atanh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
 {
-  return jbm_anxf32_tanh (x, 4);
+  return jbm_nxf32_atanh (x, 4);
 }
 
 /**
@@ -42119,7 +42119,7 @@ jbm_8xf32_acosh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
 static inline vfloat32m1_t
 jbm_8xf32_atanh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
 {
-  return jbm_anxf32_tanh (x, 8);
+  return jbm_nxf32_atanh (x, 8);
 }
 
 /**
