@@ -4391,7 +4391,7 @@ jbm_array_f32_merge (const float *xa,
   return xc;
 }
 
-#if !defined(__SSE4_2__) && !defined(__ARM_NEON__) && !defined(__riscv_vector)
+#if !defined(__SSE4_2__) && !defined(__ARM_NEON) && !defined(__riscv_vector)
 
 /**
  * Function to add 2 float arrays.

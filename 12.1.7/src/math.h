@@ -35,6 +35,7 @@
 
 #include "def.h"
 #include <math.h>
+#include <inttypes.h>
 #include <sys/param.h>
 #if JBM_PRECISION > 5
 #include <quadmath.h>
@@ -77,7 +78,7 @@
 #define JB_ALIGNED __attribute__((aligned(32)))
 #define JB_MALLOC(size) (aligned_alloc (32, size))
 #define JB_FREE aligned_free
-#elif defined(__SSE4_2__) || defined(__ARM_NEON__)
+#elif defined(__SSE4_2__) || defined(__ARM_NEON)
 #define JB_ALIGNED __attribute__((aligned(16)))
 #define JB_MALLOC(size) (aligned_alloc (16, size))
 #define JB_FREE aligned_free

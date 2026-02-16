@@ -4439,7 +4439,7 @@ jbm_array_f64_merge (const double *xa,
   return xc;
 }
 
-#if !defined(__SSE4_2__) && !defined(__ARM_NEON__) && !defined(__riscv_vector)
+#if !defined(__SSE4_2__) && !defined(__ARM_NEON) && !defined(__riscv_vector)
 
 /**
  * Function to add 2 double arrays.

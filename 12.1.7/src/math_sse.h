@@ -14972,8 +14972,7 @@ jbm_2xf64_cbrtwc (const __m128d x)
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_2xf64_abs and
- * jbm_2xf64_pow functions (__m128d).
+ * Function to calculate the function cbrt(x) (__m128d).
  *
  * \return function value (__m128d).
  */

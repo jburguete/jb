@@ -181,7 +181,7 @@ static inline int32x4_t
 jbm_4xf32_div3 (int32x4_t x)    ///< int32x4_t vector.
 {
   const int32x4_t magic = vdupq_n_s32 (0x55555556);
-  int32x4_t even, odd;
+  int32x2_t even, odd;
   even = vshrn_n_s64 (vmull_s32 (vget_low_s32 (x), vget_low_s32 (magic)), 32);
   odd = vshrn_n_s64 (vmull_s32 (vget_high_s32 (x), vget_high_s32 (magic)), 32);
   return vcombine_s32 (even, odd);
@@ -289,22 +289,6 @@ jbm_4xf32_hypot (const float32x4_t x,   ///< 1st float32x4_t vector.
 }
 
 /**
- * Function to calculate the rest of a division (float32x4_t) by a float.
- *
- * \return rest value vector (in [0,|divisor|) interval).
- */
-static inline float32x4_t
-jbm_4xf32_mod1 (const float32x4_t x,    ///< dividend (float32x4_t).
-                const float d)  ///< divisor (float).
-{
-  float32x4_t r;
-  r = vrndmq_f32 (vmulq_f32 (x, 1.f / d));
-  return
-    vbslq_f32 (vcgtq_f32 (jbm_4xf32_abs (r), vdupq_n_f32 (1.f / FLT_EPSILON)),
-               vmulq_n_f32 (d, 0.5f), vfmsq_f32 (x, r, d));
-}
-
-/**
  * Function to calculate the rest of a division (float32x4_t).
  *
  * \return rest value vector (in [0,|divisor|) interval).
@@ -329,26 +313,27 @@ static inline float32x4_t
 jbm_4xf32_frexp (const float32x4_t x,   ///< float32x4_t vector.
                  int32x4_t *e)  ///< pointer to the extracted exponents vector.
 {
-  const int32x4_t zi = vdupq_n_u32 (0);
-  const int32x4_t bias = JBM_4xF32_BIAS;
-  const int32x4_t sign_mask = JBM_4xF32_BITS_SIGN;
-  const int32x4_t mant_mask = JBM_4xF32_BITS_MANTISSA;
+  const uint32x4_t zi = vdupq_n_u32 (0);
+  const uint32x4_t bias = JBM_4xF32_BIAS;
+  const uint32x4_t sign_mask = JBM_4xF32_BITS_SIGN;
+  const uint32x4_t mant_mask = JBM_4xF32_BITS_MANTISSA;
   JBM4xF32 y, z;
   uint32x4_t exp, is_z, is_sub, is_nan, is_finite;
   // y=abs(x)
   y.x = jbm_4xf32_abs (x);
   // masks
   is_z = vceqq_u32 (y.i, zi);
-  is_nan = vcgt_u32 (y.i, vdupq_u32 (JBM_F32_BITS_EXPONENT - 1));
-  is_finite = vbicq_u32 (vdupq_n_u32 (0xffffffff), vorrq_u128 (is_z, is_nan));
+  is_nan = vcgtq_u32 (y.i, vdupq_n_u32 (JBM_F32_BITS_EXPONENT - 1));
+  is_finite = vbicq_u32 (vdupq_n_u32 (0xffffffff), vorrq_u32 (is_z, is_nan));
   // extract exponent
   exp = vshrq_n_u32 (y.i, 23);
   // subnormals
   is_sub = vandq_u32 (is_finite, vceqq_u32 (exp, zi));
-  y.x = vbslq_f32 (is_sub, vmulq_f32 (y.x, vdupq_n_f32 (0x1p23f)), y.x);
-  exp = vbslq_u32 (is_sub, vsubq_u32 (vshrq_n_u32 (y.i, 23), vdupq_n_u32 (23)));
+  y.x = vbslq_f32 (is_sub, vmulq_n_f32 (y.x, 0x1p23f), y.x);
+  exp = vbslq_u32 (is_sub, vsubq_u32 (vshrq_n_u32 (y.i, 23), vdupq_n_u32 (23)),
+                   exp);
   // exponent
-  *e = vbslq_u32 (is_finite, vsubq_u32 (exp, bias), zi);
+  *e = vreinterpretq_s32_u32 (vbslq_u32 (is_finite, vsubq_u32 (exp, bias), zi));
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = vorrq_u32 (vandq_u32 (z.i, sign_mask),
@@ -369,12 +354,12 @@ jbm_4xf32_exp2n (int32x4_t e)   ///< exponent vector (int32x4_t).
   const int32x4_t v127 = vdupq_n_s32 (127);
   const int32x4_t v149 = vdupq_n_s32 (149);
   float32x4_t x;
-  x = vbslq_f32 (vcgtq_s32 (e, kn127),
-                 vreinterpretq_f32_s32 (vshlq_n_s32 (vaddq_s32 (e, k127), 23)),
+  x = vbslq_f32 (vcgtq_s32 (e, vdupq_n_s32 (-127)),
+                 vreinterpretq_f32_s32 (vshlq_n_s32 (vaddq_s32 (e, v127), 23)),
                  vreinterpretq_f32_s32 (vshlq_s32 (vdupq_n_s32 (1),
-                                                   vaddq_s32 (k149, e))));
+                                                   vaddq_s32 (v149, e))));
   x = vbslq_f32 (vcltq_s32 (e, vdupq_n_s32 (-150)), vdupq_n_f32 (0.f), x);
-  return vbslq_f32 (vcgtq_s32 (e, k127), vdupq_n_f32 (INFINITY), x);
+  return vbslq_f32 (vcgtq_s32 (e, v127), vdupq_n_f32 (INFINITY), x);
 }
 
 /**
@@ -7000,8 +6985,8 @@ jbm_4xf32_cbrt (const float32x4_t x)    ///< float32x4_t vector.
   r = vaddq_s32 (r, vandq_s32 (n, v3));
   e3 = vsubq_s32 (e3, vandq_s32 (n, v1));
   y = jbm_4xf32_ldexp (jbm_4xf32_cbrtwc (y), e3);
-  y = vblsq_f32 (vceqq_s32 (r, v1), vmulq_f32 (y, cbrt2), y);
-  y = vblsq_f32 (vceqq_s32 (r, v2), vmulq_f32 (y, cbrt4), y);
+  y = vbslq_f32 (vceqq_s32 (r, v1), vmulq_f32 (y, cbrt2), y);
+  y = vbslq_f32 (vceqq_s32 (r, v2), vmulq_f32 (y, cbrt4), y);
   return jbm_4xf32_copysign (y, x);
 }
 
@@ -7119,15 +7104,16 @@ jbm_4xf32_log2 (const float32x4_t x)    ///< float32x4_t vector.
 {
   const float32x4_t z = vdupq_n_f32 (0.f);
   float32x4_t y;
-  int32x4_t e, m;
+  int32x4_t e;
+  uint32x4_t m;
   y = jbm_4xf32_frexp (x, &e);
-  m = vreinterpretq_u32_f32 (vcltq_f32 (y, vdupq_n_f32 (M_SQRT1_2f)));
+  m = vcltq_f32 (y, vdupq_n_f32 (M_SQRT1_2f));
   y = vbslq_f32 (m, vaddq_f32 (y, y), y);
   e = vbslq_s32 (m, vsubq_s32 (e, vdupq_n_s32 (1)), e);
   y = vaddq_f32 (jbm_4xf32_log2wc (vsubq_f32 (y, vdupq_n_f32 (1.f))),
                  vcvtq_f32_s32 (e));
   y = vbslq_f32 (vceqq_f32 (x, z), vdupq_n_f32 (-INFINITY), y);
-  y = vbslq_f32 (vctlq_f32 (x, z), vdupq_n_f32 (NAN), y);
+  y = vbslq_f32 (vcltq_f32 (x, z), vdupq_n_f32 (NAN), y);
   y = vbslq_f32 (vceqq_f32 (x, vdupq_n_f32 (-INFINITY)), x, y);
   return vbslq_f32 (vceqq_f32 (x, x), y, x);
 }
@@ -7184,9 +7170,9 @@ jbm_4xf32_pown (const float32x4_t x,    ///< float32x4_t vector.
  */
 static inline float32x4_t
 jbm_4xf32_pow (const float32x4_t x,     ///< float32x4_t vector.
-               const float e)   ///< exponent (float).
+               const float32x4_t e)     ///< exponent (float32x4_t).
 {
-  return jbm_4xf32_exp2 (vmulq_f32 (vdupq_n_f32 (e), jbm_4xf32_log2 (x)));
+  return jbm_4xf32_exp2 (vmulq_f32 (e, jbm_4xf32_log2 (x)));
 }
 
 /**
@@ -7250,12 +7236,12 @@ jbm_4xf32_sincoswc (const float32x4_t x,
  *
  * \return reduced vector (float32x4_t).
  */
-static inline float
+static inline float32x4_t
 jbm_4xf32_trig (const float32x4_t x,    ///< float32x4_t vector.
                 int32x4_t *q)   ///< quadrant (float32x4_ti).
 {
   float32x4_t y;
-  y = vrndnq_f32 (vmulq_f32 (x, vdupq_n_f32 (1.f / M_PI_2f)));
+  y = vrndnq_f32 (vmulq_n_f32 (x, 1.f / M_PI_2f));
   *q = vcvtq_s32_f32 (y);
   return vfmsq_f32 (x, y, vdupq_n_f32 (M_PI_2f));
 }
@@ -8044,6 +8030,25 @@ jbm_4xf32_integral (float32x4_t (*f) (float32x4_t),
 #endif
   k = vmulq_f32 (k, dx);
   return k;
+}
+
+#define jbm_2xf64_reduce_add vaddvq_f64
+#define jbm_2xf64_reduce_max vmaxvq_f64
+#define jbm_2xf64_reduce_min vminvq_f64
+
+/**
+ * Function to calculate the maximum and minimum reduction value of a
+ * float64x2_t vector.
+ */
+static inline void
+jbm_2xf64_reduce_maxmin (const float64x2_t x,   ///< float64x2_t vector.
+                         float *max,
+                         ///< pointer to the maximum value (float).
+                         float *min)
+                         ///< pointer to the minimum value (float).
+{
+  *max = vmaxvq_f64 (x);
+  *min = vminvq_f64 (x);
 }
 
 /**
@@ -14918,13 +14923,9 @@ jbm_2xf64_pown (const float64x2_t x,    ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_2xf64_pow (const float64x2_t x,     ///< float64x2_t vector.
-               const double e)  ///< exponent (float64x2_t).
+               const float64x2_t e)  ///< exponent (float64x2_t).
 {
-  double f;
-  f = floor (e);
-  if (f == e)
-    return jbm_2xf64_pown (x, (int) e);
-  return jbm_2xf64_exp2 (vmulq_f64 (vdupq_n_f64 (e), jbm_2xf64_log2 (x)));
+  return jbm_2xf64_exp2 (vmulq_f64 (e, jbm_2xf64_log2 (x)));
 }
 
 /**
@@ -14937,7 +14938,7 @@ static inline float64x2_t
 jbm_2xf64_cbrt (const float64x2_t x)    ///< float64x2_t vector.
 {
   float64x2_t f;
-  f = jbm_2xf64_pow (jbm_2xf64_abs (x), 1. / 3.);
+  f = jbm_2xf64_pow (jbm_2xf64_abs (x), vdupq_n_f64 (1. / 3.));
   return vbslq_f64 (vcltzq_f64 (x), f, jbm_2xf64_opposite (f));
 }
 
@@ -14989,7 +14990,7 @@ jbm_2xf64_sincoswc (const float64x2_t x,
  *
  * \return reduced vector (float64x2_t).
  */
-static inline float
+static inline float64x2_t
 jbm_2xf64_trig (const float64x2_t x,    ///< float64x2_t vector.
                 int64x2_t *q)   ///< quadrant (float64x2_ti).
 {
@@ -15251,8 +15252,8 @@ jbm_2xf64_acosh (const float64x2_t x)   ///< float64x2_t number.
 {
   return
     jbm_2xf64_log
-    (vaddq_f64 (x, vsqrtq_f64 (jbm_2xf64_opposite (vmsubq_f64 (vdupq_n_f64 (1.),
-                                                               x, x)))));
+    (vaddq_f64 (x, vsqrtq_f64 (jbm_2xf64_opposite (vmlsq_f64 (vdupq_n_f64 (1.),
+                                                              x, x)))));
 }
 
 /**
