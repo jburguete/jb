@@ -66,10 +66,6 @@ typedef union
 ///< mantissa bits for floats.
 #define JBM_4xF32_BITS_SIGN vdupq_n_u32 (JBM_F32_BITS_SIGN)
 ///< sign bits for floats.
-#define JBM_4xF32_CBRT2 vdupq_n_f32 (JBM_F32_CBRT2)
-///< cbrt(2) for floats.
-#define JBM_4xF32_CBRT4 vdupq_n_f32 (JBM_F32_CBRT4)
-///< cbrt(4) for floats.
 
 // double constants
 
@@ -83,10 +79,6 @@ typedef union
 ///< mantissa bits for doubles.
 #define JBM_2xF64_BITS_SIGN vdupq_n_u64 (JBM_F64_BITS_SIGN)
 ///< sign bits for floats.
-#define JBM_2xF64_CBRT2 vdupq_n_f64 (JBM_F64_CBRT2)
-///< cbrt(2) for doubles.
-#define JBM_2xF64_CBRT4 vdupq_n_f64 (JBM_F64_CBRT4)
-///< cbrt(4) for doubles.
 
 // Debug functions
 
@@ -180,10 +172,10 @@ print_float64x2_t (FILE *file, const char *label, float64x2_t x)
 static inline int32x4_t
 jbm_4xf32_div3 (int32x4_t x)    ///< int32x4_t vector.
 {
-  const int32x4_t magic = vdupq_n_s32 (0x55555556);
+  const int32x2_t magic = vdup_n_s32 (0x55555556);
   int32x2_t even, odd;
-  even = vshrn_n_s64 (vmull_s32 (vget_low_s32 (x), vget_low_s32 (magic)), 32);
-  odd = vshrn_n_s64 (vmull_s32 (vget_high_s32 (x), vget_high_s32 (magic)), 32);
+  even = vshrn_n_s64 (vmull_s32 (vget_low_s32 (x), magic), 32);
+  odd = vshrn_n_s64 (vmull_s32 (vget_high_s32 (x), magic), 32);
   return vcombine_s32 (even, odd);
 }
 
@@ -324,7 +316,7 @@ jbm_4xf32_frexp (const float32x4_t x,   ///< float32x4_t vector.
   // masks
   is_z = vceqq_u32 (y.i, zi);
   is_nan = vcgtq_u32 (y.i, vdupq_n_u32 (JBM_F32_BITS_EXPONENT - 1));
-  is_finite = vbicq_u32 (vdupq_n_u32 (0xffffffff), vorrq_u32 (is_z, is_nan));
+  is_finite = vmvnq_u32 (vorrq_u32 (is_z, is_nan));
   // extract exponent
   exp = vshrq_n_u32 (y.i, 23);
   // subnormals
@@ -6971,8 +6963,6 @@ jbm_4xf32_cbrtwc (const float32x4_t x)
 static inline float32x4_t
 jbm_4xf32_cbrt (const float32x4_t x)    ///< float32x4_t vector.
 {
-  const float32x4_t cbrt2 = JBM_4xF32_CBRT2;
-  const float32x4_t cbrt4 = JBM_4xF32_CBRT4;
   const int32x4_t v3 = vdupq_n_s32 (3);
   const int32x4_t v2 = vdupq_n_s32 (2);
   const int32x4_t v1 = vdupq_n_s32 (1);
@@ -6981,12 +6971,12 @@ jbm_4xf32_cbrt (const float32x4_t x)    ///< float32x4_t vector.
   y = jbm_4xf32_frexp (jbm_4xf32_abs (x), &e);
   e3 = jbm_4xf32_div3 (e);
   r = vsubq_s32 (e, vmulq_s32 (e3, v3));
-  n = vshrq_s32 (r, 31);
+  n = vshrq_n_s32 (r, 31);
   r = vaddq_s32 (r, vandq_s32 (n, v3));
   e3 = vsubq_s32 (e3, vandq_s32 (n, v1));
   y = jbm_4xf32_ldexp (jbm_4xf32_cbrtwc (y), e3);
-  y = vbslq_f32 (vceqq_s32 (r, v1), vmulq_f32 (y, cbrt2), y);
-  y = vbslq_f32 (vceqq_s32 (r, v2), vmulq_f32 (y, cbrt4), y);
+  y = vbslq_f32 (vceqq_s32 (r, v1), vmulq_n_f32 (y, JBM_F32_CBRT2), y);
+  y = vbslq_f32 (vceqq_s32 (r, v2), vmulq_n_f32 (y, JBM_F32_CBRT4), y);
   return jbm_4xf32_copysign (y, x);
 }
 
@@ -7255,20 +7245,19 @@ jbm_4xf32_trig (const float32x4_t x,    ///< float32x4_t vector.
 static inline float32x4_t
 jbm_4xf32_sin (const float32x4_t x)     ///< float32x4_t vector.
 {
-  const float32x4_t pi2 = vdupq_n_f32 (2.f * M_PIf);
-  float32x4_t y, s;
-  y = jbm_4xf32_mod1 (x, 2.f * M_PIf);
-  s = jbm_4xf32_sinwc (vsubq_f32 (y, pi2));
-  s = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f)),
-                 jbm_4xf32_opposite
-                 (jbm_4xf32_coswc (vsubq_f32 (vdupq_n_f32 (3.f * M_PI_2f),
-                                              y))), s);
-  s = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f)),
-                 jbm_4xf32_sinwc (vsubq_f32 (vdupq_n_f32 (M_PIf), y)), s);
-  s = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f)),
-                 jbm_4xf32_coswc (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y)), s);
-  return vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (M_PI_4f)),
-                    jbm_4xf32_sinwc (y), s);
+  float32x4_t y, s, c;
+  int32x4_t q;
+  y = jbm_4xf32_trig (x, &q);
+  jbm_4xf32_sincoswc (y, &s, &c);
+  y = vbslq_f32
+      (vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, vdupq_n_s32 (1)), 31)),
+       c, s);
+  return
+    vreinterpretq_f32_u32
+    (veorq_u32
+     (vreinterpretq_u32_f32 (y),
+      vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, vdupq_n_s32 (2)),
+                                          30))));
 }
 
 /**
@@ -7280,21 +7269,20 @@ jbm_4xf32_sin (const float32x4_t x)     ///< float32x4_t vector.
 static inline float32x4_t
 jbm_4xf32_cos (const float32x4_t x)     ///< float32x4_t vector.
 {
-  const float32x4_t pi2 = vdupq_n_f32 (2.f * M_PIf);
-  float32x4_t y, c;
-  y = jbm_4xf32_mod1 (x, 2.f * M_PIf);
-  c = jbm_4xf32_coswc (vsubq_f32 (y, pi2));
-  c = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (7.f * M_PI_4f)),
-                 jbm_4xf32_sinwc (vsubq_f32 (y, vdupq_n_f32 (3.f * M_PI_2f))),
-                 c);
-  c = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (5.f * M_PI_4f)),
-                 jbm_4xf32_opposite
-                 (jbm_4xf32_coswc (vsubq_f32 (vdupq_n_f32 (M_PIf), y))), c);
-  c = vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (3.f * M_PI_4f)),
-                 jbm_4xf32_sinwc (vsubq_f32 (vdupq_n_f32 (M_PI_2f), y)), c);
-  return vbslq_f32 (vcltq_f32 (y, vdupq_n_f32 (M_PI_4f)),
-                    jbm_4xf32_coswc (y), c);
-
+  const int32x4_t v1 = vdupq_n_s32 (1);
+  float32x4_t y, s, c;
+  int32x4_t q;
+  y = jbm_4xf32_trig (x, &q);
+  jbm_4xf32_sincoswc (y, &s, &c);
+  y = vbslq_f32
+      (vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, vdupq_n_s32 (1)), 31)),
+       s, c);
+  return
+    vreinterpretq_f32_u32
+    (veorq_u32
+     (vreinterpretq_u32_f32 (y),
+      vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, vdupq_n_s32 (2)),
+                                          30))));
 }
 
 /**
