@@ -7329,9 +7329,12 @@ jbm_4xf32_sincos (const float32x4_t x,
 static inline float32x4_t
 jbm_4xf32_tan (const float32x4_t x)     ///< float32x4_t vector.
 {
-  float32x4_t s, c;
-  jbm_4xf32_sincos (x, &s, &c);
-  return vdivq_f32 (s, c);
+  float32x4_t y;
+  int32x4_t q;
+  y = jbm_4xf32_tanwc (jbm_4xf32_trig (x, &q));
+  return
+    vbslq_f32 (vreinterpretq_u32_s32 (vandq_s32 (q, vdupq_n_s32(1))),
+               vmulq_f32 (vdupq_n_f32 (-1.f), y), y);
 }
 
 /**
@@ -8082,22 +8085,6 @@ jbm_2xf64_hypot (const float64x2_t x,   ///< 1st float64x2_t vector.
                  const float64x2_t y)   ///< 2nd float64x2_t vector.
 {
   return vsqrtq_f64 (vmlaq_f64 (vmulq_f64 (x, x), y, y));
-}
-
-/**
- * Function to calculate the rest of a division (float64x2_t) by a double.
- *
- * \return rest value (in [0,|divisor|) interval) (float64x2_t).
- */
-static inline float64x2_t
-jbm_2xf64_mod1 (const float64x2_t x,    ///< dividend (float64x2_t).
-                const double d) ///< divisor (float64x2_t).
-{
-  float64x2_t r;
-  r = vrndmq_f64 (vmulq_f64 (x, 1. / d));
-  return
-    vbslq_f64 (vcgtq_f64 (jbm_2xf64_abs (r), vdupq_n_f64 (1. / DBL_EPSILON)),
-               vmulq_n_f64 (d, 0.5), vfmsq_f64 (x, r, d));
 }
 
 /**

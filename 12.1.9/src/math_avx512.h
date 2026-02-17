@@ -7838,20 +7838,15 @@ jbm_16xf32_trig (const __m512 x,        ///< __m512 vector.
 static inline __m512
 jbm_16xf32_sin (const __m512 x) ///< __m512 vector.
 {
-  const __m512 pi3_2 = _mm512_set1_ps (3.f * M_PI_2f);
-  const __m512 pi = _mm512_set1_ps (M_PIf);
-  const __m512 pi_2 = _mm512_set1_ps (M_PI_2f);
-  const __m512 pi_4 = _mm512_set1_ps (M_PI_4f);
-  __m512 y, q, s;
-  q = jbm_16xf32_mod (_mm512_add_ps (x, pi_4), _mm512_set1_ps (2.f * M_PIf));
-  y = _mm512_sub_ps (q, pi_4);
-  s = jbm_16xf32_opposite (jbm_16xf32_coswc (_mm512_sub_ps (pi3_2, y)));
-  s = _mm512_mask_mov_ps (s, _mm512_cmp_ps_mask (q, pi3_2, _CMP_LT_OS),
-                          jbm_16xf32_sinwc (_mm512_sub_ps (pi, y)));
-  s = _mm512_mask_mov_ps (s, _mm512_cmp_ps_mask (q, pi, _CMP_LT_OS),
-                          jbm_16xf32_coswc (_mm512_sub_ps (pi_2, y)));
-  return _mm512_mask_mov_ps (s, _mm512_cmp_ps_mask (q, pi_2, _CMP_LT_OS),
-                             jbm_16xf32_sinwc (y));
+  __m512 y, s, c;
+  __m512i q;
+  y = jbm_16xf32_trig (x, &q);
+  jbm_16xf32_sincoswc (y, &s, &c);
+  y = _mm512_mask_blend_ps (_mm512_test_epi32_mask (q, _mm512_set1_epi32 (1)),
+                            s, c);
+  return
+    _mm512_mask_mov_ps (y, _mm512_test_epi32_mask (q, _mm512_set1_epi32 (2)),
+                        jbm_16xf32_opposite (y));
 }
 
 /**
@@ -7863,30 +7858,16 @@ jbm_16xf32_sin (const __m512 x) ///< __m512 vector.
 static inline __m512
 jbm_16xf32_cos (const __m512 x) ///< __m512 vector.
 {
-  const __m512 pi2 = _mm512_set1_ps (2.f * M_PIf);
-  __m512 y, c;
-  y = jbm_16xf32_mod (x, pi2);
-  c = _mm512_mask_blend_ps (_mm512_cmp_ps_mask (y,
-                                                _mm512_set1_ps (7.f * M_PI_4f),
-                                                _CMP_LT_OS),
-                            jbm_16xf32_coswc (_mm512_sub_ps (y, pi2)),
-                            jbm_16xf32_sinwc
-                            (_mm512_sub_ps (y,
-                                            _mm512_set1_ps (3.f * M_PI_2f))));
-  c = _mm512_mask_mov_ps (c, _mm512_cmp_ps_mask (y,
-                                                 _mm512_set1_ps (5.f * M_PI_4f),
-                                                 _CMP_LT_OS),
-                          jbm_16xf32_opposite
-                          (jbm_16xf32_coswc
-                           (_mm512_sub_ps (_mm512_set1_ps (M_PIf), y))));
-  c = _mm512_mask_mov_ps (c,
-                          _mm512_cmp_ps_mask (y, _mm512_set1_ps (3.f * M_PI_4f),
-                                              _CMP_LT_OS),
-                          jbm_16xf32_sinwc (_mm512_sub_ps
-                                            (_mm512_set1_ps (M_PI_2f), y)));
-  return _mm512_mask_mov_ps (c, _mm512_cmp_ps_mask (y, _mm512_set1_ps (M_PI_4f),
-                                                    _CMP_LT_OS),
-                             jbm_16xf32_coswc (y));
+  const __m512i v1 = _mm512_set1_epi32 (1);
+  __m512 y, s, c;
+  __m512i q;
+  y = jbm_16xf32_trig (x, &q);
+  jbm_16xf32_sincoswc (y, &s, &c);
+  y = _mm512_mask_blend_ps (_mm512_test_epi32_mask (q, v1), c, s);
+  return
+    _mm512_mask_mov_ps (y, _mm512_test_epi32_mask (_mm512_add_epi32 (q, v1),
+                                                   _mm512_set1_epi32 (2)),
+                        jbm_16xf32_opposite (y));
 }
 
 /**
@@ -7899,33 +7880,25 @@ jbm_16xf32_sincos (const __m512 x,
                    __m512 *s,   ///< pointer to the sin function value (__m512).
                    __m512 *c)   ///< pointer to the cos function value (__m512).
 {
-  const __m512 pi2 = _mm512_set1_ps (2.f * M_PIf);
-  const __m512 z = _mm512_setzero_ps ();
+  const __m512i v1 = _mm512_set1_epi32 (1);
+  const __m512i v2 = _mm512_set1_epi32 (2);
   __m512 y, s1, c1, s2, c2;
+  __m512i q;
   __mmask16 m;
-  y = jbm_16xf32_mod (x, pi2);
-  jbm_16xf32_sincoswc (_mm512_sub_ps (y, pi2), &s1, &c1);
-  jbm_16xf32_sincoswc (_mm512_sub_ps (y, _mm512_set1_ps (3.f * M_PI_2f)), &c2,
-                       &s2);
-  m = _mm512_cmp_ps_mask (y, _mm512_set1_ps (7.f * M_PI_4f), _CMP_LT_OS);
-  s1 = _mm512_mask_mov_ps (s1, m, _mm512_sub_ps (z, s2));
-  c1 = _mm512_mask_mov_ps (c1, m, c2);
-  jbm_16xf32_sincoswc (_mm512_sub_ps (_mm512_set1_ps (M_PIf), y), &s2, &c2);
-  m = _mm512_cmp_ps_mask (y, _mm512_set1_ps (5.f * M_PI_4f), _CMP_LT_OS);
-  s1 = _mm512_mask_mov_ps (s1, m, s2);
-  c1 = _mm512_mask_mov_ps (c1, m, _mm512_sub_ps (z, c2));
-  jbm_16xf32_sincoswc (_mm512_sub_ps (_mm512_set1_ps (M_PI_2f), y), &c2, &s2);
-  m = _mm512_cmp_ps_mask (y, _mm512_set1_ps (3.f * M_PI_4f), _CMP_LT_OS);
-  s1 = _mm512_mask_mov_ps (s1, m, s2);
-  c1 = _mm512_mask_mov_ps (c1, m, c2);
-  jbm_16xf32_sincoswc (y, &s2, &c2);
-  m = _mm512_cmp_ps_mask (y, _mm512_set1_ps (M_PI_4f), _CMP_LT_OS);
-  *s = _mm512_mask_mov_ps (s1, m, s2);
-  *c = _mm512_mask_mov_ps (c1, m, c2);
+  y = jbm_16xf32_trig (x, &q);
+  jbm_16xf32_sincoswc (y, &s1, &c1);
+  m = _mm512_test_epi32_mask (q, v1);
+  s2 = _mm512_mask_blend_ps(m, s1, c1);
+  c2 = _mm512_mask_blend_ps(m, c1, s1);
+  *s = _mm512_mask_mov_ps (s2, _mm512_test_epi32_mask(q, v2),
+                           jbm_16xf32_opposite (s2));
+  *c = _mm512_mask_mov_ps (c2, _mm512_test_epi32_mask(_mm512_add_epi32(q, v1),
+                                                      v2),
+                           jbm_16xf32_opposite (c2));
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_16xf32_sincos function
+ * Function to calculate the function tan(x) from jbm_16xf32_tanwc function
  * (__m512).
  *
  * \return function value (__m512).
@@ -7933,10 +7906,13 @@ jbm_16xf32_sincos (const __m512 x,
 static inline __m512
 jbm_16xf32_tan (const __m512 x) ///< __m512 vector.
 {
-  __m512 s, c;
-  jbm_16xf32_sincos (x, &s, &c);
-  return _mm512_div_ps (s, c);
-}
+  __m512 y;
+  __m512i q;
+  y = jbm_16xf32_tanwc (jbm_16xf32_trig (x, &q));
+  return
+    _mm512_mask_blend_ps (_mm512_test_epi32_mask (q, _mm512_set1_epi32 (1)), y,
+                          _mm512_div_ps (_mm512_set1_ps (-1.f), y));
+} 
 
 /**
  * Function to calculate the well conditionated function atan(x) for x in [-1,1]

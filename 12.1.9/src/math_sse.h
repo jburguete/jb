@@ -7434,27 +7434,22 @@ jbm_4xf32_sincos (const __m128 x,
                   __m128 *s,    ///< pointer to the sin function value (__m128).
                   __m128 *c)    ///< pointer to the cos function value (__m128).
 {
-  const __m128 pi2 = _mm_set1_ps (2.f * M_PIf);
-  const __m128 z = _mm_setzero_ps ();
-  __m128 y, m, s1, c1, s2, c2;
-  y = jbm_4xf32_mod (x, pi2);
-  jbm_4xf32_sincoswc (_mm_sub_ps (y, pi2), &s1, &c1);
-  jbm_4xf32_sincoswc (_mm_sub_ps (y, _mm_set1_ps (3.f * M_PI_2f)), &c2, &s2);
-  m = _mm_cmplt_ps (y, _mm_set1_ps (7.f * M_PI_4f));
-  s1 = _mm_blendv_ps (s1, _mm_sub_ps (z, s2), m);
-  c1 = _mm_blendv_ps (c1, c2, m);
-  jbm_4xf32_sincoswc (_mm_sub_ps (_mm_set1_ps (M_PIf), y), &s2, &c2);
-  m = _mm_cmplt_ps (y, _mm_set1_ps (5.f * M_PI_4f));
-  s1 = _mm_blendv_ps (s1, s2, m);
-  c1 = _mm_blendv_ps (c1, _mm_sub_ps (z, c2), m);
-  jbm_4xf32_sincoswc (_mm_sub_ps (_mm_set1_ps (M_PI_2f), y), &c2, &s2);
-  m = _mm_cmplt_ps (y, _mm_set1_ps (3.f * M_PI_4f));
-  s1 = _mm_blendv_ps (s1, s2, m);
-  c1 = _mm_blendv_ps (c1, c2, m);
-  jbm_4xf32_sincoswc (y, &s2, &c2);
-  m = _mm_cmplt_ps (y, _mm_set1_ps (M_PI_4f));
-  *s = _mm_blendv_ps (s1, s2, m);
-  *c = _mm_blendv_ps (c1, c2, m);
+  const __m128i v1 = _mm_set1_epi32 (1);
+  const __m128i v2 = _mm_set1_epi32 (2);
+  __m128 y, s1, c1, s2, c2, m;
+  __m128i q;
+  y = jbm_4xf32_trig (x, &q);
+  jbm_4xf32_sincoswc (y, &s1, &c1);
+  m = _mm_castsi128_ps( _mm_slli_epi32 (_mm_and_si128 (q, v1), 31));
+  s2 = _mm_blendv_ps (s1, c1, m);
+  c2 = _mm_blendv_ps (c1, s1, m);
+  *s = _mm_xor_ps (s2,
+                   _mm_castsi128_ps (_mm_slli_epi32 (_mm_and_si128 (q, v2),
+                                     30)));
+  *c = _mm_xor_ps
+       (c2,
+	_mm_castsi128_ps (_mm_slli_epi32 (_mm_and_si128 (_mm_add_epi32 (q, v1),
+                                                         v2), 30)));
 }
 
 /**
@@ -7466,9 +7461,14 @@ jbm_4xf32_sincos (const __m128 x,
 static inline __m128
 jbm_4xf32_tan (const __m128 x)  ///< __m128 vector.
 {
-  __m128 s, c;
-  jbm_4xf32_sincos (x, &s, &c);
-  return _mm_div_ps (s, c);
+  __m128 y;
+  __m128i q;
+  y = jbm_4xf32_tanwc (jbm_4xf32_trig (x, &q));
+  return
+    _mm_blendv_ps
+    (y, _mm_div_ps (_mm_set1_ps (-1.f), y),
+     _mm_castsi128_ps (_mm_slli_epi32 (_mm_and_si128 (q, _mm_set1_epi32(1)),
+                                       31)));
 }
 
 /**

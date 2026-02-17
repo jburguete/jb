@@ -5352,7 +5352,7 @@ main (void)
   printf ("2xf64_abs([1,-1])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
   d_2xf64 = jbm_2xf64_small (_mm_set_pd (1., 0.));
   _mm_store_pd (d_1, d_2xf64);
-  printf ("small_2xf64([0,1])=[%16llx,%16llx]\n", L_1[0], L_1[1]);
+  printf ("small_2xf64([0,1])=[%16" PRIx64 ",%16" PRIx64 "]\n", L_1[0], L_1[1]);
   d_2xf64 = jbm_2xf64_modmin (_mm_set_pd (-1., 1.), _mm_set_pd (-2., 0.5));
   _mm_store_pd (d_1, d_2xf64);
   printf ("modmin_2xf64([1,-1],[0.5,-2])=[%.17lg,%.17lg]\n", d_1[0], d_1[1]);
@@ -5600,7 +5600,8 @@ main (void)
           d_1[0], d_1[1], d_1[2], d_1[3]);
   d_4xf64 = jbm_4xf64_small (_mm256_set_pd (-1., 1., -0., 0.));
   _mm256_store_pd (d_1, d_4xf64);
-  printf ("small_4xf64([0,-0,1,-1])=[%16llx,%16llx,%16llx,%16llx]\n",
+  printf ("small_4xf64([0,-0,1,-1])=[%16" PRIx64 ",%16" PRIx64 ",%16" PRIx64
+          ",%16" PRIx64 "]\n",
           L_1[0], L_1[1], L_1[2], L_1[3]);
   d_4xf64 = jbm_4xf64_modmin (_mm256_set_pd (1., 0., -1., 1.),
                               _mm256_set_pd (-2., 1., -2., 0.5));

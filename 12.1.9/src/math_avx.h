@@ -7364,20 +7364,18 @@ jbm_8xf32_trig (const __m256 x, ///< __m256 vector.
 static inline __m256
 jbm_8xf32_sin (const __m256 x)  ///< __m256 vector.
 {
-  const __m256 pi3_2 = _mm256_set1_ps (3.f * M_PI_2f);
-  const __m256 pi = _mm256_set1_ps (M_PIf);
-  const __m256 pi_2 = _mm256_set1_ps (M_PI_2f);
-  const __m256 pi_4 = _mm256_set1_ps (M_PI_4f);
-  __m256 y, q, s;
-  q = jbm_8xf32_mod (_mm256_add_ps (x, pi_4), _mm256_set1_ps (2.f * M_PIf));
-  y = _mm256_sub_ps (q, pi_4);
-  s = jbm_8xf32_opposite (jbm_8xf32_coswc (_mm256_sub_ps (pi3_2, y)));
-  s = _mm256_blendv_ps (s, jbm_8xf32_sinwc (_mm256_sub_ps (pi, y)),
-                        _mm256_cmp_ps (q, pi3_2, _CMP_LT_OS));
-  s = _mm256_blendv_ps (s, jbm_8xf32_coswc (_mm256_sub_ps (pi_2, y)),
-                        _mm256_cmp_ps (q, pi, _CMP_LT_OS));
-  return _mm256_blendv_ps (s, jbm_8xf32_sinwc (y),
-                           _mm256_cmp_ps (q, pi_2, _CMP_LT_OS));
+  __m256 y, s, c;
+  __m256i q;
+  y = jbm_8xf32_trig (x, &q);
+  jbm_8xf32_sincoswc (y, &s, &c);
+  y = _mm256_blendv_ps
+    (s, c,
+     _mm256_castsi256_ps
+     (_mm256_slli_epi32 (_mm256_and_si256 (q, _mm256_set1_epi32 (1)), 31)));
+  return
+    _mm256_xor_ps
+    (y, _mm256_castsi256_ps
+        (_mm256_slli_epi32 (_mm256_and_si256 (q, _mm256_set1_epi32 (2)), 30)));
 }
 
 /**
@@ -7389,29 +7387,19 @@ jbm_8xf32_sin (const __m256 x)  ///< __m256 vector.
 static inline __m256
 jbm_8xf32_cos (const __m256 x)  ///< __m256 vector.
 {
-  const __m256 pi2 = _mm256_set1_ps (2.f * M_PIf);
-  __m256 y, c;
-  y = jbm_8xf32_mod (x, pi2);
-  c = _mm256_blendv_ps (jbm_8xf32_coswc (_mm256_sub_ps (y, pi2)),
-                        jbm_8xf32_sinwc
-                        (_mm256_sub_ps (y, _mm256_set1_ps (3.f * M_PI_2f))),
-                        _mm256_cmp_ps (y, _mm256_set1_ps (7.f * M_PI_4f),
-                                       _CMP_LT_OS));
-  c = _mm256_blendv_ps (c,
-                        jbm_8xf32_opposite
-                        (jbm_8xf32_coswc
-                         (_mm256_sub_ps (_mm256_set1_ps (M_PIf), y))),
-                        _mm256_cmp_ps (y, _mm256_set1_ps (5.f * M_PI_4f),
-                                       _CMP_LT_OS));
-  c =
-    _mm256_blendv_ps (c,
-                      jbm_8xf32_sinwc (_mm256_sub_ps
-                                       (_mm256_set1_ps (M_PI_2f), y)),
-                      _mm256_cmp_ps (y, _mm256_set1_ps (3.f * M_PI_4f),
-                                     _CMP_LT_OS));
-  return _mm256_blendv_ps (c, jbm_8xf32_coswc (y),
-                           _mm256_cmp_ps (y, _mm256_set1_ps (M_PI_4f),
-                                          _CMP_LT_OS));
+  const __m256i v1 = _mm256_set1_epi32 (1);
+  __m256 y, s, c;
+  __m256i q;
+  y = jbm_8xf32_trig (x, &q);
+  jbm_8xf32_sincoswc (y, &s, &c);
+  y = _mm256_blendv_ps
+    (c, s, _mm256_castsi256_ps (_mm256_slli_epi32 (_mm256_and_si256 (q, v1),
+                                                   31)));
+  return
+    _mm256_xor_ps
+    (y, _mm256_castsi256_ps
+     (_mm256_slli_epi32 (_mm256_and_si256 (_mm256_add_epi32 (q, v1),
+                                           _mm256_set1_epi32 (2)), 30)));
 }
 
 /**
@@ -7424,28 +7412,23 @@ jbm_8xf32_sincos (const __m256 x,
                   __m256 *s,    ///< pointer to the sin function value (__m256).
                   __m256 *c)    ///< pointer to the cos function value (__m256).
 {
-  const __m256 pi2 = _mm256_set1_ps (2.f * M_PIf);
-  const __m256 z = _mm256_setzero_ps ();
-  __m256 y, m, s1, c1, s2, c2;
-  y = jbm_8xf32_mod (x, pi2);
-  jbm_8xf32_sincoswc (_mm256_sub_ps (y, pi2), &s1, &c1);
-  jbm_8xf32_sincoswc (_mm256_sub_ps (y, _mm256_set1_ps (3.f * M_PI_2f)), &c2,
-                      &s2);
-  m = _mm256_cmp_ps (y, _mm256_set1_ps (7.f * M_PI_4f), _CMP_LT_OS);
-  s1 = _mm256_blendv_ps (s1, _mm256_sub_ps (z, s2), m);
-  c1 = _mm256_blendv_ps (c1, c2, m);
-  jbm_8xf32_sincoswc (_mm256_sub_ps (_mm256_set1_ps (M_PIf), y), &s2, &c2);
-  m = _mm256_cmp_ps (y, _mm256_set1_ps (5.f * M_PI_4f), _CMP_LT_OS);
-  s1 = _mm256_blendv_ps (s1, s2, m);
-  c1 = _mm256_blendv_ps (c1, _mm256_sub_ps (z, c2), m);
-  jbm_8xf32_sincoswc (_mm256_sub_ps (_mm256_set1_ps (M_PI_2f), y), &c2, &s2);
-  m = _mm256_cmp_ps (y, _mm256_set1_ps (3.f * M_PI_4f), _CMP_LT_OS);
-  s1 = _mm256_blendv_ps (s1, s2, m);
-  c1 = _mm256_blendv_ps (c1, c2, m);
-  jbm_8xf32_sincoswc (y, &s2, &c2);
-  m = _mm256_cmp_ps (y, _mm256_set1_ps (M_PI_4f), _CMP_LT_OS);
-  *s = _mm256_blendv_ps (s1, s2, m);
-  *c = _mm256_blendv_ps (c1, c2, m);
+  const __m256i v1 = _mm256_set1_epi32 (1);
+  const __m256i v2 = _mm256_set1_epi32 (2);
+  __m256 y, s1, c1, s2, c2, m;
+  __m256i q;
+  y = jbm_8xf32_trig (x, &q);
+  jbm_8xf32_sincoswc (y, &s1, &c1);
+  m = _mm256_castsi256_ps( _mm256_slli_epi32 (_mm256_and_si256 (q, v1), 31));
+  s2 = _mm256_blendv_ps (s1, c1, m);
+  c2 = _mm256_blendv_ps (c1, s1, m);
+  *s = _mm256_xor_ps
+       (s2,
+        _mm256_castsi256_ps (_mm256_slli_epi32 (_mm256_and_si256 (q, v2), 30)));
+  *c = _mm256_xor_ps
+       (c2,
+	_mm256_castsi256_ps
+	(_mm256_slli_epi32 (_mm256_and_si256 (_mm256_add_epi32 (q, v1), v2),
+                            30)));
 }
 
 /**
@@ -7457,9 +7440,14 @@ jbm_8xf32_sincos (const __m256 x,
 static inline __m256
 jbm_8xf32_tan (const __m256 x)  ///< __m256 vector.
 {
-  __m256 s, c;
-  jbm_8xf32_sincos (x, &s, &c);
-  return _mm256_div_ps (s, c);
+  __m256 y;
+  __m256i q;
+  y = jbm_8xf32_tanwc (jbm_8xf32_trig (x, &q));
+  return
+    _mm256_blendv_ps
+    (y, _mm256_div_ps (_mm256_set1_ps (-1.f), y),
+     _mm256_castsi256_ps
+     (_mm256_slli_epi32 (_mm256_and_si256 (q, _mm256_set1_epi32(1)), 31)));
 }
 
 /**
