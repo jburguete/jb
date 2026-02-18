@@ -393,13 +393,14 @@ jbm_8xf32_frexp (const __m256 x,        ///< __m256 vector.
 static inline __m256
 jbm_8xf32_exp2n (__m256i e)     ///< exponent vector (__m256i).
 {
+  const __m256i v127 = _mm256_set1_epi32 (127);
   __m256 x;
   x = _mm256_blendv_ps
     (_mm256_castsi256_ps
      (_mm256_sllv_epi32 (_mm256_set1_epi32 (1),
                          _mm256_add_epi32 (_mm256_set1_epi32 (149), e))),
      _mm256_castsi256_ps
-     (_mm256_slli_epi32 (_mm256_add_epi32 (e, _mm256_set1_epi32 (127)), 23)),
+     (_mm256_slli_epi32 (_mm256_add_epi32 (e, v127), 23)),
      _mm256_castsi256_ps (_mm256_cmpgt_epi32 (e, _mm256_set1_epi32 (-127))));
   x = _mm256_blendv_ps
     (x, _mm256_setzero_ps (),
@@ -407,7 +408,7 @@ jbm_8xf32_exp2n (__m256i e)     ///< exponent vector (__m256i).
   return
     _mm256_blendv_ps
     (x, _mm256_set1_ps (INFINITY),
-     _mm256_castsi256_ps (_mm256_cmpgt_epi32 (e, _mm256_set1_epi32 (127))));
+     _mm256_castsi256_ps (_mm256_cmpgt_epi32 (e, v127)));
 }
 
 /**

@@ -8108,29 +8108,33 @@ static inline float64x2_t
 jbm_2xf64_frexp (const float64x2_t x,   ///< float64x2_t vector.
                  int64x2_t *e)  ///< pointer to the extracted exponents vector.
 {
-  JBM2xF64 a, y, y2, z;
-  uint64x2_t b, m1, m2, m3;
-  int64x2_t e2;
-  a.x = x;
-  b = vdupq_n_u64 (0x7ff0000000000000L);
-  y.i = vandq_u64 (a.i, b);
-  m1 = vceqq_u64 (y.i, b);
-  m2 = vceqzq_u64 (y.i);
-  y2.x = x;
-  y2.i = vandq_u64 (y2.i, vdupq_n_u64 (0x000fffffffffffffL));
-  m3 = vceqzq_u64 (y2.i);
-  y2.i = vdupq_n_u64 (0x0010000000000000L);
-  z.x = vdivq_f64 (x, y2.x);
-  z.i = vandq_u64 (z.i, b);
-  e2 = vbslq_s64 (m2,
-                  vsubq_s64 (vshrq_n_s64 (vreinterpretq_s64_u64 (z.i), 52),
-                             vdupq_n_s64 (2044L)),
-                  vsubq_s64 (vshrq_n_s64 (vreinterpretq_s64_u64 (y.i), 52),
-                             vdupq_n_s64 (1022L)));
-  y.x = vbslq_f64 (m2, vmulq_f64 (y2.x, z.x), y.x);
-  e2 = vbslq_s64 (vorrq_u64 (m1, vandq_u64 (m2, m3)), vdupq_n_s64 (0L), e2);
-  *e = e2;
-  return vbslq_f64 (m1, x, vmulq_f64 (vdupq_n_f64 (0.5), vdivq_f64 (x, y.x)));
+  const uint64x2_t zi = vdupq_n_u64 (0ull);
+  const uint64x2_t bias = JBM_2xF64_BIAS;
+  const uint64x2_t sign_mask = JBM_2xF64_BITS_SIGN;
+  const uint64x2_t mant_mask = JBM_2xF64_BITS_MANTISSA;
+  JBM2xF64 y, z;
+  uint64x2_t exp, is_z, is_sub, is_nan, is_finite;
+  // y=abs(x)
+  y.x = jbm_2xf64_abs (x);
+  // masks
+  is_z = vceqq_u64 (y.i, zi);
+  is_nan = vcgtq_u64 (y.i, vdupq_n_u64 (JBM_F64_BITS_EXPONENT - 1ull));
+  is_finite = vmvnq_u64 (vorrq_u64 (is_z, is_nan));
+  // extract exponent
+  exp = vshrq_n_u64 (y.i, 52);
+  // subnormals
+  is_sub = vandq_u64 (is_finite, vceqq_u64 (exp, zi));
+  y.x = vbslq_f64 (is_sub, vmulq_n_f64 (y.x, 0x1p52), y.x);
+  exp = vbslq_u64 (is_sub, vsubq_u64 (vshrq_n_u64 (y.i, 52),
+                                      vdupq_n_u64 (52ull)), exp);
+  // exponent
+  *e = vreinterpretq_s64_u64 (vbslq_u64 (is_finite, vsubq_u64 (exp, bias), zi));
+  // build mantissa in [0.5,1)
+  z.x = x;
+  y.i = vorrq_u64 (vandq_u64 (z.i, sign_mask),
+                   vorrq_u64 (vdupq_n_u64 (JBM_F64_BIAS << 52),
+                              vandq_u64 (y.i, mant_mask)));
+  return vbslq_f64 (is_finite, y.x, x);
 }
 
 /**
@@ -8142,16 +8146,15 @@ jbm_2xf64_frexp (const float64x2_t x,   ///< float64x2_t vector.
 static inline float64x2_t
 jbm_2xf64_exp2n (int64x2_t e)   ///< exponent vector (int64x2_t).
 {
+  const int64x2_t v1023 = vdupq_n_s64 (1023ll);
+  const int64x2_t v1074 = vdupq_n_s64 (1074ll);
   float64x2_t x;
-  x = vbslq_f64
-    (vcgtq_s64 (e, vdupq_n_s64 (-1023L)),
-     vreinterpretq_f64_s64 (vshlq_n_s64 (vaddq_s64 (e, vdupq_n_s64 (1023L)),
-                                         52)),
-     vreinterpretq_f64_s64 (vshlq_s64 (vdupq_n_s64 (0x0008000000000000L),
-                                       vsubq_s64 (vdupq_n_s64 (-1023L), e))));
-  x = vbslq_f64 (vcgtq_s64 (vdupq_n_s64 (-1074L), e), vdupq_n_f64 (0.), x);
-  return
-    vbslq_f64 (vcgtq_s64 (e, vdupq_n_s64 (1023L)), vdupq_n_f64 (INFINITY), x);
+  x = vbslq_f64 (vcgtq_s64 (e, vdupq_n_s64 (-1022ll)),
+                 vreinterpretq_f64_s64 (vshlq_n_s64 (vaddq_s64 (e, v1023), 52)),
+                 vreinterpretq_f64_s64 (vshlq_s64 (vdupq_n_s64 (1ll),
+                                                   vaddq_s64 (v1074, e))));
+  x = vbslq_f64 (vcltq_s64 (e, vdupq_n_s64 (-1075ll)), vdupq_n_f64 (0.), x);
+  return vbslq_f64 (vcgtq_s64 (e, v1023), vdupq_n_f64 (INFINITY), x);
 }
 
 /**
@@ -8263,16 +8266,15 @@ jbm_2xf64_extrapolate (const float64x2_t x,
  */
 static inline float64x2_t
 jbm_2xf64_interpolate (const float64x2_t x,
-                       ///< float64x2_t vector of x-coordinates of the interpolated
-                       ///< points.
+///< float64x2_t vector of x-coordinates of the interpolated points.
                        const float64x2_t x1,
-                       ///< float64x2_t vector of x-coordinates of the 1st points.
+///< float64x2_t vector of x-coordinates of the 1st points.
                        const float64x2_t x2,
-                       ///< float64x2_t vector of x-coordinates of the 2nd points.
+///< float64x2_t vector of x-coordinates of the 2nd points.
                        const float64x2_t y1,
-                       ///< float64x2_t vector of y-coordinates of the 1st points.
+///< float64x2_t vector of y-coordinates of the 1st points.
                        const float64x2_t y2)
-                     ///< float64x2_t vector of y-coordinates of the 2nd points.
+///< float64x2_t vector of y-coordinates of the 2nd points.
 {
   float64x2_t k;
   k = jbm_2xf64_extrapolate (x, x1, x2, y1, y2);
@@ -8305,17 +8307,23 @@ jbm_2xf64_v2_length (const float64x2_t x1,
  */
 static inline float64x2_t
 jbm_2xf64_v3_length (const float64x2_t x1,
-///< float64x2_t vector of x-coordinates of the 1st points defining the segments.
+///< float64x2_t vector of x-coordinates of the 1st points defining the
+///< segments.
                      const float64x2_t y1,
-///< float64x2_t vector of y-coordinates of the 1st points defining the segments.
+///< float64x2_t vector of y-coordinates of the 1st points defining the
+///< segments.
                      const float64x2_t z1,
-///< float64x2_t vector of z-coordinates of the 1st points defining the segments.
+///< float64x2_t vector of z-coordinates of the 1st points defining the
+///< segments.
                      const float64x2_t x2,
-///< float64x2_t vector of x-coordinates of the 2nd points defining the segments.
+///< float64x2_t vector of x-coordinates of the 2nd points defining the
+///< segments.
                      const float64x2_t y2,
-///< float64x2_t vector of y-coordinates of the 2nd points defining the segments.
+///< float64x2_t vector of y-coordinates of the 2nd points defining the
+///< segments.
                      const float64x2_t z2)
-///< float64x2_t vector of z-coordinates of the 2nd points defining the segments.
+///< float64x2_t vector of z-coordinates of the 2nd points defining the
+///< segments.
 {
   float64x2_t dx, dy, dz;
   dx = jbm_2xf64_sqr (vsubq_f64 (x2, x1));
@@ -14732,6 +14740,19 @@ jbm_2xf64_rational_29_28 (const float64x2_t x,  ///< float64x2_t vector.
 {
   return vdivq_f64 (jbm_2xf64_polynomial_28 (x, p),
                     vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[29])));
+}
+
+/**
+ * Function to calculate the well conditionated function cbrt(x) for x
+ * \f$\in\left[\frac12\;,1\right]\f$ (float64x2_t).
+ *
+ * \return function value (float64x2_t).
+ */
+static inline float64x2_t
+jbm_2xf64_cbrtwc (const float64x2_t x)
+                  ///< float64x2_t vector \f$\in\left[\frac12,\;1\right]\f$.
+{
+  return jbm_2xf64_rational_11_6 (x, K_CBRTWC_F64);
 }
 
 /**

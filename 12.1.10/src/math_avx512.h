@@ -817,6 +817,7 @@ jbm_16xf32_frexp (const __m512 x,       ///< __m512 vector.
 static inline __m512
 jbm_16xf32_exp2n (__m512i e)    ///< exponent vector (__m512i).
 {
+  const __m512i v127 = _mm512_set1_epi32 (127);
   __m512 x;
   x = _mm512_mask_blend_ps
     (_mm512_cmpgt_epi32_mask (e, _mm512_set1_epi32 (-127)),
@@ -824,11 +825,11 @@ jbm_16xf32_exp2n (__m512i e)    ///< exponent vector (__m512i).
      (_mm512_sllv_epi32 (_mm512_set1_epi32 (1),
                          _mm512_add_epi32 (_mm512_set1_epi32 (149), e))),
      _mm512_castsi512_ps
-     (_mm512_slli_epi32 (_mm512_add_epi32 (e, _mm512_set1_epi32 (127)), 23)));
+     (_mm512_slli_epi32 (_mm512_add_epi32 (e, v127), 23)));
   x = _mm512_mask_mov_ps (x, _mm512_cmpgt_epi32_mask (_mm512_set1_epi32 (-150),
                                                       e), _mm512_setzero_ps ());
   return
-    _mm512_mask_mov_ps (x, _mm512_cmpgt_epi32_mask (e, _mm512_set1_epi32 (127)),
+    _mm512_mask_mov_ps (x, _mm512_cmpgt_epi32_mask (e, v127),
                         _mm512_set1_ps (INFINITY));
 }
 
@@ -8829,23 +8830,18 @@ jbm_8xf64_frexp (const __m512d x,       ///< __m512d vector.
 static inline __m512d
 jbm_8xf64_exp2n (__m512i e)     ///< exponent vector (__m512i).
 {
-  const __m512i v1074 = _mm512_set1_epi64 (1074ll);
   const __m512i v1023 = _mm512_set1_epi64 (1023ll);
-  const __m512i vn1023 = _mm512_set1_epi64 (-1023ll);
-  const __m512i vn1075 = _mm512_set1_epi64 (-1075ll);
   __m512d x;
-  __mmask16 is_norm;
-  is_norm = _mm512_cmpgt_epi64_mask (e, vn1023);
-  x =
-    _mm512_mask_blend_pd
-    (is_norm, _mm512_setzero_pd (),
-     _mm512_castsi512_pd (_mm512_slli_epi64 (_mm512_add_epi64 (e, v1023), 52)));
-  x =
-    _mm512_mask_mov_pd
-    (x, _mm512_cmpgt_epi64_mask (e, vn1075) & ~is_norm,
+  x = _mm512_mask_blend_pd
+    (_mm512_cmpgt_epi64_mask (e, _mm512_set1_epi64 (-1022ll)),
      _mm512_castsi512_pd
      (_mm512_sllv_epi64 (_mm512_set1_epi64 (1ll),
-                         _mm512_add_epi64 (e, v1074))));
+                         _mm512_add_epi64 (_mm512_set1_epi64 (1074ll), e))),
+     _mm512_castsi512_pd
+     (_mm512_slli_epi64 (_mm512_add_epi64 (e, v1023), 52)));
+  x = _mm512_mask_mov_pd (x,
+                          _mm512_cmpgt_epi64_mask (_mm512_set1_epi64 (-1075ll),
+                                                   e), _mm512_setzero_pd ());
   return
     _mm512_mask_mov_pd (x, _mm512_cmpgt_epi64_mask (e, v1023),
                         _mm512_set1_pd (INFINITY));
