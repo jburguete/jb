@@ -7300,21 +7300,22 @@ jbm_4xf32_sincos (const float32x4_t x,
 {
   const int32x4_t v1 = vdupq_n_s32(1);
   const int32x4_t v2 = vdupq_n_s32(2);
-  float32x4_t y, s1, c1, s2, c2, m;
+  float32x4_t y, s1, c1, s2, c2;
   uint32x4_t m;
   int32x4_t q;
   y = jbm_4xf32_trig (x, &q);
-  jbm_4xf32_sincoswc_neon (y, &s1, &c1);
+  jbm_4xf32_sincoswc (y, &s1, &c1);
   m = vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, v1), 31));
   s2 = vbslq_f32 (m, c1, s1);
   c2 = vbslq_f32 (m, s1, c1);
   *s = vreinterpretq_f32_u32
        (veorq_u32 (vreinterpretq_u32_f32 (s2),
-                   vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, v2), 30));
+                   vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, v2),
+                                                       30))));
   *c = vreinterpretq_f32_u32
-       (veorq_u32 (vreinterpretq_u32_f32 (c2)
+       (veorq_u32 (vreinterpretq_u32_f32 (c2),
                    vreinterpretq_u32_s32
-                   (vshlq_n_s32 (vandq_s32 (vaddq_s32(q, v1), v2), 30));
+                   (vshlq_n_s32 (vandq_s32 (vaddq_s32(q, v1), v2), 30))));
 }
 
 /**
