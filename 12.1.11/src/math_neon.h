@@ -7275,13 +7275,14 @@ jbm_4xf32_cos (const float32x4_t x)     ///< float32x4_t vector.
   y = jbm_4xf32_trig (x, &q);
   jbm_4xf32_sincoswc (y, &s, &c);
   y = vbslq_f32
-      (vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, vdupq_n_s32 (1)), 31)),
+      (vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, v1), 31)),
        s, c);
   return
     vreinterpretq_f32_u32
     (veorq_u32
      (vreinterpretq_u32_f32 (y),
-      vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, vdupq_n_s32 (2)),
+      vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (vaddq_s32 (q, v1),
+			                             vdupq_n_s32 (2)),
                                           30))));
 }
 
