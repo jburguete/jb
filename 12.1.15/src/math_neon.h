@@ -14752,6 +14752,34 @@ jbm_2xf64_cbrtwc (const float64x2_t x)
 }
 
 /**
+ * Function to calculate the function cbrt(x) using the jbm_2xf64_cbrtwc
+ * function (float64x2_t).
+ *
+ * \return function value (float64x2_t).
+ */
+static inline float64x2_t
+jbm_2xf64_cbrt (const float64x2_t x)    ///< float64x2_t vector.
+{
+{
+  const int64x2_t v3 = vdupq_n_s64(3);
+  const int64x2_t v2 = vdupq_n_s64(2);
+  const int64x2_t v1 = vdupq_n_s64(1);
+  float64x2_t y;
+  int64x2_t e, e3, r, n;
+  y = jbm_2xf64_frexp (jbm_2xf64_abs(x), &e);
+  e3 = vmulq_s64 (e, vdupq_n_s64 (0x55555556));
+  e3 = vshrq_n_s64 (e3, 32);
+  r = vsubq_s64 (e, vmulq_s64 (e3, v3));
+  n = vshrq_n_s64 (r, 63);
+  r = vaddq_s64 (r, vandq_s64 (n, v3));
+  e3 = vsubq_s64 (e3, vandq_s64 (n, v1));
+  y = jbm_2xf64_ldexp (jbm_2xf64_cbrtwc (y), e3);
+  y = vbslq_f64 (vceqq_s64 (r, v1), vmulq_f64 (y, JBM_2xF64_CBRT2), y);
+  y = vbslq_f64 (vceqq_s64 (r, v2), vmulq_f64 (y, JBM_2xF64_CBRT4), y);
+  return jbm_2xf64_copysign (y, x);
+}
+
+/**
  * Function to calculate the well conditionated function expm1(x) for x in
  * [-log(2)/2,log(2)/2] (float64x2_t).
  *
@@ -14855,12 +14883,20 @@ jbm_2xf64_log2wc (const float64x2_t x)
 static inline float64x2_t
 jbm_2xf64_log2 (const float64x2_t x)    ///< float64x2_t vector.
 {
+  const float64x2_t z = vdupq_n_f64 (0.f);
   float64x2_t y;
   int64x2_t e;
-  y = jbm_2xf64_log2wc (jbm_2xf64_frexp (x, &e));
-  y = vaddq_f64 (y, vcvtq_f64_s64 (e));
-  y = vbslq_f64 (vcgtzq_f64 (x), vdupq_n_f64 (-INFINITY), y);
-  return vbslq_f64 (vcltzq_f64 (x), y, vdupq_n_f64 (NAN));
+  uint64x2_t m;
+  y = jbm_2xf64_frexp (x, &e);
+  m = vcltq_f64 (y, vdupq_n_f64 (M_SQRT1_2));
+  y = vbslq_f64 (m, vaddq_f64 (y, y), y);
+  e = vbslq_s64 (m, vsubq_s64 (e, vdupq_n_s64 (1)), e);
+  y = vaddq_f64 (jbm_2xf64_log2wc (vsubq_f64 (y, vdupq_n_f64 (1.))),
+                 vcvtq_f64_s64 (e));
+  y = vbslq_f64 (vceqq_f64 (x, z), vdupq_n_f64 (-INFINITY), y);
+  y = vbslq_f64 (vcltq_f64 (x, z), vdupq_n_f64 (NAN), y);
+  y = vbslq_f64 (vceqq_f64 (x, vdupq_n_f64 (-INFINITY)), x, y);
+  return vbslq_f64 (vceqq_f64 (x, x), y, x);
 }
 
 /**
@@ -14918,20 +14954,6 @@ jbm_2xf64_pow (const float64x2_t x,     ///< float64x2_t vector.
                const float64x2_t e)  ///< exponent (float64x2_t).
 {
   return jbm_2xf64_exp2 (vmulq_f64 (e, jbm_2xf64_log2 (x)));
-}
-
-/**
- * Function to calculate the function cbrt(x) using the jbm_2xf64_abs and
- * jbm_2xf64_pow functions (float64x2_t).
- *
- * \return function value (float64x2_t).
- */
-static inline float64x2_t
-jbm_2xf64_cbrt (const float64x2_t x)    ///< float64x2_t vector.
-{
-  float64x2_t f;
-  f = jbm_2xf64_pow (jbm_2xf64_abs (x), vdupq_n_f64 (1. / 3.));
-  return vbslq_f64 (vcltzq_f64 (x), f, jbm_2xf64_opposite (f));
 }
 
 /**
