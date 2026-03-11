@@ -8113,7 +8113,7 @@ jbm_2xf64_frexp (const float64x2_t x,   ///< float64x2_t vector.
   // masks
   is_z = vceqq_u64 (y.i, zi);
   is_nan = vcgtq_u64 (y.i, vdupq_n_u64 (JBM_F64_BITS_EXPONENT - 1ull));
-  is_finite = vmvnq_u64 (vorrq_u64 (is_z, is_nan));
+  is_finite = ~(vorrq_u64 (is_z, is_nan));
   // extract exponent
   exp = vshrq_n_u64 (y.i, 52);
   // subnormals
@@ -8202,8 +8202,10 @@ jbm_2xf64_modmin (const float64x2_t a,  ///< 1st float64x2_t vector.
  * Function to interchange 2 float64x2_t numbers.
  */
 static inline void
-jbm_change_2xf64 (float64x2_t *restrict a,      ///< 1st float64x2_t vector pointer.
-                  float64x2_t *restrict b)      ///< 2nd float64x2_t vector pointer.
+jbm_change_2xf64 (float64x2_t *restrict a,
+                  ///< 1st float64x2_t vector pointer.
+                  float64x2_t *restrict b)
+                  ///< 2nd float64x2_t vector pointer.
 {
   float64x2_t c;
   JB_CHANGE (*a, *b, c);
