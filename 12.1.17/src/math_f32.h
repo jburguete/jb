@@ -3951,8 +3951,9 @@ jbm_f32_sincoswc (const float x,
                   float *s,     ///< pointer to the sin function value (float).
                   float *c)     ///< pointer to the cos function value (float).
 {
-  *s = jbm_f32_sinwc (x);
-  *c = jbm_f32_coswc (x);
+  float x2 = x * x;
+  *s = x * jbm_f32_polynomial_3 (x2, K_SINWC_F32);
+  *c = jbm_f32_polynomial_3 (x2, K_COSWC_F32);
 }
 
 /**

@@ -4002,8 +4002,9 @@ jbm_f64_sincoswc (const double x,
                   double *s,    ///< pointer to the sin function value (double).
                   double *c)    ///< pointer to the cos function value (double).
 {
-  *s = jbm_f64_sinwc (x);
-  *c = jbm_f64_coswc (x);
+  double x2 = x * x;
+  *s = x * jbm_f64_polynomial_6 (x2, K_SINWC_F64);
+  *c = jbm_f64_polynomial_6 (x2, K_COSWC_F64);
 }
 
 /**
