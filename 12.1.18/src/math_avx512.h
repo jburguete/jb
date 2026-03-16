@@ -824,8 +824,7 @@ jbm_16xf32_exp2n (__m512i e)    ///< exponent vector (__m512i).
      _mm512_castsi512_ps
      (_mm512_sllv_epi32 (_mm512_set1_epi32 (1),
                          _mm512_add_epi32 (_mm512_set1_epi32 (149), e))),
-     _mm512_castsi512_ps
-     (_mm512_slli_epi32 (_mm512_add_epi32 (e, v127), 23)));
+     _mm512_castsi512_ps (_mm512_slli_epi32 (_mm512_add_epi32 (e, v127), 23)));
   x = _mm512_mask_mov_ps (x, _mm512_cmpgt_epi32_mask (_mm512_set1_epi32 (-150),
                                                       e), _mm512_setzero_ps ());
   return
@@ -7914,7 +7913,7 @@ jbm_16xf32_tan (const __m512 x) ///< __m512 vector.
   return
     _mm512_mask_blend_ps (_mm512_test_epi32_mask (q, _mm512_set1_epi32 (1)), y,
                           _mm512_div_ps (_mm512_set1_ps (-1.f), y));
-} 
+}
 
 /**
  * Function to calculate the well conditionated function atan(x) for x in [-1,1]
@@ -8838,8 +8837,7 @@ jbm_8xf64_exp2n (__m512i e)     ///< exponent vector (__m512i).
      _mm512_castsi512_pd
      (_mm512_sllv_epi64 (_mm512_set1_epi64 (1ll),
                          _mm512_add_epi64 (_mm512_set1_epi64 (1074ll), e))),
-     _mm512_castsi512_pd
-     (_mm512_slli_epi64 (_mm512_add_epi64 (e, v1023), 52)));
+     _mm512_castsi512_pd (_mm512_slli_epi64 (_mm512_add_epi64 (e, v1023), 52)));
   x = _mm512_mask_mov_pd (x,
                           _mm512_cmpgt_epi64_mask (_mm512_set1_epi64 (-1075ll),
                                                    e), _mm512_setzero_pd ());

@@ -5601,8 +5601,7 @@ main (void)
   d_4xf64 = jbm_4xf64_small (_mm256_set_pd (-1., 1., -0., 0.));
   _mm256_store_pd (d_1, d_4xf64);
   printf ("small_4xf64([0,-0,1,-1])=[%16" PRIx64 ",%16" PRIx64 ",%16" PRIx64
-          ",%16" PRIx64 "]\n",
-          L_1[0], L_1[1], L_1[2], L_1[3]);
+          ",%16" PRIx64 "]\n", L_1[0], L_1[1], L_1[2], L_1[3]);
   d_4xf64 = jbm_4xf64_modmin (_mm256_set_pd (1., 0., -1., 1.),
                               _mm256_set_pd (-2., 1., -2., 0.5));
   _mm256_store_pd (d_1, d_4xf64);

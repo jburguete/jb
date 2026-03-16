@@ -7441,16 +7441,16 @@ jbm_4xf32_sincos (const __m128 x,
   __m128i q;
   y = jbm_4xf32_trig (x, &q);
   jbm_4xf32_sincoswc (y, &s1, &c1);
-  m = _mm_castsi128_ps( _mm_slli_epi32 (_mm_and_si128 (q, v1), 31));
+  m = _mm_castsi128_ps (_mm_slli_epi32 (_mm_and_si128 (q, v1), 31));
   s2 = _mm_blendv_ps (s1, c1, m);
   c2 = _mm_blendv_ps (c1, s1, m);
   *s = _mm_xor_ps (s2,
                    _mm_castsi128_ps (_mm_slli_epi32 (_mm_and_si128 (q, v2),
-                                     30)));
+                                                     30)));
   *c = _mm_xor_ps
-       (c2,
-	_mm_castsi128_ps (_mm_slli_epi32 (_mm_and_si128 (_mm_add_epi32 (q, v1),
-                                                         v2), 30)));
+    (c2,
+     _mm_castsi128_ps (_mm_slli_epi32 (_mm_and_si128 (_mm_add_epi32 (q, v1),
+                                                      v2), 30)));
 }
 
 /**
@@ -7468,7 +7468,7 @@ jbm_4xf32_tan (const __m128 x)  ///< __m128 vector.
   return
     _mm_blendv_ps
     (y, _mm_div_ps (_mm_set1_ps (-1.f), y),
-     _mm_castsi128_ps (_mm_slli_epi32 (_mm_and_si128 (q, _mm_set1_epi32(1)),
+     _mm_castsi128_ps (_mm_slli_epi32 (_mm_and_si128 (q, _mm_set1_epi32 (1)),
                                        31)));
 }
 
@@ -15209,6 +15209,20 @@ jbm_2xf64_coswc (const __m128d x)
 }
 
 /**
+ * Function to calculate the well conditionated function tann(x) for x in
+ * [-pi/4,pi/4] (__m128d)
+ *
+ * \return function value (__m128d).
+ */
+static inline __m128d
+jbm_2xf64_tanwc (const __m128d x)
+    ///< __m128d vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  return
+    _mm_mul_pd (x, jbm_2xf64_rational_6_3 (jbm_2xf64_sqr (x), K_TANWC_F64));
+}
+
+/**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_2xf64_sinwc approximation (__m128d).
  */
@@ -15251,21 +15265,19 @@ jbm_2xf64_trig (const __m128d x,        ///< __m128d vector.
 static inline __m128d
 jbm_2xf64_sin (const __m128d x) ///< __m128d vector.
 {
-  const __m128d pi2 = _mm_set1_pd (2. * M_PI);
-  __m128d y, s;
-  y = jbm_2xf64_mod (x, pi2);
-  s = jbm_2xf64_sinwc (_mm_sub_pd (y, pi2));
-  s = _mm_blendv_pd (s,
-                     jbm_2xf64_opposite
-                     (jbm_2xf64_coswc
-                      (_mm_sub_pd (_mm_set1_pd (3. * M_PI_2), y))),
-                     _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4)));
-  s = _mm_blendv_pd (s, jbm_2xf64_sinwc (_mm_sub_pd (_mm_set1_pd (M_PI), y)),
-                     _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4)));
-  s = _mm_blendv_pd (s, jbm_2xf64_coswc (_mm_sub_pd (_mm_set1_pd (M_PI_2), y)),
-                     _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4)));
-  return _mm_blendv_pd (s, jbm_2xf64_sinwc (y),
-                        _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4)));
+  __m128d y, s, c;
+  __m128i q;
+  y = jbm_2xf64_trig (x, &q);
+  jbm_2xf64_sincoswc (y, &s, &c);
+  y = _mm_blendv_pd
+    (s, c,
+     _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, _mm_set1_epi64x (1)),
+                                       63)));
+  return
+    _mm_xor_pd
+    (y,
+     _mm_castsi128_pd (_mm_slli_epi64
+                       (_mm_and_si128 (q, _mm_set1_epi64x (2)), 62)));
 }
 
 /**
@@ -15277,22 +15289,18 @@ jbm_2xf64_sin (const __m128d x) ///< __m128d vector.
 static inline __m128d
 jbm_2xf64_cos (const __m128d x) ///< __m128d vector.
 {
-  const __m128d pi2 = _mm_set1_pd (2. * M_PI);
-  __m128d y, c;
-  y = jbm_2xf64_mod (x, pi2);
-  c = jbm_2xf64_coswc (_mm_sub_pd (y, pi2));
-  c = _mm_blendv_pd (c,
-                     jbm_2xf64_sinwc
-                     (_mm_sub_pd (y, _mm_set1_pd (3. * M_PI_2))),
-                     _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4)));
-  c = _mm_blendv_pd (c,
-                     jbm_2xf64_opposite
-                     (jbm_2xf64_coswc (_mm_sub_pd (_mm_set1_pd (M_PI), y))),
-                     _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4)));
-  c = _mm_blendv_pd (c, jbm_2xf64_sinwc (_mm_sub_pd (_mm_set1_pd (M_PI_2), y)),
-                     _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4)));
-  return _mm_blendv_pd (c, jbm_2xf64_coswc (y),
-                        _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4)));
+  const __m128i v1 = _mm_set1_epi64x (1);
+  __m128d y, s, c;
+  __m128i q;
+  y = jbm_2xf64_trig (x, &q);
+  jbm_2xf64_sincoswc (y, &s, &c);
+  y = _mm_blendv_pd
+    (c, s, _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, v1), 63)));
+  return
+    _mm_xor_pd
+    (y, _mm_castsi128_pd
+     (_mm_slli_epi64 (_mm_and_si128 (_mm_add_epi64 (q, v1),
+                                     _mm_set1_epi64x (2)), 62)));
 }
 
 /**
@@ -15305,27 +15313,22 @@ jbm_2xf64_sincos (const __m128d x,
                   __m128d *s,   ///< pointer to the f64 function value (__m128d).
                   __m128d *c)   ///< pointer to the f64 function value (__m128d).
 {
-  const __m128d pi2 = _mm_set1_pd (2. * M_PI);
-  const __m128d z = _mm_setzero_pd ();
-  __m128d y, m, s1, c1, s2, c2;
-  y = jbm_2xf64_mod (x, pi2);
-  jbm_2xf64_sincoswc (_mm_sub_pd (y, pi2), &s1, &c1);
-  jbm_2xf64_sincoswc (_mm_sub_pd (y, _mm_set1_pd (3. * M_PI_2)), &c2, &s2);
-  m = _mm_cmplt_pd (y, _mm_set1_pd (7. * M_PI_4));
-  s1 = _mm_blendv_pd (s1, _mm_sub_pd (z, s2), m);
-  c1 = _mm_blendv_pd (c1, c2, m);
-  jbm_2xf64_sincoswc (_mm_sub_pd (_mm_set1_pd (M_PI), y), &s2, &c2);
-  m = _mm_cmplt_pd (y, _mm_set1_pd (5. * M_PI_4));
-  s1 = _mm_blendv_pd (s1, s2, m);
-  c1 = _mm_blendv_pd (c1, _mm_sub_pd (z, c2), m);
-  jbm_2xf64_sincoswc (_mm_sub_pd (_mm_set1_pd (M_PI_2), y), &c2, &s2);
-  m = _mm_cmplt_pd (y, _mm_set1_pd (3. * M_PI_4));
-  s1 = _mm_blendv_pd (s1, s2, m);
-  c1 = _mm_blendv_pd (c1, c2, m);
-  jbm_2xf64_sincoswc (y, &s2, &c2);
-  m = _mm_cmplt_pd (y, _mm_set1_pd (M_PI_4));
-  *s = _mm_blendv_pd (s1, s2, m);
-  *c = _mm_blendv_pd (c1, c2, m);
+  const __m128i v1 = _mm_set1_epi64x (1);
+  const __m128i v2 = _mm_set1_epi64x (2);
+  __m128d y, s1, c1, s2, c2, m;
+  __m128i q;
+  y = jbm_2xf64_trig (x, &q);
+  jbm_2xf64_sincoswc (y, &s1, &c1);
+  m = _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, v1), 63));
+  s2 = _mm_blendv_pd (s1, c1, m);
+  c2 = _mm_blendv_pd (c1, s1, m);
+  *s = _mm_xor_pd (s2,
+                   _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, v2),
+                                                     62)));
+  *c = _mm_xor_pd
+    (c2,
+     _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (_mm_add_epi64 (q, v1),
+                                                      v2), 62)));
 }
 
 /**
@@ -15337,9 +15340,14 @@ jbm_2xf64_sincos (const __m128d x,
 static inline __m128d
 jbm_2xf64_tan (const __m128d x) ///< __m128d vector.
 {
-  __m128d s, c;
-  jbm_2xf64_sincos (x, &s, &c);
-  return _mm_div_pd (s, c);
+  __m128d y;
+  __m128i q;
+  y = jbm_2xf64_tanwc (jbm_2xf64_trig (x, &q));
+  return
+    _mm_blendv_pd
+    (y, _mm_div_pd (_mm_set1_pd (-1.), y),
+     _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, _mm_set1_epi64x (1)),
+                                       63)));
 }
 
 /**

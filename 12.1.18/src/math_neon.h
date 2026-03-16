@@ -7251,8 +7251,8 @@ jbm_4xf32_sin (const float32x4_t x)     ///< float32x4_t vector.
   y = jbm_4xf32_trig (x, &q);
   jbm_4xf32_sincoswc (y, &s, &c);
   y = vbslq_f32
-      (vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, vdupq_n_s32 (1)), 31)),
-       c, s);
+    (vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, vdupq_n_s32 (1)), 31)),
+     c, s);
   return
     vreinterpretq_f32_u32
     (veorq_u32
@@ -7276,15 +7276,13 @@ jbm_4xf32_cos (const float32x4_t x)     ///< float32x4_t vector.
   y = jbm_4xf32_trig (x, &q);
   jbm_4xf32_sincoswc (y, &s, &c);
   y = vbslq_f32
-      (vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, v1), 31)),
-       s, c);
+    (vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, v1), 31)), s, c);
   return
     vreinterpretq_f32_u32
     (veorq_u32
      (vreinterpretq_u32_f32 (y),
       vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (vaddq_s32 (q, v1),
-			                             vdupq_n_s32 (2)),
-                                          30))));
+                                                     vdupq_n_s32 (2)), 30))));
 }
 
 /**
@@ -7299,8 +7297,8 @@ jbm_4xf32_sincos (const float32x4_t x,
                   float32x4_t *c)
                   ///< pointer to the cos function value (float32x4_t).
 {
-  const int32x4_t v1 = vdupq_n_s32(1);
-  const int32x4_t v2 = vdupq_n_s32(2);
+  const int32x4_t v1 = vdupq_n_s32 (1);
+  const int32x4_t v2 = vdupq_n_s32 (2);
   float32x4_t y, s1, c1, s2, c2;
   uint32x4_t m;
   int32x4_t q;
@@ -7310,13 +7308,12 @@ jbm_4xf32_sincos (const float32x4_t x,
   s2 = vbslq_f32 (m, c1, s1);
   c2 = vbslq_f32 (m, s1, c1);
   *s = vreinterpretq_f32_u32
-       (veorq_u32 (vreinterpretq_u32_f32 (s2),
-                   vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, v2),
-                                                       30))));
+    (veorq_u32 (vreinterpretq_u32_f32 (s2),
+                vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, v2), 30))));
   *c = vreinterpretq_f32_u32
-       (veorq_u32 (vreinterpretq_u32_f32 (c2),
-                   vreinterpretq_u32_s32
-                   (vshlq_n_s32 (vandq_s32 (vaddq_s32(q, v1), v2), 30))));
+    (veorq_u32 (vreinterpretq_u32_f32 (c2),
+                vreinterpretq_u32_s32
+                (vshlq_n_s32 (vandq_s32 (vaddq_s32 (q, v1), v2), 30))));
 }
 
 /**
@@ -7332,7 +7329,7 @@ jbm_4xf32_tan (const float32x4_t x)     ///< float32x4_t vector.
   int32x4_t q;
   y = jbm_4xf32_tanwc (jbm_4xf32_trig (x, &q));
   return
-    vbslq_f32 (vreinterpretq_u32_s32 (vandq_s32 (q, vdupq_n_s32(1))),
+    vbslq_f32 (vreinterpretq_u32_s32 (vandq_s32 (q, vdupq_n_s32 (1))),
                vmulq_f32 (vdupq_n_f32 (-1.f), y), y);
 }
 
@@ -14761,13 +14758,12 @@ jbm_2xf64_cbrtwc (const float64x2_t x)
 static inline float64x2_t
 jbm_2xf64_cbrt (const float64x2_t x)    ///< float64x2_t vector.
 {
-{
-  const int64x2_t v3 = vdupq_n_s64(3);
-  const int64x2_t v2 = vdupq_n_s64(2);
-  const int64x2_t v1 = vdupq_n_s64(1);
+  const int64x2_t v3 = vdupq_n_s64 (3);
+  const int64x2_t v2 = vdupq_n_s64 (2);
+  const int64x2_t v1 = vdupq_n_s64 (1);
   float64x2_t y;
   int64x2_t e, e3, r, n;
-  y = jbm_2xf64_frexp (jbm_2xf64_abs(x), &e);
+  y = jbm_2xf64_frexp (jbm_2xf64_abs (x), &e);
   e3 = vmulq_s64 (e, vdupq_n_s64 (0x55555556));
   e3 = vshrq_n_s64 (e3, 32);
   r = vsubq_s64 (e, vmulq_s64 (e3, v3));
@@ -14801,7 +14797,7 @@ jbm_2xf64_expm1wc (const float64x2_t x)
  */
 static inline float64x2_t
 jbm_2xf64_exp2wc (const float64x2_t x)
-                  ///< float64x2_t vector \f$\in[\frac12,1]\f$.
+  ///< float64x2_t vector \f$\in[\frac12,1]\f$.
 {
   return jbm_2xf64_rational_9_4 (x, K_EXP2WC_F64);
 }
@@ -14952,7 +14948,7 @@ jbm_2xf64_pown (const float64x2_t x,    ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_2xf64_pow (const float64x2_t x,     ///< float64x2_t vector.
-               const float64x2_t e)  ///< exponent (float64x2_t).
+               const float64x2_t e)     ///< exponent (float64x2_t).
 {
   return jbm_2xf64_exp2 (vmulq_f64 (e, jbm_2xf64_log2 (x)));
 }
@@ -14965,7 +14961,7 @@ jbm_2xf64_pow (const float64x2_t x,     ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_2xf64_sinwc (const float64x2_t x)
-                 ///< float64x2_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+  ///< float64x2_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
   return vmulq_f64 (x, jbm_2xf64_polynomial_6 (jbm_2xf64_sqr (x), K_SINWC_F64));
 }
@@ -14978,9 +14974,22 @@ jbm_2xf64_sinwc (const float64x2_t x)
  */
 static inline float64x2_t
 jbm_2xf64_coswc (const float64x2_t x)
-                 ///< float64x2_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+  ///< float64x2_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
 {
   return jbm_2xf64_polynomial_6 (jbm_2xf64_sqr (x), K_COSWC_F64);
+}
+
+/**
+ * Function to calculate the well conditionated function tan(x) for x in
+ * [-pi/4,pi/4] (float64x2_t)
+ *
+ * \return function value (float64x2_t).
+ */
+static inline float64x2_t
+jbm_2xf64_tanwc (const float64x2_t x)
+  ///< float64x2_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  return vmulq_f64 (x, jbm_2xf64_rational_6_3 (jbm_2xf64_sqr (x), K_TANWC_F64));
 }
 
 /**
@@ -14993,7 +15002,7 @@ jbm_2xf64_sincoswc (const float64x2_t x,
                     float64x2_t *s,
                     ///< pointer to the f64 function value (float64x2_t).
                     float64x2_t *c)
-                    ///< pointer to the f64 function value (float64x2_t).
+  ///< pointer to the f64 function value (float64x2_t).
 {
   float64x2_t x2 = jbm_2xf64_sqr (x);
   *s = vmulq_f64 (x, jbm_2xf64_polynomial_6 (x2, K_SINWC_F64));
@@ -15025,20 +15034,19 @@ jbm_2xf64_trig (const float64x2_t x,    ///< float64x2_t vector.
 static inline float64x2_t
 jbm_2xf64_sin (const float64x2_t x)     ///< float64x2_t vector.
 {
-  const float64x2_t pi2 = vdupq_n_f64 (2. * M_PI);
-  float64x2_t y, s;
-  y = jbm_2xf64_mod1 (x, 2. * M_PI);
-  s = jbm_2xf64_sinwc (vsubq_f64 (y, pi2));
-  s = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4)),
-                 jbm_2xf64_opposite
-                 (jbm_2xf64_coswc
-                  (vsubq_f64 (vdupq_n_f64 (3. * M_PI_2), y))), s);
-  s = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4)),
-                 jbm_2xf64_sinwc (vsubq_f64 (vdupq_n_f64 (M_PI), y)), s);
-  s = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4)),
-                 jbm_2xf64_coswc (vsubq_f64 (vdupq_n_f64 (M_PI_2), y)), s);
-  return vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (M_PI_4)),
-                    jbm_2xf64_sinwc (y), s);
+  float64x2_t y, s, c;
+  int64x2_t q;
+  y = jbm_2xf64_trig (x, &q);
+  jbm_2xf64_sincoswc (y, &s, &c);
+  y = vbslq_f64
+    (vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, vdupq_n_s64 (1)), 63)),
+     c, s);
+  return
+    vreinterpretq_f64_u64
+    (veorq_u64
+     (vreinterpretq_u64_f64 (y),
+      vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, vdupq_n_s64 (2)),
+                                          62))));
 }
 
 /**
@@ -15050,20 +15058,19 @@ jbm_2xf64_sin (const float64x2_t x)     ///< float64x2_t vector.
 static inline float64x2_t
 jbm_2xf64_cos (const float64x2_t x)     ///< float64x2_t vector.
 {
-  const float64x2_t pi2 = vdupq_n_f64 (2. * M_PI);
-  float64x2_t y, c;
-  y = jbm_2xf64_mod1 (x, 2. * M_PI);
-  c = jbm_2xf64_coswc (vsubq_f64 (y, pi2));
-  c = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4)),
-                 jbm_2xf64_sinwc (vsubq_f64 (y, vdupq_n_f64 (3. * M_PI_2))), c);
-  c = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4)),
-                 jbm_2xf64_opposite
-                 (jbm_2xf64_coswc (vsubq_f64 (vdupq_n_f64 (M_PI), y))), c);
-  c = vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4)),
-                 jbm_2xf64_sinwc (vsubq_f64 (vdupq_n_f64 (M_PI_2), y)), c);
-  return vbslq_f64 (vcltq_f64 (y, vdupq_n_f64 (M_PI_4)),
-                    jbm_2xf64_coswc (y), c);
-
+  const int64x2_t v1 = vdupq_n_s64 (1);
+  float64x2_t y, s, c;
+  int64x2_t q;
+  y = jbm_2xf64_trig (x, &q);
+  jbm_2xf64_sincoswc (y, &s, &c);
+  y = vbslq_f64
+    (vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, v1), 63)), s, c);
+  return
+    vreinterpretq_f64_u64
+    (veorq_u64
+     (vreinterpretq_u64_f64 (y),
+      vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (vaddq_s64 (q, v1),
+                                                     vdupq_n_s64 (2)), 62))));
 }
 
 /**
@@ -15076,29 +15083,25 @@ jbm_2xf64_sincos (const float64x2_t x,
                   float64x2_t *s,
                   ///< pointer to the f64 function value (float64x2_t).
                   float64x2_t *c)
-                  ///< pointer to the f64 function value (float64x2_t).
+  ///< pointer to the f64 function value (float64x2_t).
 {
-  const float64x2_t pi2 = vdupq_n_f64 (2. * M_PI);
+  const int64x2_t v1 = vdupq_n_s64 (1);
+  const int64x2_t v2 = vdupq_n_s64 (2);
   float64x2_t y, s1, c1, s2, c2;
   uint64x2_t m;
-  y = jbm_2xf64_mod1 (x, 2. * M_PI);
-  jbm_2xf64_sincoswc (vsubq_f64 (y, pi2), &s1, &c1);
-  jbm_2xf64_sincoswc (vsubq_f64 (y, vdupq_n_f64 (3. * M_PI_2)), &c2, &s2);
-  m = vcltq_f64 (y, vdupq_n_f64 (7. * M_PI_4));
-  s1 = vbslq_f64 (m, jbm_2xf64_opposite (s2), s1);
-  c1 = vbslq_f64 (m, c2, c1);
-  jbm_2xf64_sincoswc (vsubq_f64 (vdupq_n_f64 (M_PI), y), &s2, &c2);
-  m = vcltq_f64 (y, vdupq_n_f64 (5. * M_PI_4));
-  s1 = vbslq_f64 (m, s2, s1);
-  c1 = vbslq_f64 (m, jbm_2xf64_opposite (c2), c1);
-  jbm_2xf64_sincoswc (vsubq_f64 (vdupq_n_f64 (M_PI_2), y), &c2, &s2);
-  m = vcltq_f64 (y, vdupq_n_f64 (3. * M_PI_4));
-  s1 = vbslq_f64 (m, s2, s1);
-  c1 = vbslq_f64 (m, c2, c1);
-  jbm_2xf64_sincoswc (y, &s2, &c2);
-  m = vcltq_f64 (y, vdupq_n_f64 (M_PI_4));
-  *s = vbslq_f64 (m, s2, s1);
-  *c = vbslq_f64 (m, c2, c1);
+  int64x2_t q;
+  y = jbm_4xf64_trig (x, &q);
+  jbm_4xf64_sincoswc (y, &s1, &c1);
+  m = vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, v1), 63));
+  s2 = vbslq_f64 (m, c1, s1);
+  c2 = vbslq_f64 (m, s1, c1);
+  *s = vreinterpretq_f64_u64
+    (veorq_u64 (vreinterpretq_u64_f64 (s2),
+                vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, v2), 62))));
+  *c = vreinterpretq_f64_u64
+    (veorq_u64 (vreinterpretq_u64_f64 (c2),
+                vreinterpretq_u64_s64
+                (vshlq_n_s64 (vandq_s64 (vaddq_s64 (q, v1), v2), 62))));
 }
 
 /**
@@ -15110,9 +15113,12 @@ jbm_2xf64_sincos (const float64x2_t x,
 static inline float64x2_t
 jbm_2xf64_tan (const float64x2_t x)     ///< float64x2_t vector.
 {
-  float64x2_t s, c;
-  jbm_2xf64_sincos (x, &s, &c);
-  return vdivq_f64 (s, c);
+  float64x2_t y;
+  int64x2_t q;
+  y = jbm_2xf64_tanwc (jbm_2xf64_trig (x, &q));
+  return
+    vbslq_f64 (vreinterpretq_u64_s64 (vandq_s64 (q, vdupq_n_s64 (1))),
+               vmulq_f64 (vdupq_n_f64 (-1.), y), y);
 }
 
 /**
@@ -15123,7 +15129,7 @@ jbm_2xf64_tan (const float64x2_t x)     ///< float64x2_t vector.
  */
 static inline float64x2_t
 jbm_2xf64_atanwc (const float64x2_t x)
-                  ///< float64x2_t vector \f$\in\left[-1,1\right]\f$.
+  ///< float64x2_t vector \f$\in\left[-1,1\right]\f$.
 {
   return
     vmulq_f64 (x, jbm_2xf64_rational_11_5 (jbm_2xf64_sqr (x), K_ATANWC_F64));
@@ -15268,8 +15274,8 @@ jbm_2xf64_acosh (const float64x2_t x)   ///< float64x2_t number.
 {
   return
     jbm_2xf64_log
-    (vaddq_f64 (x, vsqrtq_f64 (jbm_2xf64_opposite (vmlsq_f64 (vdupq_n_f64 (1.),
-                                                              x, x)))));
+    (vaddq_f64
+     (x, vsqrtq_f64 (jbm_2xf64_opposite (vmlsq_f64 (vdupq_n_f64 (1.), x, x)))));
 }
 
 /**
@@ -15295,7 +15301,7 @@ jbm_2xf64_atanh (const float64x2_t x)   ///< float64x2_t number.
  */
 static inline float64x2_t
 jbm_2xf64_erfwc (const float64x2_t x)
-                 ///< float64x2_t vector \f$\in\left[-1,1\right]\f$.
+  ///< float64x2_t vector \f$\in\left[-1,1\right]\f$.
 {
   return vmulq_f64 (x, jbm_2xf64_rational_9_4 (jbm_2xf64_sqr (x), K_ERFWC_F64));
 }
@@ -15308,7 +15314,7 @@ jbm_2xf64_erfwc (const float64x2_t x)
  */
 static inline float64x2_t
 jbm_2xf64_erfcwc (const float64x2_t x)
-                  ///< float64x2_t vector \f$\in\left[1,\infty\right]\f$.
+  ///< float64x2_t vector \f$\in\left[1,\infty\right]\f$.
 {
   float64x2_t f, x2;
   x2 = jbm_2xf64_sqr (x);
@@ -15423,7 +15429,7 @@ jbm_solve_cubic_reduced_2xf64 (const float64x2_t a,
                                const float64x2_t x1,
                                ///< left limit of the solution interval.
                                const float64x2_t x2)
-                               ///< right limit of the solution interval.
+  ///< right limit of the solution interval.
 {
   float64x2_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2, c_3;
   c2p_3 = vdupq_n_f64 (2. * M_PI / 3.);
@@ -15521,7 +15527,7 @@ static inline float64x2_t
 jbm_2xf64_flux_limiter_centred (const float64x2_t d1,
                                 ///< 1st flux limiter function parameter.
                                 const float64x2_t d2)
-                              ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return vbslq_f64 (jbm_2xf64_small (d2), vdupq_n_f64 (0.), vdivq_f64 (d1, d2));
 
@@ -15539,7 +15545,7 @@ static inline float64x2_t
 jbm_2xf64_flux_limiter_superbee (const float64x2_t d1,
                                  ///< 1st flux limiter function parameter.
                                  const float64x2_t d2)
-                               ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   float64x2_t r;
   r = vdivq_f64 (d1, d2);
@@ -15560,7 +15566,7 @@ static inline float64x2_t
 jbm_2xf64_flux_limiter_minmod (const float64x2_t d1,
                                ///< 1st flux limiter function parameter.
                                const float64x2_t d2)
-                             ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   float64x2_t r;
   r = vminq_f64 (vdivq_f64 (d1, d2), vdupq_n_f64 (1.));
@@ -15580,7 +15586,7 @@ static inline float64x2_t
 jbm_2xf64_flux_limiter_VanLeer (const float64x2_t d1,
                                 ///< 1st flux limiter function parameter.
                                 const float64x2_t d2)
-                              ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   float64x2_t r, k;
   r = vdivq_f64 (d1, d2);
@@ -15601,7 +15607,7 @@ static inline float64x2_t
 jbm_2xf64_flux_limiter_VanAlbada (const float64x2_t d1,
                                   ///< 1st flux limiter function parameter.
                                   const float64x2_t d2)
-                                ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   float64x2_t r, k;
   r = vdivq_f64 (d1, d2);
@@ -15622,7 +15628,7 @@ static inline float64x2_t
 jbm_2xf64_flux_limiter_minsuper (const float64x2_t d1,
                                  ///< 1st flux limiter function parameter.
                                  const float64x2_t d2)
-                               ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   float64x2_t r;
   r = vminq_f64 (vdivq_f64 (d1, d2), vdupq_n_f64 (2.));
@@ -15641,7 +15647,7 @@ static inline float64x2_t
 jbm_2xf64_flux_limiter_supermin (const float64x2_t d1,
                                  ///< 1st flux limiter function parameter.
                                  const float64x2_t d2)
-                               ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   float64x2_t r;
   r = vdivq_f64 (d1, d2);
@@ -15684,7 +15690,7 @@ static inline float64x2_t
 jbm_2xf64_flux_limiter_mean (const float64x2_t d1,
                              ///< 1st flux limiter function parameter.
                              const float64x2_t d2)
-                           ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   float64x2_t r;
   r = vmulq_f64 (vdupq_n_f64 (0.5),
@@ -15704,7 +15710,7 @@ jbm_2xf64_flux_limiter (const float64x2_t d1,
                         const float64x2_t d2,
                         ///< 2nd flux limiter function parameter.
                         unsigned int type)
-                      ///< type of flux limiter function.
+  ///< type of flux limiter function.
 {
   switch (type)
     {
@@ -15799,25 +15805,14 @@ jbm_2xf64_integral (float64x2_t (*f) (float64x2_t),
 
 ///> macro to automatize operations on one array.
 #define JBM_ARRAY_OP(xr, xd, n, type, load128, store128, op128, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
-  unsigned int i, j; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-         j > 0; --j) \
-      { \
-        __builtin_prefetch((const char *) (xd + i + prefetch)); \
-        store128 (xr + i, op128 (load128 (xd + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (xd + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (xd + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (xd + i))); \
-        i += 16 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
+unsigned int i, j; \
+if (n > prefetch + 64 / sizeof (type)) \
+  for (i = 0, \
+       j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+       j > 0; --j) \
     { \
+      __builtin_prefetch((const char *) (xd + i + prefetch)); \
       store128 (xr + i, op128 (load128 (xd + i))); \
       i += 16 / sizeof (type); \
       store128 (xr + i, op128 (load128 (xd + i))); \
@@ -15827,35 +15822,35 @@ jbm_2xf64_integral (float64x2_t (*f) (float64x2_t),
       store128 (xr + i, op128 (load128 (xd + i))); \
       i += 16 / sizeof (type); \
     } \
-  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-       --j, i += 16 / sizeof (type)) \
+for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+  { \
     store128 (xr + i, op128 (load128 (xd + i))); \
-  for (; i < n; ++i) \
-    xr[i] = op (xd[i]);
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (xd + i))); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (xd + i))); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (xd + i))); \
+    i += 16 / sizeof (type); \
+  } \
+for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+     --j, i += 16 / sizeof (type)) \
+  store128 (xr + i, op128 (load128 (xd + i))); \
+for (; i < n; ++i) \
+  xr[i] = op (xd[i]);
 
 ///> macro to automatize operations on one array and one number.
 #define JBM_ARRAY_OP1(xr, x1, x2, n, type128, type, load128, store128, set128, \
-                      op128, op) \
-  const type128 x128 = set128 (x2); \
-  const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
-  unsigned int i, j; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-         j > 0; --j) \
-      { \
-        __builtin_prefetch((const char *) (x1 + i + prefetch)); \
-        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-        i += 16 / sizeof (type); \
-    } \
-  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+                    op128, op) \
+const type128 x128 = set128 (x2); \
+const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
+unsigned int i, j; \
+if (n > prefetch + 64 / sizeof (type)) \
+  for (i = 0, \
+       j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+       j > 0; --j) \
     { \
+      __builtin_prefetch((const char *) (x1 + i + prefetch)); \
       store128 (xr + i, op128 (load128 (x1 + i), x128)); \
       i += 16 / sizeof (type); \
       store128 (xr + i, op128 (load128 (x1 + i), x128)); \
@@ -15864,35 +15859,35 @@ jbm_2xf64_integral (float64x2_t (*f) (float64x2_t),
       i += 16 / sizeof (type); \
       store128 (xr + i, op128 (load128 (x1 + i), x128)); \
       i += 16 / sizeof (type); \
-    } \
-  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-       --j, i += 16 / sizeof (type)) \
+  } \
+for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+  { \
     store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-  for (; i < n; ++i) \
-    xr[i] = op (x1[i], x2);
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+    i += 16 / sizeof (type); \
+  } \
+for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+     --j, i += 16 / sizeof (type)) \
+  store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+for (; i < n; ++i) \
+  xr[i] = op (x1[i], x2);
 
 ///> macro to automatize operations on two arrays.
 #define JBM_ARRAY_OP2(xr, x1, x2, n, type, load128, store128, op128, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 32 : 16; \
-  unsigned int i, j; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-         j > 0; --j) \
-      { \
-        __builtin_prefetch((const char *) (x1 + i + prefetch)); \
-        __builtin_prefetch((const char *) (x2 + i + prefetch)); \
-        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-        i += 16 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+const unsigned int prefetch = sizeof (type) == 4 ? 32 : 16; \
+unsigned int i, j; \
+if (n > prefetch + 64 / sizeof (type)) \
+  for (i = 0, \
+       j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+       j > 0; --j) \
     { \
+      __builtin_prefetch((const char *) (x1 + i + prefetch)); \
+      __builtin_prefetch((const char *) (x2 + i + prefetch)); \
       store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
       i += 16 / sizeof (type); \
       store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
@@ -15902,248 +15897,259 @@ jbm_2xf64_integral (float64x2_t (*f) (float64x2_t),
       store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
       i += 16 / sizeof (type); \
     } \
-  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-       --j, i += 16 / sizeof (type)) \
+for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+  { \
     store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-  for (; i < n; ++i) \
-    xr[i] = op (x1[i], x2[i]);
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+    i += 16 / sizeof (type); \
+  } \
+for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+     --j, i += 16 / sizeof (type)) \
+  store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+for (; i < n; ++i) \
+  xr[i] = op (x1[i], x2[i]);
 
 ///> macro to automatize reduction operations on arrays.
 #define JBM_ARRAY_REDUCE_OP(x, n, type128, type, load128, op128, op, \
-                            reduce128, initial_value) \
-  type128 a128, b128, c128, d128; \
-  type a = initial_value; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
-  unsigned int i, j; \
-  i = 0; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          __builtin_prefetch ((const char *) (x + prefetch)); \
-          a128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          b128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          c128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          d128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          while (--j) \
-            { \
-              __builtin_prefetch ((const char *) (x + i + prefetch)); \
-              a128 = op128 (a128, load128 (x + i)); \
-              i += 16 / sizeof (type); \
-              b128 = op128 (b128, load128 (x + i)); \
-              i += 16 / sizeof (type); \
-              c128 = op128 (c128, load128 (x + i)); \
-              i += 16 / sizeof (type); \
-              d128 = op128 (d128, load128 (x + i)); \
-              i += 16 / sizeof (type); \
-            } \
-          a128 = op128 (a128, b128); \
-          c128 = op128 (c128, d128); \
-          a = reduce128 (op128 (a128, c128)); \
-        } \
-    } \
-  j = (n - i) >> (2 + 8 / sizeof (type)); \
-  if (j) \
-    { \
-      a128 = load128 (x + i); \
-      i += 16 / sizeof (type); \
-      b128 = load128 (x + i); \
-      i += 16 / sizeof (type); \
-      c128 = load128 (x + i); \
-      i += 16 / sizeof (type); \
-      d128 = load128 (x + i); \
-      i += 16 / sizeof (type); \
-      while (--j) \
-        { \
-          a128 = op128 (a128, load128 (x + i)); \
-          i += 16 / sizeof (type); \
-          b128 = op128 (b128, load128 (x + i)); \
-          i += 16 / sizeof (type); \
-          c128 = op128 (c128, load128 (x + i)); \
-          i += 16 / sizeof (type); \
-          d128 = op128 (d128, load128 (x + i)); \
-          i += 16 / sizeof (type); \
-        } \
-      a128 = op128 (a128, b128); \
-      c128 = op128 (c128, d128); \
-      a = op (a, reduce128 (op128 (a128, c128))); \
-    } \
-  j = (n - i) >> (8 / sizeof (type)); \
-  if (j) \
-    { \
-      a128 = load128 (x + i); \
-      i += 16 / sizeof (type); \
-      while (--j) \
-        { \
-          a128 = op128 (a128, load128 (x + i)); \
-          i += 16 / sizeof (type); \
-        } \
-      a = op (a, reduce128 (a128)); \
-    } \
-  while (i < n) \
-    a = op (a, x[i++]); \
-  return a;
+                          reduce128, initial_value) \
+type128 a128, b128, c128, d128; \
+type a = initial_value; \
+const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
+unsigned int i, j; \
+i = 0; \
+if (n > prefetch + 64 / sizeof (type)) \
+  { \
+    j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+    if (j) \
+      { \
+        __builtin_prefetch ((const char *) (x + prefetch)); \
+        a128 = load128 (x + i); \
+        i += 16 / sizeof (type); \
+        b128 = load128 (x + i); \
+        i += 16 / sizeof (type); \
+        c128 = load128 (x + i); \
+        i += 16 / sizeof (type); \
+        d128 = load128 (x + i); \
+        i += 16 / sizeof (type); \
+        while (--j) \
+          { \
+            __builtin_prefetch ((const char *) (x + i + prefetch)); \
+            a128 = op128 (a128, load128 (x + i)); \
+            i += 16 / sizeof (type); \
+            b128 = op128 (b128, load128 (x + i)); \
+            i += 16 / sizeof (type); \
+            c128 = op128 (c128, load128 (x + i)); \
+            i += 16 / sizeof (type); \
+            d128 = op128 (d128, load128 (x + i)); \
+            i += 16 / sizeof (type); \
+          } \
+        a128 = op128 (a128, b128); \
+        c128 = op128 (c128, d128); \
+        a = reduce128 (op128 (a128, c128)); \
+      } \
+  } \
+j = (n - i) >> (2 + 8 / sizeof (type)); \
+if (j) \
+  { \
+    a128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    b128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    c128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    d128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        a128 = op128 (a128, load128 (x + i)); \
+        i += 16 / sizeof (type); \
+        b128 = op128 (b128, load128 (x + i)); \
+        i += 16 / sizeof (type); \
+        c128 = op128 (c128, load128 (x + i)); \
+        i += 16 / sizeof (type); \
+        d128 = op128 (d128, load128 (x + i)); \
+        i += 16 / sizeof (type); \
+      } \
+    a128 = op128 (a128, b128); \
+    c128 = op128 (c128, d128); \
+    a = op (a, reduce128 (op128 (a128, c128))); \
+  } \
+j = (n - i) >> (8 / sizeof (type)); \
+if (j) \
+  { \
+    a128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        a128 = op128 (a128, load128 (x + i)); \
+        i += 16 / sizeof (type); \
+      } \
+    a = op (a, reduce128 (a128)); \
+  } \
+while (i < n) \
+  a = op (a, x[i++]); \
+return a;
 
 ///> macro to automatize dot products on arrays.
 #define JBM_ARRAY_DOT(x1, x2, n, type128, type, load128, mul128, add128, \
-                      ma128, reduce128) \
-  type128 a128, b128, c128, d128; \
-  type a = (type) 0.; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 32 : 16; \
-  unsigned int i, j; \
-  i = 0; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          __builtin_prefetch ((const char *) (x1 + prefetch)); \
-          __builtin_prefetch ((const char *) (x2 + prefetch)); \
-          a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          while (--j) \
-            { \
-              __builtin_prefetch ((const char *) (x1 + i + prefetch)); \
-              __builtin_prefetch ((const char *) (x2 + i + prefetch)); \
-              a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
-              i += 16 / sizeof (type); \
-              b128 = ma128 (b128, load128 (x1 + i), load128 (x2 + i)); \
-              i += 16 / sizeof (type); \
-              d128 = ma128 (c128, load128 (x1 + i), load128 (x2 + i)); \
-              i += 16 / sizeof (type); \
-              d128 = ma128 (d128, load128 (x1 + i), load128 (x2 + i)); \
-              i += 16 / sizeof (type); \
-            } \
-          a128 = add128 (a128, b128); \
-          c128 = add128 (c128, d128); \
-          a = reduce128 (add128 (a128, c128)); \
-        } \
-    } \
-  j = (n - i) >> (2 + 8 / sizeof (type)); \
-  if (j) \
-    { \
-      a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-      i += 16 / sizeof (type); \
-      b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-      i += 16 / sizeof (type); \
-      d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-      i += 16 / sizeof (type); \
-      d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-      i += 16 / sizeof (type); \
-      while (--j) \
-        { \
-          a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          b128 = ma128 (b128, load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          d128 = ma128 (c128, load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          d128 = ma128 (d128, load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-        } \
-      a128 = add128 (a128, b128); \
-      c128 = add128 (c128, d128); \
-      a += reduce128 (add128 (a128, c128)); \
-    } \
-  j = (n - i) >> (8 / sizeof (type)); \
-  if (j) \
-    { \
-      a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-      i += 16 / sizeof (type); \
-      while (--j) \
-        { \
-          a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-        } \
-      a += reduce128 (a128); \
-    } \
-  for (; i < n; ++i) \
-    a += JBM_MUL (x1[i], x2[i]); \
-  return a;
+                    ma128, reduce128) \
+type128 a128, b128, c128, d128; \
+type a = (type) 0.; \
+const unsigned int prefetch = sizeof (type) == 4 ? 32 : 16; \
+unsigned int i, j; \
+i = 0; \
+if (n > prefetch + 64 / sizeof (type)) \
+  { \
+    j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+    if (j) \
+      { \
+        __builtin_prefetch ((const char *) (x1 + prefetch)); \
+        __builtin_prefetch ((const char *) (x2 + prefetch)); \
+        a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+        b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+        d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+        d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+        while (--j) \
+          { \
+            __builtin_prefetch ((const char *) (x1 + i + prefetch)); \
+            __builtin_prefetch ((const char *) (x2 + i + prefetch)); \
+            a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
+            i += 16 / sizeof (type); \
+            b128 = ma128 (b128, load128 (x1 + i), load128 (x2 + i)); \
+            i += 16 / sizeof (type); \
+            d128 = ma128 (c128, load128 (x1 + i), load128 (x2 + i)); \
+            i += 16 / sizeof (type); \
+            d128 = ma128 (d128, load128 (x1 + i), load128 (x2 + i)); \
+            i += 16 / sizeof (type); \
+          } \
+        a128 = add128 (a128, b128); \
+        c128 = add128 (c128, d128); \
+        a = reduce128 (add128 (a128, c128)); \
+      } \
+  } \
+j = (n - i) >> (2 + 8 / sizeof (type)); \
+if (j) \
+  { \
+    a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+    i += 16 / sizeof (type); \
+    b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+    i += 16 / sizeof (type); \
+    d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+    i += 16 / sizeof (type); \
+    d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+        b128 = ma128 (b128, load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+        d128 = ma128 (c128, load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+        d128 = ma128 (d128, load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+      } \
+    a128 = add128 (a128, b128); \
+    c128 = add128 (c128, d128); \
+    a += reduce128 (add128 (a128, c128)); \
+  } \
+j = (n - i) >> (8 / sizeof (type)); \
+if (j) \
+  { \
+    a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+      } \
+    a += reduce128 (a128); \
+  } \
+for (; i < n; ++i) \
+  a += JBM_MUL (x1[i], x2[i]); \
+return a;
 
 ///> macro to automatize maxmin operations on arrays.
 #define JBM_ARRAY_MAXMIN(x, n, type128, type, load128, max128, max, min128, \
-                         min, redmax128, redmin128, mx, mn) \
-  type128 x128, mxa128, mxb128, mna128, mnb128; \
-  type mx = -INFINITY, mn = INFINITY; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
-  unsigned int i, j; \
-  i = 0; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          __builtin_prefetch ((const char *) (x + prefetch)); \
-          mxa128 = mna128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          mxb128 = mnb128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          while (--j) \
-            { \
-              __builtin_prefetch ((const char *) (x + i + prefetch)); \
-              x128 = load128 (x + i); \
-              mxa128 = max128 (mxa128, x128); \
-              mna128 = min128 (mna128, x128); \
-              i += 16 / sizeof (type); \
-              x128 = load128 (x + i); \
-              mxb128 = max128 (mxb128, x128); \
-              mnb128 = min128 (mnb128, x128); \
-              i += 16 / sizeof (type); \
-            } \
-          mx = redmax128 (max128 (mxa128, mxb128)); \
-          mn = redmin128 (min128 (mna128, mnb128)); \
-        } \
-    } \
-  j = (n - i) >> (2 + 8 / sizeof (type)); \
-  if (j) \
-    { \
-      mxa128 = mna128 = load128 (x + i); \
-      i += 16 / sizeof (type); \
-      mxb128 = mnb128 = load128 (x + i); \
-      i += 16 / sizeof (type); \
-      while (--j) \
-        { \
-          x128 = load128 (x + i); \
-          mxa128 = max128 (mxa128, x128); \
-          mna128 = min128 (mna128, x128); \
-          i += 16 / sizeof (type); \
-          x128 = load128 (x + i); \
-          mxb128 = max128 (mxb128, x128); \
-          mnb128 = min128 (mnb128, x128); \
-          i += 16 / sizeof (type); \
-        } \
-      mx = max (mx, redmax128 (max128 (mxa128, mxb128))); \
-      mn = min (mn, redmin128 (min128 (mna128, mnb128))); \
-    } \
-  j = (n - i) >> (8 / sizeof (type)); \
-  if (j) \
-    { \
-      mxa128 = mna128 = load128 (x + i); \
-      i += 16 / sizeof (type); \
-      while (--j) \
-        { \
-          x128 = load128 (x + i); \
-          mxa128 = max128 (mxa128, x128); \
-          mna128 = min128 (mna128, x128); \
-          i += 16 / sizeof (type); \
-        } \
-      mx = max (mx, redmax128 (mxa128)); \
-      mn = min (mn, redmin128 (mna128)); \
-    } \
-  for (; i < n; ++i) \
-    mx = max (mx, x[i]), mn = min (mn, x[i]); \
+                       min, redmax128, redmin128, mx, mn) \
+type128 x128, mxa128, mxb128, mna128, mnb128; \
+type mx = -INFINITY, mn = INFINITY; \
+const unsigned int prefetch = sizeof (type) == 4 ? 64 : 32; \
+unsigned int i, j; \
+i = 0; \
+if (n > prefetch + 64 / sizeof (type)) \
+  { \
+    j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
+    if (j) \
+      { \
+        __builtin_prefetch ((const char *) (x + prefetch)); \
+        mxa128 = mna128 = load128 (x + i); \
+        i += 16 / sizeof (type); \
+        mxb128 = mnb128 = load128 (x + i); \
+        i += 16 / sizeof (type); \
+        while (--j) \
+          { \
+            __builtin_prefetch ((const char *) (x + i + prefetch)); \
+            x128 = load128 (x + i); \
+            mxa128 = max128 (mxa128, x128); \
+            mna128 = min128 (mna128, x128); \
+            i += 16 / sizeof (type); \
+            x128 = load128 (x + i); \
+            mxb128 = max128 (mxb128, x128); \
+            mnb128 = min128 (mnb128, x128); \
+            i += 16 / sizeof (type); \
+          } \
+        mx = redmax128 (max128 (mxa128, mxb128)); \
+        mn = redmin128 (min128 (mna128, mnb128)); \
+      } \
+  } \
+j = (n - i) >> (2 + 8 / sizeof (type)); \
+if (j) \
+  { \
+    mxa128 = mna128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    mxb128 = mnb128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        x128 = load128 (x + i); \
+        mxa128 = max128 (mxa128, x128); \
+        mna128 = min128 (mna128, x128); \
+        i += 16 / sizeof (type); \
+        x128 = load128 (x + i); \
+        mxb128 = max128 (mxb128, x128); \
+        mnb128 = min128 (mnb128, x128); \
+        i += 16 / sizeof (type); \
+      } \
+    mx = max (mx, redmax128 (max128 (mxa128, mxb128))); \
+    mn = min (mn, redmin128 (min128 (mna128, mnb128))); \
+  } \
+j = (n - i) >> (8 / sizeof (type)); \
+if (j) \
+  { \
+    mxa128 = mna128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        x128 = load128 (x + i); \
+        mxa128 = max128 (mxa128, x128); \
+        mna128 = min128 (mna128, x128); \
+        i += 16 / sizeof (type); \
+      } \
+    mx = max (mx, redmax128 (mxa128)); \
+    mn = min (mn, redmin128 (mna128)); \
+  } \
+for (; i < n; ++i) \
+  mx = max (mx, x[i]), mn = min (mn, x[i]); \
 
 /**
  * Function to calculate the root square of a float array.
@@ -16489,8 +16495,8 @@ static inline float
 jbm_array_f32_sum (const float *x,      ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP (x, n, float32x4_t, float, vld1q_f32, vaddq_f32, JBM_ADD,
-                       jbm_4xf32_reduce_add, 0.f);
+  JBM_ARRAY_REDUCE_OP (x, n, float32x4_t, float, vld1q_f32, vaddq_f32,
+                       JBM_ADD, jbm_4xf32_reduce_add, 0.f);
 }
 
 /**
@@ -16527,11 +16533,11 @@ jbm_array_f32_reduce_maxmin (const float *x,    ///< float array.
                              float *max,        ///< the highest value.
                              float *min,        ///< the lowest value.
                              const unsigned int n)
-                             ///< number of array elements.
+  ///< number of array elements.
 {
   JBM_ARRAY_MAXMIN (x, n, float32x4_t, float, vld1q_f32, vmaxq_f32, fmaxf,
-                    vminq_f32, fmin, jbm_4xf32_reduce_max, jbm_4xf32_reduce_min,
-                    mx, mn);
+                    vminq_f32, fmin, jbm_4xf32_reduce_max,
+                    jbm_4xf32_reduce_min, mx, mn);
   *max = mx, *min = mn;
 }
 
@@ -16751,8 +16757,8 @@ jbm_array_f32_dot (const float *restrict x1,    ///< multiplier float array.
                    const float *restrict x2,    ///< multiplicand float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_DOT (x1, x2, n, float32x4_t, float, vld1q_f32, vmulq_f32, vaddq_f32,
-                 vmlaq_f32, jbm_4xf32_reduce_add);
+  JBM_ARRAY_DOT (x1, x2, n, float32x4_t, float, vld1q_f32, vmulq_f32,
+                 vaddq_f32, vmlaq_f32, jbm_4xf32_reduce_add);
 }
 
 /**
@@ -17099,8 +17105,8 @@ static inline double
 jbm_array_f64_sum (const double *x,     ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP (x, n, float64x2_t, double, vld1q_f64, vaddq_f64, JBM_ADD,
-                       jbm_2xf64_reduce_add, 0.);
+  JBM_ARRAY_REDUCE_OP (x, n, float64x2_t, double, vld1q_f64, vaddq_f64,
+                       JBM_ADD, jbm_2xf64_reduce_add, 0.);
 }
 
 /**
@@ -17137,11 +17143,11 @@ jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
                              double *max,       ///< the highest value.
                              double *min,       ///< the lowest value.
                              const unsigned int n)
-                             ///< number of array elements.
+  ///< number of array elements.
 {
   JBM_ARRAY_MAXMIN (x, n, float64x2_t, double, vld1q_f64, vmaxq_f64, fmaxf,
-                    vminq_f64, fmin, jbm_2xf64_reduce_max, jbm_2xf64_reduce_min,
-                    mx, mn);
+                    vminq_f64, fmin, jbm_2xf64_reduce_max,
+                    jbm_2xf64_reduce_min, mx, mn);
   *max = mx, *min = mn;
 }
 
