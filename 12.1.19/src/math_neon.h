@@ -66,6 +66,10 @@ typedef union
 ///< mantissa bits for floats.
 #define JBM_4xF32_BITS_SIGN vdupq_n_u32 (JBM_F32_BITS_SIGN)
 ///< sign bits for floats.
+#define JBM_4xF32_CBRT2 vdupq_n_f32 (JBM_F32_CBRT2)
+///< cbrt(2) for floats.
+#define JBM_4xF32_CBRT4 vdupq_n_f32 (JBM_F32_CBRT4)
+///< cbrt(4) for floats.
 
 // double constants
 
@@ -79,6 +83,10 @@ typedef union
 ///< mantissa bits for doubles.
 #define JBM_2xF64_BITS_SIGN vdupq_n_u64 (JBM_F64_BITS_SIGN)
 ///< sign bits for floats.
+#define JBM_2xF64_CBRT2 vdupq_n_f64 (JBM_F64_CBRT2)
+///< cbrt(2) for doubles.
+#define JBM_2xF64_CBRT4 vdupq_n_f64 (JBM_F64_CBRT4)
+///< cbrt(4) for doubles.
 
 // Debug functions
 
@@ -8068,6 +8076,27 @@ jbm_2xf64_abs (const float64x2_t x)     ///< float64x2_t vector.
 }
 
 /**
+ * Function to copy the sign of a float64x2_t vector to another float64x2_t
+ * vector.
+ *
+ * \return float64x2_t vector with magnitud of 1st vector and sign of 2nd
+ * vector.
+ */
+static inline float64x2_t
+jbm_2xf64_copysign (const float64x2_t x,
+                    ///< float64x2_t vector to preserve magnitude.
+                    const float64x2_t y)
+                    ///< float64x2_t vector to preserve sign.
+{
+  JBM2xF64 mx, my;
+  my.x = y;
+  my.i = vandq_u64 (my.i, JBM_2xF64_BITS_SIGN);
+  mx.x = jbm_2xf64_abs (x);
+  mx.i = vorrq_u64 (mx.i, my.i);
+  return mx.x;
+}
+
+/**
  * Function to calculate the hypot function (float64x2_t).
  *
  * \return function value vector (float64x2_t).
@@ -15090,8 +15119,8 @@ jbm_2xf64_sincos (const float64x2_t x,
   float64x2_t y, s1, c1, s2, c2;
   uint64x2_t m;
   int64x2_t q;
-  y = jbm_4xf64_trig (x, &q);
-  jbm_4xf64_sincoswc (y, &s1, &c1);
+  y = jbm_2xf64_trig (x, &q);
+  jbm_2xf64_sincoswc (y, &s1, &c1);
   m = vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, v1), 63));
   s2 = vbslq_f64 (m, c1, s1);
   c2 = vbslq_f64 (m, s1, c1);
