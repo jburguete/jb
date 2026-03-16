@@ -14793,8 +14793,7 @@ jbm_2xf64_cbrt (const float64x2_t x)    ///< float64x2_t vector.
   float64x2_t y;
   int64x2_t e, e3, r, n;
   y = jbm_2xf64_frexp (jbm_2xf64_abs (x), &e);
-  e3 = vmulq_s64 (e, vdupq_n_s64 (0x55555556));
-  e3 = vshrq_n_s64 (e3, 32);
+  e3 = vshrq_n_s64 (vmull_s32 (vmovn_s64 (e), vdupq_n_s32 (0x55555556)), 32);
   r = vsubq_s64 (e, vmulq_s64 (e3, v3));
   n = vshrq_n_s64 (r, 63);
   r = vaddq_s64 (r, vandq_s64 (n, v3));
