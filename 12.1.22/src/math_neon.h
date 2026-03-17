@@ -103,7 +103,7 @@ print_bit32x4_t (FILE *file, const char *label, uint32x4_t x)
 static inline void
 print_bit64x2_t (FILE *file, const char *label, uint64x2_t x)
 {
-  unsigned long long int y[2] JB_ALIGNED;
+  uint64_t y[2] JB_ALIGNED;
   unsigned int i;
   vst1q_u64 (y, x);
   for (i = 0; i < 2; ++i)
@@ -123,7 +123,7 @@ print_uint32x4_t (FILE *file, const char *label, uint32x4_t x)
 static inline void
 print_uint64x2_t (FILE *file, const char *label, uint64x2_t x)
 {
-  unsigned long long int y[2] JB_ALIGNED;
+  uint64_t y[2] JB_ALIGNED;
   unsigned int i;
   vst1q_u64 (y, x);
   for (i = 0; i < 2; ++i)
@@ -143,7 +143,7 @@ print_int32x4_t (FILE *file, const char *label, int32x4_t x)
 static inline void
 print_int64x2_t (FILE *file, const char *label, int64x2_t x)
 {
-  long long int y[2] JB_ALIGNED;
+  int64_t y[2] JB_ALIGNED;
   unsigned int i;
   vst1q_s64 (y, x);
   for (i = 0; i < 2; ++i)
@@ -7255,12 +7255,12 @@ jbm_4xf32_sin (const float32x4_t x)     ///< float32x4_t vector.
   float32x4_t y, s, c;
   int32x4_t q;
   y = jbm_4xf32_trig (x, &q);
-print_float32x4 (stderr, "x", x);
-print_float32x4 (stderr, "y", y);
-print_int32x4 (stderr, "q", q);
+print_float32x4_t (stderr, "x", x);
+print_float32x4_t (stderr, "y", y);
+print_int32x4_t (stderr, "q", q);
   jbm_4xf32_sincoswc (y, &s, &c);
-print_float32x4 (stderr, "s", s);
-print_float32x4 (stderr, "c", c);
+print_float32x4_t (stderr, "s", s);
+print_float32x4_t (stderr, "c", c);
   y = vbslq_f32
     (vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, vdupq_n_s32 (1)), 31)),
      c, s);
