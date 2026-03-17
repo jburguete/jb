@@ -90,7 +90,6 @@ typedef union
 
 // Debug functions
 
-/*
 static inline void
 print_bit32x4_t (FILE *file, const char *label, uint32x4_t x)
 {
@@ -170,7 +169,6 @@ print_float64x2_t (FILE *file, const char *label, float64x2_t x)
   for (i = 0; i < 2; ++i)
     fprintf (file, "%s[%u]=%.17lg\n", label, i, y[i]);
 }
-*/
 
 /**
  * Function to do an integer division by 3 for 32 bits (int32x4_t).
@@ -7257,7 +7255,12 @@ jbm_4xf32_sin (const float32x4_t x)     ///< float32x4_t vector.
   float32x4_t y, s, c;
   int32x4_t q;
   y = jbm_4xf32_trig (x, &q);
+print_float32x4 (stderr, "x", x);
+print_float32x4 (stderr, "y", y);
+print_int32x4 (stderr, "q", q);
   jbm_4xf32_sincoswc (y, &s, &c);
+print_float32x4 (stderr, "s", s);
+print_float32x4 (stderr, "c", c);
   y = vbslq_f32
     (vreinterpretq_u32_s32 (vshlq_n_s32 (vandq_s32 (q, vdupq_n_s32 (1)), 31)),
      c, s);

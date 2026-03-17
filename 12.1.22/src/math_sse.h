@@ -7391,7 +7391,12 @@ jbm_4xf32_sin (const __m128 x)  ///< __m128 vector.
   __m128 y, s, c;
   __m128i q;
   y = jbm_4xf32_trig (x, &q);
+print_m128 (stderr, "x", x);
+print_m128 (stderr, "y", y);
+print_m128i32 (stderr, "q", q);
   jbm_4xf32_sincoswc (y, &s, &c);
+print_m128 (stderr, "s", s);
+print_m128 (stderr, "c", c);
   y = _mm_blendv_ps
     (s, c,
      _mm_castsi128_ps (_mm_slli_epi32 (_mm_and_si128 (q, _mm_set1_epi32 (1)),
