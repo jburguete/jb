@@ -7252,12 +7252,11 @@ jbm_4xf32_trig (const float32x4_t x,    ///< float32x4_t vector.
 static inline float32x4_t
 jbm_4xf32_sin (const float32x4_t x)     ///< float32x4_t vector.
 {
-  const int32x4_t v1 = vdupq_n_s32 (1);
   float32x4_t y, s, c;
   int32x4_t q;
   y = jbm_4xf32_trig (x, &q);
   jbm_4xf32_sincoswc (y, &s, &c);
-  y = vbslq_f32 (vreinterpretq_u32_s32 (vceqq_s32 (vandq_s32 (q, v1), v1)),
+  y = vbslq_f32 (vreinterpretq_u32_s32 (vshlq_n_s32 (q, 31)),
                  c, s);
   return
     vreinterpretq_f32_u32
