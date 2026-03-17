@@ -7239,10 +7239,8 @@ static inline float32x4_t
 jbm_4xf32_trig (const float32x4_t x,    ///< float32x4_t vector.
                 int32x4_t *q)   ///< quadrant (float32x4_ti).
 {
-  float32x4_t y;
-  y = vrndnq_f32 (vmulq_n_f32 (x, 1.f / M_PI_2f));
-  *q = vcvtq_s32_f32 (y);
-  return vfmsq_f32 (x, y, vdupq_n_f32 (M_PI_2f));
+  *q = vcvtq_s32_f32 (vmulq_n_f32 (x, 1.f / M_PI_2f));
+  return vfmsq_f32 (x, vcvtq_f32_s32 (*q), vdupq_n_f32 (M_PI_2f));
 }
 
 /**
