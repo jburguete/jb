@@ -103,7 +103,7 @@ print_bit32x4_t (FILE *file, const char *label, uint32x4_t x)
 static inline void
 print_bit64x2_t (FILE *file, const char *label, uint64x2_t x)
 {
-  unsigned long long int y[2] JB_ALIGNED;
+  uint64_t y[2] JB_ALIGNED;
   unsigned int i;
   vst1q_u64 (y, x);
   for (i = 0; i < 2; ++i)
@@ -123,7 +123,7 @@ print_uint32x4_t (FILE *file, const char *label, uint32x4_t x)
 static inline void
 print_uint64x2_t (FILE *file, const char *label, uint64x2_t x)
 {
-  unsigned long long int y[2] JB_ALIGNED;
+  uint64_t y[2] JB_ALIGNED;
   unsigned int i;
   vst1q_u64 (y, x);
   for (i = 0; i < 2; ++i)
@@ -143,7 +143,7 @@ print_int32x4_t (FILE *file, const char *label, int32x4_t x)
 static inline void
 print_int64x2_t (FILE *file, const char *label, int64x2_t x)
 {
-  long long int y[2] JB_ALIGNED;
+  int64_t y[2] JB_ALIGNED;
   unsigned int i;
   vst1q_s64 (y, x);
   for (i = 0; i < 2; ++i)
