@@ -59,6 +59,15 @@ typedef union
   uint32_t i;                   ///< bits.
 } JBMF32;
 
+/**
+ * struct to generate pseudo-random numbers.
+ */
+typedef struct
+{
+  uint64_t state;               ///< current state.
+  uint64_t stream;              ///< stream.
+} JBMRandom;
+
 ///> constants to approximate the cbrt function for floats.
 static const float K_CBRTWC_F32[6] JB_ALIGNED = {
   2.8161682735545150103123149112801870e-01f,
