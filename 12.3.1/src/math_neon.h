@@ -7272,6 +7272,7 @@ static inline float32x4_t
 jbm_4xf32_cos (const float32x4_t x)     ///< float32x4_t vector.
 {
   const int32x4_t v1 = vdupq_n_s32 (1);
+  const int32x4_t v2 = vdupq_n_s32 (2);
   float32x4_t y, s, c;
   int32x4_t q;
   y = jbm_4xf32_trig (x, &q);
@@ -7306,7 +7307,7 @@ jbm_4xf32_sincos (const float32x4_t x,
   c2 = vbslq_f32 (m, s1, c1);
   *s = vreinterpretq_f32_u32
     (veorq_u32 (vreinterpretq_u32_f32 (s2),
-                vshlq_n_u32 (vreinterretq_u32_s32 (vandq_s32 (q, v2), 30))));
+                vshlq_n_u32 (vreinterpretq_u32_s32 (vandq_s32 (q, v2)), 30)));
   *c = vreinterpretq_f32_u32
     (veorq_u32
      (vreinterpretq_u32_f32 (c2),
@@ -7327,7 +7328,7 @@ jbm_4xf32_tan (const float32x4_t x)     ///< float32x4_t vector.
   float32x4_t y;
   int32x4_t q;
   y = jbm_4xf32_tanwc (jbm_4xf32_trig (x, &q));
-  return vbslq_f32 (vceqq (vandq_s32 (q, v1), v1),
+  return vbslq_f32 (vceqq_s32 (vandq_s32 (q, v1), v1),
                     vdivq_f32 (vdupq_n_f32 (-1.f), y), y);
 }
 
