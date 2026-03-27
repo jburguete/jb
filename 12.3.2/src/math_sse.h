@@ -226,6 +226,13 @@ _mm_cvtepi64_pd (const __m128i x)
   return _mm_cvtepi32_pd (_mm_shuffle_epi32 (x, _MM_SHUFFLE (0, 0, 2, 0)));
 }
 
+static inline __m128i
+_mm_cvtpd_epi64 (const __m128d x)
+{
+  return _mm_set_epi64x ((int64_t) _mm_cvtsd_f64 (_mm_unpackhi_pd (x, x)),
+                         (int64_t) _mm_cvtsd_f64 (x));
+}
+
 #endif
 
 /**
@@ -237,12 +244,16 @@ static inline __m128i
 jbm_4xf32_div3 (__m128i x)      ///< __m128i vector.
 {
   const __m128i magic = _mm_set1_epi32 (0x55555556);
-  __m128i even, odd;
-  even = _mm_srli_epi64 (_mm_mul_epi32 (x, magic), 32);
-  odd = _mm_shuffle_epi32 (x, _MM_SHUFFLE (2, 3, 0, 1));
-  odd = _mm_srli_epi64 (_mm_mul_epi32 (odd, magic), 32);
-  return _mm_unpacklo_epi32 (_mm_shuffle_epi32 (even, _MM_SHUFFLE (0, 0, 2, 0)),
-                             _mm_shuffle_epi32 (odd, _MM_SHUFFLE (0, 0, 2, 0)));
+  __m128i l, h;
+  l = _mm_srli_epi32 (x, 32);
+  h = _mm_shuffle_epi32 (x, _MM_SHUFFLE (3, 1, 3, 1));
+  l = _mm_mul_epu32 (l, magic);
+  h = _mm_mul_epu32 (h, magic);
+  l = _mm_srli_epi64 (l, 32);
+  h = _mm_srli_epi64 (h, 32);
+  l = _mm_shuffle_epi32 (x, _MM_SHUFFLE (0, 2, 0, 2));
+  h = _mm_shuffle_epi32 (x, _MM_SHUFFLE (0, 2, 0, 2));
+  return _mm_unpacklo_epi32 (l, h);
 }
 
 /**
@@ -7107,9 +7118,9 @@ jbm_4xf32_cbrt (const __m128 x) ///< __m128 vector.
   const __m128i v2 = _mm_set1_epi32 (2);
   const __m128i v1 = _mm_set1_epi32 (1);
   __m128 y;
-  __m128i e, e3, r, n;
+  __m128i e, e3, ea, r, n;
   y = jbm_4xf32_frexp (jbm_4xf32_abs (x), &e);
-  e3 = jbm_4xf32_div3 (e);
+  ea = _mm_abs_epi32 (e);
   r = _mm_sub_epi32 (e, _mm_mullo_epi32 (e3, v3));
   n = _mm_srai_epi32 (r, 31);
   r = _mm_add_epi32 (r, _mm_and_si128 (n, v3));
