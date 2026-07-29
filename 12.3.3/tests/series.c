@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
+#include <math.h>
 #if PRECISION == 1
 #define ACOS acosf
 #define ASIN asinf
@@ -58,7 +59,6 @@
 #define SIN sinf
 #define SNPRINTF snprintf
 #define SQRT sqrtf
-#include <math.h>
 #elif PRECISION == 2
 #define ACOS acos
 #define ASIN asin
@@ -99,7 +99,6 @@
 #define SIN sin
 #define SNPRINTF snprintf
 #define SQRT sqrt
-#include <math.h>
 #elif PRECISION == 3
 #define ACOS acosl
 #define ASIN asinl
@@ -140,7 +139,6 @@
 #define SIN sinl
 #define SNPRINTF snprintf
 #define SQRT sqrtl
-#include <math.h>
 #elif PRECISION == 4
 #define ACOS acosq
 #define ASIN asinq
