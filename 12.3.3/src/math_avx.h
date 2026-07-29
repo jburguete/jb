@@ -7072,25 +7072,41 @@ jbm_8xf32_cbrtwc (const __m256 x)
 static inline __m256
 jbm_8xf32_cbrt (const __m256 x) ///< __m256 vector.
 {
-  const __m256 cbrt2 = JBM_8xF32_CBRT2;
-  const __m256 cbrt4 = JBM_8xF32_CBRT4;
-  const __m256i v3 = _mm256_set1_epi32 (3);
-  const __m256i v2 = _mm256_set1_epi32 (2);
-  const __m256i v1 = _mm256_set1_epi32 (1);
-  __m256 y;
-  __m256i e, e3, r, n;
-  y = jbm_8xf32_frexp (jbm_8xf32_abs (x), &e);
-  e3 = jbm_8xf32_div3 (e);
-  r = _mm256_sub_epi32 (e, _mm256_mullo_epi32 (e3, v3));
-  n = _mm256_srai_epi32 (r, 31);
-  r = _mm256_add_epi32 (r, _mm256_and_si256 (n, v3));
-  e3 = _mm256_sub_epi32 (e3, _mm256_and_si256 (n, v1));
-  y = jbm_8xf32_ldexp (jbm_8xf32_cbrtwc (y), e3);
-  y = _mm256_blendv_ps (y, _mm256_mul_ps (y, cbrt2),
-                        _mm256_castsi256_ps (_mm256_cmpeq_epi32 (r, v1)));
-  y = _mm256_blendv_ps (y, _mm256_mul_ps (y, cbrt4),
-                        _mm256_castsi256_ps (_mm256_cmpeq_epi32 (r, v2)));
-  return jbm_8xf32_copysign (y, x);
+  __m256 xa, f, s;
+  __m256i e, q, r;
+  xa = jbm_8xf32_abs (x);
+  f = jbm_8xf32_frexp (xa, &e);
+  // q = floor(e / 3)
+  q = _mm256_cvtps_epi32
+    (_mm256_floor_ps (_mm256_mul_ps (_mm256_cvtepi32_ps (e),
+                                     _mm256_set1_ps (1.f / 3.f))));
+  // r = e - 3 * q
+  r = _mm256_sub_epi32 (e, _mm256_add_epi32 (q, _mm256_add_epi32 (q, q)));
+  s = _mm256_set1_ps (1.f);
+#ifdef __AVX512F__
+  s = _mm256_mask_blend_ps (_mm256_cmpeq_epi32_mask (r, _mm256_set1_epi32 (1)),
+                            s, JBM_8xF32_CBRT2);
+  s = _mm256_mask_blend_ps (_mm256_cmpeq_epi32_mask (r, _mm256_set1_epi32 (2)),
+                            s, JBM_8xF32_CBRT4);
+#else
+  s = _mm256_blendv_ps (s, JBM_8xF32_CBRT2,
+                        _mm256_castsi128_ps (_mm256_cmpeq_epi32 (r,
+                                                                 _mm256_set1_epi32
+                                                                 (1))));
+  s =
+    _mm256_blendv_ps (s, JBM_8xF32_CBRT4,
+                      _mm256_castsi128_ps (_mm256_cmpeq_epi32
+                                           (r, _mm256_set1_epi32 (2))));
+#endif
+  return
+    _mm256_blendv_ps
+    (jbm_8xf32_copysign (jbm_8xf32_ldexp (_mm256_mul_ps (jbm_8xf32_cbrtwc (f),
+                                                         s), q), x), x,
+     _mm256_or_ps (_mm256_cmp_ps (xa, _mm256_setzero_ps (), _CMP_EQ_OQ),
+                   _mm256_or_ps (_mm256_cmp_ps (xa,
+                                                _mm256_set1_ps (INFINITY),
+                                                _CMP_EQ_OQ),
+                                 _mm256_cmp_ps (xa, xa, _CMP_NEQ_UQ))));
 }
 
 /**
@@ -15048,26 +15064,44 @@ jbm_4xf64_cbrtwc (const __m256d x)
 static inline __m256d
 jbm_4xf64_cbrt (const __m256d x)        ///< __m256d vector.
 {
-  const __m256d cbrt2 = JBM_4xF64_CBRT2;
-  const __m256d cbrt4 = JBM_4xF64_CBRT4;
-  const __m256i v3 = _mm256_set1_epi32 (3);
-  const __m256i v2 = _mm256_set1_epi64x (2);
-  const __m256i v1 = _mm256_set1_epi64x (1);
-  __m256d y;
-  __m256i e, e3, r, n;
-  y = jbm_4xf64_frexp (jbm_4xf64_abs (x), &e);
-  e3 = _mm256_mul_epu32 (e, _mm256_set1_epi32 (0x55555556));
-  e3 = _mm256_srli_epi64 (e3, 32);
-  r = _mm256_sub_epi32 (e, _mm256_mullo_epi32 (e3, v3));
-  n = _mm256_srai_epi32 (r, 31);
-  r = _mm256_add_epi32 (r, _mm256_and_si256 (n, v3));
-  e3 = _mm256_sub_epi32 (e3, _mm256_and_si256 (n, _mm256_set1_epi32 (1)));
-  y = jbm_4xf64_ldexp (jbm_4xf64_cbrtwc (y), e3);
-  y = _mm256_blendv_pd (y, _mm256_mul_pd (y, cbrt2),
-                        _mm256_castsi256_pd (_mm256_cmpeq_epi64 (r, v1)));
-  y = _mm256_blendv_pd (y, _mm256_mul_pd (y, cbrt4),
-                        _mm256_castsi256_pd (_mm256_cmpeq_epi64 (r, v2)));
-  return jbm_4xf64_copysign (y, x);
+  __m256d xa, f, s;
+  __m256i e, q, r;
+  xa = jbm_4xf64_abs (x);
+  f = jbm_4xf64_frexp (xa, &e);
+  q = _mm256_cvtepi32_epi64
+    (_mm256_castsi256_si128
+     (_mm256_cvtps_epi32
+      (_mm256_floor_ps
+       (_mm256_mul_ps
+        (_mm256_cvtepi32_ps
+         (_mm256_castsi128_si256
+          (_mm256_castsi256_si128
+           (_mm256_permutevar8x32_epi32 (e, _mm256_set_epi32 (7, 6, 5, 4,
+                                                              6, 4, 2, 0))))),
+         _mm256_set1_ps (1.f / 3.f))))));
+  r = _mm256_sub_epi64 (e, _mm256_add_epi64 (q, _mm256_add_epi64 (q, q)));
+  s = _mm256_set1_pd (1.);
+#ifdef __AVX512F__
+  s = _mm256_mask_blend_pd (_mm256_cmpeq_epi64_mask (r, _mm256_set1_epi64x (1)),
+                            s, JBM_4xF64_CBRT2);
+  s = _mm256_mask_blend_pd (_mm256_cmpeq_epi64_mask (r, _mm256_set1_epi64x (2)),
+                            s, JBM_4xF64_CBRT4);
+#else
+  s = _mm256_blendv_pd
+    (s, JBM_4xF64_CBRT2,
+     _mm256_castsi256_pd (_mm256_cmpeq_epi64 (r, _mm256_set1_epi64x (1))));
+  s = _mm256_blendv_pd
+    (s, JBM_4xF64_CBRT4,
+     _mm256_castsi256_pd (_mm256_cmpeq_epi64 (r, _mm256_set1_epi64x (2))));
+#endif
+  return
+    _mm256_blendv_pd
+    (jbm_4xf64_copysign (jbm_4xf64_ldexp (_mm256_mul_pd (jbm_4xf64_cbrtwc (f),
+                                                         s), q), x), x,
+     _mm256_or_pd (_mm256_cmp_pd (xa, _mm256_setzero_pd (), _CMP_EQ_OQ),
+                   _mm256_or_pd (_mm256_cmp_pd (xa, _mm256_set1_pd (INFINITY),
+                                                _CMP_EQ_OQ),
+                                 _mm256_cmp_pd (xa, xa, _CMP_NEQ_UQ))));
 }
 
 /**

@@ -1,6 +1,7 @@
 #include "../src/math.h"
 
 #define MAX_ITERATIONS 1024
+#define MAX_CHECKS 10000
 
 typedef struct
 {
@@ -1735,7 +1736,7 @@ test_uni_f32 (float (*f) (const float), float (*g) (const float),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_f32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+    if (check_uni_f32 (f, g, n * FLT_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -1851,7 +1852,7 @@ test_uni_f64 (double (*f) (const double), double (*g) (const double),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_f64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+    if (check_uni_f64 (f, g, n * DBL_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -1968,7 +1969,7 @@ test_uni_4xf32 (__m128 (*f) (const __m128), float (*g) (const float),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_4xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+    if (check_uni_4xf32 (f, g, n * FLT_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -2083,7 +2084,7 @@ test_uni_2xf64 (__m128d (*f) (const __m128d), double (*g) (const double),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_2xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+    if (check_uni_2xf64 (f, g, n * DBL_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -2202,7 +2203,7 @@ test_uni_8xf32 (__m256 (*f) (const __m256), float (*g) (const float),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_8xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+    if (check_uni_8xf32 (f, g, n * FLT_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -2317,7 +2318,7 @@ test_uni_4xf64 (__m256d (*f) (const __m256d), double (*g) (const double),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_4xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+    if (check_uni_4xf64 (f, g, n * DBL_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -2436,7 +2437,7 @@ test_uni_16xf32 (__m512 (*f) (const __m512), float (*g) (const float),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_16xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+    if (check_uni_16xf32 (f, g, n * FLT_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -2551,7 +2552,7 @@ test_uni_8xf64 (__m512d (*f) (const __m512d), double (*g) (const double),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_8xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+    if (check_uni_8xf64 (f, g, n * DBL_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -2670,7 +2671,7 @@ test_uni_4xf32 (float32x4_t (*f) (const float32x4_t), float (*g) (const float),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_4xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+    if (check_uni_4xf32 (f, g, n * FLT_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -2787,7 +2788,7 @@ test_uni_2xf64 (float64x2_t (*f) (const float64x2_t),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_2xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+    if (check_uni_2xf64 (f, g, n * DBL_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -2907,7 +2908,7 @@ test_uni_4xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_4xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+    if (check_uni_4xf32 (f, g, n * FLT_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -3025,7 +3026,7 @@ test_uni_2xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_2xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+    if (check_uni_2xf64 (f, g, n * DBL_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -3141,7 +3142,7 @@ test_uni_8xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_8xf32 (f, g, n * FLT_EPSILON, xmin, xmax, 1000))
+    if (check_uni_8xf32 (f, g, n * FLT_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }
@@ -3259,7 +3260,7 @@ test_uni_4xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
 {
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
-    if (check_uni_4xf64 (f, g, n * DBL_EPSILON, xmin, xmax, 1000))
+    if (check_uni_4xf64 (f, g, n * DBL_EPSILON, xmin, xmax, MAX_CHECKS))
       break;
   return n;
 }

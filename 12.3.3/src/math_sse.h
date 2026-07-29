@@ -7112,25 +7112,36 @@ jbm_4xf32_cbrtwc (const __m128 x)
 static inline __m128
 jbm_4xf32_cbrt (const __m128 x) ///< __m128 vector.
 {
-  const __m128 cbrt2 = JBM_4xF32_CBRT2;
-  const __m128 cbrt4 = JBM_4xF32_CBRT4;
-  const __m128i v3 = _mm_set1_epi32 (3);
-  const __m128i v2 = _mm_set1_epi32 (2);
-  const __m128i v1 = _mm_set1_epi32 (1);
-  __m128 y;
-  __m128i e, e3, ea, r, n;
-  y = jbm_4xf32_frexp (jbm_4xf32_abs (x), &e);
-  ea = _mm_abs_epi32 (e);
-  r = _mm_sub_epi32 (e, _mm_mullo_epi32 (e3, v3));
-  n = _mm_srai_epi32 (r, 31);
-  r = _mm_add_epi32 (r, _mm_and_si128 (n, v3));
-  e3 = _mm_sub_epi32 (e3, _mm_and_si128 (n, v1));
-  y = jbm_4xf32_ldexp (jbm_4xf32_cbrtwc (y), e3);
-  y = _mm_blendv_ps (y, _mm_mul_ps (y, cbrt2),
-                     _mm_castsi128_ps (_mm_cmpeq_epi32 (r, v1)));
-  y = _mm_blendv_ps (y, _mm_mul_ps (y, cbrt4),
-                     _mm_castsi128_ps (_mm_cmpeq_epi32 (r, v2)));
-  return jbm_4xf32_copysign (y, x);
+  __m128 xa, f, s;
+  __m128i e, q, r;
+  xa = jbm_4xf32_abs (x);
+  f = jbm_4xf32_frexp (xa, &e);
+  // q = floor(e / 3)
+  q = _mm_cvtps_epi32 (_mm_floor_ps (_mm_mul_ps (_mm_cvtepi32_ps (e),
+                                                 _mm_set1_ps (1.f / 3.f))));
+  // r = e - 3 * q
+  r = _mm_sub_epi32 (e, _mm_add_epi32 (q, _mm_add_epi32 (q, q)));
+  s = _mm_set1_ps (1.f);
+#ifdef __AVX512F__
+  s = _mm_mask_blend_ps (_mm_cmpeq_epi32_mask (r, _mm_set1_epi32 (1)), s,
+                         JBM_4xF32_CBRT2);
+  s = _mm_mask_blend_ps (_mm_cmpeq_epi32_mask (r, _mm_set1_epi32 (2)), s,
+                         JBM_4xF32_CBRT4);
+#else
+  s = _mm_blendv_ps (s, JBM_4xF32_CBRT2,
+                     _mm_castsi128_ps (_mm_cmpeq_epi32 (r,
+                                                        _mm_set1_epi32 (1))));
+  s = _mm_blendv_ps (s, JBM_4xF32_CBRT4,
+                     _mm_castsi128_ps (_mm_cmpeq_epi32 (r,
+                                                        _mm_set1_epi32 (2))));
+#endif
+  return
+    _mm_blendv_ps
+    (jbm_4xf32_copysign (jbm_4xf32_ldexp (_mm_mul_ps (jbm_4xf32_cbrtwc (f), s),
+                                          q), x), x,
+     _mm_or_ps (_mm_cmpeq_ps (xa, _mm_setzero_ps ()),
+                _mm_or_ps (_mm_cmpeq_ps (xa, _mm_set1_ps (INFINITY)),
+                           _mm_cmpneq_ps (xa, xa))));
 }
 
 /**
@@ -14991,26 +15002,40 @@ jbm_2xf64_cbrtwc (const __m128d x)
 static inline __m128d
 jbm_2xf64_cbrt (const __m128d x)        ///< __m128d vector.
 {
-  const __m128d cbrt2 = JBM_2xF64_CBRT2;
-  const __m128d cbrt4 = JBM_2xF64_CBRT4;
-  const __m128i v3 = _mm_set1_epi32 (3);
-  const __m128i v2 = _mm_set1_epi64x (2);
-  const __m128i v1 = _mm_set1_epi64x (1);
-  __m128d y;
-  __m128i e, e3, r, n;
-  y = jbm_2xf64_frexp (jbm_2xf64_abs (x), &e);
-  e3 = _mm_mul_epu32 (e, _mm_set1_epi32 (0x55555556));
-  e3 = _mm_srli_epi64 (e3, 32);
-  r = _mm_sub_epi32 (e, _mm_mullo_epi32 (e3, v3));
-  n = _mm_srai_epi32 (r, 31);
-  r = _mm_add_epi32 (r, _mm_and_si128 (n, v3));
-  e3 = _mm_sub_epi32 (e3, _mm_and_si128 (n, _mm_set1_epi32 (1)));
-  y = jbm_2xf64_ldexp (jbm_2xf64_cbrtwc (y), e3);
-  y = _mm_blendv_pd (y, _mm_mul_pd (y, cbrt2),
-                     _mm_castsi128_pd (_mm_cmpeq_epi64 (r, v1)));
-  y = _mm_blendv_pd (y, _mm_mul_pd (y, cbrt4),
-                     _mm_castsi128_pd (_mm_cmpeq_epi64 (r, v2)));
-  return jbm_2xf64_copysign (y, x);
+  __m128d xa, f, s;
+  __m128i e, q, r;
+  xa = jbm_2xf64_abs (x);
+  f = jbm_2xf64_frexp (xa, &e);
+  // q = floor (e / 3)
+  q = _mm_cvtepi32_epi64
+    (_mm_cvtpd_epi32
+     (_mm_floor_pd
+      (_mm_mul_pd
+       (_mm_cvtepi32_pd (_mm_shuffle_epi32 (e, _MM_SHUFFLE (0, 0, 2, 0))),
+        _mm_set1_pd (1. / 3.)))));
+  // r = e - 3 * q
+  r = _mm_sub_epi64 (e, _mm_add_epi64 (q, _mm_add_epi64 (q, q)));
+  s = _mm_set1_pd (1.);
+#ifdef __AVX512F__
+  s = _mm_mask_blend_pd (_mm_cmpeq_epi64_mask (r, _mm_set1_epi64x (1)), s,
+                         JBM_2xF64_CBRT2);
+  s = _mm_mask_blend_pd (_mm_cmpeq_epi64_mask (r, _mm_set1_epi64x (2)), s,
+                         JBM_2xF64_CBRT4);
+#else
+  s = _mm_blendv_pd (s, JBM_2xF64_CBRT2,
+                     _mm_castsi128_pd (_mm_cmpeq_epi64 (r,
+                                                        _mm_set1_epi64x (1))));
+  s = _mm_blendv_pd (s, JBM_2xF64_CBRT4,
+                     _mm_castsi128_pd (_mm_cmpeq_epi64 (r,
+                                                        _mm_set1_epi64x (2))));
+#endif
+  return
+    _mm_blendv_pd
+    (jbm_2xf64_copysign (jbm_2xf64_ldexp (_mm_mul_pd (jbm_2xf64_cbrtwc (f), s),
+                                          q), x), x,
+     _mm_or_pd (_mm_cmpeq_pd (xa, _mm_setzero_pd ()),
+                _mm_or_pd (_mm_cmpeq_pd (xa, _mm_set1_pd (INFINITY)),
+                           _mm_cmpneq_pd (xa, xa))));
 }
 
 /**
