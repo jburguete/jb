@@ -1,12 +1,13 @@
 # Header
 AC_PREREQ([2.69])
-AC_INIT([jb],[12.3.4],[https://github.com/jburguete/jb])
+AC_INIT([jb],[12.3.5],[https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 AC_MSG_NOTICE([Build: $build])
 AC_MSG_NOTICE([Host: $host])
+AC_MSG_NOTICE([CPU: $host_cpu])
 win=0
 win32=0
 mac=0
@@ -250,6 +251,17 @@ AC_CHECK_FUNC([exp10], AC_DEFINE([HAVE_EXP10], [1]))
 AC_CHECK_FUNC([fmemopen], AC_DEFINE([HAVE_FMEMOPEN], [1]))
 AC_CHECK_FUNC([get_nprocs], AC_DEFINE([HAVE_GET_NPROCS], [1]))
 AC_CHECK_FUNC([aligned_alloc], AC_DEFINE([HAVE_ALIGNED_ALLOC], [1]))
+
+# Check for intrinsics
+AS_IF([test "$host_cpu" = "aarch64"], [
+	AC_MSG_CHECKING([for vmvnq_u64 intrinsic])
+	AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+		[[#include <arm_neon.h>]],
+		[[uint64x2_t a = vdupq_n_u64(0); uint64x2_t b = vmvnq_u64(a);
+		 (void)b;]])],
+		[AC_MSG_RESULT([yes])
+		AC_DEFINE([HAVE_VMVNQ_U64], [1])],[AC_MSG_RESULT([no])])
+])
 
 # Check for font
 if test $gtk = 1; then

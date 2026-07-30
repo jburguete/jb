@@ -36,6 +36,10 @@
 #include "math_f32.h"
 #include "math_f64.h"
 
+#if !HAVE_VMVNQ_U64
+#define vmvnq_u64(x) (veorq_u64 (x, vdupq_n_u64 (~0ull)))
+#endif
+
 /**
  * union to work with bits in 4 packed float numbers.
  */
