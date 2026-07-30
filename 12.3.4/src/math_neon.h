@@ -6969,21 +6969,24 @@ jbm_4xf32_cbrtwc (const float32x4_t x)
 static inline float32x4_t
 jbm_4xf32_cbrt (const float32x4_t x)    ///< float32x4_t vector.
 {
-  const int32x4_t v3 = vdupq_n_s32 (3);
-  const int32x4_t v2 = vdupq_n_s32 (2);
-  const int32x4_t v1 = vdupq_n_s32 (1);
-  float32x4_t y;
-  int32x4_t e, e3, r, n;
-  y = jbm_4xf32_frexp (jbm_4xf32_abs (x), &e);
-  e3 = jbm_4xf32_div3 (e);
-  r = vsubq_s32 (e, vmulq_s32 (e3, v3));
-  n = vshrq_n_s32 (r, 31);
-  r = vaddq_s32 (r, vandq_s32 (n, v3));
-  e3 = vsubq_s32 (e3, vandq_s32 (n, v1));
-  y = jbm_4xf32_ldexp (jbm_4xf32_cbrtwc (y), e3);
-  y = vbslq_f32 (vceqq_s32 (r, v1), vmulq_n_f32 (y, JBM_F32_CBRT2), y);
-  y = vbslq_f32 (vceqq_s32 (r, v2), vmulq_n_f32 (y, JBM_F32_CBRT4), y);
-  return jbm_4xf32_copysign (y, x);
+  float32x4_t xa, f, s;
+  int32x4_t e, q, r;
+  xa = jbm_4xf32_abs (x);
+  f  = jbm_4xf32_frexp (xa, &e);
+  // q = floor (e / 3)
+  q = vcvtmq_s32_f32 (vmulq_f32 (vcvtq_f32_s32 (e), vdupq_n_f32 (1.f / 3.f)));
+  // r = e - 3 * q
+  r = vsubq_s32 (e, vaddq_s32 (q, vaddq_s32 (q, q)));
+  s = vdupq_n_f32 (1.f);
+  s = vbslq_f32 (vceqq_s32 (r, vdupq_n_s32 (1)), JBM_4xF32_CBRT2, s);
+  s = vbslq_f32 (vceqq_s32 (r, vdupq_n_s32 (2)), JBM_4xF32_CBRT4, s);
+  f = vmulq_f32 (jbm_4xf32_cbrtwc (f), s);
+  f = jbm_4xf32_ldexp (f, q);
+  f = jbm_4xf32_copysign (f, x);
+  return
+    vbslq_f32 (vorrq_u32 (vceqq_f32 (xa, vdupq_n_f32 (0.f)),
+                          vorrq_u32 (vceqq_f32 (xa, vdupq_n_f32 (INFINITY)),
+                                     vmvnq_u32 (vceqq_f32 (xa, xa)))), x, f);
 }
 
 /**
@@ -14778,22 +14781,24 @@ jbm_2xf64_cbrtwc (const float64x2_t x)
 static inline float64x2_t
 jbm_2xf64_cbrt (const float64x2_t x)    ///< float64x2_t vector.
 {
-  const int64x2_t v3 = vdupq_n_s64 (3);
-  const int64x2_t v2 = vdupq_n_s64 (2);
-  const int64x2_t v1 = vdupq_n_s64 (1);
-  float64x2_t y;
-  int64x2_t e, e3, r, n;
-  y = jbm_2xf64_frexp (jbm_2xf64_abs (x), &e);
-  e3 = vshrq_n_s64 (vmull_s32 (vmovn_s64 (e), vdup_n_s32 (0x55555556)), 32);
-  r = vsubq_s64 (e, vshlq_n_s64 (e3, 1));
-  r = vsubq_s64 (e, e3);
-  n = vshrq_n_s64 (r, 63);
-  r = vaddq_s64 (r, vandq_s64 (n, v3));
-  e3 = vsubq_s64 (e3, vandq_s64 (n, v1));
-  y = jbm_2xf64_ldexp (jbm_2xf64_cbrtwc (y), e3);
-  y = vbslq_f64 (vceqq_s64 (r, v1), vmulq_f64 (y, JBM_2xF64_CBRT2), y);
-  y = vbslq_f64 (vceqq_s64 (r, v2), vmulq_f64 (y, JBM_2xF64_CBRT4), y);
-  return jbm_2xf64_copysign (y, x);
+  float64x2_t xa, f, s;
+  int64x2_t e, q, r;
+  xa = jbm_2xf64_abs (x);
+  f  = jbm_2xf64_frexp (xa, &e);
+  // q = floor (e / 3)
+  q = vcvtmq_s64_f64 (vmulq_f64 (vcvtq_f64_s64 (e), vdupq_n_f64 (1. / 3.)));
+  // r = e - 3 * q
+  r = vsubq_s64 (e, vaddq_s64 (q, vaddq_s64 (q, q)));
+  s = vdupq_n_f64 (1.);
+  s = vbslq_f64 (vceqq_s64 (r, vdupq_n_s64 (1)), JBM_4xF64_CBRT2, s);
+  s = vbslq_f64 (vceqq_s64 (r, vdupq_n_s64 (2)), JBM_4xF64_CBRT4, s);
+  f = vmulq_f64 (jbm_2xf64_cbrtwc (f), s);
+  f = jbm_2xf64_ldexp (f, q);
+  f = jbm_2xf64_copysign (f, x);
+  return
+    vbslq_f64 (vorrq_u64 (vceqq_f64 (xa, vdupq_n_f64 (0.)),
+                          vorrq_u64 (vceqq_f64 (xa, vdupq_n_f64 (INFINITY)),
+                                     vmvnq_u64 (vceqq_f64 (xa, xa)))), x, f);
 }
 
 /**
