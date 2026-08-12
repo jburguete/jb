@@ -7244,13 +7244,11 @@ static inline float32x4_t
 jbm_4xf32_trig (const float32x4_t x,    ///< float32x4_t vector.
                 int32x4_t *q)   ///< quadrant (float32x4_ti).
 {
-  const float32x4_t half = vdupq_n_f32 (0.5f);
   float32x4_t y;
-  y = vmulq_f32 (x, vdupq_n_f32 (1.f / M_PI_2f));
-  y = vbslq_f32 (vcgeq_f32 (y, vdupq_n_f32 (0.0f)),
-                 vaddq_f32 (y, half), vsubq_f32 (y, half));
+  y = vrndnq_f32 (vmulq_n_f32 (x, 1.f / M_PI_2f));
   *q = vcvtq_s32_f32 (y);
-  return vfmsq_f32 (x, vcvtq_f32_s32 (*q), vdupq_n_f32 (M_PI_2f));}
+  return vfmsq_f32 (x, y, vdupq_n_f32 (M_PI_2f));
+}
 
 /**
  * Function to calculate the function sin(x) from jbm_4xf32_sinwc and
@@ -7314,14 +7312,9 @@ jbm_4xf32_sincos (const float32x4_t x,
   m = vceqq_s32 (vandq_s32 (q, v1), v1);
   s2 = vbslq_f32 (m, c1, s1);
   c2 = vbslq_f32 (m, s1, c1);
-  *s = vreinterpretq_f32_u32
-    (veorq_u32 (vreinterpretq_u32_f32 (s2),
-                vshlq_n_u32 (vreinterpretq_u32_s32 (vandq_s32 (q, v2)), 30)));
-  *c = vreinterpretq_f32_u32
-    (veorq_u32
-     (vreinterpretq_u32_f32 (c2),
-      vshlq_n_u32 (vreinterpretq_u32_s32 (vandq_s32 (vaddq_s32 (q, v1), v2)),
-                   30)));
+  *s = vbslq_f32 (vceqq_s32 (vandq_s32 (q, v2), v2), vnegq_f32 (s2), s2);
+  *c = vbslq_f32 (vceqq_s32 (vandq_s32 (vaddq_s32 (q, v1), v2), v2),
+                  vnegq_f32 (c2), c2);
 }
 
 /**
@@ -15051,7 +15044,7 @@ jbm_2xf64_trig (const float64x2_t x,    ///< float64x2_t vector.
                 int64x2_t *q)   ///< quadrant (float64x2_ti).
 {
   float64x2_t y;
-  y = vrndnq_f64 (vmulq_f64 (x, vdupq_n_f64 (1. / M_PI_2)));
+  y = vrndnq_f64 (vmulq_n_f64 (x, 1. / M_PI_2));
   *q = vcvtq_s64_f64 (y);
   return vfmsq_f64 (x, y, vdupq_n_f64 (M_PI_2));
 }
@@ -15065,19 +15058,14 @@ jbm_2xf64_trig (const float64x2_t x,    ///< float64x2_t vector.
 static inline float64x2_t
 jbm_2xf64_sin (const float64x2_t x)     ///< float64x2_t vector.
 {
+  const int64x2_t v1 = vdupq_n_s64 (1);
+  const int64x2_t v2 = vdupq_n_s64 (2);
   float64x2_t y, s, c;
   int64x2_t q;
   y = jbm_2xf64_trig (x, &q);
   jbm_2xf64_sincoswc (y, &s, &c);
-  y = vbslq_f64
-    (vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, vdupq_n_s64 (1)), 63)),
-     c, s);
-  return
-    vreinterpretq_f64_u64
-    (veorq_u64
-     (vreinterpretq_u64_f64 (y),
-      vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, vdupq_n_s64 (2)),
-                                          62))));
+  y = vbslq_f64 (vceqq_s64 (vandq_s64 (q, v1), v1), c, s);
+  return vbslq_f64 (vceqq_s64 (vandq_s64 (q, v2), v2), vnegq_f64 (y), y);
 }
 
 /**
@@ -15090,18 +15078,14 @@ static inline float64x2_t
 jbm_2xf64_cos (const float64x2_t x)     ///< float64x2_t vector.
 {
   const int64x2_t v1 = vdupq_n_s64 (1);
+  const int64x2_t v2 = vdupq_n_s64 (2);
   float64x2_t y, s, c;
   int64x2_t q;
   y = jbm_2xf64_trig (x, &q);
   jbm_2xf64_sincoswc (y, &s, &c);
-  y = vbslq_f64
-    (vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, v1), 63)), s, c);
-  return
-    vreinterpretq_f64_u64
-    (veorq_u64
-     (vreinterpretq_u64_f64 (y),
-      vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (vaddq_s64 (q, v1),
-                                                     vdupq_n_s64 (2)), 62))));
+  y = vbslq_f64 (vceqq_s64 (vandq_s64 (q, v1), v1), s, c);
+  return vbslq_f64 (vceqq_s64 (vandq_s64 (vaddq_s64 (q, v1), v2), v2),
+                    vnegq_f64 (y), y);
 }
 
 /**
@@ -15126,13 +15110,9 @@ jbm_2xf64_sincos (const float64x2_t x,
   m = vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, v1), 63));
   s2 = vbslq_f64 (m, c1, s1);
   c2 = vbslq_f64 (m, s1, c1);
-  *s = vreinterpretq_f64_u64
-    (veorq_u64 (vreinterpretq_u64_f64 (s2),
-                vreinterpretq_u64_s64 (vshlq_n_s64 (vandq_s64 (q, v2), 62))));
-  *c = vreinterpretq_f64_u64
-    (veorq_u64 (vreinterpretq_u64_f64 (c2),
-                vreinterpretq_u64_s64
-                (vshlq_n_s64 (vandq_s64 (vaddq_s64 (q, v1), v2), 62))));
+  *s = vbslq_f64 (vceqq_s64 (vandq_s64 (q, v2), v2), vnegq_f64 (s2), s2);
+  *c = vbslq_f64 (vceqq_s64 (vandq_s64 (vaddq_s64 (q, v1), v2), v2),
+                  vnegq_f32 (c2), c2);
 }
 
 /**
@@ -15144,12 +15124,12 @@ jbm_2xf64_sincos (const float64x2_t x,
 static inline float64x2_t
 jbm_2xf64_tan (const float64x2_t x)     ///< float64x2_t vector.
 {
+  const int64x2_t v1 = vdupq_n_s64 (1);
   float64x2_t y;
   int64x2_t q;
   y = jbm_2xf64_tanwc (jbm_2xf64_trig (x, &q));
-  return
-    vbslq_f64 (vreinterpretq_u64_s64 (vandq_s64 (q, vdupq_n_s64 (1))),
-               vmulq_f64 (vdupq_n_f64 (-1.), y), y);
+  return vbslq_f64 (vceqq_s64 (vandq_s64 (q, v1), v1),
+                    vdivq_f64 (vdupq_n_f64 (-1.), y), y);
 }
 
 /**
