@@ -7244,11 +7244,13 @@ static inline float32x4_t
 jbm_4xf32_trig (const float32x4_t x,    ///< float32x4_t vector.
                 int32x4_t *q)   ///< quadrant (float32x4_ti).
 {
+  const float32x4_t half = vdupq_n_f32 (0.5f);
   float32x4_t y;
-  y = vrndnq_f32 (vmulq_n_f32 (x, 1.f / M_PI_2f));
+  y = vmulq_f32 (x, vdupq_n_f32 (1.f / M_PI_2f));
+  y = vbslq_f32 (vcgeq_f32 (y, vdupq_n_f32 (0.0f)),
+                 vaddq_f32 (y, half), vsubq_f32 (y, half));
   *q = vcvtq_s32_f32 (y);
-  return vfmsq_f32 (x, y, vdupq_n_f32 (M_PI_2f));
-}
+  return vfmsq_f32 (x, vcvtq_f32_s32 (*q), vdupq_n_f32 (M_PI_2f));}
 
 /**
  * Function to calculate the function sin(x) from jbm_4xf32_sinwc and
