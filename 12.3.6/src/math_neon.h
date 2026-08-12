@@ -14794,8 +14794,8 @@ jbm_2xf64_cbrt (const float64x2_t x)    ///< float64x2_t vector.
   // r = e - 3 * q
   r = vsubq_s64 (e, vaddq_s64 (q, vaddq_s64 (q, q)));
   s = vdupq_n_f64 (1.);
-  s = vbslq_f64 (vceqq_s64 (r, vdupq_n_s64 (1)), JBM_4xF64_CBRT2, s);
-  s = vbslq_f64 (vceqq_s64 (r, vdupq_n_s64 (2)), JBM_4xF64_CBRT4, s);
+  s = vbslq_f64 (vceqq_s64 (r, vdupq_n_s64 (1)), JBM_2xF64_CBRT2, s);
+  s = vbslq_f64 (vceqq_s64 (r, vdupq_n_s64 (2)), JBM_2xF64_CBRT4, s);
   f = vmulq_f64 (jbm_2xf64_cbrtwc (f), s);
   f = jbm_2xf64_ldexp (f, q);
   f = jbm_2xf64_copysign (f, x);
