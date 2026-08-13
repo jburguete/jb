@@ -6961,7 +6961,7 @@ jbm_4xf32_cbrt (const float32x4_t x)    ///< float32x4_t vector.
   float32x4_t xa, f, s;
   int32x4_t e, q, r;
   xa = jbm_4xf32_abs (x);
-  f  = jbm_4xf32_frexp (xa, &e);
+  f = jbm_4xf32_frexp (xa, &e);
   // q = floor (e / 3)
   q = vcvtmq_s32_f32 (vmulq_f32 (vcvtq_f32_s32 (e), vdupq_n_f32 (1.f / 3.f)));
   // r = e - 3 * q
@@ -14768,7 +14768,7 @@ jbm_2xf64_cbrt (const float64x2_t x)    ///< float64x2_t vector.
   float64x2_t xa, f, s;
   int64x2_t e, q, r;
   xa = jbm_2xf64_abs (x);
-  f  = jbm_2xf64_frexp (xa, &e);
+  f = jbm_2xf64_frexp (xa, &e);
   // q = floor (e / 3)
   q = vcvtmq_s64_f64 (vmulq_f64 (vcvtq_f64_s64 (e), vdupq_n_f64 (1. / 3.)));
   // r = e - 3 * q
