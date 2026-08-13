@@ -15112,7 +15112,7 @@ jbm_2xf64_sincos (const float64x2_t x,
   c2 = vbslq_f64 (m, s1, c1);
   *s = vbslq_f64 (vceqq_s64 (vandq_s64 (q, v2), v2), vnegq_f64 (s2), s2);
   *c = vbslq_f64 (vceqq_s64 (vandq_s64 (vaddq_s64 (q, v1), v2), v2),
-                  vnegq_f32 (c2), c2);
+                  vnegq_f64 (c2), c2);
 }
 
 /**
