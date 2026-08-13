@@ -236,27 +236,6 @@ _mm_cvtpd_epi64 (const __m128d x)
 #endif
 
 /**
- * Function to do an integer division by 3 for 32 bits (__m128i).
- *
- * \return divided by 3 vector (__m128i).
- */
-static inline __m128i
-jbm_4xf32_div3 (__m128i x)      ///< __m128i vector.
-{
-  const __m128i magic = _mm_set1_epi32 (0x55555556);
-  __m128i l, h;
-  l = _mm_srli_epi32 (x, 32);
-  h = _mm_shuffle_epi32 (x, _MM_SHUFFLE (3, 1, 3, 1));
-  l = _mm_mul_epu32 (l, magic);
-  h = _mm_mul_epu32 (h, magic);
-  l = _mm_srli_epi64 (l, 32);
-  h = _mm_srli_epi64 (h, 32);
-  l = _mm_shuffle_epi32 (x, _MM_SHUFFLE (0, 2, 0, 2));
-  h = _mm_shuffle_epi32 (x, _MM_SHUFFLE (0, 2, 0, 2));
-  return _mm_unpacklo_epi32 (l, h);
-}
-
-/**
  * Function to calculate the additive reduction value of a __m128 vector.
  *
  * \return additive reduction (float).

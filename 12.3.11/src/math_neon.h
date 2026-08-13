@@ -174,21 +174,6 @@ print_float64x2_t (FILE *file, const char *label, float64x2_t x)
     fprintf (file, "%s[%u]=%.17lg\n", label, i, y[i]);
 }
 
-/**
- * Function to do an integer division by 3 for 32 bits (int32x4_t).
- *
- * \return divided by 3 vector (int32x4_t).
- */
-static inline int32x4_t
-jbm_4xf32_div3 (int32x4_t x)    ///< int32x4_t vector.
-{
-  const int32x2_t magic = vdup_n_s32 (0x55555556);
-  int32x2_t even, odd;
-  even = vshrn_n_s64 (vmull_s32 (vget_low_s32 (x), magic), 32);
-  odd = vshrn_n_s64 (vmull_s32 (vget_high_s32 (x), magic), 32);
-  return vcombine_s32 (even, odd);
-}
-
 #define jbm_4xf32_reduce_add vaddvq_f32
 #define jbm_4xf32_reduce_max vmaxvq_f32
 #define jbm_4xf32_reduce_min vminvq_f32

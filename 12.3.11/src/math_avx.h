@@ -164,26 +164,6 @@ _mm256_cvtepi64_pd (__m256i x)
 #endif
 
 /**
- * Function to do an integer division by 3 for 32 bits (__m256i).
- *
- * \return divided by 3 vector (__m256i).
- */
-static inline __m256i
-jbm_8xf32_div3 (__m256i x)      ///< __m256i vector.
-{
-  const __m256i magic = _mm256_set1_epi32 (0x55555556);
-  __m256i even, odd;
-  even = _mm256_srli_epi64 (_mm256_mul_epu32 (x, magic), 32);
-  odd = _mm256_shuffle_epi32 (x, _MM_SHUFFLE (2, 3, 0, 1));
-  odd = _mm256_srli_epi64 (_mm256_mul_epu32 (odd, magic), 32);
-  return
-    _mm256_unpacklo_epi32 (_mm256_shuffle_epi32 (even,
-                                                 _MM_SHUFFLE (3, 1, 2, 0)),
-                           _mm256_shuffle_epi32 (odd,
-                                                 _MM_SHUFFLE (3, 1, 2, 0)));
-}
-
-/**
  * Function to calculate the additive reduction value of a __m256 vector.
  *
  * \return additive reduction (float).
