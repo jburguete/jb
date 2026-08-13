@@ -111,7 +111,7 @@ print_bit64x2_t (FILE *file, const char *label, uint64x2_t x)
   unsigned int i;
   vst1q_u64 (y, x);
   for (i = 0; i < 2; ++i)
-    fprintf (file, "%s[%u]=%016llx\n", label, i, y[i]);
+    fprintf (file, "%s[%u]=%016" PRIx64 "\n", label, i, y[i]);
 }
 
 static inline void
@@ -131,7 +131,7 @@ print_uint64x2_t (FILE *file, const char *label, uint64x2_t x)
   unsigned int i;
   vst1q_u64 (y, x);
   for (i = 0; i < 2; ++i)
-    fprintf (file, "%s[%u]=%llu\n", label, i, y[i]);
+    fprintf (file, "%s[%u]=%" PRIu64 "\n", label, i, y[i]);
 }
 
 static inline void
@@ -151,7 +151,7 @@ print_int64x2_t (FILE *file, const char *label, int64x2_t x)
   unsigned int i;
   vst1q_s64 (y, x);
   for (i = 0; i < 2; ++i)
-    fprintf (file, "%s[%u]=%lld\n", label, i, y[i]);
+    fprintf (file, "%s[%u]=%" PRId64 "\n", label, i, y[i]);
 }
 
 static inline void
