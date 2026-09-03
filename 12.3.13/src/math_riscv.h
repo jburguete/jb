@@ -231,7 +231,7 @@ jbm_nxf32_trunc (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
  * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
-jbm_floor_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+jbm_nxf32_floor (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< vector size.
 {
   vint32m1_t i;
@@ -247,7 +247,7 @@ jbm_floor_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
  * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
-jbm_ceil_nxf32 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
+jbm_nxf32_ceil (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                 const size_t vl)        ///< vector size.
 {
   vint32m1_t i;
@@ -271,7 +271,7 @@ jbm_nxf32_mod (const vfloat32m1_t x,    ///< dividend (vfloat32m1_t).
     __riscv_vfnmsac_vv_f32m1
     (x,
      __riscv_vfcvt_f_x_v_f32m1
-     (jbm_floor_nxf32 (__riscv_vfdiv_vv_f32m1 (x, d, vl), vl), vl), d, vl);
+     (jbm_nxf32_floor (__riscv_vfdiv_vv_f32m1 (x, d, vl), vl), vl), d, vl);
 }
 
 /**
@@ -370,7 +370,7 @@ jbm_nxf32_ldexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline vbool32_t
-jbm_small_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+jbm_nxf32_small (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< vector size.
 {
   return __riscv_vmflt_vf_f32m1_b32 (jbm_nxf32_abs (x, vl), FLT_EPSILON, vl);
@@ -388,7 +388,7 @@ jbm_small_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
  * \return modmin vfloat32m1_t vector.
  */
 static inline vfloat32m1_t
-jbm_modmin_nxf32 (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
+jbm_nxf32_modmin (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat32m1_t b, ///< 2nd vfloat64m1_t vector.
                   const size_t vl)      ///< vector size.
 {
@@ -407,7 +407,7 @@ jbm_modmin_nxf32 (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
  * Function to interchange 2 vfloat32m1_t vectors.
  */
 static inline void
-jbm_change_nxf32 (vfloat32m1_t *restrict a,
+jbm_nxf32_change (vfloat32m1_t *restrict a,
 ///< 1st vfloat32m1_t vector pointer.
                   vfloat32m1_t *restrict b)
 ///< 2nd vfloat32m1_t vector pointer.
@@ -10189,7 +10189,7 @@ jbm_nxf32_exp2 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 {
   vfloat32m1_t f, y;
   vint32m1_t i;
-  i = jbm_floor_nxf32 (x, vl);
+  i = jbm_nxf32_floor (x, vl);
   f = __riscv_vfsub_vv_f32m1 (x, __riscv_vfcvt_f_x_v_f32m1 (i, vl), vl);
   y = jbm_nxf32_exp2n (i, vl);
   return __riscv_vfmul_vv_f32m1 (y, jbm_nxf32_exp2wc (f, vl), vl);
@@ -10423,7 +10423,7 @@ jbm_nxf32_coswc (const vfloat32m1_t x,
  * x in [-pi/4,pi/4] from jbm_nxf32_sinwc approximation (vfloat32m1_t).
  */
 static inline void
-jbm_sinnxf32_coswc (const vfloat32m1_t x,
+jbm_nxf32_sincoswc (const vfloat32m1_t x,
                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     vfloat32m1_t *s,
                     ///< pointer to the sin function value (vfloat32m1_t).
@@ -10513,7 +10513,7 @@ jbm_nxf32_cos (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
  * jbm_nxf32_sinwc and jbm_nxf32_coswc approximations (vfloat32m1_t).
  */
 static inline void
-jbm_sinnxf32_cos (const vfloat32m1_t x,
+jbm_nxf32_sincos (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   vfloat32m1_t *s,
                   ///< pointer to the sin function value (vfloat32m1_t).
@@ -10525,32 +10525,32 @@ jbm_sinnxf32_cos (const vfloat32m1_t x,
   vbool32_t m;
   pi2 = __riscv_vfmv_v_f_f32m1 (2.f * M_PIf, vl);
   y = jbm_nxf32_mod (x, pi2, vl);
-  jbm_sinnxf32_coswc (__riscv_vfsub_vv_f32m1 (y, pi2, vl), &s1, &c1, vl);
-  jbm_sinnxf32_coswc (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl), &c2, &s2,
+  jbm_nxf32_sincoswc (__riscv_vfsub_vv_f32m1 (y, pi2, vl), &s1, &c1, vl);
+  jbm_nxf32_sincoswc (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl), &c2, &s2,
                       vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl);
   s1 = __riscv_vmerge_vvm_f32m1 (s1, jbm_nxf32_opposite (s2, vl), m, vl);
   c1 = __riscv_vmerge_vvm_f32m1 (c1, c2, m, vl);
-  jbm_sinnxf32_coswc (__riscv_vfsub_vv_f32m1
+  jbm_nxf32_sincoswc (__riscv_vfsub_vv_f32m1
                       (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), &s2, &c2,
                       vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, 5.f * M_PI_4f, vl);
   s1 = __riscv_vmerge_vvm_f32m1 (s1, s2, m, vl);
   c1 = __riscv_vmerge_vvm_f32m1 (c1, jbm_nxf32_opposite (c2, vl), m, vl);
-  jbm_sinnxf32_coswc (__riscv_vfsub_vv_f32m1
+  jbm_nxf32_sincoswc (__riscv_vfsub_vv_f32m1
                       (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl), &c2, &s2,
                       vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, 3.f * M_PI_4f, vl);
   s1 = __riscv_vmerge_vvm_f32m1 (s1, s2, m, vl);
   c1 = __riscv_vmerge_vvm_f32m1 (c1, c2, m, vl);
-  jbm_sinnxf32_coswc (y, &s2, &c2, vl);
+  jbm_nxf32_sincoswc (y, &s2, &c2, vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl);
   *s = __riscv_vmerge_vvm_f32m1 (s1, s2, m, vl);
   *c = __riscv_vmerge_vvm_f32m1 (c1, c2, m, vl);
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_sinnxf32_cos function
+ * Function to calculate the function tan(x) from jbm_nxf32_sincos function
  * (vfloat32m1_t).
  *
  * \return function value (vfloat32m1_t).
@@ -10560,7 +10560,7 @@ jbm_nxf32_tan (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
                const size_t vl) ///< array size.
 {
   vfloat32m1_t s, c;
-  jbm_sinnxf32_cos (x, &s, &c, vl);
+  jbm_nxf32_sincos (x, &s, &c, vl);
   return __riscv_vfdiv_vv_f32m1 (s, c, vl);
 }
 
@@ -10871,7 +10871,7 @@ jbm_nxf32_erfc (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
  * \return vfloat32m1_t vector of solution values.
  */
 static inline vfloat32m1_t
-jbm_solve_quadratic_reduced_nxf32 (vfloat32m1_t a,
+jbm_nxf32_solve_quadratic_reduced (vfloat32m1_t a,
 ///< vfloat32m1_t vector of 1st order coefficient of the equations.
                                    vfloat32m1_t b,
 ///< vfloat32m1_t vector of 0th order coefficient of the equations.
@@ -10916,11 +10916,11 @@ jbm_nxf32_solve_quadratic (const vfloat32m1_t a,
                            const size_t vl)     ///< array size.
 {
   vfloat32m1_t k1, k2;
-  k1 = jbm_solve_quadratic_reduced_nxf32 (__riscv_vfdiv_vv_f32m1 (b, a, vl),
+  k1 = jbm_nxf32_solve_quadratic_reduced (__riscv_vfdiv_vv_f32m1 (b, a, vl),
                                           __riscv_vfdiv_vv_f32m1 (c, a, vl),
                                           x1, x2, vl);
   k2 = __riscv_vfdiv_vv_f32m1 (jbm_nxf32_opposite (c, vl), b, vl);
-  return __riscv_vmerge_vvm_f32m1 (k2, k1, jbm_small_nxf32 (a, vl), vl);
+  return __riscv_vmerge_vvm_f32m1 (k2, k1, jbm_nxf32_small (a, vl), vl);
 }
 
 /**
@@ -10931,7 +10931,7 @@ jbm_nxf32_solve_quadratic (const vfloat32m1_t a,
  * \return vfloat32m1_t vector of solution values.
  */
 static inline vfloat32m1_t
-jbm_solve_cubic_reduced_nxf32 (const vfloat32m1_t a,
+jbm_nxf32_solve_cubic_reduced (const vfloat32m1_t a,
                                ///< 2nd order coefficient of the equation.
                                const vfloat32m1_t b,
                                ///< 1st order coefficient of the equation.
@@ -11029,10 +11029,10 @@ jbm_nxf32_solve_cubic (vfloat32m1_t a,
   return
     __riscv_vmerge_vvm_f32m1
     (jbm_nxf32_solve_quadratic (b, c, d, x1, x2, vl),
-     jbm_solve_cubic_reduced_nxf32 (__riscv_vfdiv_vv_f32m1 (b, a, vl),
+     jbm_nxf32_solve_cubic_reduced (__riscv_vfdiv_vv_f32m1 (b, a, vl),
                                     __riscv_vfdiv_vv_f32m1 (c, a, vl),
                                     __riscv_vfdiv_vv_f32m1 (d, a, vl), x1, x2,
-                                    vl), jbm_small_nxf32 (a, vl), vl);
+                                    vl), jbm_nxf32_small (a, vl), vl);
 
 }
 
@@ -11083,7 +11083,7 @@ jbm_nxf32_flux_limiter_centred (const vfloat32m1_t d1,
 {
   return __riscv_vmerge_vvm_f32m1 (__riscv_vfmv_v_f_f32m1 (0.f, vl),
                                    __riscv_vfdiv_vv_f32m1 (d1, d2, vl),
-                                   jbm_small_nxf32 (d2, vl), vl);
+                                   jbm_nxf32_small (d2, vl), vl);
 }
 
 /**
@@ -11482,7 +11482,7 @@ jbm_nxf64_trunc (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_floor_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+jbm_nxf64_floor (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
   vint64m1_t i;
@@ -11498,7 +11498,7 @@ jbm_floor_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_ceil_nxf64 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+jbm_nxf64_ceil (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                 const size_t vl)        ///< vector size.
 {
   vint64m1_t i;
@@ -11520,7 +11520,7 @@ jbm_nxf64_mod (const vfloat64m1_t x,    ///< dividend (vfloat64m1_t).
 {
   return
     __riscv_vfnmsac_vv_f64m1 (x,
-                              __riscv_vfcvt_f_x_v_f64m1 (jbm_floor_nxf32
+                              __riscv_vfcvt_f_x_v_f64m1 (jbm_nxf32_floor
                                                          (__riscv_vfdiv_vv_f64m1
                                                           (x, d, vl), vl), vl),
                               d, vl);
@@ -11622,7 +11622,7 @@ jbm_nxf64_ldexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline vbool64_t
-jbm_small_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+jbm_nxf64_small (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
   return __riscv_vmflt_vf_f64m1_b64 (jbm_nxf64_abs (x, vl), DBL_EPSILON, vl);
@@ -11640,7 +11640,7 @@ jbm_small_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  * \return modmin vfloat64m1_t vector.
  */
 static inline vfloat64m1_t
-jbm_modmin_nxf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
+jbm_nxf64_modmin (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat64m1_t b, ///< 2nd vfloat64m1_t vector.
                   const size_t vl)      ///< vector size.
 {
@@ -11659,7 +11659,7 @@ jbm_modmin_nxf64 (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
  * Function to interchange 2 vfloat64m1_t numbers.
  */
 static inline void
-jbm_change_nxf64 (vfloat64m1_t *restrict a,
+jbm_nxf64_change (vfloat64m1_t *restrict a,
                   ///< 1st vfloat64m1_t vector pointer.
                   vfloat64m1_t *restrict b)
                   ///< 2nd vfloat64m1_t vector pointer.
@@ -21463,7 +21463,7 @@ jbm_nxf64_exp2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 {
   vfloat64m1_t f, y;
   vint64m1_t i;
-  i = jbm_floor_nxf64 (x, vl);
+  i = jbm_nxf64_floor (x, vl);
   f = __riscv_vfsub_vv_f64m1 (x, __riscv_vfcvt_f_x_v_f64m1 (i, vl), vl);
   y = jbm_nxf64_exp2n (i, vl);
   return __riscv_vfmul_vv_f64m1 (y, jbm_nxf64_exp2wc (f, vl), vl);
@@ -21669,7 +21669,7 @@ jbm_nxf64_coswc (const vfloat64m1_t x,
  * x in [-pi/4,pi/4] from jbm_nxf64_sinwc approximation (vfloat64m1_t).
  */
 static inline void
-jbm_sinnxf64_coswc (const vfloat64m1_t x,
+jbm_nxf64_sincoswc (const vfloat64m1_t x,
                     ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                     vfloat64m1_t *s,
                     ///< pointer to the f64 function value (vfloat64m1_t).
@@ -21757,7 +21757,7 @@ jbm_nxf64_cos (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
  * and jbm_nxf64_coswc approximations (vfloat64m1_t).
  */
 static inline void
-jbm_sinnxf64_cos (const vfloat64m1_t x,
+jbm_nxf64_sincos (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   vfloat64m1_t *s,
                   ///< pointer to the f64 function value (vfloat64m1_t).
@@ -21769,24 +21769,24 @@ jbm_sinnxf64_cos (const vfloat64m1_t x,
   vbool64_t m;
   pi2 = __riscv_vfmv_v_f_f64m1 (2. * M_PIf, vl);
   y = jbm_nxf64_mod (x, pi2, vl);
-  jbm_sinnxf64_coswc (__riscv_vfsub_vv_f64m1 (y, pi2, vl), &s1, &c1, vl);
-  jbm_sinnxf64_coswc (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), &c2, &s2,
+  jbm_nxf64_sincoswc (__riscv_vfsub_vv_f64m1 (y, pi2, vl), &s1, &c1, vl);
+  jbm_nxf64_sincoswc (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), &c2, &s2,
                       vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4f, vl);
   s1 = __riscv_vmerge_vvm_f64m1 (s1, jbm_nxf64_opposite (s2, vl), m, vl);
   c1 = __riscv_vmerge_vvm_f64m1 (c1, c2, m, vl);
-  jbm_sinnxf64_coswc (__riscv_vfsub_vv_f64m1
+  jbm_nxf64_sincoswc (__riscv_vfsub_vv_f64m1
                       (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), &s2, &c2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl);
   s1 = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
   c1 = __riscv_vmerge_vvm_f64m1 (c1, jbm_nxf64_opposite (c2, vl), m, vl);
-  jbm_sinnxf64_coswc
+  jbm_nxf64_sincoswc
     (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl),
      &c2, &s2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4f, vl);
   s1 = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
   c1 = __riscv_vmerge_vvm_f64m1 (c1, c2, m, vl);
-  jbm_sinnxf64_coswc (y, &s2, &c2, vl);
+  jbm_nxf64_sincoswc (y, &s2, &c2, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl);
   *s = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
   *c = __riscv_vmerge_vvm_f64m1 (c1, c2, m, vl);
@@ -21803,7 +21803,7 @@ jbm_nxf64_tan (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                const size_t vl) ///< array size.
 {
   vfloat64m1_t s, c;
-  jbm_sinnxf64_cos (x, &s, &c, vl);
+  jbm_nxf64_sincos (x, &s, &c, vl);
   return __riscv_vfdiv_vv_f64m1 (s, c, vl);
 }
 
@@ -22115,7 +22115,7 @@ jbm_nxf64_erfc (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  * \return vfloat64m1_t vector of solution values.
  */
 static inline vfloat64m1_t
-jbm_solve_quadratic_reduced_nxf64 (vfloat64m1_t a,
+jbm_nxf64_solve_quadratic_reduced (vfloat64m1_t a,
 ///< vfloat64m1_t vector of 1st order coefficient of the equations.
                                    vfloat64m1_t b,
 ///< vfloat64m1_t vector of 0th order coefficient of the equations.
@@ -22159,11 +22159,11 @@ jbm_nxf64_solve_quadratic (const vfloat64m1_t a,
                            const size_t vl)     ///< array size.
 {
   vfloat64m1_t k1, k2;
-  k1 = jbm_solve_quadratic_reduced_nxf64 (__riscv_vfdiv_vv_f64m1 (b, a, vl),
+  k1 = jbm_nxf64_solve_quadratic_reduced (__riscv_vfdiv_vv_f64m1 (b, a, vl),
                                           __riscv_vfdiv_vv_f64m1 (c, a, vl),
                                           x1, x2, vl);
   k2 = __riscv_vfdiv_vv_f64m1 (jbm_nxf64_opposite (c, vl), b, vl);
-  return __riscv_vmerge_vvm_f64m1 (k2, k1, jbm_small_nxf64 (a, vl), vl);
+  return __riscv_vmerge_vvm_f64m1 (k2, k1, jbm_nxf64_small (a, vl), vl);
 }
 
 /**
@@ -22174,7 +22174,7 @@ jbm_nxf64_solve_quadratic (const vfloat64m1_t a,
  * \return vfloat64m1_t vector of solution values.
  */
 static inline vfloat64m1_t
-jbm_solve_cubic_reduced_nxf64 (const vfloat64m1_t a,
+jbm_nxf64_solve_cubic_reduced (const vfloat64m1_t a,
                                ///< 2nd order coefficient of the equation.
                                const vfloat64m1_t b,
                                ///< 1st order coefficient of the equation.
@@ -22269,11 +22269,11 @@ jbm_nxf64_solve_cubic (vfloat64m1_t a,
 {
   return
     __riscv_vmerge_vvm_f64m1 (jbm_nxf64_solve_quadratic (b, c, d, x1, x2, vl),
-                              jbm_solve_cubic_reduced_nxf64
+                              jbm_nxf64_solve_cubic_reduced
                               (__riscv_vfdiv_vv_f64m1 (b, a, vl),
                                __riscv_vfdiv_vv_f64m1 (c, a, vl),
                                __riscv_vfdiv_vv_f64m1 (d, a, vl), x1, x2, vl),
-                              jbm_small_nxf64 (a, vl), vl);
+                              jbm_nxf64_small (a, vl), vl);
 }
 
 /**
@@ -22323,7 +22323,7 @@ jbm_nxf64_flux_limiter_centred (const vfloat64m1_t d1,
 {
   return __riscv_vmerge_vvm_f64m1 (__riscv_vfmv_v_f_f64m1 (0., vl),
                                    __riscv_vfdiv_vv_f64m1 (d1, d2, vl),
-                                   jbm_small_nxf64 (d2, vl), vl);
+                                   jbm_nxf64_small (d2, vl), vl);
 }
 
 /**
@@ -22742,9 +22742,9 @@ jbm_trunc_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
  * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
-jbm_floor_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+jbm_4xf32_floor (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
-  return jbm_floor_nxf32 (x, 4);
+  return jbm_nxf32_floor (x, 4);
 }
 
 /**
@@ -22753,9 +22753,9 @@ jbm_floor_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
  * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
-jbm_ceil_4xf32 (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+jbm_4xf32_ceil (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 {
-  return jbm_floor_nxf32 (x, 4);
+  return jbm_nxf32_floor (x, 4);
 }
 
 /**
@@ -22814,7 +22814,7 @@ jbm_4xf32_ldexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 static inline vbool32_t
 jbm_4xf32_small (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
-  return jbm_small_nxf32 (x, 4);
+  return jbm_nxf32_small (x, 4);
 }
 
 /**
@@ -22832,7 +22832,7 @@ static inline vfloat32m1_t
 jbm_4xf32_modmin (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat32m1_t b) ///< 2nd vfloat64m1_t vector.
 {
-  return jbm_modmin_nxf32 (a, b, 4);
+  return jbm_nxf32_modmin (a, b, 4);
 }
 
 /**
@@ -28711,7 +28711,7 @@ jbm_4xf32_sincoswc (const vfloat32m1_t x,
                     vfloat32m1_t *c)
                     ///< pointer to the cos function value (4x vfloat32m1_t).
 {
-  jbm_sinnxf32_coswc (x, s, c, 4);
+  jbm_nxf32_sincoswc (x, s, c, 4);
 }
 
 /**
@@ -28750,7 +28750,7 @@ jbm_4xf32_sincos (const vfloat32m1_t x,
                   vfloat32m1_t *c)
                   ///< pointer to the cos function value (4x vfloat32m1_t).
 {
-  jbm_sinnxf32_cos (x, s, c, 4);
+  jbm_nxf32_sincos (x, s, c, 4);
 }
 
 /**
@@ -28965,7 +28965,7 @@ jbm_4xf32_erfc (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
  * \return vfloat32m1_t vector of solution values.
  */
 static inline vfloat32m1_t
-jbm_solve_quadratic_reduced_4xf32 (vfloat32m1_t a,
+jbm_4xf32_solve_quadratic_reduced (vfloat32m1_t a,
 ///< vfloat32m1_t vector of 1st order coefficient of the equations.
                                    vfloat32m1_t b,
 ///< vfloat32m1_t vector of 0th order coefficient of the equations.
@@ -28974,7 +28974,7 @@ jbm_solve_quadratic_reduced_4xf32 (vfloat32m1_t a,
                                    const vfloat32m1_t x2)
 ///< vfloat32m1_t vector of right limits of the solution intervals.
 {
-  return jbm_solve_quadratic_reduced_nxf32 (a, b, x1, x2, 4);
+  return jbm_nxf32_solve_quadratic_reduced (a, b, x1, x2, 4);
 }
 
 /**
@@ -29007,7 +29007,7 @@ jbm_4xf32_solve_quadratic (const vfloat32m1_t a,
  * \return vfloat32m1_t vector of solution values.
  */
 static inline vfloat32m1_t
-jbm_solve_cubic_reduced_4xf32 (const vfloat32m1_t a,
+jbm_4xf32_solve_cubic_reduced (const vfloat32m1_t a,
                                ///< 2nd order coefficient of the equation.
                                const vfloat32m1_t b,
                                ///< 1st order coefficient of the equation.
@@ -29018,7 +29018,7 @@ jbm_solve_cubic_reduced_4xf32 (const vfloat32m1_t a,
                                const vfloat32m1_t x2)
                                ///< right limit of the solution interval.
 {
-  return jbm_solve_cubic_reduced_nxf32 (a, b, c, x1, x2, 4);
+  return jbm_nxf32_solve_cubic_reduced (a, b, c, x1, x2, 4);
 }
 
 /**
@@ -29350,9 +29350,9 @@ jbm_2xf64_trunc (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_floor_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+jbm_2xf64_floor (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
-  return jbm_floor_nxf64 (x, 2);
+  return jbm_nxf64_floor (x, 2);
 }
 
 /**
@@ -29361,9 +29361,9 @@ jbm_floor_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_ceil_2xf64 (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
+jbm_2xf64_ceil (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
-  return jbm_floor_nxf64 (x, 2);
+  return jbm_nxf64_floor (x, 2);
 }
 
 /**
@@ -29422,7 +29422,7 @@ jbm_2xf64_ldexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 static inline vbool64_t
 jbm_2xf64_small (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
-  return jbm_small_nxf64 (x, 2);
+  return jbm_nxf64_small (x, 2);
 }
 
 /**
@@ -29440,7 +29440,7 @@ static inline vfloat64m1_t
 jbm_2xf64_modmin (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat64m1_t b) ///< 2nd vfloat64m1_t vector.
 {
-  return jbm_modmin_nxf64 (a, b, 2);
+  return jbm_nxf64_modmin (a, b, 2);
 }
 
 /**
@@ -35319,7 +35319,7 @@ jbm_2xf64_sincoswc (const vfloat64m1_t x,
                     vfloat64m1_t *c)
                     ///< pointer to the cos function value (2x vfloat64m1_t).
 {
-  jbm_sinnxf64_coswc (x, s, c, 2);
+  jbm_nxf64_sincoswc (x, s, c, 2);
 }
 
 /**
@@ -35358,7 +35358,7 @@ jbm_2xf64_sincos (const vfloat64m1_t x,
                   vfloat64m1_t *c)
                   ///< pointer to the cos function value (2x vfloat64m1_t).
 {
-  jbm_sinnxf64_cos (x, s, c, 2);
+  jbm_nxf64_sincos (x, s, c, 2);
 }
 
 /**
@@ -35573,7 +35573,7 @@ jbm_2xf64_erfc (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
  * \return vfloat64m1_t vector of solution values.
  */
 static inline vfloat64m1_t
-jbm_solve_quadratic_reduced_2xf64 (vfloat64m1_t a,
+jbm_2xf64_solve_quadratic_reduced (vfloat64m1_t a,
 ///< vfloat64m1_t vector of 1st order coefficient of the equations.
                                    vfloat64m1_t b,
 ///< vfloat64m1_t vector of 0th order coefficient of the equations.
@@ -35582,7 +35582,7 @@ jbm_solve_quadratic_reduced_2xf64 (vfloat64m1_t a,
                                    const vfloat64m1_t x2)
 ///< vfloat64m1_t vector of right limits of the solution intervals.
 {
-  return jbm_solve_quadratic_reduced_nxf64 (a, b, x1, x2, 2);
+  return jbm_nxf64_solve_quadratic_reduced (a, b, x1, x2, 2);
 }
 
 /**
@@ -35615,7 +35615,7 @@ jbm_2xf64_solve_quadratic (const vfloat64m1_t a,
  * \return vfloat64m1_t vector of solution values.
  */
 static inline vfloat64m1_t
-jbm_solve_cubic_reduced_2xf64 (const vfloat64m1_t a,
+jbm_2xf64_solve_cubic_reduced (const vfloat64m1_t a,
                                ///< 2nd order coefficient of the equation.
                                const vfloat64m1_t b,
                                ///< 1st order coefficient of the equation.
@@ -35626,7 +35626,7 @@ jbm_solve_cubic_reduced_2xf64 (const vfloat64m1_t a,
                                const vfloat64m1_t x2)
                                ///< right limit of the solution interval.
 {
-  return jbm_solve_cubic_reduced_nxf64 (a, b, c, x1, x2, 2);
+  return jbm_nxf64_solve_cubic_reduced (a, b, c, x1, x2, 2);
 }
 
 /**
@@ -35958,9 +35958,9 @@ jbm_trunc_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
  * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
-jbm_floor_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+jbm_8xf32_floor (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
-  return jbm_floor_nxf32 (x, 8);
+  return jbm_nxf32_floor (x, 8);
 }
 
 /**
@@ -35969,9 +35969,9 @@ jbm_floor_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
  * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
-jbm_ceil_8xf32 (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+jbm_8xf32_ceil (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 {
-  return jbm_floor_nxf32 (x, 8);
+  return jbm_nxf32_floor (x, 8);
 }
 
 /**
@@ -36030,7 +36030,7 @@ jbm_8xf32_ldexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 static inline vbool32_t
 jbm_8xf32_small (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
-  return jbm_small_nxf32 (x, 8);
+  return jbm_nxf32_small (x, 8);
 }
 
 /**
@@ -36048,7 +36048,7 @@ static inline vfloat32m1_t
 jbm_8xf32_modmin (const vfloat32m1_t a, ///< 1st vfloat32m1_t vector.
                   const vfloat32m1_t b) ///< 2nd vfloat32m1_t vector.
 {
-  return jbm_modmin_nxf32 (a, b, 8);
+  return jbm_nxf32_modmin (a, b, 8);
 }
 
 /**
@@ -41927,7 +41927,7 @@ jbm_8xf32_sincoswc (const vfloat32m1_t x,
                     vfloat32m1_t *c)
                     ///< pointer to the cos function value (8x vfloat32m1_t).
 {
-  jbm_sinnxf32_coswc (x, s, c, 8);
+  jbm_nxf32_sincoswc (x, s, c, 8);
 }
 
 /**
@@ -41966,7 +41966,7 @@ jbm_8xf32_sincos (const vfloat32m1_t x,
                   vfloat32m1_t *c)
                   ///< pointer to the cos function value (8x vfloat32m1_t).
 {
-  jbm_sinnxf32_cos (x, s, c, 8);
+  jbm_nxf32_sincos (x, s, c, 8);
 }
 
 /**
@@ -42181,7 +42181,7 @@ jbm_8xf32_erfc (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
  * \return vfloat32m1_t vector of solution values.
  */
 static inline vfloat32m1_t
-jbm_solve_quadratic_reduced_8xf32 (vfloat32m1_t a,
+jbm_8xf32_solve_quadratic_reduced (vfloat32m1_t a,
 ///< vfloat32m1_t vector of 1st order coefficient of the equations.
                                    vfloat32m1_t b,
 ///< vfloat32m1_t vector of 0th order coefficient of the equations.
@@ -42190,7 +42190,7 @@ jbm_solve_quadratic_reduced_8xf32 (vfloat32m1_t a,
                                    const vfloat32m1_t x2)
 ///< vfloat32m1_t vector of right limits of the solution intervals.
 {
-  return jbm_solve_quadratic_reduced_nxf32 (a, b, x1, x2, 8);
+  return jbm_nxf32_solve_quadratic_reduced (a, b, x1, x2, 8);
 }
 
 /**
@@ -42223,7 +42223,7 @@ jbm_8xf32_solve_quadratic (const vfloat32m1_t a,
  * \return vfloat32m1_t vector of solution values.
  */
 static inline vfloat32m1_t
-jbm_solve_cubic_reduced_8xf32 (const vfloat32m1_t a,
+jbm_8xf32_solve_cubic_reduced (const vfloat32m1_t a,
                                ///< 2nd order coefficient of the equation.
                                const vfloat32m1_t b,
                                ///< 1st order coefficient of the equation.
@@ -42234,7 +42234,7 @@ jbm_solve_cubic_reduced_8xf32 (const vfloat32m1_t a,
                                const vfloat32m1_t x2)
                                ///< right limit of the solution interval.
 {
-  return jbm_solve_cubic_reduced_nxf32 (a, b, c, x1, x2, 8);
+  return jbm_nxf32_solve_cubic_reduced (a, b, c, x1, x2, 8);
 }
 
 /**
@@ -42566,9 +42566,9 @@ jbm_4xf64_trunc (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_floor_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+jbm_4xf64_floor (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
-  return jbm_floor_nxf64 (x, 4);
+  return jbm_nxf64_floor (x, 4);
 }
 
 /**
@@ -42577,9 +42577,9 @@ jbm_floor_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_ceil_4xf64 (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
+jbm_4xf64_ceil (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
-  return jbm_floor_nxf64 (x, 4);
+  return jbm_nxf64_floor (x, 4);
 }
 
 /**
@@ -42638,7 +42638,7 @@ jbm_4xf64_ldexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 static inline vbool64_t
 jbm_4xf64_small (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
-  return jbm_small_nxf64 (x, 4);
+  return jbm_nxf64_small (x, 4);
 }
 
 /**
@@ -42656,7 +42656,7 @@ static inline vfloat64m1_t
 jbm_4xf64_modmin (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat64m1_t b) ///< 2nd vfloat64m1_t vector.
 {
-  return jbm_modmin_nxf64 (a, b, 4);
+  return jbm_nxf64_modmin (a, b, 4);
 }
 
 /**
@@ -48535,7 +48535,7 @@ jbm_4xf64_sincoswc (const vfloat64m1_t x,
                     vfloat64m1_t *c)
                     ///< pointer to the cos function value (4x vfloat64m1_t).
 {
-  jbm_sinnxf64_coswc (x, s, c, 4);
+  jbm_nxf64_sincoswc (x, s, c, 4);
 }
 
 /**
@@ -48574,7 +48574,7 @@ jbm_4xf64_sincos (const vfloat64m1_t x,
                   vfloat64m1_t *c)
                   ///< pointer to the cos function value (4x vfloat64m1_t).
 {
-  jbm_sinnxf64_cos (x, s, c, 4);
+  jbm_nxf64_sincos (x, s, c, 4);
 }
 
 /**
@@ -48789,7 +48789,7 @@ jbm_4xf64_erfc (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
  * \return vfloat64m1_t vector of solution values.
  */
 static inline vfloat64m1_t
-jbm_solve_quadratic_reduced_4xf64 (vfloat64m1_t a,
+jbm_4xf64_solve_quadratic_reduced (vfloat64m1_t a,
 ///< vfloat64m1_t vector of 1st order coefficient of the equations.
                                    vfloat64m1_t b,
 ///< vfloat64m1_t vector of 0th order coefficient of the equations.
@@ -48798,7 +48798,7 @@ jbm_solve_quadratic_reduced_4xf64 (vfloat64m1_t a,
                                    const vfloat64m1_t x2)
 ///< vfloat64m1_t vector of right limits of the solution intervals.
 {
-  return jbm_solve_quadratic_reduced_nxf64 (a, b, x1, x2, 4);
+  return jbm_nxf64_solve_quadratic_reduced (a, b, x1, x2, 4);
 }
 
 /**
@@ -48831,7 +48831,7 @@ jbm_4xf64_solve_quadratic (const vfloat64m1_t a,
  * \return vfloat64m1_t vector of solution values.
  */
 static inline vfloat64m1_t
-jbm_solve_cubic_reduced_4xf64 (const vfloat64m1_t a,
+jbm_4xf64_solve_cubic_reduced (const vfloat64m1_t a,
                                ///< 2nd order coefficient of the equation.
                                const vfloat64m1_t b,
                                ///< 1st order coefficient of the equation.
@@ -48842,7 +48842,7 @@ jbm_solve_cubic_reduced_4xf64 (const vfloat64m1_t a,
                                const vfloat64m1_t x2)
                                ///< right limit of the solution interval.
 {
-  return jbm_solve_cubic_reduced_nxf64 (a, b, c, x1, x2, 4);
+  return jbm_nxf64_solve_cubic_reduced (a, b, c, x1, x2, 4);
 }
 
 /**
