@@ -1,6 +1,6 @@
 # Header
 AC_PREREQ([2.69])
-AC_INIT([jb],[12.3.11],[https://github.com/jburguete/jb])
+AC_INIT([jb],[12.3.12],[https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_TARGET
@@ -105,14 +105,24 @@ compiler=$CC
 AC_ARG_WITH([native], AS_HELP_STRING([--with-native],
 	[Build using -march=native compiler flag]))
 if test "x$with_native" = "xyes"; then
-	CC="$CC -march=native"
+	AC_MSG_NOTICE([Machine: $host_cpu])
+	case $host_cpu in
+    	riscv64)
+        	CANDIDATE_FLAGS="-march=rv64gcv -mabi=lp64d -mcmodel=medany -mtune=sifive-u74";;
+    	*)
+        	CANDIDATE_FLAGS="-march=native";;
+	esac
+	for flag in $CANDIDATE_FLAGS; do
+    		AX_CHECK_COMPILE_FLAG([$flag], [CFLAGS="$CFLAGS $flag"],
+        		[AC_MSG_WARN([Compiler doesn't support $flag])])
+	done
+	CC="$CC $CFLAGS"
 	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [arch=1], [arch=0])
 	CC=$compiler
 	if test $arch = 0; then
 		AC_MSG_NOTICE([checking for -march=native... no])
 	else
 		AC_MSG_NOTICE([checking for -march=native... yes])
-		AC_SUBST(ARCH, "-march=native")
 	fi
 fi
 

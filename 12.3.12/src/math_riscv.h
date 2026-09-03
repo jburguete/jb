@@ -203,7 +203,7 @@ jbm_nxf32_hypot (const vfloat32m1_t x,  ///< 1st vfloat32m1_t vector.
  * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
-jbm_round_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+jbm_nxf32_round (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< vector size.
 {
   return __riscv_vfcvt_x_f_v_i32m1 (x, vl);
@@ -215,7 +215,7 @@ jbm_round_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
  * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
-jbm_trunc_nxf32 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+jbm_nxf32_trunc (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< vector size.
 {
   vint32m1_t i;
@@ -10601,7 +10601,7 @@ jbm_nxf32_atan (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
     __riscv_vmerge_vvm_f32m1 (f, __riscv_vfsub_vv_f32m1
                               (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), f, vl),
                               m, vl);
-  return jbm_copynxf32_sign (f, x);
+  return jbm_nxf32_copysign (f, x);
 }
 
 /**
@@ -11454,7 +11454,7 @@ jbm_nxf64_hypot (const vfloat64m1_t x,  ///< 1st vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_round_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+jbm_nxf64_round (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
   return __riscv_vfcvt_x_f_v_i64m1 (x, vl);
@@ -11466,7 +11466,7 @@ jbm_round_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_trunc_nxf64 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+jbm_nxf64_trunc (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
   vint64m1_t i;
@@ -21448,7 +21448,7 @@ jbm_nxf64_exp2wc (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in[\frac12,1]\f$.
                   const size_t vl)      ///< array size.
 {
-  return jbm_nxf64_rational_9_4 (x, K_EXP2WC_F64);
+  return jbm_nxf64_rational_9_4 (x, K_EXP2WC_F64, vl);
 }
 
 /**
@@ -22720,9 +22720,9 @@ jbm_4xf32_hypot (const vfloat32m1_t x,  ///< 1st vfloat32m1_t vector.
  * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
-jbm_round_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+jbm_4xf32_round (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
-  return jbm_round_nxf32 (x, 4);
+  return jbm_nxf32_round (x, 4);
 }
 
 /**
@@ -22733,7 +22733,7 @@ jbm_round_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 static inline vint32m1_t
 jbm_trunc_4xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
-  return jbm_trunc_nxf32 (x, 4);
+  return jbm_nxf32_trunc (x, 4);
 }
 
 /**
@@ -28775,7 +28775,7 @@ static inline vfloat32m1_t
 jbm_atanwc0_4xf32 (const vfloat32m1_t x)
                    ///< vfloat32m1_t vector \f$\in\left[0,\frac12\right]\f$.
 {
-  return jbm_atanwc0_nxf32 (x, 4);
+  return jbm_nxf32_atanwc0 (x, 4);
 }
 
 /**
@@ -28785,15 +28785,15 @@ jbm_atanwc0_4xf32 (const vfloat32m1_t x)
  * \return function value (4x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_atanwc1_4xf32 (const vfloat32m1_t x)
+jbm_4xf32_atanwc1 (const vfloat32m1_t x)
                    ///< vfloat32m1_t vector \f$\in\left[\frac12,1\right]\f$.
 {
-  return jbm_atanwc1_nxf32 (x, 4);
+  return jbm_nxf32_atanwc1 (x, 4);
 }
 
 /**
  * Function to calculate the function atan(x) using the jbm_atanwc0_4xf32 and
- * jbm_atanwc1_4xf32 functions (4x vfloat32m1_t).
+ * jbm_4xf32_atanwc1 functions (4x vfloat32m1_t).
  *
  * \return function value (in [-pi/2,pi/2]) (4x vfloat32m1_t).
  */
@@ -29328,9 +29328,9 @@ jbm_2xf64_hypot (const vfloat64m1_t x,  ///< 1st vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_round_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+jbm_2xf64_round (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
-  return jbm_round_nxf64 (x, 2);
+  return jbm_nxf64_round (x, 2);
 }
 
 /**
@@ -29339,9 +29339,9 @@ jbm_round_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_trunc_2xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+jbm_2xf64_trunc (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
-  return jbm_trunc_nxf64 (x, 2);
+  return jbm_nxf64_trunc (x, 2);
 }
 
 /**
@@ -35383,7 +35383,7 @@ static inline vfloat64m1_t
 jbm_atanwc0_2xf64 (const vfloat64m1_t x)
                    ///< vfloat64m1_t vector \f$\in\left[0,\frac12\right]\f$.
 {
-  return jbm_atanwc0_nxf64 (x, 2);
+  return jbm_nxf64_atanwc0 (x, 2);
 }
 
 /**
@@ -35396,7 +35396,7 @@ static inline vfloat64m1_t
 jbm_atanwc1_2xf64 (const vfloat64m1_t x)
                    ///< vfloat64m1_t vector \f$\in\left[\frac12,1\right]\f$.
 {
-  return jbm_atanwc1_nxf64 (x, 2);
+  return jbm_nxf64_atanwc1 (x, 2);
 }
 
 /**
@@ -35936,9 +35936,9 @@ jbm_8xf32_hypot (const vfloat32m1_t x,  ///< 1st vfloat32m1_t vector.
  * \return function value vector (vint32m1_t).
  */
 static inline vint32m1_t
-jbm_round_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+jbm_8xf32_round (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
-  return jbm_round_nxf32 (x, 8);
+  return jbm_nxf32_round (x, 8);
 }
 
 /**
@@ -35949,7 +35949,7 @@ jbm_round_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 static inline vint32m1_t
 jbm_trunc_8xf32 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
-  return jbm_trunc_nxf32 (x, 8);
+  return jbm_nxf32_trunc (x, 8);
 }
 
 /**
@@ -41991,7 +41991,7 @@ static inline vfloat32m1_t
 jbm_atanwc0_8xf32 (const vfloat32m1_t x)
                    ///< vfloat32m1_t vector \f$\in\left[0,\frac12\right]\f$.
 {
-  return jbm_atanwc0_nxf32 (x, 8);
+  return jbm_nxf32_atanwc0 (x, 8);
 }
 
 /**
@@ -42001,15 +42001,15 @@ jbm_atanwc0_8xf32 (const vfloat32m1_t x)
  * \return function value (8x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_atanwc1_8xf32 (const vfloat32m1_t x)
+jbm_8xf32_atanwc1 (const vfloat32m1_t x)
                    ///< vfloat32m1_t vector \f$\in\left[\frac12,1\right]\f$.
 {
-  return jbm_atanwc1_nxf32 (x, 8);
+  return jbm_nxf32_atanwc1 (x, 8);
 }
 
 /**
  * Function to calculate the function atan(x) using the jbm_atanwc0_8xf32 and
- * jbm_atanwc1_8xf32 functions (8x vfloat32m1_t).
+ * jbm_8xf32_atanwc1 functions (8x vfloat32m1_t).
  *
  * \return function value (in [-pi/2,pi/2]) (8x vfloat32m1_t).
  */
@@ -42544,9 +42544,9 @@ jbm_4xf64_hypot (const vfloat64m1_t x,  ///< 1st vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_round_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+jbm_4xf64_round (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
-  return jbm_round_nxf64 (x, 4);
+  return jbm_nxf64_round (x, 4);
 }
 
 /**
@@ -42555,9 +42555,9 @@ jbm_round_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
  * \return function value vector (vint64m1_t).
  */
 static inline vint64m1_t
-jbm_trunc_4xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+jbm_4xf64_trunc (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
-  return jbm_trunc_nxf64 (x, 4);
+  return jbm_nxf64_trunc (x, 4);
 }
 
 /**
@@ -48599,7 +48599,7 @@ static inline vfloat64m1_t
 jbm_atanwc0_4xf64 (const vfloat64m1_t x)
                    ///< vfloat64m1_t vector \f$\in\left[0,\frac12\right]\f$.
 {
-  return jbm_atanwc0_nxf64 (x, 4);
+  return jbm_nxf64_atanwc0 (x, 4);
 }
 
 /**
@@ -48609,15 +48609,15 @@ jbm_atanwc0_4xf64 (const vfloat64m1_t x)
  * \return function value (4x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_atanwc1_4xf64 (const vfloat64m1_t x)
+jbm_4xf64_atanwc1 (const vfloat64m1_t x)
                    ///< vfloat64m1_t vector \f$\in\left[\frac12,1\right]\f$.
 {
-  return jbm_atanwc1_nxf64 (x, 4);
+  return jbm_nxf64_atanwc1 (x, 4);
 }
 
 /**
  * Function to calculate the function atan(x) using the jbm_atanwc0_4xf64 and
- * jbm_atanwc1_4xf64 functions (4x vfloat64m1_t).
+ * jbm_4xf64_atanwc1 functions (4x vfloat64m1_t).
  *
  * \return function value (in [-pi/2,pi/2]) (4x vfloat64m1_t).
  */
