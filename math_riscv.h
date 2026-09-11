@@ -306,17 +306,17 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
   vint32m1_t en;
   vbool32_t m1, m2, m3;
   ai = __riscv_vreinterpret_v_f32m1_u32m1 (x);
-  yi = __riscv_vand_vx_u32m1 (ai, 0x7f800000, vl);
-  m1 = __riscv_vmseq_vx_u32m1_b32 (yi, 0x7f800000, vl);
+  yi = __riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_EXPONENT, vl);
+  m1 = __riscv_vmseq_vx_u32m1_b32 (yi, JBM_F32_BITS_EXPONENT, vl);
   m2 = __riscv_vmseq_vx_u32m1_b32 (yi, 0, vl);
   y2i = ai;
-  y2i = __riscv_vand_vx_u32m1 (y2i, 0x007fffff, vl);
+  y2i = __riscv_vand_vx_u32m1 (y2i, JBM_F32_BITS_MANTISA, vl);
   m3 = __riscv_vmseq_vx_u32m1_b32 (y2i, 0, vl);
   y2i = __riscv_vmv_v_x_u32m1 (0x00400000, vl);
   y2x = __riscv_vreinterpret_v_u32m1_f32m1 (y2i);
   zx = __riscv_vfdiv_vv_f32m1 (x, y2x, vl);
   zi = __riscv_vreinterpret_v_f32m1_u32m1 (zx);
-  zi = __riscv_vand_vx_u32m1 (zi, 0x7f800000, vl);
+  zi = __riscv_vand_vx_u32m1 (zi, JBM_F32_BITS_EXPONENT, vl);
   en =
     __riscv_vmerge_vvm_i32m1 (__riscv_vsub_vx_i32m1
                               (__riscv_vsra_vx_i32m1
@@ -324,7 +324,7 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                                 vl), 253, vl),
                               __riscv_vsub_vx_i32m1 (__riscv_vsra_vx_i32m1
                                                      (__riscv_vreinterpret_v_u32m1_i32m1
-                                                      (yi), 23, vl), 126, vl),
+                                                      (yi), 23, vl), JBM_F32_BIAS, vl),
                               m2, vl);
   yx = __riscv_vreinterpret_v_u32m1_f32m1 (yi);
   yx =
@@ -364,7 +364,7 @@ jbm_nxf32_exp2n (vint32m1_t e,  ///< exponent vector (vint32m1_t).
          __riscv_vreinterpret_v_i32m1_u32m1
          (__riscv_vrsub_vx_i32m1 (e, -127, vl)), vl),
         __riscv_vmslt_vx_i32m1_b32 (e, -127, vl), vl), 0,
-       __riscv_vmslt_vx_i32m1_b32 (e, -150, vl), vl), 0x7f800000,
+       __riscv_vmslt_vx_i32m1_b32 (e, -150, vl), vl), JBM_F32_BITS_EXPONENT,
       __riscv_vmsgt_vx_i32m1_b32 (e, 127, vl), vl));
 }
 
