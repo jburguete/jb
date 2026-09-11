@@ -183,6 +183,23 @@ jbm_nxf32_abs (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
 }
 
 /**
+ * Function to copy the sign of a vfloat32m1_t vector to another vfloat32m1_t
+ * vector.
+ *
+ * \return vloat32m1_t vector with magnitude of 1st vector and sign of 2nd
+ * vector.
+ */
+static inline vfloat32m1_t
+jbm_nxf32_copysign (const vfloat32m1_t x,
+                    ///< vfloat32m1_t vector to preserve magnitude.
+                    const vfloat32m1_t y,
+                    ///< vfloat32m1_t vector to preserve sign.
+                    const size_t vl)    ///< vector size.
+{
+  return __riscv_vfsgnj_vv_f32m1 (x, y, vl);
+}
+
+/**
  * Function to calculate the hypot function (vfloat32m1_t).
  *
  * \return function value vector (vfloat32m1_t).
@@ -10601,7 +10618,7 @@ jbm_nxf32_atan (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
     __riscv_vmerge_vvm_f32m1 (f, __riscv_vfsub_vv_f32m1
                               (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), f, vl),
                               m, vl);
-  return jbm_nxf32_copysign (f, x);
+  return jbm_nxf32_copysign (f, x, vl);
 }
 
 /**
@@ -11434,6 +11451,23 @@ jbm_nxf64_abs (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
 }
 
 /**
+ * Function to copy the sign of a vfloat64m1_t vector to another vfloat64m1_t
+ * vector.
+ *
+ * \return vloat64m1_t vector with magnitude of 1st vector and sign of 2nd
+ * vector.
+ */
+static inline vfloat64m1_t
+jbm_nxf64_copysign (const vfloat64m1_t x,
+                    ///< vfloat64m1_t vector to preserve magnitude.
+                    const vfloat64m1_t y,
+                    ///< vfloat64m1_t vector to preserve sign.
+                    const size_t vl)    ///< vector size.
+{
+  return __riscv_vfsgnj_vv_f64m1 (x, y, vl);
+}
+
+/**
  * Function to calculate the hypot function (vfloat64m1_t).
  *
  * \return function value vector (vfloat64m1_t).
@@ -11520,7 +11554,7 @@ jbm_nxf64_mod (const vfloat64m1_t x,    ///< dividend (vfloat64m1_t).
 {
   return
     __riscv_vfnmsac_vv_f64m1 (x,
-                              __riscv_vfcvt_f_x_v_f64m1 (jbm_nxf32_floor
+                              __riscv_vfcvt_f_x_v_f64m1 (jbm_nxf64_floor
                                                          (__riscv_vfdiv_vv_f64m1
                                                           (x, d, vl), vl), vl),
                               d, vl);
@@ -22703,6 +22737,22 @@ jbm_4xf32_abs (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 }
 
 /**
+ * Function to copy the sign of a vfloat32m1_t vector to another vfloat32m1_t
+ * vector.
+ *
+ * \return 4x vloat32m1_t vector with magnitude of 1st vector and sign of 2nd
+ * vector.
+ */
+static inline vfloat32m1_t
+jbm_4xf32_copysign (const vfloat32m1_t x,
+                    ///< vfloat32m1_t vector to preserve magnitude.
+                    const vfloat32m1_t y)
+                    ///< vfloat32m1_t vector to preserve sign.
+{
+  return jbm_nxf32_copysign (x, y, 4);
+}
+
+/**
  * Function to calculate the hypot function (vfloat32m1_t).
  *
  * \return function value vector (4x vfloat32m1_t).
@@ -29308,6 +29358,22 @@ static inline vfloat64m1_t
 jbm_2xf64_abs (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_abs (x, 2);
+}
+
+/**
+ * Function to copy the sign of a vfloat64m1_t vector to another vfloat64m1_t
+ * vector.
+ *
+ * \return 2x vloat64m1_t vector with magnitude of 1st vector and sign of 2nd
+ * vector.
+ */
+static inline vfloat64m1_t
+jbm_2xf64_copysign (const vfloat64m1_t x,
+                    ///< vfloat64m1_t vector to preserve magnitude.
+                    const vfloat64m1_t y)
+                    ///< vfloat64m1_t vector to preserve sign.
+{
+  return jbm_nxf64_copysign (x, y, 2);
 }
 
 /**
@@ -35919,6 +35985,22 @@ jbm_8xf32_abs (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 }
 
 /**
+ * Function to copy the sign of a vfloat32m1_t vector to another vfloat32m1_t
+ * vector.
+ *
+ * \return 8x vloat32m1_t vector with magnitude of 1st vector and sign of 2nd
+ * vector.
+ */
+static inline vfloat32m1_t
+jbm_8xf32_copysign (const vfloat32m1_t x,
+                    ///< vfloat32m1_t vector to preserve magnitude.
+                    const vfloat32m1_t y)
+                    ///< vfloat32m1_t vector to preserve sign.
+{
+  return jbm_nxf32_copysign (x, y, 8);
+}
+
+/**
  * Function to calculate the hypot function (vfloat32m1_t).
  *
  * \return function value vector (8x vfloat32m1_t).
@@ -42524,6 +42606,22 @@ static inline vfloat64m1_t
 jbm_4xf64_abs (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_abs (x, 4);
+}
+
+/**
+ * Function to copy the sign of a vfloat64m1_t vector to another vfloat64m1_t
+ * vector.
+ *
+ * \return 4x vloat64m1_t vector with magnitude of 1st vector and sign of 2nd
+ * vector.
+ */
+static inline vfloat64m1_t
+jbm_4xf64_copysign (const vfloat64m1_t x,
+                    ///< vfloat64m1_t vector to preserve magnitude.
+                    const vfloat64m1_t y)
+                    ///< vfloat64m1_t vector to preserve sign.
+{
+  return jbm_nxf64_copysign (x, y, 4);
 }
 
 /**

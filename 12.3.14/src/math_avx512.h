@@ -723,7 +723,7 @@ jbm_16xf32_abs (const __m512 x) ///< __m512 vector.
 /**
  * Function to copy the sign of a __m512 vector to another __m512 vector.
  *
- * \return __m512 vector with magnitud of 1st vector and sign of 2nd vector.
+ * \return __m512 vector with magnitude of 1st vector and sign of 2nd vector.
  */
 static inline __m512
 jbm_16xf32_copysign (const __m512 x,
