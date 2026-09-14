@@ -36,6 +36,130 @@
 #include "math_f32.h"
 #include "math_f64.h"
 
+///> macro to automatize operations on one array.
+#define JBM_ARRAY_OPV(xr, xd, n, type, load, store, opv, op) \
+  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
+  const unsigned int vl = sizeof (type) == 4 ? 8 : 4; \
+  unsigned int i, j; \
+  if (n > prefetch + 128 / sizeof (type)) \
+    for (i = 0, \
+         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
+	 j > 0; --j) \
+      { \
+        __builtin_prefetch((const char *) (xd + i + prefetch), 0, 3); \
+        store (xr + i, opv (load (xd + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (xd + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (xd + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (xd + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+      } \
+  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+        store (xr + i, opv (load (xd + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (xd + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (xd + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (xd + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+       --j, i += 32 / sizeof (type)) \
+    store (xr + i, opv (load (xd + i, vl), vl), vl); \
+  vl >>= 1; \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store (xr + i, opv (load (xd + i, vl), vl), vl); \
+  for (; i < n; ++i) \
+    xr[i] = op (xd[i]);
+
+///> macro to automatize operations on one array and one number.
+#define JBM_ARRAY_OPV1(xr, x1, x2, n, type, load, store, opv, op) \
+  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
+  const unsigned int vl = sizeof (type) == 4 ? 8 : 4; \
+  unsigned int i, j; \
+  if (n > prefetch + 128 / sizeof (type)) \
+    for (i = 0, \
+         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
+	 j > 0; --j) \
+      { \
+        __builtin_prefetch((const char *) (xd + i + prefetch), 0, 3); \
+        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
+        i += 32 / sizeof (type); \
+      } \
+  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
+        i += 32 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+       --j, i += 32 / sizeof (type)) \
+    store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
+  vl >>= 1; \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
+  for (; i < n; ++i) \
+    xr[i] = op (x1[i], x2);
+
+///> macro to automatize operations on two arrays.
+#define JBM_ARRAY_OPV2(xr, x1, x2, n, type, load, store, opv, op) \
+  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
+  const unsigned int vl = sizeof (type) == 4 ? 8 : 4; \
+  unsigned int i, j; \
+  if (n > prefetch + 128 / sizeof (type)) \
+    for (i = 0, \
+         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
+	 j > 0; --j) \
+      { \
+        __builtin_prefetch((const char *) (x1 + i + prefetch), 0, 3); \
+        __builtin_prefetch((const char *) (x2 + i + prefetch), 0, 3); \
+        store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+        store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+        i += 32 / sizeof (type); \
+      } \
+  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+      i += 32 / sizeof (type); \
+      store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+      i += 32 / sizeof (type); \
+      store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+      i += 32 / sizeof (type); \
+      store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+      i += 32 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+       --j, i += 32 / sizeof (type)) \
+    store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+  vl >>= 1; \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+  for (; i < n; ++i) \
+    xr[i] = op (x1[i], x2[i]);
+
 // Debug functions
 
 static inline void
@@ -310,7 +434,7 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
   m1 = __riscv_vmseq_vx_u32m1_b32 (yi, JBM_F32_BITS_EXPONENT, vl);
   m2 = __riscv_vmseq_vx_u32m1_b32 (yi, 0, vl);
   y2i = ai;
-  y2i = __riscv_vand_vx_u32m1 (y2i, JBM_F32_BITS_MANTISA, vl);
+  y2i = __riscv_vand_vx_u32m1 (y2i, JBM_F32_BITS_MANTISSA, vl);
   m3 = __riscv_vmseq_vx_u32m1_b32 (y2i, 0, vl);
   y2i = __riscv_vmv_v_x_u32m1 (0x00400000, vl);
   y2x = __riscv_vreinterpret_v_u32m1_f32m1 (y2i);
