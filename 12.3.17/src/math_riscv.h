@@ -36,129 +36,39 @@
 #include "math_f32.h"
 #include "math_f64.h"
 
+///> macro to set the maximum vector size.
+#define JBM_VLMAX(type) \
+  (sizeof(type) == 4 ? __riscv_vsetvlmax_e32m1 () : __riscv_vsetvlmax_e64m1 ())
+
 ///> macro to automatize operations on one array.
-#define JBM_ARRAY_OPV(xr, xd, n, type, load, store, opv, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
-  const unsigned int vl = sizeof (type) == 4 ? 8 : 4; \
+#define JBM_ARRAY_OP(xr, xd, n, type, load, store, op) \
+  unsigned int vl = JBM_VLMAX (type); \
   unsigned int i, j; \
-  if (n > prefetch + 128 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        __builtin_prefetch((const char *) (xd + i + prefetch), 0, 3); \
-        store (xr + i, opv (load (xd + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (xd + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (xd + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (xd + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
-    { \
-        store (xr + i, opv (load (xd + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (xd + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (xd + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (xd + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-    } \
-  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+  for (i = 0, j = n >> (1 + 8 / sizeof (type)); j > 0; \
        --j, i += 32 / sizeof (type)) \
-    store (xr + i, opv (load (xd + i, vl), vl), vl); \
-  vl >>= 1; \
-  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-       --j, i += 16 / sizeof (type)) \
-    store (xr + i, opv (load (xd + i, vl), vl), vl); \
-  for (; i < n; ++i) \
-    xr[i] = op (xd[i]);
+    store (xr + i, op (load (xd + i, vl), vl), vl); \
+  vl = n - i; \
+  store (xr + i, op (load (xd + i, vl), vl), vl);
 
 ///> macro to automatize operations on one array and one number.
-#define JBM_ARRAY_OPV1(xr, x1, x2, n, type, load, store, opv, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
-  const unsigned int vl = sizeof (type) == 4 ? 8 : 4; \
+#define JBM_ARRAY_OP1(xr, x1, x2, n, type, load, store, op) \
+  unsigned int vl = JBM_VLMAX (type); \
   unsigned int i, j; \
-  if (n > prefetch + 128 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        __builtin_prefetch((const char *) (xd + i + prefetch), 0, 3); \
-        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
-        i += 32 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
-    { \
-        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
-        i += 32 / sizeof (type); \
-    } \
-  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+  for (i = 0, j = n >> (1 + 8 / sizeof (type)); j > 0; \
        --j, i += 32 / sizeof (type)) \
-    store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
-  vl >>= 1; \
-  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-       --j, i += 16 / sizeof (type)) \
-    store (xr + i, opv (load (x1 + i, vl), x2, vl), vl); \
-  for (; i < n; ++i) \
-    xr[i] = op (x1[i], x2);
+    store (xr + i, op (load (x1 + i, vl), x2, vl), vl); \
+  vl = n - i; \
+  store (xr + i, op (load (x1 + i, vl), x2, vl), vl);
 
 ///> macro to automatize operations on two arrays.
-#define JBM_ARRAY_OPV2(xr, x1, x2, n, type, load, store, opv, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
-  const unsigned int vl = sizeof (type) == 4 ? 8 : 4; \
+#define JBM_ARRAY_OP2(xr, x1, x2, n, type, load, store, op) \
+  unsigned int vl = JBM_VLMAX (type); \
   unsigned int i, j; \
-  if (n > prefetch + 128 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        __builtin_prefetch((const char *) (x1 + i + prefetch), 0, 3); \
-        __builtin_prefetch((const char *) (x2 + i + prefetch), 0, 3); \
-        store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-        store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-        i += 32 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
-    { \
-      store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-      i += 32 / sizeof (type); \
-      store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-      i += 32 / sizeof (type); \
-      store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-      i += 32 / sizeof (type); \
-      store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-      i += 32 / sizeof (type); \
-    } \
-  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+  for (i = 0, j = n >> (1 + 8 / sizeof (type)); j > 0; \
        --j, i += 32 / sizeof (type)) \
-    store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-  vl >>= 1; \
-  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-       --j, i += 16 / sizeof (type)) \
-    store (xr + i, opv (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-  for (; i < n; ++i) \
-    xr[i] = op (x1[i], x2[i]);
+    store (xr + i, op (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+  vl = n - i; \
+  store (xr + i, op (load (x1 + i, vl), load (x2 + i, vl), vl), vl);
 
 // Debug functions
 
@@ -49320,6 +49230,342 @@ jbm_4xf64_integral (vfloat64m1_t (*f) (const vfloat64m1_t, const size_t),
                     ///< right limit of the interval.
 {
   return jbm_nxf64_integral (f, x1, x2, 4);
+}
+
+/**
+ * Function to calculate the root square of a float array.
+ */
+static inline void
+jbm_array_f32_sqrt (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                __riscv_vfsqrt_v_f32m1);
+}
+
+/**
+ * Function to calculate the double of a float array.
+ */
+static inline void
+jbm_array_f32_dbl (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_dbl);
+}
+
+/**
+ * Function to calculate the square of a float array.
+ */
+static inline void
+jbm_array_f32_sqr (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_sqr);
+}
+
+/**
+ * Function to calculate the additive inverse of a float array.
+ */
+static inline void
+jbm_array_f32_opposite (float *restrict xr,     ///< result float array.
+                        const float *restrict xd,       ///< data float array.
+                        const unsigned int n)   ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_opposite);
+}
+
+/**
+ * Function to calculate the multiplicative inverse of a float array.
+ */
+static inline void
+jbm_array_f32_reciprocal (float *restrict xr,   ///< result float array.
+                          const float *restrict xd,     ///< data float array.
+                          const unsigned int n) ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_reciprocal);
+}
+
+/**
+ * Function to calculate the abs function of a float array.
+ */
+static inline void
+jbm_array_f32_abs (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_abs);
+}
+
+/**
+ * Function to calculate the cbrt function of a float array.
+ */
+static inline void
+jbm_array_f32_cbrt (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_cbrt);
+}
+
+/**
+ * Function to calculate the exp2 function of a float array.
+ */
+static inline void
+jbm_array_f32_exp2 (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_exp2);
+}
+
+/**
+ * Function to calculate the exp function a float array.
+ */
+static inline void
+jbm_array_f32_exp (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_exp);
+}
+
+/**
+ * Function to calculate the exp10 function a float array.
+ */
+static inline void
+jbm_array_f32_exp10 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_exp10);
+}
+
+/**
+ * Function to calculate the exp10 function a float array.
+ */
+static inline void
+jbm_array_f32_expm1 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_expm1);
+}
+
+/**
+ * Function to calculate the log2 function a float array.
+ */
+static inline void
+jbm_array_f32_log2 (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_log2);
+}
+
+/**
+ * Function to calculate the log function a float array.
+ */
+static inline void
+jbm_array_f32_log (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_log);
+}
+
+/**
+ * Function to calculate the log10 function a float array.
+ */
+static inline void
+jbm_array_f32_log10 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_log10);
+}
+
+/**
+ * Function to calculate the sin function a float array.
+ */
+static inline void
+jbm_array_f32_sin (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_sin);
+}
+
+/**
+ * Function to calculate the cos function a float array.
+ */
+static inline void
+jbm_array_f32_cos (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_cos);
+}
+
+/**
+ * Function to calculate the tan function a float array.
+ */
+static inline void
+jbm_array_f32_tan (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_tan);
+}
+
+/**
+ * Function to calculate the asin function a float array.
+ */
+static inline void
+jbm_array_f32_asin (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_asin);
+}
+
+/**
+ * Function to calculate the acos function a float array.
+ */
+static inline void
+jbm_array_f32_acos (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_acos);
+}
+
+/**
+ * Function to calculate the atan function a float array.
+ */
+static inline void
+jbm_array_f32_atan (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_atan);
+}
+
+/**
+ * Function to calculate the sinh function a float array.
+ */
+static inline void
+jbm_array_f32_sinh (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_sinh);
+}
+
+/**
+ * Function to calculate the cosh function a float array.
+ */
+static inline void
+jbm_array_f32_cosh (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_cosh);
+}
+
+/**
+ * Function to calculate the tanh function a float array.
+ */
+static inline void
+jbm_array_f32_tanh (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_tanh);
+}
+
+/**
+ * Function to calculate the asinh function a float array.
+ */
+static inline void
+jbm_array_f32_asinh (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_asinh);
+}
+
+/**
+ * Function to calculate the acosh function a float array.
+ */
+static inline void
+jbm_array_f32_acosh (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_acosh);
+}
+
+/**
+ * Function to calculate the atanh function a float array.
+ */
+static inline void
+jbm_array_f32_atanh (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_atanh);
+}
+
+/**
+ * Function to calculate the erf function a float array.
+ */
+static inline void
+jbm_array_f32_erf (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_erf);
+}
+
+/**
+ * Function to calculate the erfc function a float array.
+ */
+static inline void
+jbm_array_f32_erfc (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+                jbm_nxf32_erfc);
 }
 
 #endif

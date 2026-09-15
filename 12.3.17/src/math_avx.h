@@ -16142,24 +16142,8 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
 ///> macro to automatize operations on one array.
 #define JBM_ARRAY_OP(xr, xd, n, type, load256, load128, store256, store128, \
                      op256, op128, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
-  if (n > prefetch + 128 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        _mm_prefetch((const char *) (xd + i + prefetch), _MM_HINT_T0); \
-        store256 (xr + i, op256 (load256 (xd + i))); \
-        i += 32 / sizeof (type); \
-        store256 (xr + i, op256 (load256 (xd + i))); \
-        i += 32 / sizeof (type); \
-        store256 (xr + i, op256 (load256 (xd + i))); \
-        i += 32 / sizeof (type); \
-        store256 (xr + i, op256 (load256 (xd + i))); \
-        i += 32 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
+  for (i = 0, j = n >> (3 + 8 / sizeof (type)); j > 0; --j) \
     { \
       store256 (xr + i, op256 (load256 (xd + i))); \
       i += 32 / sizeof (type); \
@@ -16184,24 +16168,8 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
                       store256, store128, set256, set128, op256, op128, op) \
   const type256 x256 = set256 (x2); \
   const type128 x128 = set128 (x2); \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
-  if (n > prefetch + 128 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        _mm_prefetch((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
-        store256 (xr + i, op256 (load256 (x1 + i), x256)); \
-        i += 32 / sizeof (type); \
-        store256 (xr + i, op256 (load256 (x1 + i), x256)); \
-        i += 32 / sizeof (type); \
-        store256 (xr + i, op256 (load256 (x1 + i), x256)); \
-        i += 32 / sizeof (type); \
-        store256 (xr + i, op256 (load256 (x1 + i), x256)); \
-        i += 32 / sizeof (type); \
-    } \
-  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
+  for (i = 0, j = n >> (3 + 8 / sizeof (type)); j > 0; --j) \
     { \
       store256 (xr + i, op256 (load256 (x1 + i), x256)); \
       i += 32 / sizeof (type); \
@@ -16224,25 +16192,8 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
 ///> macro to automatize operations on two arrays.
 #define JBM_ARRAY_OP2(xr, x1, x2, n, type, load256, load128, store256, \
                       store128, op256, op128, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
   unsigned int i, j; \
-  if (n > prefetch + 128 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        _mm_prefetch((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
-        _mm_prefetch((const char *) (x2 + i + prefetch), _MM_HINT_T0); \
-        store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
-        i += 32 / sizeof (type); \
-        store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
-        i += 32 / sizeof (type); \
-        store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
-        i += 32 / sizeof (type); \
-        store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
-        i += 32 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (3 + 8 / sizeof (type)); j > 0; --j) \
+  for (i = 0, j = n >> (3 + 8 / sizeof (type)); j > 0; --j) \
     { \
       store256 (xr + i, op256 (load256 (x1 + i), load256 (x2 + i))); \
       i += 32 / sizeof (type); \
@@ -16269,41 +16220,9 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
   type256 a256, b256, c256, d256; \
   type128 a128; \
   type a = initial_value; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
   i = 0; \
-  if (n > prefetch + 128 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          _mm_prefetch ((const char *) (x + prefetch), _MM_HINT_T0); \
-          a256 = load256 (x + i); \
-          i += 32 / sizeof (type); \
-          b256 = load256 (x + i); \
-          i += 32 / sizeof (type); \
-          c256 = load256 (x + i); \
-          i += 32 / sizeof (type); \
-          d256 = load256 (x + i); \
-          i += 32 / sizeof (type); \
-          while (--j) \
-            { \
-              _mm_prefetch ((const char *) (x + i + prefetch), _MM_HINT_T0); \
-              a256 = op256 (a256, load256 (x + i)); \
-              i += 32 / sizeof (type); \
-              b256 = op256 (b256, load256 (x + i)); \
-              i += 32 / sizeof (type); \
-              c256 = op256 (c256, load256 (x + i)); \
-              i += 32 / sizeof (type); \
-              d256 = op256 (d256, load256 (x + i)); \
-              i += 32 / sizeof (type); \
-            } \
-          a256 = op256 (a256, b256); \
-          c256 = op256 (c256, d256); \
-          a = reduce256 (op256 (a256, c256)); \
-        } \
-    } \
-  j = (n - i) >> (3 + 8 / sizeof (type)); \
+  j = n >> (3 + 8 / sizeof (type)); \
   if (j) \
     { \
       a256 = load256 (x + i); \
@@ -16364,43 +16283,9 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
   type256 a256, b256, c256, d256; \
   type128 a128; \
   type a = (type) 0.; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
   unsigned int i, j; \
   i = 0; \
-  if (n > prefetch + 128 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          _mm_prefetch ((const char *) (x1 + prefetch), _MM_HINT_T0); \
-          _mm_prefetch ((const char *) (x2 + prefetch), _MM_HINT_T0); \
-          a256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
-          i += 32 / sizeof (type); \
-          b256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
-          i += 32 / sizeof (type); \
-          d256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
-          i += 32 / sizeof (type); \
-          d256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
-          i += 32 / sizeof (type); \
-          while (--j) \
-            { \
-              _mm_prefetch ((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
-              _mm_prefetch ((const char *) (x2 + i + prefetch), _MM_HINT_T0); \
-              a256 = ma256 (load256 (x1 + i), load256 (x2 + i), a256); \
-              i += 32 / sizeof (type); \
-              b256 = ma256 (load256 (x1 + i), load256 (x2 + i), b256); \
-              i += 32 / sizeof (type); \
-              d256 = ma256 (load256 (x1 + i), load256 (x2 + i), c256); \
-              i += 32 / sizeof (type); \
-              d256 = ma256 (load256 (x1 + i), load256 (x2 + i), d256); \
-              i += 32 / sizeof (type); \
-            } \
-          a256 = add256 (a256, b256); \
-          c256 = add256 (c256, d256); \
-          a = reduce256 (add256 (a256, c256)); \
-        } \
-    } \
-  j = (n - i) >> (3 + 8 / sizeof (type)); \
+  j = n >> (3 + 8 / sizeof (type)); \
   if (j) \
     { \
       a256 = mul256 (load256 (x1 + i), load256 (x2 + i)); \
@@ -16461,36 +16346,9 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
   type256 x256, mxa256, mxb256, mna256, mnb256; \
   type128 x128, mx128, mn128; \
   type mx = -INFINITY, mn = INFINITY; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
   i = 0; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          _mm_prefetch ((const char *) (x + prefetch), _MM_HINT_T0); \
-          mxa256 = mna256 = load256 (x + i); \
-          i += 32 / sizeof (type); \
-          mxb256 = mnb256 = load256 (x + i); \
-          i += 32 / sizeof (type); \
-          while (--j) \
-            { \
-              _mm_prefetch ((const char *) (x + i + prefetch), _MM_HINT_T0); \
-              x256 = load256 (x + i); \
-              mxa256 = max256 (mxa256, x256); \
-              mna256 = min256 (mna256, x256); \
-              i += 32 / sizeof (type); \
-              x256 = load256 (x + i); \
-              mxb256 = max256 (mxb256, x256); \
-              mnb256 = min256 (mnb256, x256); \
-              i += 32 / sizeof (type); \
-            } \
-          mx = redmax256 (max256 (mxa256, mxb256)); \
-          mn = redmin256 (min256 (mna256, mnb256)); \
-        } \
-    } \
-  j = (n - i) >> (2 + 8 / sizeof (type)); \
+  j = n >> (2 + 8 / sizeof (type)); \
   if (j) \
     { \
       mxa256 = mna256 = load256 (x + i); \

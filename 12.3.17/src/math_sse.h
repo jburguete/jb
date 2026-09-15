@@ -16032,24 +16032,8 @@ jbm_2xf64_integral (__m128d (*f) (__m128d),
 
 ///> macro to automatize operations on one array.
 #define JBM_ARRAY_OP(xr, xd, n, type, load128, store128, op128, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        _mm_prefetch((const char *) (xd + i + prefetch), _MM_HINT_T0); \
-        store128 (xr + i, op128 (load128 (xd + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (xd + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (xd + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (xd + i))); \
-        i += 16 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
     { \
       store128 (xr + i, op128 (load128 (xd + i))); \
       i += 16 / sizeof (type); \
@@ -16070,24 +16054,8 @@ jbm_2xf64_integral (__m128d (*f) (__m128d),
 #define JBM_ARRAY_OP1(xr, x1, x2, n, type128, type, load128, store128, set128, \
                       op128, op) \
   const type128 x128 = set128 (x2); \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        _mm_prefetch((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
-        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-        i += 16 / sizeof (type); \
-    } \
-  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
     { \
       store128 (xr + i, op128 (load128 (x1 + i), x128)); \
       i += 16 / sizeof (type); \
@@ -16106,25 +16074,8 @@ jbm_2xf64_integral (__m128d (*f) (__m128d),
 
 ///> macro to automatize operations on two arrays.
 #define JBM_ARRAY_OP2(xr, x1, x2, n, type, load128, store128, op128, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
   unsigned int i, j; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        _mm_prefetch((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
-        _mm_prefetch((const char *) (x2 + i + prefetch), _MM_HINT_T0); \
-        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-        i += 16 / sizeof (type); \
-        store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-        i += 16 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; --j) \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
     { \
       store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
       i += 16 / sizeof (type); \
@@ -16146,41 +16097,9 @@ jbm_2xf64_integral (__m128d (*f) (__m128d),
                             reduce128, initial_value) \
   type128 a128, b128, c128, d128; \
   type a = initial_value; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
   i = 0; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          _mm_prefetch ((const char *) (x + prefetch), _MM_HINT_T0); \
-          a128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          b128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          c128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          d128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          while (--j) \
-            { \
-              _mm_prefetch ((const char *) (x + i + prefetch), _MM_HINT_T0); \
-              a128 = op128 (a128, load128 (x + i)); \
-              i += 16 / sizeof (type); \
-              b128 = op128 (b128, load128 (x + i)); \
-              i += 16 / sizeof (type); \
-              c128 = op128 (c128, load128 (x + i)); \
-              i += 16 / sizeof (type); \
-              d128 = op128 (d128, load128 (x + i)); \
-              i += 16 / sizeof (type); \
-            } \
-          a128 = op128 (a128, b128); \
-          c128 = op128 (c128, d128); \
-          a = reduce128 (op128 (a128, c128)); \
-        } \
-    } \
-  j = (n - i) >> (2 + 8 / sizeof (type)); \
+  j = n >> (2 + 8 / sizeof (type)); \
   if (j) \
     { \
       a128 = load128 (x + i); \
@@ -16227,43 +16146,9 @@ jbm_2xf64_integral (__m128d (*f) (__m128d),
                       ma128, reduce128) \
   type128 a128, b128, c128, d128; \
   type a = (type) 0.; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
   unsigned int i, j; \
   i = 0; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          _mm_prefetch ((const char *) (x1 + prefetch), _MM_HINT_T0); \
-          _mm_prefetch ((const char *) (x2 + prefetch), _MM_HINT_T0); \
-          a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-          i += 16 / sizeof (type); \
-          while (--j) \
-            { \
-              _mm_prefetch ((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
-              _mm_prefetch ((const char *) (x2 + i + prefetch), _MM_HINT_T0); \
-              a128 = ma128 (load128 (x1 + i), load128 (x2 + i), a128); \
-              i += 16 / sizeof (type); \
-              b128 = ma128 (load128 (x1 + i), load128 (x2 + i), b128); \
-              i += 16 / sizeof (type); \
-              d128 = ma128 (load128 (x1 + i), load128 (x2 + i), c128); \
-              i += 16 / sizeof (type); \
-              d128 = ma128 (load128 (x1 + i), load128 (x2 + i), d128); \
-              i += 16 / sizeof (type); \
-            } \
-          a128 = add128 (a128, b128); \
-          c128 = add128 (c128, d128); \
-          a = reduce128 (add128 (a128, c128)); \
-        } \
-    } \
-  j = (n - i) >> (2 + 8 / sizeof (type)); \
+  j = n >> (2 + 8 / sizeof (type)); \
   if (j) \
     { \
       a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
@@ -16310,36 +16195,9 @@ jbm_2xf64_integral (__m128d (*f) (__m128d),
                          min, redmax128, redmin128, mx, mn) \
   type128 x128, mxa128, mxb128, mna128, mnb128; \
   type mx = -INFINITY, mn = INFINITY; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
   i = 0; \
-  if (n > prefetch + 64 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 64 / sizeof (type)) >> (2 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          _mm_prefetch ((const char *) (x + prefetch), _MM_HINT_T0); \
-          mxa128 = mna128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          mxb128 = mnb128 = load128 (x + i); \
-          i += 16 / sizeof (type); \
-          while (--j) \
-            { \
-              _mm_prefetch ((const char *) (x + i + prefetch), _MM_HINT_T0); \
-              x128 = load128 (x + i); \
-              mxa128 = max128 (mxa128, x128); \
-              mna128 = min128 (mna128, x128); \
-              i += 16 / sizeof (type); \
-              x128 = load128 (x + i); \
-              mxb128 = max128 (mxb128, x128); \
-              mnb128 = min128 (mnb128, x128); \
-              i += 16 / sizeof (type); \
-            } \
-          mx = redmax128 (max128 (mxa128, mxb128)); \
-          mn = redmin128 (min128 (mna128, mnb128)); \
-        } \
-    } \
-  j = (n - i) >> (2 + 8 / sizeof (type)); \
+  j = n >> (2 + 8 / sizeof (type)); \
   if (j) \
     { \
       mxa128 = mna128 = load128 (x + i); \

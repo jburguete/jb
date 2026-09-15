@@ -91,24 +91,8 @@ typedef union
 ///> macro to automatize operations on one array.
 #define JBM_ARRAY_OP(xr, xd, n, type, load512, load256, load128, store512, \
                      store256, store128, op512, op256, op128, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
-  if (n > prefetch + 256 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 256 / sizeof (type)) >> (4 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        _mm_prefetch((const char *) (xd + i + prefetch), _MM_HINT_T0); \
-        store512 (xr + i, op512 (load512 (xd + i))); \
-        i += 64 / sizeof (type); \
-        store512 (xr + i, op512 (load512 (xd + i))); \
-        i += 64 / sizeof (type); \
-        store512 (xr + i, op512 (load512 (xd + i))); \
-        i += 64 / sizeof (type); \
-        store512 (xr + i, op512 (load512 (xd + i))); \
-        i += 64 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (4 + 8 / sizeof (type)); j > 0; --j) \
+  for (i = 0, j = n >> (4 + 8 / sizeof (type)); j > 0; --j) \
     { \
       store512 (xr + i, op512 (load512 (xd + i))); \
       i += 64 / sizeof (type); \
@@ -138,24 +122,8 @@ typedef union
   const type512 x512 = set512 (x2); \
   const type256 x256 = set256 (x2); \
   const type128 x128 = set128 (x2); \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
-  if (n > prefetch + 256 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 256 / sizeof (type)) >> (4 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        _mm_prefetch((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
-        store512 (xr + i, op512 (load512 (x1 + i), x512)); \
-        i += 64 / sizeof (type); \
-        store512 (xr + i, op512 (load512 (x1 + i), x512)); \
-        i += 64 / sizeof (type); \
-        store512 (xr + i, op512 (load512 (x1 + i), x512)); \
-        i += 64 / sizeof (type); \
-        store512 (xr + i, op512 (load512 (x1 + i), x512)); \
-        i += 64 / sizeof (type); \
-    } \
-  for (j = (n - i) >> (4 + 8 / sizeof (type)); j > 0; --j) \
+  for (i =0, j = n >> (4 + 8 / sizeof (type)); j > 0; --j) \
     { \
       store512 (xr + i, op512 (load512 (x1 + i), x512)); \
       i += 64 / sizeof (type); \
@@ -181,25 +149,8 @@ typedef union
 ///> macro to automatize operations on two arrays.
 #define JBM_ARRAY_OP2(xr, x1, x2, n, type, load512, load256, load128, \
                       store512, store256, store128, op512, op256, op128, op) \
-  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
   unsigned int i, j; \
-  if (n > prefetch + 256 / sizeof (type)) \
-    for (i = 0, \
-         j = (n - prefetch - 256 / sizeof (type)) >> (4 + 8 / sizeof (type)); \
-	 j > 0; --j) \
-      { \
-        _mm_prefetch((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
-        _mm_prefetch((const char *) (x2 + i + prefetch), _MM_HINT_T0); \
-        store512 (xr + i, op512 (load512 (x1 + i), load512 (x2 + i))); \
-        i += 64 / sizeof (type); \
-        store512 (xr + i, op512 (load512 (x1 + i), load512 (x2 + i))); \
-        i += 64 / sizeof (type); \
-        store512 (xr + i, op512 (load512 (x1 + i), load512 (x2 + i))); \
-        i += 64 / sizeof (type); \
-        store512 (xr + i, op512 (load512 (x1 + i), load512 (x2 + i))); \
-        i += 64 / sizeof (type); \
-      } \
-  for (j = (n - i) >> (4 + 8 / sizeof (type)); j > 0; --j) \
+  for (i = 0, j = n >> (4 + 8 / sizeof (type)); j > 0; --j) \
     { \
       store512 (xr + i, op512 (load512 (x1 + i), load512 (x2 + i))); \
       i += 64 / sizeof (type); \
@@ -230,41 +181,9 @@ typedef union
   type256 a256; \
   type128 a128; \
   type a = initial_value; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
   i = 0; \
-  if (n > prefetch + 256 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 256 / sizeof (type)) >> (4 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          _mm_prefetch ((const char *) (x + prefetch), _MM_HINT_T0); \
-          a512 = load512 (x + i); \
-          i += 64 / sizeof (type); \
-          b512 = load512 (x + i); \
-          i += 64 / sizeof (type); \
-          c512 = load512 (x + i); \
-          i += 64 / sizeof (type); \
-          d512 = load512 (x + i); \
-          i += 64 / sizeof (type); \
-          while (--j) \
-            { \
-              _mm_prefetch ((const char *) (x + i + prefetch), _MM_HINT_T0); \
-              a512 = op512 (a512, load512 (x + i)); \
-              i += 64 / sizeof (type); \
-              b512 = op512 (b512, load512 (x + i)); \
-              i += 64 / sizeof (type); \
-              c512 = op512 (c512, load512 (x + i)); \
-              i += 64 / sizeof (type); \
-              d512 = op512 (d512, load512 (x + i)); \
-              i += 64 / sizeof (type); \
-            } \
-          a512 = op512 (a512, b512); \
-          c512 = op512 (c512, d512); \
-          a = reduce512 (op512 (a512, c512)); \
-        } \
-    } \
-  j = (n - i) >> (4 + 8 / sizeof (type)); \
+  j = n >> (4 + 8 / sizeof (type)); \
   if (j) \
     { \
       a512 = load512 (x + i); \
@@ -339,43 +258,9 @@ typedef union
   type256 a256; \
   type128 a128; \
   type a = (type) 0.; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 128 : 32; \
   unsigned int i, j; \
   i = 0; \
-  if (n > prefetch + 256 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 256 / sizeof (type)) >> (4 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          _mm_prefetch ((const char *) (x1 + prefetch), _MM_HINT_T0); \
-          _mm_prefetch ((const char *) (x2 + prefetch), _MM_HINT_T0); \
-          a512 = mul512 (load512 (x1 + i), load512 (x2 + i)); \
-          i += 64 / sizeof (type); \
-          b512 = mul512 (load512 (x1 + i), load512 (x2 + i)); \
-          i += 64 / sizeof (type); \
-          d512 = mul512 (load512 (x1 + i), load512 (x2 + i)); \
-          i += 64 / sizeof (type); \
-          d512 = mul512 (load512 (x1 + i), load512 (x2 + i)); \
-          i += 64 / sizeof (type); \
-          while (--j) \
-            { \
-              _mm_prefetch ((const char *) (x1 + i + prefetch), _MM_HINT_T0); \
-              _mm_prefetch ((const char *) (x2 + i + prefetch), _MM_HINT_T0); \
-              a512 = ma512 (load512 (x1 + i), load512 (x2 + i), a512); \
-              i += 64 / sizeof (type); \
-              b512 = ma512 (load512 (x1 + i), load512 (x2 + i), b512); \
-              i += 64 / sizeof (type); \
-              d512 = ma512 (load512 (x1 + i), load512 (x2 + i), c512); \
-              i += 64 / sizeof (type); \
-              d512 = ma512 (load512 (x1 + i), load512 (x2 + i), d512); \
-              i += 64 / sizeof (type); \
-            } \
-          a512 = add512 (a512, b512); \
-          c512 = add512 (c512, d512); \
-          a = reduce512 (add512 (a512, c512)); \
-        } \
-    } \
-  j = (n - i) >> (4 + 8 / sizeof (type)); \
+  j = n >> (4 + 8 / sizeof (type)); \
   if (j) \
     { \
       a512 = mul512 (load512 (x1 + i), load512 (x2 + i)); \
@@ -450,36 +335,9 @@ typedef union
   type256 x256, mx256, mn256; \
   type128 x128, mx128, mn128; \
   type mx = -INFINITY, mn = INFINITY; \
-  const unsigned int prefetch = sizeof (type) == 4 ? 256 : 64; \
   unsigned int i, j; \
   i = 0; \
-  if (n > prefetch + 128 / sizeof (type)) \
-    { \
-      j = (n - prefetch - 128 / sizeof (type)) >> (3 + 8 / sizeof (type)); \
-      if (j) \
-        { \
-          _mm_prefetch ((const char *) (x + prefetch), _MM_HINT_T0); \
-          mxa512 = mna512 = load512 (x + i); \
-          i += 64 / sizeof (type); \
-          mxb512 = mnb512 = load512 (x + i); \
-          i += 64 / sizeof (type); \
-          while (--j) \
-            { \
-              _mm_prefetch ((const char *) (x + i + prefetch), _MM_HINT_T0); \
-              x512 = load512 (x + i); \
-              mxa512 = max512 (mxa512, x512); \
-              mna512 = min512 (mna512, x512); \
-              i += 64 / sizeof (type); \
-              x512 = load512 (x + i); \
-              mxb512 = max512 (mxb512, x512); \
-              mnb512 = min512 (mnb512, x512); \
-              i += 64 / sizeof (type); \
-            } \
-          mx = redmax512 (max512 (mxa512, mxb512)); \
-          mn = redmin512 (min512 (mna512, mnb512)); \
-        } \
-    } \
-  j = (n - i) >> (3 + 8 / sizeof (type)); \
+  j = n >> (3 + 8 / sizeof (type)); \
   if (j) \
     { \
       mxa512 = mna512 = load512 (x + i); \
@@ -16611,7 +16469,7 @@ jbm_array_f32_sqr (float *restrict xr,  ///< result float array.
 }
 
 /**
- * Function to calculate the square of a float array.
+ * Function to calculate the additive inverse of a float array.
  */
 static inline void
 jbm_array_f32_opposite (float *restrict xr,     ///< result float array.
@@ -16625,7 +16483,7 @@ jbm_array_f32_opposite (float *restrict xr,     ///< result float array.
 }
 
 /**
- * Function to calculate the square of a float array.
+ * Function to calculate the multiplicative inverse of a float array.
  */
 static inline void
 jbm_array_f32_reciprocal (float *restrict xr,   ///< result float array.
