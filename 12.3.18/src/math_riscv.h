@@ -40,6 +40,10 @@
 #define JBM_VLMAX(type) \
   (sizeof(type) == 4 ? __riscv_vsetvlmax_e32m1 () : __riscv_vsetvlmax_e64m1 ())
 
+///> macro to set the vector size.
+#define JBM_VL(type, n) \
+  (sizeof(type) == 4 ? __riscv_vsetvl_e32m1 (n) : __riscv_vsetvl_e64m1 (n))
+
 ///> macro to automatize operations on one array.
 #define JBM_ARRAY_OP(xr, xd, n, type, load, store, op) \
   unsigned int vl = JBM_VLMAX (type); \
@@ -52,8 +56,8 @@
 
 ///> macro to automatize operations on one array and one number.
 #define JBM_ARRAY_OP1(xr, x1, x2, n, type, load, store, op) \
-  unsigned int vl = JBM_VLMAX (type); \
-  unsigned int i, j; \
+  size_t vl = JBM_VLMAX (type); \
+  size_t i, j; \
   for (i = 0, j = n >> (1 + 8 / sizeof (type)); j > 0; \
        --j, i += 32 / sizeof (type)) \
     store (xr + i, op (load (x1 + i, vl), x2, vl), vl); \
@@ -62,13 +66,102 @@
 
 ///> macro to automatize operations on two arrays.
 #define JBM_ARRAY_OP2(xr, x1, x2, n, type, load, store, op) \
-  unsigned int vl = JBM_VLMAX (type); \
-  unsigned int i, j; \
+  size_t vl = JBM_VLMAX (type); \
+  size_t i, j; \
   for (i = 0, j = n >> (1 + 8 / sizeof (type)); j > 0; \
        --j, i += 32 / sizeof (type)) \
     store (xr + i, op (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
   vl = n - i; \
   store (xr + i, op (load (x1 + i, vl), load (x2 + i, vl), vl), vl);
+
+///> macro to automatize reduction operations on arrays.
+#define JBM_ARRAY_REDUCE_OP(x, n, type, vtype, sload, load, vop, rop, op, \
+                            seed) \
+  const size_t vlmax = JBM_VLMAX (type); \
+  const vtype vseed = sload (seed, vlmax); \
+  size_t i, vl; \
+  vtype s0, s1, s2, s3; \
+  s0 = vseed; \
+  s1 = vseed; \
+  s2 = vseed; \
+  s3 = vseed; \
+  for (i = 0; i + 4 * vlmax <= n;) \
+    { \
+      s0 = vop (load (x + i, vlmax), s0, vlmax); \
+      i += vlmax; \
+      s1 = vop (load (x + i, vlmax), s1, vlmax); \
+      i += vlmax; \
+      s2 = vop (load (x + i, vlmax), s2, vlmax); \
+      i += vlmax; \
+      s3 = vop (load (x + i, vlmax), s3, vlmax); \
+      i += vlmax; \
+    } \
+  while (i < n) \
+    { \
+      vl = JBM_VL (type, n - i); \
+      s0 = vop (load (x + i, vl), s0, vl); \
+      i += vl; \
+    } \
+  s0 = rop (s0, s1, vlmax); \
+  s2 = rop (s2, s3, vlmax); \
+  s0 = rop (s0, s2, vlmax); \
+  s0 = vop (s0, vseed, vlmax); \
+  return op (s0);
+
+///> macro to automatize reduction operations on arrays.
+#define JBM_ARRAY_MAXMIN(x, n, xmax, xmin, type, vtype, sload, load, vmax, \
+                         vmin, rmax, rmin, sop) \
+  const size_t vlmax = JBM_VLMAX (type); \
+  const vtype cx = sload (-INFINITY, vlmax); \
+  const vtype cn = sload (INFINITY, vlmax); \
+  vtype vx; \
+  size_t i, vl; \
+  vtype mx0, mx1, mx2, mx3, mn0, mn1, mn2, mn3; \
+  mx0 = cx; \
+  mx1 = cx; \
+  mx2 = cx; \
+  mx3 = cx; \
+  mn0 = cn; \
+  mn1 = cn; \
+  mn2 = cn; \
+  mn3 = cn; \
+  for (i = 0; i + 4 * vlmax <= n;) \
+    { \
+      vx = load (x + i, vlmax); \
+      mx0 = vmax (vx, mx0, vlmax); \
+      mn0 = vmin (vx, mn0, vlmax); \
+      i += vlmax; \
+      vx = load (x + i, vlmax); \
+      mx1 = vmax (vx, mx1, vlmax); \
+      mn1 = vmin (vx, mn1, vlmax); \
+      i += vlmax; \
+      vx = load (x + i, vlmax); \
+      mx2 = vmax (vx, mx2, vlmax); \
+      mn2 = vmin (vx, mn2, vlmax); \
+      i += vlmax; \
+      vx = load (x + i, vlmax); \
+      mx3 = vmax (vx, mx3, vlmax); \
+      mn3 = vmin (vx, mn3, vlmax); \
+      i += vlmax; \
+    } \
+  while (i < n) \
+    { \
+      vl = JBM_VL (type, n - i); \
+      vx = load (x + i, vl); \
+      mx0 = vmax (vx, mx0, vl); \
+      mn0 = vmin (vx, mn0, vl); \
+      i += vl; \
+    } \
+  mx0 = rmax (mx0, mx1, vlmax); \
+  mx2 = rmax (mx2, mx3, vlmax); \
+  mx0 = rmax (mx0, mx2, vlmax); \
+  mx0 = vmax (mx0, cx, vlmax); \
+  *xmax = sop (mx0); \
+  mn0 = rmin (mn0, mn1, vlmax); \
+  mn2 = rmin (mn2, mn3, vlmax); \
+  mn0 = rmin (mn0, mn2, vlmax); \
+  mn0 = vmin (mn0, cn, vlmax); \
+  *xmin = sop (mn0);
 
 // Debug functions
 
@@ -49566,6 +49659,54 @@ jbm_array_f32_erfc (float *restrict xr, ///< result float array.
 {
   JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
                 jbm_nxf32_erfc);
+}
+
+/**
+ * Function to calculate the sum of the elements of a float array.
+ *
+ * \return the sum value.
+ */
+static inline float
+jbm_array_f32_sum (const float *x,      ///< float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
+                             __riscv_vle32_v_f32m1,
+                             __riscv_vfredusum_vs_f32m1_f32m1,
+                             __riscv_vfadd_vv_f32m1, __riscv_vfmv_f_s_f32m1_f32,
+                             0.f);
+}
+
+/**
+ * Function to find the highest element of a float array.
+ *
+ * \return the highest value.
+ */
+static inline float
+jbm_array_f32_reduce_max (const float *x,       ///< float array.
+                          const unsigned int n) ///< number of array elements.
+{
+  return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
+                             __riscv_vle32_v_f32m1,
+                             __riscv_vfredmax_vs_f32m1_f32m1,
+                             __riscv_vfmax_vv_f32m1, __riscv_vfmv_f_s_f32m1_f32,
+                             -INFINITY);
+}
+
+/**
+ * Function to find the lowest element of a float array.
+ *
+ * \return the lowest value.
+ */
+static inline float
+jbm_array_f32_reduce_min (const float *x,       ///< float array.
+                          const unsigned int n) ///< number of array elements.
+{
+  return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
+                             __riscv_vle32_v_f32m1,
+                             __riscv_vfredmin_vs_f32m1_f32m1,
+                             __riscv_vfmin_vv_f32m1, __riscv_vfmv_f_s_f32m1_f32,
+                             INFINITY);
 }
 
 #endif
