@@ -46,117 +46,56 @@
 
 ///> macro to automatize operations on one array.
 #define JBM_ARRAY_OP(xr, xd, n, type, load, store, op) \
-  unsigned int vl = JBM_VLMAX (type); \
-  unsigned int i, j; \
-  for (i = 0, j = n >> (1 + 8 / sizeof (type)); j > 0; \
-       --j, i += 32 / sizeof (type)) \
-    store (xr + i, op (load (xd + i, vl), vl), vl); \
-  vl = n - i; \
-  store (xr + i, op (load (xd + i, vl), vl), vl);
+  size_t i, vl = JBM_VL (type, n); \
+  for (i = 0; i < n; i += vl) \
+    { \
+      vl = JBM_VL (type, n - i); \
+      store (xr + i, op (load (xd + i, vl), vl), vl); \
+    };
 
 ///> macro to automatize operations on one array and one number.
 #define JBM_ARRAY_OP1(xr, x1, x2, n, type, load, store, op) \
-  size_t vl = JBM_VLMAX (type); \
-  size_t i, j; \
-  for (i = 0, j = n >> (1 + 8 / sizeof (type)); j > 0; \
-       --j, i += 32 / sizeof (type)) \
-    store (xr + i, op (load (x1 + i, vl), x2, vl), vl); \
-  vl = n - i; \
-  store (xr + i, op (load (x1 + i, vl), x2, vl), vl);
+  size_t i, vl = JBM_VL (type, n); \
+  for (i = 0; i < n; i += vl) \
+    { \
+      vl = JBM_VL (type, n - i); \
+      store (xr + i, op (load (x1 + i, vl), x2, vl), vl); \
+    };
 
 ///> macro to automatize operations on two arrays.
 #define JBM_ARRAY_OP2(xr, x1, x2, n, type, load, store, op) \
-  size_t vl = JBM_VLMAX (type); \
-  size_t i, j; \
-  for (i = 0, j = n >> (1 + 8 / sizeof (type)); j > 0; \
-       --j, i += 32 / sizeof (type)) \
-    store (xr + i, op (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
-  vl = n - i; \
-  store (xr + i, op (load (x1 + i, vl), load (x2 + i, vl), vl), vl);
+  size_t i, vl = JBM_VL (type, n); \
+  for (i = 0; i < n; i += vl) \
+    { \
+      vl = JBM_VL (type, n - i); \
+      store (xr + i, op (load (x1 + i, vl), load (x2 + i, vl), vl), vl); \
+    };
 
 ///> macro to automatize reduction operations on arrays.
-#define JBM_ARRAY_REDUCE_OP(x, n, type, vtype, sload, load, vop, sop, seed) \
-  const size_t vlmax = JBM_VLMAX (type, n); \
-  const vtype vseed = sload (seed, vlmax); \
-  size_t i, vl = vlmax; \
-  vtype s0, s1, s2, s3; \
-  s0 = vseed; \
-  s1 = vseed; \
-  s2 = vseed; \
-  s3 = vseed; \
-  for (i = 0; i + 4 * vl <= n;) \
-    { \
-      s0 = vop (load (x + i, vl), s0, vl); \
-      i += vl; \
-      s1 = vop (load (x + i, vl), s1, vl); \
-      i += vl; \
-      s2 = vop (load (x + i, vl), s2, vl); \
-      i += vl; \
-      s3 = vop (load (x + i, vl), s3, vl); \
-      i += vl; \
-    } \
-  while (i < n) \
+#define JBM_ARRAY_REDUCE_OP(x, n, type, vtype, sload, load, vop, sop) \
+  vtype s0; \
+  size_t i, vl = JBM_VL (type, n); \
+  for (i = vl, s0 = load (x, vl); i < n;  i += vl) \
     { \
       vl = JBM_VL (type, n - i); \
       s0 = vop (load (x + i, vl), s0, vl); \
-      i += vl; \
     } \
-  s0 = vop (s0, s1, vlmax); \
-  s2 = vop (s2, s3, vlmax); \
-  s0 = vop (s0, s2, vlmax); \
   return sop (s0);
 
 ///> macro to automatize reduction operations on arrays.
 #define JBM_ARRAY_MAXMIN(x, n, xmax, xmin, type, vtype, sload, load, vmax, \
                          vmin, sop) \
-  const size_t vlmax = JBM_VLMAX (type); \
-  const vtype cx = sload (-INFINITY, vlmax); \
-  const vtype cn = sload (INFINITY, vlmax); \
-  vtype vx; \
-  size_t i, vl = vlmax; \
-  vtype mx0, mx1, mx2, mx3, mn0, mn1, mn2, mn3; \
-  mx0 = cx; \
-  mx1 = cx; \
-  mx2 = cx; \
-  mx3 = cx; \
-  mn0 = cn; \
-  mn1 = cn; \
-  mn2 = cn; \
-  mn3 = cn; \
-  for (i = 0; i + 4 * vl <= n;) \
-    { \
-      vx = load (x + i, vl); \
-      mx0 = vmax (vx, mx0, vl); \
-      mn0 = vmin (vx, mn0, vl); \
-      i += vl; \
-      vx = load (x + i, vl); \
-      mx1 = vmax (vx, mx1, vl); \
-      mn1 = vmin (vx, mn1, vl); \
-      i += vl; \
-      vx = load (x + i, vl); \
-      mx2 = vmax (vx, mx2, vl); \
-      mn2 = vmin (vx, mn2, vl); \
-      i += vl; \
-      vx = load (x + i, vl); \
-      mx3 = vmax (vx, mx3, vl); \
-      mn3 = vmin (vx, mn3, vl); \
-      i += vl; \
-    } \
-  while (i < n) \
+  vtype vx, mx0, mn0; \
+  size_t i, vl = JBM_VL (type, n); \
+  vx = load (x, vl); \
+  for (i = vl, mx0 = mn0 = vx; i < n; i += vl) \
     { \
       vl = JBM_VL (type, n - i); \
       vx = load (x + i, vl); \
       mx0 = vmax (vx, mx0, vl); \
       mn0 = vmin (vx, mn0, vl); \
-      i += vl; \
     } \
-  mx0 = vmax (mx0, mx1, vlmax); \
-  mx2 = vmax (mx2, mx3, vlmax); \
-  mx0 = vmax (mx0, mx2, vlmax); \
   *xmax = sop (mx0); \
-  mn0 = vmin (mn0, mn1, vlmax); \
-  mn2 = vmin (mn2, mn3, vlmax); \
-  mn0 = vmin (mn0, mn2, vlmax); \
   *xmin = sop (mn0);
 
 // Debug functions
@@ -49329,7 +49268,7 @@ jbm_array_f32_sqrt (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 __riscv_vfsqrt_v_f32m1);
 }
 
@@ -49341,7 +49280,7 @@ jbm_array_f32_dbl (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_dbl);
 }
 
@@ -49353,7 +49292,7 @@ jbm_array_f32_sqr (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_sqr);
 }
 
@@ -49365,7 +49304,7 @@ jbm_array_f32_opposite (float *restrict xr,     ///< result float array.
                         const float *restrict xd,       ///< data float array.
                         const unsigned int n)   ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_opposite);
 }
 
@@ -49377,7 +49316,7 @@ jbm_array_f32_reciprocal (float *restrict xr,   ///< result float array.
                           const float *restrict xd,     ///< data float array.
                           const unsigned int n) ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_reciprocal);
 }
 
@@ -49389,7 +49328,7 @@ jbm_array_f32_abs (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_abs);
 }
 
@@ -49401,7 +49340,7 @@ jbm_array_f32_cbrt (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_cbrt);
 }
 
@@ -49413,7 +49352,7 @@ jbm_array_f32_exp2 (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_exp2);
 }
 
@@ -49425,7 +49364,7 @@ jbm_array_f32_exp (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_exp);
 }
 
@@ -49437,7 +49376,7 @@ jbm_array_f32_exp10 (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_exp10);
 }
 
@@ -49449,7 +49388,7 @@ jbm_array_f32_expm1 (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_expm1);
 }
 
@@ -49461,7 +49400,7 @@ jbm_array_f32_log2 (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_log2);
 }
 
@@ -49473,7 +49412,7 @@ jbm_array_f32_log (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_log);
 }
 
@@ -49485,7 +49424,7 @@ jbm_array_f32_log10 (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_log10);
 }
 
@@ -49497,7 +49436,7 @@ jbm_array_f32_sin (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_sin);
 }
 
@@ -49509,7 +49448,7 @@ jbm_array_f32_cos (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_cos);
 }
 
@@ -49521,7 +49460,7 @@ jbm_array_f32_tan (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_tan);
 }
 
@@ -49533,7 +49472,7 @@ jbm_array_f32_asin (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_asin);
 }
 
@@ -49545,7 +49484,7 @@ jbm_array_f32_acos (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_acos);
 }
 
@@ -49557,7 +49496,7 @@ jbm_array_f32_atan (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_atan);
 }
 
@@ -49569,7 +49508,7 @@ jbm_array_f32_sinh (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_sinh);
 }
 
@@ -49581,7 +49520,7 @@ jbm_array_f32_cosh (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_cosh);
 }
 
@@ -49593,7 +49532,7 @@ jbm_array_f32_tanh (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_tanh);
 }
 
@@ -49605,7 +49544,7 @@ jbm_array_f32_asinh (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_asinh);
 }
 
@@ -49617,7 +49556,7 @@ jbm_array_f32_acosh (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_acosh);
 }
 
@@ -49629,7 +49568,7 @@ jbm_array_f32_atanh (float *restrict xr,        ///< result float array.
                      const float *restrict xd,  ///< data float array.
                      const unsigned int n)      ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_atanh);
 }
 
@@ -49641,7 +49580,7 @@ jbm_array_f32_erf (float *restrict xr,  ///< result float array.
                    const float *restrict xd,    ///< data float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_erf);
 }
 
@@ -49653,7 +49592,7 @@ jbm_array_f32_erfc (float *restrict xr, ///< result float array.
                     const float *restrict xd,   ///< data float array.
                     const unsigned int n)       ///< number of array elements.
 {
-  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vst32_v_f32m1,
+  JBM_ARRAY_OP (xr, xd, n, float, __riscv_vle32_v_f32m1, __riscv_vse32_v_f32m1,
                 jbm_nxf32_erfc);
 }
 
@@ -49669,7 +49608,7 @@ jbm_array_f32_sum (const float *x,      ///< float array.
   return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
                              __riscv_vle32_v_f32m1,
                              __riscv_vfredusum_vs_f32m1_f32m1,
-                             __riscv_vfmv_f_s_f32m1_f32, 0.f);
+                             __riscv_vfmv_f_s_f32m1_f32);
 }
 
 /**
@@ -49684,7 +49623,7 @@ jbm_array_f32_reduce_max (const float *x,       ///< float array.
   return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
                              __riscv_vle32_v_f32m1,
                              __riscv_vfredmax_vs_f32m1_f32m1,
-                             __riscv_vfmv_f_s_f32m1_f32, -INFINITY);
+                             __riscv_vfmv_f_s_f32m1_f32);
 }
 
 /**
@@ -49699,7 +49638,7 @@ jbm_array_f32_reduce_min (const float *x,       ///< float array.
   return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
                              __riscv_vle32_v_f32m1,
                              __riscv_vfredmin_vs_f32m1_f32m1,
-                             __riscv_vfmv_f_s_f32m1_f32, INFINITY);
+                             __riscv_vfmv_f_s_f32m1_f32);
 }
 
 #endif
