@@ -75,26 +75,25 @@
   store (xr + i, op (load (x1 + i, vl), load (x2 + i, vl), vl), vl);
 
 ///> macro to automatize reduction operations on arrays.
-#define JBM_ARRAY_REDUCE_OP(x, n, type, vtype, sload, load, vop, rop, op, \
-                            seed) \
-  const size_t vlmax = JBM_VLMAX (type); \
+#define JBM_ARRAY_REDUCE_OP(x, n, type, vtype, sload, load, vop, sop, seed) \
+  const size_t vlmax = JBM_VLMAX (type, n); \
   const vtype vseed = sload (seed, vlmax); \
-  size_t i, vl; \
+  size_t i, vl = vlmax; \
   vtype s0, s1, s2, s3; \
   s0 = vseed; \
   s1 = vseed; \
   s2 = vseed; \
   s3 = vseed; \
-  for (i = 0; i + 4 * vlmax <= n;) \
+  for (i = 0; i + 4 * vl <= n;) \
     { \
-      s0 = vop (load (x + i, vlmax), s0, vlmax); \
-      i += vlmax; \
-      s1 = vop (load (x + i, vlmax), s1, vlmax); \
-      i += vlmax; \
-      s2 = vop (load (x + i, vlmax), s2, vlmax); \
-      i += vlmax; \
-      s3 = vop (load (x + i, vlmax), s3, vlmax); \
-      i += vlmax; \
+      s0 = vop (load (x + i, vl), s0, vl); \
+      i += vl; \
+      s1 = vop (load (x + i, vl), s1, vl); \
+      i += vl; \
+      s2 = vop (load (x + i, vl), s2, vl); \
+      i += vl; \
+      s3 = vop (load (x + i, vl), s3, vl); \
+      i += vl; \
     } \
   while (i < n) \
     { \
@@ -102,20 +101,19 @@
       s0 = vop (load (x + i, vl), s0, vl); \
       i += vl; \
     } \
-  s0 = rop (s0, s1, vlmax); \
-  s2 = rop (s2, s3, vlmax); \
-  s0 = rop (s0, s2, vlmax); \
-  s0 = vop (s0, vseed, vlmax); \
-  return op (s0);
+  s0 = vop (s0, s1, vlmax); \
+  s2 = vop (s2, s3, vlmax); \
+  s0 = vop (s0, s2, vlmax); \
+  return sop (s0);
 
 ///> macro to automatize reduction operations on arrays.
 #define JBM_ARRAY_MAXMIN(x, n, xmax, xmin, type, vtype, sload, load, vmax, \
-                         vmin, rmax, rmin, sop) \
+                         vmin, sop) \
   const size_t vlmax = JBM_VLMAX (type); \
   const vtype cx = sload (-INFINITY, vlmax); \
   const vtype cn = sload (INFINITY, vlmax); \
   vtype vx; \
-  size_t i, vl; \
+  size_t i, vl = vlmax; \
   vtype mx0, mx1, mx2, mx3, mn0, mn1, mn2, mn3; \
   mx0 = cx; \
   mx1 = cx; \
@@ -125,24 +123,24 @@
   mn1 = cn; \
   mn2 = cn; \
   mn3 = cn; \
-  for (i = 0; i + 4 * vlmax <= n;) \
+  for (i = 0; i + 4 * vl <= n;) \
     { \
-      vx = load (x + i, vlmax); \
-      mx0 = vmax (vx, mx0, vlmax); \
-      mn0 = vmin (vx, mn0, vlmax); \
-      i += vlmax; \
-      vx = load (x + i, vlmax); \
-      mx1 = vmax (vx, mx1, vlmax); \
-      mn1 = vmin (vx, mn1, vlmax); \
-      i += vlmax; \
-      vx = load (x + i, vlmax); \
-      mx2 = vmax (vx, mx2, vlmax); \
-      mn2 = vmin (vx, mn2, vlmax); \
-      i += vlmax; \
-      vx = load (x + i, vlmax); \
-      mx3 = vmax (vx, mx3, vlmax); \
-      mn3 = vmin (vx, mn3, vlmax); \
-      i += vlmax; \
+      vx = load (x + i, vl); \
+      mx0 = vmax (vx, mx0, vl); \
+      mn0 = vmin (vx, mn0, vl); \
+      i += vl; \
+      vx = load (x + i, vl); \
+      mx1 = vmax (vx, mx1, vl); \
+      mn1 = vmin (vx, mn1, vl); \
+      i += vl; \
+      vx = load (x + i, vl); \
+      mx2 = vmax (vx, mx2, vl); \
+      mn2 = vmin (vx, mn2, vl); \
+      i += vl; \
+      vx = load (x + i, vl); \
+      mx3 = vmax (vx, mx3, vl); \
+      mn3 = vmin (vx, mn3, vl); \
+      i += vl; \
     } \
   while (i < n) \
     { \
@@ -152,15 +150,13 @@
       mn0 = vmin (vx, mn0, vl); \
       i += vl; \
     } \
-  mx0 = rmax (mx0, mx1, vlmax); \
-  mx2 = rmax (mx2, mx3, vlmax); \
-  mx0 = rmax (mx0, mx2, vlmax); \
-  mx0 = vmax (mx0, cx, vlmax); \
+  mx0 = vmax (mx0, mx1, vlmax); \
+  mx2 = vmax (mx2, mx3, vlmax); \
+  mx0 = vmax (mx0, mx2, vlmax); \
   *xmax = sop (mx0); \
-  mn0 = rmin (mn0, mn1, vlmax); \
-  mn2 = rmin (mn2, mn3, vlmax); \
-  mn0 = rmin (mn0, mn2, vlmax); \
-  mn0 = vmin (mn0, cn, vlmax); \
+  mn0 = vmin (mn0, mn1, vlmax); \
+  mn2 = vmin (mn2, mn3, vlmax); \
+  mn0 = vmin (mn0, mn2, vlmax); \
   *xmin = sop (mn0);
 
 // Debug functions
@@ -49673,8 +49669,7 @@ jbm_array_f32_sum (const float *x,      ///< float array.
   return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
                              __riscv_vle32_v_f32m1,
                              __riscv_vfredusum_vs_f32m1_f32m1,
-                             __riscv_vfadd_vv_f32m1, __riscv_vfmv_f_s_f32m1_f32,
-                             0.f);
+                             __riscv_vfmv_f_s_f32m1_f32, 0.f);
 }
 
 /**
@@ -49689,8 +49684,7 @@ jbm_array_f32_reduce_max (const float *x,       ///< float array.
   return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
                              __riscv_vle32_v_f32m1,
                              __riscv_vfredmax_vs_f32m1_f32m1,
-                             __riscv_vfmax_vv_f32m1, __riscv_vfmv_f_s_f32m1_f32,
-                             -INFINITY);
+                             __riscv_vfmv_f_s_f32m1_f32, -INFINITY);
 }
 
 /**
@@ -49705,8 +49699,7 @@ jbm_array_f32_reduce_min (const float *x,       ///< float array.
   return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
                              __riscv_vle32_v_f32m1,
                              __riscv_vfredmin_vs_f32m1_f32m1,
-                             __riscv_vfmin_vv_f32m1, __riscv_vfmv_f_s_f32m1_f32,
-                             INFINITY);
+                             __riscv_vfmv_f_s_f32m1_f32, INFINITY);
 }
 
 #endif
