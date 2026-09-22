@@ -3028,7 +3028,7 @@ thread_f64 (void *data, void *user_data __attribute__((unused)))
     }
 }
 
-#ifdef __SSE4_2__
+#if __SSE4_2__
 
 #define BUCLE_4XF32(f) \
   for (i = imin; i < imax; i += 4) \
@@ -3364,7 +3364,7 @@ thread_2xf64 (void *data, void *user_data __attribute__((unused)))
 
 #endif
 
-#ifdef __AVX__
+#if __AVX2__
 
 #define BUCLE_8XF32(f) \
   for (i = imin; i < imax; i += 8) \
@@ -3700,7 +3700,7 @@ thread_4xf64 (void *data, void *user_data __attribute__((unused)))
 
 #endif
 
-#ifdef __AVX512F__
+#if JBM_AVX512
 
 #define BUCLE_16XF32(f) \
   for (i = imin; i < imax; i += 16) \
@@ -4699,7 +4699,7 @@ main (int argn, char **argc)
   efficiency_f64 (TYPE_JBM_POL15, thread_f64, x64, y64, r, n, 0., 1.,
                   nthreads, "pol15_f64");
 
-#ifdef __SSE4_2__
+#if __SSE4_2__
 
   // 4xf32 functions
   printf ("\n4xf32 functions\n");
@@ -4833,7 +4833,7 @@ main (int argn, char **argc)
 
 #endif
 
-#ifdef __AVX__
+#if __AVX2__
 
   // 8xf32 functions
   printf ("\n8xf32 functions\n");
@@ -4967,7 +4967,7 @@ main (int argn, char **argc)
 
 #endif
 
-#ifdef __AVX512F__
+#if JBM_AVX512
 
   // 16xf32 functions
   printf ("\n16xf32 functions\n");

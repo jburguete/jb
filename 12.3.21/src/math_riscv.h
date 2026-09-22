@@ -49605,10 +49605,9 @@ static inline float
 jbm_array_f32_sum (const float *x,      ///< float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
-                             __riscv_vle32_v_f32m1,
-                             __riscv_vfredusum_vs_f32m1_f32m1,
-                             __riscv_vfmv_f_s_f32m1_f32);
+  JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
+                      __riscv_vle32_v_f32m1, __riscv_vfredusum_vs_f32m1_f32m1,
+                      __riscv_vfmv_f_s_f32m1_f32);
 }
 
 /**
@@ -49620,10 +49619,9 @@ static inline float
 jbm_array_f32_reduce_max (const float *x,       ///< float array.
                           const unsigned int n) ///< number of array elements.
 {
-  return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
-                             __riscv_vle32_v_f32m1,
-                             __riscv_vfredmax_vs_f32m1_f32m1,
-                             __riscv_vfmv_f_s_f32m1_f32);
+  JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
+                      __riscv_vle32_v_f32m1, __riscv_vfredmax_vs_f32m1_f32m1,
+                      __riscv_vfmv_f_s_f32m1_f32);
 }
 
 /**
@@ -49635,10 +49633,9 @@ static inline float
 jbm_array_f32_reduce_min (const float *x,       ///< float array.
                           const unsigned int n) ///< number of array elements.
 {
-  return JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
-                             __riscv_vle32_v_f32m1,
-                             __riscv_vfredmin_vs_f32m1_f32m1,
-                             __riscv_vfmv_f_s_f32m1_f32);
+  JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
+                      __riscv_vle32_v_f32m1, __riscv_vfredmin_vs_f32m1_f32m1,
+                      __riscv_vfmv_f_s_f32m1_f32);
 }
 
 #endif

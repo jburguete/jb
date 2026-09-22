@@ -301,17 +301,16 @@ jbm_4xf32_frexp (const float32x4_t x,   ///< float32x4_t vector.
                  int32x4_t *e)  ///< pointer to the extracted exponents vector.
 {
   const uint32x4_t zi = vdupq_n_u32 (0);
-  const uint32x4_t bias = JBM_4xF32_BIAS;
-  const uint32x4_t sign_mask = JBM_4xF32_BITS_SIGN;
   const uint32x4_t mant_mask = JBM_4xF32_BITS_MANTISSA;
   JBM4xF32 y, z;
-  uint32x4_t exp, is_z, is_sub, is_nan, is_finite;
+  uint32x4_t exp, is_sub, is_finite;
   // y=abs(x)
   y.x = jbm_4xf32_abs (x);
-  // masks
-  is_z = vceqq_u32 (y.i, zi);
-  is_nan = vcgtq_u32 (y.i, vdupq_n_u32 (JBM_F32_BITS_EXPONENT - 1));
-  is_finite = vmvnq_u32 (vorrq_u32 (is_z, is_nan));
+  // mask
+  is_finite
+    = vmvnq_u32
+      (vorrq_u32 (vceqq_u32 (y.i, zi),
+                  vcgtq_u32 (y.i, vdupq_n_u32 (JBM_F32_BITS_EXPONENT - 1))));
   // extract exponent
   exp = vshrq_n_u32 (y.i, 23);
   // subnormals
@@ -320,10 +319,11 @@ jbm_4xf32_frexp (const float32x4_t x,   ///< float32x4_t vector.
   exp = vbslq_u32 (is_sub, vsubq_u32 (vshrq_n_u32 (y.i, 23), vdupq_n_u32 (23)),
                    exp);
   // exponent
-  *e = vreinterpretq_s32_u32 (vbslq_u32 (is_finite, vsubq_u32 (exp, bias), zi));
+  *e = vreinterpretq_s32_u32 (vbslq_u32 (is_finite,
+                                         vsubq_u32 (exp, JBM_4xF32_BIAS), zi));
   // build mantissa in [0.5,1)
   z.x = x;
-  y.i = vorrq_u32 (vandq_u32 (z.i, sign_mask),
+  y.i = vorrq_u32 (vandq_u32 (z.i, JBM_4xF32_BITS_SIGN),
                    vorrq_u32 (vdupq_n_u32 (JBM_F32_BIAS << 23),
                               vandq_u32 (y.i, mant_mask)));
   return vbslq_f32 (is_finite, y.x, x);
@@ -8108,17 +8108,16 @@ jbm_2xf64_frexp (const float64x2_t x,   ///< float64x2_t vector.
                  int64x2_t *e)  ///< pointer to the extracted exponents vector.
 {
   const uint64x2_t zi = vdupq_n_u64 (0ull);
-  const uint64x2_t bias = JBM_2xF64_BIAS;
-  const uint64x2_t sign_mask = JBM_2xF64_BITS_SIGN;
   const uint64x2_t mant_mask = JBM_2xF64_BITS_MANTISSA;
   JBM2xF64 y, z;
-  uint64x2_t exp, is_z, is_sub, is_nan, is_finite;
+  uint64x2_t exp, is_sub, is_finite;
   // y=abs(x)
   y.x = jbm_2xf64_abs (x);
-  // masks
-  is_z = vceqq_u64 (y.i, zi);
-  is_nan = vcgtq_u64 (y.i, vdupq_n_u64 (JBM_F64_BITS_EXPONENT - 1ull));
-  is_finite = ~(vorrq_u64 (is_z, is_nan));
+  // mask
+  is_finite
+    = ~(vorrq_u64 (vceqq_u64 (y.i, zi),
+                   vcgtq_u64 (y.i,
+                              vdupq_n_u64 (JBM_F64_BITS_EXPONENT - 1ull))));
   // extract exponent
   exp = vshrq_n_u64 (y.i, 52);
   // subnormals
@@ -8127,10 +8126,11 @@ jbm_2xf64_frexp (const float64x2_t x,   ///< float64x2_t vector.
   exp = vbslq_u64 (is_sub, vsubq_u64 (vshrq_n_u64 (y.i, 52),
                                       vdupq_n_u64 (52ull)), exp);
   // exponent
-  *e = vreinterpretq_s64_u64 (vbslq_u64 (is_finite, vsubq_u64 (exp, bias), zi));
+  *e = vreinterpretq_s64_u64 (vbslq_u64 (is_finite,
+                                         vsubq_u64 (exp, JBM_2xF64_BIAS), zi));
   // build mantissa in [0.5,1)
   z.x = x;
-  y.i = vorrq_u64 (vandq_u64 (z.i, sign_mask),
+  y.i = vorrq_u64 (vandq_u64 (z.i, JBM_2xF64_BITS_SIGN),
                    vorrq_u64 (vdupq_n_u64 (JBM_F64_BIAS << 52),
                               vandq_u64 (y.i, mant_mask)));
   return vbslq_f64 (is_finite, y.x, x);

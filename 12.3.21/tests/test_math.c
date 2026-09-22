@@ -490,7 +490,7 @@ fn14d (const JBDOUBLE x)
   return x * fn13d (x);
 }
 
-#ifdef __SSE4_2__
+#if __SSE4_2__
 
 __m128
 fn0_4xf32 (const __m128 x __attribute__((unused)))
@@ -584,7 +584,7 @@ fn14_4xf32 (const __m128 x)
 
 #endif
 
-#ifdef __AVX__
+#if __AVX2__
 
 __m256
 fn0_8xf32 (const __m256 x __attribute__((unused)))
@@ -678,7 +678,7 @@ fn14_8xf32 (const __m256 x)
 
 #endif
 
-#ifdef __AVX512F__
+#if JBM_AVX512
 
 __m512
 fn0_16xf32 (const __m512 x __attribute__((unused)))
@@ -1050,7 +1050,7 @@ fn14_8xf32 (const vfloat32m1_t x)
 
 #endif
 
-#ifdef __SSE4_2__
+#if __SSE4_2__
 
 __m128d
 fn0_2xf64 (const __m128d x __attribute__((unused)))
@@ -1144,7 +1144,7 @@ fn14_2xf64 (const __m128d x)
 
 #endif
 
-#ifdef __AVX__
+#if __AVX2__
 
 __m256d
 fn0_4xf64 (const __m256d x __attribute__((unused)))
@@ -1238,7 +1238,7 @@ fn14_4xf64 (const __m256d x)
 
 #endif
 
-#ifdef __AVX512F__
+#if JBM_AVX512
 
 __m512d
 fn0_8xf64 (const __m512d x __attribute__((unused)))
@@ -1878,7 +1878,7 @@ test_logn_f64 (double (*f) (const double), double (*g) (const double),
   return n;
 }
 
-#ifdef __SSE4_2__
+#if __SSE4_2__
 
 int
 check_uni_4xf32 (__m128 (*f) (const __m128), float (*g) (const float),
@@ -2112,7 +2112,7 @@ test_logn_2xf64 (__m128d (*f) (const __m128d), double (*g) (const double),
 
 #endif
 
-#ifdef __AVX__
+#if __AVX2__
 
 int
 check_uni_8xf32 (__m256 (*f) (const __m256), float (*g) (const float),
@@ -2346,7 +2346,7 @@ test_logn_4xf64 (__m256d (*f) (const __m256d), double (*g) (const double),
 
 #endif
 
-#ifdef __AVX512F__
+#if JBM_AVX512
 
 int
 check_uni_16xf32 (__m512 (*f) (const __m512), float (*g) (const float),
@@ -3654,15 +3654,15 @@ main (void)
   JBFLOAT f, f2;
   double x, y;
   float xf, yf;
-#ifdef __SSE4_2__
+#if __SSE4_2__
   double *d_1, *d_2;
   uint64_t *L_1;
   __m128d d_2xf64, d2_2xf64;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   __m256d d_4xf64, d2_4xf64;
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   __m512d d_8xf64, d2_8xf64;
   __mmask8 m_8;
 #endif
@@ -3901,7 +3901,7 @@ main (void)
 #endif
 #if defined (__SSE4_2__) || defined (__ARM_NEON) || defined (__riscv_vector)
 
-#ifdef __SSE4_2__
+#if __SSE4_2__
   printf ("checking __m128 functions\n");
 #endif
 #ifdef __ARM_NEON
@@ -3994,7 +3994,7 @@ main (void)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
 
-#ifdef __SSE4_2__
+#if __SSE4_2__
   printf ("checking __m128d functions\n");
 #endif
 #ifdef __ARM_NEON
@@ -4091,7 +4091,7 @@ main (void)
 
 #if defined (__AVX__) || defined (__riscv_vector)
 
-#ifdef __AVX__
+#if __AVX2__
   printf ("checking __m256 functions\n");
 #endif
 #ifdef __riscv_vector
@@ -4181,7 +4181,7 @@ main (void)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
 
-#ifdef __AVX__
+#if __AVX2__
   printf ("checking __m256d functions\n");
 #endif
 #ifdef __riscv_vector
@@ -5367,7 +5367,7 @@ main (void)
              jbm_integrall (fn14d, (JBDOUBLE) 0., (JBDOUBLE) 1.));
   printf ("integrall(x^14,0,1)=%s\n", buffer);
 
-#ifdef __SSE4_2__
+#if __SSE4_2__
   printf ("check SSE 4.2 functions\n");
   d_1 = aligned_alloc (16, 2 * sizeof (double));
   L_1 = (uint64_t *) d_1;
@@ -5614,7 +5614,7 @@ main (void)
   aligned_free (d_2);
   aligned_free (d_1);
 #endif
-#ifdef __AVX__
+#if __AVX2__
   printf ("check AVX functions\n");
   d_1 = aligned_alloc (32, 4 * sizeof (double));
   L_1 = (uint64_t *) d_1;
@@ -5848,7 +5848,7 @@ main (void)
   aligned_free (d_2);
   aligned_free (d_1);
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   printf ("check AVX512 functions\n");
   d_1 = aligned_alloc (64, 8 * sizeof (double));
   d_2 = aligned_alloc (64, 8 * sizeof (double));

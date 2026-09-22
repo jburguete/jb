@@ -63,6 +63,16 @@
 #endif
 
 /**
+ * \def JBM_AVX512
+ * \brief macro to define the AVX512 vectorial extension.
+ */
+#if __AVX512F__ && __AVX512BW__ && __AVX512CD__ && __AVX512DQ__ && __AVX512VL__
+#define JBM_AVX512 1
+#else
+#define JBM_AVX512 0
+#endif
+
+/**
  * \def JB_ALIGNED
  * \brief macro to define the aligned size in vectorized arrays.
  * \def JB_MALLOC
@@ -70,15 +80,15 @@
  * \def JB_FREE
  * \brief macro to free the memory used in vectorized arrays. 
  */
-#if defined(__AVX512F__)
+#if JBM_AVX512
 #define JB_ALIGNED __attribute__((aligned(64)))
 #define JB_MALLOC(size) (aligned_alloc (64, size))
 #define JB_FREE aligned_free
-#elif defined(__AVX__) || defined(__riscv_vector)
+#elif __AVX2__ || __riscv_vector
 #define JB_ALIGNED __attribute__((aligned(32)))
 #define JB_MALLOC(size) (aligned_alloc (32, size))
 #define JB_FREE aligned_free
-#elif defined(__SSE4_2__) || defined(__ARM_NEON)
+#elif __SSE4_2__ || __ARM_NEON
 #define JB_ALIGNED __attribute__((aligned(16)))
 #define JB_MALLOC(size) (aligned_alloc (16, size))
 #define JB_FREE aligned_free
@@ -656,19 +666,19 @@ enum JBMFluxLimiterType
 
 #include "math_f32.h"
 #include "math_f64.h"
-#ifdef __SSE4_2__
+#if __SSE4_2__
 #include "math_sse.h"
-#endif
-#ifdef __AVX__
+#if __AVX2__
 #include "math_avx.h"
-#endif
-#ifdef __AVX512F__
+#if JBM_AVX512 
 #include "math_avx512.h"
 #endif
-#ifdef __ARM_NEON
+#endif
+#endif
+#if __ARM_NEON
 #include "math_neon.h"
 #endif
-#ifdef __riscv_vector
+#if __riscv_vector
 #include "math_riscv.h"
 #endif
 
@@ -2634,13 +2644,13 @@ jbm_farray_set1 (JBMFarray *fa, ///< pointer to the JBMFarray struct.
   JBFLOAT *xa;
   unsigned int i;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   unsigned int n4;
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   unsigned int n8;
 #endif
 #endif
@@ -2648,17 +2658,17 @@ jbm_farray_set1 (JBMFarray *fa, ///< pointer to the JBMFarray struct.
   i = 0;
   xa = fa->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX512F__
+#if JBM_AVX512
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
     _mm512_store_pd (xa + i, _mm512_set1_pd (x));
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xa + i, _mm256_set1_pd (x));
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
     _mm_store_pd (xa + i, _mm_set1_pd (x));
@@ -2711,13 +2721,13 @@ jbm_farray_add (JBMFarray *fr,  ///< result JBMFarray struct.
   JBFLOAT *xr, *x1, *x2;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   unsigned int n4;
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   unsigned int n8;
 #endif
 #endif
@@ -2727,19 +2737,19 @@ jbm_farray_add (JBMFarray *fr,  ///< result JBMFarray struct.
   x1 = f1->x;
   x2 = f2->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX512F__
+#if JBM_AVX512
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
     _mm512_store_pd (xr + i, _mm512_add_pd (_mm512_load_pd (x1 + i),
                                             _mm512_load_pd (x2 + i)));
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, _mm256_add_pd (_mm256_load_pd (x1 + i),
                                             _mm256_load_pd (x2 + i)));
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
     _mm_store_pd (xr + i,
@@ -2761,13 +2771,13 @@ jbm_farray_sub (JBMFarray *fr,  ///< result JBMFarray struct.
   JBFLOAT *xr, *x1, *x2;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   unsigned int n4;
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   unsigned int n8;
 #endif
 #endif
@@ -2777,19 +2787,19 @@ jbm_farray_sub (JBMFarray *fr,  ///< result JBMFarray struct.
   x1 = f1->x;
   x2 = f2->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX512F__
+#if JBM_AVX512
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
     _mm512_store_pd (xr + i, _mm512_sub_pd (_mm512_load_pd (x1 + i),
                                             _mm512_load_pd (x2 + i)));
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, _mm256_sub_pd (_mm256_load_pd (x1 + i),
                                             _mm256_load_pd (x2 + i)));
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
     _mm_store_pd (xr + i,
@@ -2811,15 +2821,15 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
   JBFLOAT *xr, *x1;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   __m128d s2;
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   __m256d a4;
   unsigned int n4;
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   __m512d a8;
   unsigned int n8;
 #endif
@@ -2829,7 +2839,7 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
   xr = fr->x;
   x1 = f1->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX512F__
+#if JBM_AVX512
   n8 = n >> 3;
   if (n8)
     {
@@ -2838,7 +2848,7 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
         _mm512_store_pd (xr + i, _mm512_mul_pd (_mm512_load_pd (x1 + i), a8));
     }
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = (n - i) >> 2;
   if (n4)
     {
@@ -2847,7 +2857,7 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
         _mm256_store_pd (xr + i, _mm256_mul_pd (_mm256_load_pd (x1 + i), a4));
     }
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   if (n2)
     {
@@ -2872,15 +2882,15 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
   JBFLOAT *xr, *x1;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   __m128d s2;
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   __m256d a4;
   unsigned int n4;
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   __m512d a8;
   unsigned int n8;
 #endif
@@ -2890,7 +2900,7 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
   xr = fr->x;
   x1 = f1->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX512F__
+#if JBM_AVX512
   n8 = n >> 3;
   if (n8)
     {
@@ -2899,7 +2909,7 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
         _mm512_store_pd (xr + i, _mm512_div_pd (_mm512_load_pd (x1 + i), a8));
     }
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = (n - i) >> 2;
   if (n4)
     {
@@ -2908,7 +2918,7 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
         _mm256_store_pd (xr + i, _mm256_div_pd (_mm256_load_pd (x1 + i), a4));
     }
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   if (n2)
     {
@@ -2933,13 +2943,13 @@ jbm_farray_mul (JBMFarray *fr,  ///< result JBMFarray struct.
   JBFLOAT *xr, *x1, *x2;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   unsigned int n4;
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   unsigned int n8;
 #endif
 #endif
@@ -2949,19 +2959,19 @@ jbm_farray_mul (JBMFarray *fr,  ///< result JBMFarray struct.
   x1 = f1->x;
   x2 = f2->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX512F__
+#if JBM_AVX512
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
     _mm512_store_pd (xr + i, _mm512_mul_pd (_mm512_load_pd (x1 + i),
                                             _mm512_load_pd (x2 + i)));
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, _mm256_mul_pd (_mm256_load_pd (x1 + i),
                                             _mm256_load_pd (x2 + i)));
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
     _mm_store_pd (xr + i,
@@ -2983,13 +2993,13 @@ jbm_farray_div (JBMFarray *fr,  ///< result JBMFarray struct.
   JBFLOAT *xr, *x1, *x2;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   unsigned int n4;
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   unsigned int n8;
 #endif
 #endif
@@ -2999,19 +3009,19 @@ jbm_farray_div (JBMFarray *fr,  ///< result JBMFarray struct.
   x1 = f1->x;
   x2 = f2->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX512F__
+#if JBM_AVX512
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
     _mm512_store_pd (xr + i, _mm512_div_pd (_mm512_load_pd (x1 + i),
                                             _mm512_load_pd (x2 + i)));
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, _mm256_div_pd (_mm256_load_pd (x1 + i),
                                             _mm256_load_pd (x2 + i)));
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
     _mm_store_pd (xr + i,
@@ -3032,13 +3042,13 @@ jbm_farray_dbl (JBMFarray *fr,  ///< result JBMFarray struct.
   JBFLOAT *xr, *xd;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   unsigned int n4;
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   unsigned int n8;
 #endif
 #endif
@@ -3047,17 +3057,17 @@ jbm_farray_dbl (JBMFarray *fr,  ///< result JBMFarray struct.
   xr = fr->x;
   xd = fd->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX512F__
+#if JBM_AVX512
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
     _mm512_store_pd (xr + i, jbm_8xf64_dbl (_mm512_load_pd (xd + i)));
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, jbm_4xf64_dbl (_mm256_load_pd (xd + i)));
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
     _mm_store_pd (xr + i, jbm_2xf64_dbl (_mm_load_pd (xd + i)));
@@ -3077,13 +3087,13 @@ jbm_farray_sqr (JBMFarray *fr,  ///< result JBMFarray struct.
   JBFLOAT *xr, *xd;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   unsigned int n4;
 #endif
-#ifdef __AVX512F__
+#if JBM_AVX512
   unsigned int n8;
 #endif
 #endif
@@ -3092,17 +3102,17 @@ jbm_farray_sqr (JBMFarray *fr,  ///< result JBMFarray struct.
   xr = fr->x;
   xd = fd->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX512F__
+#if JBM_AVX512
   n8 = n >> 3;
   for (; n8 > 0; --n8, i += 8)
     _mm512_store_pd (xr + i, jbm_8xf64_sqr (_mm512_load_pd (xd + i)));
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = (n - i) >> 2;
   for (; n4 > 0; --n4, i += 4)
     _mm256_store_pd (xr + i, jbm_4xf64_sqr (_mm256_load_pd (xd + i)));
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   for (; n2 > 0; --n2, i += 2)
     _mm_store_pd (xr + i, jbm_2xf64_sqr (_mm_load_pd (xd + i)));
@@ -3167,12 +3177,12 @@ jbm_farray_max (const JBMFarray *fa)    ///< JBMFarray struct.
   JBFLOAT k;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   __m128d s2;
   double sx[2];
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   __m256d a4;
   double ax[4];
   unsigned int n4;
@@ -3181,7 +3191,7 @@ jbm_farray_max (const JBMFarray *fa)    ///< JBMFarray struct.
   n = fa->n;
   xx = fa->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX__
+#if __AVX2__
   n4 = n >> 2;
   if (n4)
     {
@@ -3209,7 +3219,7 @@ jbm_farray_max (const JBMFarray *fa)    ///< JBMFarray struct.
       i = 1;
     }
 #else
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = n >> 1;
   if (n2)
     {
@@ -3254,12 +3264,12 @@ jbm_farray_min (const JBMFarray *fa)    ///< JBMFarray struct.
   JBFLOAT k;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   __m128d s2;
   double sx[2];
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   __m256d a4;
   double ax[4];
   unsigned int n4;
@@ -3268,7 +3278,7 @@ jbm_farray_min (const JBMFarray *fa)    ///< JBMFarray struct.
   n = fa->n;
   xx = fa->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX__
+#if __AVX2__
   n4 = n >> 2;
   if (n4)
     {
@@ -3297,7 +3307,7 @@ jbm_farray_min (const JBMFarray *fa)    ///< JBMFarray struct.
     }
 
 #else
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = n >> 1;
   if (n2)
     {
@@ -3342,12 +3352,12 @@ jbm_farray_maxmin (const JBMFarray *fa, ///< JBMFarray struct.
   JBFLOAT kmax, kmin;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __SSE4_2__
+#if __SSE4_2__
   __m128d s2, smax2, smin2;
   double smax[2], smin[2];
   unsigned int n2;
 #endif
-#ifdef __AVX__
+#if __AVX2__
   __m256d a4, amax4, amin4;
   double amax[4], amin[4];
   unsigned int n4;
@@ -3356,7 +3366,7 @@ jbm_farray_maxmin (const JBMFarray *fa, ///< JBMFarray struct.
   n = fa->n;
   xx = fa->x;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX__
+#if __AVX2__
   n4 = n >> 2;
   if (n4)
     {
@@ -3392,7 +3402,7 @@ jbm_farray_maxmin (const JBMFarray *fa, ///< JBMFarray struct.
       i = 1;
     }
 #else
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = n >> 1;
   if (n2)
     {
@@ -4139,12 +4149,12 @@ jbm_regression_linear (JBMFarray *fx,
   JBFLOAT syx, sy, sxx, sx;
   unsigned int i, n;
 #if JBM_LOW_PRECISION < 3
-#ifdef __AVX__
+#if __AVX2__
   double t4[4];
   __m256d x4, y4, syx4, sy4, sxx4, sx4;
   unsigned int n4;
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   double t2[2];
   __m128d x2, y2, syx2, sy2, sxx2, sx2;
   unsigned int n2;
@@ -4155,13 +4165,13 @@ jbm_regression_linear (JBMFarray *fx,
   n = fx->n;
   i = 0;
   syx = sy = sxx = sx = (JBFLOAT) 0.;
-#ifdef __SSE4_2__
+#if __SSE4_2__
   sy2 = _mm_setzero_pd ();
   sx2 = _mm_setzero_pd ();
   syx2 = _mm_setzero_pd ();
   sxx2 = _mm_setzero_pd ();
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = n >> 2;
   sy4 = _mm256_setzero_pd ();
   sx4 = _mm256_setzero_pd ();
@@ -4192,7 +4202,7 @@ jbm_regression_linear (JBMFarray *fx,
       sxx2 = _mm_add_pd (sxx2, _mm_load_pd (t4 + 2));
     }
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   if (n2)
     {
@@ -4271,13 +4281,13 @@ jbm_regression_polynomial (JBMFarray *fx,
   JBFLOAT *k, *x, *y, *xx, *yx;
   JBFLOAT zx, zy;
   unsigned int i, j, n;
-#ifdef __AVX__
+#if __AVX2__
   __m256d xx4[m + m + 1], yx4[m + 1];
   __m256d x4, y4, zx4, zy4;
   double t4[4];
   unsigned int n4;
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   __m128d xx2[m + m + 1], yx2[m + 1];
   __m128d x2, y2, zx2, zy2;
   double t2[2];
@@ -4295,19 +4305,19 @@ jbm_regression_polynomial (JBMFarray *fx,
   y = fy->x;
   xx = fxx->x;
   yx = fyx->x;
-#ifdef __AVX__
+#if __AVX2__
   for (j = 0; j <= m; ++j)
     yx4[j] = xx4[j] = _mm256_setzero_pd ();
   for (; j <= m + m; ++j)
     xx4[j] = _mm256_setzero_pd ();
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   for (j = 0; j <= m; ++j)
     yx2[j] = xx2[j] = _mm_setzero_pd ();
   for (; j <= m + m; ++j)
     xx2[j] = _mm_setzero_pd ();
 #endif
-#ifdef __AVX__
+#if __AVX2__
   n4 = n >> 2;
   if (n4)
     {
@@ -4343,7 +4353,7 @@ jbm_regression_polynomial (JBMFarray *fx,
         }
     }
 #endif
-#ifdef __SSE4_2__
+#if __SSE4_2__
   n2 = (n - i) >> 1;
   if (n2)
     {
