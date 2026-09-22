@@ -190,35 +190,39 @@ _mm_fnmadd_pd (const __m128d x, const __m128d y, const __m128d z)
 
 #endif
 
-#ifndef __AVX2__
+#if !__AVX2__
 
 static inline __m128i
 _mm_sllv_epi32 (const __m128i x, const __m128i y)
 {
-  int32_t ix[4] JB_ALIGNED, iy[4] JB_ALIGNED;
+  uint32_t ix[4] JB_ALIGNED, iy[4] JB_ALIGNED;
   _mm_store_si128 ((__m128i *) ix, x);
   _mm_store_si128 ((__m128i *) iy, y);
-  ix[0] <<= iy[0];
-  ix[1] <<= iy[1];
-  ix[2] <<= iy[2];
-  ix[3] <<= iy[3];
-  return _mm_load_si128 ((__m128i *) ix);
-}
-
-static inline __m128i
-_mm_sllv_epi64 (const __m128i x, const __m128i y)
-{
-  int64_t ix[2] JB_ALIGNED, iy[2] JB_ALIGNED;
-  _mm_store_si128 ((__m128i *) ix, x);
-  _mm_store_si128 ((__m128i *) iy, y);
-  ix[0] <<= iy[0];
-  ix[1] <<= iy[1];
+  ix[0] <<= (iy[0] & 0x1fu);
+  ix[1] <<= (iy[1] & 0x1fu);
+  ix[2] <<= (iy[2] & 0x1fu);
+  ix[3] <<= (iy[3] & 0x1fu);
   return _mm_load_si128 ((__m128i *) ix);
 }
 
 #endif
 
-#ifndef __AVX512F__
+#if !JBM_AVX512
+
+static inline __m128i
+_mm_sllv_epi64 (const __m128i x, const __m128i y)
+{
+  uint64_t ix[2] JB_ALIGNED, iy[2] JB_ALIGNED;
+  _mm_store_si128 ((__m128i *) ix, x);
+  _mm_store_si128 ((__m128i *) iy, y);
+  ix[0] <<= (iy[0] & 0x3fu);
+  ix[1] <<= (iy[1] & 0x3fu);
+  return _mm_load_si128 ((__m128i *) ix);
+}
+
+#endif
+
+#if !JBM_AVX512
 
 static inline __m128d
 _mm_cvtepi64_pd (const __m128i x)
@@ -472,6 +476,9 @@ jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
 static inline __m128
 jbm_4xf32_exp2n (const __m128i e)       ///< exponent vector (__m128i).
 {
+#if JBM_AVX512
+  return _mm_scalef_ps (_mm_set1_ps (1.f), _mm_cvtepi32_ps (e));
+#else
   const __m128i v127 = _mm_set1_epi32 (127);
   __m128 x;
   x = _mm_blendv_ps
@@ -486,6 +493,7 @@ jbm_4xf32_exp2n (const __m128i e)       ///< exponent vector (__m128i).
                                                         (-149))));
   return _mm_blendv_ps (x, _mm_set1_ps (INFINITY),
                         _mm_castsi128_ps (_mm_cmpgt_epi32 (e, v127)));
+#endif
 }
 
 /**
@@ -8387,6 +8395,9 @@ jbm_2xf64_frexp (const __m128d x,       ///< __m128d vector.
 static inline __m128d
 jbm_2xf64_exp2n (const __m128i e)       ///< exponent vector (__m128i).
 {
+#if JBM_AVX512
+  return _mm_scalef_pd (_mm_set1_pd (1.), _mm_cvtepi64_pd (e));
+#else
   const __m128i v1023 = _mm_set1_epi64x (1023ll);
   __m128d x;
   // normal and subnormal
@@ -8400,11 +8411,12 @@ jbm_2xf64_exp2n (const __m128i e)       ///< exponent vector (__m128i).
   // zero
   x = _mm_blendv_pd
     (x, _mm_setzero_pd (),
-     _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64x (-1075ll), e)));
+     _mm_castsi128_pd (_mm_cmpgt_epi64 (_mm_set1_epi64x (-1074ll), e)));
   // infinity
   return
     _mm_blendv_pd (x, _mm_set1_pd (INFINITY),
                    _mm_castsi128_pd (_mm_cmpgt_epi64 (e, v1023)));
+#endif
 }
 
 /**

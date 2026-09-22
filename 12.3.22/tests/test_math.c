@@ -4273,7 +4273,7 @@ main (void)
 
 #endif
 
-#if __AVX512F__
+#if JBM_AVX512
 
   printf ("checking __m512 functions\n");
   n = test_uni_16xf32 (jbm_16xf32_abs, fabsf, -FLT_MAX, FLT_MAX);

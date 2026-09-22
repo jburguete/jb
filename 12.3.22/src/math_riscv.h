@@ -363,45 +363,43 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  vint32m1_t *e, ///< pointer to the extracted exponents vector.
                  const size_t vl)       ///< vector size.
 {
-  vfloat32m1_t yx, y2x, zx;
-  vuint32m1_t ai, yi, y2i, zi;
-  vint32m1_t en;
-  vbool32_t m1, m2, m3;
-  ai = __riscv_vreinterpret_v_f32m1_u32m1 (x);
-  yi = __riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_EXPONENT, vl);
-  m1 = __riscv_vmseq_vx_u32m1_b32 (yi, JBM_F32_BITS_EXPONENT, vl);
-  m2 = __riscv_vmseq_vx_u32m1_b32 (yi, 0, vl);
-  y2i = ai;
-  y2i = __riscv_vand_vx_u32m1 (y2i, JBM_F32_BITS_MANTISSA, vl);
-  m3 = __riscv_vmseq_vx_u32m1_b32 (y2i, 0, vl);
-  y2i = __riscv_vmv_v_x_u32m1 (0x00400000, vl);
-  y2x = __riscv_vreinterpret_v_u32m1_f32m1 (y2i);
-  zx = __riscv_vfdiv_vv_f32m1 (x, y2x, vl);
-  zi = __riscv_vreinterpret_v_f32m1_u32m1 (zx);
-  zi = __riscv_vand_vx_u32m1 (zi, JBM_F32_BITS_EXPONENT, vl);
-  en =
-    __riscv_vmerge_vvm_i32m1 (__riscv_vsub_vx_i32m1
-                              (__riscv_vsra_vx_i32m1
-                               (__riscv_vreinterpret_v_u32m1_i32m1 (zi), 23,
-                                vl), 253, vl),
-                              __riscv_vsub_vx_i32m1 (__riscv_vsra_vx_i32m1
-                                                     (__riscv_vreinterpret_v_u32m1_i32m1
-                                                      (yi), 23, vl), JBM_F32_BIAS, vl),
-                              m2, vl);
-  yx = __riscv_vreinterpret_v_u32m1_f32m1 (yi);
-  yx =
-    __riscv_vmerge_vvm_f32m1 (__riscv_vfmul_vv_f32m1 (y2x, zx, vl), yx, m2, vl);
-  en =
-    __riscv_vmerge_vvm_i32m1 (__riscv_vmv_v_x_i32m1 (0, vl), en,
-                              __riscv_vmor_mm_b32 (m1,
-                                                   __riscv_vmand_mm_b32 (m2, m3,
-                                                                         vl),
-                                                   vl), vl);
-  *e = en;
-  return __riscv_vmerge_vvm_f32m1 (x,
-                                   __riscv_vfmul_vf_f32m1
-                                   (__riscv_vfdiv_vv_f32m1 (x, yx, vl), 0.5f,
-                                    vl), m1, vl);
+  const vuint32m1_t ai = __riscv_vreinterpret_v_f32m1_u32m1 (x);
+  const vuint32m1_t yi = __riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_EXPONENT, vl);
+  const vbool32_t m_sub = __riscv_vmseq_vx_u32m1_b32 (yi, 0, vl);
+  const vbool32_t m_special
+    = __riscv_vmor_mm_b32
+      (__riscv_vmseq_vx_u32m1_b32 (yi, JBM_F32_BITS_EXPONENT, vl),
+       __riscv_vmand_mm_b32
+       (m_sub,
+        __riscv_vmseq_vx_u32m1_b32
+        (__riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_MANTISSA, vl), 0, vl), vl),
+       vl);
+  const vuint32m1_t zi
+    = __riscv_vreinterpret_v_f32m1_u32m1 (__riscv_vfmul_vf_f32m1 (x, 0x1p127f,
+                                                                  vl));
+  // Exponent
+  vint32m1_t en
+    = __riscv_vmerge_vvm_i32m1
+      (__riscv_vsub_vx_i32m1
+       (__riscv_vsra_vx_i32m1
+        (__riscv_vreinterpret_v_u32m1_i32m1 (yi), 23, vl), JBM_F32_BIAS, vl),
+       __riscv_vsub_vx_i32m1
+       (__riscv_vsra_vx_i32m1
+        (__riscv_vreinterpret_v_u32m1_i32m1
+         (__riscv_vand_vx_u32m1 (zi, JBM_F32_BITS_EXPONENT, vl)), 23, vl),
+        JBM_F32_BIAS + 127, vl), m_sub, vl);
+  *e =__riscv_vmerge_vvm_i32m1 (en, __riscv_vmv_v_x_i32m1 (0, vl), m_special,
+                                vl);
+  // Mantissa
+  return
+    __riscv_vmerge_vvm_f32m1
+    (__riscv_vreinterpret_v_u32m1_f32m1
+     (__riscv_vor_vx_u32m1
+      (__riscv_vor_vx_u32m1 (__riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_SIGN, vl),
+                             0x3F000000, vl),
+       __riscv_vand_vx_u32m1 (__riscv_vmerge_vvm_u32m1 (ai, zi, m_sub, vl),
+                              JBM_F32_BITS_MANTISSA, vl), vl)), x, m_special,
+     vl);
 }
 
 /**
@@ -425,7 +423,7 @@ jbm_nxf32_exp2n (vint32m1_t e,  ///< exponent vector (vint32m1_t).
         (__riscv_vmv_v_x_u32m1 (0x00400000, vl),
          __riscv_vreinterpret_v_i32m1_u32m1
          (__riscv_vrsub_vx_i32m1 (e, -127, vl)), vl),
-        __riscv_vmslt_vx_i32m1_b32 (e, -127, vl), vl), 0,
+        __riscv_vmslt_vx_i32m1_b32 (e, -126, vl), vl), 0,
        __riscv_vmslt_vx_i32m1_b32 (e, -150, vl), vl), JBM_F32_BITS_EXPONENT,
       __riscv_vmsgt_vx_i32m1_b32 (e, 127, vl), vl));
 }
@@ -11632,45 +11630,43 @@ jbm_nxf64_frexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  vint64m1_t *e, ///< pointer to the extracted exponents vector.
                  const size_t vl)       ///< vector size.
 {
-  vfloat64m1_t yx, y2x, zx;
-  vuint64m1_t ai, yi, y2i, zi;
-  vint64m1_t en;
-  vbool64_t m1, m2, m3;
-  ai = __riscv_vreinterpret_v_f64m1_u64m1 (x);
-  yi = __riscv_vand_vx_u64m1 (ai, 0x7ff0000000000000L, vl);
-  m1 = __riscv_vmseq_vx_u64m1_b64 (yi, 0x7ff0000000000000L, vl);
-  m2 = __riscv_vmseq_vx_u64m1_b64 (yi, 0L, vl);
-  y2i = ai;
-  y2i = __riscv_vand_vx_u64m1 (y2i, 0x000fffffffffffffL, vl);
-  m3 = __riscv_vmseq_vx_u64m1_b64 (y2i, 0L, vl);
-  y2i = __riscv_vmv_v_x_u64m1 (0x0010000000000000L, vl);
-  y2x = __riscv_vreinterpret_v_u64m1_f64m1 (y2i);
-  zx = __riscv_vfdiv_vv_f64m1 (x, y2x, vl);
-  zi = __riscv_vreinterpret_v_f64m1_u64m1 (zx);
-  zi = __riscv_vand_vx_u64m1 (zi, 0x7ff0000000000000L, vl);
-  en =
-    __riscv_vmerge_vvm_i64m1 (__riscv_vsub_vx_i64m1
-                              (__riscv_vsra_vx_i64m1
-                               (__riscv_vreinterpret_v_u64m1_i64m1 (zi), 52,
-                                vl), 2044L, vl),
-                              __riscv_vsub_vx_i64m1 (__riscv_vsra_vx_i64m1
-                                                     (__riscv_vreinterpret_v_u64m1_i64m1
-                                                      (yi), 52, vl), 1022L, vl),
-                              m2, vl);
-  yx = __riscv_vreinterpret_v_u64m1_f64m1 (yi);
-  yx =
-    __riscv_vmerge_vvm_f64m1 (__riscv_vfmul_vv_f64m1 (y2x, zx, vl), yx, m2, vl);
-  en =
-    __riscv_vmerge_vvm_i64m1 (__riscv_vmv_v_x_i64m1 (0L, vl), en,
-                              __riscv_vmor_mm_b64 (m1,
-                                                   __riscv_vmand_mm_b64 (m2, m3,
-                                                                         vl),
-                                                   vl), vl);
-  *e = en;
-  return __riscv_vmerge_vvm_f64m1 (x,
-                                   __riscv_vfmul_vf_f64m1
-                                   (__riscv_vfdiv_vv_f64m1 (x, yx, vl), 0.5,
-                                    vl), m1, vl);
+  const vuint64m1_t ai = __riscv_vreinterpret_v_f64m1_u64m1 (x);
+  const vuint64m1_t yi = __riscv_vand_vx_u64m1 (ai, JBM_F64_BITS_EXPONENT, vl);
+  const vbool64_t m_sub = __riscv_vmseq_vx_u64m1_b64 (yi, 0ull, vl);
+  const vbool64_t m_special
+    = __riscv_vmor_mm_b64
+      (__riscv_vmseq_vx_u64m1_b64 (yi, JBM_F64_BITS_EXPONENT, vl),
+       __riscv_vmand_mm_b64
+       (m_sub,
+        __riscv_vmseq_vx_u64m1_b64
+        (__riscv_vand_vx_u64m1 (ai, JBM_F64_BITS_MANTISSA, vl), 0ull, vl), vl),
+       vl);
+  const vuint64m1_t zi
+    = __riscv_vreinterpret_v_f64m1_u64m1 (__riscv_vfmul_vf_f64m1 (x, 0x1p1023,
+                                                                  vl));
+  // Exponent
+  vint64m1_t en
+    = __riscv_vmerge_vvm_i64m1
+      (__riscv_vsub_vx_i64m1
+       (__riscv_vsra_vx_i64m1
+        (__riscv_vreinterpret_v_u64m1_i64m1 (yi), 52ll, vl), JBM_F64_BIAS, vl),
+       __riscv_vsub_vx_i64m1
+       (__riscv_vsra_vx_i64m1
+        (__riscv_vreinterpret_v_u64m1_i64m1
+         (__riscv_vand_vx_u64m1 (zi, JBM_F64_BITS_EXPONENT, vl)), 52ll, vl),
+        (int64_t) (JBM_F64_BIAS + 1023ull), vl), m_sub, vl);
+  *e =__riscv_vmerge_vvm_i64m1 (en, __riscv_vmv_v_x_i64m1 (0ll, vl), m_special,
+                                vl);
+  // Mantissa
+  return
+    __riscv_vmerge_vvm_f64m1
+    (__riscv_vreinterpret_v_u64m1_f64m1
+     (__riscv_vor_vx_u64m1
+      (__riscv_vor_vx_u64m1 (__riscv_vand_vx_u64m1 (ai, JBM_F64_BITS_SIGN, vl),
+                             0x3FE0000000000000ull, vl),
+       __riscv_vand_vx_u64m1 (__riscv_vmerge_vvm_u64m1 (ai, zi, m_sub, vl),
+                              JBM_F64_BITS_MANTISSA, vl), vl)), x, m_special,
+     vl);
 }
 
 /**

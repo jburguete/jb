@@ -150,7 +150,7 @@ print_m256d (FILE *file, const char *label, __m256d x)
     fprintf (file, "%s[%u]=%.17lg\n", label, i, y[i]);
 }
 
-#ifndef __AVX512F__
+#if !JBM_AVX512
 
 static inline __m256d
 _mm256_cvtepi64_pd (__m256i x)
@@ -403,6 +403,9 @@ jbm_8xf32_frexp (const __m256 x,        ///< __m256 vector.
 static inline __m256
 jbm_8xf32_exp2n (__m256i e)     ///< exponent vector (__m256i).
 {
+#if JBM_AVX512
+  return _mm256_scalef_ps (_mm256_set1_ps (1.f), _mm256_cvtepi32_ps (e));
+#else
   const __m256i v127 = _mm256_set1_epi32 (127);
   __m256 x;
   x = _mm256_blendv_ps
@@ -414,11 +417,12 @@ jbm_8xf32_exp2n (__m256i e)     ///< exponent vector (__m256i).
      _mm256_castsi256_ps (_mm256_cmpgt_epi32 (e, _mm256_set1_epi32 (-127))));
   x = _mm256_blendv_ps
     (x, _mm256_setzero_ps (),
-     _mm256_castsi256_ps (_mm256_cmpgt_epi32 (_mm256_set1_epi32 (-150), e)));
+     _mm256_castsi256_ps (_mm256_cmpgt_epi32 (_mm256_set1_epi32 (-149), e)));
   return
     _mm256_blendv_ps
     (x, _mm256_set1_ps (INFINITY),
      _mm256_castsi256_ps (_mm256_cmpgt_epi32 (e, v127)));
+#endif
 }
 
 /**
@@ -8420,12 +8424,15 @@ jbm_4xf64_frexp (const __m256d x,       ///< __m256d vector.
 static inline __m256d
 jbm_4xf64_exp2n (const __m256i e)       ///< exponent vector (__m256i).
 {
+#if JBM_AVX512
+  return _mm256_scalef_pd (_mm256_set1_pd (1.), _mm256_cvtepi64_pd (e));
+#else
   const __m256i v1023 = _mm256_set1_epi64x (1023ll);
   __m256d x;
   // normal and subnormal
   x = _mm256_blendv_pd
     (_mm256_castsi256_pd
-     (_mm256_slli_epi64 (_mm256_add_epi64 (e, v1023), 52)),
+     (_mm256_slli_epi64 (_mm256_add_epi64 (e, v1023), 52ll)),
      _mm256_castsi256_pd
      (_mm256_sllv_epi64 (_mm256_set1_epi64x (1),
                          _mm256_add_epi64 (e, _mm256_set1_epi64x (1074ll)))),
@@ -8434,12 +8441,13 @@ jbm_4xf64_exp2n (const __m256i e)       ///< exponent vector (__m256i).
   // zero
   x = _mm256_blendv_pd
     (x, _mm256_setzero_pd (),
-     _mm256_castsi256_pd (_mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1075ll),
+     _mm256_castsi256_pd (_mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1074ll),
                                               e)));
   // infinity
   return
     _mm256_blendv_pd (x, _mm256_set1_pd (INFINITY),
                       _mm256_castsi256_pd (_mm256_cmpgt_epi64 (e, v1023)));
+#endif
 }
 
 /**
@@ -16197,7 +16205,7 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
   return _mm256_mul_pd (k, dx);
 }
 
-#ifndef __AVX512F__
+#if !JBM_AVX512
 
 ///> macro to automatize operations on one array.
 #define JBM_ARRAY_OP(xr, xd, n, type, load256, load128, store256, store128, \
