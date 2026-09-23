@@ -42134,32 +42134,6 @@ jbm_8xf32_tan (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [-1/2,1/2] (8x vfloat32m1_t).
- *
- * \return function value (8x vfloat32m1_t).
- */
-static inline vfloat32m1_t
-jbm_atanwc0_8xf32 (const vfloat32m1_t x)
-                   ///< vfloat32m1_t vector \f$\in\left[0,\frac12\right]\f$.
-{
-  return jbm_nxf32_atanwc0 (x, 8);
-}
-
-/**
- * Function to calculate the well conditionated function atan(x) for x in
- * [1/2,3/2] (8x vfloat32m1_t).
- *
- * \return function value (8x vfloat32m1_t).
- */
-static inline vfloat32m1_t
-jbm_8xf32_atanwc1 (const vfloat32m1_t x)
-                   ///< vfloat32m1_t vector \f$\in\left[\frac12,1\right]\f$.
-{
-  return jbm_nxf32_atanwc1 (x, 8);
-}
-
-/**
  * Function to calculate the function atan(x) using the jbm_atanwc0_8xf32 and
  * jbm_8xf32_atanwc1 functions (8x vfloat32m1_t).
  *
@@ -48755,32 +48729,6 @@ static inline vfloat64m1_t
 jbm_4xf64_tan (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_tan (x, 4);
-}
-
-/**
- * Function to calculate the well conditionated function atan(x) for x in
- * [-1/2,1/2] (4x vfloat64m1_t).
- *
- * \return function value (4x vfloat64m1_t).
- */
-static inline vfloat64m1_t
-jbm_atanwc0_4xf64 (const vfloat64m1_t x)
-                   ///< vfloat64m1_t vector \f$\in\left[0,\frac12\right]\f$.
-{
-  return jbm_nxf64_atanwc0 (x, 4);
-}
-
-/**
- * Function to calculate the well conditionated function atan(x) for x in
- * [1/2,3/2] (4x vfloat64m1_t).
- *
- * \return function value (4x vfloat64m1_t).
- */
-static inline vfloat64m1_t
-jbm_4xf64_atanwc1 (const vfloat64m1_t x)
-                   ///< vfloat64m1_t vector \f$\in\left[\frac12,1\right]\f$.
-{
-  return jbm_nxf64_atanwc1 (x, 4);
 }
 
 /**
