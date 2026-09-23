@@ -682,7 +682,7 @@ static inline __m512
 jbm_16xf32_ldexp (const __m512 x,       ///< __m512 vector.
                   __m512i e)    ///< exponent vector (__m512i).
 {
-  return _mm512_mul_ps (x, jbm_16xf32_exp2n (e));
+  return _mm512_scalef_ps (x, _mm512_cvtepi32_ps (e));
 }
 
 /**
@@ -7389,22 +7389,24 @@ jbm_16xf32_cbrtwc (const __m512 x)
 static inline __m512
 jbm_16xf32_cbrt (const __m512 x)        ///< __m512 vector.
 {
-  __m512 xa, f;
+  const __m512 xa = jbm_16xf32_abs (x);
+  __m512 f, s;
   __m512i e, q, r;
-  xa = jbm_16xf32_abs (x);
   f = jbm_16xf32_frexp (xa, &e);
   q = _mm512_cvtps_epi32
     (_mm512_floor_ps (_mm512_mul_ps (_mm512_cvtepi32_ps (e),
                                      _mm512_set1_ps (1.f / 3.f))));
   r = _mm512_sub_epi32 (e, _mm512_add_epi32 (q, _mm512_add_epi32 (q, q)));
-  f = jbm_16xf32_ldexp (jbm_16xf32_cbrtwc (f), q);
-  f = _mm512_mask_mul_ps (f,
-                          _mm512_cmpeq_epi32_mask (r, _mm512_set1_epi32 (1)),
-                          f, JBM_16xF32_CBRT2);
-  f = _mm512_mask_mul_ps (f,
-                          _mm512_cmpeq_epi32_mask (r, _mm512_set1_epi32 (2)),
-                          f, JBM_16xF32_CBRT4);
-  return jbm_16xf32_copysign (f, x);
+  s = _mm512_mask_blend_ps (_mm512_cmpeq_epi32_mask (r, _mm512_set1_epi32 (1)),
+                            _mm512_set1_ps (1.f), JBM_16xF32_CBRT2);
+  s = _mm512_mask_blend_ps (_mm512_cmpeq_epi32_mask (r, _mm512_set1_epi32 (2)),
+                            s, JBM_16xF32_CBRT4);
+  f = jbm_16xf32_ldexp (_mm512_mul_ps (jbm_16xf32_cbrtwc (f), s), q);
+  return
+    _mm512_mask_mov_ps (jbm_16xf32_copysign (f, x), 
+                        _mm512_cmpeq_ps_mask (xa, _mm512_set1_ps (INFINITY))
+			| _mm512_cmpeq_ps_mask (xa, _mm512_setzero_ps ())
+			| ~_mm512_cmp_ps_mask (xa, xa, _CMP_ORD_Q), x);
 }
 
 /**
@@ -7429,11 +7431,9 @@ jbm_16xf32_exp2wc (const __m512 x)
 static inline __m512
 jbm_16xf32_exp2 (const __m512 x)        ///< __m512 vector.
 {
-  __m512 y, f;
-  y = _mm512_floor_ps (x);
-  f = _mm512_sub_ps (x, y);
-  y = jbm_16xf32_exp2n (_mm512_cvtps_epi32 (y));
-  return _mm512_mul_ps (y, jbm_16xf32_exp2wc (f));
+  const __m512 y = _mm512_floor_ps (x);
+  const __m512 f = _mm512_sub_ps (x, y);
+  return _mm512_scalef_ps (jbm_16xf32_exp2wc (f), y);
 }
 
 /**
@@ -7534,6 +7534,9 @@ jbm_16xf32_log2 (const __m512 x)        ///< __m512 vector.
                      _mm512_cvtepi32_ps (e));
   y = _mm512_mask_mov_ps (y, _mm512_cmpeq_ps_mask (x, z),
                           _mm512_set1_ps (-INFINITY));
+  y = _mm512_mask_mov_ps (y,
+                          _mm512_cmpeq_ps_mask (x, _mm512_set1_ps (INFINITY)),
+                          x);
   y = _mm512_mask_mov_ps (y, _mm512_cmplt_ps_mask (x, z), _mm512_set1_ps (NAN));
   return
     _mm512_mask_mov_ps (y, _mm512_cmp_ps_mask (x, x, _CMP_ORD_Q) ^ 0xffff, x);
@@ -7664,8 +7667,8 @@ jbm_16xf32_trig (const __m512 x,        ///< __m512 vector.
                  __m512i *q)    ///< quadrant (__m512i).
 {
   __m512 y;
-  y = _mm512_roundscale_ps (_mm512_mul_ps (x, _mm512_set1_ps (1.f / M_PI_2f)),
-                            _MM_FROUND_TO_NEAREST_INT);
+  y = _mm512_roundscale_ps (_mm512_mul_ps (x, _mm512_set1_ps (M_2_PIf)),
+                            _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
   *q = _mm512_cvtps_epi32 (y);
   return _mm512_fnmadd_ps (y, _mm512_set1_ps (M_PI_2f), x);
 }
@@ -8679,7 +8682,7 @@ static inline __m512d
 jbm_8xf64_ldexp (const __m512d x,       ///< __m512d vector.
                  __m512i e)     ///< exponent vector (__m512i).
 {
-  return _mm512_mul_pd (x, jbm_8xf64_exp2n (e));
+  return _mm512_scalef_pd (x, _mm512_cvtepi64_pd (e));
 }
 
 /**
@@ -15332,22 +15335,24 @@ jbm_8xf64_cbrtwc (const __m512d x)
 static inline __m512d
 jbm_8xf64_cbrt (const __m512d x)        ///< __m512d vector.
 {
-  __m512d xa, f;
+  const __m512d xa = jbm_8xf64_abs (x);
+  __m512d f, s;
   __m512i e, q, r;
-  xa = jbm_8xf64_abs (x);
   f = jbm_8xf64_frexp (xa, &e);
   q = _mm512_cvtpd_epi64
     (_mm512_floor_pd (_mm512_mul_pd (_mm512_cvtepi64_pd (e),
                                      _mm512_set1_pd (1. / 3.))));
   r = _mm512_sub_epi64 (e, _mm512_add_epi64 (q, _mm512_add_epi64 (q, q)));
-  f = jbm_8xf64_ldexp (jbm_8xf64_cbrtwc (f), q);
-  f = _mm512_mask_mul_pd (f,
-                          _mm512_cmpeq_epi64_mask (r, _mm512_set1_epi64 (1)),
-                          f, JBM_8xF64_CBRT2);
-  f = _mm512_mask_mul_pd (f,
-                          _mm512_cmpeq_epi64_mask (r, _mm512_set1_epi64 (2)),
-                          f, JBM_8xF64_CBRT4);
-  return jbm_8xf64_copysign (f, x);
+  s = _mm512_mask_blend_pd (_mm512_cmpeq_epi64_mask (r, _mm512_set1_epi64 (1)),
+                            _mm512_set1_pd (1.), JBM_8xF64_CBRT2);
+  s = _mm512_mask_blend_pd (_mm512_cmpeq_epi64_mask (r, _mm512_set1_epi64 (2)),
+                            s, JBM_8xF64_CBRT4);
+  f = jbm_8xf64_ldexp (_mm512_mul_pd (jbm_8xf64_cbrtwc (f), s), q);
+  return
+    _mm512_mask_mov_pd (jbm_8xf64_copysign (f, x), 
+                        _mm512_cmpeq_pd_mask (xa, _mm512_set1_pd (INFINITY))
+			| _mm512_cmpeq_pd_mask (xa, _mm512_setzero_pd ())
+			| ~_mm512_cmp_pd_mask (xa, xa, _CMP_ORD_Q), x);
 }
 
 /**
@@ -15385,11 +15390,9 @@ jbm_8xf64_exp2wc (const __m512d x)
 static inline __m512d
 jbm_8xf64_exp2 (const __m512d x)        ///< __m512d vector.
 {
-  __m512d y, f;
-  y = _mm512_floor_pd (x);
-  f = _mm512_sub_pd (x, y);
-  return _mm512_mul_pd (jbm_8xf64_exp2n (_mm512_cvtpd_epi64 (y)),
-                        jbm_8xf64_exp2wc (f));
+  const __m512d y = _mm512_floor_pd (x);
+  const __m512d f = _mm512_sub_pd (x, y);
+  return _mm512_scalef_pd (jbm_8xf64_exp2wc (f), y);
 }
 
 /**
@@ -15467,6 +15470,9 @@ jbm_8xf64_log2 (const __m512d x)        ///< __m512d vector.
                      _mm512_cvtepi64_pd (e));
   y = _mm512_mask_mov_pd (y, _mm512_cmpeq_pd_mask (x, z),
                           _mm512_set1_pd (-INFINITY));
+  y = _mm512_mask_mov_pd (y,
+                          _mm512_cmpeq_pd_mask (x, _mm512_set1_pd (INFINITY)),
+                          x);
   y = _mm512_mask_mov_pd (y, _mm512_cmplt_pd_mask (x, z), _mm512_set1_pd (NAN));
   return
     _mm512_mask_mov_pd (y, ~_mm512_cmp_pd_mask (x, x, _CMP_ORD_Q), x);
@@ -15598,8 +15604,8 @@ jbm_8xf64_trig (const __m512d x,        ///< __m512d vector.
                 __m512i *q)     ///< quadrant (__m512i).
 {
   __m512d y;
-  y = _mm512_roundscale_pd (_mm512_mul_pd (x, _mm512_set1_pd (1. / M_PI_2)),
-                            _MM_FROUND_TO_NEAREST_INT);
+  y = _mm512_roundscale_pd (_mm512_mul_pd (x, _mm512_set1_pd (M_2_PI)),
+                            _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
   *q = _mm512_cvtpd_epi64 (y);
   return _mm512_fnmadd_pd (y, _mm512_set1_pd (M_PI_2), x);
 }

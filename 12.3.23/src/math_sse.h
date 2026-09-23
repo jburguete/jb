@@ -220,10 +220,6 @@ _mm_sllv_epi64 (const __m128i x, const __m128i y)
   return _mm_load_si128 ((__m128i *) ix);
 }
 
-#endif
-
-#if !JBM_AVX512
-
 static inline __m128d
 _mm_cvtepi64_pd (const __m128i x)
 {
@@ -505,7 +501,11 @@ static inline __m128
 jbm_4xf32_ldexp (const __m128 x,        ///< __m128 vector.
                  const __m128i e)       ///< exponent vector (__m128i).
 {
+#if JBM_AVX512
+  return _mm_scalef_ps (x, _mm_cvtepi32_ps (e));
+#else
   return _mm_mul_ps (x, jbm_4xf32_exp2n (e));
+#endif
 }
 
 /**
@@ -7119,8 +7119,7 @@ jbm_4xf32_cbrtwc (const __m128 x)
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_cbrtwc_4xdbl
- * function (__m128).
+ * Function to calculate the function cbrt(x) function (__m128).
  *
  * \return function value (__m128).
  */
@@ -7181,11 +7180,17 @@ jbm_4xf32_exp2wc (const __m128 x)
 static inline __m128
 jbm_4xf32_exp2 (const __m128 x) ///< __m128 vector.
 {
+#if JBM_AVX512
+  const __m128 y = _mm_floor_ps (x);
+  const __m128 f = _mm_sub_ps (x, y);
+  return _mm_scalef_ps (jbm_4xf32_exp2wc (f), y);
+#else
   __m128 y, f;
   y = _mm_floor_ps (x);
   f = _mm_sub_ps (x, y);
   y = jbm_4xf32_exp2n (_mm_cvtps_epi32 (y));
   return _mm_mul_ps (y, jbm_4xf32_exp2wc (f));
+#endif
 }
 
 /**
@@ -7410,7 +7415,7 @@ jbm_4xf32_trig (const __m128 x, ///< __m128 vector.
                 __m128i *q)     ///< quadrant (__m128i).
 {
   __m128 y;
-  y = _mm_round_ps (_mm_mul_ps (x, _mm_set1_ps (1.f / M_PI_2f)),
+  y = _mm_round_ps (_mm_mul_ps (x, _mm_set1_ps (M_2_PIf)),
                     _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
   *q = _mm_cvtps_epi32 (y);
   return _mm_fnmadd_ps (y, _mm_set1_ps (M_PI_2f), x);
@@ -8428,7 +8433,11 @@ static inline __m128d
 jbm_2xf64_ldexp (const __m128d x,       ///< __m128d vector.
                  const __m128i e)       ///< exponent vector (__m128i).
 {
+#if JBM_AVX512
+  return _mm_scalef_pd (x, _mm_cvtepi64_pd (e));
+#else
   return _mm_mul_pd (x, jbm_2xf64_exp2n (e));
+#endif
 }
 
 /**
@@ -15121,16 +15130,18 @@ jbm_2xf64_exp2wc (const __m128d x)
 static inline __m128d
 jbm_2xf64_exp2 (const __m128d x)        ///< __m128d vector.
 {
+#if JBM_AVX512
+  const __m128d y = _mm_floor_pd (x);
+  const __m128d f = _mm_sub_pd (x, y);
+  return _mm_scalef_pd (jbm_2xf64_exp2wc (f), y);
+#else
   __m128d y, f;
   __m128i i;
   y = _mm_floor_pd (x);
   f = _mm_sub_pd (x, y);
-#if JBM_AVX512
-  i = _mm_cvttpd_epi64 (y);
-#else
   i = _mm_cvtepi32_epi64 (_mm_cvttpd_epi32 (y));
-#endif
   return _mm_mul_pd (jbm_2xf64_exp2n (i), jbm_2xf64_exp2wc (f));
+#endif
 }
 
 /**
@@ -15334,7 +15345,7 @@ jbm_2xf64_trig (const __m128d x,        ///< __m128d vector.
                 __m128i *q)     ///< quadrant (__m128i).
 {
   __m128d y;
-  y = _mm_round_pd (_mm_mul_pd (x, _mm_set1_pd (1. / M_PI_2)),
+  y = _mm_round_pd (_mm_mul_pd (x, _mm_set1_pd (M_2_PI)),
                     _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
   *q = _mm_cvtpd_epi64 (y);
   return _mm_fnmadd_pd (y, _mm_set1_pd (M_PI_2), x);

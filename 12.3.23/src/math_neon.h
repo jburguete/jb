@@ -307,10 +307,8 @@ jbm_4xf32_frexp (const float32x4_t x,   ///< float32x4_t vector.
   // y=abs(x)
   y.x = jbm_4xf32_abs (x);
   // mask
-  is_finite
-    = vmvnq_u32
-      (vorrq_u32 (vceqq_u32 (y.i, zi),
-                  vcgtq_u32 (y.i, vdupq_n_u32 (JBM_F32_BITS_EXPONENT - 1))));
+  is_finite = vcltq_u32 (vsubq_u32 (y.i, vdupq_n_u32 (1)),
+                         vdupq_n_u32 (JBM_F32_BITS_EXPONENT - 1));
   // extract exponent
   exp = vshrq_n_u32 (y.i, 23);
   // subnormals
@@ -345,7 +343,6 @@ jbm_4xf32_exp2n (int32x4_t e)   ///< exponent vector (int32x4_t).
                  vreinterpretq_f32_s32 (vshlq_n_s32 (vaddq_s32 (e, v127), 23)),
                  vreinterpretq_f32_s32 (vshlq_s32 (vdupq_n_s32 (1),
                                                    vaddq_s32 (v149, e))));
-  x = vbslq_f32 (vcltq_s32 (e, vdupq_n_s32 (-150)), vdupq_n_f32 (0.f), x);
   return vbslq_f32 (vcgtq_s32 (e, v127), vdupq_n_f32 (INFINITY), x);
 }
 
@@ -7101,8 +7098,8 @@ jbm_4xf32_log2 (const float32x4_t x)    ///< float32x4_t vector.
   y = vaddq_f32 (jbm_4xf32_log2wc (vsubq_f32 (y, vdupq_n_f32 (1.f))),
                  vcvtq_f32_s32 (e));
   y = vbslq_f32 (vceqq_f32 (x, z), vdupq_n_f32 (-INFINITY), y);
+  y = vbslq_f32 (vceqq_f32 (x, vdupq_n_f32 (INFINITY)), x, y);
   y = vbslq_f32 (vcltq_f32 (x, z), vdupq_n_f32 (NAN), y);
-  y = vbslq_f32 (vceqq_f32 (x, vdupq_n_f32 (-INFINITY)), x, y);
   return vbslq_f32 (vceqq_f32 (x, x), y, x);
 }
 
@@ -7230,7 +7227,7 @@ jbm_4xf32_trig (const float32x4_t x,    ///< float32x4_t vector.
                 int32x4_t *q)   ///< quadrant (float32x4_ti).
 {
   float32x4_t y;
-  y = vrndnq_f32 (vmulq_n_f32 (x, 1.f / M_PI_2f));
+  y = vrndnq_f32 (vmulq_n_f32 (x, M_2_PIf));
   *q = vcvtq_s32_f32 (y);
   return vfmsq_f32 (x, y, vdupq_n_f32 (M_PI_2f));
 }
@@ -8114,10 +8111,8 @@ jbm_2xf64_frexp (const float64x2_t x,   ///< float64x2_t vector.
   // y=abs(x)
   y.x = jbm_2xf64_abs (x);
   // mask
-  is_finite
-    = ~(vorrq_u64 (vceqq_u64 (y.i, zi),
-                   vcgtq_u64 (y.i,
-                              vdupq_n_u64 (JBM_F64_BITS_EXPONENT - 1ull))));
+  is_finite = vcltq_u64 (vsubq_u64 (y.i, vdupq_n_u64 (1ull)),
+                         vdupq_n_u64 (JBM_F64_BITS_EXPONENT - 1ull));
   // extract exponent
   exp = vshrq_n_u64 (y.i, 52);
   // subnormals
@@ -8149,10 +8144,9 @@ jbm_2xf64_exp2n (int64x2_t e)   ///< exponent vector (int64x2_t).
   const int64x2_t v1074 = vdupq_n_s64 (1074ll);
   float64x2_t x;
   x = vbslq_f64 (vcgtq_s64 (e, vdupq_n_s64 (-1022ll)),
-                 vreinterpretq_f64_s64 (vshlq_n_s64 (vaddq_s64 (e, v1023), 52)),
+                 vreinterpretq_f64_s64 (vshlq_n_s64 (vaddq_s64 (e, v1023), 52ll)),
                  vreinterpretq_f64_s64 (vshlq_s64 (vdupq_n_s64 (1ll),
                                                    vaddq_s64 (v1074, e))));
-  x = vbslq_f64 (vcltq_s64 (e, vdupq_n_s64 (-1075ll)), vdupq_n_f64 (0.), x);
   return vbslq_f64 (vcgtq_s64 (e, v1023), vdupq_n_f64 (INFINITY), x);
 }
 
@@ -14900,8 +14894,8 @@ jbm_2xf64_log2 (const float64x2_t x)    ///< float64x2_t vector.
   y = vaddq_f64 (jbm_2xf64_log2wc (vsubq_f64 (y, vdupq_n_f64 (1.))),
                  vcvtq_f64_s64 (e));
   y = vbslq_f64 (vceqq_f64 (x, z), vdupq_n_f64 (-INFINITY), y);
+  y = vbslq_f64 (vceqq_f64 (x, vdupq_n_f64 (INFINITY)), x, y);
   y = vbslq_f64 (vcltq_f64 (x, z), vdupq_n_f64 (NAN), y);
-  y = vbslq_f64 (vceqq_f64 (x, vdupq_n_f64 (-INFINITY)), x, y);
   return vbslq_f64 (vceqq_f64 (x, x), y, x);
 }
 
@@ -15029,7 +15023,7 @@ jbm_2xf64_trig (const float64x2_t x,    ///< float64x2_t vector.
                 int64x2_t *q)   ///< quadrant (float64x2_ti).
 {
   float64x2_t y;
-  y = vrndnq_f64 (vmulq_n_f64 (x, 1. / M_PI_2));
+  y = vrndnq_f64 (vmulq_n_f64 (x, M_2_PI));
   *q = vcvtq_s64_f64 (y);
   return vfmsq_f64 (x, y, vdupq_n_f64 (M_PI_2));
 }

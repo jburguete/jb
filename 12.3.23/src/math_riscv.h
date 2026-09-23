@@ -297,11 +297,7 @@ static inline vint32m1_t
 jbm_nxf32_trunc (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  vint32m1_t i;
-  jbm_riscv_set_frm (0x1);
-  i = __riscv_vfcvt_x_f_v_i32m1 (x, vl);
-  jbm_riscv_set_frm (0x0);
-  return i;
+  return __riscv_vfcvt_rtz_x_f_v_i32m1 (x, vl);
 }
 
 /**
@@ -313,11 +309,7 @@ static inline vint32m1_t
 jbm_nxf32_floor (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  vint32m1_t i;
-  jbm_riscv_set_frm (0x2);
-  i = __riscv_vfcvt_x_f_v_i32m1 (x, vl);
-  jbm_riscv_set_frm (0x0);
-  return i;
+  return __riscv_vfcvt_rdn_x_f_v_i32m1 (x, vl);
 }
 
 /**
@@ -329,11 +321,7 @@ static inline vint32m1_t
 jbm_nxf32_ceil (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                 const size_t vl)        ///< vector size.
 {
-  vint32m1_t i;
-  jbm_riscv_set_frm (0x3);
-  i = __riscv_vfcvt_x_f_v_i32m1 (x, vl);
-  jbm_riscv_set_frm (0x0);
-  return i;
+  return __riscv_vfcvt_rup_x_f_v_i32m1 (x, vl);
 }
 
 /**
@@ -10241,6 +10229,57 @@ jbm_nxf32_rational_29_28 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 }
 
 /**
+ * Function to calculate the well conditionated function cbrt(x) for x
+ * \f$\in\left[\frac12\;,1\right]\f$ (vfloat32m1_t).
+ *
+ * \return function value (vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_cbrtwc (const vfloat32m1_t x)
+                   ///< vfloat32m1_t vector \f$\in\left[\frac12,\;1\right]\f$.
+{
+  return jbm_16xf32_rational_5_3 (x, K_CBRTWC_F32);
+}
+
+/**
+ * Function to calculate the function cbrt(x) using the jbm_nxf32_abs and
+ * jbm_nxf32_pow functions (vfloat32m1_t).
+ *
+ * \return function value (vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_nxf32_cbrt (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
+                const size_t vl)        ///< vector size.
+{
+  const vfloat32m1_t xa = __riscv_vfabs_v_f32m1 (x, vl);
+  vfloat32m1_t f, s, ef;
+  vint32m1_t e, q, r;
+  vbool32_t m1, m2, m3;
+  f = jbm_nxf32_frexp (xa, &e, vl);
+  ef = __riscv_vfcvt_f_x_v_f32m1 (e, vl);
+  ef = __riscv_vfmul_vf_f32m1 (ef, 1.f / 3.f, vl);
+  q = jbm_nxf32_floor (ef, vl);
+  r = __riscv_vsub_vv_i32m1
+      (e, 
+       __riscv_vadd_vv_i32m1 (q, __riscv_vadd_vv_i32m1 (q, q, vl), vl), vl);
+  s = __riscv_vfmv_v_f_f32m1 (1.f, vl);
+  s = __riscv_vfmerge_vfm_f32m1 (s, JBM_F32_CBRT2,
+                                 __riscv_vmseq_vx_i32m1_b32 (r, 1, vl), vl);
+  s = __riscv_vfmerge_vfm_f32m1 (s, JBM_F32_CBRT4,
+                                 __riscv_vmseq_vx_i32m1_b32 (r, 2, vl), vl);
+  f = __riscv_vfmul_vv_f32m1 (jbm_nxf32_cbrtwc (f, vl), s, vl);
+  f = jbm_nxf32_ldexp (f, q, vl);
+  f = jbm_nxf32_copysign (f, x, vl);
+  m1 = __riscv_vmfeq_vf_f32m1_b32 (xa, 0.f, vl);
+  m2 = __riscv_vmfeq_vf_f32m1_b32 (xa, INFINITY, vl);
+  m3 = __riscv_vmfne_vv_f32m1_b32 (xa, xa, vl);
+  return
+    __riscv_vfmerge_vvm_f32m1
+    (f, x,
+     __riscv_vmor_mm_b32 (m1, __riscv_vmor_mm_b32 (m2, m3, vl), vl), vl);
+}
+
+/**
  * Function to calculate the well conditionated function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (vfloat32m1_t).
  *
@@ -10365,18 +10404,26 @@ static inline vfloat32m1_t
 jbm_nxf32_log2 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                 const size_t vl)        ///< array size.
 {
-  vfloat32m1_t y;
-  vint32m1_t e;
+  vfloat32m1_t y, y2;
+  vint32m1_t e, e2;
+  vbool32_t m;
   y = jbm_nxf32_frexp (x, &e, vl);
-  y =
-    __riscv_vfadd_vv_f32m1 (jbm_nxf32_log2wc (y, vl),
-                            __riscv_vfcvt_f_x_v_f32m1 (e, vl), vl);
-  y =
-    __riscv_vfmerge_vfm_f32m1 (y, -INFINITY,
-                               __riscv_vmfgt_vf_f32m1_b32 (x, 0.f, vl), vl);
-  return __riscv_vfmerge_vfm_f32m1 (y, NAN,
-                                    __riscv_vmfge_vf_f32m1_b32 (x, 0.f, vl),
-                                    vl);
+  m = __riscv_vmflt_vf_f32m1_b32 (y, M_SQRT1_2f, vl);
+  y2 = __riscv_vfadd_vv_f32m1 (y, y, vl);
+  y = __riscv_vfmerge_vvm_f32m1 (y, y2, m, vl);
+  e2 = __riscv_vsub_vx_i32m1 (e, 1, vl);
+  e = __riscv_vmerge_vvm_i32m1 (e, e2, m, vl);
+  y = __riscv_vfadd_vv_f32m1 (jbm_nxf32_log2wc (y, vl),
+                              __riscv_vfcvt_f_x_v_f32m1 (e, vl), vl);
+  y = __riscv_vfmerge_vfm_f32m1 (y, -INFINITY,
+                                 __riscv_vmfeq_vf_f32m1_b32 (x, 0.f, vl), vl);
+  y = __riscv_vfmerge_vfm_f32m1 (y, INFINITY,
+                                 __riscv_vmfeq_vf_f32m1_b32 (x, INFINITY, vl),
+                                 vl);
+  y = __riscv_vfmerge_vfm_f32m1 (y, NAN,
+                                 __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl), vl);
+  return __riscv_vfmerge_vvm_f32m1 (y, x,
+                                    __riscv_vmfne_vv_f32m1_b32 (x, x, vl), vl);
 }
 
 /**
@@ -10439,29 +10486,8 @@ jbm_nxf32_pow (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
                const float e,   ///< exponent (float).
                const size_t vl) ///< array size.
 {
-  float f;
-  f = floorf (e);
-  if (f == e)
-    return jbm_nxf32_pown (x, (int) e, vl);
   return jbm_nxf32_exp2 (__riscv_vfmul_vf_f32m1 (jbm_nxf32_log2 (x, vl), e, vl),
                          vl);
-}
-
-/**
- * Function to calculate the function cbrt(x) using the jbm_nxf32_abs and
- * jbm_nxf32_pow functions (vfloat32m1_t).
- *
- * \return function value (vfloat32m1_t).
- */
-static inline vfloat32m1_t
-jbm_nxf32_cbrt (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
-                const size_t vl)        ///< array size.
-{
-  vfloat32m1_t f;
-  f = jbm_nxf32_abs (x, vl);
-  f = jbm_nxf32_pow (x, 1.f / 3.f, vl);
-  return __riscv_vmerge_vvm_f32m1 (f, jbm_nxf32_opposite (f, vl),
-                                   __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl), vl);
 }
 
 /**
@@ -10517,6 +10543,24 @@ jbm_nxf32_sincoswc (const vfloat32m1_t x,
 }
 
 /**
+ * Function to calculate reduction to \f$2\,\pi\f$ in trigonometric functions
+ * (vfloat32m1_t).
+ *
+ * \return reduced vector (vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_nxf32_trig (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
+                vint32m1_t *q,          ///< pointer to the quadrant (vint32m1_t).
+                const size_t vl)        ///< vector size.
+{
+  vfloat32m1_t t, y;
+  t = __riscv_vfmul_vf_f32m1 (x, M_2_PIf, vl);
+  *q = jbm_nxf32_round (t, vl);
+  y = __riscv_vfcvt_f_x_v_f32m1 (*q, vl);
+  return __riscv_vfnmacc_vf_f32m1 (x, M_PI_2f, y, vl);
+}
+
+/**
  * Function to calculate the function sin(x) from jbm_nxf32_sinwc and
  * jbm_nxf32_coswc approximations (vfloat32m1_t).
  *
@@ -10526,29 +10570,16 @@ static inline vfloat32m1_t
 jbm_nxf32_sin (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
                const size_t vl) ///< array size.
 {
-  vfloat32m1_t y, s, pi2;
-  pi2 = __riscv_vfmv_v_f_f32m1 (2.f * M_PIf, vl);
-  y = jbm_nxf32_mod (x, pi2, vl);
-  s = jbm_nxf32_sinwc (__riscv_vfsub_vv_f32m1 (y, pi2, vl), vl);
-  s = __riscv_vmerge_vvm_f32m1
-    (s, jbm_nxf32_opposite
-     (jbm_nxf32_coswc
-      (__riscv_vfsub_vv_f32m1
-       (__riscv_vfmv_v_f_f32m1 (3.f * M_PI_2f, vl), y, vl), vl), vl),
-     __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl), vl);
-  s = __riscv_vmerge_vvm_f32m1
-    (s, jbm_nxf32_sinwc
-     (__riscv_vfsub_vv_f32m1
-      (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), vl),
-     __riscv_vmflt_vf_f32m1_b32 (y, 5.f * M_PI_4f, vl), vl);
-  s = __riscv_vmerge_vvm_f32m1
-    (s, jbm_nxf32_coswc
-     (__riscv_vfsub_vv_f32m1
-      (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl), vl),
-     __riscv_vmflt_vf_f32m1_b32 (y, 3.f * M_PI_4f, vl), vl);
-  return __riscv_vmerge_vvm_f32m1
-    (s, jbm_nxf32_sinwc (y, vl), __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl),
-     vl);
+  vfloat32m1_t y, s, c, ns;
+  vint32m1_t q;
+  vbool32_t m1, m2;
+  y = jbm_nxf32_trig (x, &q, vl);
+  jbm_nxf32_sincoswc (y, &s, &c, vl);
+  m1 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 1, vl), 0, vl);
+  y = __riscv_vfmerge_vvm_f32m1 (s, c, m1, vl);
+  m2 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 2, vl), 0, vl);
+  ns = jbm_nxf32_opposite (y, vl);
+  return __riscv_vfmerge_vvm_f32m1 (y, ns, m2, vl);
 }
 
 /**
@@ -10561,28 +10592,17 @@ static inline vfloat32m1_t
 jbm_nxf32_cos (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
                const size_t vl) ///< array size.
 {
-  vfloat32m1_t y, c, pi2;
-  pi2 = __riscv_vfmv_v_f_f32m1 (2.f * M_PIf, vl);
-  y = jbm_nxf32_mod (x, pi2, vl);
-  c = jbm_nxf32_coswc (__riscv_vfsub_vv_f32m1 (y, pi2, vl), vl);
-  c = __riscv_vmerge_vvm_f32m1
-    (c, jbm_nxf32_sinwc
-     (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl), vl),
-     __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl), vl);
-  c = __riscv_vmerge_vvm_f32m1
-    (c, jbm_nxf32_opposite
-     (jbm_nxf32_coswc
-      (__riscv_vfsub_vv_f32m1
-       (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), vl), vl),
-     __riscv_vmflt_vf_f32m1_b32 (y, 5.f * M_PI_4f, vl), vl);
-  c = __riscv_vmerge_vvm_f32m1
-    (c, jbm_nxf32_sinwc
-     (__riscv_vfsub_vv_f32m1
-      (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl), vl),
-     __riscv_vmflt_vf_f32m1_b32 (y, 3.f * M_PI_4f, vl), vl);
-  return
-    __riscv_vmerge_vvm_f32m1 (c, jbm_nxf32_coswc (y, vl),
-                              __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl), vl);
+  vfloat32m1_t y, s, c, ns;
+  vint32m1_t q, q1;
+  vbool32_t m1, m2;
+  y = jbm_nxf32_trig (x, &q, vl);
+  jbm_nxf32_sincoswc (y, &s, &c, vl);
+  m1 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 1, vl), 0, vl);
+  y  = __riscv_vfmerge_vvm_f32m1 (c, s, m1, vl);
+  q1 = __riscv_vadd_vx_i32m1 (q, 1, vl);
+  m2 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q1, 2, vl), 0, vl);
+  ns = jbm_nxf32_opposite (y, vl);
+  return __riscv_vfmerge_vvm_f32m1 (y, ns, m2, vl);
 }
 
 /**
@@ -10598,32 +10618,21 @@ jbm_nxf32_sincos (const vfloat32m1_t x,
                   ///< pointer to the cos function value (vfloat32m1_t).
                   const size_t vl)      ///< array size.
 {
-  vfloat32m1_t y, pi2, s1, c1, s2, c2;
-  vbool32_t m;
-  pi2 = __riscv_vfmv_v_f_f32m1 (2.f * M_PIf, vl);
-  y = jbm_nxf32_mod (x, pi2, vl);
-  jbm_nxf32_sincoswc (__riscv_vfsub_vv_f32m1 (y, pi2, vl), &s1, &c1, vl);
-  jbm_nxf32_sincoswc (__riscv_vfsub_vf_f32m1 (y, 3.f * M_PI_2f, vl), &c2, &s2,
-                      vl);
-  m = __riscv_vmflt_vf_f32m1_b32 (y, 7.f * M_PI_4f, vl);
-  s1 = __riscv_vmerge_vvm_f32m1 (s1, jbm_nxf32_opposite (s2, vl), m, vl);
-  c1 = __riscv_vmerge_vvm_f32m1 (c1, c2, m, vl);
-  jbm_nxf32_sincoswc (__riscv_vfsub_vv_f32m1
-                      (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), &s2, &c2,
-                      vl);
-  m = __riscv_vmflt_vf_f32m1_b32 (y, 5.f * M_PI_4f, vl);
-  s1 = __riscv_vmerge_vvm_f32m1 (s1, s2, m, vl);
-  c1 = __riscv_vmerge_vvm_f32m1 (c1, jbm_nxf32_opposite (c2, vl), m, vl);
-  jbm_nxf32_sincoswc (__riscv_vfsub_vv_f32m1
-                      (__riscv_vfmv_v_f_f32m1 (M_PI_2f, vl), y, vl), &c2, &s2,
-                      vl);
-  m = __riscv_vmflt_vf_f32m1_b32 (y, 3.f * M_PI_4f, vl);
-  s1 = __riscv_vmerge_vvm_f32m1 (s1, s2, m, vl);
-  c1 = __riscv_vmerge_vvm_f32m1 (c1, c2, m, vl);
-  jbm_nxf32_sincoswc (y, &s2, &c2, vl);
-  m = __riscv_vmflt_vf_f32m1_b32 (y, M_PI_4f, vl);
-  *s = __riscv_vmerge_vvm_f32m1 (s1, s2, m, vl);
-  *c = __riscv_vmerge_vvm_f32m1 (c1, c2, m, vl);
+  vfloat32m1_t y, s1, c1, s2, c2, ns, nc;
+  vint32m1_t q, q1;
+  vbool32_t m1, m2, m3;
+  y = jbm_nxf32_trig (x, &q, vl);
+  jbm_nxf32_sincoswc (y, &s1, &c1, vl);
+  m1 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 1, vl), 0, vl);
+  s2 = __riscv_vfmerge_vvm_f32m1 (s1, c1, m1, vl);
+  c2 = __riscv_vfmerge_vvm_f32m1 (c1, s1, m1, vl);
+  m2 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 2, vl), 0, vl);
+  ns = jbm_nxf32_opposite (s2, vl);
+  *s = __riscv_vfmerge_vvm_f32m1 (s2, ns, m2, vl);
+  q1 = __riscv_vadd_vx_i32m1 (q, 1, vl);
+  m3 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q1, 2, vl), 0, vl);
+  nc = jbm_nxf32_opposite (c2, vl);
+  *c = __riscv_vfmerge_vvm_f32m1 (c2, nc, m3, vl);
 }
 
 /**
@@ -10636,9 +10645,13 @@ static inline vfloat32m1_t
 jbm_nxf32_tan (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
                const size_t vl) ///< array size.
 {
-  vfloat32m1_t s, c;
-  jbm_nxf32_sincos (x, &s, &c, vl);
-  return __riscv_vfdiv_vv_f32m1 (s, c, vl);
+  vfloat32m1_t y, z;
+  vint32m1_t q;
+  vbool32_t m1;
+  y  = jbm_nxf32_tanwc (jbm_nxf32_trig (x, &q, vl), vl);
+  z  = __riscv_vfrdiv_vf_f32m1 (y, -1.f, vl);
+  m1 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 1, vl), 0, vl);
+  return __riscv_vfmerge_vvm_f32m1 (y, z, m1, vl);
 }
 
 /**
@@ -11563,11 +11576,7 @@ static inline vint64m1_t
 jbm_nxf64_trunc (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  vint64m1_t i;
-  jbm_riscv_set_frm (0x1);
-  i = __riscv_vfcvt_x_f_v_i64m1 (x, vl);
-  jbm_riscv_set_frm (0x0);
-  return i;
+  return __riscv_vfcvt_rtz_x_f_v_i64m1 (x, vl);
 }
 
 /**
@@ -11579,11 +11588,7 @@ static inline vint64m1_t
 jbm_nxf64_floor (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
-  vint64m1_t i;
-  jbm_riscv_set_frm (0x2);
-  i = __riscv_vfcvt_x_f_v_i64m1 (x, vl);
-  jbm_riscv_set_frm (0x0);
-  return i;
+  return __riscv_vfcvt_rdn_x_f_v_i64m1 (x, vl);
 }
 
 /**
@@ -11595,11 +11600,7 @@ static inline vint64m1_t
 jbm_nxf64_ceil (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                 const size_t vl)        ///< vector size.
 {
-  vint64m1_t i;
-  jbm_riscv_set_frm (0x3);
-  i = __riscv_vfcvt_x_f_v_i64m1 (x, vl);
-  jbm_riscv_set_frm (0x0);
-  return i;
+  return __riscv_vfcvt_rup_x_f_v_i64m1 (x, vl);
 }
 
 /**
@@ -21514,6 +21515,57 @@ jbm_nxf64_rational_29_28 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 }
 
 /**
+ * Function to calculate the well conditionated function cbrt(x) for x
+ * \f$\in\left[\frac12\;,1\right]\f$ (vfloat64m1_t).
+ *
+ * \return function value (vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_cbrtwc (const vfloat64m1_t x)
+                   ///< vfloat64m1_t vector \f$\in\left[\frac12,\;1\right]\f$.
+{
+  return jbm_8xf64_rational_11_6 (x, K_CBRTWC_F64);
+}
+
+/**
+ * Function to calculate the function cbrt(x) using the jbm_nxf64_abs and
+ * jbm_nxf64_pow functions (vfloat64m1_t).
+ *
+ * \return function value (vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_nxf64_cbrt (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                const size_t vl)        ///< array size.
+{
+  const vfloat64m1_t xa = __riscv_vfabs_v_f64m1 (x, vl);
+  vfloat64m1_t f, s, ef;
+  vint64m1_t e, q, r;
+  vbool64_t m1, m2, m3;
+  f = jbm_nxf64_frexp (xa, &e, vl);
+  ef = __riscv_vfcvt_f_x_v_f64m1 (e, vl);
+  ef = __riscv_vfmul_vf_f64m1 (ef, 1. / 3., vl);
+  q = jbm_nxf64_floor (ef, vl);
+  r = __riscv_vsub_vv_i64m1
+      (e, 
+       __riscv_vadd_vv_i64m1 (q, __riscv_vadd_vv_i64m1 (q, q, vl), vl), vl);
+  s = __riscv_vfmv_v_f_f64m1 (1., vl);
+  s = __riscv_vfmerge_vfm_f64m1 (s, JBM_F64_CBRT2,
+                                 __riscv_vmseq_vx_i64m1_b64 (r, 1ll, vl), vl);
+  s = __riscv_vfmerge_vfm_f64m1 (s, JBM_F64_CBRT4,
+                                 __riscv_vmseq_vx_i64m1_b64 (r, 2ll, vl), vl);
+  f = __riscv_vfmul_vv_f64m1 (jbm_nxf64_cbrtwc (f, vl), s, vl);
+  f = jbm_nxf64_ldexp (f, q, vl);
+  f = jbm_nxf64_copysign (f, x, vl);
+  m1 = __riscv_vmfeq_vf_f64m1_b64 (xa, 0., vl);
+  m2 = __riscv_vmfeq_vf_f64m1_b64 (xa, INFINITY, vl);
+  m3 = __riscv_vmfne_vv_f64m1_b64 (xa, xa, vl);
+  return
+    __riscv_vfmerge_vvm_f64m1
+    (f, x,
+     __riscv_vmor_mm_b64 (m1, __riscv_vmor_mm_b64 (m2, m3, vl), vl), vl);
+}
+
+/**
  * Function to calculate the well conditionated function expm1(x) for x in
  * [-log(2)/2,log(2)/2] (vfloat64m1_t).
  *
@@ -21627,17 +21679,26 @@ static inline vfloat64m1_t
 jbm_nxf64_log2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                 const size_t vl)        ///< array size.
 {
-  vfloat64m1_t y;
-  vint64m1_t e;
+  vfloat64m1_t y, y2;
+  vint64m1_t e, e2;
+  vbool64_t m;
   y = jbm_nxf64_frexp (x, &e, vl);
-  y =
-    __riscv_vfadd_vv_f64m1 (jbm_nxf64_log2wc (y, vl),
-                            __riscv_vfcvt_f_x_v_f64m1 (e, vl), vl);
-  y =
-    __riscv_vfmerge_vfm_f64m1 (y, -INFINITY,
-                               __riscv_vmfgt_vf_f64m1_b64 (x, 0., vl), vl);
-  return __riscv_vfmerge_vfm_f64m1 (y, NAN,
-                                    __riscv_vmfge_vf_f64m1_b64 (x, 0., vl), vl);
+  m = __riscv_vmflt_vf_f64m1_b64 (y, M_SQRT1_2, vl);
+  y2 = __riscv_vfadd_vv_f64m1 (y, y, vl);
+  y = __riscv_vfmerge_vvm_f64m1 (y, y2, m, vl);
+  e2 = __riscv_vsub_vx_i64m1 (e, 1ll, vl);
+  e = __riscv_vmerge_vvm_i64m1 (e, e2, m, vl);
+  y = __riscv_vfadd_vv_f64m1 (jbm_nxf64_log2wc (y, vl),
+                              __riscv_vfcvt_f_x_v_f64m1 (e, vl), vl);
+  y = __riscv_vfmerge_vfm_f64m1 (y, -INFINITY,
+                                 __riscv_vmfeq_vf_f64m1_b64 (x, 0., vl), vl);
+  y = __riscv_vfmerge_vfm_f64m1 (y, INFINITY,
+                                 __riscv_vmfeq_vf_f64m1_b64 (x, INFINITY, vl),
+                                 vl);
+  y = __riscv_vfmerge_vfm_f64m1 (y, NAN,
+                                 __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
+  return __riscv_vfmerge_vvm_f64m1 (y, x,
+                                    __riscv_vmfne_vv_f64m1_b64 (x, x, vl), vl);
 }
 
 /**
@@ -21701,28 +21762,8 @@ jbm_nxf64_pow (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                const double e,  ///< exponent (vfloat64m1_t).
                const size_t vl) ///< array size.
 {
-  double f;
-  f = floor (e);
-  if (f == e)
-    return jbm_nxf64_pown (x, (int) e, vl);
   return jbm_nxf64_exp2 (__riscv_vfmul_vf_f64m1 (jbm_nxf64_log2 (x, vl), e, vl),
                          vl);
-}
-
-/**
- * Function to calculate the function cbrt(x) using the jbm_nxf64_abs and
- * jbm_nxf64_pow functions (vfloat64m1_t).
- *
- * \return function value (vfloat64m1_t).
- */
-static inline vfloat64m1_t
-jbm_nxf64_cbrt (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
-                const size_t vl)        ///< array size.
-{
-  vfloat64m1_t f;
-  f = jbm_nxf64_pow (jbm_nxf64_abs (x, vl), 1. / 3., vl);
-  return __riscv_vmerge_vvm_f64m1 (f, jbm_nxf64_opposite (f, vl),
-                                   __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
 }
 
 /**
@@ -21778,6 +21819,24 @@ jbm_nxf64_sincoswc (const vfloat64m1_t x,
 }
 
 /**
+ * Function to calculate reduction to \f$2\,\pi\f$ in trigonometric functions
+ * (vfloat64m1_t).
+ *
+ * \return reduced vector (vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_nxf64_trig (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                vint64m1_t *q,          ///< pointer to the quadrant (vint64m1_t).
+                const size_t vl)        ///< vector size.
+{
+  vfloat64m1_t t, y;
+  t = __riscv_vfmul_vf_f64m1 (x, M_2_PI, vl);
+  *q = jbm_nxf64_round (t, vl);
+  y = __riscv_vfcvt_f_x_v_f64m1 (*q, vl);
+  return __riscv_vfnmacc_vf_f64m1 (x, M_PI_2, y, vl);
+}
+
+/**
  * Function to calculate the function sin(x) from jbm_nxf64_sinwc and
  * jbm_nxf64_coswc approximations.
  *
@@ -21787,28 +21846,16 @@ static inline vfloat64m1_t
 jbm_nxf64_sin (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                const size_t vl) ///< array size.
 {
-  vfloat64m1_t y, s, pi2;
-  pi2 = __riscv_vfmv_v_f_f64m1 (2. * M_PI, vl);
-  y = jbm_nxf64_mod (x, pi2, vl);
-  s = jbm_nxf64_sinwc (__riscv_vfsub_vv_f64m1 (y, pi2, vl), vl);
-  s = __riscv_vmerge_vvm_f64m1
-    (s, jbm_nxf64_opposite
-     (jbm_nxf64_coswc
-      (__riscv_vfsub_vv_f64m1
-       (__riscv_vfmv_v_f_f64m1 (3. * M_PI_2, vl), y, vl), vl), vl),
-     __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
-  s = __riscv_vmerge_vvm_f64m1
-    (s, jbm_nxf64_sinwc
-     (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), vl),
-     __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl), vl);
-  s = __riscv_vmerge_vvm_f64m1
-    (s, jbm_nxf64_coswc
-     (__riscv_vfsub_vv_f64m1
-      (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
-     __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4, vl), vl);
-  return __riscv_vmerge_vvm_f64m1 (s, jbm_nxf64_sinwc (y, vl),
-                                   __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl),
-                                   vl);
+  vfloat64m1_t y, s, c, ns;
+  vint64m1_t q;
+  vbool64_t m1, m2;
+  y = jbm_nxf64_trig (x, &q, vl);
+  jbm_nxf64_sincoswc (y, &s, &c, vl);
+  m1 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1ll, vl), 0ll, vl);
+  y = __riscv_vfmerge_vvm_f64m1 (s, c, m1, vl);
+  m2 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 2ll, vl), 0ll, vl);
+  ns = jbm_nxf64_opposite (y, vl);
+  return __riscv_vfmerge_vvm_f64m1 (y, ns, m2, vl);
 }
 
 /**
@@ -21821,72 +21868,52 @@ static inline vfloat64m1_t
 jbm_nxf64_cos (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                const size_t vl) ///< array size.
 {
-  vfloat64m1_t y, c, pi2;
-  pi2 = __riscv_vfmv_v_f_f64m1 (2. * M_PI, vl);
-  y = jbm_nxf64_mod (x, pi2, vl);
-  c = jbm_nxf64_coswc (__riscv_vfsub_vv_f64m1 (y, pi2, vl), vl);
-  c = __riscv_vmerge_vvm_f64m1
-    (c, jbm_nxf64_sinwc
-     (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), vl),
-     __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4, vl), vl);
-  c = __riscv_vmerge_vvm_f64m1
-    (c, jbm_nxf64_opposite
-     (jbm_nxf64_coswc
-      (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl),
-       vl), vl), __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl), vl);
-  c = __riscv_vmerge_vvm_f64m1
-    (c, jbm_nxf64_sinwc
-     (__riscv_vfsub_vv_f64m1
-      (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl), vl),
-     __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4, vl), vl);
-  return
-    __riscv_vmerge_vvm_f64m1 (c, jbm_nxf64_coswc (y, vl),
-                              __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl), vl);
+  vfloat64m1_t y, s, c, ns;
+  vint64m1_t q, q1;
+  vbool64_t m1, m2;
+  y = jbm_nxf64_trig (x, &q, vl);
+  jbm_nxf64_sincoswc (y, &s, &c, vl);
+  m1 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1, vl), 0, vl);
+  y  = __riscv_vfmerge_vvm_f64m1 (c, s, m1, vl);
+  q1 = __riscv_vadd_vx_i64m1 (q, 1, vl);
+  m2 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q1, 2, vl), 0, vl);
+  ns = jbm_nxf64_opposite (y, vl);
+  return __riscv_vfmerge_vvm_f64m1 (y, ns, m2, vl);
 }
 
 /**
- * Function to calculate the functions sin(x) and cos(x) from jbm_nxf64_sinwc
- * and jbm_nxf64_coswc approximations (vfloat64m1_t).
+ * Function to calculate the functions sin(x) and cos(x) from
+ * jbm_nxf64_sinwc and jbm_nxf64_coswc approximations (vfloat64m1_t).
  */
 static inline void
 jbm_nxf64_sincos (const vfloat64m1_t x,
                   ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
                   vfloat64m1_t *s,
-                  ///< pointer to the f64 function value (vfloat64m1_t).
+                  ///< pointer to the sin function value (vfloat64m1_t).
                   vfloat64m1_t *c,
-                  ///< pointer to the f64 function value (vfloat64m1_t).
+                  ///< pointer to the cos function value (vfloat64m1_t).
                   const size_t vl)      ///< array size.
 {
-  vfloat64m1_t y, pi2, s1, c1, s2, c2;
-  vbool64_t m;
-  pi2 = __riscv_vfmv_v_f_f64m1 (2. * M_PIf, vl);
-  y = jbm_nxf64_mod (x, pi2, vl);
-  jbm_nxf64_sincoswc (__riscv_vfsub_vv_f64m1 (y, pi2, vl), &s1, &c1, vl);
-  jbm_nxf64_sincoswc (__riscv_vfsub_vf_f64m1 (y, 3. * M_PI_2, vl), &c2, &s2,
-                      vl);
-  m = __riscv_vmflt_vf_f64m1_b64 (y, 7. * M_PI_4f, vl);
-  s1 = __riscv_vmerge_vvm_f64m1 (s1, jbm_nxf64_opposite (s2, vl), m, vl);
-  c1 = __riscv_vmerge_vvm_f64m1 (c1, c2, m, vl);
-  jbm_nxf64_sincoswc (__riscv_vfsub_vv_f64m1
-                      (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), &s2, &c2, vl);
-  m = __riscv_vmflt_vf_f64m1_b64 (y, 5. * M_PI_4, vl);
-  s1 = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
-  c1 = __riscv_vmerge_vvm_f64m1 (c1, jbm_nxf64_opposite (c2, vl), m, vl);
-  jbm_nxf64_sincoswc
-    (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), y, vl),
-     &c2, &s2, vl);
-  m = __riscv_vmflt_vf_f64m1_b64 (y, 3. * M_PI_4f, vl);
-  s1 = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
-  c1 = __riscv_vmerge_vvm_f64m1 (c1, c2, m, vl);
-  jbm_nxf64_sincoswc (y, &s2, &c2, vl);
-  m = __riscv_vmflt_vf_f64m1_b64 (y, M_PI_4, vl);
-  *s = __riscv_vmerge_vvm_f64m1 (s1, s2, m, vl);
-  *c = __riscv_vmerge_vvm_f64m1 (c1, c2, m, vl);
+  vfloat64m1_t y, s1, c1, s2, c2, ns, nc;
+  vint64m1_t q, q1;
+  vbool64_t m1, m2, m3;
+  y = jbm_nxf64_trig (x, &q, vl);
+  jbm_nxf64_sincoswc (y, &s1, &c1, vl);
+  m1 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1, vl), 0, vl);
+  s2 = __riscv_vfmerge_vvm_f64m1 (s1, c1, m1, vl);
+  c2 = __riscv_vfmerge_vvm_f64m1 (c1, s1, m1, vl);
+  m2 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 2, vl), 0, vl);
+  ns = jbm_nxf64_opposite (s2, vl);
+  *s = __riscv_vfmerge_vvm_f64m1 (s2, ns, m2, vl);
+  q1 = __riscv_vadd_vx_i64m1 (q, 1, vl);
+  m3 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q1, 2, vl), 0, vl);
+  nc = jbm_nxf64_opposite (c2, vl);
+  *c = __riscv_vfmerge_vvm_f64m1 (c2, nc, m3, vl);
 }
 
 /**
- * Function to calculate the function tan(x) from jbm_nxf64_sinwc and
- * jbm_nxf64_coswc approximations.
+ * Function to calculate the function tan(x) from jbm_nxf64_sincos function
+ * (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
  */
@@ -21894,9 +21921,13 @@ static inline vfloat64m1_t
 jbm_nxf64_tan (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                const size_t vl) ///< array size.
 {
-  vfloat64m1_t s, c;
-  jbm_nxf64_sincos (x, &s, &c, vl);
-  return __riscv_vfdiv_vv_f64m1 (s, c, vl);
+  vfloat64m1_t y, z;
+  vint64m1_t q;
+  vbool64_t m1;
+  y  = jbm_nxf64_tanwc (jbm_nxf64_trig (x, &q, vl), vl);
+  z  = __riscv_vfrdiv_vf_f64m1 (y, -1.f, vl);
+  m1 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1, vl), 0, vl);
+  return __riscv_vfmerge_vvm_f64m1 (y, z, m1, vl);
 }
 
 /**

@@ -434,7 +434,11 @@ static inline __m256
 jbm_8xf32_ldexp (const __m256 x,        ///< __m256 vector.
                  const __m256i e)       ///< exponent vector (__m256i).
 {
+#if JBM_AVX512
+  return _mm256_scalef_ps (x, _mm256_cvtepi32_ps (e));
+#else
   return _mm256_mul_ps (x, jbm_8xf32_exp2n (e));
+#endif
 }
 
 /**
@@ -7104,12 +7108,12 @@ jbm_8xf32_cbrt (const __m256 x) ///< __m256 vector.
                             s, JBM_8xF32_CBRT4);
 #else
   s = _mm256_blendv_ps (s, JBM_8xF32_CBRT2,
-                        _mm256_castsi128_ps (_mm256_cmpeq_epi32 (r,
+                        _mm256_castsi256_ps (_mm256_cmpeq_epi32 (r,
                                                                  _mm256_set1_epi32
                                                                  (1))));
   s =
     _mm256_blendv_ps (s, JBM_8xF32_CBRT4,
-                      _mm256_castsi128_ps (_mm256_cmpeq_epi32
+                      _mm256_castsi256_ps (_mm256_cmpeq_epi32
                                            (r, _mm256_set1_epi32 (2))));
 #endif
   return
@@ -7145,11 +7149,17 @@ jbm_8xf32_exp2wc (const __m256 x)
 static inline __m256
 jbm_8xf32_exp2 (const __m256 x) ///< __m256 vector.
 {
+#if JBM_AVX512
+  const __m256 y = _mm256_floor_ps (x);
+  const __m256 f = _mm256_sub_ps (x, y);
+  return _mm256_scalef_ps (jbm_8xf32_exp2wc (f), y);
+#else
   __m256 y, f;
   y = _mm256_floor_ps (x);
   f = _mm256_sub_ps (x, y);
   y = jbm_8xf32_exp2n (_mm256_cvtps_epi32 (y));
   return _mm256_mul_ps (y, jbm_8xf32_exp2wc (f));
+#endif
 }
 
 /**
@@ -7381,7 +7391,7 @@ jbm_8xf32_trig (const __m256 x, ///< __m256 vector.
                 __m256i *q)     ///< quadrant (__m256i).
 {
   __m256 y;
-  y = _mm256_round_ps (_mm256_mul_ps (x, _mm256_set1_ps (1.f / M_PI_2f)),
+  y = _mm256_round_ps (_mm256_mul_ps (x, _mm256_set1_ps (M_2_PIf)),
                        _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
   *q = _mm256_cvtps_epi32 (y);
   return _mm256_fnmadd_ps (y, _mm256_set1_ps (M_PI_2f), x);
@@ -8459,7 +8469,11 @@ static inline __m256d
 jbm_4xf64_ldexp (const __m256d x,       ///< __m256d vector.
                  __m256i e)     ///< exponent vector (__m256i).
 {
+#if JBM_AVX512
+  return _mm256_scalef_pd (x, _mm256_cvtepi64_pd (e));
+#else
   return _mm256_mul_pd (x, jbm_4xf64_exp2n (e));
+#endif
 }
 
 /**
@@ -15117,16 +15131,14 @@ jbm_4xf64_cbrt (const __m256d x)        ///< __m256d vector.
   xa = jbm_4xf64_abs (x);
   f = jbm_4xf64_frexp (xa, &e);
   q = _mm256_cvtepi32_epi64
-    (_mm256_castsi256_si128
-     (_mm256_cvtps_epi32
-      (_mm256_floor_ps
-       (_mm256_mul_ps
-        (_mm256_cvtepi32_ps
-         (_mm256_castsi128_si256
+      (_mm_cvtps_epi32
+       (_mm_floor_ps
+        (_mm_mul_ps
+         (_mm_cvtepi32_ps
           (_mm256_castsi256_si128
-           (_mm256_permutevar8x32_epi32 (e, _mm256_set_epi32 (7, 6, 5, 4,
-                                                              6, 4, 2, 0))))),
-         _mm256_set1_ps (1.f / 3.f))))));
+           (_mm256_permutevar8x32_epi32 (e, _mm256_setr_epi32 (0, 2, 4, 6,
+                                                               0, 0, 0, 0)))),
+          _mm_set1_ps (1.f / 3.f)))));
   r = _mm256_sub_epi64 (e, _mm256_add_epi64 (q, _mm256_add_epi64 (q, q)));
   s = _mm256_set1_pd (1.);
 #if JBM_AVX512
@@ -15187,16 +15199,18 @@ jbm_4xf64_exp2wc (const __m256d x)
 static inline __m256d
 jbm_4xf64_exp2 (const __m256d x)        ///< __m256d vector.
 {
+#if JBM_AVX512
+  const __m256d y = _mm256_floor_pd (x);
+  const __m256d f = _mm256_sub_pd (x, y);
+  return _mm256_scalef_pd (jbm_4xf64_exp2wc (f), y);
+#else
   __m256d y, f;
   __m256i i;
   y = _mm256_floor_pd (x);
   f = _mm256_sub_pd (x, y);
-#if JBM_AVX512
-  i = _mm256_cvttpd_epi64 (y);
-#else
   i = _mm256_cvtepi32_epi64 (_mm256_cvttpd_epi32 (y));
-#endif
   return _mm256_mul_pd (jbm_4xf64_exp2n (i), jbm_4xf64_exp2wc (f));
+#endif
 }
 
 /**
@@ -15405,7 +15419,7 @@ jbm_4xf64_trig (const __m256d x,        ///< __m256d vector.
                 __m256i *q)     ///< quadrant (__m256i).
 {
   __m256d y;
-  y = _mm256_round_pd (_mm256_mul_pd (x, _mm256_set1_pd (1. / M_PI_2)),
+  y = _mm256_round_pd (_mm256_mul_pd (x, _mm256_set1_pd (M_2_PI)),
                        _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC);
   *q = _mm256_cvtpd_epi64 (y);
   return _mm256_fnmadd_pd (y, _mm256_set1_pd (M_PI_2), x);
