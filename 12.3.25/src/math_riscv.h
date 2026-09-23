@@ -10523,6 +10523,23 @@ jbm_nxf32_coswc (const vfloat32m1_t x,
 }
 
 /**
+ * Function to calculate the well conditionated function tan(x) for x in
+ * [-pi/4,pi/4] (vfloat32m1_t):
+ *
+ * \return function value (vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_nxf32_tanwc (const vfloat32m1_t x,
+                 ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                 const size_t vl)       ///< array size.
+{
+  return
+    __riscv_vfmul_vv_f32m1 (x,
+                            jbm_nxf32_rational_3_1 (jbm_nxf32_sqr (x, vl),
+                                                    K_TANWC_F32, vl), vl);
+}
+
+/**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_nxf32_sinwc approximation (vfloat32m1_t).
  */
@@ -10706,17 +10723,14 @@ jbm_nxf32_atan2 (const vfloat32m1_t y,  ///< vfloat32m1_t y component.
                  const vfloat32m1_t x,  ///< vfloat32m1_t x component.
                  const size_t vl)       ///< array size.
 {
-  vfloat32m1_t f;
-  vbool32_t mx, my;
-  f = jbm_nxf32_atan (__riscv_vfdiv_vv_f32m1 (y, x, vl), vl);
-  mx = __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl);
-  my = __riscv_vmflt_vf_f32m1_b32 (y, 0.f, vl);
-  f = __riscv_vmerge_vvm_f32m1 (f, __riscv_vfsub_vf_f32m1 (f, M_PIf, vl),
-                                __riscv_vmand_mm_b32 (my, mx, vl), vl);
   return
-    __riscv_vmerge_vvm_f32m1 (f, __riscv_vfadd_vf_f32m1 (f, M_PIf, vl),
-                              __riscv_vmand_mm_b32
-                              (my, __riscv_vmnot_m_b32 (mx, vl), vl), vl);
+    __riscv_vfmerge_vvm_f32m1
+    (jbm_nxf32_atan (__riscv_vfdiv_vv_f32m1 (y, x, vl), vl),
+     __riscv_vfadd_vv_f32m1
+     (f, jbm_nxf32_copysign (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), vl),
+     __riscv_vmsne_vx_u32m1_b32
+     (__riscv_vand_vx_u32m1 (__riscv_vreinterpret_v_f32m1_u32m1 (x),
+                             JBM_F32_BITS_SIGN, vl), 0, vl), vl);
 }
 
 /**
@@ -21984,16 +21998,16 @@ jbm_nxf64_atan2 (const vfloat64m1_t y,  ///< vfloat64m1_t y component.
                  const vfloat64m1_t x,  ///< vfloat64m1_t x component.
                  const size_t vl)       ///< array size.
 {
-  vfloat64m1_t f;
-  vbool64_t mx, my;
-  f = jbm_nxf64_atan (__riscv_vfdiv_vv_f64m1 (y, x, vl), vl);
-  mx = __riscv_vmflt_vf_f64m1_b64 (x, 0., vl);
-  my = __riscv_vmflt_vf_f64m1_b64 (y, 0., vl);
-  f = __riscv_vmerge_vvm_f64m1 (f, __riscv_vfsub_vf_f64m1 (f, M_PI, vl),
-                                __riscv_vmand_mm_b64 (my, mx, vl), vl);
-  return __riscv_vmerge_vvm_f64m1 (f, __riscv_vfadd_vf_f64m1 (f, M_PI, vl),
-                                   __riscv_vmand_mm_b64
-                                   (my, __riscv_vmnot_m_b64 (mx, vl), vl), vl);
+  const vfloat64m1_t f
+    = jbm_nxf64_atan (__riscv_vfdiv_vv_f64m1 (y, x, vl), vl);
+  const vfloat64m1_t g
+    = __riscv_vfadd_vv_f64m1
+      (f, jbm_nxf64_copysign (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), vl);
+  return
+    __riscv_vfmerge_vvm_f64m1
+    (f, g, __riscv_vmsne_vx_u64m1_b64
+          (__riscv_vand_vx_u64m1 (__riscv_vreinterpret_v_f64m1_u64m1 (x),
+                                  JBM_F64_BITS_SIGN, vl), 0ll, vl), vl);
 }
 
 /**
@@ -22008,12 +22022,10 @@ jbm_nxf64_asin (const vfloat64m1_t x,   ///< vfloat64m1_t number.
 {
   return
     jbm_nxf64_atan
-    (__riscv_vfdiv_vv_f64m1 (x,
-                             __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64m1
-                                                     (__riscv_vfmv_v_f_f64m1
-                                                      (1., vl),
-                                                      jbm_nxf64_sqr (x, vl),
-                                                      vl), vl), vl), vl);
+    (__riscv_vfdiv_vv_f64m1 
+     (x, __riscv_vfsqrt_v_f64m1
+         (__riscv_vfsub_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl),
+                                  jbm_nxf64_sqr (x, vl), vl), vl), vl), vl);
 }
 
 /**

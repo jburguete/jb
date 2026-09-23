@@ -15154,14 +15154,10 @@ static inline float64x2_t
 jbm_2xf64_atan2 (const float64x2_t y,   ///< float64x2_t y component.
                  const float64x2_t x)   ///< float64x2_t x component.
 {
-  float64x2_t f, pi;
-  uint64x2_t mx, my;
-  pi = vdupq_n_f64 (M_PI);
+  float64x2_t f, g;
   f = jbm_2xf64_atan (vdivq_f64 (y, x));
-  mx = vcltzq_f64 (x);
-  my = vcltzq_f64 (y);
-  f = vbslq_f64 (vandq_u64 (my, mx), vsubq_f64 (f, pi), f);
-  return vbslq_f64 (vbicq_u64 (my, mx), vaddq_f64 (f, pi), f);
+  g = vaddq_f64 (f, jbm_2xf64_copysign (vdupq_n_f64 (M_PI), y));
+  return vbslq_f64 (vcltq_f64 (x, vdupq_n_f64 (0.)), g, f);
 }
 
 /**

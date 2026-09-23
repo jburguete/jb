@@ -7537,8 +7537,10 @@ jbm_8xf32_atan2 (const __m256 y,        ///< __m256 y component.
   f = jbm_8xf32_atan (_mm256_div_ps (y, x));
   g = _mm256_add_ps (f, jbm_8xf32_copysign (_mm256_set1_ps (M_PIf), y));
   return
-    _mm256_blendv_ps (f, g,
-                      _mm256_cmp_ps (x, _mm256_setzero_ps (), _CMP_LT_OS));
+    _mm256_blendv_ps
+    (f, g,
+     _mm256_and_ps
+     (x, _mm256_castsi256_ps (_mm256_set1_epi32 ((int) JBM_F32_BITS_SIGN))));
 }
 
 /**
@@ -15562,12 +15564,15 @@ static inline __m256d
 jbm_4xf64_atan2 (const __m256d y,       ///< __m256d y component.
                  const __m256d x)       ///< __m256d x component.
 {
-  const __m256d pi = _mm256_set1_pd (M_PI);
-  const __m256d z = _mm256_setzero_pd ();
   __m256d f, g;
   f = jbm_4xf64_atan (_mm256_div_pd (y, x));
-  g = _mm256_add_pd (f, jbm_4xf64_copysign (pi, y));
-  return _mm256_blendv_pd (f, g, _mm256_cmp_pd (x, z, _CMP_LT_OS));
+  g = _mm256_add_pd (f, jbm_4xf64_copysign (_mm256_set1_pd (M_PI), y));
+  return
+    _mm256_blendv_pd
+    (f, g,
+     _mm256_and_pd
+     (x, _mm256_castsi256_pd (_mm256_set1_epi64x ((long long int)
+                                                  JBM_F64_BITS_SIGN))));
 }
 
 /**

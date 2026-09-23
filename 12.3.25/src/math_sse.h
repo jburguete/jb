@@ -7559,7 +7559,11 @@ jbm_4xf32_atan2 (const __m128 y,        ///< __m128 y component.
   __m128 f, g;
   f = jbm_4xf32_atan (_mm_div_ps (y, x));
   g = _mm_add_ps (f, jbm_4xf32_copysign (_mm_set1_ps (M_PIf), y));
-  return _mm_blendv_ps (f, g, _mm_cmplt_ps (x, _mm_setzero_ps ()));
+  return
+    _mm_blendv_ps
+    (f, g,
+     _mm_and_ps (x,
+                 _mm_castsi128_ps (_mm_set1_epi32 ((int) JBM_F32_BITS_SIGN))));
 }
 
 /**
@@ -15487,12 +15491,15 @@ static inline __m128d
 jbm_2xf64_atan2 (const __m128d y,       ///< __m128d y component.
                  const __m128d x)       ///< __m128d x component.
 {
-  const __m128d pi = _mm_set1_pd (M_PI);
-  const __m128d z = _mm_setzero_pd ();
   __m128d f, g;
   f = jbm_2xf64_atan (_mm_div_pd (y, x));
-  g = _mm_add_pd (f, jbm_2xf64_copysign (pi, y));
-  return _mm_blendv_pd (f, g, _mm_cmplt_pd (x, z));
+  g = _mm_add_pd (f, jbm_2xf64_copysign (_mm_set1_pd (M_PI), y));
+  return
+    _mm_blendv_pd
+    (f, g,
+     _mm_and_pd (x,
+                 _mm_castsi128_pd (_mm_set1_epi64x ((long long int)
+                                                    JBM_F64_BITS_SIGN))));
 }
 
 /**

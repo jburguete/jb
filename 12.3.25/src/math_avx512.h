@@ -547,7 +547,7 @@ jbm_16xf32_opposite (const __m512 x)    ///< __m512 vector.
 static inline __m512
 jbm_16xf32_reciprocal (const __m512 x)  ///< __m512 vector.
 {
-  return _mm512_rcp14_ps (x);
+  return _mm512_div_ps (_mm512_set1_ps (1.f), x);
 }
 
 /**
@@ -7806,8 +7806,7 @@ jbm_16xf32_atan2 (const __m512 y,       ///< __m512 y component.
   f = jbm_16xf32_atan (_mm512_div_ps (y, x));
   g = _mm512_add_ps (f, jbm_16xf32_copysign (_mm512_set1_ps (M_PIf), y));
   return
-    _mm512_mask_mov_ps (f, _mm512_cmp_ps_mask (x, _mm512_setzero_ps (),
-                                               _CMP_LT_OS), g);
+    _mm512_mask_mov_ps (f, _mm512_movepi32_mask (_mm512_castps_si512 (x)), g);
 }
 
 /**
@@ -15742,12 +15741,11 @@ static inline __m512d
 jbm_8xf64_atan2 (const __m512d y,       ///< __m512d y component.
                  const __m512d x)       ///< __m512d x component.
 {
-  const __m512d pi = _mm512_set1_pd (M_PI);
-  const __m512d z = _mm512_setzero_pd ();
   __m512d f, g;
   f = jbm_8xf64_atan (_mm512_div_pd (y, x));
-  g = _mm512_add_pd (f, jbm_8xf64_copysign (pi, y));
-  return _mm512_mask_mov_pd (f, _mm512_cmp_pd_mask (x, z, _CMP_LT_OS), g);
+  g = _mm512_add_pd (f, jbm_8xf64_copysign (_mm512_set1_pd (M_PI), y));
+  return
+    _mm512_mask_mov_pd (f, _mm512_movepi64_mask (_mm512_castpd_si512 (x)), g);
 }
 
 /**
