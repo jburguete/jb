@@ -10723,14 +10723,16 @@ jbm_nxf32_atan2 (const vfloat32m1_t y,  ///< vfloat32m1_t y component.
                  const vfloat32m1_t x,  ///< vfloat32m1_t x component.
                  const size_t vl)       ///< array size.
 {
+  const vfloat32m1_t f
+    = jbm_nxf32_atan (__riscv_vfdiv_vv_f32m1 (y, x, vl), vl);
+  const vfloat32m1_t g
+    = __riscv_vfadd_vv_f32m1
+      (f, jbm_nxf32_copysign (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), vl);
   return
-    __riscv_vfmerge_vvm_f32m1
-    (jbm_nxf32_atan (__riscv_vfdiv_vv_f32m1 (y, x, vl), vl),
-     __riscv_vfadd_vv_f32m1
-     (f, jbm_nxf32_copysign (__riscv_vfmv_v_f_f32m1 (M_PIf, vl), y, vl), vl),
-     __riscv_vmsne_vx_u32m1_b32
-     (__riscv_vand_vx_u32m1 (__riscv_vreinterpret_v_f32m1_u32m1 (x),
-                             JBM_F32_BITS_SIGN, vl), 0, vl), vl);
+    __riscv_vmerge_vvm_f32m1
+    (f, g, __riscv_vmsne_vx_u32m1_b32
+          (__riscv_vand_vx_u32m1 (__riscv_vreinterpret_v_f32m1_u32m1 (x),
+                                  JBM_F32_BITS_SIGN, vl), 0, vl), vl);
 }
 
 /**
@@ -21814,6 +21816,23 @@ jbm_nxf64_coswc (const vfloat64m1_t x,
 }
 
 /**
+ * Function to calculate the well conditionated function tan(x) for x in
+ * [-pi/4,pi/4] (vfloat64m1_t):
+ *
+ * \return function value (vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_nxf64_tanwc (const vfloat64m1_t x,
+                 ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                 const size_t vl)       ///< array size.
+{
+  return
+    __riscv_vfmul_vv_f64m1 (x,
+                            jbm_nxf64_rational_6_3 (jbm_nxf64_sqr (x, vl),
+                                                    K_TANWC_F64, vl), vl);
+}
+
+/**
  * Function to calculate the well conditionated functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_nxf64_sinwc approximation (vfloat64m1_t).
  */
@@ -22004,7 +22023,7 @@ jbm_nxf64_atan2 (const vfloat64m1_t y,  ///< vfloat64m1_t y component.
     = __riscv_vfadd_vv_f64m1
       (f, jbm_nxf64_copysign (__riscv_vfmv_v_f_f64m1 (M_PI, vl), y, vl), vl);
   return
-    __riscv_vfmerge_vvm_f64m1
+    __riscv_vmerge_vvm_f64m1
     (f, g, __riscv_vmsne_vx_u64m1_b64
           (__riscv_vand_vx_u64m1 (__riscv_vreinterpret_v_f64m1_u64m1 (x),
                                   JBM_F64_BITS_SIGN, vl), 0ll, vl), vl);
@@ -28919,32 +28938,6 @@ jbm_4xf32_tan (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
- * [-1/2,1/2] (4x vfloat32m1_t).
- *
- * \return function value (4x vfloat32m1_t).
- */
-static inline vfloat32m1_t
-jbm_atanwc0_4xf32 (const vfloat32m1_t x)
-                   ///< vfloat32m1_t vector \f$\in\left[0,\frac12\right]\f$.
-{
-  return jbm_nxf32_atanwc0 (x, 4);
-}
-
-/**
- * Function to calculate the well conditionated function atan(x) for x in
- * [1/2,3/2] (4x vfloat32m1_t).
- *
- * \return function value (4x vfloat32m1_t).
- */
-static inline vfloat32m1_t
-jbm_4xf32_atanwc1 (const vfloat32m1_t x)
-                   ///< vfloat32m1_t vector \f$\in\left[\frac12,1\right]\f$.
-{
-  return jbm_nxf32_atanwc1 (x, 4);
-}
-
-/**
  * Function to calculate the function atan(x) using the jbm_atanwc0_4xf32 and
  * jbm_4xf32_atanwc1 functions (4x vfloat32m1_t).
  *
@@ -35540,32 +35533,6 @@ static inline vfloat64m1_t
 jbm_2xf64_tan (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_tan (x, 2);
-}
-
-/**
- * Function to calculate the well conditionated function atan(x) for x in
- * [-1/2,1/2] (2x vfloat64m1_t).
- *
- * \return function value (2x vfloat64m1_t).
- */
-static inline vfloat64m1_t
-jbm_atanwc0_2xf64 (const vfloat64m1_t x)
-                   ///< vfloat64m1_t vector \f$\in\left[0,\frac12\right]\f$.
-{
-  return jbm_nxf64_atanwc0 (x, 2);
-}
-
-/**
- * Function to calculate the well conditionated function atan(x) for x in
- * [1/2,3/2] (2x vfloat64m1_t).
- *
- * \return function value (2x vfloat64m1_t).
- */
-static inline vfloat64m1_t
-jbm_atanwc1_2xf64 (const vfloat64m1_t x)
-                   ///< vfloat64m1_t vector \f$\in\left[\frac12,1\right]\f$.
-{
-  return jbm_nxf64_atanwc1 (x, 2);
 }
 
 /**
