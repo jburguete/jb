@@ -4130,11 +4130,7 @@ jbm_f32_asin (const float x)    ///< float number.
 static inline float
 jbm_f32_acos (const float x)    ///< float number.
 {
-  float f;
-  f = jbm_f32_atan (sqrtf (1.f - x * x) / x);
-  if (x < 0.f)
-    f += M_PIf;
-  return f;
+  return jbm_f32_dbl (jbm_f32_atan (sqrtf ((1.f - x) / (1.f + x))));
 }
 
 /**

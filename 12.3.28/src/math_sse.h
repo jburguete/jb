@@ -7589,12 +7589,11 @@ jbm_4xf32_asin (const __m128 x) ///< __m128 vector.
 static inline __m128
 jbm_4xf32_acos (const __m128 x) ///< __m128 vector.
 {
-  __m128 f;
-  f =
-    jbm_4xf32_atan (_mm_div_ps
-                    (_mm_sqrt_ps (_mm_fnmadd_ps (x, x, _mm_set1_ps (1.f))), x));
-  return _mm_blendv_ps (f, _mm_add_ps (f, _mm_set1_ps (M_PIf)),
-                        _mm_cmplt_ps (x, _mm_setzero_ps ()));
+  const __m128 k1 = _mm_set1_ps (1.f);
+  return
+    jbm_4xf32_dbl
+    (jbm_4xf32_atan (_mm_sqrt_ps (_mm_div_ps (_mm_sub_ps (k1, x),
+                                              _mm_add_ps (k1, x)))));
 }
 
 /**
@@ -15525,12 +15524,11 @@ jbm_2xf64_asin (const __m128d x)        ///< __m128d number.
 static inline __m128d
 jbm_2xf64_acos (const __m128d x)        ///< __m128d number.
 {
-  __m128d f;
-  f =
-    jbm_2xf64_atan (_mm_div_pd
-                    (_mm_sqrt_pd (_mm_fnmadd_pd (x, x, _mm_set1_pd (1.))), x));
-  return _mm_blendv_pd (f, _mm_add_pd (f, _mm_set1_pd (M_PI)),
-                        _mm_cmplt_pd (x, _mm_setzero_pd ()));
+  const __m128d k1 = _mm_set1_pd (1.);
+  return
+    jbm_2xf64_dbl
+    (jbm_2xf64_atan (_mm_sqrt_pd (_mm_div_pd (_mm_sub_pd (k1, x),
+                                              _mm_add_pd (k1, x)))));
 }
 
 /**

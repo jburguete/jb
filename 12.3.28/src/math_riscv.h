@@ -10763,15 +10763,14 @@ static inline vfloat32m1_t
 jbm_nxf32_acos (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                 const size_t vl)        ///< array size.
 {
-  vfloat32m1_t f;
-  f =
-    jbm_nxf32_atan (__riscv_vfdiv_vv_f32m1
-                    (__riscv_vfsqrt_v_f32m1
-                     (__riscv_vfnmsac_vv_f32m1
-                      (__riscv_vfmv_v_f_f32m1 (1.f, vl), x, x, vl),
-                      vl), x, vl), vl);
-  return __riscv_vmerge_vvm_f32m1 (f, __riscv_vfadd_vf_f32m1 (f, M_PIf, vl),
-                                   __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl), vl);
+  const vfloat32m1_t k1 = __riscv_vfmv_v_f_f32m1 (1.f, vl);
+  return
+    jbm_nxf32_dbl
+    (jbm_nxf32_atan
+     (__riscv_vfsqrt_v_f32m1
+      (__riscv_vfdiv_vv_f32m1 (_riscv_vfsub_vv_f32m1 (k1, x, vl),
+                               _riscv_vfadd_vv_f32m1 (k1, x, vl), vl), vl),
+      vl), vl);
 }
 
 /**
@@ -22057,15 +22056,14 @@ static inline vfloat64m1_t
 jbm_nxf64_acos (const vfloat64m1_t x,   ///< vfloat64m1_t number.
                 const size_t vl)        ///< array size.
 {
-  vfloat64m1_t f;
-  f =
-    jbm_nxf64_atan (__riscv_vfdiv_vv_f64m1
-                    (__riscv_vfsqrt_v_f64m1
-                     (__riscv_vfnmsac_vv_f64m1
-                      (__riscv_vfmv_v_f_f64m1 (1., vl), x, x, vl),
-                      vl), x, vl), vl);
-  return __riscv_vmerge_vvm_f64m1 (f, __riscv_vfadd_vf_f64m1 (f, M_PI, vl),
-                                   __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
+  const vfloat64m1_t k1 = __riscv_vfmv_v_f_f64m1 (1., vl);
+  return
+    jbm_nxf64_dbl
+    (jbm_nxf64_atan
+     (__riscv_vfsqrt_v_f64m1
+      (__riscv_vfdiv_vv_f64m1 (_riscv_vfsub_vv_f64m1 (k1, x, vl),
+                               _riscv_vfadd_vv_f64m1 (k1, x, vl), vl), vl),
+      vl), vl);
 }
 
 /**

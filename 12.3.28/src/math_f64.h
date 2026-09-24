@@ -4169,11 +4169,7 @@ jbm_f64_asin (const double x)   ///< double number.
 static inline double
 jbm_f64_acos (const double x)   ///< double number.
 {
-  double f;
-  f = jbm_f64_atan (sqrt (1. - x * x) / x);
-  if (x < 0.)
-    f += M_PI;
-  return f;
+  return jbm_f64_dbl (jbm_f64_atan (sqrt ((1. - x) / (1. + x))));
 }
 
 /**
