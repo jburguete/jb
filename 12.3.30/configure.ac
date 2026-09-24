@@ -1,6 +1,6 @@
 # Header
 AC_PREREQ([2.69])
-AC_INIT([jb],[12.3.29],[https://github.com/jburguete/jb])
+AC_INIT([jb],[12.3.28],[https://github.com/jburguete/jb])
 
 # Checks for operative systems
 AC_CANONICAL_TARGET
@@ -128,7 +128,14 @@ fi
 
 # Checking -flto compiler flag
 CC="$CC -flto"
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [lto=1], [lto=0])
+lto=0
+case $host_cpu in
+riscv*) # LTO is not working in gcc 14-15 for RISCV
+	;;
+*)
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[]])], [lto=1])
+	;;
+esac
 CC=$compiler
 if test $lto = 0; then
 	AC_MSG_NOTICE([checking for -flto... no])

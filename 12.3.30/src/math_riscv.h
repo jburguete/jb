@@ -10768,8 +10768,8 @@ jbm_nxf32_acos (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
     jbm_nxf32_dbl
     (jbm_nxf32_atan
      (__riscv_vfsqrt_v_f32m1
-      (__riscv_vfdiv_vv_f32m1 (_riscv_vfsub_vv_f32m1 (k1, x, vl),
-                               _riscv_vfadd_vv_f32m1 (k1, x, vl), vl), vl),
+      (__riscv_vfdiv_vv_f32m1 (__riscv_vfsub_vv_f32m1 (k1, x, vl),
+                               __riscv_vfadd_vv_f32m1 (k1, x, vl), vl), vl),
       vl), vl);
 }
 
@@ -10835,7 +10835,7 @@ jbm_nxf32_tanh (const vfloat32m1_t x,   ///< vfloat32m1_t number.
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_anxf32_sinh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
+jbm_nxf32_asinh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
                  const size_t vl)       ///< array size.
 {
   return
@@ -10853,7 +10853,7 @@ jbm_anxf32_sinh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_anxf32_cosh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
+jbm_nxf32_acosh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
                  const size_t vl)       ///< array size.
 {
   return
@@ -22061,8 +22061,8 @@ jbm_nxf64_acos (const vfloat64m1_t x,   ///< vfloat64m1_t number.
     jbm_nxf64_dbl
     (jbm_nxf64_atan
      (__riscv_vfsqrt_v_f64m1
-      (__riscv_vfdiv_vv_f64m1 (_riscv_vfsub_vv_f64m1 (k1, x, vl),
-                               _riscv_vfadd_vv_f64m1 (k1, x, vl), vl), vl),
+      (__riscv_vfdiv_vv_f64m1 (__riscv_vfsub_vv_f64m1 (k1, x, vl),
+                               __riscv_vfadd_vv_f64m1 (k1, x, vl), vl), vl),
       vl), vl);
 }
 
@@ -29025,7 +29025,7 @@ jbm_4xf32_tanh (const vfloat32m1_t x)   ///< vfloat32m1_t number.
 static inline vfloat32m1_t
 jbm_4xf32_asinh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
 {
-  return jbm_anxf32_sinh (x, 4);
+  return jbm_nxf32_asinh (x, 4);
 }
 
 /**
@@ -29036,7 +29036,7 @@ jbm_4xf32_asinh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
 static inline vfloat32m1_t
 jbm_4xf32_acosh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
 {
-  return jbm_anxf32_sinh (x, 4);
+  return jbm_nxf32_asinh (x, 4);
 }
 
 /**
@@ -42221,7 +42221,7 @@ jbm_8xf32_tanh (const vfloat32m1_t x)   ///< vfloat32m1_t number.
 static inline vfloat32m1_t
 jbm_8xf32_asinh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
 {
-  return jbm_anxf32_sinh (x, 8);
+  return jbm_nxf32_asinh (x, 8);
 }
 
 /**
@@ -42232,7 +42232,7 @@ jbm_8xf32_asinh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
 static inline vfloat32m1_t
 jbm_8xf32_acosh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
 {
-  return jbm_anxf32_sinh (x, 8);
+  return jbm_nxf32_asinh (x, 8);
 }
 
 /**
