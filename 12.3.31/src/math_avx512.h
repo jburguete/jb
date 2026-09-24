@@ -7432,8 +7432,7 @@ static inline __m512
 jbm_16xf32_exp2 (const __m512 x)        ///< __m512 vector.
 {
   const __m512 y = _mm512_floor_ps (x);
-  const __m512 f = _mm512_sub_ps (x, y);
-  return _mm512_scalef_ps (jbm_16xf32_exp2wc (f), y);
+  return _mm512_scalef_ps (jbm_16xf32_exp2wc (_mm512_sub_ps (x, y)), y);
 }
 
 /**
@@ -15387,8 +15386,7 @@ static inline __m512d
 jbm_8xf64_exp2 (const __m512d x)        ///< __m512d vector.
 {
   const __m512d y = _mm512_floor_pd (x);
-  const __m512d f = _mm512_sub_pd (x, y);
-  return _mm512_scalef_pd (jbm_8xf64_exp2wc (f), y);
+  return _mm512_scalef_pd (jbm_8xf64_exp2wc (_mm512_sub_pd (x, y)), y);
 }
 
 /**

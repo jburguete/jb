@@ -7151,14 +7151,11 @@ jbm_8xf32_exp2 (const __m256 x) ///< __m256 vector.
 {
 #if JBM_AVX512
   const __m256 y = _mm256_floor_ps (x);
-  const __m256 f = _mm256_sub_ps (x, y);
-  return _mm256_scalef_ps (jbm_8xf32_exp2wc (f), y);
+  return _mm256_scalef_ps (jbm_8xf32_exp2wc (_mm256_sub_ps (x, y)), y);
 #else
-  __m256 y, f;
-  y = _mm256_floor_ps (x);
-  f = _mm256_sub_ps (x, y);
-  y = jbm_8xf32_exp2n (_mm256_cvtps_epi32 (y));
-  return _mm256_mul_ps (y, jbm_8xf32_exp2wc (f));
+  const __m256 y = _mm256_floor_ps (x);
+  return jbm_8xf32_ldexp (jbm_8xf32_exp2wc (_mm256_sub_ps (x, y)),
+                          _mm256_cvtps_epi32 (y));
 #endif
 }
 
@@ -15201,15 +15198,11 @@ jbm_4xf64_exp2 (const __m256d x)        ///< __m256d vector.
 {
 #if JBM_AVX512
   const __m256d y = _mm256_floor_pd (x);
-  const __m256d f = _mm256_sub_pd (x, y);
-  return _mm256_scalef_pd (jbm_4xf64_exp2wc (f), y);
+  return _mm256_scalef_pd (jbm_4xf64_exp2wc (_mm256_sub_pd (x, y)), y);
 #else
-  __m256d y, f;
-  __m256i i;
-  y = _mm256_floor_pd (x);
-  f = _mm256_sub_pd (x, y);
-  i = _mm256_cvtepi32_epi64 (_mm256_cvttpd_epi32 (y));
-  return _mm256_mul_pd (jbm_4xf64_exp2n (i), jbm_4xf64_exp2wc (f));
+  const __m256d y = _mm256_floor_pd (x);
+  return jbm_4xf64_ldexp (jbm_4xf64_exp2wc (_mm256_sub_pd (x, y)),
+                          _mm256_cvtepi32_epi64 (_mm256_cvttpd_epi32 (y)));
 #endif
 }
 

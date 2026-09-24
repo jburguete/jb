@@ -7182,14 +7182,11 @@ jbm_4xf32_exp2 (const __m128 x) ///< __m128 vector.
 {
 #if JBM_AVX512
   const __m128 y = _mm_floor_ps (x);
-  const __m128 f = _mm_sub_ps (x, y);
-  return _mm_scalef_ps (jbm_4xf32_exp2wc (f), y);
+  return _mm_scalef_ps (jbm_4xf32_exp2wc (_mm_sub_ps (x, y)), y);
 #else
-  __m128 y, f;
-  y = _mm_floor_ps (x);
-  f = _mm_sub_ps (x, y);
-  y = jbm_4xf32_exp2n (_mm_cvtps_epi32 (y));
-  return _mm_mul_ps (y, jbm_4xf32_exp2wc (f));
+  const __m128 y = _mm_floor_ps (x);
+  return jbm_4xf32_ldexp (jbm_4xf32_exp2wc (_mm_sub_ps (x, y)),
+                          _mm_cvtps_epi32 (y));
 #endif
 }
 
@@ -15138,12 +15135,9 @@ jbm_2xf64_exp2 (const __m128d x)        ///< __m128d vector.
   const __m128d f = _mm_sub_pd (x, y);
   return _mm_scalef_pd (jbm_2xf64_exp2wc (f), y);
 #else
-  __m128d y, f;
-  __m128i i;
-  y = _mm_floor_pd (x);
-  f = _mm_sub_pd (x, y);
-  i = _mm_cvtepi32_epi64 (_mm_cvttpd_epi32 (y));
-  return _mm_mul_pd (jbm_2xf64_exp2n (i), jbm_2xf64_exp2wc (f));
+  const __m128d y = _mm_floor_pd (x);
+  return jbm_2xf64_ldexp (jbm_2xf64_exp2wc (_mm_sub_pd (x, y)),
+                          _mm_cvtepi32_epi64 (_mm_cvttpd_epi32 (y)));
 #endif
 }
 

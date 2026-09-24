@@ -10304,12 +10304,10 @@ static inline vfloat32m1_t
 jbm_nxf32_exp2 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                 const size_t vl)        ///< array size.
 {
-  vfloat32m1_t f, y;
-  vint32m1_t i;
-  i = jbm_nxf32_floor (x, vl);
-  f = __riscv_vfsub_vv_f32m1 (x, __riscv_vfcvt_f_x_v_f32m1 (i, vl), vl);
-  y = jbm_nxf32_exp2n (i, vl);
-  return __riscv_vfmul_vv_f32m1 (y, jbm_nxf32_exp2wc (f, vl), vl);
+  const vint32m1_t i = jbm_nxf32_floor (x, vl);
+  const vfloat32m1_t
+    f = __riscv_vfsub_vv_f32m1 (x, __riscv_vfcvt_f_x_v_f32m1 (i, vl), vl);
+  return jbm_nxf32_ldexp (jbm_nxf32_exp2wc (f, vl), i, vl);
 }
 
 /**
@@ -21622,12 +21620,10 @@ static inline vfloat64m1_t
 jbm_nxf64_exp2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                 const size_t vl)        ///< array size.
 {
-  vfloat64m1_t f, y;
-  vint64m1_t i;
-  i = jbm_nxf64_floor (x, vl);
-  f = __riscv_vfsub_vv_f64m1 (x, __riscv_vfcvt_f_x_v_f64m1 (i, vl), vl);
-  y = jbm_nxf64_exp2n (i, vl);
-  return __riscv_vfmul_vv_f64m1 (y, jbm_nxf64_exp2wc (f, vl), vl);
+  const vint64m1_t i = jbm_nxf64_floor (x, vl);
+  const vfloat64m1_t
+    f = __riscv_vfsub_vv_f64m1 (x, __riscv_vfcvt_f_x_v_f64m1 (i, vl), vl);
+  return jbm_nxf64_ldexp (jbm_nxf64_exp2wc (f, vl), i, vl);
 }
 
 /**

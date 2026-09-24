@@ -6997,11 +6997,9 @@ jbm_4xf32_exp2wc (const float32x4_t x)
 static inline float32x4_t
 jbm_4xf32_exp2 (const float32x4_t x)    ///< float32x4_t vector.
 {
-  float32x4_t y, f;
-  y = vrndmq_f32 (x);
-  f = vsubq_f32 (x, y);
-  y = jbm_4xf32_exp2n (vcvtq_s32_f32 (y));
-  return vmulq_f32 (y, jbm_4xf32_exp2wc (f));
+  const float32x4_t y = vrndmq_f32 (x);
+  return jbm_4xf32_ldexp (jbm_4xf32_exp2wc (vsubq_f32 (x, y)),
+                          vcvtq_s32_f32 (y));
 }
 
 /**
@@ -8142,7 +8140,8 @@ jbm_2xf64_exp2n (int64x2_t e)   ///< exponent vector (int64x2_t).
   const int64x2_t v1074 = vdupq_n_s64 (1074ll);
   float64x2_t x;
   x = vbslq_f64 (vcgtq_s64 (e, vdupq_n_s64 (-1022ll)),
-                 vreinterpretq_f64_s64 (vshlq_n_s64 (vaddq_s64 (e, v1023), 52ll)),
+                 vreinterpretq_f64_s64 (vshlq_n_s64 (vaddq_s64 (e, v1023),
+                                                     52ll)),
                  vreinterpretq_f64_s64 (vshlq_s64 (vdupq_n_s64 (1ll),
                                                    vaddq_s64 (v1074, e))));
   return vbslq_f64 (vcgtq_s64 (e, v1023), vdupq_n_f64 (INFINITY), x);
@@ -14812,11 +14811,9 @@ jbm_2xf64_exp2wc (const float64x2_t x)
 static inline float64x2_t
 jbm_2xf64_exp2 (const float64x2_t x)    ///< float64x2_t vector.
 {
-  float64x2_t y, f;
-  y = vrndmq_f64 (x);
-  f = vsubq_f64 (x, y);
-  y = jbm_2xf64_exp2n (vcvtq_s64_f64 (y));
-  return vmulq_f64 (y, jbm_2xf64_exp2wc (f));
+  const float64x2_t y = vrndmq_f64 (x);
+  return jbm_2xf64_ldexp (jbm_2xf64_exp2wc (vsubq_f64 (x, y)),
+                          vcvtq_s64_f64 (y));
 }
 
 /**
