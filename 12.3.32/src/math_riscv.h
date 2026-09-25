@@ -10390,7 +10390,9 @@ jbm_nxf32_log2wc (const vfloat32m1_t x,
                   ///< vfloat32m1_t vector \f$\in[0.5,1]\f$.
                   const size_t vl)      ///< array size.
 {
-  return jbm_nxf32_rational_6_3 (x, K_LOG2WC_F32, vl);
+  return
+    __riscv_vfmul_vv_f32m1 (x, jbm_nxf32_rational_5_2 (x, K_LOG2WC_F32, vl),
+                            vl);
 }
 
 /**
@@ -10403,17 +10405,18 @@ static inline vfloat32m1_t
 jbm_nxf32_log2 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                 const size_t vl)        ///< array size.
 {
-  vfloat32m1_t y, y2;
-  vint32m1_t e, e2;
+  vfloat32m1_t y;
+  vint32m1_t e, e1;
   vbool32_t m;
   y = jbm_nxf32_frexp (x, &e, vl);
   m = __riscv_vmflt_vf_f32m1_b32 (y, M_SQRT1_2f, vl);
-  y2 = __riscv_vfadd_vv_f32m1 (y, y, vl);
-  y = __riscv_vmerge_vvm_f32m1 (y, y2, m, vl);
-  e2 = __riscv_vsub_vx_i32m1 (e, 1, vl);
-  e = __riscv_vmerge_vvm_i32m1 (e, e2, m, vl);
-  y = __riscv_vfadd_vv_f32m1 (jbm_nxf32_log2wc (y, vl),
-                              __riscv_vfcvt_f_x_v_f32m1 (e, vl), vl);
+  y = __riscv_vmerge_vvm_f32m1 (y, __riscv_vfadd_vv_f32m1 (y, y, vl), m, vl);
+  e1 = __riscv_vsub_vx_i32m1 (e, 1, vl);
+  e = __riscv_vmerge_vvm_i32m1 (e, e1, m, vl);
+  y =
+    __riscv_vfadd_vv_f32m1 (jbm_nxf32_log2wc (__riscv_vfsub_vf_f32m1 (y, 1.f,
+                                                                      vl), vl),
+                            __riscv_vfcvt_f_x_v_f32m1 (e, vl), vl);
   y = __riscv_vfmerge_vfm_f32m1 (y, -INFINITY,
                                  __riscv_vmfeq_vf_f32m1_b32 (x, 0.f, vl), vl);
   y = __riscv_vfmerge_vfm_f32m1 (y, INFINITY,
@@ -10422,7 +10425,7 @@ jbm_nxf32_log2 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   y = __riscv_vfmerge_vfm_f32m1 (y, NAN,
                                  __riscv_vmflt_vf_f32m1_b32 (x, 0.f, vl), vl);
   return __riscv_vmerge_vvm_f32m1 (y, x,
-                                    __riscv_vmfne_vv_f32m1_b32 (x, x, vl), vl);
+                                   __riscv_vmfne_vv_f32m1_b32 (x, x, vl), vl);
 }
 
 /**
@@ -10550,12 +10553,10 @@ jbm_nxf32_sincoswc (const vfloat32m1_t x,
                     ///< pointer to the cos function value (vfloat32m1_t).
                     const size_t vl)    ///< array size.
 {
-  vfloat32m1_t s0;
-  *s = s0 = jbm_nxf32_sinwc (x, vl);
-  *c =
-    __riscv_vfsqrt_v_f32m1 (__riscv_vfsub_vv_f32m1
-                            (__riscv_vfmv_v_f_f32m1 (1.f, vl),
-                             jbm_nxf32_sqr (s0, vl), vl), vl);
+  vfloat32m1_t x2 = jbm_nxf32_sqr (x, vl);
+  *s = __riscv_vfmul_vv_f32m1 (x, jbm_nxf32_polynomial_3 (x2, K_SINWC_F32, vl),
+                               vl);
+  *c = jbm_nxf32_polynomial_3 (x2, K_COSWC_F32, vl);
 }
 
 /**
@@ -10573,7 +10574,7 @@ jbm_nxf32_trig (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
   t = __riscv_vfmul_vf_f32m1 (x, M_2_PIf, vl);
   *q = jbm_nxf32_round (t, vl);
   y = __riscv_vfcvt_f_x_v_f32m1 (*q, vl);
-  return __riscv_vfnmacc_vf_f32m1 (x, M_PI_2f, y, vl);
+  return __riscv_vfnmsac_vf_f32m1 (x, M_PI_2f, y, vl);
 }
 
 /**
@@ -10586,16 +10587,15 @@ static inline vfloat32m1_t
 jbm_nxf32_sin (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
                const size_t vl) ///< array size.
 {
-  vfloat32m1_t y, s, c, ns;
+  vfloat32m1_t y, s, c;
   vint32m1_t q;
-  vbool32_t m1, m2;
+  vbool32_t m;
   y = jbm_nxf32_trig (x, &q, vl);
   jbm_nxf32_sincoswc (y, &s, &c, vl);
-  m1 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 1, vl), 0, vl);
-  y = __riscv_vmerge_vvm_f32m1 (s, c, m1, vl);
-  m2 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 2, vl), 0, vl);
-  ns = jbm_nxf32_opposite (y, vl);
-  return __riscv_vmerge_vvm_f32m1 (y, ns, m2, vl);
+  m = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 1, vl), 0, vl);
+  y = __riscv_vmerge_vvm_f32m1 (s, c, m, vl);
+  m = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 2, vl), 0, vl);
+  return __riscv_vmerge_vvm_f32m1 (y, jbm_nxf32_opposite (y, vl), m, vl);
 }
 
 /**
@@ -10608,17 +10608,16 @@ static inline vfloat32m1_t
 jbm_nxf32_cos (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
                const size_t vl) ///< array size.
 {
-  vfloat32m1_t y, s, c, ns;
-  vint32m1_t q, q1;
-  vbool32_t m1, m2;
+  vfloat32m1_t y, s, c;
+  vint32m1_t q;
+  vbool32_t m;
   y = jbm_nxf32_trig (x, &q, vl);
   jbm_nxf32_sincoswc (y, &s, &c, vl);
-  m1 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 1, vl), 0, vl);
-  y  = __riscv_vmerge_vvm_f32m1 (c, s, m1, vl);
-  q1 = __riscv_vadd_vx_i32m1 (q, 1, vl);
-  m2 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q1, 2, vl), 0, vl);
-  ns = jbm_nxf32_opposite (y, vl);
-  return __riscv_vmerge_vvm_f32m1 (y, ns, m2, vl);
+  m = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 1, vl), 0, vl);
+  y  = __riscv_vmerge_vvm_f32m1 (c, s, m, vl);
+  q = __riscv_vadd_vx_i32m1 (q, 1, vl);
+  m = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 2, vl), 0, vl);
+  return __riscv_vmerge_vvm_f32m1 (y, jbm_nxf32_opposite (y, vl), m, vl);
 }
 
 /**
@@ -10634,21 +10633,19 @@ jbm_nxf32_sincos (const vfloat32m1_t x,
                   ///< pointer to the cos function value (vfloat32m1_t).
                   const size_t vl)      ///< array size.
 {
-  vfloat32m1_t y, s1, c1, s2, c2, ns, nc;
-  vint32m1_t q, q1;
-  vbool32_t m1, m2, m3;
+  vfloat32m1_t y, s1, c1, s2, c2;
+  vint32m1_t q;
+  vbool32_t m;
   y = jbm_nxf32_trig (x, &q, vl);
   jbm_nxf32_sincoswc (y, &s1, &c1, vl);
-  m1 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 1, vl), 0, vl);
-  s2 = __riscv_vmerge_vvm_f32m1 (s1, c1, m1, vl);
-  c2 = __riscv_vmerge_vvm_f32m1 (c1, s1, m1, vl);
-  m2 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 2, vl), 0, vl);
-  ns = jbm_nxf32_opposite (s2, vl);
-  *s = __riscv_vmerge_vvm_f32m1 (s2, ns, m2, vl);
-  q1 = __riscv_vadd_vx_i32m1 (q, 1, vl);
-  m3 = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q1, 2, vl), 0, vl);
-  nc = jbm_nxf32_opposite (c2, vl);
-  *c = __riscv_vmerge_vvm_f32m1 (c2, nc, m3, vl);
+  m = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 1, vl), 0, vl);
+  s2 = __riscv_vmerge_vvm_f32m1 (s1, c1, m, vl);
+  c2 = __riscv_vmerge_vvm_f32m1 (c1, s1, m, vl);
+  m = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 2, vl), 0, vl);
+  *s = __riscv_vmerge_vvm_f32m1 (s2, jbm_nxf32_opposite (s2, vl), m, vl);
+  q = __riscv_vadd_vx_i32m1 (q, 1, vl);
+  m = __riscv_vmsne_vx_i32m1_b32 (__riscv_vand_vx_i32m1 (q, 2, vl), 0, vl);
+  *c = __riscv_vmerge_vvm_f32m1 (c2, jbm_nxf32_opposite (c2, vl), m, vl);
 }
 
 /**
@@ -21679,7 +21676,9 @@ jbm_nxf64_log2wc (const vfloat64m1_t x,
 ///< vfloat64m1_t vector \f$\in[0.5,1]\f$.
                   const size_t vl)      ///< array size.
 {
-  return jbm_nxf64_rational_12_6 (x, K_LOG2WC_F64, vl);
+  return
+    __riscv_vfmul_vv_f64m1 (x, jbm_nxf64_rational_11_5 (x, K_LOG2WC_F64, vl),
+                            vl);
 }
 
 /**
@@ -21693,16 +21692,18 @@ jbm_nxf64_log2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                 const size_t vl)        ///< array size.
 {
   vfloat64m1_t y, y2;
-  vint64m1_t e, e2;
+  vint64m1_t e, e1;
   vbool64_t m;
   y = jbm_nxf64_frexp (x, &e, vl);
   m = __riscv_vmflt_vf_f64m1_b64 (y, M_SQRT1_2, vl);
   y2 = __riscv_vfadd_vv_f64m1 (y, y, vl);
   y = __riscv_vmerge_vvm_f64m1 (y, y2, m, vl);
-  e2 = __riscv_vsub_vx_i64m1 (e, 1ll, vl);
-  e = __riscv_vmerge_vvm_i64m1 (e, e2, m, vl);
-  y = __riscv_vfadd_vv_f64m1 (jbm_nxf64_log2wc (y, vl),
-                              __riscv_vfcvt_f_x_v_f64m1 (e, vl), vl);
+  e1 = __riscv_vsub_vx_i64m1 (e, 1ll, vl);
+  e = __riscv_vmerge_vvm_i64m1 (e, e1, m, vl);
+  y =
+    __riscv_vfadd_vv_f64m1 (jbm_nxf64_log2wc (__riscv_vfsub_vf_f64m1 (y, 1.,
+                                                                      vl), vl),
+                            __riscv_vfcvt_f_x_v_f64m1 (e, vl), vl);
   y = __riscv_vfmerge_vfm_f64m1 (y, -INFINITY,
                                  __riscv_vmfeq_vf_f64m1_b64 (x, 0., vl), vl);
   y = __riscv_vfmerge_vfm_f64m1 (y, INFINITY,
@@ -21711,7 +21712,7 @@ jbm_nxf64_log2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
   y = __riscv_vfmerge_vfm_f64m1 (y, NAN,
                                  __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
   return __riscv_vmerge_vvm_f64m1 (y, x,
-                                    __riscv_vmfne_vv_f64m1_b64 (x, x, vl), vl);
+                                   __riscv_vmfne_vv_f64m1_b64 (x, x, vl), vl);
 }
 
 /**
@@ -21840,12 +21841,10 @@ jbm_nxf64_sincoswc (const vfloat64m1_t x,
                     ///< pointer to the f64 function value (vfloat64m1_t).
                     const size_t vl)    ///< array size.
 {
-  vfloat64m1_t s0;
-  *s = s0 = jbm_nxf64_sinwc (x, vl);
-  *c =
-    __riscv_vfsqrt_v_f64m1 (__riscv_vfsub_vv_f64m1
-                            (__riscv_vfmv_v_f_f64m1 (1., vl),
-                             jbm_nxf64_sqr (x, vl), vl), vl);
+  vfloat64m1_t x2 = jbm_nxf64_sqr (x, vl);
+  *s = __riscv_vfmul_vv_f64m1 (x, jbm_nxf64_polynomial_6 (x2, K_SINWC_F64, vl),
+                               vl);
+  *c = jbm_nxf64_polynomial_6 (x2, K_COSWC_F64, vl);
 }
 
 /**
@@ -21863,7 +21862,7 @@ jbm_nxf64_trig (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
   t = __riscv_vfmul_vf_f64m1 (x, M_2_PI, vl);
   *q = jbm_nxf64_round (t, vl);
   y = __riscv_vfcvt_f_x_v_f64m1 (*q, vl);
-  return __riscv_vfnmacc_vf_f64m1 (x, M_PI_2, y, vl);
+  return __riscv_vfnmsac_vf_f64m1 (x, M_PI_2, y, vl);
 }
 
 /**
@@ -21876,16 +21875,15 @@ static inline vfloat64m1_t
 jbm_nxf64_sin (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                const size_t vl) ///< array size.
 {
-  vfloat64m1_t y, s, c, ns;
+  vfloat64m1_t y, s, c;
   vint64m1_t q;
-  vbool64_t m1, m2;
+  vbool64_t m;
   y = jbm_nxf64_trig (x, &q, vl);
   jbm_nxf64_sincoswc (y, &s, &c, vl);
-  m1 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1ll, vl), 0ll, vl);
-  y = __riscv_vmerge_vvm_f64m1 (s, c, m1, vl);
-  m2 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 2ll, vl), 0ll, vl);
-  ns = jbm_nxf64_opposite (y, vl);
-  return __riscv_vmerge_vvm_f64m1 (y, ns, m2, vl);
+  m = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1ll, vl), 0ll, vl);
+  y = __riscv_vmerge_vvm_f64m1 (s, c, m, vl);
+  m = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 2ll, vl), 0ll, vl);
+  return __riscv_vmerge_vvm_f64m1 (y, jbm_nxf64_opposite (y, vl), m, vl);
 }
 
 /**
@@ -21898,17 +21896,16 @@ static inline vfloat64m1_t
 jbm_nxf64_cos (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
                const size_t vl) ///< array size.
 {
-  vfloat64m1_t y, s, c, ns;
-  vint64m1_t q, q1;
-  vbool64_t m1, m2;
+  vfloat64m1_t y, s, c;
+  vint64m1_t q;
+  vbool64_t m;
   y = jbm_nxf64_trig (x, &q, vl);
   jbm_nxf64_sincoswc (y, &s, &c, vl);
-  m1 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1, vl), 0, vl);
-  y  = __riscv_vmerge_vvm_f64m1 (c, s, m1, vl);
-  q1 = __riscv_vadd_vx_i64m1 (q, 1, vl);
-  m2 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q1, 2, vl), 0, vl);
-  ns = jbm_nxf64_opposite (y, vl);
-  return __riscv_vmerge_vvm_f64m1 (y, ns, m2, vl);
+  m = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1, vl), 0, vl);
+  y  = __riscv_vmerge_vvm_f64m1 (c, s, m, vl);
+  q = __riscv_vadd_vx_i64m1 (q, 1, vl);
+  m = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 2, vl), 0, vl);
+  return __riscv_vmerge_vvm_f64m1 (y, jbm_nxf64_opposite (y, vl), m, vl);
 }
 
 /**
@@ -21924,21 +21921,19 @@ jbm_nxf64_sincos (const vfloat64m1_t x,
                   ///< pointer to the cos function value (vfloat64m1_t).
                   const size_t vl)      ///< array size.
 {
-  vfloat64m1_t y, s1, c1, s2, c2, ns, nc;
-  vint64m1_t q, q1;
-  vbool64_t m1, m2, m3;
+  vfloat64m1_t y, s1, c1, s2, c2;
+  vint64m1_t q;
+  vbool64_t m;
   y = jbm_nxf64_trig (x, &q, vl);
   jbm_nxf64_sincoswc (y, &s1, &c1, vl);
-  m1 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1, vl), 0, vl);
-  s2 = __riscv_vmerge_vvm_f64m1 (s1, c1, m1, vl);
-  c2 = __riscv_vmerge_vvm_f64m1 (c1, s1, m1, vl);
-  m2 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 2, vl), 0, vl);
-  ns = jbm_nxf64_opposite (s2, vl);
-  *s = __riscv_vmerge_vvm_f64m1 (s2, ns, m2, vl);
-  q1 = __riscv_vadd_vx_i64m1 (q, 1, vl);
-  m3 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q1, 2, vl), 0, vl);
-  nc = jbm_nxf64_opposite (c2, vl);
-  *c = __riscv_vmerge_vvm_f64m1 (c2, nc, m3, vl);
+  m = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1, vl), 0, vl);
+  s2 = __riscv_vmerge_vvm_f64m1 (s1, c1, m, vl);
+  c2 = __riscv_vmerge_vvm_f64m1 (c1, s1, m, vl);
+  m = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 2, vl), 0, vl);
+  *s = __riscv_vmerge_vvm_f64m1 (s2, jbm_nxf64_opposite (s2, vl), m, vl);
+  q = __riscv_vadd_vx_i64m1 (q, 1, vl);
+  m = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 2, vl), 0, vl);
+  *c = __riscv_vmerge_vvm_f64m1 (c2, jbm_nxf64_opposite (c2, vl), m, vl);
 }
 
 /**
@@ -21953,11 +21948,11 @@ jbm_nxf64_tan (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
 {
   vfloat64m1_t y, z;
   vint64m1_t q;
-  vbool64_t m1;
+  vbool64_t m;
   y  = jbm_nxf64_tanwc (jbm_nxf64_trig (x, &q, vl), vl);
   z  = __riscv_vfrdiv_vf_f64m1 (y, -1.f, vl);
-  m1 = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1, vl), 0, vl);
-  return __riscv_vmerge_vvm_f64m1 (y, z, m1, vl);
+  m = __riscv_vmsne_vx_i64m1_b64 (__riscv_vand_vx_i64m1 (q, 1, vl), 0, vl);
+  return __riscv_vmerge_vvm_f64m1 (y, z, m, vl);
 }
 
 /**

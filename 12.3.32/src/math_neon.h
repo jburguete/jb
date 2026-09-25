@@ -7209,7 +7209,7 @@ jbm_4xf32_sincoswc (const float32x4_t x,
                     float32x4_t *c)
                     ///< pointer to the cos function value (float32x4_t).
 {
-  float32x4_t x2 = jbm_4xf32_sqr (x);
+  const float32x4_t x2 = jbm_4xf32_sqr (x);
   *s = vmulq_f32 (x, jbm_4xf32_polynomial_3 (x2, K_SINWC_F32));
   *c = jbm_4xf32_polynomial_3 (x2, K_COSWC_F32);
 }
@@ -15000,7 +15000,7 @@ jbm_2xf64_sincoswc (const float64x2_t x,
                     float64x2_t *c)
   ///< pointer to the f64 function value (float64x2_t).
 {
-  float64x2_t x2 = jbm_2xf64_sqr (x);
+  const float64x2_t x2 = jbm_2xf64_sqr (x);
   *s = vmulq_f64 (x, jbm_2xf64_polynomial_6 (x2, K_SINWC_F64));
   *c = jbm_2xf64_polynomial_6 (x2, K_COSWC_F64);
 }

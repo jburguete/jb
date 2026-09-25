@@ -7650,7 +7650,7 @@ jbm_16xf32_sincoswc (const __m512 x,
                      __m512 *s, ///< pointer to the sin function value (__m512).
                      __m512 *c) ///< pointer to the cos function value (__m512).
 {
-  __m512 x2 = jbm_16xf32_sqr (x);
+  const __m512 x2 = jbm_16xf32_sqr (x);
   *s = _mm512_mul_ps (x, jbm_16xf32_polynomial_3 (x2, K_SINWC_F32));
   *c = jbm_16xf32_polynomial_3 (x2, K_COSWC_F32);
 }
@@ -15582,7 +15582,7 @@ jbm_8xf64_sincoswc (const __m512d x,
                     __m512d *c)
     ///< pointer to the sin function value (__m512d).
 {
-  __m512d x2 = jbm_8xf64_sqr (x);
+  const __m512d x2 = jbm_8xf64_sqr (x);
   *s = _mm512_mul_pd (x, jbm_8xf64_polynomial_6 (x2, K_SINWC_F64));
   *c = jbm_8xf64_polynomial_6 (x2, K_COSWC_F64);
 }
