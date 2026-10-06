@@ -343,6 +343,7 @@ jbm_4xf32_exp2n (int32x4_t e)   ///< exponent vector (int32x4_t).
                  vreinterpretq_f32_s32 (vshlq_n_s32 (vaddq_s32 (e, v127), 23)),
                  vreinterpretq_f32_s32 (vshlq_s32 (vdupq_n_s32 (1),
                                                    vaddq_s32 (v149, e))));
+  x = vbslq_f32 (vcltq_s32 (e, vdupq_n_s32 (-150)), vdupq_n_f32 (0.f), x);
   return vbslq_f32 (vcgtq_s32 (e, v127), vdupq_n_f32 (INFINITY), x);
 }
 
@@ -8144,6 +8145,7 @@ jbm_2xf64_exp2n (int64x2_t e)   ///< exponent vector (int64x2_t).
                                                      52ll)),
                  vreinterpretq_f64_s64 (vshlq_s64 (vdupq_n_s64 (1ll),
                                                    vaddq_s64 (v1074, e))));
+  x = vbslq_f64 (vcltq_s64 (e, vdupq_n_s64 (-1075ll)), vdupq_n_f64 (0.), x);
   return vbslq_f64 (vcgtq_s64 (e, v1023), vdupq_n_f64 (INFINITY), x);
 }
 

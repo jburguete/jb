@@ -407,12 +407,11 @@ jbm_nxf32_exp2n (vint32m1_t e,  ///< exponent vector (vint32m1_t).
       (__riscv_vmerge_vvm_u32m1
        (__riscv_vsll_vx_u32m1 (__riscv_vreinterpret_v_i32m1_u32m1
                                (__riscv_vadd_vx_i32m1 (e, 127, vl)), 23, vl),
-        __riscv_vsrl_vv_u32m1
-        (__riscv_vmv_v_x_u32m1 (0x00400000, vl),
-         __riscv_vreinterpret_v_i32m1_u32m1
-         (__riscv_vrsub_vx_i32m1 (e, -127, vl)), vl),
+        __riscv_vsll_vv_u32m1 (__riscv_vmv_v_x_u32m1 (1, vl),
+                               __riscv_vreinterpret_v_i32m1_u32m1
+                               (__riscv_vadd_vx_i32m1 (e, 149, vl)), vl),
         __riscv_vmslt_vx_i32m1_b32 (e, -126, vl), vl), 0,
-       __riscv_vmslt_vx_i32m1_b32 (e, -150, vl), vl), JBM_F32_BITS_EXPONENT,
+       __riscv_vmslt_vx_i32m1_b32 (e, -149, vl), vl), JBM_F32_BITS_EXPONENT,
       __riscv_vmsgt_vx_i32m1_b32 (e, 127, vl), vl));
 }
 
@@ -11699,11 +11698,12 @@ jbm_nxf64_exp2n (vint64m1_t e,  ///< exponent vector (vint64m1_t).
        (__riscv_vsll_vx_u64m1 (__riscv_vreinterpret_v_i64m1_u64m1
                                (__riscv_vadd_vx_i64m1 (e, 1023ll, vl)), 52ll,
                                vl),
-        __riscv_vsrl_vv_u64m1 (__riscv_vmv_v_x_u64m1 (0x0008000000000000ll, vl),
+        __riscv_vsll_vv_u64m1 (__riscv_vmv_v_x_u64m1 (1ll, vl),
                                __riscv_vreinterpret_v_i64m1_u64m1
-                               (__riscv_vrsub_vx_i64m1 (e, -1023ll, vl)), vl),
-        __riscv_vmslt_vx_i64m1_b64 (e, -1023ll, vl), vl), 0,
-       __riscv_vmslt_vx_i64m1_b64 (e, -1074ll, vl), vl), 0x7ff0000000000000ll,
+                               (__riscv_vadd_vx_i64m1 (e, 1074ll, vl)), vl),
+        __riscv_vmslt_vx_i64m1_b64 (e, -1022ll, vl), vl), 0,
+       __riscv_vmslt_vx_i64m1_b64 (e, -1074ll, vl), vl),
+      (int64_t) JBM_F64_BITS_EXPONENT,
       __riscv_vmsgt_vx_i64m1_b64 (e, 1023ll, vl), vl));
 }
 

@@ -8408,7 +8408,7 @@ jbm_2xf64_exp2n (const __m128i e)       ///< exponent vector (__m128i).
   // normal and subnormal
   x = _mm_blendv_pd
     (_mm_castsi128_pd
-     (_mm_slli_epi64 (_mm_add_epi64 (e, v1023), 52)),
+     (_mm_slli_epi64 (_mm_add_epi64 (e, v1023), 52ll)),
      _mm_castsi128_pd
      (_mm_sllv_epi64 (_mm_set1_epi64x (1),
                       _mm_add_epi64 (e, _mm_set1_epi64x (1074ll)))),
@@ -15364,12 +15364,12 @@ jbm_2xf64_sin (const __m128d x) ///< __m128d vector.
   y = _mm_blendv_pd
     (s, c,
      _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, _mm_set1_epi64x (1)),
-                                       63)));
+                                       63ll)));
   return
     _mm_xor_pd
     (y,
      _mm_castsi128_pd (_mm_slli_epi64
-                       (_mm_and_si128 (q, _mm_set1_epi64x (2)), 62)));
+                       (_mm_and_si128 (q, _mm_set1_epi64x (2)), 62ll)));
 }
 
 /**
@@ -15387,12 +15387,12 @@ jbm_2xf64_cos (const __m128d x) ///< __m128d vector.
   y = jbm_2xf64_trig (x, &q);
   jbm_2xf64_sincoswc (y, &s, &c);
   y = _mm_blendv_pd
-    (c, s, _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, v1), 63)));
+    (c, s, _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, v1), 63ll)));
   return
     _mm_xor_pd
     (y, _mm_castsi128_pd
      (_mm_slli_epi64 (_mm_and_si128 (_mm_add_epi64 (q, v1),
-                                     _mm_set1_epi64x (2)), 62)));
+                                     _mm_set1_epi64x (2)), 62ll)));
 }
 
 /**
@@ -15411,16 +15411,16 @@ jbm_2xf64_sincos (const __m128d x,
   __m128i q;
   y = jbm_2xf64_trig (x, &q);
   jbm_2xf64_sincoswc (y, &s1, &c1);
-  m = _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, v1), 63));
+  m = _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, v1), 63ll));
   s2 = _mm_blendv_pd (s1, c1, m);
   c2 = _mm_blendv_pd (c1, s1, m);
   *s = _mm_xor_pd (s2,
                    _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, v2),
-                                                     62)));
+                                                     62ll)));
   *c = _mm_xor_pd
     (c2,
      _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (_mm_add_epi64 (q, v1),
-                                                      v2), 62)));
+                                                      v2), 62ll)));
 }
 
 /**
@@ -15439,7 +15439,7 @@ jbm_2xf64_tan (const __m128d x) ///< __m128d vector.
     _mm_blendv_pd
     (y, _mm_div_pd (_mm_set1_pd (-1.), y),
      _mm_castsi128_pd (_mm_slli_epi64 (_mm_and_si128 (q, _mm_set1_epi64x (1)),
-                                       63)));
+                                       63ll)));
 }
 
 /**
