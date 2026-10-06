@@ -97,6 +97,7 @@ if test $CC = "clang"; then
 	fi
 	AC_MSG_NOTICE([llvm-profdata: $LLVM_PROFDATA])
 fi
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
 
 # Checks for compiler flags
 compiler=$CC
@@ -341,7 +342,6 @@ else
 fi
 
 # Detect Doxygen and CPU
-AS_IF([test -z "$DOXYGEN"], [AC_MSG_WARN([Doxygen not found])])
 AS_CASE([$host_cpu],
 	[x86_64*|amd64*],
 	[
@@ -358,15 +358,13 @@ AS_CASE([$host_cpu],
 		DOXYGEN_PREDEFINED="__riscv_vector=1"
 		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h"
 	],
-	[
-		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h src/math_riscv.h"
-		AC_MSG_ERROR([Unsupported architecture: $host_cpu])
-	]
+	[AC_MSG_ERROR([Unsupported architecture: $host_cpu])]
 )
+AC_SUBST([DOXYGEN])
 AC_SUBST([DOXYGEN_PREDEFINED])
 AC_SUBST([DOXYGEN_EXCLUDE])
 
 # Final output
 AC_CONFIG_HEADERS([src/config.h])
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile Doxyfile])
 AC_OUTPUT

@@ -188,8 +188,12 @@ it = $(locale)it/LC_MESSAGES/
 pot = $(locale)jb.pot
 locales = $(es)jb.mo $(fr)jb.mo $(it)jb.mo
 
+ifneq (@DOXYGEN@,)
+DOC = doc/latex/refman.pdf
+endif
+
 # Default building
-all: $(OBJ) $(BIN) $(BINPGO) @EXEBIN@ $(locales) doc/latex/refman.pdf
+all: $(OBJ) $(BIN) $(BINPGO) @EXEBIN@ $(locales) $(DOC)
 
 # Directories
 $(OBJ):
@@ -419,7 +423,7 @@ $(it)jb.mo: $(pot) $(it)jb.po
 
 # Documentation
 doc/latex/refman.pdf: $(src) Doxyfile Makefile
-	doxygen
+	@DOXYGEN@
 	cd doc/latex; pdflatex refman; pdflatex refman;
 
 # Final version
@@ -430,4 +434,4 @@ strip:
 
 # Clean
 clean:
-	rm -rf doc $(OBJ) $(BIN) $(BINPGO)
+	rm -rf doc Doxyfile Makefile $(OBJ) $(BIN) $(BINPGO)

@@ -1050,8 +1050,7 @@ RECURSIVE              = NO
 # Note that relative paths are relative to the directory from which Doxygen is
 # run.
 
-EXCLUDE                = src/fc2i.c \
-                         src/fc2i.h
+EXCLUDE                = src/fc2i.c src/fc2i.h @DOXYGEN_EXCLUDE@
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -2512,7 +2511,7 @@ PREDEFINED             = __attribute__(x)= \
                          JBW_GTK=2 \
                          JBM_HIGH_PRECISION=2 \
                          JBM_LOW_PRECISION=1 \
-                         JBW_NO=1
+                         JBW_NO=1 @DOXYGEN_PREDEFINED@
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
