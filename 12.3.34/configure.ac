@@ -340,6 +340,32 @@ else
 	AC_SUBST(SUFFIX, [-2])
 fi
 
+# Detect Doxygen and CPU
+AS_IF([test -z "$DOXYGEN"], [AC_MSG_WARN([Doxygen not found])])
+AS_CASE([$host_cpu],
+	[x86_64*|amd64*],
+	[
+		DOXYGEN_PREDEFINED="__SSE4_2__=1 __AVX2__=1 JBM_AVX512=1"
+		DOXYGEN_EXCLUDE="src/math_neon.h src/math_riscv.h"
+	],
+	[aarch64*|arm64*],
+	[
+		DOXYGEN_PREDEFINED="__ARM_NEON=1"
+		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_riscv.h"
+	],
+	[riscv64*],
+	[
+		DOXYGEN_PREDEFINED="__riscv_vector=1"
+		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h"
+	],
+	[
+		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h src/math_riscv.h"
+		AC_MSG_ERROR([Unsupported architecture: $host_cpu])
+	]
+)
+AC_SUBST([DOXYGEN_PREDEFINED])
+AC_SUBST([DOXYGEN_EXCLUDE])
+
 # Final output
 AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([Makefile])

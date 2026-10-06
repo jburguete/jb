@@ -153,12 +153,20 @@ print_m256d (FILE *file, const char *label, __m256d x)
 #if !JBM_AVX512
 
 static inline __m256d
-_mm256_cvtepi64_pd (__m256i x)
+_mm256_cvtepi64_pd (const __m256i x)
 {
   const __m256i i = _mm256_setr_epi32 (0, 2, 4, 6, 0, 0, 0, 0);
   return
     _mm256_cvtepi32_pd
     (_mm256_castsi256_si128 (_mm256_permutevar8x32_epi32 (x, i)));
+}
+
+static inline __m256i
+_mm256_cvtpd_epi64 (const __m256d x)
+{
+  return _mm256_set_m128i (
+    _mm_cvtpd_epi64 (_mm256_extractf128_pd (x, 1)),
+    _mm_cvtpd_epi64 (_mm256_castpd256_pd128 (x)));
 }
 
 #endif

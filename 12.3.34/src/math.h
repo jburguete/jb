@@ -674,11 +674,9 @@ enum JBMFluxLimiterType
 #include "math_avx512.h"
 #endif
 #endif
-#endif
-#if __ARM_NEON
+#elif __ARM_NEON
 #include "math_neon.h"
-#endif
-#if __riscv_vector
+#elif __riscv_vector
 #include "math_riscv.h"
 #endif
 
