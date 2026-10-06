@@ -7848,10 +7848,15 @@ jbm_16xf32_acos (const __m512 x)        ///< __m512 vector.
 static inline __m512
 jbm_16xf32_sinh (const __m512 x)        ///< __m512 number.
 {
-  __m512 f;
-  f = jbm_16xf32_exp (x);
-  return _mm512_mul_ps (_mm512_set1_ps (0.5f),
-                        _mm512_sub_ps (f, jbm_16xf32_reciprocal (f)));
+  const __m512 f = jbm_16xf32_expm1 (jbm_16xf32_abs (x));
+  return
+    jbm_16xf32_copysign
+    (_mm512_mul_ps
+     (_mm512_set1_ps (0.5f),
+      _mm512_add_ps (f,
+                     _mm512_div_ps (f,
+                                    _mm512_add_ps (_mm512_set1_ps (1.f), f)))),
+     x);
 }
 
 /**
@@ -7876,17 +7881,16 @@ jbm_16xf32_cosh (const __m512 x)        ///< __m512 number.
 static inline __m512
 jbm_16xf32_tanh (const __m512 x)        ///< __m512 number.
 {
-  __m512 f, fi;
-  f = jbm_16xf32_exp (x);
-  fi = jbm_16xf32_reciprocal (f);
-  f = _mm512_div_ps (_mm512_sub_ps (f, fi), _mm512_add_ps (f, fi));
-  f = _mm512_mask_mov_ps
-    (f, _mm512_cmp_ps_mask (x, _mm512_set1_ps (JBM_FLT_MAX_E_EXP), _CMP_GT_OS),
-     _mm512_set1_ps (1.f));
+  const __m512 x2 = jbm_16xf32_dbl (x);
+  __m512 f = jbm_16xf32_expm1 (x2);
+  f = _mm512_div_ps (f, _mm512_add_ps (f, _mm512_set1_ps (2.f)));
+  f = _mm512_blendv_ps (f, _mm512_set1_ps (1.f),
+                       _mm512_cmpgt_ps (x2,
+                                        _mm512_set1_ps (JBM_FLT_MAX_E_EXP)));
   return
-    _mm512_mask_mov_ps
-    (f, _mm512_cmp_ps_mask (x, _mm512_set1_ps (-JBM_FLT_MAX_E_EXP), _CMP_LT_OS),
-     _mm512_set1_ps (-1.f));
+    _mm512_blendv_ps (f, _mm512_set1_ps (-1.f),
+                      _mm512_cmplt_ps (x2,
+                                       _mm512_set1_ps (-JBM_FLT_MAX_E_EXP)));
 }
 
 /**
@@ -15783,10 +15787,15 @@ jbm_8xf64_acos (const __m512d x)        ///< __m512d number.
 static inline __m512d
 jbm_8xf64_sinh (const __m512d x)        ///< __m512d number.
 {
-  __m512d f;
-  f = jbm_8xf64_exp (x);
-  return _mm512_mul_pd (_mm512_set1_pd (0.5),
-                        _mm512_sub_pd (f, jbm_8xf64_reciprocal (f)));
+  const __m512d f = jbm_8xf64_expm1 (jbm_8xf64_abs (x));
+  return
+    jbm_8xf64_copysign
+    (_mm512_mul_pd
+     (_mm512_set1_pd (0.5),
+      _mm512_add_pd (f,
+                     _mm512_div_pd (f,
+                                    _mm512_add_pd (_mm512_set1_pd (1.), f)))),
+     x);
 }
 
 /**
@@ -15811,16 +15820,16 @@ jbm_8xf64_cosh (const __m512d x)        ///< __m512d number.
 static inline __m512d
 jbm_8xf64_tanh (const __m512d x)        ///< __m512d number.
 {
-  __m512d f, fi;
-  f = jbm_8xf64_exp (x);
-  fi = jbm_8xf64_reciprocal (f);
-  f = _mm512_div_pd (_mm512_sub_pd (f, fi), _mm512_add_pd (f, fi));
-  f = _mm512_mask_mov_pd
-    (f, _mm512_cmp_pd_mask (x, _mm512_set1_pd (JBM_DBL_MAX_E_EXP), _CMP_GT_OS),
-     _mm512_set1_pd (1.));
-  return _mm512_mask_mov_pd
-    (f, _mm512_cmp_pd_mask (x, _mm512_set1_pd (-JBM_DBL_MAX_E_EXP), _CMP_LT_OS),
-     _mm512_set1_pd (-1.));
+  const __m512d x2 = jbm_8xf64_dbl (x);
+  __m512 f = jbm_8xf64_expm1 (x2);
+  f = _mm512_div_pd (f, _mm512_add_pd (f, _mm512_set1_pd (2.)));
+  f = _mm512_blendv_pd (f, _mm512_set1_pd (1.),
+                       _mm512_cmpgt_pd (x2,
+                                        _mm512_set1_pd (JBM_DBL_MAX_E_EXP)));
+  return
+    _mm512_blendv_pd (f, _mm512_set1_pd (-1.),
+                      _mm512_cmplt_pd (x2,
+                                       _mm512_set1_pd (-JBM_DBL_MAX_E_EXP)));
 }
 
 /**

@@ -4180,9 +4180,8 @@ jbm_f64_acos (const double x)   ///< double number.
 static inline double
 jbm_f64_sinh (const double x)   ///< double number.
 {
-  double f;
-  f = jbm_f64_exp (x);
-  return 0.5 * (f - 1. / f);
+  const double f = jbm_f64_expm1 (jbm_f64_abs (x));
+  return jbm_f64_copysign (0.5 * (f + f / (1. + f)), x);
 }
 
 /**
@@ -4206,14 +4205,13 @@ jbm_f64_cosh (const double x)   ///< double number.
 static inline double
 jbm_f64_tanh (const double x)   ///< double number.
 {
-  double f, fi;
-  if (x > JBM_DBL_MAX_E_EXP)
+  const double x2 = jbm_f64_dbl (x);
+  const double f = jbm_f64_expm1 (x2);
+  if (x2 > JBM_DBL_MAX_E_EXP)
     return 1.f;
-  if (x < -JBM_DBL_MAX_E_EXP)
+  if (x2 < -JBM_DBL_MAX_E_EXP)
     return -1.;
-  f = jbm_f64_exp (x);
-  fi = 1. / f;
-  return (f - fi) / (f + fi);
+  return f / (f + 2.);
 }
 
 /**

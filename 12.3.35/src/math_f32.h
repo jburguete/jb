@@ -4141,9 +4141,8 @@ jbm_f32_acos (const float x)    ///< float number.
 static inline float
 jbm_f32_sinh (const float x)    ///< float number.
 {
-  float f;
-  f = jbm_f32_exp (x);
-  return 0.5f * (f - 1.f / f);
+  const float f = jbm_f32_expm1 (jbm_f32_abs (x));
+  return jbm_f32_copysign (0.5f * (f + f / (1.f + f)), x);
 }
 
 /**
@@ -4167,14 +4166,13 @@ jbm_f32_cosh (const float x)    ///< float number.
 static inline float
 jbm_f32_tanh (const float x)    ///< float number.
 {
-  float f, fi;
-  if (x > JBM_FLT_MAX_E_EXP)
+  const float x2 = jbm_f32_dbl (x);
+  const float f = jbm_f32_expm1 (x2);
+  if (x2 > JBM_FLT_MAX_E_EXP)
     return 1.f;
-  if (x < -JBM_FLT_MAX_E_EXP)
+  if (x2 < -JBM_FLT_MAX_E_EXP)
     return -1.f;
-  f = jbm_f32_exp (x);
-  fi = 1.f / f;
-  return (f - fi) / (f + fi);
+  return f / (f + 2.f);
 }
 
 /**

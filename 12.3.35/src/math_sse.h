@@ -7601,10 +7601,14 @@ jbm_4xf32_acos (const __m128 x) ///< __m128 vector.
 static inline __m128
 jbm_4xf32_sinh (const __m128 x) ///< __m128 number.
 {
-  __m128 f;
-  f = jbm_4xf32_exp (x);
-  return _mm_mul_ps (_mm_set1_ps (0.5f),
-                     _mm_sub_ps (f, jbm_4xf32_reciprocal (f)));
+  const __m128 f = jbm_4xf32_expm1 (jbm_4xf32_abs (x));
+  return
+    jbm_4xf32_copysign
+    (_mm_mul_ps (_mm_set1_ps (0.5f),
+                 _mm_add_ps (f,
+                             _mm_div_ps (f,
+                                         _mm_add_ps (_mm_set1_ps (1.f), f)))),
+     x);
 }
 
 /**
@@ -7615,8 +7619,7 @@ jbm_4xf32_sinh (const __m128 x) ///< __m128 number.
 static inline __m128
 jbm_4xf32_cosh (const __m128 x) ///< __m128 number.
 {
-  __m128 f;
-  f = jbm_4xf32_exp (x);
+  const __m128 f = jbm_4xf32_exp (x);
   return _mm_mul_ps (_mm_set1_ps (0.5f),
                      _mm_add_ps (f, jbm_4xf32_reciprocal (f)));
 }
@@ -7629,14 +7632,13 @@ jbm_4xf32_cosh (const __m128 x) ///< __m128 number.
 static inline __m128
 jbm_4xf32_tanh (const __m128 x) ///< __m128 number.
 {
-  __m128 f, fi;
-  f = jbm_4xf32_exp (x);
-  fi = jbm_4xf32_reciprocal (f);
-  f = _mm_div_ps (_mm_sub_ps (f, fi), _mm_add_ps (f, fi));
+  const __m128 x2 = jbm_4xf32_dbl (x);
+  __m128 f = jbm_4xf32_expm1 (x2);
+  f = _mm_div_ps (f, _mm_add_ps (f, _mm_set1_ps (2.f)));
   f = _mm_blendv_ps (f, _mm_set1_ps (1.f),
-                     _mm_cmpgt_ps (x, _mm_set1_ps (JBM_FLT_MAX_E_EXP)));
+                     _mm_cmpgt_ps (x2, _mm_set1_ps (JBM_FLT_MAX_E_EXP)));
   return _mm_blendv_ps (f, _mm_set1_ps (-1.f),
-                        _mm_cmplt_ps (x, _mm_set1_ps (-JBM_FLT_MAX_E_EXP)));
+                        _mm_cmplt_ps (x2, _mm_set1_ps (-JBM_FLT_MAX_E_EXP)));
 }
 
 /**
@@ -15533,10 +15535,13 @@ jbm_2xf64_acos (const __m128d x)        ///< __m128d number.
 static inline __m128d
 jbm_2xf64_sinh (const __m128d x)        ///< __m128d number.
 {
-  __m128d f;
-  f = jbm_2xf64_exp (x);
-  return _mm_mul_pd (_mm_set1_pd (0.5),
-                     _mm_sub_pd (f, jbm_2xf64_reciprocal (f)));
+  const __m128d f = jbm_2xf64_expm1 (jbm_2xf64_abs (x));
+  return
+    jbm_2xf64_copysign
+    (_mm_mul_pd (_mm_set1_pd (0.5),
+                 _mm_add_pd (f,
+                             _mm_div_pd (f, _mm_add_pd (_mm_set1_pd (1.), f)))),
+     x);
 }
 
 /**
@@ -15561,14 +15566,13 @@ jbm_2xf64_cosh (const __m128d x)        ///< __m128d number.
 static inline __m128d
 jbm_2xf64_tanh (const __m128d x)        ///< __m128d number.
 {
-  __m128d f, fi;
-  f = jbm_2xf64_exp (x);
-  fi = jbm_2xf64_reciprocal (f);
-  f = _mm_div_pd (_mm_sub_pd (f, fi), _mm_add_pd (f, fi));
+  const __m128d x2 = jbm_2xf64_dbl (x);
+  __m128d f = jbm_2xf64_expm1 (x2);
+  f = _mm_div_pd (f, _mm_add_pd (f, _mm_set1_pd (2.)));
   f = _mm_blendv_pd (f, _mm_set1_pd (1.),
-                     _mm_cmpgt_pd (x, _mm_set1_pd (JBM_DBL_MAX_E_EXP)));
+                     _mm_cmpgt_pd (x2, _mm_set1_pd (JBM_DBL_MAX_E_EXP)));
   return _mm_blendv_pd (f, _mm_set1_pd (-1.),
-                        _mm_cmplt_pd (x, _mm_set1_pd (-JBM_DBL_MAX_E_EXP)));
+                        _mm_cmplt_pd (x2, _mm_set1_pd (-JBM_DBL_MAX_E_EXP)));
 }
 
 /**

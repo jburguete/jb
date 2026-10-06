@@ -7588,10 +7588,15 @@ jbm_8xf32_acos (const __m256 x) ///< __m256 vector.
 static inline __m256
 jbm_8xf32_sinh (const __m256 x) ///< __m256 number.
 {
-  __m256 f;
-  f = jbm_8xf32_exp (x);
-  return _mm256_mul_ps (_mm256_set1_ps (0.5f),
-                        _mm256_sub_ps (f, jbm_8xf32_reciprocal (f)));
+  const __m256 f = jbm_8xf32_expm1 (jbm_8xf32_abs (x));
+  return
+    jbm_8xf32_copysign
+    (_mm256_mul_ps
+     (_mm256_set1_ps (0.5f),
+      _mm256_add_ps (f,
+                     _mm256_div_ps (f,
+                                    _mm256_add_ps (_mm256_set1_ps (1.f), f)))),
+     x);
 }
 
 /**
@@ -7616,17 +7621,16 @@ jbm_8xf32_cosh (const __m256 x) ///< __m256 number.
 static inline __m256
 jbm_8xf32_tanh (const __m256 x) ///< __m256 number.
 {
-  __m256 f, fi;
-  f = jbm_8xf32_exp (x);
-  fi = jbm_8xf32_reciprocal (f);
-  f = _mm256_div_ps (_mm256_sub_ps (f, fi), _mm256_add_ps (f, fi));
+  const __m256 x2 = jbm_8xf32_dbl (x);
+  __m256 f = jbm_8xf32_expm1 (x2);
+  f = _mm256_div_ps (f, _mm256_add_ps (f, _mm256_set1_ps (2.f)));
   f = _mm256_blendv_ps (f, _mm256_set1_ps (1.f),
-                        _mm256_cmp_ps (x, _mm256_set1_ps (JBM_FLT_MAX_E_EXP),
-                                       _CMP_GT_OS));
+                       _mm256_cmpgt_ps (x2,
+                                        _mm256_set1_ps (JBM_FLT_MAX_E_EXP)));
   return
     _mm256_blendv_ps (f, _mm256_set1_ps (-1.f),
-                      _mm256_cmp_ps (x, _mm256_set1_ps (-JBM_FLT_MAX_E_EXP),
-                                     _CMP_LT_OS));
+                      _mm256_cmplt_ps (x2,
+                                       _mm256_set1_ps (-JBM_FLT_MAX_E_EXP)));
 }
 
 /**
@@ -15614,10 +15618,15 @@ jbm_4xf64_acos (const __m256d x)        ///< __m256d number.
 static inline __m256d
 jbm_4xf64_sinh (const __m256d x)        ///< __m256d number.
 {
-  __m256d f;
-  f = jbm_4xf64_exp (x);
-  return _mm256_mul_pd (_mm256_set1_pd (0.5),
-                        _mm256_sub_pd (f, jbm_4xf64_reciprocal (f)));
+  const __m256d f = jbm_4xf64_expm1 (jbm_4xf64_abs (x));
+  return
+    jbm_4xf64_copysign
+    (_mm256_mul_pd
+     (_mm256_set1_pd (0.5),
+      _mm256_add_pd (f,
+                     _mm256_div_pd (f,
+                                    _mm256_add_pd (_mm256_set1_pd (1.), f)))),
+     x);
 }
 
 /**
@@ -15642,17 +15651,16 @@ jbm_4xf64_cosh (const __m256d x)        ///< __m256d number.
 static inline __m256d
 jbm_4xf64_tanh (const __m256d x)        ///< __m256d number.
 {
-  __m256d f, fi;
-  f = jbm_4xf64_exp (x);
-  fi = jbm_4xf64_reciprocal (f);
-  f = _mm256_div_pd (_mm256_sub_pd (f, fi), _mm256_add_pd (f, fi));
+  const __m256d x2 = jbm_4xf64_dbl (x);
+  __m256 f = jbm_4xf64_expm1 (x2);
+  f = _mm256_div_pd (f, _mm256_add_pd (f, _mm256_set1_pd (2.)));
   f = _mm256_blendv_pd (f, _mm256_set1_pd (1.),
-                        _mm256_cmp_pd (x, _mm256_set1_pd (JBM_DBL_MAX_E_EXP),
-                                       _CMP_GT_OS));
-  return _mm256_blendv_pd (f, _mm256_set1_pd (-1.),
-                           _mm256_cmp_pd (x,
-                                          _mm256_set1_pd (-JBM_DBL_MAX_E_EXP),
-                                          _CMP_LT_OS));
+                       _mm256_cmpgt_pd (x2,
+                                        _mm256_set1_pd (JBM_DBL_MAX_E_EXP)));
+  return
+    _mm256_blendv_pd (f, _mm256_set1_pd (-1.),
+                      _mm256_cmplt_pd (x2,
+                                       _mm256_set1_pd (-JBM_DBL_MAX_E_EXP)));
 }
 
 /**
