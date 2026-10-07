@@ -88,6 +88,60 @@ typedef union
 #define JBM_8xF64_CBRT4 _mm512_set1_pd (JBM_F64_CBRT4)
 ///< cbrt(4) for doubles.
 
+///> macro to automatize sets on one array.
+#define JBM_ARRAY_SET(xr, xd, n, type, load512, load256, load128, store512, \
+                      store256, store128) \
+  unsigned int i, j; \
+  for (i = 0, j = n >> (4 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store512 (xr + i, load512 (xd + i)); \
+      i += 64 / sizeof (type); \
+      store512 (xr + i, load512 (xd + i)); \
+      i += 64 / sizeof (type); \
+      store512 (xr + i, load512 (xd + i)); \
+      i += 64 / sizeof (type); \
+      store512 (xr + i, load512 (xd + i)); \
+      i += 64 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; \
+       --j, i += 64 / sizeof (type)) \
+    store512 (xr + i, load512 (xd + i)); \
+  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+       --j, i += 32 / sizeof (type)) \
+    store256 (xr + i, load256 (xd + i)); \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, load128 (xd + i)); \
+  for (; i < n; ++i) \
+    xr[i] = xd[i];
+
+///> macro to automatize sets on one array and one number.
+#define JBM_ARRAY_SET1(xr, xd, n, type, set512, set256, set128, store512, \
+                       store256, store128) \
+  unsigned int i, j; \
+  for (i = 0, j = n >> (4 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store512 (xr + i, set512 (xd)); \
+      i += 64 / sizeof (type); \
+      store512 (xr + i, set512 (xd)); \
+      i += 64 / sizeof (type); \
+      store512 (xr + i, set512 (xd)); \
+      i += 64 / sizeof (type); \
+      store512 (xr + i, set512 (xd)); \
+      i += 64 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (2 + 8 / sizeof (type)); j > 0; \
+       --j, i += 64 / sizeof (type)) \
+    store512 (xr + i, set512 (xd)); \
+  for (j = (n - i) >> (1 + 8 / sizeof (type)); j > 0; \
+       --j, i += 32 / sizeof (type)) \
+    store256 (xr + i, set256 (xd)); \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, set128 (xd)); \
+  for (; i < n; ++i) \
+    xr[i] = xd;
+
 ///> macro to automatize operations on one array.
 #define JBM_ARRAY_OP(xr, xd, n, type, load512, load256, load128, store512, \
                      store256, store128, op512, op256, op128, op) \
@@ -118,7 +172,7 @@ typedef union
 ///> macro to automatize operations on one array and one number.
 #define JBM_ARRAY_OP1(xr, x1, x2, n, type512, type256, type128, type, load512, \
                       load256, load128, store512, store256, store128, set512, \
-		      set256, set128, op512, op256, op128, op) \
+                      set256, set128, op512, op256, op128, op) \
   const type512 x512 = set512 (x2); \
   const type256 x256 = set256 (x2); \
   const type128 x128 = set128 (x2); \
@@ -7405,8 +7459,8 @@ jbm_16xf32_cbrt (const __m512 x)        ///< __m512 vector.
   return
     _mm512_mask_mov_ps (jbm_16xf32_copysign (f, x), 
                         _mm512_cmpeq_ps_mask (xa, _mm512_set1_ps (INFINITY))
-			| _mm512_cmpeq_ps_mask (xa, _mm512_setzero_ps ())
-			| ~_mm512_cmp_ps_mask (xa, xa, _CMP_ORD_Q), x);
+                        | _mm512_cmpeq_ps_mask (xa, _mm512_setzero_ps ())
+                        | ~_mm512_cmp_ps_mask (xa, xa, _CMP_ORD_Q), x);
 }
 
 /**
@@ -7884,13 +7938,13 @@ jbm_16xf32_tanh (const __m512 x)        ///< __m512 number.
   const __m512 x2 = jbm_16xf32_dbl (x);
   __m512 f = jbm_16xf32_expm1 (x2);
   f = _mm512_div_ps (f, _mm512_add_ps (f, _mm512_set1_ps (2.f)));
-  f = _mm512_blendv_ps (f, _mm512_set1_ps (1.f),
-                       _mm512_cmpgt_ps (x2,
-                                        _mm512_set1_ps (JBM_FLT_MAX_E_EXP)));
+  f = _mm512_mask_mov_ps
+    (f, _mm512_cmp_ps_mask (x2, _mm512_set1_ps (JBM_FLT_MAX_E_EXP), _CMP_GT_OS),
+     _mm512_set1_ps (1.f));
   return
-    _mm512_blendv_ps (f, _mm512_set1_ps (-1.f),
-                      _mm512_cmplt_ps (x2,
-                                       _mm512_set1_ps (-JBM_FLT_MAX_E_EXP)));
+    _mm512_mask_mov_ps
+    (f, _mm512_cmp_ps_mask (x2, _mm512_set1_ps (-JBM_FLT_MAX_E_EXP),
+                            _CMP_LT_OS), _mm512_set1_ps (-1.f));
 }
 
 /**
@@ -15350,8 +15404,8 @@ jbm_8xf64_cbrt (const __m512d x)        ///< __m512d vector.
   return
     _mm512_mask_mov_pd (jbm_8xf64_copysign (f, x), 
                         _mm512_cmpeq_pd_mask (xa, _mm512_set1_pd (INFINITY))
-			| _mm512_cmpeq_pd_mask (xa, _mm512_setzero_pd ())
-			| ~_mm512_cmp_pd_mask (xa, xa, _CMP_ORD_Q), x);
+                        | _mm512_cmpeq_pd_mask (xa, _mm512_setzero_pd ())
+                        | ~_mm512_cmp_pd_mask (xa, xa, _CMP_ORD_Q), x);
 }
 
 /**
@@ -15821,15 +15875,15 @@ static inline __m512d
 jbm_8xf64_tanh (const __m512d x)        ///< __m512d number.
 {
   const __m512d x2 = jbm_8xf64_dbl (x);
-  __m512 f = jbm_8xf64_expm1 (x2);
+  __m512d f = jbm_8xf64_expm1 (x2);
   f = _mm512_div_pd (f, _mm512_add_pd (f, _mm512_set1_pd (2.)));
-  f = _mm512_blendv_pd (f, _mm512_set1_pd (1.),
-                       _mm512_cmpgt_pd (x2,
-                                        _mm512_set1_pd (JBM_DBL_MAX_E_EXP)));
+  f = _mm512_mask_mov_pd
+    (f, _mm512_cmp_pd_mask (x2, _mm512_set1_pd (JBM_DBL_MAX_E_EXP), _CMP_GT_OS),
+     _mm512_set1_pd (1.));
   return
-    _mm512_blendv_pd (f, _mm512_set1_pd (-1.),
-                      _mm512_cmplt_pd (x2,
-                                       _mm512_set1_pd (-JBM_DBL_MAX_E_EXP)));
+    _mm512_mask_mov_pd
+    (f, _mm512_cmp_pd_mask (x2, _mm512_set1_pd (-JBM_DBL_MAX_E_EXP),
+                            _CMP_LT_OS), _mm512_set1_pd (-1.));
 }
 
 /**
@@ -16402,6 +16456,19 @@ jbm_8xf64_integral (__m512d (*f) (__m512d),
 }
 
 /**
+ * Function to set a float array with another float array.
+ */
+static inline void
+jbm_array_f32_set (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_SET (xr, xd, n, float, _mm512_loadu_ps, _mm256_loadu_ps,
+                 _mm_loadu_ps, _mm512_storeu_ps, _mm256_storeu_ps,
+                 _mm_storeu_ps);
+}
+
+/**
  * Function to calculate the root square of a float array.
  */
 static inline void
@@ -16839,6 +16906,18 @@ jbm_array_f32_reduce_maxmin (const float *x,    ///< float array.
 }
 
 /**
+ * Function to set a float array with a number.
+ */
+static inline void
+jbm_array_f32_set1 (float *restrict xr, ///< result float array.
+                    const float xd,     ///< data float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_SET1 (xr, xd, n, float, _mm512_set1_ps, _mm256_set1_ps, _mm_set1_ps,
+                  _mm512_storeu_ps, _mm256_storeu_ps, _mm_storeu_ps);
+}
+
+/**
  * Function to add 1 float array + 1 number.
  */
 static inline void
@@ -17100,6 +17179,19 @@ jbm_array_f32_dot (const float *restrict x1,    ///< multiplier float array.
                  _mm512_fmadd_ps, _mm256_fmadd_ps, _mm_fmadd_ps,
                  jbm_16xf32_reduce_add, jbm_8xf32_reduce_add,
                  jbm_4xf32_reduce_add);
+}
+
+/**
+ * Function to set a double array with another double array.
+ */
+static inline void
+jbm_array_f64_set (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_SET (xr, xd, n, double, _mm512_loadu_pd, _mm256_loadu_pd,
+                 _mm_loadu_pd, _mm512_storeu_pd, _mm256_storeu_pd,
+                 _mm_storeu_pd);
 }
 
 /**
@@ -17537,6 +17629,19 @@ jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
                     jbm_2xf64_reduce_max, jbm_8xf64_reduce_min,
                     jbm_4xf64_reduce_min, jbm_2xf64_reduce_min, mx, mn);
   *max = mx, *min = mn;
+}
+
+/**
+ * Function to set a double array with a number.
+ */
+static inline void
+jbm_array_f64_set1 (double *restrict xr,        ///< result double array.
+                    const double xd,    ///< data double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_SET1 (xr, xd, n, double, _mm512_set1_pd, _mm256_set1_pd,
+                  _mm_set1_pd, _mm512_storeu_pd, _mm256_storeu_pd,
+                  _mm_storeu_pd);
 }
 
 /**

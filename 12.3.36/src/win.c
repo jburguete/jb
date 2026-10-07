@@ -2810,49 +2810,6 @@ jbw_graphic_draw_resize (JBFLOAT *x,    ///< x-coordinates array.
 
 /**
  * Function to get the limit coordinates on the current JBWGraphic widget from 4
- * tabular functions (JBDOUBLE).
- */
-void
-jbw_graphic_draw_resizel (JBDOUBLE *x,  ///< x-coordinates array.
-                          JBDOUBLE *y1, ///< 1st y-coordinates array.
-                          JBDOUBLE *y2, ///< 2nd y-coordinates array.
-                          JBDOUBLE *z1, ///< 1st z-coordinates array.
-                          JBDOUBLE *z2, ///< 2nd z-coordinates array.
-                          int n)        ///< number of array elements.
-{
-  JBWGraphic *graphic = jbw_graphic_pointer;
-  JBDOUBLE k1, k2, kmin, kmax;
-  jbm_darray_maxmin (x, n, &kmax, &kmin);
-  graphic->xmax = kmax;
-  graphic->xmin = kmin;
-  if (y1)
-    {
-      jbm_darray_maxmin (y1, n, &kmax, &kmin);
-      if (y2)
-        {
-          jbm_darray_maxmin (y2, n, &k2, &k1);
-          kmax = FMAXL (kmax, k2);
-          kmin = FMINL (kmin, k1);
-        }
-      graphic->ymax = kmax;
-      graphic->ymin = kmin;
-    }
-  if (z1)
-    {
-      jbm_darray_maxmin (z1, n, &kmax, &kmin);
-      if (z2)
-        {
-          jbm_darray_maxmin (z2, n, &k2, &k1);
-          kmax = FMAXL (kmax, k2);
-          kmin = FMINL (kmin, k1);
-        }
-      graphic->zmax = kmax;
-      graphic->zmin = kmin;
-    }
-}
-
-/**
- * Function to get the limit coordinates on the current JBWGraphic widget from 4
  * tabular functions defined by a struct array (JBFLOAT).
  */
 void
@@ -3406,53 +3363,6 @@ jbw_graphic_draw_lines (JBFLOAT *x,     ///< x-coordinates array.
         jbw_graphic_draw_farray (x, z1, n, jbw_red, GL_LINE_STRIP);
       if (z2)
         jbw_graphic_draw_farray (x, z2, n, jbw_green, GL_LINE_STRIP);
-    }
-}
-
-/**
- * Function to draw lines defined by float arrays in the current JBWGraphic 
- * widget (JBDOUBLE).
- */
-void
-jbw_graphic_draw_linesl (JBDOUBLE *x,   ///< x-coordinates array.
-                         JBDOUBLE *y1,  ///< 1st y-coordinates array.
-                         JBDOUBLE *y2,  ///< 2nd y-coordinates array.
-                         JBDOUBLE *z1,  ///< 1st z-coordinates array.
-                         JBDOUBLE *z2,  ///< 2nd z-coordinates array.
-                         int n) ///< last arrays element number.
-{
-  JBWGraphic *graphic = jbw_graphic_pointer;
-  if (!x)
-    {
-      jbw_graphic_draw_labels ();
-      return;
-    }
-  if (graphic->resize)
-    jbw_graphic_draw_resizel (x, y1, y2, z1, z2, n);
-  jbw_graphic_draw_labels ();
-  if (y1 || y2)
-    {
-      jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
-                                   (GLdouble) graphic->xmin,
-                                   (GLdouble) graphic->ymin,
-                                   (GLdouble) graphic->xmax - graphic->xmin,
-                                   (GLdouble) graphic->ymax - graphic->ymin);
-      if (y1)
-        jbw_graphic_draw_darray (x, y1, n, jbw_blue, GL_LINE_STRIP);
-      if (y2)
-        jbw_graphic_draw_darray (x, y2, n, jbw_brown, GL_LINE_STRIP);
-    }
-  if (z1 || z2)
-    {
-      jbw_draw_orthogonal_matrixl (graphic->uniform_2D_matrix,
-                                   (GLdouble) graphic->xmin,
-                                   (GLdouble) graphic->ymin,
-                                   (GLdouble) graphic->xmax - graphic->xmin,
-                                   (GLdouble) graphic->ymax - graphic->ymin);
-      if (z1)
-        jbw_graphic_draw_darray (x, z1, n, jbw_red, GL_LINE_STRIP);
-      if (z2)
-        jbw_graphic_draw_darray (x, z2, n, jbw_green, GL_LINE_STRIP);
     }
 }
 

@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: jb 12.3.35\n"
+"Project-Id-Version: jb 12.3.36\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-23 04:51+0200\n"
+"POT-Creation-Date: 2026-10-07 05:22+0200\n"
 "PO-Revision-Date: 2020-05-05 02:59+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -306,67 +306,67 @@ msgstr "no se pudo abrir el widget de área gráfica"
 msgid "unable to open the window"
 msgstr "no se pudo abrir la ventana"
 
-#: src/win.c:3687 src/win.c:3702
+#: src/win.c:3597 src/win.c:3612
 msgid "PNG file"
 msgstr "Fichero PNG"
 
-#: src/win.c:3688
+#: src/win.c:3598
 msgid "JPEG file"
 msgstr "Fichero JPEG"
 
-#: src/win.c:3689
+#: src/win.c:3599
 msgid "XPM file"
 msgstr "Fichero XPM"
 
-#: src/win.c:3690
+#: src/win.c:3600
 msgid "TIFF file"
 msgstr "Fichero TIFF"
 
-#: src/win.c:3691
+#: src/win.c:3601
 msgid "BMP file"
 msgstr "Fichero BMP"
 
-#: src/win.c:3692
+#: src/win.c:3602
 msgid "GIF file"
 msgstr "Fichero GIF"
 
-#: src/win.c:3693
+#: src/win.c:3603
 msgid "ICO file"
 msgstr "Fichero ICO"
 
-#: src/win.c:3713
+#: src/win.c:3623
 msgid "Save graph"
 msgstr "Guardar gráfica"
 
-#: src/win.c:3716
+#: src/win.c:3626
 msgid "_OK"
 msgstr "_Aceptar"
 
-#: src/win.c:3717
+#: src/win.c:3627
 msgid "_Cancel"
 msgstr "_Cancelar"
 
-#: src/win.c:3758
+#: src/win.c:3668
 msgid "no a text editor type"
 msgstr "no es un tipo de editor de texto"
 
-#: src/win.c:3761
+#: src/win.c:3671
 msgid "no an integer numbers editor type"
 msgstr "no es un tipo de editor de números enteros"
 
-#: src/win.c:3764
+#: src/win.c:3674
 msgid "no a float numbers editor type"
 msgstr "no es un tipo de editor de números reales"
 
-#: src/win.c:3767
+#: src/win.c:3677
 msgid "no a date editor type"
 msgstr "no es un tipo de editor de fechas"
 
-#: src/win.c:4410
+#: src/win.c:4320
 msgid "bad array editor widget type"
 msgstr "tipo incorrecto de widget de editor de matrices"
 
-#: src/win.c:4416
+#: src/win.c:4326
 msgid "not enough memory to open the array editor"
 msgstr "memoria insuficiente para abrir el editor de matrices"
 

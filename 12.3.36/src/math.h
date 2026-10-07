@@ -685,12 +685,24 @@ enum JBMFluxLimiterType
  */
 typedef struct
 {
-  JBFLOAT *x;                   ///< array of numbers.
+  JBFLOAT *x;                   ///< array of JBFLOAT numbers.
   size_t size;                  ///< memory size of the array.
   unsigned int n;               ///< number of elements.
   unsigned int last;            ///< last element.
   unsigned int alloc;           ///< 1 if x is allocated, 0 otherwise.
 } JBMFarray;
+
+/**
+ * struct to define arrays of JBDOUBLE numbers.
+ */
+typedef struct
+{
+  JBDOUBLE *x;                  ///< array of JBDOUBLE numbers.
+  size_t size;                  ///< memory size of the array.
+  unsigned int n;               ///< number of elements.
+  unsigned int last;            ///< last element.
+  unsigned int alloc;           ///< 1 if x is allocated, 0 otherwise.
+} JBMDarray;
 
 extern void jbm_index_sort_flash (JBFLOAT * restrict x, unsigned int *ni,
                                   unsigned int n);
@@ -2640,40 +2652,20 @@ jbm_farray_set1 (JBMFarray *fa, ///< pointer to the JBMFarray struct.
                  const unsigned int n)  ///< number of array elements.
 {
   JBFLOAT *xa;
+#if JBM_LOW_PRECISION > 2
   unsigned int i;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  unsigned int n2;
-#endif
-#if __AVX2__
-  unsigned int n4;
-#endif
-#if JBM_AVX512
-  unsigned int n8;
-#endif
 #endif
   jbm_farray_init (fa, n);
-  i = 0;
   xa = fa->x;
-#if JBM_LOW_PRECISION < 3
-#if JBM_AVX512
-  n8 = n >> 3;
-  for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xa + i, _mm512_set1_pd (x));
-#endif
-#if __AVX2__
-  n4 = (n - i) >> 2;
-  for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xa + i, _mm256_set1_pd (x));
-#endif
-#if __SSE4_2__
-  n2 = (n - i) >> 1;
-  for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xa + i, _mm_set1_pd (x));
-#endif
-#endif
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_set1 (xa, x, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_set1 (xa, x, n);
+#else
+  i = 0;
   for (; i < n; ++i)
     xa[i] = x;
+#endif
 }
 
 /**
@@ -2685,7 +2677,13 @@ jbm_farray_set (JBMFarray *fa,  ///< pointer to the JBMFarray struct.
                 const unsigned int n)   ///< number of array elements.
 {
   jbm_farray_init (fa, n);
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_set (fa->x, x, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_set (fa->x, x, n);
+#else
   memcpy (fa->x, x, fa->size);
+#endif
 }
 
 /**
@@ -2709,103 +2707,55 @@ jbm_farray_destroy (JBMFarray *fa)      ///< pointer to the JBWFarray struct.
 }
 
 /**
- * Function to add 2 JBMFarray structs.
+ * Function to add a JBMFarray struct by a JBFLOAT number.
  */
 static inline void
-jbm_farray_add (JBMFarray *fr,  ///< result JBMFarray struct.
-                const JBMFarray *f1,    ///< 1st addend JBMFarray struct.
-                const JBMFarray *f2)    ///< 1st addend JBMFarray struct.
+jbm_farray_add1 (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *f1,   ///< addend JBMFarray struct.
+                 const JBFLOAT x2)      ///< addend JBFLOAT number.
 {
-  JBFLOAT *xr, *x1, *x2;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  unsigned int n2;
+  JBFLOAT *xr, *x1;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
 #endif
-#if __AVX2__
-  unsigned int n4;
-#endif
-#if JBM_AVX512
-  unsigned int n8;
-#endif
-#endif
-  i = 0;
   n = fr->n;
   xr = fr->x;
   x1 = f1->x;
-  x2 = f2->x;
-#if JBM_LOW_PRECISION < 3
-#if JBM_AVX512
-  n8 = n >> 3;
-  for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xr + i, _mm512_add_pd (_mm512_load_pd (x1 + i),
-                                            _mm512_load_pd (x2 + i)));
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_add1 (xr, x1, x2, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_add1 (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] + x2;
 #endif
-#if __AVX2__
-  n4 = (n - i) >> 2;
-  for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xr + i, _mm256_add_pd (_mm256_load_pd (x1 + i),
-                                            _mm256_load_pd (x2 + i)));
-#endif
-#if __SSE4_2__
-  n2 = (n - i) >> 1;
-  for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xr + i,
-                  _mm_add_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i)));
-#endif
-#endif
-  for (; i < n; ++i)
-    xr[i] = x1[i] + x2[i];
 }
 
 /**
- * Function to subtract 2 JBMFarray structs.
+ * Function to subtract a JBMFarray struct by a JBFLOAT number.
  */
 static inline void
-jbm_farray_sub (JBMFarray *fr,  ///< result JBMFarray struct.
-                const JBMFarray *f1,    ///< minuend JBMFarray struct.
-                const JBMFarray *f2)    ///< subtrahend JBMFarray struct.
+jbm_farray_sub1 (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *f1,   ///< minuend JBMFarray struct.
+                 const JBFLOAT x2)      ///< subtrahend JBFLOAT number.
 {
-  JBFLOAT *xr, *x1, *x2;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  unsigned int n2;
+  JBFLOAT *xr, *x1;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
 #endif
-#if __AVX2__
-  unsigned int n4;
-#endif
-#if JBM_AVX512
-  unsigned int n8;
-#endif
-#endif
-  i = 0;
   n = fr->n;
   xr = fr->x;
   x1 = f1->x;
-  x2 = f2->x;
-#if JBM_LOW_PRECISION < 3
-#if JBM_AVX512
-  n8 = n >> 3;
-  for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xr + i, _mm512_sub_pd (_mm512_load_pd (x1 + i),
-                                            _mm512_load_pd (x2 + i)));
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_sub1 (xr, x1, x2, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_sub1 (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] - x2;
 #endif
-#if __AVX2__
-  n4 = (n - i) >> 2;
-  for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xr + i, _mm256_sub_pd (_mm256_load_pd (x1 + i),
-                                            _mm256_load_pd (x2 + i)));
-#endif
-#if __SSE4_2__
-  n2 = (n - i) >> 1;
-  for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xr + i,
-                  _mm_sub_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i)));
-#endif
-#endif
-  for (; i < n; ++i)
-    xr[i] = x1[i] - x2[i];
 }
 
 /**
@@ -2817,56 +2767,21 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
                  const JBFLOAT x2)      ///< multiplicand JBFLOAT number.
 {
   JBFLOAT *xr, *x1;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  __m128d s2;
-  unsigned int n2;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
 #endif
-#if __AVX2__
-  __m256d a4;
-  unsigned int n4;
-#endif
-#if JBM_AVX512
-  __m512d a8;
-  unsigned int n8;
-#endif
-#endif
-  i = 0;
   n = fr->n;
   xr = fr->x;
   x1 = f1->x;
-#if JBM_LOW_PRECISION < 3
-#if JBM_AVX512
-  n8 = n >> 3;
-  if (n8)
-    {
-      a8 = _mm512_set1_pd (x2);
-      for (; n8 > 0; --n8, i += 8)
-        _mm512_store_pd (xr + i, _mm512_mul_pd (_mm512_load_pd (x1 + i), a8));
-    }
-#endif
-#if __AVX2__
-  n4 = (n - i) >> 2;
-  if (n4)
-    {
-      a4 = _mm256_set1_pd (x2);
-      for (; n4 > 0; --n4, i += 4)
-        _mm256_store_pd (xr + i, _mm256_mul_pd (_mm256_load_pd (x1 + i), a4));
-    }
-#endif
-#if __SSE4_2__
-  n2 = (n - i) >> 1;
-  if (n2)
-    {
-      s2 = _mm_set1_pd (x2);
-      for (; n2 > 0; --n2, i += 2)
-        _mm_store_pd (xr + i, _mm_mul_pd (_mm_load_pd (x1 + i), s2));
-    }
-#endif
-#endif
-  for (; i < n; ++i)
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_mul1 (xr, x1, x2, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_mul1 (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
     xr[i] = x1[i] * x2;
+#endif
 }
 
 /**
@@ -2878,56 +2793,75 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
                  const JBFLOAT x2)      ///< divisor JBFLOAT number.
 {
   JBFLOAT *xr, *x1;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  __m128d s2;
-  unsigned int n2;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
 #endif
-#if __AVX2__
-  __m256d a4;
-  unsigned int n4;
-#endif
-#if JBM_AVX512
-  __m512d a8;
-  unsigned int n8;
-#endif
-#endif
-  i = 0;
   n = fr->n;
   xr = fr->x;
   x1 = f1->x;
-#if JBM_LOW_PRECISION < 3
-#if JBM_AVX512
-  n8 = n >> 3;
-  if (n8)
-    {
-      a8 = _mm512_set1_pd (x2);
-      for (; n8 > 0; --n8, i += 8)
-        _mm512_store_pd (xr + i, _mm512_div_pd (_mm512_load_pd (x1 + i), a8));
-    }
-#endif
-#if __AVX2__
-  n4 = (n - i) >> 2;
-  if (n4)
-    {
-      a4 = _mm256_set1_pd (x2);
-      for (; n4 > 0; --n4, i += 4)
-        _mm256_store_pd (xr + i, _mm256_div_pd (_mm256_load_pd (x1 + i), a4));
-    }
-#endif
-#if __SSE4_2__
-  n2 = (n - i) >> 1;
-  if (n2)
-    {
-      s2 = _mm_set1_pd (x2);
-      for (; n2 > 0; --n2, i += 2)
-        _mm_store_pd (xr + i, _mm_div_pd (_mm_load_pd (x1 + i), s2));
-    }
-#endif
-#endif
-  for (; i < n; ++i)
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_div1 (xr, x1, x2, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_div1 (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
     xr[i] = x1[i] / x2;
+#endif
+}
+
+/**
+ * Function to add 2 JBMFarray structs.
+ */
+static inline void
+jbm_farray_add (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *f1,    ///< 1st addend JBMFarray struct.
+                const JBMFarray *f2)    ///< 1st addend JBMFarray struct.
+{
+  JBFLOAT *xr, *x1, *x2;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  x1 = f1->x;
+  x2 = f2->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_add (xr, x1, x2, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_add (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] + x2[i];
+#endif
+}
+
+/**
+ * Function to subtract 2 JBMFarray structs.
+ */
+static inline void
+jbm_farray_sub (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *f1,    ///< minuend JBMFarray struct.
+                const JBMFarray *f2)    ///< subtrahend JBMFarray struct.
+{
+  JBFLOAT *xr, *x1, *x2;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  x1 = f1->x;
+  x2 = f2->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_sub (xr, x1, x2, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_sub (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] - x2[i];
+#endif
 }
 
 /**
@@ -2939,45 +2873,22 @@ jbm_farray_mul (JBMFarray *fr,  ///< result JBMFarray struct.
                 const JBMFarray *f2)    ///< multiplicand JBMFarray struct.
 {
   JBFLOAT *xr, *x1, *x2;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  unsigned int n2;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
 #endif
-#if __AVX2__
-  unsigned int n4;
-#endif
-#if JBM_AVX512
-  unsigned int n8;
-#endif
-#endif
-  i = 0;
   n = fr->n;
   xr = fr->x;
   x1 = f1->x;
   x2 = f2->x;
-#if JBM_LOW_PRECISION < 3
-#if JBM_AVX512
-  n8 = n >> 3;
-  for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xr + i, _mm512_mul_pd (_mm512_load_pd (x1 + i),
-                                            _mm512_load_pd (x2 + i)));
-#endif
-#if __AVX2__
-  n4 = (n - i) >> 2;
-  for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xr + i, _mm256_mul_pd (_mm256_load_pd (x1 + i),
-                                            _mm256_load_pd (x2 + i)));
-#endif
-#if __SSE4_2__
-  n2 = (n - i) >> 1;
-  for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xr + i,
-                  _mm_mul_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i)));
-#endif
-#endif
-  for (; i < n; ++i)
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_mul (xr, x1, x2, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_mul (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
     xr[i] = x1[i] * x2[i];
+#endif
 }
 
 /**
@@ -2989,45 +2900,22 @@ jbm_farray_div (JBMFarray *fr,  ///< result JBMFarray struct.
                 const JBMFarray *f2)    ///< divisor JBMFarray struct.
 {
   JBFLOAT *xr, *x1, *x2;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  unsigned int n2;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
 #endif
-#if __AVX2__
-  unsigned int n4;
-#endif
-#if JBM_AVX512
-  unsigned int n8;
-#endif
-#endif
-  i = 0;
   n = fr->n;
   xr = fr->x;
   x1 = f1->x;
   x2 = f2->x;
-#if JBM_LOW_PRECISION < 3
-#if JBM_AVX512
-  n8 = n >> 3;
-  for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xr + i, _mm512_div_pd (_mm512_load_pd (x1 + i),
-                                            _mm512_load_pd (x2 + i)));
-#endif
-#if __AVX2__
-  n4 = (n - i) >> 2;
-  for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xr + i, _mm256_div_pd (_mm256_load_pd (x1 + i),
-                                            _mm256_load_pd (x2 + i)));
-#endif
-#if __SSE4_2__
-  n2 = (n - i) >> 1;
-  for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xr + i,
-                  _mm_div_pd (_mm_load_pd (x1 + i), _mm_load_pd (x2 + i)));
-#endif
-#endif
-  for (; i < n; ++i)
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_div (xr, x1, x2, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_div (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
     xr[i] = x1[i] / x2[i];
+#endif
 }
 
 /**
@@ -3038,41 +2926,21 @@ jbm_farray_dbl (JBMFarray *fr,  ///< result JBMFarray struct.
                 const JBMFarray *fd)    ///< data JBMFarray struct.
 {
   JBFLOAT *xr, *xd;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  unsigned int n2;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
 #endif
-#if __AVX2__
-  unsigned int n4;
-#endif
-#if JBM_AVX512
-  unsigned int n8;
-#endif
-#endif
-  i = 0;
   n = fr->n;
   xr = fr->x;
   xd = fd->x;
-#if JBM_LOW_PRECISION < 3
-#if JBM_AVX512
-  n8 = n >> 3;
-  for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xr + i, jbm_8xf64_dbl (_mm512_load_pd (xd + i)));
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_dbl (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_dbl (xr, xd, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_fdbl (xd[i]);
 #endif
-#if __AVX2__
-  n4 = (n - i) >> 2;
-  for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xr + i, jbm_4xf64_dbl (_mm256_load_pd (xd + i)));
-#endif
-#if __SSE4_2__
-  n2 = (n - i) >> 1;
-  for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xr + i, jbm_2xf64_dbl (_mm_load_pd (xd + i)));
-#endif
-#endif
-  for (; i < n; ++i)
-    xr[i] = jbm_f64_dbl (xd[i]);
 }
 
 /**
@@ -3083,41 +2951,21 @@ jbm_farray_sqr (JBMFarray *fr,  ///< result JBMFarray struct.
                 const JBMFarray *fd)    ///< data JBMFarray struct.
 {
   JBFLOAT *xr, *xd;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  unsigned int n2;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
 #endif
-#if __AVX2__
-  unsigned int n4;
-#endif
-#if JBM_AVX512
-  unsigned int n8;
-#endif
-#endif
-  i = 0;
   n = fr->n;
   xr = fr->x;
   xd = fd->x;
-#if JBM_LOW_PRECISION < 3
-#if JBM_AVX512
-  n8 = n >> 3;
-  for (; n8 > 0; --n8, i += 8)
-    _mm512_store_pd (xr + i, jbm_8xf64_sqr (_mm512_load_pd (xd + i)));
-#endif
-#if __AVX2__
-  n4 = (n - i) >> 2;
-  for (; n4 > 0; --n4, i += 4)
-    _mm256_store_pd (xr + i, jbm_4xf64_sqr (_mm256_load_pd (xd + i)));
-#endif
-#if __SSE4_2__
-  n2 = (n - i) >> 1;
-  for (; n2 > 0; --n2, i += 2)
-    _mm_store_pd (xr + i, jbm_2xf64_sqr (_mm_load_pd (xd + i)));
-#endif
-#endif
-  for (; i < n; ++i)
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_sqr (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_sqr (xr, xd, n);
+#else
+  for (i = 0; i < n; ++i)
     xr[i] = jbm_fsqr (xd[i]);
+#endif
 }
 
 /**
@@ -3173,80 +3021,21 @@ jbm_farray_max (const JBMFarray *fa)    ///< JBMFarray struct.
 {
   JBFLOAT *xx;
   JBFLOAT k;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  __m128d s2;
-  double sx[2];
-  unsigned int n2;
-#endif
-#if __AVX2__
-  __m256d a4;
-  double ax[4];
-  unsigned int n4;
-#endif
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
 #endif
   n = fa->n;
   xx = fa->x;
-#if JBM_LOW_PRECISION < 3
-#if __AVX2__
-  n4 = n >> 2;
-  if (n4)
-    {
-      a4 = _mm256_load_pd (xx);
-      i = 4;
-      while (--n4 > 0)
-        {
-          a4 = _mm256_max_pd (a4, _mm256_load_pd (xx + i));
-          i += 4;
-        }
-      _mm256_store_pd (ax, a4);
-      s2 = _mm_max_pd (_mm_load_pd (ax), _mm_load_pd (ax + 2));
-      n2 = (n - i) >> 1;
-      if (n2)
-        {
-          s2 = _mm_max_pd (s2, _mm_load_pd (xx + i));
-          i += 2;
-        }
-      _mm_store_pd (sx, s2);
-      k = fmax (sx[0], sx[1]);
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
-#else
-#if __SSE4_2__
-  n2 = n >> 1;
-  if (n2)
-    {
-      s2 = _mm_load_pd (xx);
-      i += 2;
-      while (--n2 > 0)
-        {
-          s2 = _mm_max_pd (s2, _mm_load_pd (xx + i));
-          i += 2;
-        }
-      _mm_store_pd (sx, s2);
-      k = fmax (sx[0], sx[1]);
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
+#if JBM_LOW_PRECISION == 1
+  k = jbm_array_f32_reduce_max (xx, n);
+#elif JBM_LOW_PRECISION == 2
+  k = jbm_array_f64_reduce_max (xx, n);
 #else
   k = xx[0];
-  i = 1;
+  for (i = 1; i < n; ++i)
+    k = FMAX (k, xx[i]);
 #endif
-#endif
-#else
-  k = xx[0];
-  i = 1;
-#endif
-  while (i < n)
-    k = FMAX (k, xx[i++]);
   return k;
 }
 
@@ -3260,81 +3049,21 @@ jbm_farray_min (const JBMFarray *fa)    ///< JBMFarray struct.
 {
   JBFLOAT *xx;
   JBFLOAT k;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  __m128d s2;
-  double sx[2];
-  unsigned int n2;
-#endif
-#if __AVX2__
-  __m256d a4;
-  double ax[4];
-  unsigned int n4;
-#endif
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
+  unsigned int i;
 #endif
   n = fa->n;
   xx = fa->x;
-#if JBM_LOW_PRECISION < 3
-#if __AVX2__
-  n4 = n >> 2;
-  if (n4)
-    {
-      a4 = _mm256_load_pd (xx);
-      i = 4;
-      while (--n4 > 0)
-        {
-          a4 = _mm256_min_pd (a4, _mm256_load_pd (xx + i));
-          i += 4;
-        }
-      _mm256_store_pd (ax, a4);
-      s2 = _mm_min_pd (_mm_load_pd (ax), _mm_load_pd (ax + 2));
-      n2 = (n - i) >> 1;
-      if (n2)
-        {
-          s2 = _mm_min_pd (s2, _mm_load_pd (xx + i));
-          i += 2;
-        }
-      _mm_store_pd (sx, s2);
-      k = fmin (sx[0], sx[1]);
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
-
-#else
-#if __SSE4_2__
-  n2 = n >> 1;
-  if (n2)
-    {
-      s2 = _mm_load_pd (xx);
-      i = 2;
-      while (--n2 > 0)
-        {
-          s2 = _mm_min_pd (s2, _mm_load_pd (xx + i));
-          i += 2;
-        }
-      _mm_store_pd (sx, s2);
-      k = fmin (sx[0], sx[1]);
-    }
-  else
-    {
-      k = xx[0];
-      i = 1;
-    }
+#if JBM_LOW_PRECISION == 1
+  k = jbm_array_f32_reduce_min (xx, n);
+#elif JBM_LOW_PRECISION == 2
+  k = jbm_array_f64_reduce_min (xx, n);
 #else
   k = xx[0];
-  i = 1;
+  for (i = 1; i < n; ++i)
+    k = FMIN (k, xx[i]);
 #endif
-#endif
-#else
-  k = xx[0];
-  i = 1;
-#endif
-  while (i < n)
-    k = FMIN (k, xx[i++]);
   return k;
 }
 
@@ -3347,100 +3076,28 @@ jbm_farray_maxmin (const JBMFarray *fa, ///< JBMFarray struct.
                    JBFLOAT *min)        ///< the lowest value.
 {
   JBFLOAT *xx;
+  unsigned int n;
+#if JBM_LOW_PRECISION > 2
   JBFLOAT kmax, kmin;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __SSE4_2__
-  __m128d s2, smax2, smin2;
-  double smax[2], smin[2];
-  unsigned int n2;
-#endif
-#if __AVX2__
-  __m256d a4, amax4, amin4;
-  double amax[4], amin[4];
-  unsigned int n4;
-#endif
+  unsigned int i;
 #endif
   n = fa->n;
   xx = fa->x;
-#if JBM_LOW_PRECISION < 3
-#if __AVX2__
-  n4 = n >> 2;
-  if (n4)
-    {
-      amax4 = amin4 = _mm256_load_pd (xx);
-      i = 4;
-      while (--n4 > 0)
-        {
-          a4 = _mm256_load_pd (xx + i);
-          amax4 = _mm256_max_pd (amax4, a4);
-          amin4 = _mm256_min_pd (amin4, a4);
-          i += 4;
-        }
-      _mm256_store_pd (amax, amax4);
-      smax2 = _mm_max_pd (_mm_load_pd (amax), _mm_load_pd (amax + 2));
-      _mm256_store_pd (amin, amin4);
-      smin2 = _mm_min_pd (_mm_load_pd (amin), _mm_load_pd (amin + 2));
-      n2 = (n - i) >> 1;
-      if (n2)
-        {
-          s2 = _mm_load_pd (xx + i);
-          smax2 = _mm_max_pd (smax2, s2);
-          smin2 = _mm_min_pd (smin2, s2);
-          i += 2;
-        }
-      _mm_store_pd (smax, smax2);
-      kmax = fmax (smax[0], smax[1]);
-      _mm_store_pd (smin, smin2);
-      kmin = fmin (smin[0], smin[1]);
-    }
-  else
-    {
-      kmax = xx[0], kmin = xx[0];
-      i = 1;
-    }
-#else
-#if __SSE4_2__
-  n2 = n >> 1;
-  if (n2)
-    {
-      smax2 = smin2 = _mm_load_pd (xx);
-      i = 2;
-      while (--n2 > 0)
-        {
-          s2 = _mm_load_pd (xx + i);
-          smax2 = _mm_max_pd (smax2, s2);
-          smin2 = _mm_min_pd (smin2, s2);
-          i += 2;
-        }
-      _mm_store_pd (smax, smax2);
-      kmax = fmax (smax[0], smax[1]);
-      _mm_store_pd (smin, smin2);
-      kmin = fmin (smin[0], smin[1]);
-    }
-  else
-    {
-      kmax = xx[0], kmin = xx[0];
-      i = 1;
-    }
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_reduce_maxmin (xx, max, min, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_reduce_maxmin (xx, max, min, n);
 #else
   kmax = xx[0], kmin = xx[0];
-  i = 1;
-#endif
-#endif
-#else
-  kmax = xx[0], kmin = xx[0];
-  i = 1;
-#endif
-  while (i < n)
+  for (i = 1; i < n; ++i)
     {
       if (kmax < xx[i])
         kmax = xx[i];
       else if (kmin > xx[i])
         kmin = xx[i];
-      ++i;
     }
   *max = kmax, *min = kmin;
+#endif
 }
 
 /**
@@ -3667,6 +3324,736 @@ jbm_farray_root_mean_square_error (JBMFarray *fxa,
 ///< JBMFarray struct defining the y-coordinates of the 2nd tabular function.
 {
   return SQRT (jbm_farray_mean_square_error (fxa, fya, fxr, fyr));
+}
+
+/**
+ * Function to init data of a JBMDarray struct.
+ */
+static inline void
+jbm_darray_init (JBMDarray *fa, ///< pointer to the JBMDarray struct.
+                 const unsigned int n)  ///< number of array elements.
+{
+  fa->size = n * sizeof (JBDOUBLE);
+  fa->n = n;
+  fa->last = n - 1;
+}
+
+/**
+ * Function to create a new JBMDarray struct.
+ *
+ * \return pointer to the new JBMDarray struct.
+ */
+static inline JBMDarray *
+jbm_darray_new (const unsigned int n)   ///< number of array elements.
+{
+  JBMDarray *fa;
+  fa = (JBMDarray *) malloc (sizeof (JBMDarray));
+  jbm_darray_init (fa, n);
+  fa->x = (JBDOUBLE *) JB_MALLOC (fa->size);
+  if (!fa->x)
+    {
+      free (fa);
+      return NULL;
+    }
+  return fa;
+}
+
+/**
+ * Function to create a JBMDarray struct from an array of JBDOUBLE numbers.
+ *
+ * \return pointer to the new JBMDarray struct.
+ */
+static inline JBMDarray *
+jbm_darray_create (const JBDOUBLE *x,    ///< array of JBDOUBLE numbers.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBMDarray *fa;
+  fa = jbm_darray_new (n);
+  memcpy (fa->x, x, fa->size);
+  return fa;
+}
+
+/**
+ * Function to set a JBMDarray struct from a JBDOUBLE number.
+ */
+static inline void
+jbm_darray_set1 (JBMDarray *fa, ///< pointer to the JBMDarray struct.
+                 const JBDOUBLE x,       ///< JBDOUBLE number.
+                 const unsigned int n)  ///< number of array elements.
+{
+  JBDOUBLE *xa;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  jbm_darray_init (fa, n);
+  xa = fa->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_set1 (xa, x, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_set1 (xa, x, n);
+#else
+  i = 0;
+  for (; i < n; ++i)
+    xa[i] = x;
+#endif
+}
+
+/**
+ * Function to set a JBMDarray struct from an array of JBDOUBLE numbers.
+ */
+static inline void
+jbm_darray_set (JBMDarray *fa,  ///< pointer to the JBMDarray struct.
+                const JBDOUBLE *x,       ///< array of JBDOUBLE numbers.
+                const unsigned int n)   ///< number of array elements.
+{
+  jbm_darray_init (fa, n);
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_set (fa->x, x, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_set (fa->x, x, n);
+#else
+  memcpy (fa->x, x, fa->size);
+#endif
+}
+
+/**
+ * Function to store a JBMDarray struct on an array of JBDOUBLE numbers.
+ */
+static inline void
+jbm_darray_store (JBMDarray *fa,        ///< pointer to the JBMDarray struct.
+                  JBDOUBLE *x)   ///< array of JBDOUBLE numbers.
+{
+  memcpy (x, fa->x, fa->size);
+}
+
+/**
+ * Function to free the memory used by a JBMDarray struct.
+ */
+static inline void
+jbm_darray_destroy (JBMDarray *fa)      ///< pointer to the JBWDarray struct.
+{
+  JB_FREE (fa->x);
+  free (fa);
+}
+
+/**
+ * Function to add a JBMDarray struct by a JBDOUBLE number.
+ */
+static inline void
+jbm_darray_add1 (JBMDarray *fr, ///< result JBMDarray struct.
+                 const JBMDarray *f1,   ///< addend JBMDarray struct.
+                 const JBDOUBLE x2)     ///< addend JBDOUBLE number.
+{
+  JBDOUBLE *xr, *x1;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  x1 = f1->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_add1 (xr, x1, x2, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_add1 (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] + x2;
+#endif
+}
+
+/**
+ * Function to subtract a JBMDarray struct by a JBDOUBLE number.
+ */
+static inline void
+jbm_darray_sub1 (JBMDarray *fr, ///< result JBMDarray struct.
+                 const JBMDarray *f1,   ///< minuend JBMDarray struct.
+                 const JBDOUBLE x2)     ///< subtrahend JBDOUBLE number.
+{
+  JBDOUBLE *xr, *x1;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  x1 = f1->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_sub1 (xr, x1, x2, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_sub1 (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] - x2;
+#endif
+}
+
+/**
+ * Function to multiply a JBMDarray struct by a JBDOUBLE number.
+ */
+static inline void
+jbm_darray_mul1 (JBMDarray *fr, ///< result JBMDarray struct.
+                 const JBMDarray *f1,   ///< multiplier JBMDarray struct.
+                 const JBDOUBLE x2)     ///< multiplicand JBDOUBLE number.
+{
+  JBDOUBLE *xr, *x1;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  x1 = f1->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_mul1 (xr, x1, x2, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_mul1 (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] * x2;
+#endif
+}
+
+/**
+ * Function to divide a JBMDarray struct by a JBDOUBLE number.
+ */
+static inline void
+jbm_darray_div1 (JBMDarray *fr, ///< result JBMDarray struct.
+                 const JBMDarray *f1,   ///< dividend JBMDarray struct.
+                 const JBDOUBLE x2)     ///< divisor JBDOUBLE number.
+{
+  JBDOUBLE *xr, *x1;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  x1 = f1->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_div1 (xr, x1, x2, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_div1 (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] / x2;
+#endif
+}
+
+/**
+ * Function to add 2 JBMDarray structs.
+ */
+static inline void
+jbm_darray_add (JBMDarray *fr,  ///< result JBMDarray struct.
+                const JBMDarray *f1,    ///< 1st addend JBMDarray struct.
+                const JBMDarray *f2)    ///< 1st addend JBMDarray struct.
+{
+  JBDOUBLE *xr, *x1, *x2;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  x1 = f1->x;
+  x2 = f2->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_add (xr, x1, x2, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_add (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] + x2[i];
+#endif
+}
+
+/**
+ * Function to subtract 2 JBMDarray structs.
+ */
+static inline void
+jbm_darray_sub (JBMDarray *fr,  ///< result JBMDarray struct.
+                const JBMDarray *f1,    ///< minuend JBMDarray struct.
+                const JBMDarray *f2)    ///< subtrahend JBMDarray struct.
+{
+  JBDOUBLE *xr, *x1, *x2;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  x1 = f1->x;
+  x2 = f2->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_sub (xr, x1, x2, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_sub (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] - x2[i];
+#endif
+}
+
+/**
+ * Function to multiply 2 JBMDarray structs.
+ */
+static inline void
+jbm_darray_mul (JBMDarray *fr,  ///< result JBMDarray struct.
+                const JBMDarray *f1,    ///< multiplier JBMDarray struct.
+                const JBMDarray *f2)    ///< multiplicand JBMDarray struct.
+{
+  JBDOUBLE *xr, *x1, *x2;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  x1 = f1->x;
+  x2 = f2->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_mul (xr, x1, x2, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_mul (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] * x2[i];
+#endif
+}
+
+/**
+ * Function to divide 2 JBMDarray structs.
+ */
+static inline void
+jbm_darray_div (JBMDarray *fr,  ///< result JBMDarray struct.
+                const JBMDarray *f1,    ///< dividend JBMDarray struct.
+                const JBMDarray *f2)    ///< divisor JBMDarray struct.
+{
+  JBDOUBLE *xr, *x1, *x2;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  x1 = f1->x;
+  x2 = f2->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_div (xr, x1, x2, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_div (xr, x1, x2, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = x1[i] / x2[i];
+#endif
+}
+
+/**
+ * Function to calculate the double of a JBMDarray struct.
+ */
+static inline void
+jbm_darray_dbl (JBMDarray *fr,  ///< result JBMDarray struct.
+                const JBMDarray *fd)    ///< data JBMDarray struct.
+{
+  JBDOUBLE *xr, *xd;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  xd = fd->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_dbl (xr, xd, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_dbl (xr, xd, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_fdbll (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the square of a JBMDarray struct.
+ */
+static inline void
+jbm_darray_sqr (JBMDarray *fr,  ///< result JBMDarray struct.
+                const JBMDarray *fd)    ///< data JBMDarray struct.
+{
+  JBDOUBLE *xr, *xd;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fr->n;
+  xr = fr->x;
+  xd = fd->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_sqr (xr, xd, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_sqr (xr, xd, n);
+#else
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_fsqrl (xd[i]);
+#endif
+}
+
+/**
+ * Function to search the interval where a number is in a increasingly sorted
+ * JBMDarray.
+ *
+ * \return interval number.
+ */
+static inline unsigned int
+jbm_darray_search (const JBMDarray *fa, ///< JBMDarray struct.
+                   const JBDOUBLE x)    ///< number to search.
+{
+  JBDOUBLE *xx;
+  unsigned int i, j, n;
+  n = fa->last;
+  xx = fa->x;
+  for (i = 0; n - i > 1;)
+    {
+      j = (i + n) >> 1;
+      if (x < xx[j])
+        n = j;
+      else
+        i = j;
+    }
+  return i;
+}
+
+/**
+ * Function to search the interval where a number is in a increasingly sorted
+ * array of JBDOUBLE numbers.
+ * \return interval number, -1 if x<fa[0] or n-1 if x>fa[n-1].
+ */
+static inline int
+jbm_darray_search_extended (const JBMDarray *fa,        ///< JBMDarray struct.
+                            const JBDOUBLE x)   ///< number to search.
+{
+  JBDOUBLE *xx;
+  xx = fa->x;
+  if (x < xx[0])
+    return -1;
+  if (x >= xx[fa->last])
+    return (int) fa->last;
+  return (int) jbm_darray_search (fa, x);
+}
+
+/**
+ * Function to find the highest element of a JBMDarray struct.
+ *
+ * \return the highest value.
+ */
+static inline JBDOUBLE
+jbm_darray_max (const JBMDarray *fa)    ///< JBMDarray struct.
+{
+  JBDOUBLE *xx;
+  JBDOUBLE k;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fa->n;
+  xx = fa->x;
+#if JBM_HIGH_PRECISION == 1
+  k = jbm_array_f32_reduce_max (xx, n);
+#elif JBM_HIGH_PRECISION == 2
+  k = jbm_array_f64_reduce_max (xx, n);
+#else
+  k = xx[0];
+  for (i = 1; i < n; ++i)
+    k = FMAX (k, xx[i]);
+#endif
+  return k;
+}
+
+/**
+ * Function to find the lowest element of a JBMDarray struct.
+ *
+ * \return the lowest value.
+ */
+static inline JBDOUBLE
+jbm_darray_min (const JBMDarray *fa)    ///< JBMDarray struct.
+{
+  JBDOUBLE *xx;
+  JBDOUBLE k;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  unsigned int i;
+#endif
+  n = fa->n;
+  xx = fa->x;
+#if JBM_HIGH_PRECISION == 1
+  k = jbm_array_f32_reduce_min (xx, n);
+#elif JBM_HIGH_PRECISION == 2
+  k = jbm_array_f64_reduce_min (xx, n);
+#else
+  k = xx[0];
+  for (i = 1; i < n; ++i)
+    k = FMIN (k, xx[i]);
+#endif
+  return k;
+}
+
+/**
+ * Function to find the highest and the lowest elements of a JBMDarray struct.
+ */
+static inline void
+jbm_darray_maxmin (const JBMDarray *fa, ///< JBMDarray struct.
+                   JBDOUBLE *max,       ///< the highest value.
+                   JBDOUBLE *min)       ///< the lowest value.
+{
+  JBDOUBLE *xx;
+  unsigned int n;
+#if JBM_HIGH_PRECISION > 2
+  JBDOUBLE kmax, kmin;
+  unsigned int i;
+#endif
+  n = fa->n;
+  xx = fa->x;
+#if JBM_HIGH_PRECISION == 1
+  jbm_array_f32_reduce_maxmin (xx, max, min, n);
+#elif JBM_HIGH_PRECISION == 2
+  jbm_array_f64_reduce_maxmin (xx, max, min, n);
+#else
+  kmax = xx[0], kmin = xx[0];
+  for (i = 1; i < n; ++i)
+    {
+      if (kmax < xx[i])
+        kmax = xx[i];
+      else if (kmin > xx[i])
+        kmin = xx[i];
+    }
+  *max = kmax, *min = kmin;
+#endif
+}
+
+/**
+ * Function to interchange 2 JBMDarray structs.
+ */
+static inline void
+jbm_darray_change (JBMDarray *restrict fa,      ///< 1st JBMDarray struct.
+                   JBMDarray *restrict fb)      ///< 2nd JBMDarray struct.
+{
+  JBMDarray fc[1];
+  size_t s;
+  s = sizeof (JBMDarray);
+  memcpy (fc, fa, s);
+  memcpy (fa, fb, s);
+  memcpy (fb, fc, s);
+}
+
+/**
+ * Function to calculate the y-coordinate of a 2D point interpolated 
+ * between a tabular function defined by 2 JBMDarray structs.
+ *
+ * \return y-coordinate of the interpolated point.
+ */
+static inline JBDOUBLE
+jbm_darray_interpolate (const JBMDarray *fa,
+///< JBMDarray struct defining the increasingly sorted array of x-coordinates.
+                        const JBMDarray *fb,
+///< JBMDarray struct defining the array of y-coordinates.
+                        const JBDOUBLE x)        ///< x-coordinate of the point.
+{
+  JBDOUBLE *fx, *fy;
+  unsigned int i;
+  i = jbm_darray_search (fa, x);
+  fy = fb->x;
+  if (i == fa->last)
+    return fy[i];
+  fx = fa->x;
+  return jbm_interpolate (x, fx[i], fx[i + 1], fy[i], fy[i + 1]);
+}
+
+/**
+ * Function to merge 2 increasingly sorted JBMDarray structs.
+ *
+ * \return resulting JBMDarray struct.
+ */
+static inline JBMDarray *
+jbm_darray_merge (JBMDarray *restrict fa,
+                  ///< pointer to the 1st increasingly sorted JBMDarray struct.
+                  JBMDarray *restrict fb)
+                  ///< pointer to the 2nd increasingly sorted JBMDarray struct.
+{
+  JBMDarray *fc;
+  JBDOUBLE *xa, *xb, *xc;
+  unsigned int i, j, k, na, nb;
+  na = fa->n;
+  nb = fb->n;
+  fc = jbm_darray_new (na + nb);
+  if (!fc)
+    return NULL;
+  xa = fa->x;
+  xb = fb->x;
+  xc = fc->x;
+  for (i = j = k = 0; i < na || j < nb; ++k)
+    {
+      if (i >= na)
+        xc[k] = xb[j++];
+      else if (j >= nb)
+        xc[k] = xa[i++];
+      else if (xa[i] > xb[j])
+        xc[k] = xb[j++];
+      else if (xa[i] < xb[j])
+        xc[k] = xa[i++];
+      else
+        xc[k] = xa[i++], j++;
+    }
+  jbm_darray_init (fc, k);
+  return fc;
+}
+
+/**
+ * Function to integrate a tabular function, defined by 2 JBMDarray structs,in
+ * an interval.
+ *
+ * \return integral value.
+ */
+static inline JBDOUBLE
+jbm_darray_integral (JBMDarray *restrict fx,
+///< incresingly sorted JBMDarray defining the x-coordinates of the tabular
+///< function.
+                     JBMDarray *restrict fy,
+///< JBDarray defining the y-coordinates of the tabular function.
+                     JBDOUBLE x1,
+                     ///< left limit of the integration interval.
+                     JBDOUBLE x2)
+                     ///< right limit of the integration interval.
+{
+  JBDOUBLE *x, *y, *yy, *xx;
+  JBDOUBLE I, y1;
+  int i;
+  unsigned int n, last;
+  n = fx->n;
+  y = fy->x;
+  if (n == 0)
+    {
+      I = y[0] * (x2 - x1);
+      goto exit1;
+    }
+  x = fx->x;
+  i = jbm_darray_search_extended (fx, x1);
+  last = fx->last;
+  if (i < 0)
+    {
+      if (x2 <= x[0])
+        {
+          I = y[0] * (x2 - x1);
+          goto exit1;
+        }
+      I = y[0] * (x[0] - x1);
+      i = 0;
+      x1 = x[0];
+      y1 = y[0];
+      xx = x;
+      yy = y;
+    }
+  else if (i == (int) last)
+    {
+      I = y[i] * (x2 - x1);
+      goto exit1;
+    }
+  else
+    {
+      I = (JBDOUBLE) 0.;
+      xx = x + i;
+      yy = y + i;
+      y1 = jbm_extrapolate (x1, xx[0], xx[1], yy[0], yy[1]);
+    }
+  if (x2 < xx[1])
+    {
+      I += (JBDOUBLE) 0.5
+        * (y1 + jbm_extrapolate (x2, xx[0], xx[1], yy[0], yy[1])) * (x2 - x1);
+      goto exit1;
+    }
+  I += (JBDOUBLE) 0.5 *(y1 + yy[1]) * (xx[1] - x1);
+  if (++i == (int) last)
+    {
+      I += yy[1] * (x2 - xx[1]);
+      goto exit1;
+    }
+  while (++i < (int) last && x2 > xx[2])
+    {
+      ++xx, ++yy;
+      I += (JBDOUBLE) 0.5 *(yy[0] + yy[1]) * (xx[1] - xx[0]);
+    }
+  if (i == (int) last)
+    I += yy[2] * (x2 - xx[1]);
+  else if (x2 < xx[2])
+    I += (JBDOUBLE) 0.5
+      * (yy[1] + jbm_extrapolate (x2, xx[1], xx[2], yy[1], yy[2]))
+      * (x2 - xx[1]);
+exit1:
+  return I;
+}
+
+/**
+ * Function to calculate the mean square error between 2 tabular functions
+ * (JBDOUBLE).
+ *
+ * \return mean square error.
+ */
+static inline JBDOUBLE
+jbm_darray_mean_square_error (JBMDarray *fxa,
+///< incresingly sorted JBMDarray struct defining the x-coordinates of the 1st
+///< tabular function.
+                              JBMDarray *fya,
+///< JBMDarray struct defining the y-coordinates of the 1st tabular function.
+                              JBMDarray *fxr,
+///< incresingly sorted JBMDarray struct defining the x-coordinates of the 2nd
+///< tabular function.
+                              JBMDarray *fyr)
+///< JBMDarray struct defining the y-coordinates of the 2nd tabular function.
+{
+  JBDOUBLE k = (JBDOUBLE) 0.;
+  JBDOUBLE *xa, *ya, *xr, *yr;
+  unsigned int i, j, lastr, na;
+  lastr = fxr->last;
+  na = fxa->n;
+  xa = fxa->x;
+  ya = fya->x;
+  xr = fxr->x;
+  yr = fyr->x;
+  for (i = 0; i < na && xa[i] < xr[0]; ++i)
+    k += jbm_fsqr (ya[i] - yr[0]);
+  for (j = 0; i < na; ++i)
+    {
+      while (j < lastr && xa[i] > xr[j + 1])
+        ++j;
+      if (j == lastr)
+        for (; i < na; ++i)
+          k += jbm_fsqr (ya[i] - yr[lastr]);
+      else
+        k += jbm_fsqr (ya[i] - jbm_extrapolate (xa[i], xr[j], xr[j + 1], yr[j],
+                                                yr[j + 1]));
+    }
+  k /= na;
+  return k;
+}
+
+/**
+ * Function to calculate the root mean square error between 2 tabular functions
+ * (JBDOUBLE).
+ *
+ * \return root mean square error.
+ */
+static inline JBDOUBLE
+jbm_darray_root_mean_square_error (JBMDarray *fxa,
+///< incresingly sorted JBMDarray struct defining the x-coordinates of the 1st
+///< tabular function.
+                                   JBMDarray *fya,
+///< JBMDarray struct defining the y-coordinates of the 1st tabular function.
+                                   JBMDarray *fxr,
+///< incresingly sorted JBMDarray struct defining the x-coordinates of the 2nd
+///< tabular function.
+                                   JBMDarray *fyr)
+///< JBMDarray struct defining the y-coordinates of the 2nd tabular function.
+{
+  return SQRT (jbm_darray_mean_square_error (fxa, fya, fxr, fyr));
 }
 
 /**
@@ -5156,280 +5543,6 @@ jbm_file_root_mean_square_error (char *namea,
 }
 
 /**
- * Function to search the interval where a number is in a increasingly sorted
- * array of JBDOUBLE numbers.
- *
- * \return interval number.
- */
-static inline unsigned int
-jbm_darray_search (JBDOUBLE x,  ///< number to search.
-                   JBDOUBLE *fa,        ///< array of JBDOUBLE numbers.
-                   unsigned int n)
-                   ///< number of the highest array element.
-{
-  unsigned int i, j;
-  for (i = 0; n - i > 1;)
-    {
-      j = (i + n) >> 1;
-      if (x <= fa[j])
-        n = j;
-      else
-        i = j;
-    }
-  return i;
-}
-
-/**
- * Function to search the interval where a number is in a increasingly sorted
- * array of JBDOUBLE numbers.
- * \return interval number, -1 if x<fa[0] or n if x>fa[n].
- */
-static inline int
-jbm_darray_search_extended (JBDOUBLE x, ///< number to search.
-                            JBDOUBLE *fa,       ///< array of JBDOUBLE numbers.
-                            unsigned int n)
-                            ///< number of the highest array element.
-{
-  int i;
-  if (x < fa[0])
-    i = -1;
-  else if (x >= fa[n])
-    i = (int) n;
-  else
-    i = (int) jbm_darray_search (x, fa, n);
-  return i;
-}
-
-/**
- * Function to find the highest element of an array of JBDOUBLE numbers.
- *
- * \return the highest value.
- */
-static inline JBDOUBLE
-jbm_darray_max (JBDOUBLE *fa,   ///< array of JBDOUBLE numbers.
-                unsigned int n) ///< number of the ending array element.
-{
-  JBDOUBLE k;
-  unsigned int i;
-  k = fa[0];
-  for (i = 0; ++i <= n;)
-    k = FMAX (k, fa[i]);
-  return k;
-}
-
-/**
- * Function to find the lowest element of an array of JBDOUBLE numbers.
- *
- * \return the lowest value.
- */
-static inline JBDOUBLE
-jbm_darray_min (JBDOUBLE *fa,   ///< array of JBDOUBLE numbers.
-                unsigned int n) ///< number of the ending array element.
-{
-  JBDOUBLE k;
-  unsigned int i;
-  k = fa[0];
-  for (i = 0; ++i <= n;)
-    k = FMIN (k, fa[i]);
-  return k;
-}
-
-/**
- * Function to find the highest and the lowest elements of an array of JBDOUBLE
- * numbers.
- */
-static inline void
-jbm_darray_maxmin (JBDOUBLE *fa,        ///< array of JBDOUBLE numbers.
-                   unsigned int n,      ///< number of the ending array element.
-                   JBDOUBLE *max,       ///< the highest value.
-                   JBDOUBLE *min)       ///< the lowest value.
-{
-  JBDOUBLE kmax, kmin;
-  unsigned int i;
-  kmax = kmin = fa[0];
-  for (i = 0; ++i <= n;)
-    {
-      if (kmax < fa[i])
-        kmax = fa[i];
-      else if (kmin > fa[i])
-        kmin = fa[i];
-    }
-  *max = kmax, *min = kmin;
-}
-
-/**
- * Function to interchange 2 arrays of JBDOUBLE numbers.
- */
-static inline void
-jbm_darray_change (JBDOUBLE *restrict fa,
-                   ///< 1st array of JBDOUBLE numbers.
-                   JBDOUBLE *restrict fb,
-                   ///< 2nd array of JBDOUBLE numbers.
-                   unsigned int n)
-                   ///< the highest element number of the arrays.
-{
-  JBDOUBLE *restrict fc;
-  size_t s;
-  s = (n + 1) * sizeof (JBDOUBLE);
-  fc = (JBDOUBLE *) malloc (s);
-  memcpy (fc, fa, s);
-  memcpy (fa, fb, s);
-  memcpy (fb, fc, s);
-  free (fc);
-}
-
-/**
- * Function to calculate the y-coordinate of a 2D point interpolated 
- * between a tabular function defined by 2 arrays of JBDOUBLE numbers.
- *
- * \return y-coordinate of the interpolated point.
- */
-static inline JBDOUBLE
-jbm_darray_interpolate (JBDOUBLE x,     ///< x-coordinate of the point.
-                        JBDOUBLE *fa,
-///< increasingly sorted array of x-coordinates of the tabular function.
-                        JBDOUBLE *fb,
-///< array of y-coordinates of the tabular function.
-                        unsigned int n)
-///< the highest element number of the arrays.
-{
-  JBDOUBLE k;
-  unsigned int i;
-  i = jbm_darray_search (x, fa, n);
-  if (i == n)
-    k = fb[i];
-  else
-    k = jbm_interpolatel (x, fa[i], fa[i + 1], fb[i], fb[i + 1]);
-  return k;
-}
-
-/**
- * Function to merge 2 increasingly sorted arrays of JBDOUBLE numbers.
- *
- * \return resulting array.
- */
-static inline JBDOUBLE *
-jbm_darray_merge (JBDOUBLE *restrict fa,
-                  ///< 1st increasingly sorted array of JBDOUBLE numbers.
-                  unsigned int na,
-                  ///< the highest element number of the 1st array.
-                  JBDOUBLE *restrict fb,
-                  ///< 2nd increasingly sorted array of JBDOUBLE numbers.
-                  unsigned int nb,
-                  ///< the highest element number of the 2nd array.
-                  JBDOUBLE **fc,
-///< pointer to the resulting increasingly sorted array of JBDOUBLE numbers.
-                  unsigned int *nc)
-                  ///< the highest element number of the resulting array.
-{
-  JBDOUBLE *restrict x;
-  unsigned int i, j, k;
-  x = (JBDOUBLE *) malloc ((na + nb + 2) * sizeof (JBDOUBLE));
-  if (!x)
-    return NULL;
-  for (i = j = k = 0; i <= na || j <= nb; ++k)
-    {
-      if (i > na)
-        x[k] = fb[j++];
-      else if (j > nb)
-        x[k] = fa[i++];
-      else if (fa[i] > fb[j])
-        x[k] = fb[j++];
-      else if (fa[i] < fb[j])
-        x[k] = fa[i++];
-      else
-        x[k] = fa[i++], j++;
-    }
-  *fc = (JBDOUBLE *) jb_realloc (x, k * sizeof (JBDOUBLE));
-  *nc = --k;
-  return *fc;
-}
-
-/**
- * Function to integrate a tabular function (JBDOUBLE) in an interval.
- *
- * \return integral value.
- */
-static inline JBDOUBLE
-jbm_darray_integral (JBDOUBLE *restrict x,
-///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates of
-///< the tabular function.
-                     JBDOUBLE *restrict y,
-///< array of JBDOUBLE numbers defining the y-coordinates of the tabular
-///< function.
-                     unsigned int n,
-                     ///< the highest element number of the arrays.
-                     JBDOUBLE x1,
-                     ///< left limit of the integration interval.
-                     JBDOUBLE x2)
-                     ///< right limit of the integration interval.
-{
-  JBDOUBLE *yy, *xx;
-  JBDOUBLE I, y1;
-  int i;
-  if (n == 0)
-    {
-      I = y[0] * (x2 - x1);
-      goto exit1;
-    }
-  i = jbm_darray_search_extended (x1, x, n);
-  if (i < 0)
-    {
-      if (x2 <= x[0])
-        {
-          I = y[0] * (x2 - x1);
-          goto exit1;
-        }
-      I = y[0] * (x[0] - x1);
-      i = 0;
-      x1 = x[0];
-      y1 = y[0];
-      xx = x;
-      yy = y;
-    }
-  else if (i == (int) n)
-    {
-      I = y[i] * (x2 - x1);
-      goto exit1;
-    }
-  else
-    {
-      I = (JBDOUBLE) 0.;
-      xx = x + i;
-      yy = y + i;
-      y1 = jbm_extrapolatel (x1, xx[0], xx[1], yy[0], yy[1]);
-    }
-  if (x2 < xx[1])
-    {
-      I +=
-        (JBDOUBLE) 0.5 *(y1 +
-                         jbm_extrapolatel (x2, xx[0], xx[1], yy[0],
-                                           yy[1])) * (x2 - x1);
-      goto exit1;
-    }
-  I += (JBDOUBLE) 0.5 *(y1 + yy[1]) * (xx[1] - x1);
-  if (++i == (int) n)
-    {
-      I += yy[1] * (x2 - xx[1]);
-      goto exit1;
-    }
-  while (++i < (int) n && x2 > xx[2])
-    {
-      ++xx, ++yy;
-      I += (JBDOUBLE) 0.5 *(yy[0] + yy[1]) * (xx[1] - xx[0]);
-    }
-  if (i == (int) n)
-    I += yy[2] * (x2 - xx[1]);
-  else if (x2 < xx[2])
-    I +=
-      (JBDOUBLE) 0.5 *(yy[1] +
-                       jbm_extrapolatel (x2, xx[1], xx[2], yy[1],
-                                         yy[2])) * (x2 - xx[1]);
-exit1:
-  return I;
-}
-
-/**
  * Function to get a JBDOUBLE number on a string.
  *
  * \return 1 on success, 0 on error.
@@ -5467,80 +5580,6 @@ jbm_read_double (FILE *file,    ///< file.
   *x = STRTOD (buffer, NULL);
   return i;
 #endif
-}
-
-/**
- * Function to calculate the mean square error between 2 tabular functions
- * (JBDOUBLE).
- *
- * \return mean square error.
- */
-static inline JBDOUBLE
-jbm_darray_mean_square_error (JBDOUBLE *restrict xa,
-///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates
-///< of the 1st tabular function.
-                              JBDOUBLE *restrict fa,
-///< array of JBDOUBLE numbers defining the y-coordinates of the 1st tabular
-///< function.
-                              unsigned int na,
-///< the highest element number of the arrays defining the 1st tabular
-///< function.
-                              JBDOUBLE *restrict xr,
-///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates
-///< of the 2nd tabular function.
-                              JBDOUBLE *restrict fr,
-///< array of JBDOUBLE numbers defining the y-coordinates of the 2nd tabular
-///< function.
-                              unsigned int nr)
-///< the highest element number of the arrays defining the 2nd tabular
-///< function.
-{
-  JBDOUBLE k = (JBDOUBLE) 0.;
-  unsigned int i, j;
-  for (i = 0; i <= na && xa[i] < xr[0]; ++i)
-    k += jbm_fsqrl (fa[i] - fr[0]);
-  for (j = 0; i <= na; ++i)
-    {
-      while (j < nr && xa[i] > xr[j + 1])
-        ++j;
-      if (j == nr)
-        for (; i <= na; ++i)
-          k += jbm_fsqrl (fa[i] - fr[nr]);
-      else
-        k += jbm_fsqrl (fa[i] - jbm_extrapolatel (xa[i], xr[j], xr[j + 1],
-                                                  fr[j], fr[j + 1]));
-    }
-  k /= na + 1;
-  return k;
-}
-
-/**
- * Function to calculate the root mean square error between 2 tabular functions
- * (JBDOUBLE).
- *
- * \return root mean square error.
- */
-static inline JBDOUBLE
-jbm_darray_root_mean_square_error (JBDOUBLE *restrict xa,
-///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates
-///< of the 1st tabular function.
-                                   JBDOUBLE *restrict fa,
-///< array of JBDOUBLE numbers defining the y-coordinates of the 1st tabular
-///< function.
-                                   int na,
-///< the highest element number of the arrays defining the 1st tabular
-///< function.
-                                   JBDOUBLE *restrict xr,
-///< incresingly sorted array of JBDOUBLE numbers defining the x-coordinates
-///< of the 2nd tabular function.
-                                   JBDOUBLE *restrict fr,
-///< array of JBDOUBLE numbers defining the y-coordinates of the 2nd tabular
-///< function.
-                                   int nr)
-///< the highest element number of the arrays defining the 2nd tabular
-///< function.
-{
-  return SQRTL (jbm_darray_mean_square_error (xa, fa, na, xr, fr, nr));
 }
 
 /**
@@ -5727,518 +5766,6 @@ jbm_index_sort_extendedl (JBDOUBLE *restrict x,
     (*ni)[nk[i]] = nj[i];
 index_exit:
   return j;
-}
-
-/**
- * Function to solve a linear equations system stored in a matrix with format:
- * \f$\left(\begin{array}{cccc|c}
- * x_{0,0} & x_{0,1} & \cdots & x_{0,n-1} & x_{0,n}\\
- * x_{1,0} & x_{1,1} & \cdots & x_{1,n-1} & x_{1,n}\\
- * & & \cdots \\
- * x_{n-1,0} & x_{n-1,1} & \cdots & x_{n-1,n-1} & x_{n-1,n}
- * \end{array}\right)\f$.
- * Results are stored in the n+1-th column:
- * \f$\left(x_{0,n},\;x_{1,n},\;\cdots,\;x_{n-1,n}\right)\f$.
- * It modifies the x matrix (JBDOUBLE).
- */
-static inline void
-jbm_matrix_solvel (JBDOUBLE *x,
-///< matrix storing the linear equations system.
-                   int n)       ///< number of matrix rows.
-{
-  JBDOUBLE *f, *g;
-  JBDOUBLE k1, k2;
-  int i, j, k;
-  // Setting n to the number of row elements
-  ++n;
-  // Scaling every equation to reduce rounding effects.
-  for (i = n, f = x; --i > 0;)
-    {
-      jbm_darray_maxmin (f, n, &k1, &k2);
-      k1 = FMAXL (FABSL (k1), FABSL (k2));
-      for (j = n; --j >= 0; ++f)
-        *f /= k1;
-    }
-  // Gaussian elimination
-  for (i = n - 1, f = x; --i > 0; f += n + 1)
-    {
-      // Obtaining the highest pivot element        
-      k1 = FABSL (*f);
-      for (k = j = i, g = f; --j >= 0;)
-        {
-          g += n;
-          k2 = FABSL (*g);
-          if (k2 > k1)
-            {
-              k1 = k2;
-              k = j;
-            }
-        }
-      // Interchanging rows
-      if (k != i)
-        {
-          g = f + (i - k) * n;
-          jbm_darray_change (g, f, i + 1);
-        }
-      // Eliminating column
-      for (j = i, g = f + n; --j >= 0; g += n)
-        {
-          k1 = *g / *f;
-          for (k = i + 2; --k > 0;)
-            g[k] -= k1 * f[k];
-        }
-    }
-  // Retrieving solutions
-  f = x + n * (n - 1) - 1;
-  for (i = 0; ++i < n; f -= n)
-    {
-      // Solution
-      k1 = *f /= *(f - i);
-      // Eliminating column
-      for (j = n, g = f - n; --j > i; g -= n)
-        *g -= *(g - i) * k1;
-    }
-}
-
-/**
- * Function to solve a linear equations system stored in a tridiagonal matrix
- * with format: \f$\left(\begin{array}{cccc|c}
- * D_0 & E_0    &         &         & H_0\\
- * C_0 & D_1    & E_1     &         & H_1\\
- *     & \ddots & \ddots  & \ddots  & \vdots\\
- *     &        & C_{n-2} & D_{n-1} & H_{n-1}
- * \end{array}\right)\f$.
- * Results are stored in the H array. It modifies D and H arrays (JBDOUBLE).
- */
-static inline void
-jbm_matrix_solve_tridiagonall (JBDOUBLE *restrict C,
-                               ///< left diagonal array.
-                               JBDOUBLE *restrict D,
-                               ///< central diagonal array.
-                               JBDOUBLE *restrict E,
-                               ///< right diagonal array.
-                               JBDOUBLE *restrict H,    ///< final column array.
-                               int n)   ///< number of matrix rows.
-{
-  JBDOUBLE k;
-  int i;
-  for (i = 0; i < n; ++i)
-    {
-      k = C[i] / D[i];
-      D[i + 1] -= k * E[i];
-      H[i + 1] -= k * H[i];
-    }
-  H[i] /= D[i];
-  while (i--)
-    H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
-}
-
-/**
- * Function to solve a linear equations system stored in a tridiagonal matrix
- * with format: \f$\left(\begin{array}{cccc|c}
- * D_0 & E_0    &         &         & H_0\\
- * C_0 & D_1    & E_1     &         & H_1\\
- *     & \ddots & \ddots  & \ddots  & \vdots\\
- *     &        & C_{n-2} & D_{n-1} & H_{n-1}
- * \end{array}\right)\f$.
- * avoiding zero divisions. Results are stored in the H array. It modifies D and
- * H arrays (JBDOUBLE).
- */
-static inline void
-jbm_matrix_solve_tridiagonal_zerol (JBDOUBLE *restrict C,
-                                    ///< left diagonal array.
-                                    JBDOUBLE *restrict D,
-                                    ///< central diagonal array.
-                                    JBDOUBLE *restrict E,
-                                    ///< right diagonal array.
-                                    JBDOUBLE *restrict H,
-                                    ///< final column array.
-                                    int n)      ///< number of matrix rows.
-{
-  JBDOUBLE k;
-  int i;
-  for (i = 0; i < n; ++i)
-    if (!jbm_smalll (D[i]))
-      {
-        k = C[i] / D[i];
-        D[i + 1] -= k * E[i];
-        H[i + 1] -= k * H[i];
-      }
-  if (jbm_smalll (D[i]))
-    H[i] = (JBDOUBLE) 0.;
-  else
-    H[i] /= D[i];
-  while (i--)
-    if (jbm_smalll (D[i]))
-      H[i] = (JBDOUBLE) 0.;
-    else
-      H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
-}
-
-/**
- * Function to solve a linear equations system stored in a pentadiagonal matrix
- * with format: \f$\left(\begin{array}{cccccc|c}
- * D_0 & E_0    & F_0     &         &         &         & H_0\\
- * C_0 & D_1    & E_1     & F_1     &         &         & H_1\\
- * B_0 & C_1    & D_2     & E_2     & F_2     &         & H_2\\
- *     & \ddots & \ddots  & \ddots  & \ddots  & \ddots  & \vdots\\
- *     &        &         & B_{n-3} & C_{n-2} & D_{n-1} & H_{n-1}
- * \end{array}\right)\f$.
- * Results are stored in the H array. It modifies C, D, E and H arrays 
- * (JBDOUBLE).
- */
-static inline void
-jbm_matrix_solve_pentadiagonall (JBDOUBLE *restrict B,
-                                 ///< double-left diagonal array.
-                                 JBDOUBLE *restrict C,
-                                 ///< left diagonal array.
-                                 JBDOUBLE *restrict D,
-                                 ///< central diagonal array.
-                                 JBDOUBLE *restrict E,
-                                 ///< right diagonal array.
-                                 JBDOUBLE *restrict F,
-                                 ///< double-right diagonal array.
-                                 JBDOUBLE *restrict H,
-                                 ///< final column array.
-                                 int n) ///< number of matrix rows.
-{
-  JBDOUBLE k;
-  int i;
-  for (i = 0; i < n - 1; ++i)
-    {
-      k = C[i] / D[i];
-      D[i + 1] -= k * E[i];
-      E[i + 1] -= k * F[i];
-      H[i + 1] -= k * H[i];
-      k = B[i] / D[i];
-      C[i + 1] -= k * E[i];
-      D[i + 2] -= k * F[i];
-      H[i + 2] -= k * H[i];
-    }
-  k = C[i] / D[i];
-  D[i + 1] -= k * E[i];
-  H[i + 1] -= k * H[i];
-  H[i + 1] /= D[i + 1];
-  H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
-  while (i--)
-    H[i] = (H[i] - E[i] * H[i + 1] - F[i] * H[i + 2]) / D[i];
-}
-
-/**
- * Function to solve a linear equations system stored in a pentadiagonal matrix
- * with format: \f$\left(\begin{array}{cccccc|c}
- * D_0 & E_0    & F_0     &         &         &         & H_0\\
- * C_0 & D_1    & E_1     & F_1     &         &         & H_1\\
- * B_0 & C_1    & D_2     & E_2     & F_2     &         & H_2\\
- *     & \ddots & \ddots  & \ddots  & \ddots  & \ddots  & \vdots\\
- *     &        &         & B_{n-3} & C_{n-2} & D_{n-1} & H_{n-1}
- * \end{array}\right)\f$.
- * avoiding zero divisions. Results are stored in the H array. It modifies C, D,
- * E and H arrays (JBDOUBLE).
- */
-static inline void
-jbm_matrix_solve_pentadiagonal_zerol (JBDOUBLE *restrict B,
-                                      ///< double-left diagonal array.
-                                      JBDOUBLE *restrict C,
-                                      ///< left diagonal array.
-                                      JBDOUBLE *restrict D,
-                                      ///< central diagonal array.
-                                      JBDOUBLE *restrict E,
-                                      ///< right diagonal array.
-                                      JBDOUBLE *restrict F,
-                                      ///< double-right diagonal array.
-                                      JBDOUBLE *restrict H,
-                                      ///< final column array.
-                                      int n)    ///< number of matrix rows.
-{
-  JBDOUBLE k;
-  int i;
-  for (i = 0; i < n - 1; ++i)
-    if (!jbm_smalll (D[i]))
-      {
-        k = C[i] / D[i];
-        D[i + 1] -= k * E[i];
-        E[i + 1] -= k * F[i];
-        H[i + 1] -= k * H[i];
-        k = B[i] / D[i];
-        C[i + 1] -= k * E[i];
-        D[i + 2] -= k * F[i];
-        H[i + 2] -= k * H[i];
-      }
-  if (!jbm_smalll (D[i]))
-    {
-      k = C[i] / D[i];
-      D[i + 1] -= k * E[i];
-      H[i + 1] -= k * H[i];
-    }
-  if (jbm_smalll (D[i + 1]))
-    H[i + 1] = (JBDOUBLE) 0.;
-  else
-    H[i + 1] /= D[i + 1];
-  if (jbm_smalll (D[i]))
-    H[i] = (JBDOUBLE) 0.;
-  else
-    H[i] = (H[i] - E[i] * H[i + 1]) / D[i];
-  while (i--)
-    if (jbm_smalll (D[i]))
-      H[i] = (JBDOUBLE) 0.;
-    else
-      H[i] = (H[i] - E[i] * H[i + 1] - F[i] * H[i + 2]) / D[i];
-}
-
-/**
- * Function to calculate the coefficients of a linear regression adjusted by 
- * minimum squares: \f$y=a+b\,x\f$ (JBDOUBLE).
- */
-static inline void
-jbm_regression_linearl (JBDOUBLE *restrict x,
-                        ///< array of point x-coordinates.
-                        JBDOUBLE *restrict y,
-                        ///< array of point y-coordinates.
-                        unsigned int n, ///< points number.
-                        JBDOUBLE *a,
-                        ///< pointer to the 0th order regression coefficient.
-                        JBDOUBLE *b)
-                        ///< pointer to the 1st order regression coefficient.
-{
-  JBDOUBLE syx, sy, sxx, sx;
-  unsigned int i;
-  ++n;
-  syx = sy = sxx = sx = (JBDOUBLE) 0.;
-  for (i = 0; i < n; ++i)
-    {
-      sy += y[i];
-      syx += x[i] * y[i];
-      sxx += x[i] * x[i];
-      sx += x[i];
-    }
-  *b = (n * syx - sy * sx) / (n * sxx - sx * sx);
-  *a = (sy - *b * sx) / n;
-}
-
-/**
- * Function to calculate the coefficients of a polynomial regression adjusted
- * by minimum squares: \f$y=A_0+A_1\,x+A_2\,x^2+\cdots\f$ (JBDOUBLE).
- */
-static inline void
-jbm_regression_polynomiall (JBDOUBLE *restrict x,
-                            ///< array of point x-coordinates.
-                            JBDOUBLE *restrict y,
-                            ///< array of point y-coordinates.
-                            int n,      ///< points number.
-                            JBDOUBLE **A,
-///< pointer to the array of regression coefficients generated by the function
-///< calling to malloc.
-                            int m)      ///< order of the polynomial regression.
-{
-  JBDOUBLE xx[m + m + 1], yx[m + 1], B[(m + 1) * (m + 2)];
-  JBDOUBLE *k;
-  JBDOUBLE zx, zy;
-  int i, j;
-  *A = (JBDOUBLE *) malloc ((m + 1) * sizeof (JBDOUBLE));
-  for (j = m + m; --j > m;)
-    xx[j] = (JBDOUBLE) 0.;
-  for (; j >= 0; --j)
-    xx[j] = yx[j] = (JBDOUBLE) 0.;
-  for (i = n; --i >= 0;)
-    {
-      for (j = 0, zx = (JBDOUBLE) 1., zy = y[i]; j <= m; ++j)
-        {
-          yx[j] += zy;
-          xx[j] += zx;
-          zx *= x[i];
-          zy *= x[i];
-        }
-      for (; j <= m + m; ++j)
-        {
-          xx[j] += zx;
-          zx *= x[i];
-        }
-    }
-  for (i = 0, k = B; i <= m; ++i, ++k)
-    {
-      for (j = 0; j <= m; ++j, ++k)
-        *k = xx[j + i];
-      *k = yx[i];
-    }
-  jbm_matrix_solvel (B, m + 1);
-  for (i = 0, k = B; i <= m; ++i, k += m + 1)
-    (*A)[i] = *k;
-}
-
-/**
- * Function to calculate the coefficients of an exponential regression adjusted
- * by minimum squares: \f$y=a\,x^b\f$ (JBDOUBLE).
- */
-static inline void
-jbm_regression_exponentiall (JBDOUBLE *restrict x,
-///< array of point x-coordinates. It is modified by the function.
-                             JBDOUBLE *restrict y,
-///< array of point y-coordinates. It is modified by the function.
-                             int n,     ///< points number.
-                             JBDOUBLE *a,
-///< pointer to the constant parameter regression coefficient.
-                             JBDOUBLE *b)
-///< pointer to the exponent regression coefficient.
-{
-  int i;
-  for (i = n; i-- >= 0;)
-    x[i] = LOGL (x[i]), y[i] = LOGL (y[i]);
-  jbm_regression_linearl (x, y, n, a, b);
-  *a = EXPL (*a);
-}
-
-/**
- * Function to calculate the coefficients of a multilinear regression adjusted 
- * by minimum squares: \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$ (JBDOUBLE).
- */
-static inline void
-jbm_regression_multilinearl (JBDOUBLE **restrict x,
-///< array of point coordinates in format:
-///< \f$\left(x_1,\cdots,x_n,y_1,\cdots,y_n,\cdots,f_1,\cdots,f_n\right)\f$.
-                             int n,     ///< points number.
-                             JBDOUBLE *restrict a,
-///< array of regression coefficients.
-                             int m)     ///< number of variables.
-{
-  JBDOUBLE c[(m + 1) * (m + 2)];
-  JBDOUBLE *d, *xj, *xk;
-  int i, j, k;
-  ++m;
-  for (j = m; --j > 0;)
-    {
-      for (k = m; --k >= j;)
-        {
-          d = c + (m + 1) * j + k;
-          xj = x[j];
-          xk = x[k];
-          for (*d = (JBDOUBLE) 0., i = n + 1; --i >= 0;)
-            *d += *(xj++) ** (xk++);
-        }
-      d = c + (m + 1) * j + m;
-      xj = x[j];
-      xk = x[0];
-      for (*d = (JBDOUBLE) 0., i = n + 1; --i >= 0;)
-        *d += *(xj++) ** (xk++);
-    }
-  for (k = m; --k > 0;)
-    {
-      d = c + k;
-      xk = x[k];
-      for (*d = (JBDOUBLE) 0., i = n + 1; --i >= 0;)
-        *d += *(xk++);
-    }
-  d = c + m;
-  xk = x[0];
-  for (*d = (JBDOUBLE) 0., i = n + 1; --i >= 0;)
-    *d += *(xk++);
-  c[0] = n + 1;
-  for (j = m; --j > 0;)
-    for (k = j; --k >= 0;)
-      c[(m + 1) * j + k] = c[(m + 1) * k + j];
-  jbm_matrix_solvel (c, m);
-  for (i = 0, d = c + m; ++i <= m; ++a, d += m + 1)
-    *a = *d;
-}
-
-/**
- * Function to calculate the coefficients of a multiexponential regression 
- * adjusted by minimum squares: \f$f=a_0+a_1\,x+a_2\,y+\cdots\f$ (JBDOUBLE).
- */
-static inline void
-jbm_regression_multiexponentiall (JBDOUBLE **restrict x,
-///< array of point coordinates in format:
-///< \f$\left(x_1,\cdots,x_n,y_1,\cdots,y_n,\cdots,f_1,\cdots,f_n\right)\f$. It
-///< is modified by the function.
-                                  int n,        ///< points number.
-                                  JBDOUBLE *restrict a,
-///< array of regression coefficients.
-                                  int m)        ///< number of variables.
-{
-  JBDOUBLE *c;
-  int i, j;
-  for (j = m + 1; --j >= 0;)
-    for (i = n + 1, c = x[j]; --i >= 0;)
-      c[i] = LOGL (c[i]);
-  jbm_regression_multilinearl (x, n, a, m);
-  a[0] = EXPL (a[0]);
-}
-
-/**
- * Function to calculate a cubic spline on tabular data (JBDOUBLE).
- */
-static inline void
-jbm_spline_cubicl (JBDOUBLE *restrict x,
-                   ///< array of point x-coordinates.
-                   JBDOUBLE *y,
-                   ///< array of point y-coordinates.
-                   int n,       ///< number of points.
-                   JBDOUBLE **restrict b,
-///< pointer to the array of 1st order spline coefficients. It is generated by
-///< malloc.
-                   JBDOUBLE **restrict c,
-///< pointer to the array of 2nd order spline coefficients.
-                   JBDOUBLE **restrict d)
-///< pointer to the array of 3rd order spline coefficients.
-{
-  JBDOUBLE *B, *C, *D, *E, *F, *H;
-  JBDOUBLE dx;
-  int i, j, m;
-  --n;
-  m = 3 * n;
-  B = (JBDOUBLE *) malloc (6 * (m - 1) * sizeof (JBDOUBLE));
-  C = B + m - 2;
-  D = C + m - 1;
-  E = D + m;
-  F = E + m - 1;
-  H = F + m - 2;
-  dx = x[1] - x[0];
-  B[0] = B[1] = D[3] = E[2] = E[3] = F[3] = H[1] = H[2] = H[3] = (JBDOUBLE) 0.;
-  C[0] = C[1] = C[2] = (JBDOUBLE) 1.;
-  F[1] = F[2] = -(JBDOUBLE) 1.;
-  D[0] = dx;
-  D[1] = D[0] + dx;
-  D[2] = D[1] + dx;
-  E[0] = D[0] * dx;
-  E[1] = (JBDOUBLE) 3. *E[0];
-  F[0] = E[0] * dx;
-  H[0] = y[1] - y[0];
-  for (i = n - 1; --i > 0;)
-    {
-      j = 3 * i + 1;
-      dx = x[i + 1] - x[i];
-      B[j - 2] = D[j + 2] = F[j] = F[j + 1] = F[j + 2] = H[j + 1] = H[j + 2]
-        = (JBDOUBLE) 0.;
-      B[j - 1] = B[j] = (JBDOUBLE) 1.;
-      E[j + 1] = E[j + 2] = -(JBDOUBLE) 1.;
-      C[j - 1] = dx;
-      C[j] = C[j - 1] + dx;
-      C[j + 1] = C[j] + dx;
-      D[j] = C[j - 1] * dx;
-      D[j + 1] = (JBDOUBLE) 3. *D[j];
-      E[j] = D[j] * dx;
-      H[j] = y[i + 1] - y[i];
-    }
-  j = 3 * n - 2;
-  dx = x[n] - x[n - 1];
-  B[j - 2] = B[j - 1] = C[j] = H[j + 1] = (JBDOUBLE) 0.;
-  D[j + 1] = (JBDOUBLE) 1.;
-  C[j - 1] = dx;
-  D[j] = dx * dx;
-  E[j] = D[j] * dx;
-  H[j] = y[n] - y[n - 1];
-  jbm_matrix_solve_pentadiagonall (B, C, D, E, F, H, m - 1);
-  *b = (JBDOUBLE *) malloc (3 * n * sizeof (JBDOUBLE));
-  *c = *b + n;
-  *d = *c + n;
-  for (i = n; i-- > 0;)
-    {
-      j = 3 * i;
-      (*b)[i] = H[j];
-      (*c)[i] = H[j + 1];
-      (*d)[i] = H[j + 2];
-    }
-  free (B);
 }
 
 /**
