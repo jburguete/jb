@@ -16113,6 +16113,46 @@ jbm_2xf64_integral (__m128d (*f) (__m128d),
 
 #ifndef __AVX__
 
+///> macro to automatize sets on one array.
+#define JBM_ARRAY_SET(xr, xd, n, type, load128, store128) \
+  unsigned int i, j; \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, load128 (xd + i)); \
+  for (; i < n; ++i) \
+    xr[i] = xd[i];
+
+///> macro to automatize sets on one array and one number.
+#define JBM_ARRAY_SET1(xr, xd, n, type, set128, store128) \
+  unsigned int i, j; \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, set128 (xd)); \
+  for (; i < n; ++i) \
+    xr[i] = xd;
+
 ///> macro to automatize operations on one array.
 #define JBM_ARRAY_OP(xr, xd, n, type, load128, store128, op128, op) \
   unsigned int i, j; \
@@ -16318,6 +16358,17 @@ jbm_2xf64_integral (__m128d (*f) (__m128d),
     } \
   for (; i < n; ++i) \
     mx = max (mx, x[i]), mn = min (mn, x[i]); \
+
+/**
+ * Function to set a float array with another float array.
+ */
+static inline void
+jbm_array_f32_set (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_SET (xr, xd, n, float, _mm_loadu_ps, _mm_storeu_ps);
+}
 
 /**
  * Function to calculate the root square of a float array.
@@ -16711,6 +16762,17 @@ jbm_array_f32_reduce_maxmin (const float *x,    ///< float array.
 }
 
 /**
+ * Function to set a float array with a number.
+ */
+static inline void
+jbm_array_f32_set1 (float *restrict xr, ///< result float array.
+                    const float xd,     ///< data float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_SET1 (xr, xd, n, float, _mm_set1_ps, _mm_storeu_ps);
+}
+
+/**
  * Function to add 1 float array + 1 number.
  */
 static inline void
@@ -16930,6 +16992,17 @@ jbm_array_f32_dot (const float *restrict x1,    ///< multiplier float array.
 {
   JBM_ARRAY_DOT (x1, x2, n, __m128, float, _mm_loadu_ps, _mm_mul_ps, _mm_add_ps,
                  _mm_fmadd_ps, jbm_4xf32_reduce_add);
+}
+
+/**
+ * Function to set a double array with another double array.
+ */
+static inline void
+jbm_array_f64_set (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_SET (xr, xd, n, double, _mm_loadu_pd, _mm_storeu_pd);
 }
 
 /**
@@ -17321,6 +17394,17 @@ jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
                     _mm_min_pd, fmin, jbm_2xf64_reduce_max,
                     jbm_2xf64_reduce_min, mx, mn);
   *max = mx, *min = mn;
+}
+
+/**
+ * Function to set a double array with a number.
+ */
+static inline void
+jbm_array_f64_set1 (double *restrict xr,        ///< result double array.
+                    const double xd,    ///< data double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_SET1 (xr, xd, n, double, _mm_set1_pd, _mm_storeu_pd);
 }
 
 /**

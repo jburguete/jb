@@ -92,6 +92,252 @@ typedef union
 #define JBM_2xF64_CBRT4 vdupq_n_f64 (JBM_F64_CBRT4)
 ///< cbrt(4) for doubles.
 
+///> macro to automatize sets on one array.
+#define JBM_ARRAY_SET(xr, xd, n, type, load128, store128) \
+  unsigned int i, j; \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, load128 (xd + i)); \
+  for (; i < n; ++i) \
+    xr[i] = xd[i];
+
+///> macro to automatize sets on one array and one number.
+#define JBM_ARRAY_SET1(xr, xd, n, type, set128, store128) \
+  unsigned int i, j; \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+    } \
+  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+       --j, i += 16 / sizeof (type)) \
+    store128 (xr + i, set128 (xd)); \
+  for (; i < n; ++i) \
+    xr[i] = xd;
+
+///> macro to automatize operations on one array.
+#define JBM_ARRAY_OP(xr, xd, n, type, load128, store128, op128, op) \
+unsigned int i, j; \
+for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+  { \
+    store128 (xr + i, op128 (load128 (xd + i))); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (xd + i))); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (xd + i))); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (xd + i))); \
+    i += 16 / sizeof (type); \
+  } \
+for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+     --j, i += 16 / sizeof (type)) \
+  store128 (xr + i, op128 (load128 (xd + i))); \
+for (; i < n; ++i) \
+  xr[i] = op (xd[i]);
+
+///> macro to automatize operations on one array and one number.
+#define JBM_ARRAY_OP1(xr, x1, x2, n, type128, type, load128, store128, set128, \
+                    op128, op) \
+const type128 x128 = set128 (x2); \
+unsigned int i, j; \
+for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+  { \
+    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+    i += 16 / sizeof (type); \
+  } \
+for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+     --j, i += 16 / sizeof (type)) \
+  store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+for (; i < n; ++i) \
+  xr[i] = op (x1[i], x2);
+
+///> macro to automatize operations on two arrays.
+#define JBM_ARRAY_OP2(xr, x1, x2, n, type, load128, store128, op128, op) \
+unsigned int i, j; \
+for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+  { \
+    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+    i += 16 / sizeof (type); \
+    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+    i += 16 / sizeof (type); \
+  } \
+for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
+     --j, i += 16 / sizeof (type)) \
+  store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+for (; i < n; ++i) \
+  xr[i] = op (x1[i], x2[i]);
+
+///> macro to automatize reduction operations on arrays.
+#define JBM_ARRAY_REDUCE_OP(x, n, type128, type, load128, op128, op, \
+                          reduce128, initial_value) \
+type128 a128, b128, c128, d128; \
+type a = initial_value; \
+unsigned int i, j; \
+i = 0; \
+j = n >> (2 + 8 / sizeof (type)); \
+if (j) \
+  { \
+    a128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    b128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    c128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    d128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        a128 = op128 (a128, load128 (x + i)); \
+        i += 16 / sizeof (type); \
+        b128 = op128 (b128, load128 (x + i)); \
+        i += 16 / sizeof (type); \
+        c128 = op128 (c128, load128 (x + i)); \
+        i += 16 / sizeof (type); \
+        d128 = op128 (d128, load128 (x + i)); \
+        i += 16 / sizeof (type); \
+      } \
+    a128 = op128 (a128, b128); \
+    c128 = op128 (c128, d128); \
+    a = op (a, reduce128 (op128 (a128, c128))); \
+  } \
+j = (n - i) >> (8 / sizeof (type)); \
+if (j) \
+  { \
+    a128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        a128 = op128 (a128, load128 (x + i)); \
+        i += 16 / sizeof (type); \
+      } \
+    a = op (a, reduce128 (a128)); \
+  } \
+while (i < n) \
+  a = op (a, x[i++]); \
+return a;
+
+///> macro to automatize dot products on arrays.
+#define JBM_ARRAY_DOT(x1, x2, n, type128, type, load128, mul128, add128, \
+                    ma128, reduce128) \
+type128 a128, b128, c128, d128; \
+type a = (type) 0.; \
+unsigned int i, j; \
+i = 0; \
+j = n >> (2 + 8 / sizeof (type)); \
+if (j) \
+  { \
+    a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+    i += 16 / sizeof (type); \
+    b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+    i += 16 / sizeof (type); \
+    d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+    i += 16 / sizeof (type); \
+    d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+        b128 = ma128 (b128, load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+        d128 = ma128 (c128, load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+        d128 = ma128 (d128, load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+      } \
+    a128 = add128 (a128, b128); \
+    c128 = add128 (c128, d128); \
+    a += reduce128 (add128 (a128, c128)); \
+  } \
+j = (n - i) >> (8 / sizeof (type)); \
+if (j) \
+  { \
+    a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
+        i += 16 / sizeof (type); \
+      } \
+    a += reduce128 (a128); \
+  } \
+for (; i < n; ++i) \
+  a += JBM_MUL (x1[i], x2[i]); \
+return a;
+
+///> macro to automatize maxmin operations on arrays.
+#define JBM_ARRAY_MAXMIN(x, n, type128, type, load128, max128, max, min128, \
+                       min, redmax128, redmin128, mx, mn) \
+type128 x128, mxa128, mxb128, mna128, mnb128; \
+type mx = -INFINITY, mn = INFINITY; \
+unsigned int i, j; \
+i = 0; \
+j = n >> (2 + 8 / sizeof (type)); \
+if (j) \
+  { \
+    mxa128 = mna128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    mxb128 = mnb128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        x128 = load128 (x + i); \
+        mxa128 = max128 (mxa128, x128); \
+        mna128 = min128 (mna128, x128); \
+        i += 16 / sizeof (type); \
+        x128 = load128 (x + i); \
+        mxb128 = max128 (mxb128, x128); \
+        mnb128 = min128 (mnb128, x128); \
+        i += 16 / sizeof (type); \
+      } \
+    mx = max (mx, redmax128 (max128 (mxa128, mxb128))); \
+    mn = min (mn, redmin128 (min128 (mna128, mnb128))); \
+  } \
+j = (n - i) >> (8 / sizeof (type)); \
+if (j) \
+  { \
+    mxa128 = mna128 = load128 (x + i); \
+    i += 16 / sizeof (type); \
+    while (--j) \
+      { \
+        x128 = load128 (x + i); \
+        mxa128 = max128 (mxa128, x128); \
+        mna128 = min128 (mna128, x128); \
+        i += 16 / sizeof (type); \
+      } \
+    mx = max (mx, redmax128 (mxa128)); \
+    mn = min (mn, redmin128 (mna128)); \
+  } \
+for (; i < n; ++i) \
+  mx = max (mx, x[i]), mn = min (mn, x[i]); \
+
 // Debug functions
 
 static inline void
@@ -15789,211 +16035,16 @@ jbm_2xf64_integral (float64x2_t (*f) (float64x2_t),
   return k;
 }
 
-///> macro to automatize operations on one array.
-#define JBM_ARRAY_OP(xr, xd, n, type, load128, store128, op128, op) \
-unsigned int i, j; \
-for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
-  { \
-    store128 (xr + i, op128 (load128 (xd + i))); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (xd + i))); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (xd + i))); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (xd + i))); \
-    i += 16 / sizeof (type); \
-  } \
-for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-     --j, i += 16 / sizeof (type)) \
-  store128 (xr + i, op128 (load128 (xd + i))); \
-for (; i < n; ++i) \
-  xr[i] = op (xd[i]);
-
-///> macro to automatize operations on one array and one number.
-#define JBM_ARRAY_OP1(xr, x1, x2, n, type128, type, load128, store128, set128, \
-                    op128, op) \
-const type128 x128 = set128 (x2); \
-unsigned int i, j; \
-for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
-  { \
-    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-    i += 16 / sizeof (type); \
-  } \
-for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-     --j, i += 16 / sizeof (type)) \
-  store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-for (; i < n; ++i) \
-  xr[i] = op (x1[i], x2);
-
-///> macro to automatize operations on two arrays.
-#define JBM_ARRAY_OP2(xr, x1, x2, n, type, load128, store128, op128, op) \
-unsigned int i, j; \
-for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
-  { \
-    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-    i += 16 / sizeof (type); \
-  } \
-for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-     --j, i += 16 / sizeof (type)) \
-  store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-for (; i < n; ++i) \
-  xr[i] = op (x1[i], x2[i]);
-
-///> macro to automatize reduction operations on arrays.
-#define JBM_ARRAY_REDUCE_OP(x, n, type128, type, load128, op128, op, \
-                          reduce128, initial_value) \
-type128 a128, b128, c128, d128; \
-type a = initial_value; \
-unsigned int i, j; \
-i = 0; \
-j = n >> (2 + 8 / sizeof (type)); \
-if (j) \
-  { \
-    a128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    b128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    c128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    d128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        a128 = op128 (a128, load128 (x + i)); \
-        i += 16 / sizeof (type); \
-        b128 = op128 (b128, load128 (x + i)); \
-        i += 16 / sizeof (type); \
-        c128 = op128 (c128, load128 (x + i)); \
-        i += 16 / sizeof (type); \
-        d128 = op128 (d128, load128 (x + i)); \
-        i += 16 / sizeof (type); \
-      } \
-    a128 = op128 (a128, b128); \
-    c128 = op128 (c128, d128); \
-    a = op (a, reduce128 (op128 (a128, c128))); \
-  } \
-j = (n - i) >> (8 / sizeof (type)); \
-if (j) \
-  { \
-    a128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        a128 = op128 (a128, load128 (x + i)); \
-        i += 16 / sizeof (type); \
-      } \
-    a = op (a, reduce128 (a128)); \
-  } \
-while (i < n) \
-  a = op (a, x[i++]); \
-return a;
-
-///> macro to automatize dot products on arrays.
-#define JBM_ARRAY_DOT(x1, x2, n, type128, type, load128, mul128, add128, \
-                    ma128, reduce128) \
-type128 a128, b128, c128, d128; \
-type a = (type) 0.; \
-unsigned int i, j; \
-i = 0; \
-j = n >> (2 + 8 / sizeof (type)); \
-if (j) \
-  { \
-    a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-    i += 16 / sizeof (type); \
-    b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-    i += 16 / sizeof (type); \
-    d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-    i += 16 / sizeof (type); \
-    d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
-        i += 16 / sizeof (type); \
-        b128 = ma128 (b128, load128 (x1 + i), load128 (x2 + i)); \
-        i += 16 / sizeof (type); \
-        d128 = ma128 (c128, load128 (x1 + i), load128 (x2 + i)); \
-        i += 16 / sizeof (type); \
-        d128 = ma128 (d128, load128 (x1 + i), load128 (x2 + i)); \
-        i += 16 / sizeof (type); \
-      } \
-    a128 = add128 (a128, b128); \
-    c128 = add128 (c128, d128); \
-    a += reduce128 (add128 (a128, c128)); \
-  } \
-j = (n - i) >> (8 / sizeof (type)); \
-if (j) \
-  { \
-    a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
-        i += 16 / sizeof (type); \
-      } \
-    a += reduce128 (a128); \
-  } \
-for (; i < n; ++i) \
-  a += JBM_MUL (x1[i], x2[i]); \
-return a;
-
-///> macro to automatize maxmin operations on arrays.
-#define JBM_ARRAY_MAXMIN(x, n, type128, type, load128, max128, max, min128, \
-                       min, redmax128, redmin128, mx, mn) \
-type128 x128, mxa128, mxb128, mna128, mnb128; \
-type mx = -INFINITY, mn = INFINITY; \
-unsigned int i, j; \
-i = 0; \
-j = n >> (2 + 8 / sizeof (type)); \
-if (j) \
-  { \
-    mxa128 = mna128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    mxb128 = mnb128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        x128 = load128 (x + i); \
-        mxa128 = max128 (mxa128, x128); \
-        mna128 = min128 (mna128, x128); \
-        i += 16 / sizeof (type); \
-        x128 = load128 (x + i); \
-        mxb128 = max128 (mxb128, x128); \
-        mnb128 = min128 (mnb128, x128); \
-        i += 16 / sizeof (type); \
-      } \
-    mx = max (mx, redmax128 (max128 (mxa128, mxb128))); \
-    mn = min (mn, redmin128 (min128 (mna128, mnb128))); \
-  } \
-j = (n - i) >> (8 / sizeof (type)); \
-if (j) \
-  { \
-    mxa128 = mna128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        x128 = load128 (x + i); \
-        mxa128 = max128 (mxa128, x128); \
-        mna128 = min128 (mna128, x128); \
-        i += 16 / sizeof (type); \
-      } \
-    mx = max (mx, redmax128 (mxa128)); \
-    mn = min (mn, redmin128 (mna128)); \
-  } \
-for (; i < n; ++i) \
-  mx = max (mx, x[i]), mn = min (mn, x[i]); \
+/**
+ * Function to set a float array with another float array.
+ */
+static inline void
+jbm_array_f32_set (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_SET (xr, xd, n, float, vld1q_f32, vst1q_f32);
+}
 
 /**
  * Function to calculate the root square of a float array.
@@ -16386,6 +16437,17 @@ jbm_array_f32_reduce_maxmin (const float *x,    ///< float array.
 }
 
 /**
+ * Function to set a float array with a number.
+ */
+static inline void
+jbm_array_f32_set1 (float *restrict xr, ///< result float array.
+                    const float xd,     ///< data float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_SET1 (xr, xd, n, float, vdupq_n_f32, vst1q_f32);
+}
+
+/**
  * Function to add 1 float array + 1 number.
  */
 static inline void
@@ -16603,6 +16665,17 @@ jbm_array_f32_dot (const float *restrict x1,    ///< multiplier float array.
 {
   JBM_ARRAY_DOT (x1, x2, n, float32x4_t, float, vld1q_f32, vmulq_f32,
                  vaddq_f32, vmlaq_f32, jbm_4xf32_reduce_add);
+}
+
+/**
+ * Function to set a double array with another double array.
+ */
+static inline void
+jbm_array_f64_set (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_SET (xr, xd, n, double, vld1q_f64, vst1q_f64);
 }
 
 /**
@@ -16993,6 +17066,17 @@ jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
                     vminq_f64, fmin, jbm_2xf64_reduce_max,
                     jbm_2xf64_reduce_min, mx, mn);
   *max = mx, *min = mn;
+}
+
+/**
+ * Function to set a double array with a number.
+ */
+static inline void
+jbm_array_f64_set1 (double *restrict xr,        ///< result double array.
+                    const double xd,     ///< data double number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_SET1 (xr, xd, n, double, vdupq_n_f64, vst1q_f64);
 }
 
 /**

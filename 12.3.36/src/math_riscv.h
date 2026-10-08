@@ -44,6 +44,24 @@
 #define JBM_VL(type, n) \
   (sizeof(type) == 4 ? __riscv_vsetvl_e32m1 (n) : __riscv_vsetvl_e64m1 (n))
 
+///> macro to automatize sets on one array.
+#define JBM_ARRAY_SET(xr, xd, n, type, load, store) \
+  size_t i, vl = JBM_VL (type, n); \
+  for (i = 0; i < n; i += vl) \
+    { \
+      vl = JBM_VL (type, n - i); \
+      store (xr + i, load (xd + i, vl), vl); \
+    };
+
+///> macro to automatize sets on one array and one number.
+#define JBM_ARRAY_SET1(xr, x1, x2, n, type, store) \
+  size_t i, vl = JBM_VL (type, n); \
+  for (i = 0; i < n; i += vl) \
+    { \
+      vl = JBM_VL (type, n - i); \
+      store (xr + i, x2, vl); \
+    };
+
 ///> macro to automatize operations on one array.
 #define JBM_ARRAY_OP(xr, xd, n, type, load, store, op) \
   size_t i, vl = JBM_VL (type, n); \
@@ -72,7 +90,7 @@
     };
 
 ///> macro to automatize reduction operations on arrays.
-#define JBM_ARRAY_REDUCE_OP(x, n, type, vtype, sload, load, vop, sop) \
+#define JBM_ARRAY_REDUCE_OP(x, n, type, vtype, load, vop, sop) \
   vtype s0; \
   size_t i, vl = JBM_VL (type, n); \
   for (i = vl, s0 = load (x, vl); i < n;  i += vl) \
@@ -83,8 +101,8 @@
   return sop (s0);
 
 ///> macro to automatize reduction operations on arrays.
-#define JBM_ARRAY_MAXMIN(x, n, xmax, xmin, type, vtype, sload, load, vmax, \
-                         vmin, sop) \
+#define JBM_ARRAY_MAXMIN(x, n, xmax, xmin, type, vtype, load, vmax, vmin, \
+                         smax, smin) \
   vtype vx, mx0, mn0; \
   size_t i, vl = JBM_VL (type, n); \
   vx = load (x, vl); \
@@ -95,8 +113,8 @@
       mx0 = vmax (vx, mx0, vl); \
       mn0 = vmin (vx, mn0, vl); \
     } \
-  *xmax = sop (mx0); \
-  *xmin = sop (mn0);
+  *xmax = smax (mx0); \
+  *xmin = smin (mn0);
 
 // Debug functions
 
@@ -339,6 +357,23 @@ jbm_nxf32_mod (const vfloat32m1_t x,    ///< dividend (vfloat32m1_t).
     (x,
      __riscv_vfcvt_f_x_v_f32m1
      (jbm_nxf32_floor (__riscv_vfdiv_vv_f32m1 (x, d, vl), vl), vl), d, vl);
+}
+
+/**
+ * Function to calculate the rest of a division by a float (vfloat32m1_t).
+ *
+ * \return rest value vector (in [0,|divisor|) interval).
+ */
+static inline vfloat32m1_t
+jbm_nxf32_mod1 (const vfloat32m1_t x,    ///< dividend (vfloat32m1_t).
+                const float d,   ///< divisor (float).
+                const size_t vl)        ///< vector size.
+{
+  return
+    __riscv_vfnmsac_vf_f32m1
+    (x,
+     __riscv_vfcvt_f_x_v_f32m1
+     (jbm_nxf32_floor (__riscv_vfdiv_vf_f32m1 (x, d, vl), vl), vl), d, vl);
 }
 
 /**
@@ -49204,6 +49239,18 @@ jbm_4xf64_integral (vfloat64m1_t (*f) (const vfloat64m1_t, const size_t),
 }
 
 /**
+ * Function to set a float array with another float array.
+ */
+static inline void
+jbm_array_f32_set (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_SET (xr, xd, n, float, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1);
+}
+
+/**
  * Function to calculate the root square of a float array.
  */
 static inline void
@@ -49562,9 +49609,8 @@ static inline float
 jbm_array_f32_reduce_max (const float *x,       ///< float array.
                           const unsigned int n) ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
-                      __riscv_vle32_v_f32m1, __riscv_vfredmax_vs_f32m1_f32m1,
-                      __riscv_vfmv_f_s_f32m1_f32);
+  JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                      __riscv_vfmax_vv_f32m1, __riscv_vfredmax_vs_f32m1);
 }
 
 /**
@@ -49576,9 +49622,138 @@ static inline float
 jbm_array_f32_reduce_min (const float *x,       ///< float array.
                           const unsigned int n) ///< number of array elements.
 {
-  JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vfmv_v_f_f32m1,
-                      __riscv_vle32_v_f32m1, __riscv_vfredmin_vs_f32m1_f32m1,
-                      __riscv_vfmv_f_s_f32m1_f32);
+  JBM_ARRAY_REDUCE_OP(x, n, float, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                      __riscv_vfmin_vv_f32m1, __riscv_vfredmin_vs_f32m1);
+}
+
+/**
+ * Function to find the highest and the lowest elements of a float array.
+ */
+static inline void
+jbm_array_f32_reduce_maxmin (const float *x,    ///< float array.
+                             float *max,        ///< the highest value.
+                             float *min,        ///< the lowest value.
+                             const unsigned int n)
+  ///< number of array elements.
+{
+  JBM_ARRAY_MAXMIN (x, n, max, min, float, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                    __riscv_vfmax_vv_f32m1, __riscv_vfmin_vv_f32m1,
+                    __riscv_vfredmax_vs_f32m1, __riscv_vfredmin_vs_f32m1);
+}
+
+/**
+ * Function to set a float array with a number.
+ */
+static inline void
+jbm_array_f32_set1 (float *restrict xr, ///< result float array.
+                    const float xd,     ///< data float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_SET1 (xr, xd, n, float, __riscv_vfmv_v_f_f32m1);
+}
+
+/**
+ * Function to add 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_add1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< addend float array.
+                    const float x2,     ///< addend float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, __riscv_vfadd_vf_f32m1);
+}
+
+/**
+ * Function to subtract 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_sub1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< minuend float array.
+                    const float x2,     ///< subtrahend float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, __riscv_vfsub_vf_f32m1);
+}
+
+/**
+ * Function to multiply a float array by a float number.
+ */
+static inline void
+jbm_array_f32_mul1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< multiplier float array.
+                    const float x2,     ///< multiplicand float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, __riscv_vfmul_vf_f32m1);
+}
+
+/**
+ * Function to divide a float array by a float number.
+ */
+static inline void
+jbm_array_f32_div1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< dividend float array.
+                    const float x2,     ///< divisor float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, __riscv_vfdiv_vf_f32m1);
+}
+
+/**
+ * Function to calculate the maximum between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_max1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, __riscv_vfmax_vf_f32m1);
+}
+
+/**
+ * Function to calculate the minimum between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_min1 (float *restrict xr, ///< result float array.
+                    const float *restrict x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, __riscv_vfmin_vf_f32m1);
+}
+
+/**
+ * Function to calculate the module between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_mod1 (float *xr, ///< result float array.
+                    const float *x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, jbm_nxf32_mod1);
+}
+
+/**
+ * Function to calculate the pow function between 1 float array + 1 number.
+ */
+static inline void
+jbm_array_f32_pow1 (float *xr, ///< result float array.
+                    const float *x1,   ///< float array.
+                    const float x2,     ///< float number.
+                    const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP1 (xr, x1, x2, n, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, jbm_nxf32_pow);
 }
 
 #endif
