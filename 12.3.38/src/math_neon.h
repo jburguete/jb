@@ -7680,7 +7680,7 @@ static inline float32x4_t
 jbm_4xf32_tanh (const float32x4_t x)    ///< float32x4_t number.
 {
   const float32x4_t x2 = jbm_4xf32_dbl (x);
-  float32x4_t f = jbm_4xf32_expm1 (x);
+  float32x4_t f = jbm_4xf32_expm1 (x2);
   f = vdivq_f32 (f, vaddq_f32 (f, vdupq_n_f32 (2.f)));
   f = vbslq_f32 (vcgtq_f32 (x2, vdupq_n_f32 (JBM_FLT_MAX_E_EXP)),
                  vdupq_n_f32 (1.f), f);
@@ -15442,7 +15442,6 @@ jbm_2xf64_acos (const float64x2_t x)    ///< float64x2_t number.
 static inline float64x2_t
 jbm_2xf64_sinh (const float64x2_t x)    ///< float64x2_t number.
 {
-  float64x2_t f;
   const float64x2_t f = jbm_2xf64_expm1 (jbm_2xf64_abs (x));
   return
     jbm_2xf64_copysign
@@ -15474,7 +15473,7 @@ static inline float64x2_t
 jbm_2xf64_tanh (const float64x2_t x)    ///< float64x2_t number.
 {
   const float64x2_t x2 = jbm_2xf64_dbl (x);
-  float64x2_t f = jbm_2xf64_expm1 (x);
+  float64x2_t f = jbm_2xf64_expm1 (x2);
   f = vdivq_f64 (f, vaddq_f64 (f, vdupq_n_f64 (2.)));
   f = vbslq_f64 (vcgtq_f64 (x2, vdupq_n_f64 (JBM_DBL_MAX_E_EXP)),
                  vdupq_n_f64 (1.), f);
