@@ -289,6 +289,45 @@ jbm_f32_copysign (const float x,        ///< float number to preserve magnitude.
 }
 
 /**
+ * Function to calculate the fnmadd function (float).
+ *
+ * \return \f$-(x*y)+z\f$ (float).
+ */
+static inline float
+jbm_f32_fnmadd (const float x,  ///< 1st multiplier (float).
+                const float y,  ///< 2nd multiplier (float).
+                const float z)  ///< addend (float).
+{
+  return fmaf (-x, y, z);
+}
+
+/**
+ * Function to calculate the fmsub function (float).
+ *
+ * \return \f$(x*y)-z\f$ (float).
+ */
+static inline float
+jbm_f32_fmsub (const float x,   ///< 1st multiplier (float).
+               const float y,   ///< 2nd multiplier (float).
+               const float z)   ///< subtrahend (float).
+{
+  return fmaf (x, y, -z);
+}
+
+/**
+ * Function to calculate the fnmsub function (float).
+ *
+ * \return \f$-(x*y)-z\f$ (float).
+ */
+static inline float
+jbm_f32_fnmsub (const float x,  ///< 1st multiplier (float).
+                const float y,  ///< 2nd multiplier (float).
+                const float z)  ///< subtrahend (float).
+{
+  return -fmaf (x, y, z);
+}
+
+/**
  * Function to calculate the hypot function (float).
  *
  * \return function value (float).

@@ -106,9 +106,18 @@ typedef union
       store128 (xr + i, load128 (xd + i)); \
       i += 16 / sizeof (type); \
     } \
-  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-       --j, i += 16 / sizeof (type)) \
-    store128 (xr + i, load128 (xd + i)); \
+  if ((n - i) >> (1 + 8 / sizeof (type))) \
+    { \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (8 / sizeof (type))) \
+    { \
+      store128 (xr + i, load128 (xd + i)); \
+      i += 16 / sizeof (type); \
+    } \
   for (; i < n; ++i) \
     xr[i] = xd[i];
 
@@ -126,9 +135,18 @@ typedef union
       store128 (xr + i, set128 (xd)); \
       i += 16 / sizeof (type); \
     } \
-  for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-       --j, i += 16 / sizeof (type)) \
-    store128 (xr + i, set128 (xd)); \
+  if ((n - i) >> (1 + 8 / sizeof (type))) \
+    { \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (8 / sizeof (type))) \
+    { \
+      store128 (xr + i, set128 (xd)); \
+      i += 16 / sizeof (type); \
+    } \
   for (; i < n; ++i) \
     xr[i] = xd;
 
@@ -146,197 +164,292 @@ for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
     store128 (xr + i, op128 (load128 (xd + i))); \
     i += 16 / sizeof (type); \
   } \
-for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-     --j, i += 16 / sizeof (type)) \
-  store128 (xr + i, op128 (load128 (xd + i))); \
-for (; i < n; ++i) \
-  xr[i] = op (xd[i]);
+  if ((n - i) >> (1 + 8 / sizeof (type))) \
+    { \
+      store128 (xr + i, op128 (load128 (xd + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (xd + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (8 / sizeof (type))) \
+    { \
+      store128 (xr + i, op128 (load128 (xd + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  for (; i < n; ++i) \
+    xr[i] = op (xd[i]);
 
 ///> macro to automatize operations on one array and one number.
 #define JBM_ARRAY_OP1(xr, x1, x2, n, type128, type, load128, store128, set128, \
                     op128, op) \
-const type128 x128 = set128 (x2); \
-unsigned int i, j; \
-for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
-  { \
-    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-    i += 16 / sizeof (type); \
-  } \
-for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-     --j, i += 16 / sizeof (type)) \
-  store128 (xr + i, op128 (load128 (x1 + i), x128)); \
-for (; i < n; ++i) \
-  xr[i] = op (x1[i], x2);
+  const type128 x128 = set128 (x2); \
+  unsigned int i, j; \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (1 + 8 / sizeof (type))) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (8 / sizeof (type))) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), x128)); \
+      i += 16 / sizeof (type); \
+    } \
+  for (; i < n; ++i) \
+    xr[i] = op (x1[i], x2);
 
 ///> macro to automatize operations on two arrays.
 #define JBM_ARRAY_OP2(xr, x1, x2, n, type, load128, store128, op128, op) \
-unsigned int i, j; \
-for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
-  { \
-    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-    i += 16 / sizeof (type); \
-    store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-    i += 16 / sizeof (type); \
-  } \
-for (j = (n - i) >> (8 / sizeof (type)); j > 0; \
-     --j, i += 16 / sizeof (type)) \
-  store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
-for (; i < n; ++i) \
-  xr[i] = op (x1[i], x2[i]);
+  unsigned int i, j; \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (1 + 8 / sizeof (type))) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (8 / sizeof (type))) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  for (; i < n; ++i) \
+    xr[i] = op (x1[i], x2[i]);
+
+///> macro to automatize operations on two arrays and one number.
+#define JBM_ARRAY_OP3(xr, x1, x2, x3, n, type128, type, load128, store128, \
+                      set128, op128, op) \
+  const type128 x128 = set128 (x2); \
+  unsigned int i, j; \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, op128 (load128 (x3 + i), x128, load128 (x1 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x3 + i), x128, load128 (x1 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x3 + i), x128, load128 (x1 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x3 + i), x128, load128 (x1 + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (1 + 8 / sizeof (type))) \
+    { \
+      store128 (xr + i, op128 (load128 (x3 + i), x128, load128 (x1 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x3 + i), x128, load128 (x1 + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (8 / sizeof (type))) \
+    { \
+      store128 (xr + i, op128 (load128 (x3 + i), x128, load128 (x1 + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  for (; i < n; ++i) \
+    xr[i] = op (x1[i], x2, x3[i]);
+
+///> macro to automatize operations on three arrays.
+#define JBM_ARRAY_OP4(xr, x1, x2, x3, n, type, load512, load256, load128, \
+                      store512, store256, store128, op512, op256, op128, op) \
+  unsigned int i, j; \
+  for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i), \
+                               load128 (x3 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i), \
+                               load128 (x3 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i), \
+                               load128 (x3 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i), \
+                               load128 (x3 + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (1 + 8 / sizeof (type))) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i), \
+                               load128 (x3 + i))); \
+      i += 16 / sizeof (type); \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i), \
+                               load128 (x3 + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  if ((n - i) >> (8 / sizeof (type))) \
+    { \
+      store128 (xr + i, op128 (load128 (x1 + i), load128 (x2 + i), \
+                               load128 (x3 + i))); \
+      i += 16 / sizeof (type); \
+    } \
+  for (; i < n; ++i) \
+    xr[i] = op (x1[i], x2[i], x3[i]);
 
 ///> macro to automatize reduction operations on arrays.
 #define JBM_ARRAY_REDUCE_OP(x, n, type128, type, load128, op128, op, \
-                          reduce128, initial_value) \
-type128 a128, b128, c128, d128; \
-type a = initial_value; \
-unsigned int i, j; \
-i = 0; \
-j = n >> (2 + 8 / sizeof (type)); \
-if (j) \
-  { \
-    a128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    b128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    c128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    d128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        a128 = op128 (a128, load128 (x + i)); \
-        i += 16 / sizeof (type); \
-        b128 = op128 (b128, load128 (x + i)); \
-        i += 16 / sizeof (type); \
-        c128 = op128 (c128, load128 (x + i)); \
-        i += 16 / sizeof (type); \
-        d128 = op128 (d128, load128 (x + i)); \
-        i += 16 / sizeof (type); \
-      } \
-    a128 = op128 (a128, b128); \
-    c128 = op128 (c128, d128); \
-    a = op (a, reduce128 (op128 (a128, c128))); \
-  } \
-j = (n - i) >> (8 / sizeof (type)); \
-if (j) \
-  { \
-    a128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        a128 = op128 (a128, load128 (x + i)); \
-        i += 16 / sizeof (type); \
-      } \
-    a = op (a, reduce128 (a128)); \
-  } \
-while (i < n) \
-  a = op (a, x[i++]); \
-return a;
+                            reduce128, initial_value) \
+  type128 a128, b128, c128, d128; \
+  type a = initial_value; \
+  unsigned int i, j; \
+  i = 0; \
+  j = n >> (2 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      a128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      b128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      c128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      d128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          a128 = op128 (a128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+          b128 = op128 (b128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+          c128 = op128 (c128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+          d128 = op128 (d128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+        } \
+      a128 = op128 (a128, b128); \
+      c128 = op128 (c128, d128); \
+      a = op (a, reduce128 (op128 (a128, c128))); \
+    } \
+  j = (n - i) >> (8 / sizeof (type)); \
+  if (j) \
+    { \
+      a128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          a128 = op128 (a128, load128 (x + i)); \
+          i += 16 / sizeof (type); \
+        } \
+      a = op (a, reduce128 (a128)); \
+    } \
+  while (i < n) \
+    a = op (a, x[i++]); \
+  return a;
 
 ///> macro to automatize dot products on arrays.
 #define JBM_ARRAY_DOT(x1, x2, n, type128, type, load128, mul128, add128, \
-                    ma128, reduce128) \
-type128 a128, b128, c128, d128; \
-type a = (type) 0.; \
-unsigned int i, j; \
-i = 0; \
-j = n >> (2 + 8 / sizeof (type)); \
-if (j) \
-  { \
-    a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-    i += 16 / sizeof (type); \
-    b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-    i += 16 / sizeof (type); \
-    d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-    i += 16 / sizeof (type); \
-    d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
-        i += 16 / sizeof (type); \
-        b128 = ma128 (b128, load128 (x1 + i), load128 (x2 + i)); \
-        i += 16 / sizeof (type); \
-        d128 = ma128 (c128, load128 (x1 + i), load128 (x2 + i)); \
-        i += 16 / sizeof (type); \
-        d128 = ma128 (d128, load128 (x1 + i), load128 (x2 + i)); \
-        i += 16 / sizeof (type); \
-      } \
-    a128 = add128 (a128, b128); \
-    c128 = add128 (c128, d128); \
-    a += reduce128 (add128 (a128, c128)); \
-  } \
-j = (n - i) >> (8 / sizeof (type)); \
-if (j) \
-  { \
-    a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        a128 = ma128 (a128, load128 (x1 + i), load128 (x2 + i)); \
-        i += 16 / sizeof (type); \
-      } \
-    a += reduce128 (a128); \
-  } \
-for (; i < n; ++i) \
-  a += JBM_MUL (x1[i], x2[i]); \
-return a;
+                      ma128, reduce128) \
+  type128 a128, b128, c128, d128; \
+  type a = (type) 0.; \
+  unsigned int i, j; \
+  i = 0; \
+  j = n >> (2 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      b128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      c128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      d128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          a128 = ma128 (load128 (x1 + i), load128 (x2 + i), a128); \
+          i += 16 / sizeof (type); \
+          b128 = ma128 (load128 (x1 + i), load128 (x2 + i), b128); \
+          i += 16 / sizeof (type); \
+          c128 = ma128 (load128 (x1 + i), load128 (x2 + i), c128); \
+          i += 16 / sizeof (type); \
+          d128 = ma128 (load128 (x1 + i), load128 (x2 + i), d128); \
+          i += 16 / sizeof (type); \
+        } \
+      a128 = add128 (a128, b128); \
+      c128 = add128 (c128, d128); \
+      a += reduce128 (add128 (a128, c128)); \
+    } \
+  j = (n - i) >> (8 / sizeof (type)); \
+  if (j) \
+    { \
+      a128 = mul128 (load128 (x1 + i), load128 (x2 + i)); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          a128 = ma128 (load128 (x1 + i), load128 (x2 + i), a128); \
+          i += 16 / sizeof (type); \
+        } \
+      a += reduce128 (a128); \
+    } \
+  for (; i < n; ++i) \
+    a += JBM_MUL (x1[i], x2[i]); \
+  return a;
 
 ///> macro to automatize maxmin operations on arrays.
 #define JBM_ARRAY_MAXMIN(x, n, type128, type, load128, max128, max, min128, \
-                       min, redmax128, redmin128, mx, mn) \
-type128 x128, mxa128, mxb128, mna128, mnb128; \
-type mx = -INFINITY, mn = INFINITY; \
-unsigned int i, j; \
-i = 0; \
-j = n >> (2 + 8 / sizeof (type)); \
-if (j) \
-  { \
-    mxa128 = mna128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    mxb128 = mnb128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        x128 = load128 (x + i); \
-        mxa128 = max128 (mxa128, x128); \
-        mna128 = min128 (mna128, x128); \
-        i += 16 / sizeof (type); \
-        x128 = load128 (x + i); \
-        mxb128 = max128 (mxb128, x128); \
-        mnb128 = min128 (mnb128, x128); \
-        i += 16 / sizeof (type); \
-      } \
-    mx = max (mx, redmax128 (max128 (mxa128, mxb128))); \
-    mn = min (mn, redmin128 (min128 (mna128, mnb128))); \
-  } \
-j = (n - i) >> (8 / sizeof (type)); \
-if (j) \
-  { \
-    mxa128 = mna128 = load128 (x + i); \
-    i += 16 / sizeof (type); \
-    while (--j) \
-      { \
-        x128 = load128 (x + i); \
-        mxa128 = max128 (mxa128, x128); \
-        mna128 = min128 (mna128, x128); \
-        i += 16 / sizeof (type); \
-      } \
-    mx = max (mx, redmax128 (mxa128)); \
-    mn = min (mn, redmin128 (mna128)); \
-  } \
-for (; i < n; ++i) \
-  mx = max (mx, x[i]), mn = min (mn, x[i]); \
+                         min, redmax128, redmin128, mx, mn) \
+  type128 x128, mxa128, mxb128, mna128, mnb128; \
+  type mx = -INFINITY, mn = INFINITY; \
+  unsigned int i, j; \
+  i = 0; \
+  j = n >> (2 + 8 / sizeof (type)); \
+  if (j) \
+    { \
+      mxa128 = mna128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      mxb128 = mnb128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          x128 = load128 (x + i); \
+          mxa128 = max128 (mxa128, x128); \
+          mna128 = min128 (mna128, x128); \
+          i += 16 / sizeof (type); \
+          x128 = load128 (x + i); \
+          mxb128 = max128 (mxb128, x128); \
+          mnb128 = min128 (mnb128, x128); \
+          i += 16 / sizeof (type); \
+        } \
+      mx = max (mx, redmax128 (max128 (mxa128, mxb128))); \
+      mn = min (mn, redmin128 (min128 (mna128, mnb128))); \
+    } \
+  j = (n - i) >> (8 / sizeof (type)); \
+  if (j) \
+    { \
+      mxa128 = mna128 = load128 (x + i); \
+      i += 16 / sizeof (type); \
+      while (--j) \
+        { \
+          x128 = load128 (x + i); \
+          mxa128 = max128 (mxa128, x128); \
+          mna128 = min128 (mna128, x128); \
+          i += 16 / sizeof (type); \
+        } \
+      mx = max (mx, redmax128 (mxa128)); \
+      mn = min (mn, redmin128 (mna128)); \
+    } \
+  for (; i < n; ++i) \
+    mx = max (mx, x[i]), mn = min (mn, x[i]); \
 
 // Debug functions
 
@@ -507,6 +620,32 @@ jbm_4xf32_copysign (const float32x4_t x,
   mx.x = jbm_4xf32_abs (x);
   mx.i = vorrq_u32 (mx.i, my.i);
   return mx.x;
+}
+
+/**
+ * Function to do the fmsub function (float32x4_t).
+ *
+ * \return \f$-x+(y*z)\f$ (float32x4_t).
+ */
+static inline float32x4_t
+jbm_4xf32_fmsub (float32x4_t x, ///< substrahend (float32x4_t).
+                 float32x4_t y, ///< 1st multiplier (float32x4_t).
+                 float32x4_t z) ///< 2nd multiplier (float32x4_t).
+{
+  return vfmaq_f32 (jbm_4xf32_opposite (x), y, z);
+}
+
+/**
+ * Function to do the fnmsub function (float32x4_t).
+ *
+ * \return \f$-x-(y*z)\f$ (float32x4_t).
+ */
+static inline float32x4_t
+jbm_4xf32_fnmsub (float32x4_t x,        ///< substrahend (float32x4_t).
+                  float32x4_t y,        ///< 1st multiplier (float32x4_t).
+                  float32x4_t z)        ///< 2nd multiplier (float32x4_t).
+{
+  return vfmsq_f32 (jbm_4xf32_opposite (x), y, z);
 }
 
 /**
@@ -8317,6 +8456,32 @@ jbm_2xf64_copysign (const float64x2_t x,
 }
 
 /**
+ * Function to do the fmsub function (float64x2_t).
+ *
+ * \return \f$-x+(y*z)\f$ (float64x2_t).
+ */
+static inline float64x2_t
+jbm_2xf64_fmsub (float64x2_t x, ///< substrahend (float64x2_t).
+                 float64x2_t y, ///< 1st multiplier (float64x2_t).
+                 float64x2_t z) ///< 2nd multiplier (float64x2_t).
+{
+  return vfmaq_f64 (jbm_2xf64_opposite (x), y, z);
+}
+
+/**
+ * Function to do the fnmsub function (float64x2_t).
+ *
+ * \return \f$-x-(y*z)\f$ (float64x2_t).
+ */
+static inline float64x2_t
+jbm_2xf64_fnmsub (float64x2_t x,        ///< substrahend (float64x2_t).
+                  float64x2_t y,        ///< 1st multiplier (float64x2_t).
+                  float64x2_t z)        ///< 2nd multiplier (float64x2_t).
+{
+  return vfmsq_f64 (jbm_2xf64_opposite (x), y, z);
+}
+
+/**
  * Function to calculate the hypot function (float64x2_t).
  *
  * \return function value vector (float64x2_t).
@@ -15447,8 +15612,7 @@ jbm_2xf64_sinh (const float64x2_t x)    ///< float64x2_t number.
     jbm_2xf64_copysign
     (vmulq_f64 (vdupq_n_f64 (0.5),
                 vaddq_f64 (f,
-                           vdivq_f64 (f,
-                                      vaddq_f64 (f, vdupq_n_f64 (1.))))), x);
+                           vdivq_f64 (f, vaddq_f64 (f, vdupq_n_f64 (1.))))), x);
 }
 
 /**
@@ -16667,6 +16831,283 @@ jbm_array_f32_dot (const float *restrict x1,    ///< multiplier float array.
 }
 
 /**
+ * Function to calculate the fmadd function of two float arrays and
+ * one float number: \f$xr_i=\left(x1_i\cdot x2_i\right)+x3\f$.
+ */
+static inline void
+jbm_array_f32_fmadd1 (float *xr,        ///< result float array.
+                      const float *x1,  ///< 1st multiplicand float array.
+                      const float x2,   ///< 2nd multiplicand float number.
+                      const float *x3,  ///< addend float array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, vfmaq_f32, fmaf);
+}
+
+/**
+ * Function to calculate the fnmadd function of two float arrays and
+ * one float number: \f$xr_i=-\left(x1_i\cdot x2_i\right)+x3\f$.
+ */
+static inline void
+jbm_array_f32_fnmadd1 (float *xr,       ///< result float array.
+                       const float *x1, ///< 1st multiplicand float array.
+                       const float x2,  ///< 2nd multiplicand float number.
+                       const float *x3, ///< addend float array.
+                       const unsigned int n)    ///< number of array elements.
+{
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, vfmsq_f32, jbm_f32_fnmadd);
+}
+
+/**
+ * Function to calculate the fmsub function of two float arrays and
+ * one float number: \f$xr_i=\left(x1_i\cdot x2_i\right)-x3\f$.
+ */
+static inline void
+jbm_array_f32_fmsub1 (float *xr,        ///< result float array.
+                      const float *x1,  ///< 1st multiplicand float array.
+                      const float x2,   ///< 2nd multiplicand float number.
+                      const float *x3,  ///< subtrahend float array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, jbm_4xf32_fmsub, jbm_f32_fmsub);
+}
+
+/**
+ * Function to calculate the fnmsub function of two float arrays and
+ * one float number: \f$xr_i=-\left(x1_i\cdot x2_i\right)-x3\f$.
+ */
+static inline void
+jbm_array_f32_fnmsub1 (float *xr,       ///< result float array.
+                       const float *x1, ///< 1st multiplicand float array.
+                       const float x2,  ///< 2nd multiplicand float number.
+                       const float *x3, ///< subtrahend float array.
+                       const unsigned int n)    ///< number of array elements.
+{
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float32x4_t, float, vld1q_f32, vst1q_f32,
+                 vdupq_n_f32, jbm_4xf32_fnmsub, jbm_f32_fnmsub);
+}
+
+/**
+ * Function to calculate the fmadd function of three float arrays:
+ * \f$xr_i=\left(x1_i\cdot x2_i\right)+x3_i\f$.
+ */
+static inline void
+jbm_array_f32_fmadd (float *xr, ///< result float array.
+                     const float *x1,   ///< 1st multiplicand float array.
+                     const float *x2,   ///< 2nd multiplicand float array.
+                     const float *x3,   ///< addend float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, vld1q_f32, vst1q_f32, vfmaq_f32,
+                 fmaf);
+}
+
+/**
+ * Function to calculate the fnmadd function of three float arrays:
+ * \f$xr_i=-\left(x1_i\cdot x2_i\right)+x3_i\f$.
+ */
+static inline void
+jbm_array_f32_fnmadd (float *xr,        ///< result float array.
+                      const float *x1,  ///< 1st multiplicand float array.
+                      const float *x2,  ///< 2nd multiplicand float array.
+                      const float *x3,  ///< addend float array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, vld1q_f32, vst1q_f32, vfmsq_f32,
+                 jbm_f32_fnmadd);
+}
+
+/**
+ * Function to calculate the fmsub function of three float arrays:
+ * \f$xr_i=\left(x1_i\cdot x2_i\right)-x3_i\f$.
+ */
+static inline void
+jbm_array_f32_fmsub (float *xr, ///< result float array.
+                     const float *x1,   ///< 1st multiplicand float array.
+                     const float *x2,   ///< 2nd multiplicand float array.
+                     const float *x3,   ///< subtrahend float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, vld1q_f32, vst1q_f32,
+                 jbm_4xf32_fmsub, jbm_f32_fmsub);
+}
+
+/**
+ * Function to calculate the fnmsub function of three float arrays:
+ * \f$xr_i=-\left(x1_i\cdot x2_i\right)-x3_i\f$.
+ */
+static inline void
+jbm_array_f32_fnmsub (float *xr,        ///< result float array.
+                      const float *x1,  ///< 1st multiplicand float array.
+                      const float *x2,  ///< 2nd multiplicand float array.
+                      const float *x3,  ///< subtrahend float array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, vld1q_f32, vst1q_f32,
+                 jbm_4xf32_fnmsub, jbm_f32_fnmsub);
+}
+
+/**
+ * Function to calculate the coefficients of a linear regression adjusted by 
+ * minimum squares: \f$y=a+b\,x\f$ (float).
+ */
+static inline void
+jbm_array_f32_regression_linear (const float *x,
+                                 ///< array of point x-coordinates (float).
+                                 const float *y,
+                                 ///< array of point y-coordinates (float).
+                                 const unsigned int n,
+                                 ///< number of array elements.
+                                 float *a,
+///< pointer to the 0th order regression coefficient.
+                                 float *b)
+///< pointer to the 1st order regression coefficient.
+{
+  float32x4_t x2, y2, mx2, my2, sx2, sy2, sx2b, sy2b, sx2c, sy2c, sx2d, sy2d;
+  float mx, my, sx, sy, dx, dy;
+  unsigned int i, nn;
+  sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = vdupq_n_f32 (0.f);
+  i = 0;
+  nn = n >> 4;
+  if (nn)
+    {
+      for (; nn > 0; --nn, i += 4)
+        {
+          x2 = vld1q_f32 (x + i);
+          y2 = vld1q_f32 (y + i);
+          sx2 = vaddq_f32 (sx2, x2);
+          sy2 = vaddq_f32 (sy2, y2);
+          i += 4;
+          x2 = vld1q_f32 (x + i);
+          y2 = vld1q_f32 (y + i);
+          sx2b = vaddq_f32 (sx2b, x2);
+          sy2b = vaddq_f32 (sy2b, y2);
+          i += 4;
+          x2 = vld1q_f32 (x + i);
+          y2 = vld1q_f32 (y + i);
+          sx2c = vaddq_f32 (sx2c, x2);
+          sy2c = vaddq_f32 (sy2c, y2);
+          i += 4;
+          x2 = vld1q_f32 (x + i);
+          y2 = vld1q_f32 (y + i);
+          sx2d = vaddq_f32 (sx2d, x2);
+          sy2d = vaddq_f32 (sy2d, y2);
+        }
+      sx2 = vaddq_f32 (sx2, sx2b);
+      sy2 = vaddq_f32 (sy2, sy2b);
+      sx2c = vaddq_f32 (sx2c, sx2d);
+      sy2c = vaddq_f32 (sy2c, sy2d);
+      sx2 = vaddq_f32 (sx2, sx2c);
+      sy2 = vaddq_f32 (sy2, sy2c);
+    }
+  nn = (n - i) >> 3;
+  if (nn)
+    {
+      x2 = vld1q_f32 (x + i);
+      y2 = vld1q_f32 (y + i);
+      sx2 = vaddq_f32 (sx2, x2);
+      sy2 = vaddq_f32 (sy2, y2);
+      i += 4;
+      x2 = vld1q_f32 (x + i);
+      y2 = vld1q_f32 (y + i);
+      sx2 = vaddq_f32 (sx2, x2);
+      sy2 = vaddq_f32 (sy2, y2);
+      i += 4;
+    }
+  nn = (n - i) >> 2;
+  if (nn)
+    {
+      x2 = vld1q_f32 (x + i);
+      y2 = vld1q_f32 (y + i);
+      sx2 = vaddq_f32 (sx2, x2);
+      sy2 = vaddq_f32 (sy2, y2);
+      i += 4;
+    }
+  mx = vaddvq_f32 (sx2);
+  my = vaddvq_f32 (sy2);
+  for (; i < n; ++i)
+    {
+      mx += x[i];
+      my += y[i];
+    }
+  mx /= (float) n;
+  my /= (float) n;
+  mx2 = vdupq_n_f32 (mx);
+  my2 = vdupq_n_f32 (my);
+  sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = vdupq_n_f32 (0.f);
+  i = 0;
+  nn = n >> 4;
+  if (nn)
+    {
+      for (; nn > 0; --nn, i += 4)
+        {
+          x2 = vsubq_f32 (vld1q_f32 (x + i), mx2);
+          y2 = vsubq_f32 (vld1q_f32 (y + i), my2);
+          sx2 = vfmaq_f32 (sx2, x2, x2);
+          sy2 = vfmaq_f32 (sy2, x2, y2);
+          i += 4;
+          x2 = vsubq_f32 (vld1q_f32 (x + i), mx2);
+          y2 = vsubq_f32 (vld1q_f32 (y + i), my2);
+          sx2b = vfmaq_f32 (sx2b, x2, x2);
+          sy2b = vfmaq_f32 (sy2b, x2, y2);
+          i += 4;
+          x2 = vsubq_f32 (vld1q_f32 (x + i), mx2);
+          y2 = vsubq_f32 (vld1q_f32 (y + i), my2);
+          sx2c = vfmaq_f32 (sx2c, x2, x2);
+          sy2c = vfmaq_f32 (sy2c, x2, y2);
+          i += 4;
+          x2 = vsubq_f32 (vld1q_f32 (x + i), mx2);
+          y2 = vsubq_f32 (vld1q_f32 (y + i), my2);
+          sx2d = vfmaq_f32 (sx2d, x2, x2);
+          sy2d = vfmaq_f32 (sy2d, x2, y2);
+        }
+      sx2 = vaddq_f32 (sx2, sx2b);
+      sy2 = vaddq_f32 (sy2, sy2b);
+      sx2c = vaddq_f32 (sx2c, sx2d);
+      sy2c = vaddq_f32 (sy2c, sy2d);
+      sx2 = vaddq_f32 (sx2, sx2c);
+      sy2 = vaddq_f32 (sy2, sy2c);
+    }
+  nn = (n - i) >> 3;
+  if (nn)
+    {
+      x2 = vsubq_f32 (vld1q_f32 (x + i), mx2);
+      y2 = vsubq_f32 (vld1q_f32 (y + i), my2);
+      sx2 = vfmaq_f32 (sx2, x2, x2);
+      sy2 = vfmaq_f32 (sy2, x2, y2);
+      i += 4;
+      x2 = vsubq_f32 (vld1q_f32 (x + i), mx2);
+      y2 = vsubq_f32 (vld1q_f32 (y + i), my2);
+      sx2 = vfmaq_f32 (sx2, x2, x2);
+      sy2 = vfmaq_f32 (sy2, x2, y2);
+      i += 4;
+    }
+  nn = (n - i) >> 2;
+  if (nn)
+    {
+      x2 = vsubq_f32 (vld1q_f32 (x + i), mx2);
+      y2 = vsubq_f32 (vld1q_f32 (y + i), my2);
+      sx2 = vfmaq_f32 (sx2, x2, x2);
+      sy2 = vfmaq_f32 (sy2, x2, y2);
+      i += 4;
+    }
+  sx = vaddvq_f32 (sx2);
+  sy = vaddvq_f32 (sy2);
+  for (; i < n; ++i)
+    {
+      dx = x[i] - mx;
+      dy = y[i] - my;
+      sx += dx * dx;
+      sy += dx * dy;
+    }
+  *b = sy / sx;
+  *a = my - (*b) * mx;
+}
+
+/**
  * Function to set a double array with another double array.
  */
 static inline void
@@ -17072,7 +17513,7 @@ jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
  */
 static inline void
 jbm_array_f64_set1 (double *restrict xr,        ///< result double array.
-                    const double xd,     ///< data double number.
+                    const double xd,    ///< data double number.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_SET1 (xr, xd, n, double, vdupq_n_f64, vst1q_f64);
@@ -17296,6 +17737,285 @@ jbm_array_f64_dot (const double *restrict x1,   ///< multiplier double array.
 {
   JBM_ARRAY_DOT (x1, x2, n, float64x2_t, double, vld1q_f64, vmulq_f64,
                  vaddq_f64, vmlaq_f64, jbm_2xf64_reduce_add);
+}
+
+/**
+ * Function to calculate the fmadd function of two double arrays and
+ * one double number: \f$xr_i=\left(x1_i\cdot x2_i\right)+x3\f$.
+ */
+static inline void
+jbm_array_f64_fmadd1 (double *xr,       ///< result double array.
+                      const double *x1, ///< 1st multiplicand double array.
+                      const double x2,  ///< 2nd multiplicand double number.
+                      const double *x3, ///< addend double array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, vfmaq_f64, fma);
+}
+
+/**
+ * Function to calculate the fnmadd function of two double arrays and
+ * one double number: \f$xr_i=-\left(x1_i\cdot x2_i\right)+x3\f$.
+ */
+static inline void
+jbm_array_f64_fnmadd1 (double *xr,      ///< result double array.
+                       const double *x1,
+                       ///< 1st multiplicand double array.
+                       const double x2, ///< 2nd multiplicand double number.
+                       const double *x3,        ///< addend double array.
+                       const unsigned int n)    ///< number of array elements.
+{
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, vfmsq_f64, jbm_f64_fnmadd);
+}
+
+/**
+ * Function to calculate the fmsub function of two double arrays and
+ * one double number: \f$xr_i=\left(x1_i\cdot x2_i\right)-x3\f$.
+ */
+static inline void
+jbm_array_f64_fmsub1 (double *xr,       ///< result double array.
+                      const double *x1, ///< 1st multiplicand double array.
+                      const double x2,  ///< 2nd multiplicand double number.
+                      const double *x3, ///< subtrahend double array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, jbm_2xf64_fmsub, jbm_f64_fmsub);
+}
+
+/**
+ * Function to calculate the fnmsub function of two double arrays and
+ * one double number: \f$xr_i=-\left(x1_i\cdot x2_i\right)-x3\f$.
+ */
+static inline void
+jbm_array_f64_fnmsub1 (double *xr,      ///< result double array.
+                       const double *x1,
+                       ///< 1st multiplicand double array.
+                       const double x2, ///< 2nd multiplicand double number.
+                       const double *x3,        ///< subtrahend double array.
+                       const unsigned int n)    ///< number of array elements.
+{
+  JBM_ARRAY_OP3 (xr, x1, x2, x3, n, float64x2_t, double, vld1q_f64, vst1q_f64,
+                 vdupq_n_f64, jbm_2xf64_fnmsub, jbm_f64_fnmsub);
+}
+
+/**
+ * Function to calculate the fmadd function of three double arrays:
+ * \f$xr_i=\left(x1_i\cdot x2_i\right)+x3_i\f$.
+ */
+static inline void
+jbm_array_f64_fmadd (double *xr,        ///< result double array.
+                     const double *x1,  ///< 1st multiplicand double array.
+                     const double *x2,  ///< 2nd multiplicand double array.
+                     const double *x3,  ///< addend double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, vld1q_f64, vst1q_f64, vfmaq_f64,
+                 fma);
+}
+
+/**
+ * Function to calculate the fnmadd function of three double arrays:
+ * \f$xr_i=-\left(x1_i\cdot x2_i\right)+x3_i\f$.
+ */
+static inline void
+jbm_array_f64_fnmadd (double *xr,       ///< result double array.
+                      const double *x1, ///< 1st multiplicand double array.
+                      const double *x2, ///< 2nd multiplicand double array.
+                      const double *x3, ///< addend double array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, vld1q_f64, vst1q_f64, vfmsq_f64,
+                 jbm_f64_fnmadd);
+}
+
+/**
+ * Function to calculate the fmsub function of three double arrays:
+ * \f$xr_i=\left(x1_i\cdot x2_i\right)-x3_i\f$.
+ */
+static inline void
+jbm_array_f64_fmsub (double *xr,        ///< result double array.
+                     const double *x1,  ///< 1st multiplicand double array.
+                     const double *x2,  ///< 2nd multiplicand double array.
+                     const double *x3,  ///< subtrahend double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, vld1q_f64, vst1q_f64,
+                 jbm_2xf64_fmsub, jbm_f64_fmsub);
+}
+
+/**
+ * Function to calculate the fnmsub function of three double arrays:
+ * \f$xr_i=-\left(x1_i\cdot x2_i\right)-x3_i\f$.
+ */
+static inline void
+jbm_array_f64_fnmsub (double *xr,       ///< result double array.
+                      const double *x1, ///< 1st multiplicand double array.
+                      const double *x2, ///< 2nd multiplicand double array.
+                      const double *x3, ///< subtrahend double array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, vld1q_f64, vst1q_f64,
+                 jbm_2xf64_fnmsub, jbm_f64_fnmsub);
+}
+
+/**
+ * Function to calculate the coefficients of a linear regression adjusted by 
+ * minimum squares: \f$y=a+b\,x\f$ (double).
+ */
+static inline void
+jbm_array_f64_regression_linear (const double *x,
+                                 ///< array of point x-coordinates (double).
+                                 const double *y,
+                                 ///< array of point y-coordinates (double).
+                                 const unsigned int n,
+                                 ///< number of array elements.
+                                 double *a,
+///< pointer to the 0th order regression coefficient.
+                                 double *b)
+///< pointer to the 1st order regression coefficient.
+{
+  float64x2_t x2, y2, mx2, my2, sx2, sy2, sx2b, sy2b, sx2c, sy2c, sx2d, sy2d;
+  double mx, my, sx, sy, dx, dy;
+  unsigned int i, nn;
+  sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = vdupq_n_f64 (0.);
+  i = 0;
+  nn = n >> 3;
+  if (nn)
+    {
+      for (; nn > 0; --nn, i += 2)
+        {
+          x2 = vld1q_f64 (x + i);
+          y2 = vld1q_f64 (y + i);
+          sx2 = vaddq_f64 (sx2, x2);
+          sy2 = vaddq_f64 (sy2, y2);
+          i += 2;
+          x2 = vld1q_f64 (x + i);
+          y2 = vld1q_f64 (y + i);
+          sx2b = vaddq_f64 (sx2b, x2);
+          sy2b = vaddq_f64 (sy2b, y2);
+          i += 2;
+          x2 = vld1q_f64 (x + i);
+          y2 = vld1q_f64 (y + i);
+          sx2c = vaddq_f64 (sx2c, x2);
+          sy2c = vaddq_f64 (sy2c, y2);
+          i += 2;
+          x2 = vld1q_f64 (x + i);
+          y2 = vld1q_f64 (y + i);
+          sx2d = vaddq_f64 (sx2d, x2);
+          sy2d = vaddq_f64 (sy2d, y2);
+        }
+      sx2 = vaddq_f64 (sx2, sx2b);
+      sy2 = vaddq_f64 (sy2, sy2b);
+      sx2c = vaddq_f64 (sx2c, sx2d);
+      sy2c = vaddq_f64 (sy2c, sy2d);
+      sx2 = vaddq_f64 (sx2, sx2c);
+      sy2 = vaddq_f64 (sy2, sy2c);
+    }
+  nn = (n - i) >> 2;
+  if (nn)
+    {
+      x2 = vld1q_f64 (x + i);
+      y2 = vld1q_f64 (y + i);
+      sx2 = vaddq_f64 (sx2, x2);
+      sy2 = vaddq_f64 (sy2, y2);
+      i += 2;
+      x2 = vld1q_f64 (x + i);
+      y2 = vld1q_f64 (y + i);
+      sx2 = vaddq_f64 (sx2, x2);
+      sy2 = vaddq_f64 (sy2, y2);
+      i += 2;
+    }
+  nn = (n - i) >> 1;
+  if (nn)
+    {
+      x2 = vld1q_f64 (x + i);
+      y2 = vld1q_f64 (y + i);
+      sx2 = vaddq_f64 (sx2, x2);
+      sy2 = vaddq_f64 (sy2, y2);
+      i += 2;
+    }
+  mx = vaddvq_f64 (sx2);
+  my = vaddvq_f64 (sy2);
+  if (i < n)
+    {
+      mx += x[i];
+      my += y[i];
+    }
+  mx /= (double) n;
+  my /= (double) n;
+  mx2 = vdupq_n_f64 (mx);
+  my2 = vdupq_n_f64 (my);
+  sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = vdupq_n_f64 (0.);
+  i = 0;
+  nn = n >> 3;
+  if (nn)
+    {
+      for (; nn > 0; --nn, i += 2)
+        {
+          x2 = vsubq_f64 (vld1q_f64 (x + i), mx2);
+          y2 = vsubq_f64 (vld1q_f64 (y + i), my2);
+          sx2 = vfmaq_f64 (sx2, x2, x2);
+          sy2 = vfmaq_f64 (sy2, x2, y2);
+          i += 2;
+          x2 = vsubq_f64 (vld1q_f64 (x + i), mx2);
+          y2 = vsubq_f64 (vld1q_f64 (y + i), my2);
+          sx2b = vfmaq_f64 (sx2b, x2, x2);
+          sy2b = vfmaq_f64 (sy2b, x2, y2);
+          i += 2;
+          x2 = vsubq_f64 (vld1q_f64 (x + i), mx2);
+          y2 = vsubq_f64 (vld1q_f64 (y + i), my2);
+          sx2c = vfmaq_f64 (sx2c, x2, x2);
+          sy2c = vfmaq_f64 (sy2c, x2, y2);
+          i += 2;
+          x2 = vsubq_f64 (vld1q_f64 (x + i), mx2);
+          y2 = vsubq_f64 (vld1q_f64 (y + i), my2);
+          sx2d = vfmaq_f64 (sx2d, x2, x2);
+          sy2d = vfmaq_f64 (sy2d, x2, y2);
+        }
+      sx2 = vaddq_f64 (sx2, sx2b);
+      sy2 = vaddq_f64 (sy2, sy2b);
+      sx2c = vaddq_f64 (sx2c, sx2d);
+      sy2c = vaddq_f64 (sy2c, sy2d);
+      sx2 = vaddq_f64 (sx2, sx2c);
+      sy2 = vaddq_f64 (sy2, sy2c);
+    }
+  nn = (n - i) >> 2;
+  if (nn)
+    {
+      x2 = vsubq_f64 (vld1q_f64 (x + i), mx2);
+      y2 = vsubq_f64 (vld1q_f64 (y + i), my2);
+      sx2 = vfmaq_f64 (sx2, x2, x2);
+      sy2 = vfmaq_f64 (sy2, x2, y2);
+      i += 2;
+      x2 = vsubq_f64 (vld1q_f64 (x + i), mx2);
+      y2 = vsubq_f64 (vld1q_f64 (y + i), my2);
+      sx2 = vfmaq_f64 (sx2, x2, x2);
+      sy2 = vfmaq_f64 (sy2, x2, y2);
+      i += 2;
+    }
+  nn = (n - i) >> 1;
+  if (nn)
+    {
+      x2 = vsubq_f64 (vld1q_f64 (x + i), mx2);
+      y2 = vsubq_f64 (vld1q_f64 (y + i), my2);
+      sx2 = vfmaq_f64 (sx2, x2, x2);
+      sy2 = vfmaq_f64 (sy2, x2, y2);
+      i += 2;
+    }
+  sx = vaddvq_f64 (sx2);
+  sy = vaddvq_f64 (sy2);
+  if (i < n)
+    {
+      dx = x[i] - mx;
+      dy = y[i] - my;
+      sx += dx * dx;
+      sy += dx * dy;
+    }
+  *b = sy / sx;
+  *a = my - (*b) * mx;
 }
 
 #endif

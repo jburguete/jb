@@ -241,20 +241,42 @@ exp10l (long double x)
  * \brief Maximum string length of JBDOUBLE numbers in simplified notation.
  * \def ACOS
  * \brief Low precision standard acos math function.
+ * \def ACOSH
+ * \brief Low precision standard acosh math function.
+ * \def ASIN
+ * \brief Low precision standard asin math function.
+ * \def ASINH
+ * \brief Low precision standard asinh math function.
+ * \def ATAN
+ * \brief Low precision standard atan math function.
+ * \def ATANH
+ * \brief Low precision standard atanh math function.
  * \def CBRT
  * \brief Low precision standard cbrt math function.
  * \def CEIL
  * \brief Low precision standard ceil math function.
  * \def COS
  * \brief Low precision standard cos math function.
+ * \def COSH
+ * \brief Low precision standard cosh math function.
+ * \def ERF
+ * \brief Low precision standard erf math function.
+ * \def ERFC
+ * \brief Low precision standard erfc math function.
  * \def EXP
+ * \brief Low precision standard exp math function.
+ * \def EXP2
  * \brief Low precision standard exp math function.
  * \def EXP10
  * \brief Low precision standard exp10 math function.
+ * \def EXPM1
+ * \brief Low precision standard expm1 math function.
  * \def FABS
  * \brief Low precision standard fabs math function.
  * \def FLOOR
  * \brief Low precision standard floor math function.
+ * \def FMA
+ * \brief Low precision standard fma math function.
  * \def FMAX
  * \brief Low precision standard fmax math function.
  * \def FMIN
@@ -263,30 +285,60 @@ exp10l (long double x)
  * \brief Low precision standard hypot math function.
  * \def LOG
  * \brief Low precision standard log math function.
+ * \def LOG2
+ * \brief Low precision standard log2 math function.
  * \def LOG10
  * \brief Low precision standard log10 math function.
+ * \def SIN
+ * \brief Low precision standard sin math function.
+ * \def SINH
+ * \brief Low precision standard sinh math function.
  * \def SNPRINTF
  * \brief Low precision standard snprintf math function.
  * \def SQRT
  * \brief Low precision standard sqrt math function.
+ * \def TAN
+ * \brief Low precision standard tan math function.
+ * \def TANH
+ * \brief Low precision standard tanh math function.
  * \def STRTOF
  * \brief Low precision standard strtof math function.
  * \def ACOSL
  * \brief High precision standard acos math function.
+ * \def ACOSHL
+ * \brief High precision standard acosh math function.
+ * \def ASINL
+ * \brief High precision standard asin math function.
+ * \def ASINHL
+ * \brief High precision standard asinh math function.
+ * \def ATANL
+ * \brief High precision standard atan math function.
+ * \def ATANHL
+ * \brief High precision standard atanh math function.
  * \def CBRTL
  * \brief High precision standard cbrt math function.
  * \def CEILL
  * \brief High precision standard ceil math function.
+ * \def COSHL
+ * \brief High precision standard cosh math function.
  * \def COSL
  * \brief High precision standard cos math function.
+ * \def ERFL
+ * \brief High precision standard erf math function.
+ * \def ERFCL
+ * \brief High precision standard erfc math function.
  * \def EXPL
  * \brief High precision standard exp math function.
  * \def EXP10L
  * \brief High precision standard exp10 math function.
+ * \def EXPM1L
+ * \brief High precision standard expm1 math function.
  * \def FABSL
  * \brief High precision standard fabs math function.
  * \def FLOORL
  * \brief High precision standard floor math function.
+ * \def FMAL
+ * \brief High precision standard fma math function.
  * \def FMAXL
  * \brief High precision standard fmax math function.
  * \def FMINL
@@ -295,21 +347,31 @@ exp10l (long double x)
  * \brief High precision standard hypot math function.
  * \def LOGL
  * \brief High precision standard log math function.
+ * \def LOG2L
+ * \brief High precision standard log2 math function.
  * \def LOG10L
  * \brief High precision standard log10 math function.
+ * \def SINL
+ * \brief High precision standard sin math function.
+ * \def SINHL
+ * \brief High precision standard sinh math function.
  * \def SNPRINTFL
  * \brief High precision standard snprintf math function.
  * \def SQRTL
  * \brief High precision standard sqrt math function.
+ * \def TANL
+ * \brief High precision standard tan math function.
+ * \def TANHL
+ * \brief High precision standard tanh math function.
  * \def STRTOD
  * \brief High precision standard strtod math function.
  * \def JBM_EPSILON
  * \brief Low precision epsilon number.
- * \def JB_PI
+ * \def JBM_PI
  * \brief Low precision pi number.
  * \def JBM_EPSILONL
  * \brief High precision epsilon number.
- * \def JB_PIL
+ * \def JBM_PIL
  * \brief High precision pi number.
  */
 #if JBM_PRECISION == 1
@@ -338,121 +400,203 @@ exp10l (long double x)
 #endif
 #if JBM_LOW_PRECISION == 1
 #define JBFLOAT float
-#define ACOS acos
-#define CBRT cbrt
-#define CEIL ceil
-#define COS cos
-#define EXP exp
-#define EXP10 exp10
-#define FABS fabs
-#define FLOOR floor
-#define FMAX fmax
-#define FMIN fmin
-#define HYPOT hypot
-#define LOG log
-#define LOG10 log10
+#define ACOS acosf
+#define ACOSH acoshf
+#define ASIN asinf
+#define ASINH asinhf
+#define ATAN atanf
+#define ATANH atanhf
+#define CBRT cbrtf
+#define CEIL ceilf
+#define COS cosf
+#define COSH coshf
+#define ERF erff
+#define ERFC erfcf
+#define EXP expf
+#define EXP2 exp2f
+#define EXP10 exp10f
+#define EXPM1 expm1f
+#define FABS fabsf
+#define FLOOR floorf
+#define FMA fmaf
+#define FMAX fmaxf
+#define FMIN fminf
+#define HYPOT hypotf
+#define LOG logf
+#define LOG2 log2f
+#define LOG10 log10f
+#define SIN sinf
+#define SINH sinhf
+#define SQRT sqrtf
+#define TAN tanf
+#define TANH tanhf
 #define SNPRINTF snprintf
-#define SQRT sqrt
 #define STRTOF strtof
 #define FRF "%e"
 #define FWF "%.6e"
 #define FPF "%.7g"
 #define FGF "%.5g"
 #define JBM_EPSILON FLT_EPSILON
-#define JB_PI M_PI
+#define JBM_PI M_PI
 #elif JBM_LOW_PRECISION == 2
 #define JBFLOAT double
 #define ACOS acos
+#define ACOSH acosh
+#define ASIN asin
+#define ASINH asinh
+#define ATAN atan
+#define ATANH atanh
 #define CBRT cbrt
 #define CEIL ceil
 #define COS cos
+#define COSH cosh
+#define ERF erf
+#define ERFC erfc
 #define EXP exp
+#define EXP2 exp2
 #define EXP10 exp10
+#define EXPM1 expm1
 #define FABS fabs
 #define FLOOR floor
+#define FMA fma
 #define FMAX fmax
 #define FMIN fmin
 #define HYPOT hypot
 #define LOG log
+#define LOG2 log2
 #define LOG10 log10
-#define SNPRINTF snprintf
+#define SIN sin
+#define SINH sinh
 #define SQRT sqrt
+#define TAN tan
+#define TANH tanh
+#define SNPRINTF snprintf
 #define STRTOF strtod
 #define FRF "%le"
 #define FWF "%.15le"
 #define FPF "%.16lg"
 #define FGF "%.5lg"
 #define JBM_EPSILON DBL_EPSILON
-#define JB_PI M_PI
+#define JBM_PI M_PI
 #elif JBM_LOW_PRECISION == 3
 #define JBFLOAT long double
 #define ACOS acosl
+#define ACOSH acoshl
+#define ASIN asinl
+#define ASINH asinhl
+#define ATAN atanl
+#define ATANH atanhl
 #define CBRT cbrtl
 #define CEIL ceill
 #define COS cosl
+#define COSH coshl
+#define ERF erfl
+#define ERFC erfcl
 #define EXP expl
+#define EXP2 exp2l
 #define EXP10 exp10l
+#define EXPM1 expm1l
 #define FABS fabsl
 #define FLOOR floorl
+#define FMA fmal
 #define FMAX fmaxl
 #define FMIN fminl
 #define HYPOT hypotl
 #define LOG logl
+#define LOG2 log2l
 #define LOG10 log10l
-#define SNPRINTF snprintf
+#define SIN sinl
+#define SINH sinhl
 #define SQRT sqrtl
+#define TAN tanl
+#define TANH tanhl
+#define SNPRINTF snprintf
 #define STRTOF strtold
 #define FRF "%Le"
 #define FWF "%.18Le"
 #define FPF "%.19Lg"
 #define FGF "%.5Lg"
 #define JBM_EPSILON LDBL_EPSILON
-#define JB_PI M_PIl
+#define JBM_PI M_PIl
 #elif JBM_LOW_PRECISION == 4
 #define JBFLOAT __float128
 #define ACOS acosq
+#define ACOSH acoshq
+#define ASIN asinq
+#define ASINH asinhq
+#define ATAN atanq
+#define ATANH atanhq
 #define CBRT cbrtq
 #define CEIL ceilq
 #define COS cosq
+#define COSH coshq
+#define ERF erfq
+#define ERFC erfcq
 #define EXP expq
+#define EXP2 exp2q
 #define EXP10 exp10q
+#define EXPM1 expm1q
 #define FABS fabsq
 #define FLOOR floorq
+#define FMA fmaq
 #define FMAX fmaxq
 #define FMIN fminq
 #define HYPOT hypotq
 #define LOG logq
+#define LOG2 log2q
 #define LOG10 log10q
-#define SNPRINTF quadmath_snprintf
+#define SIN sinq
+#define SINH sinhq
 #define SQRT sqrtq
+#define TAN tanq
+#define TANH tanhq
+#define SNPRINTF quadmath_snprintf
 #define STRTOF strtoflt128
 #define FRF "%Qe"
 #define FWF "%.33Qe"
 #define FPF "%.34Qg"
 #define FGF "%.5Qg"
 #define JBM_EPSILON FLT128_EPSILON
-#define JB_PI M_PIq
+#define JBM_PI M_PIq
 #endif
 #if JBM_HIGH_PRECISION == 1
 #define JBDOUBLE float
-#define ACOSL acos
-#define CBRTL cbrt
-#define CEILL ceil
-#define COSL cos
-#define EXPL exp
-#define EXP10L exp10
-#define FABSL fabs
-#define FLOORL floor
-#define FMAXL fmax
-#define FMINL fmin
-#define HYPOTL hypot
-#define LOGL log
-#define LOG10L log10
+#define ACOSL acosf
+#define ACOSHL acoshf
+#define ASINL asinf
+#define ASINHL asinhf
+#define ATANL atanf
+#define ATANHL atanhf
+#define CBRTL cbrtf
+#define CEILL ceilf
+#define COSL cosf
+#define COSHL coshf
+#define ERFL erff
+#define ERFCL erfcf
+#define ERFL erf
+#define ERFCL erfc
+#define EXPL expf
+#define EXP2L exp2f
+#define EXP10L exp10f
+#define EXPM1L expm1f
+#define FABSL fabsf
+#define FLOORL floorf
+#define FMAL fmaf
+#define FMAXL fmaxf
+#define FMINL fminf
+#define HYPOTL hypotf
+#define LOGL logf
+#define LOG2L log2f
+#define LOG10L log10f
+#define SINL sinf
+#define SINHL sinhf
+#define SQRTL sqrtf
+#define TANL tanf
+#define TANHL tanhf
 #define SNPRINTFL snprintf
-#define SQRTL sqrt
 #define STRTOD strtof
 #define JBM_EPSILONL FLT_EPSILON
-#define JB_PIL M_PI
+#define JBM_PIL M_PI
 #define FRL "%f"
 #define FWL "%.6e"
 #define FPL "%.7g"
@@ -460,23 +604,39 @@ exp10l (long double x)
 #elif JBM_HIGH_PRECISION == 2
 #define JBDOUBLE double
 #define ACOSL acos
+#define ACOSHL acosh
+#define ASINL asin
+#define ASINHL asinh
+#define ATANL atan
+#define ATANHL atanh
 #define CBRTL cbrt
 #define CEILL ceil
 #define COSL cos
+#define COSHL cosh
+#define ERFL erf
+#define ERFCL erfc
 #define EXPL exp
+#define EXP2L exp2
 #define EXP10L exp10
+#define EXPM1L expm1
 #define FABSL fabs
 #define FLOORL floor
+#define FMAL fma
 #define FMAXL fmax
 #define FMINL fmin
 #define HYPOTL hypot
 #define LOGL log
+#define LOG2L log2
 #define LOG10L log10
-#define SNPRINTFL snprintf
+#define SINL sin
+#define SINHL sinh
 #define SQRTL sqrt
+#define TANL tan
+#define TANHL tanh
+#define SNPRINTFL snprintf
 #define STRTOD strtod
 #define JBM_EPSILONL DBL_EPSILON
-#define JB_PIL M_PI
+#define JBM_PIL M_PI
 #define FRL "%lf"
 #define FWL "%.15le"
 #define FPL "%.16lg"
@@ -484,23 +644,41 @@ exp10l (long double x)
 #elif JBM_HIGH_PRECISION == 3
 #define JBDOUBLE long double
 #define ACOSL acosl
+#define ACOSHL acoshl
+#define ASINL asinl
+#define ASINHL asinhl
+#define ATANL atanl
+#define ATANHL atanhl
 #define CBRTL cbrtl
 #define CEILL ceill
 #define COSL cosl
+#define COSHL coshl
+#define ERFL erfl
+#define ERFCL erfcl
+#define ERFL erfl
+#define ERFCL erfcl
 #define EXPL expl
+#define EXP2L exp2l
 #define EXP10L exp10l
+#define EXPM1L expm1l
 #define FABSL fabsl
 #define FLOORL floorl
+#define FMAL fmal
 #define FMAXL fmaxl
 #define FMINL fminl
 #define HYPOTL hypotl
 #define LOGL logl
+#define LOG2L log2l
 #define LOG10L log10l
-#define SNPRINTFL snprintf
+#define SINL sinl
+#define SINHL sinhl
 #define SQRTL sqrtl
+#define TANL tanl
+#define TANHL tanhl
+#define SNPRINTFL snprintf
 #define STRTOD strtold
 #define JBM_EPSILONL LDBL_EPSILON
-#define JB_PIL M_PIl
+#define JBM_PIL M_PIl
 #define FRL "%Lf"
 #define FWL "%.18Le"
 #define FPL "%.19Lg"
@@ -508,23 +686,39 @@ exp10l (long double x)
 #elif JBM_HIGH_PRECISION == 4
 #define JBDOUBLE __float128
 #define ACOSL acosq
+#define ACOSHL acoshq
+#define ASINL asinq
+#define ASINHL asinhq
+#define ATANL atanq
+#define ATANHL atanhq
 #define CBRTL cbrtq
 #define CEILL ceilq
 #define COSL cosq
+#define COSHL coshq
+#define ERFL erfq
+#define ERFCL erfcq
 #define EXPL expq
+#define EXP2L exp2q
 #define EXP10L exp10q
+#define EXPM1L expm1q
 #define FABSL fabsq
 #define FLOORL floorq
+#define FMAL fmaq
 #define FMAXL fmaxq
 #define FMINL fminq
 #define HYPOTL hypotq
 #define LOGL logq
+#define LOG2L log2q
 #define LOG10L log10q
-#define SNPRINTFL quadmath_snprintf
+#define SINL sinq
+#define SINHL sinq
 #define SQRTL sqrtq
+#define TANL tanq
+#define TANHL tanhq
+#define SNPRINTFL quadmath_snprintf
 #define STRTOD strtoflt128
 #define JBM_EPSILONL FLT128_EPSILON
-#define JB_PIL M_PIq
+#define JBM_PIL M_PIq
 #define FRL "%Qf"
 #define FWL "%.33Qe"
 #define FPL "%.34Qg"
@@ -670,7 +864,7 @@ enum JBMFluxLimiterType
 #include "math_sse.h"
 #if __AVX2__
 #include "math_avx.h"
-#if JBM_AVX512 
+#if JBM_AVX512
 #include "math_avx512.h"
 #endif
 #endif
@@ -1484,9 +1678,9 @@ jbm_solve_cubic_reduced (JBFLOAT a,
       k2 = k1 * COS (k0) - a;
       if (k2 < x1 || k2 > x2)
         {
-          k2 = k1 * COS (k0 + (JBFLOAT) 2. * JB_PI / (JBFLOAT) 3.) - a;
+          k2 = k1 * COS (k0 + (JBFLOAT) 2. * JBM_PI / (JBFLOAT) 3.) - a;
           if (k2 < x1 || k2 > x2)
-            k2 = k1 * COS (k0 - (JBFLOAT) 2. * JB_PI / (JBFLOAT) 3.) - a;
+            k2 = k1 * COS (k0 - (JBFLOAT) 2. * JBM_PI / (JBFLOAT) 3.) - a;
         }
     }
   else
@@ -2217,9 +2411,9 @@ jbm_solve_cubic_reducedl (JBDOUBLE a,
       k2 = k1 * COSL (k0) - a;
       if (k2 < x1 || k2 > x2)
         {
-          k2 = k1 * COSL (k0 + (JBDOUBLE) 2. * JB_PI / (JBDOUBLE) 3.) - a;
+          k2 = k1 * COSL (k0 + (JBDOUBLE) 2. * JBM_PIL / (JBDOUBLE) 3.) - a;
           if (k2 < x1 || k2 > x2)
-            k2 = k1 * COSL (k0 - (JBDOUBLE) 2. * JB_PI / (JBDOUBLE) 3.) - a;
+            k2 = k1 * COSL (k0 - (JBDOUBLE) 2. * JBM_PIL / (JBDOUBLE) 3.) - a;
         }
     }
   else
@@ -2608,6 +2802,19 @@ jbm_farray_init (JBMFarray *fa, ///< pointer to the JBMFarray struct.
   fa->last = n - 1;
 }
 
+///> Macro to allocate memory in a JBMFarray struct.
+#define JBM_FARRAY_ALLOCA(f, n) \
+  jbm_farray_init (f, n); \
+  if ((f)->size > JB_MAX_ALLOCA_SIZE) \
+    (f)->x = (JBFLOAT *) malloc ((f)->size); \
+  else \
+    (f)->x = (JBFLOAT *) alloca ((f)->size);
+
+///> Macro to free memory in a JBMFarray struct.
+#define JBM_FARRAY_DESTROY(f) \
+  if ((f)->size > JB_MAX_ALLOCA_SIZE) \
+    free ((f)->x);
+
 /**
  * Function to create a new JBMFarray struct.
  *
@@ -2714,19 +2921,15 @@ jbm_farray_add1 (JBMFarray *fr, ///< result JBMFarray struct.
                  const JBMFarray *f1,   ///< addend JBMFarray struct.
                  const JBFLOAT x2)      ///< addend JBFLOAT number.
 {
-  JBFLOAT *xr, *x1;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fr->n;
-  xr = fr->x;
-  x1 = f1->x;
+  const JBFLOAT *x1 = f1->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
 #if JBM_LOW_PRECISION == 1
   jbm_array_f32_add1 (xr, x1, x2, n);
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_add1 (xr, x1, x2, n);
 #else
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = x1[i] + x2;
 #endif
@@ -2740,19 +2943,15 @@ jbm_farray_sub1 (JBMFarray *fr, ///< result JBMFarray struct.
                  const JBMFarray *f1,   ///< minuend JBMFarray struct.
                  const JBFLOAT x2)      ///< subtrahend JBFLOAT number.
 {
-  JBFLOAT *xr, *x1;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fr->n;
-  xr = fr->x;
-  x1 = f1->x;
+  const JBFLOAT *x1 = f1->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
 #if JBM_LOW_PRECISION == 1
   jbm_array_f32_sub1 (xr, x1, x2, n);
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_sub1 (xr, x1, x2, n);
 #else
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = x1[i] - x2;
 #endif
@@ -2766,19 +2965,15 @@ jbm_farray_mul1 (JBMFarray *fr, ///< result JBMFarray struct.
                  const JBMFarray *f1,   ///< multiplier JBMFarray struct.
                  const JBFLOAT x2)      ///< multiplicand JBFLOAT number.
 {
-  JBFLOAT *xr, *x1;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fr->n;
-  xr = fr->x;
-  x1 = f1->x;
+  const JBFLOAT *x1 = f1->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
 #if JBM_LOW_PRECISION == 1
   jbm_array_f32_mul1 (xr, x1, x2, n);
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_mul1 (xr, x1, x2, n);
 #else
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = x1[i] * x2;
 #endif
@@ -2792,19 +2987,15 @@ jbm_farray_div1 (JBMFarray *fr, ///< result JBMFarray struct.
                  const JBMFarray *f1,   ///< dividend JBMFarray struct.
                  const JBFLOAT x2)      ///< divisor JBFLOAT number.
 {
-  JBFLOAT *xr, *x1;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fr->n;
-  xr = fr->x;
-  x1 = f1->x;
+  const JBFLOAT *x1 = f1->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
 #if JBM_LOW_PRECISION == 1
   jbm_array_f32_div1 (xr, x1, x2, n);
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_div1 (xr, x1, x2, n);
 #else
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = x1[i] / x2;
 #endif
@@ -2818,20 +3009,16 @@ jbm_farray_add (JBMFarray *fr,  ///< result JBMFarray struct.
                 const JBMFarray *f1,    ///< 1st addend JBMFarray struct.
                 const JBMFarray *f2)    ///< 1st addend JBMFarray struct.
 {
-  JBFLOAT *xr, *x1, *x2;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fr->n;
-  xr = fr->x;
-  x1 = f1->x;
-  x2 = f2->x;
+  const JBFLOAT *x1 = f1->x;
+  const JBFLOAT *x2 = f2->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
 #if JBM_LOW_PRECISION == 1
   jbm_array_f32_add (xr, x1, x2, n);
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_add (xr, x1, x2, n);
 #else
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = x1[i] + x2[i];
 #endif
@@ -2845,20 +3032,16 @@ jbm_farray_sub (JBMFarray *fr,  ///< result JBMFarray struct.
                 const JBMFarray *f1,    ///< minuend JBMFarray struct.
                 const JBMFarray *f2)    ///< subtrahend JBMFarray struct.
 {
-  JBFLOAT *xr, *x1, *x2;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fr->n;
-  xr = fr->x;
-  x1 = f1->x;
-  x2 = f2->x;
+  const JBFLOAT *x1 = f1->x;
+  const JBFLOAT *x2 = f2->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
 #if JBM_LOW_PRECISION == 1
   jbm_array_f32_sub (xr, x1, x2, n);
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_sub (xr, x1, x2, n);
 #else
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = x1[i] - x2[i];
 #endif
@@ -2872,20 +3055,16 @@ jbm_farray_mul (JBMFarray *fr,  ///< result JBMFarray struct.
                 const JBMFarray *f1,    ///< multiplier JBMFarray struct.
                 const JBMFarray *f2)    ///< multiplicand JBMFarray struct.
 {
-  JBFLOAT *xr, *x1, *x2;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fr->n;
-  xr = fr->x;
-  x1 = f1->x;
-  x2 = f2->x;
+  const JBFLOAT *x1 = f1->x;
+  const JBFLOAT *x2 = f2->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
 #if JBM_LOW_PRECISION == 1
   jbm_array_f32_mul (xr, x1, x2, n);
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_mul (xr, x1, x2, n);
 #else
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = x1[i] * x2[i];
 #endif
@@ -2899,22 +3078,143 @@ jbm_farray_div (JBMFarray *fr,  ///< result JBMFarray struct.
                 const JBMFarray *f1,    ///< dividend JBMFarray struct.
                 const JBMFarray *f2)    ///< divisor JBMFarray struct.
 {
-  JBFLOAT *xr, *x1, *x2;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fr->n;
-  xr = fr->x;
-  x1 = f1->x;
-  x2 = f2->x;
+  const JBFLOAT *x1 = f1->x;
+  const JBFLOAT *x2 = f2->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
 #if JBM_LOW_PRECISION == 1
   jbm_array_f32_div (xr, x1, x2, n);
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_div (xr, x1, x2, n);
 #else
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = x1[i] / x2[i];
+#endif
+}
+
+/**
+ * Function to calculate the fmadd function of two JBMFarray structs and
+ * one JBFLOAT number: \f$xr_i=\left(x1_i\cdot x2_i\right)+x3\f$.
+ */
+static inline void
+jbm_farray_fmadd1 (JBMFarray *fr,       ///< result JBMFarray struct.
+                   const JBMFarray *f1, ///< 1st multiplicand JBMFarray struct.
+                   const JBFLOAT x2,    ///< 2nd multiplicand JBFLOAT number.
+                   const JBMFarray *f3) ///< addend JBMFarray struct.
+{
+  const JBFLOAT *x1 = f1->x;
+  const JBFLOAT *x3 = f3->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_fmadd1 (xr, x1, x2, x3, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_fmadd1 (xr, x1, x2, x3, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = FMA (x1[i], x2, x3[i]);
+#endif
+}
+
+/**
+ * Function to calculate the fnmadd function of two JBMFarray structs and
+ * one JBFLOAT number: \f$xr_i=-\left(x1_i\cdot x2_i\right)+x3\f$.
+ */
+static inline void
+jbm_farray_fnmadd1 (JBMFarray *fr,      ///< result JBMFarray struct.
+                    const JBMFarray *f1,
+                    ///< 1st multiplicand JBMFarray struct.
+                    const JBFLOAT x2,   ///< 2nd multiplicand JBFLOAT number.
+                    const JBMFarray *f3)        ///< addend JBMFarray struct.
+{
+  const JBFLOAT *x1 = f1->x;
+  const JBFLOAT *x3 = f3->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_fnmadd1 (xr, x1, x2, x3, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_fnmadd1 (xr, x1, x2, x3, n);
+#else
+  const JBFLOAT nx2 = -x2;
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = FMA (x1[i], nx2, x3[i]);
+#endif
+}
+
+/**
+ * Function to calculate the fmsub function of two JBMFarray structs and
+ * one JBFLOAT number: \f$xr_i=\left(x1_i\cdot x2_i\right)-x3\f$.
+ */
+static inline void
+jbm_farray_fmsub1 (JBMFarray *fr,       ///< result JBMFarray struct.
+                   const JBMFarray *f1, ///< 1st multiplicand JBMFarray struct.
+                   const JBFLOAT x2,    ///< 2nd multiplicand JBFLOAT number.
+                   const JBMFarray *f3) ///< substrahend JBMFarray struct.
+{
+  const JBFLOAT *x1 = f1->x;
+  const JBFLOAT *x3 = f3->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_fmsub1 (xr, x1, x2, x3, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_fmsub1 (xr, x1, x2, x3, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = FMA (x1[i], x2, -x3[i]);
+#endif
+}
+
+/**
+ * Function to calculate the fnmsub function of two JBMFarray structs and
+ * one JBFLOAT number: \f$xr_i=-\left(x1_i\cdot x2_i\right)-x3\f$.
+ */
+static inline void
+jbm_farray_fnmsub1 (JBMFarray *fr,      ///< result JBMFarray struct.
+                    const JBMFarray *f1,
+                    ///< 1st multiplicand JBMFarray struct.
+                    const JBFLOAT x2,   ///< 2nd multiplicand JBFLOAT number.
+                    const JBMFarray *f3)
+                    ///< substrahend JBMFarray struct.
+{
+  const JBFLOAT *x1 = f1->x;
+  const JBFLOAT *x3 = f3->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_fnmsub1 (xr, x1, x2, x3, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_fnmsub1 (xr, x1, x2, x3, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = -FMA (x1[i], x2, x3[i]);
+#endif
+}
+
+/**
+ * Function to calculate the root square of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_sqrt (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_sqrt (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_sqrt (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = SQRT (xd[i]);
 #endif
 }
 
@@ -2925,19 +3225,15 @@ static inline void
 jbm_farray_dbl (JBMFarray *fr,  ///< result JBMFarray struct.
                 const JBMFarray *fd)    ///< data JBMFarray struct.
 {
-  JBFLOAT *xr, *xd;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fr->n;
-  xr = fr->x;
-  xd = fd->x;
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
 #if JBM_LOW_PRECISION == 1
   jbm_array_f32_dbl (xr, xd, n);
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_dbl (xr, xd, n);
 #else
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = jbm_fdbl (xd[i]);
 #endif
@@ -2950,21 +3246,542 @@ static inline void
 jbm_farray_sqr (JBMFarray *fr,  ///< result JBMFarray struct.
                 const JBMFarray *fd)    ///< data JBMFarray struct.
 {
-  JBFLOAT *xr, *xd;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fr->n;
-  xr = fr->x;
-  xd = fd->x;
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
 #if JBM_LOW_PRECISION == 1
   jbm_array_f32_sqr (xr, xd, n);
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_sqr (xr, xd, n);
 #else
+  unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = jbm_fsqr (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the additive inverse value of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_opposite (JBMFarray *fr,     ///< result JBMFarray struct.
+                     const JBMFarray *fd)       ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_opposite (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_opposite (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = -xd[i];
+#endif
+}
+
+/**
+ * Function to calculate the additive inverse value of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_reciprocal (JBMFarray *fr,   ///< result JBMFarray struct.
+                       const JBMFarray *fd)     ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_reciprocal (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_reciprocal (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = (JBFLOAT) 1. / xd[i];
+#endif
+}
+
+/**
+ * Function to calculate the absolute value of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_abs (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *fd)    ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_abs (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_abs (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = FABS (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the cbrt function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_cbrt (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_cbrt (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_cbrt (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = CBRT (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the exp2 function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_exp2 (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_exp2 (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_exp2 (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = EXP2 (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the exp function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_exp (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_exp (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_exp (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = EXP (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the exp10 function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_exp10 (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_exp10 (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_exp10 (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = EXP10 (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the expm1 function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_expm1 (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_expm1 (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_expm1 (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = EXPM1 (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the log2 function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_log2 (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_log2 (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_log2 (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = LOG2 (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the log function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_log (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_log (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_log (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = LOG (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the log10 function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_log10 (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_log10 (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_log10 (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = LOG10 (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the sin function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_sin (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_sin (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_sin (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = SIN (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the cos function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_cos (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_cos (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_cos (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = COS (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the tan function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_tan (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_tan (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_tan (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = TAN (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the asin function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_asin (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_asin (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_asin (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = ASIN (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the acos function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_acos (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_acos (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_acos (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = ACOS (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the atan function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_atan (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_atan (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_atan (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = ATAN (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the sinh function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_sinh (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_sinh (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_sinh (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = SINH (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the cosh function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_cosh (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_cosh (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_cosh (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = COSH (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the tanh function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_tanh (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_tanh (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_tanh (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = TANH (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the asinh function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_asinh (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_asinh (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_asinh (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = ASINH (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the acosh function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_acosh (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_acosh (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_acosh (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = ACOSH (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the atanh function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_atanh (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_atanh (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_atanh (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = ATANH (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the erf function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_erf (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_erf (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_erf (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = ERF (xd[i]);
+#endif
+}
+
+/**
+ * Function to calculate the erfc function of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_erfc (JBMFarray *fr, ///< result JBMFarray struct.
+                 const JBMFarray *fd)   ///< data JBMFarray struct.
+{
+  const JBFLOAT *xd = fd->x;
+  const unsigned int n = fr->n;
+  JBFLOAT *xr = fr->x;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_erfc (xr, xd, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_erfc (xr, xd, n);
+#else
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = ERFC (xd[i]);
 #endif
 }
 
@@ -3364,7 +4181,7 @@ jbm_darray_new (const unsigned int n)   ///< number of array elements.
  * \return pointer to the new JBMDarray struct.
  */
 static inline JBMDarray *
-jbm_darray_create (const JBDOUBLE *x,    ///< array of JBDOUBLE numbers.
+jbm_darray_create (const JBDOUBLE *x,   ///< array of JBDOUBLE numbers.
                    const unsigned int n)        ///< number of array elements.
 {
   JBMDarray *fa;
@@ -3378,7 +4195,7 @@ jbm_darray_create (const JBDOUBLE *x,    ///< array of JBDOUBLE numbers.
  */
 static inline void
 jbm_darray_set1 (JBMDarray *fa, ///< pointer to the JBMDarray struct.
-                 const JBDOUBLE x,       ///< JBDOUBLE number.
+                 const JBDOUBLE x,      ///< JBDOUBLE number.
                  const unsigned int n)  ///< number of array elements.
 {
   JBDOUBLE *xa;
@@ -3403,7 +4220,7 @@ jbm_darray_set1 (JBMDarray *fa, ///< pointer to the JBMDarray struct.
  */
 static inline void
 jbm_darray_set (JBMDarray *fa,  ///< pointer to the JBMDarray struct.
-                const JBDOUBLE *x,       ///< array of JBDOUBLE numbers.
+                const JBDOUBLE *x,      ///< array of JBDOUBLE numbers.
                 const unsigned int n)   ///< number of array elements.
 {
   jbm_darray_init (fa, n);
@@ -3421,7 +4238,7 @@ jbm_darray_set (JBMDarray *fa,  ///< pointer to the JBMDarray struct.
  */
 static inline void
 jbm_darray_store (JBMDarray *fa,        ///< pointer to the JBMDarray struct.
-                  JBDOUBLE *x)   ///< array of JBDOUBLE numbers.
+                  JBDOUBLE *x)  ///< array of JBDOUBLE numbers.
 {
   memcpy (x, fa->x, fa->size);
 }
@@ -3764,7 +4581,7 @@ jbm_darray_max (const JBMDarray *fa)    ///< JBMDarray struct.
 #else
   k = xx[0];
   for (i = 1; i < n; ++i)
-    k = FMAX (k, xx[i]);
+    k = FMAXL (k, xx[i]);
 #endif
   return k;
 }
@@ -3792,7 +4609,7 @@ jbm_darray_min (const JBMDarray *fa)    ///< JBMDarray struct.
 #else
   k = xx[0];
   for (i = 1; i < n; ++i)
-    k = FMIN (k, xx[i]);
+    k = FMINL (k, xx[i]);
 #endif
   return k;
 }
@@ -3856,7 +4673,7 @@ jbm_darray_interpolate (const JBMDarray *fa,
 ///< JBMDarray struct defining the increasingly sorted array of x-coordinates.
                         const JBMDarray *fb,
 ///< JBMDarray struct defining the array of y-coordinates.
-                        const JBDOUBLE x)        ///< x-coordinate of the point.
+                        const JBDOUBLE x)       ///< x-coordinate of the point.
 {
   JBDOUBLE *fx, *fy;
   unsigned int i;
@@ -4053,7 +4870,7 @@ jbm_darray_root_mean_square_error (JBMDarray *fxa,
                                    JBMDarray *fyr)
 ///< JBMDarray struct defining the y-coordinates of the 2nd tabular function.
 {
-  return SQRT (jbm_darray_mean_square_error (fxa, fya, fxr, fyr));
+  return SQRTL (jbm_darray_mean_square_error (fxa, fya, fxr, fyr));
 }
 
 /**
@@ -4258,15 +5075,15 @@ static inline void
 jbm_matrix_solve (JBFLOAT *x,   ///< matrix storing the linear equations system.
                   unsigned int n)       ///< number of matrix rows.
 {
-  JBMFarray *fa, *fa2;
+  JBMFarray fa[2];
   JBFLOAT *f, *g;
   JBFLOAT k1, k2;
   size_t size;
   unsigned int i, j, k, last;
   // Setting n to the number of row elements
   last = n++;
-  fa = jbm_farray_new (n);
-  fa2 = jbm_farray_new (n);
+  JBM_FARRAY_ALLOCA (fa, n);
+  JBM_FARRAY_ALLOCA (fa + 1, n);
   // Scaling every equation to reduce rounding effects.
   for (i = n, f = x; --i > 0; f += n)
     {
@@ -4305,9 +5122,9 @@ jbm_matrix_solve (JBFLOAT *x,   ///< matrix storing the linear equations system.
         {
           k1 = *g / *f;
           jbm_farray_set (fa, g + 1, i + 1);
-          jbm_farray_set (fa2, f + 1, i + 1);
-          jbm_farray_mul1 (fa2, fa2, k1);
-          jbm_farray_sub (fa, fa, fa2);
+          jbm_farray_set (fa + 1, f + 1, i + 1);
+          jbm_farray_mul1 (fa + 1, fa + 1, k1);
+          jbm_farray_sub (fa, fa, fa + 1);
           jbm_farray_store (fa, g + 1);
         }
     }
@@ -4321,8 +5138,8 @@ jbm_matrix_solve (JBFLOAT *x,   ///< matrix storing the linear equations system.
       for (j = n, g = f - n; --j > i; g -= n)
         *g -= *(g - i) * k1;
     }
-  jbm_farray_destroy (fa2);
-  jbm_farray_destroy (fa);
+  JBM_FARRAY_DESTROY (fa + 1)
+  JBM_FARRAY_DESTROY (fa)
 }
 
 /**
@@ -4530,95 +5347,35 @@ jbm_regression_linear (JBMFarray *fx,
                        JBFLOAT *b)
                        ///< pointer to the 1st order regression coefficient.
 {
-  JBFLOAT *x, *y;
-  JBFLOAT syx, sy, sxx, sx;
-  unsigned int i, n;
-#if JBM_LOW_PRECISION < 3
-#if __AVX2__
-  double t4[4];
-  __m256d x4, y4, syx4, sy4, sxx4, sx4;
-  unsigned int n4;
-#endif
-#if __SSE4_2__
-  double t2[2];
-  __m128d x2, y2, syx2, sy2, sxx2, sx2;
-  unsigned int n2;
-#endif
-#endif
-  x = fx->x;
-  y = fy->x;
-  n = fx->n;
-  i = 0;
-  syx = sy = sxx = sx = (JBFLOAT) 0.;
-#if __SSE4_2__
-  sy2 = _mm_setzero_pd ();
-  sx2 = _mm_setzero_pd ();
-  syx2 = _mm_setzero_pd ();
-  sxx2 = _mm_setzero_pd ();
-#endif
-#if __AVX2__
-  n4 = n >> 2;
-  sy4 = _mm256_setzero_pd ();
-  sx4 = _mm256_setzero_pd ();
-  syx4 = _mm256_setzero_pd ();
-  sxx4 = _mm256_setzero_pd ();
-  if (n4)
+  const JBFLOAT *x = fx->x;
+  const JBFLOAT *y = fy->x;
+  const unsigned int n = fx->n;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_regression_linear (x, y, n, a, b);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_regression_linear (x, y, n, a, b);
+#else
+  JBFLOAT sy, my, dy, sx, mx, dx;
+  unsigned int i;
+  mx = my = (JBFLOAT) 0.;
+  for (i = 0; i < n; ++i)
     {
-      for (; n4 > 0; --n4, i += 4)
-        {
-          y4 = _mm256_load_pd (y + i);
-          x4 = _mm256_load_pd (x + i);
-          sy4 = _mm256_add_pd (sy4, y4);
-          sx4 = _mm256_add_pd (sx4, x4);
-          syx4 = _mm256_fmadd_pd (y4, x4, syx4);
-          sxx4 = _mm256_fmadd_pd (x4, x4, sxx4);
-        }
-      _mm256_store_pd (t4, sy4);
-      sy2 = _mm_load_pd (t4);
-      sy2 = _mm_add_pd (sy2, _mm_load_pd (t4 + 2));
-      _mm256_store_pd (t4, sx4);
-      sx2 = _mm_load_pd (t4);
-      sx2 = _mm_add_pd (sx2, _mm_load_pd (t4 + 2));
-      _mm256_store_pd (t4, syx4);
-      syx2 = _mm_load_pd (t4);
-      syx2 = _mm_add_pd (syx2, _mm_load_pd (t4 + 2));
-      _mm256_store_pd (t4, sxx4);
-      sxx2 = _mm_load_pd (t4);
-      sxx2 = _mm_add_pd (sxx2, _mm_load_pd (t4 + 2));
+      mx += x[i];
+      my += y[i];
     }
-#endif
-#if __SSE4_2__
-  n2 = (n - i) >> 1;
-  if (n2)
+  mx /= (JBFLOAT) n;
+  my /= (JBFLOAT) n;
+  sx = sy = (JBFLOAT) 0.;
+  if (i < n)
     {
-      for (; n2 > 0; --n2, i += 2)
-        {
-          y2 = _mm_load_pd (y + i);
-          x2 = _mm_load_pd (x + i);
-          sy2 = _mm_add_pd (sy2, y2);
-          sx2 = _mm_add_pd (sx2, x2);
-          syx2 = _mm_fmadd_pd (y2, x2, syx2);
-          sxx2 = _mm_fmadd_pd (x2, x2, sxx2);
-        }
-      _mm_store_pd (t2, sy2);
-      sy = t2[0] + t2[1];
-      _mm_store_pd (t2, sx2);
-      sx = t2[0] + t2[1];
-      _mm_store_pd (t2, syx2);
-      syx = t2[0] + t2[1];
-      _mm_store_pd (t2, sxx2);
-      sxx = t2[0] + t2[1];
+      dx = x[i] - mx;
+      dy = y[i] - my;
+      sx += dx * dx;
+      sy += dx * dy;
     }
+  *b = sy / sx;
+  *a = my - (*b) * mx;
 #endif
-  for (; i < n; ++i)
-    {
-      sy += y[i];
-      syx += x[i] * y[i];
-      sxx += x[i] * x[i];
-      sx += x[i];
-    }
-  *b = (n * syx - sy * sx) / (n * sxx - sx * sx);
-  *a = (sy - *b * sx) / n;
 }
 
 /**

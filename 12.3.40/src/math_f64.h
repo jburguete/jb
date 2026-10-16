@@ -243,7 +243,7 @@ static const double JBM_INTEGRAL_GAUSS_B_F64[JBM_INTEGRAL_GAUSS_N] = {
 #endif
 };
 
-/**,,
+/**
  * Function to calculate the double of a double number.
  *
  * \return double double.
@@ -331,6 +331,45 @@ jbm_f64_copysign (const double x,
   sy.x = y;
   ax.i |= sy.i & JBM_F64_BITS_SIGN;
   return ax.x;
+}
+
+/**
+ * Function to calculate the fnmadd function (double).
+ *
+ * \return \f$-(x*y)+z\f$ (double).
+ */
+static inline double
+jbm_f64_fnmadd (const double x, ///< 1st multiplier (double).
+                const double y, ///< 2nd multiplier (double).
+                const double z) ///< addend (double).
+{
+  return fma (-x, y, z);
+}
+
+/**
+ * Function to calculate the fmsub function (double).
+ *
+ * \return \f$(x*y)-z\f$ (double).
+ */
+static inline double
+jbm_f64_fmsub (const double x,  ///< 1st multiplier (double).
+               const double y,  ///< 2nd multiplier (double).
+               const double z)  ///< addend (double).
+{
+  return fma (x, y, -z);
+}
+
+/**
+ * Function to calculate the fnmsub function (double).
+ *
+ * \return \f$-(x*y)-z\f$ (double).
+ */
+static inline double
+jbm_f64_fnmsub (const double x, ///< 1st multiplier (double).
+                const double y, ///< 2nd multiplier (double).
+                const double z) ///< addend (double).
+{
+  return -fma (x, y, z);
 }
 
 /**
