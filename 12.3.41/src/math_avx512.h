@@ -16998,9 +16998,9 @@ jbm_array_f32_erfc (float *xr,  ///< result float array.
 }
 
 /**
- * Function to calculate the sum of the elements of a float array.
+ * Function to calculate the summation of the elements of a float array.
  *
- * \return the sum value.
+ * \return the summation value.
  */
 static inline float
 jbm_array_f32_sum (const float *x,      ///< float array.
@@ -18083,9 +18083,9 @@ jbm_array_f64_erfc (double *xr, ///< result double array.
 }
 
 /**
- * Function to calculate the sum of the elements of a double array.
+ * Function to calculate the summation of the elements of a double array.
  *
- * \return the sum value.
+ * \return the summation value.
  */
 static inline double
 jbm_array_f64_sum (const double *x,     ///< double array.

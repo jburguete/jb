@@ -54,19 +54,19 @@
 #if defined(__APPLE__) || defined(__MACH__) \
  || defined(__OpenBSD__)
   /* macOS and OpenBSD: thread stack ~512 KB */
-  #define JB_MAX_ALLOCA_SIZE 8192u
+#define JB_MAX_ALLOCA_SIZE 8192u
 #elif defined(_WIN32) || defined(_WIN64) \
    || defined(__FreeBSD__) || defined(__NetBSD__) \
    || defined(__DragonFly__) || defined(__HAIKU__)
   /* Windows, FreeBSD, NetBSD, DragonFly, Haiku: 1-2 MB */
-  #define JB_MAX_ALLOCA_SIZE 16384u
+#define JB_MAX_ALLOCA_SIZE 16384u
 #elif defined(__linux__) || defined(__sun) || defined(__illumos__) \
    || defined(__GNU__) || defined(__gnu_hurd__)
   /* Linux, Solaris, illumos, Hurd: 8 MB */
-  #define JB_MAX_ALLOCA_SIZE 65536u
+#define JB_MAX_ALLOCA_SIZE 65536u
 #else
   /* Unknown platform: conservative value */
-  #define JB_MAX_ALLOCA_SIZE 8192u
+#define JB_MAX_ALLOCA_SIZE 8192u
 #endif
 #endif
 

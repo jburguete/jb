@@ -16448,8 +16448,8 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
     xr[i] = op (x1[i], x2, x3[i]);
 
 ///> macro to automatize operations on three arrays.
-#define JBM_ARRAY_OP4(xr, x1, x2, x3, n, type, load512, load256, load128, \
-                      store512, store256, store128, op512, op256, op128, op) \
+#define JBM_ARRAY_OP4(xr, x1, x2, x3, n, type, load256, load128, store256, \
+                      store128, op256, op128, op) \
   unsigned int i, j; \
   for (i = 0, j = n >> (3 + 8 / sizeof (type)); j > 0; --j) \
     { \
@@ -17056,9 +17056,9 @@ jbm_array_f32_erfc (float *xr,  ///< result float array.
 }
 
 /**
- * Function to calculate the sum of the elements of a float array.
+ * Function to calculate the summation of the elements of a float array.
  *
- * \return the sum value.
+ * \return the summation value.
  */
 static inline float
 jbm_array_f32_sum (const float *x,      ///< float array.
@@ -17378,8 +17378,8 @@ jbm_array_f32_fmadd1 (float *xr,        ///< result float array.
                       const unsigned int n)     ///< number of array elements.
 {
   JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m256, __m128, float, _mm256_loadu_ps,
-                _mm_loadu_ps, _mm256_storeu_ps, _mm_storeu_ps, _mm256_set1_ps,
-                _mm_set1_ps, _mm256_fmadd_ps, _mm_fmadd_ps, fmaf);
+                 _mm_loadu_ps, _mm256_storeu_ps, _mm_storeu_ps, _mm256_set1_ps,
+                 _mm_set1_ps, _mm256_fmadd_ps, _mm_fmadd_ps, fmaf);
 }
 
 /**
@@ -17394,8 +17394,8 @@ jbm_array_f32_fnmadd1 (float *xr,       ///< result float array.
                        const unsigned int n)    ///< number of array elements.
 {
   JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m256, __m128, float, _mm256_loadu_ps,
-                _mm_loadu_ps, _mm256_storeu_ps, _mm_storeu_ps, _mm256_set1_ps,
-                _mm_set1_ps, _mm256_fnmadd_ps, _mm_fnmadd_ps, jbm_f32_fnmadd);
+                 _mm_loadu_ps, _mm256_storeu_ps, _mm_storeu_ps, _mm256_set1_ps,
+                 _mm_set1_ps, _mm256_fnmadd_ps, _mm_fnmadd_ps, jbm_f32_fnmadd);
 }
 
 /**
@@ -17410,8 +17410,8 @@ jbm_array_f32_fmsub1 (float *xr,        ///< result float array.
                       const unsigned int n)     ///< number of array elements.
 {
   JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m256, __m128, float, _mm256_loadu_ps,
-                _mm_loadu_ps, _mm256_storeu_ps, _mm_storeu_ps, _mm256_set1_ps,
-                _mm_set1_ps, _mm256_fmsub_ps, _mm_fmsub_ps, jbm_f32_fmsub);
+                 _mm_loadu_ps, _mm256_storeu_ps, _mm_storeu_ps, _mm256_set1_ps,
+                 _mm_set1_ps, _mm256_fmsub_ps, _mm_fmsub_ps, jbm_f32_fmsub);
 }
 
 /**
@@ -17426,8 +17426,8 @@ jbm_array_f32_fnmsub1 (float *xr,       ///< result float array.
                        const unsigned int n)    ///< number of array elements.
 {
   JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m256, __m128, float, _mm256_loadu_ps,
-                _mm_loadu_ps, _mm256_storeu_ps, _mm_storeu_ps, _mm256_set1_ps,
-                _mm_set1_ps, _mm256_fnmsub_ps, _mm_fnmsub_ps, jbm_f32_fnmsub);
+                 _mm_loadu_ps, _mm256_storeu_ps, _mm_storeu_ps, _mm256_set1_ps,
+                 _mm_set1_ps, _mm256_fnmsub_ps, _mm_fnmsub_ps, jbm_f32_fnmsub);
 }
 
 /**
@@ -17997,9 +17997,9 @@ jbm_array_f64_erfc (double *xr, ///< result double array.
 }
 
 /**
- * Function to calculate the sum of the elements of a double array.
+ * Function to calculate the summation of the elements of a double array.
  *
- * \return the sum value.
+ * \return the summation value.
  */
 static inline double
 jbm_array_f64_sum (const double *x,     ///< double array.
@@ -18330,8 +18330,8 @@ jbm_array_f64_fmadd1 (double *xr,       ///< result double array.
                       const unsigned int n)     ///< number of array elements.
 {
   JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m256d, __m128d, double, _mm256_loadu_pd,
-                _mm_loadu_pd, _mm256_storeu_pd, _mm_storeu_pd, _mm256_set1_pd,
-                _mm_set1_pd, _mm256_fmadd_pd, _mm_fmadd_pd, fma);
+                 _mm_loadu_pd, _mm256_storeu_pd, _mm_storeu_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm256_fmadd_pd, _mm_fmadd_pd, fma);
 }
 
 /**
@@ -18347,8 +18347,8 @@ jbm_array_f64_fnmadd1 (double *xr,      ///< result double array.
                        const unsigned int n)    ///< number of array elements.
 {
   JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m256d, __m128d, double, _mm256_loadu_pd,
-                _mm_loadu_pd, _mm256_storeu_pd, _mm_storeu_pd, _mm256_set1_pd,
-                _mm_set1_pd, _mm256_fnmadd_pd, _mm_fnmadd_pd, jbm_f64_fnmadd);
+                 _mm_loadu_pd, _mm256_storeu_pd, _mm_storeu_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm256_fnmadd_pd, _mm_fnmadd_pd, jbm_f64_fnmadd);
 }
 
 /**
@@ -18363,8 +18363,8 @@ jbm_array_f64_fmsub1 (double *xr,       ///< result double array.
                       const unsigned int n)     ///< number of array elements.
 {
   JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m256d, __m128d, double, _mm256_loadu_pd,
-                _mm_loadu_pd, _mm256_storeu_pd, _mm_storeu_pd, _mm256_set1_pd,
-                _mm_set1_pd, _mm256_fmsub_pd, _mm_fmsub_pd, jbm_f64_fmsub);
+                 _mm_loadu_pd, _mm256_storeu_pd, _mm_storeu_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm256_fmsub_pd, _mm_fmsub_pd, jbm_f64_fmsub);
 }
 
 /**
@@ -18380,8 +18380,8 @@ jbm_array_f64_fnmsub1 (double *xr,      ///< result double array.
                        const unsigned int n)    ///< number of array elements.
 {
   JBM_ARRAY_OP3 (xr, x1, x2, x3, n, __m256d, __m128d, double, _mm256_loadu_pd,
-                _mm_loadu_pd, _mm256_storeu_pd, _mm_storeu_pd, _mm256_set1_pd,
-                _mm_set1_pd, _mm256_fnmsub_pd, _mm_fnmsub_pd, jbm_f64_fnmsub);
+                 _mm_loadu_pd, _mm256_storeu_pd, _mm_storeu_pd, _mm256_set1_pd,
+                 _mm_set1_pd, _mm256_fnmsub_pd, _mm_fnmsub_pd, jbm_f64_fnmsub);
 }
 
 /**

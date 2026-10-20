@@ -2869,8 +2869,7 @@ jbm_farray_set1 (JBMFarray *fa, ///< pointer to the JBMFarray struct.
 #elif JBM_LOW_PRECISION == 2
   jbm_array_f64_set1 (xa, x, n);
 #else
-  i = 0;
-  for (; i < n; ++i)
+  for (i = 0; i < n; ++i)
     xa[i] = x;
 #endif
 }
@@ -3369,8 +3368,8 @@ jbm_farray_exp2 (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the exp function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_exp (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_exp (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *fd)    ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3390,8 +3389,8 @@ jbm_farray_exp (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the exp10 function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_exp10 (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_exp10 (JBMFarray *fr,        ///< result JBMFarray struct.
+                  const JBMFarray *fd)  ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3411,8 +3410,8 @@ jbm_farray_exp10 (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the expm1 function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_expm1 (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_expm1 (JBMFarray *fr,        ///< result JBMFarray struct.
+                  const JBMFarray *fd)  ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3453,8 +3452,8 @@ jbm_farray_log2 (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the log function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_log (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_log (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *fd)    ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3474,8 +3473,8 @@ jbm_farray_log (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the log10 function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_log10 (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_log10 (JBMFarray *fr,        ///< result JBMFarray struct.
+                  const JBMFarray *fd)  ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3495,8 +3494,8 @@ jbm_farray_log10 (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the sin function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_sin (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_sin (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *fd)    ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3516,8 +3515,8 @@ jbm_farray_sin (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the cos function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_cos (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_cos (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *fd)    ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3537,8 +3536,8 @@ jbm_farray_cos (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the tan function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_tan (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_tan (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *fd)    ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3684,8 +3683,8 @@ jbm_farray_tanh (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the asinh function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_asinh (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_asinh (JBMFarray *fr,        ///< result JBMFarray struct.
+                  const JBMFarray *fd)  ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3705,8 +3704,8 @@ jbm_farray_asinh (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the acosh function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_acosh (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_acosh (JBMFarray *fr,        ///< result JBMFarray struct.
+                  const JBMFarray *fd)  ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3726,8 +3725,8 @@ jbm_farray_acosh (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the atanh function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_atanh (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_atanh (JBMFarray *fr,        ///< result JBMFarray struct.
+                  const JBMFarray *fd)  ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3747,8 +3746,8 @@ jbm_farray_atanh (JBMFarray *fr, ///< result JBMFarray struct.
  * Function to calculate the erf function of a JBMFarray struct.
  */
 static inline void
-jbm_farray_erf (JBMFarray *fr, ///< result JBMFarray struct.
-                 const JBMFarray *fd)   ///< data JBMFarray struct.
+jbm_farray_erf (JBMFarray *fr,  ///< result JBMFarray struct.
+                const JBMFarray *fd)    ///< data JBMFarray struct.
 {
   const JBFLOAT *xd = fd->x;
   const unsigned int n = fr->n;
@@ -3786,6 +3785,116 @@ jbm_farray_erfc (JBMFarray *fr, ///< result JBMFarray struct.
 }
 
 /**
+ * Function to calculate the summation of the elements of JBMFarray struct.
+ *
+ * \return the summation value (JBFLOAT).
+ */
+static inline JBFLOAT
+jbm_farray_sum (JBMFarray *f)   ///< JBMFarray struct.
+{
+  const JBFLOAT *x = f->x;
+  const unsigned int n = f->n;
+#if JBM_LOW_PRECISION == 1
+  return jbm_array_f32_sum (x, n);
+#elif JBM_LOW_PRECISION == 2
+  return jbm_array_f64_sum (x, n);
+#else
+  JBFLOAT s;
+  unsigned int i;
+  for (i = 0, s = x[0]; ++i < n;)
+    s += x[i];
+  return s;
+#endif
+}
+
+/**
+ * Function to find the highest element of a JBMFarray struct.
+ *
+ * \return the highest value (JBFLOAT).
+ */
+static inline JBFLOAT
+jbm_farray_max (JBMFarray *f)   ///< JBMFarray struct.
+{
+  const JBFLOAT *x = f->x;
+  const unsigned int n = f->n;
+#if JBM_LOW_PRECISION == 1
+  return jbm_array_f32_reduce_max (x, n);
+#elif JBM_LOW_PRECISION == 2
+  return jbm_array_f64_reduce_max (x, n);
+#else
+  JBFLOAT s;
+  unsigned int i;
+  for (i = 0, s = x[0]; ++i < n;)
+    s = FMAX (s, x[i]);
+  return s;
+#endif
+}
+
+/**
+ * Function to find the lowest element of a JBMFarray struct.
+ *
+ * \return the lowest value (JBFLOAT).
+ */
+static inline JBFLOAT
+jbm_farray_min (JBMFarray *f)   ///< JBMFarray struct.
+{
+  const JBFLOAT *x = f->x;
+  const unsigned int n = f->n;
+#if JBM_LOW_PRECISION == 1
+  return jbm_array_f32_reduce_min (x, n);
+#elif JBM_LOW_PRECISION == 2
+  return jbm_array_f64_reduce_min (x, n);
+#else
+  JBFLOAT s;
+  unsigned int i;
+  for (i = 0, s = x[0]; ++i < n;)
+    s = FMIN (s, x[i]);
+  return s;
+#endif
+}
+
+/**
+ * Function to find the highest and the lowest elements of a JBMFarray struct.
+ */
+static inline void
+jbm_farray_maxmin (const JBMFarray *f,  ///< JBMFarray struct.
+                   JBFLOAT *max,        ///< the highest value (JBFLOAT).
+                   JBFLOAT *min)        ///< the lowest value (JBFLOAT).
+{
+  const JBFLOAT *x = f->x;
+  const unsigned int n = f->n;
+#if JBM_LOW_PRECISION == 1
+  jbm_array_f32_reduce_maxmin (x, max, min, n);
+#elif JBM_LOW_PRECISION == 2
+  jbm_array_f64_reduce_maxmin (x, max, min, n);
+#else
+  JBFLOAT kmax, kmin;
+  unsigned int i;
+  for (i = 0, kmax = kmin = x[0]; ++i < n;)
+    {
+      kmax = FMAX (kmax, x[i]);
+      kmin = FMIN (kmin, x[i]);
+    }
+  *max = kmax, *min = kmin;
+#endif
+}
+
+/**
+ * Function to interchange 2 JBMFarray structs.
+ */
+static inline void
+jbm_farray_change (JBMFarray *restrict fa,      ///< 1st JBMFarray struct.
+                   JBMFarray *restrict fb)      ///< 2nd JBMFarray struct.
+{
+  JBMFarray fc[1];
+  size_t s;
+  s = sizeof (JBMFarray);
+  memcpy (fc, fa, s);
+  memcpy (fa, fb, s);
+  memcpy (fb, fc, s);
+}
+
+/**
  * Function to search the interval where a number is in a increasingly sorted
  * JBMFarray.
  *
@@ -3811,128 +3920,6 @@ jbm_farray_search (const JBMFarray *fa, ///< JBMFarray struct.
 }
 
 /**
- * Function to search the interval where a number is in a increasingly sorted
- * array of JBFLOAT numbers.
- * \return interval number, -1 if x<fa[0] or n-1 if x>fa[n-1].
- */
-static inline int
-jbm_farray_search_extended (const JBMFarray *fa,        ///< JBMFarray struct.
-                            const JBFLOAT x)    ///< number to search.
-{
-  JBFLOAT *xx;
-  xx = fa->x;
-  if (x < xx[0])
-    return -1;
-  if (x >= xx[fa->last])
-    return (int) fa->last;
-  return (int) jbm_farray_search (fa, x);
-}
-
-/**
- * Function to find the highest element of a JBMFarray struct.
- *
- * \return the highest value.
- */
-static inline JBFLOAT
-jbm_farray_max (const JBMFarray *fa)    ///< JBMFarray struct.
-{
-  JBFLOAT *xx;
-  JBFLOAT k;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fa->n;
-  xx = fa->x;
-#if JBM_LOW_PRECISION == 1
-  k = jbm_array_f32_reduce_max (xx, n);
-#elif JBM_LOW_PRECISION == 2
-  k = jbm_array_f64_reduce_max (xx, n);
-#else
-  k = xx[0];
-  for (i = 1; i < n; ++i)
-    k = FMAX (k, xx[i]);
-#endif
-  return k;
-}
-
-/**
- * Function to find the lowest element of a JBMFarray struct.
- *
- * \return the lowest value.
- */
-static inline JBFLOAT
-jbm_farray_min (const JBMFarray *fa)    ///< JBMFarray struct.
-{
-  JBFLOAT *xx;
-  JBFLOAT k;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  unsigned int i;
-#endif
-  n = fa->n;
-  xx = fa->x;
-#if JBM_LOW_PRECISION == 1
-  k = jbm_array_f32_reduce_min (xx, n);
-#elif JBM_LOW_PRECISION == 2
-  k = jbm_array_f64_reduce_min (xx, n);
-#else
-  k = xx[0];
-  for (i = 1; i < n; ++i)
-    k = FMIN (k, xx[i]);
-#endif
-  return k;
-}
-
-/**
- * Function to find the highest and the lowest elements of a JBMFarray struct.
- */
-static inline void
-jbm_farray_maxmin (const JBMFarray *fa, ///< JBMFarray struct.
-                   JBFLOAT *max,        ///< the highest value.
-                   JBFLOAT *min)        ///< the lowest value.
-{
-  JBFLOAT *xx;
-  unsigned int n;
-#if JBM_LOW_PRECISION > 2
-  JBFLOAT kmax, kmin;
-  unsigned int i;
-#endif
-  n = fa->n;
-  xx = fa->x;
-#if JBM_LOW_PRECISION == 1
-  jbm_array_f32_reduce_maxmin (xx, max, min, n);
-#elif JBM_LOW_PRECISION == 2
-  jbm_array_f64_reduce_maxmin (xx, max, min, n);
-#else
-  kmax = xx[0], kmin = xx[0];
-  for (i = 1; i < n; ++i)
-    {
-      if (kmax < xx[i])
-        kmax = xx[i];
-      else if (kmin > xx[i])
-        kmin = xx[i];
-    }
-  *max = kmax, *min = kmin;
-#endif
-}
-
-/**
- * Function to interchange 2 JBMFarray structs.
- */
-static inline void
-jbm_farray_change (JBMFarray *restrict fa,      ///< 1st JBMFarray struct.
-                   JBMFarray *restrict fb)      ///< 2nd JBMFarray struct.
-{
-  JBMFarray fc[1];
-  size_t s;
-  s = sizeof (JBMFarray);
-  memcpy (fc, fa, s);
-  memcpy (fa, fb, s);
-  memcpy (fb, fc, s);
-}
-
-/**
  * Function to calculate the y-coordinate of a 2D point interpolated 
  * between a tabular function defined by 2 JBMFarray structs.
  *
@@ -3953,6 +3940,24 @@ jbm_farray_interpolate (const JBMFarray *fa,
     return fy[i];
   fx = fa->x;
   return jbm_interpolate (x, fx[i], fx[i + 1], fy[i], fy[i + 1]);
+}
+
+/**
+ * Function to search the interval where a number is in a increasingly sorted
+ * array of JBFLOAT numbers.
+ * \return interval number, -1 if x<fa[0] or n-1 if x>fa[n-1].
+ */
+static inline int
+jbm_farray_search_extended (const JBMFarray *fa,        ///< JBMFarray struct.
+                            const JBFLOAT x)    ///< number to search.
+{
+  JBFLOAT *xx;
+  xx = fa->x;
+  if (x < xx[0])
+    return -1;
+  if (x >= xx[fa->last])
+    return (int) fa->last;
+  return (int) jbm_farray_search (fa, x);
 }
 
 /**
@@ -5138,8 +5143,8 @@ jbm_matrix_solve (JBFLOAT *x,   ///< matrix storing the linear equations system.
       for (j = n, g = f - n; --j > i; g -= n)
         *g -= *(g - i) * k1;
     }
-  JBM_FARRAY_DESTROY (fa + 1)
-  JBM_FARRAY_DESTROY (fa)
+  JBM_FARRAY_DESTROY (fa + 1);
+  JBM_FARRAY_DESTROY (fa);
 }
 
 /**

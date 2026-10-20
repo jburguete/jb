@@ -49881,9 +49881,9 @@ jbm_array_f32_erfc (float *restrict xr, ///< result float array.
 }
 
 /**
- * Function to calculate the sum of the elements of a float array.
+ * Function to calculate the summation of the elements of a float array.
  *
- * \return the sum value.
+ * \return the summation value.
  */
 static inline float
 jbm_array_f32_sum (const float *x,      ///< float array.
@@ -50289,9 +50289,9 @@ jbm_array_f32_regression_linear (const float *x,
   sy2 = __riscv_vfadd_vv_f32m1 (sy2, sy3, vlmax);
   sy0 = __riscv_vfadd_vv_f32m1 (sy0, sy2, vlmax);
   mx = __riscv_vfmv_f_s_f32m1_f32
-       (__riscv_vfredusum_vs_f32m1_f32m1 (sx0, zero, vlmax));
+    (__riscv_vfredusum_vs_f32m1_f32m1 (sx0, zero, vlmax));
   my = __riscv_vfmv_f_s_f32m1_f32
-       (__riscv_vfredusum_vs_f32m1_f32m1 (sy0, zero, vlmax));
+    (__riscv_vfredusum_vs_f32m1_f32m1 (sy0, zero, vlmax));
   mx /= (float) n;
   my /= (float) n;
   mx2 = __riscv_vfmv_v_f_f32m1 (mx, vlmax);
@@ -50370,9 +50370,9 @@ jbm_array_f32_regression_linear (const float *x,
   sy2 = __riscv_vfadd_vv_f32m1 (sy2, sy3, vlmax);
   sy0 = __riscv_vfadd_vv_f32m1 (sy0, sy2, vlmax);
   sx = __riscv_vfmv_f_s_f32m1_f32
-       (__riscv_vfredusum_vs_f32m1_f32m1 (sx0, zero, vlmax));
+    (__riscv_vfredusum_vs_f32m1_f32m1 (sx0, zero, vlmax));
   sy = __riscv_vfmv_f_s_f32m1_f32
-       (__riscv_vfredusum_vs_f32m1_f32m1 (sy0, zero, vlmax));
+    (__riscv_vfredusum_vs_f32m1_f32m1 (sy0, zero, vlmax));
   *b = sy / sx;
   *a = my - (*b) * mx;
 }
@@ -50726,9 +50726,9 @@ jbm_array_f64_erfc (double *restrict xr,        ///< result double array.
 }
 
 /**
- * Function to calculate the sum of the elements of a double array.
+ * Function to calculate the summation of the elements of a double array.
  *
- * \return the sum value.
+ * \return the summation value.
  */
 static inline double
 jbm_array_f64_sum (const double *x,     ///< double array.
@@ -51048,7 +51048,7 @@ jbm_array_f64_fnmsub1 (double *xr,      ///< result double array.
                        const double *x1,
                        ///< 1st multiplicand double array.
                        const double x2, ///< 2nd multiplicand double number.
-                       const double *x3,         ///< subtrahend double array.
+                       const double *x3,        ///< subtrahend double array.
                        const unsigned int n)    ///< number of array elements.
 {
   JBM_ARRAY_OP3 (xr, x1, x2, x3, n, double, __riscv_vle64_v_f64m1,
@@ -51137,9 +51137,9 @@ jbm_array_f64_regression_linear (const double *x,
   sy2 = __riscv_vfadd_vv_f64m1 (sy2, sy3, vlmax);
   sy0 = __riscv_vfadd_vv_f64m1 (sy0, sy2, vlmax);
   mx = __riscv_vfmv_f_s_f64m1_f64
-       (__riscv_vfredusum_vs_f64m1_f64m1 (sx0, zero, vlmax));
+    (__riscv_vfredusum_vs_f64m1_f64m1 (sx0, zero, vlmax));
   my = __riscv_vfmv_f_s_f64m1_f64
-       (__riscv_vfredusum_vs_f64m1_f64m1 (sy0, zero, vlmax));
+    (__riscv_vfredusum_vs_f64m1_f64m1 (sy0, zero, vlmax));
   mx /= (double) n;
   my /= (double) n;
   mx2 = __riscv_vfmv_v_f_f64m1 (mx, vlmax);
@@ -51218,9 +51218,9 @@ jbm_array_f64_regression_linear (const double *x,
   sy2 = __riscv_vfadd_vv_f64m1 (sy2, sy3, vlmax);
   sy0 = __riscv_vfadd_vv_f64m1 (sy0, sy2, vlmax);
   sx = __riscv_vfmv_f_s_f64m1_f64
-       (__riscv_vfredusum_vs_f64m1_f64m1 (sx0, zero, vlmax));
+    (__riscv_vfredusum_vs_f64m1_f64m1 (sx0, zero, vlmax));
   sy = __riscv_vfmv_f_s_f64m1_f64
-       (__riscv_vfredusum_vs_f64m1_f64m1 (sy0, zero, vlmax));
+    (__riscv_vfredusum_vs_f64m1_f64m1 (sy0, zero, vlmax));
   *b = sy / sx;
   *a = my - (*b) * mx;
 }

@@ -16304,8 +16304,7 @@ jbm_2xf64_integral (__m128d (*f) (__m128d),
     xr[i] = op (x1[i], x2, x3[i]);
 
 ///> macro to automatize operations on three arrays.
-#define JBM_ARRAY_OP4(xr, x1, x2, x3, n, type, load512, load256, load128, \
-                      store512, store256, store128, op512, op256, op128, op) \
+#define JBM_ARRAY_OP4(xr, x1, x2, x3, n, type, load128, store128, op128, op) \
   unsigned int i, j; \
   for (i = 0, j = n >> (2 + 8 / sizeof (type)); j > 0; --j) \
     { \
@@ -16832,9 +16831,9 @@ jbm_array_f32_erfc (float *restrict xr, ///< result float array.
 }
 
 /**
- * Function to calculate the sum of the elements of a float array.
+ * Function to calculate the summation of the elements of a float array.
  *
- * \return the sum value.
+ * \return the summation value.
  */
 static inline float
 jbm_array_f32_sum (const float *x,      ///< float array.
@@ -17688,9 +17687,9 @@ jbm_array_f64_erfc (double *restrict xr,        ///< result double array.
 }
 
 /**
- * Function to calculate the sum of the elements of a double array.
+ * Function to calculate the summation of the elements of a double array.
  *
- * \return the sum value.
+ * \return the summation value.
  */
 static inline double
 jbm_array_f64_sum (const double *x,     ///< double array.
@@ -18063,8 +18062,8 @@ jbm_array_f64_fnmadd (double *xr,       ///< result double array.
                       const double *x3, ///< addend double array.
                       const unsigned int n)     ///< number of array elements.
 {
-  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, _mm_loadu_pd, _mm256_storeu_pd,
-                 _mm_storeu_pd, _mm_fnmadd_pd, jbm_f64_fnmadd);
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, _mm_loadu_pd, _mm_storeu_pd,
+                 _mm_fnmadd_pd, jbm_f64_fnmadd);
 }
 
 /**
