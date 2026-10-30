@@ -3921,7 +3921,7 @@ jbm_f64_log2 (const double x)   ///< double number.
     return NAN;
   if (x == 0.)
     return -INFINITY;
-  if (!finite (x))
+  if (!isfinite (x))
     return x;
   y = jbm_f64_frexp (x, &e);
   if (y < M_SQRT1_2)

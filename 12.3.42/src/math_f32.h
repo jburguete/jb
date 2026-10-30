@@ -3881,7 +3881,7 @@ jbm_f32_log2 (const float x)    ///< float number.
     return NAN;
   if (x == 0.f)
     return -INFINITY;
-  if (!finitef (x))
+  if (!isfinite (x))
     return x;
   y = jbm_f32_frexp (x, &e);
   m = y < M_SQRT1_2f;
