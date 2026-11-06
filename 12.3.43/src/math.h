@@ -47,6 +47,9 @@
 #ifdef __ARM_NEON
 #include <arm_neon.h>
 #endif
+#ifdef __ARM_FEATURE_SVE2
+#include <arm_sve.h>
+#endif
 #ifdef __riscv_vector
 #include <riscv_vector.h>
 #endif
@@ -66,10 +69,9 @@
  * \def JBM_AVX512
  * \brief macro to define the AVX512 vectorial extension.
  */
-#if __AVX512F__ && __AVX512BW__ && __AVX512CD__ && __AVX512DQ__ && __AVX512VL__
+#if defined(__AVX512F__) && defined(__AVX512BW__) && defined(__AVX512CD__) \
+  && defined(__AVX512DQ__) && defined(__AVX512VL__)
 #define JBM_AVX512 1
-#else
-#define JBM_AVX512 0
 #endif
 
 /**
@@ -860,17 +862,19 @@ enum JBMFluxLimiterType
 
 #include "math_f32.h"
 #include "math_f64.h"
-#if __SSE4_2__
+#ifdef __SSE4_2__
 #include "math_sse.h"
-#if __AVX2__
+#ifdef __AVX2__
 #include "math_avx.h"
-#if JBM_AVX512
+#ifdef JBM_AVX512
 #include "math_avx512.h"
 #endif
 #endif
-#elif __ARM_NEON
+#elif defined (__ARM_FEATURE_SVE2)
+#include "math_sve.h"
+#elif defined (__ARM_NEON)
 #include "math_neon.h"
-#elif __riscv_vector
+#elif defined (__riscv_vector)
 #include "math_riscv.h"
 #endif
 

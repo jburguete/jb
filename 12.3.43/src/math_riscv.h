@@ -401,6 +401,93 @@
   *xmax = red (mx0); \
   *xmin = red (mn0);
 
+///> macro to automatize dot products on arrays.
+#define JBM_ARRAY_DOT(x1, x2, n, type, vtype, load, mul, fma, add, rop, red, \
+                      vec) \
+  const size_t vlmax = JBM_VLMAX (type); \
+  const vtype z = vec ((type) 0., vlmax); \
+  vtype a, b, c, d; \
+  size_t i, vl; \
+  i = 0; \
+  if (n >= (vlmax << 2)) \
+    { \
+      a = mul (load (x1, vlmax), load (x2, vlmax), vlmax); \
+      i += vlmax; \
+      b = mul (load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+      i += vlmax; \
+      c = mul (load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+      i += vlmax; \
+      d = mul (load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+      i += vlmax; \
+      while ((n - i) >= (vlmax << 2)) \
+        { \
+          a = fma (a, load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+          i += vlmax; \
+          b = fma (b, load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+          i += vlmax; \
+          c = fma (c, load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+          i += vlmax; \
+          d = fma (d, load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+          i += vlmax; \
+        } \
+      if ((n - i) >= (vlmax << 1)) \
+        { \
+          a = fma (a, load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+          i += vlmax; \
+          b = fma (b, load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+          i += vlmax; \
+        } \
+      if ((n - i) >= vlmax) \
+        { \
+          a = fma (a, load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+          i += vlmax; \
+        } \
+      a = add (a, b, vlmax); \
+      c = add (c, d, vlmax); \
+      a = add (a, c, vlmax); \
+      a = rop (a, z, vlmax); \
+      if (i < n) \
+        { \
+          vl = JBM_VL (type, n - i); \
+          a = rop (mul (load (x1 + i, vl), load (x2 + i, vl), vl), a, vl); \
+        } \
+      return red (a); \
+    } \
+  if (n >= (vlmax << 1)) \
+    { \
+      a = mul (load (x1, vlmax), load (x2, vlmax), vlmax); \
+      i += vlmax; \
+      b = mul (load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+      i += vlmax; \
+      if ((n - i) >= vlmax) \
+        { \
+          a = fma (a, load (x1 + i, vlmax), load (x2 + i, vlmax), vlmax); \
+          i += vlmax; \
+        } \
+      a = add (a, b, vlmax); \
+      a = rop (a, z, vlmax); \
+      if (i < n) \
+        { \
+          vl = JBM_VL (type, n - i); \
+          a = rop (mul (load (x1 + i, vl), load (x2 + i, vl), vl), a, vl); \
+        } \
+      return red (a); \
+    } \
+  if (n >= vlmax) \
+    { \
+      a = mul (load (x1, vlmax), load (x2, vlmax), vlmax); \
+      i += vlmax; \
+      a = rop (a, z, vlmax); \
+      if (i < n) \
+        { \
+          vl = JBM_VL (type, n - i); \
+          a = rop (mul (load (x1 + i, vl), load (x2 + i, vl), vl), a, vl); \
+        } \
+      return red (a); \
+    } \
+  vl = JBM_VL (type, n); \
+  return red (rop (mul (load (x1, vl), load (x2, vl), vl), z, vl));
+
 // Debug functions
 
 static inline void
@@ -10561,8 +10648,7 @@ static inline vfloat32m1_t jbm_nxf32_cbrtwc (const vfloat32m1_t x,
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_nxf32_abs and
- * jbm_nxf32_pow functions (vfloat32m1_t).
+ * Function to calculate the function cbrt(x) (vfloat32m1_t).
  *
  * \return function value (vfloat32m1_t).
  */
@@ -10800,11 +10886,26 @@ jbm_nxf32_pown (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_nxf32_pow (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
-               const float e,   ///< exponent (float).
-               const size_t vl) ///< array size.
+jbm_nxf32_pow1 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
+                const float e,  ///< exponent (float).
+                const size_t vl)        ///< array size.
 {
   return jbm_nxf32_exp2 (__riscv_vfmul_vf_f32m1 (jbm_nxf32_log2 (x, vl), e, vl),
+                         vl);
+}
+
+/**
+ * Function to calculate the function pow using the jbm_nxf32_exp2 and
+ * jbm_nxf32_log2 functions (vfloat32m1_t).
+ *
+ * \return function value (vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_nxf32_pow (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
+               const vfloat32m1_t e,    ///< exponent (vfloat32m1_t).
+               const size_t vl) ///< array size.
+{
+  return jbm_nxf32_exp2 (__riscv_vfmul_vv_f32m1 (jbm_nxf32_log2 (x, vl), e, vl),
                          vl);
 }
 
@@ -21871,8 +21972,7 @@ static inline vfloat64m1_t jbm_nxf64_cbrtwc (const vfloat64m1_t x,
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_nxf64_abs and
- * jbm_nxf64_pow functions (vfloat64m1_t).
+ * Function to calculate the function cbrt(x) (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
  */
@@ -22101,11 +22201,26 @@ jbm_nxf64_pown (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  * \return function value (vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_nxf64_pow (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
-               const double e,  ///< exponent (vfloat64m1_t).
-               const size_t vl) ///< array size.
+jbm_nxf64_pow1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                const double e, ///< exponent (double).
+                const size_t vl)        ///< array size.
 {
   return jbm_nxf64_exp2 (__riscv_vfmul_vf_f64m1 (jbm_nxf64_log2 (x, vl), e, vl),
+                         vl);
+}
+
+/**
+ * Function to calculate the function f64 using the jbm_nxf64_exp2 and
+ * jbm_nxf64_log2 functions.
+ *
+ * \return function value (vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_nxf64_pow (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
+               const vfloat64m1_t e,    ///< exponent (vfloat64m1_t).
+               const size_t vl) ///< array size.
+{
+  return jbm_nxf64_exp2 (__riscv_vfmul_vv_f64m1 (jbm_nxf64_log2 (x, vl), e, vl),
                          vl);
 }
 
@@ -29143,15 +29258,27 @@ jbm_4xf32_pown (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
  * \return function value (4x vfloat32m1_t).
  */
 static inline vfloat32m1_t
+jbm_4xf32_pow1 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
+                const float e)  ///< exponent (float).
+{
+  return jbm_nxf32_pow1 (x, e, 4);
+}
+
+/**
+ * Function to calculate the function pow using the jbm_4xf32_exp2 and
+ * jbm_4xf32_log2 functions (4x vfloat32m1_t).
+ *
+ * \return function value (4x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
 jbm_4xf32_pow (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
-               const float e)   ///< exponent (float).
+               const vfloat32m1_t e)    ///< exponent (vfloat32m1_t).
 {
   return jbm_nxf32_pow (x, e, 4);
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_4xf32_abs and
- * jbm_4xf32_pow functions (4x vfloat32m1_t).
+ * Function to calculate the function cbrt(x) (4x vfloat32m1_t).
  *
  * \return function value (4x vfloat32m1_t).
  */
@@ -35741,15 +35868,27 @@ jbm_2xf64_pown (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  * \return function value (2x vfloat64m1_t).
  */
 static inline vfloat64m1_t
+jbm_2xf64_pow1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                const double e) ///< exponent (double).
+{
+  return jbm_nxf64_pow1 (x, e, 2);
+}
+
+/**
+ * Function to calculate the function pow using the jbm_2xf64_exp2 and
+ * jbm_2xf64_log2 functions (2x vfloat64m1_t).
+ *
+ * \return function value (2x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
 jbm_2xf64_pow (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
-               const double e)  ///< exponent (float).
+               const vfloat64m1_t e)    ///< exponent (vfloat64m1_t).
 {
   return jbm_nxf64_pow (x, e, 2);
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_2xf64_abs and
- * jbm_2xf64_pow functions (2x vfloat64m1_t).
+ * Function to calculate the function cbrt(x) (2x vfloat64m1_t).
  *
  * \return function value (2x vfloat64m1_t).
  */
@@ -42339,15 +42478,27 @@ jbm_8xf32_pown (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
  * \return function value (8x vfloat32m1_t).
  */
 static inline vfloat32m1_t
+jbm_8xf32_pow1 (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
+                const float e)  ///< exponent (float).
+{
+  return jbm_nxf32_pow1 (x, e, 8);
+}
+
+/**
+ * Function to calculate the function pow using the jbm_8xf32_exp2 and
+ * jbm_8xf32_log2 functions (8x vfloat32m1_t).
+ *
+ * \return function value (8x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
 jbm_8xf32_pow (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
-               const float e)   ///< exponent (float).
+               const vfloat32m1_t e)    ///< exponent (float).
 {
   return jbm_nxf32_pow (x, e, 8);
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_8xf32_abs and
- * jbm_8xf32_pow functions (8x vfloat32m1_t).
+ * Function to calculate the function cbrt(x) (8x vfloat32m1_t).
  *
  * \return function value (8x vfloat32m1_t).
  */
@@ -48937,15 +49088,27 @@ jbm_4xf64_pown (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
  * \return function value (4x vfloat64m1_t).
  */
 static inline vfloat64m1_t
+jbm_4xf64_pow1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                const double e) ///< exponent (double).
+{
+  return jbm_nxf64_pow1 (x, e, 4);
+}
+
+/**
+ * Function to calculate the function pow using the jbm_4xf64_exp2 and
+ * jbm_4xf64_log2 functions (4x vfloat64m1_t).
+ *
+ * \return function value (4x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
 jbm_4xf64_pow (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
-               const double e)  ///< exponent (float).
+               const vfloat64m1_t e)    ///< exponent (vfloat64m1_t).
 {
   return jbm_nxf64_pow (x, e, 4);
 }
 
 /**
- * Function to calculate the function cbrt(x) using the jbm_4xf64_abs and
- * jbm_4xf64_pow functions (4x vfloat64m1_t).
+ * Function to calculate the function cbrt(x) (4x vfloat64m1_t).
  *
  * \return function value (4x vfloat64m1_t).
  */
@@ -50054,7 +50217,7 @@ jbm_array_f32_pow1 (float *xr,  ///< result float array.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, float, __riscv_vle32_v_f32m1,
-                 __riscv_vse32_v_f32m1, jbm_nxf32_pow);
+                 __riscv_vse32_v_f32m1, jbm_nxf32_pow1);
 }
 
 /**
@@ -50146,6 +50309,35 @@ jbm_array_f32_mod (float *xr,   ///< result float array.
 {
   JBM_ARRAY_OP2 (xr, x1, x2, n, float, __riscv_vle32_v_f32m1,
                  __riscv_vse32_v_f32m1, jbm_nxf32_mod);
+}
+
+/**
+ * Function to calculate the pow function between 2 float arrays.
+ */
+static inline void
+jbm_array_f32_pow (float *xr,   ///< result float array.
+                   const float *x1,     ///< float array.
+                   const float *x2,     ///< float array.
+                   const unsigned int n)       ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, float, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, jbm_nxf32_pow);
+}
+
+/**
+ * Function to do the dot product of 2 float arrays.
+ *
+ * \return dot product (float).
+ */
+static inline float
+jbm_array_f32_dot (const float *x1,     ///< multiplier float array.
+                   const float *x2,     ///< multiplicand float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_DOT (x1, x2, n, float, vfloat32m1_t, __riscv_vle32_v_f32m1,
+                 __riscv_vfmul_vv_f32m1, __riscv_vfmacc_vv_f32m1,
+                 __riscv_vfadd_vv_f32m1, __riscv_vfredusum_vs_f32m1_f32m1,
+                 __riscv_vfmv_f_s_f32m1_f32, __riscv_vfmv_v_f_f32m1);
 }
 
 /**
@@ -50899,7 +51091,7 @@ jbm_array_f64_pow1 (double *xr, ///< result double array.
                     const unsigned int n)       ///< number of array elements.
 {
   JBM_ARRAY_OP1 (xr, x1, x2, n, double, __riscv_vle64_v_f64m1,
-                 __riscv_vse64_v_f64m1, jbm_nxf64_pow);
+                 __riscv_vse64_v_f64m1, jbm_nxf64_pow1);
 }
 
 /**
@@ -50991,6 +51183,35 @@ jbm_array_f64_mod (double *xr,  ///< result double array.
 {
   JBM_ARRAY_OP2 (xr, x1, x2, n, double, __riscv_vle64_v_f64m1,
                  __riscv_vse64_v_f64m1, jbm_nxf64_mod);
+}
+
+/**
+ * Function to calculate the pow function between 2 double arrays.
+ */
+static inline void
+jbm_array_f64_pow (double *xr,  ///< result double array.
+                   const double *x1,    ///< double array.
+                   const double *x2,    ///< double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_OP2 (xr, x1, x2, n, double, __riscv_vle64_v_f64m1,
+                 __riscv_vse64_v_f64m1, jbm_nxf64_pow2);
+}
+
+/**
+ * Function to do the dot product of 2 double arrays.
+ *
+ * \return dot product (double).
+ */
+static inline double
+jbm_array_f64_dot (const double *x1,    ///< multiplier double array.
+                   const double *x2,    ///< multiplicand double array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  JBM_ARRAY_DOT (x1, x2, n, double, vdouble64m1_t, __riscv_vle64_v_f64m1,
+                 __riscv_vfmul_vv_f64m1, __riscv_vfmacc_vv_f64m1,
+                 __riscv_vfadd_vv_f64m1, __riscv_vfredusum_vs_f64m1_f64m1,
+                 __riscv_vfmv_f_s_f64m1_f64, __riscv_vfmv_v_f_f64m1);
 }
 
 /**
