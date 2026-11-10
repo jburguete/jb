@@ -50054,7 +50054,7 @@ jbm_array_f32_sum (const float *x,      ///< float array.
 {
   JBM_ARRAY_REDUCE_OP (x, n, float, vfloat32m1_t, __riscv_vle32_v_f32m1,
                        __riscv_vfadd_vv_f32m1, __riscv_vfredusum_vs_f32m1_f32m1,
-                       __riscv_vfmv_v_f_f32m1, __riscv_vfmv_f_s_f32m1_f32, 0.f);
+                       __riscv_vfmv_f_s_f32m1_f32, __riscv_vfmv_v_f_f32m1, 0.f);
 }
 
 /**
@@ -50068,7 +50068,7 @@ jbm_array_f32_reduce_max (const float *x,       ///< float array.
 {
   JBM_ARRAY_REDUCE_OP (x, n, float, vfloat32m1_t, __riscv_vle32_v_f32m1,
                        __riscv_vfmax_vv_f32m1, __riscv_vfredmax_vs_f32m1_f32m1,
-                       __riscv_vfmv_v_f_f32m1, __riscv_vfmv_f_s_f32m1_f32,
+                       __riscv_vfmv_f_s_f32m1_f32, __riscv_vfmv_v_f_f32m1,
                        -INFINITY);
 }
 
@@ -50083,7 +50083,7 @@ jbm_array_f32_reduce_min (const float *x,       ///< float array.
 {
   JBM_ARRAY_REDUCE_OP (x, n, float, vfloat32m1_t, __riscv_vle32_v_f32m1,
                        __riscv_vfmin_vv_f32m1, __riscv_vfredmin_vs_f32m1_f32m1,
-                       __riscv_vfmv_v_f_f32m1, __riscv_vfmv_f_s_f32m1_f32,
+                       __riscv_vfmv_f_s_f32m1_f32, __riscv_vfmv_v_f_f32m1,
                        INFINITY);
 }
 
@@ -51195,7 +51195,7 @@ jbm_array_f64_pow (double *xr,  ///< result double array.
                    const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP2 (xr, x1, x2, n, double, __riscv_vle64_v_f64m1,
-                 __riscv_vse64_v_f64m1, jbm_nxf64_pow2);
+                 __riscv_vse64_v_f64m1, jbm_nxf64_pow);
 }
 
 /**
@@ -51208,7 +51208,7 @@ jbm_array_f64_dot (const double *x1,    ///< multiplier double array.
                    const double *x2,    ///< multiplicand double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_DOT (x1, x2, n, double, vdouble64m1_t, __riscv_vle64_v_f64m1,
+  JBM_ARRAY_DOT (x1, x2, n, double, vfloat64m1_t, __riscv_vle64_v_f64m1,
                  __riscv_vfmul_vv_f64m1, __riscv_vfmacc_vv_f64m1,
                  __riscv_vfadd_vv_f64m1, __riscv_vfredusum_vs_f64m1_f64m1,
                  __riscv_vfmv_f_s_f64m1_f64, __riscv_vfmv_v_f_f64m1);
