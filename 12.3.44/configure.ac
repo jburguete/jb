@@ -358,6 +358,10 @@ AS_CASE([$host_cpu],
 		DOXYGEN_PREDEFINED="__riscv_vector=1"
 		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h"
 	],
+	[loongarch64*],
+	[
+		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h src/math_riscv.h"
+	],
 	[AC_MSG_ERROR([Unsupported architecture: $host_cpu])]
 )
 AC_SUBST([DOXYGEN])
