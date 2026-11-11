@@ -82,15 +82,15 @@
  * \def JB_FREE
  * \brief macro to free the memory used in vectorized arrays. 
  */
-#if JBM_AVX512
+#if JBM_AVX512 || defined(__riscv_vector)
 #define JB_ALIGNED __attribute__((aligned(64)))
 #define JB_MALLOC(size) (aligned_alloc (64, size))
 #define JB_FREE aligned_free
-#elif __AVX2__ || __riscv_vector
+#elif defined(__AVX2__)
 #define JB_ALIGNED __attribute__((aligned(32)))
 #define JB_MALLOC(size) (aligned_alloc (32, size))
 #define JB_FREE aligned_free
-#elif __SSE4_2__ || __ARM_NEON
+#elif defined(__SSE4_2__) || defined(__ARM_NEON)
 #define JB_ALIGNED __attribute__((aligned(16)))
 #define JB_MALLOC(size) (aligned_alloc (16, size))
 #define JB_FREE aligned_free

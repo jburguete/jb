@@ -1048,6 +1048,96 @@ fn14_8xf32 (const vfloat32m1_t x)
   return __riscv_vfmul_vv_f32m1 (x, fn13_8xf32 (x), 8);
 }
 
+vfloat32m1_t
+fn0_16xf32 (const vfloat32m1_t x __attribute__((unused)))
+{
+  return __riscv_vfmv_v_f_f32m1 (1.f, 16);
+}
+
+vfloat32m1_t
+fn1_16xf32 (const vfloat32m1_t x)
+{
+  return x;
+}
+
+vfloat32m1_t
+fn2_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn1_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn3_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn2_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn4_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn3_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn5_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn4_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn6_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn5_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn7_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn6_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn8_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn7_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn9_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn8_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn10_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn9_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn11_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn10_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn12_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn11_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn13_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn12_16xf32 (x), 16);
+}
+
+vfloat32m1_t
+fn14_16xf32 (const vfloat32m1_t x)
+{
+  return __riscv_vfmul_vv_f32m1 (x, fn13_16xf32 (x), 16);
+}
+
 #endif
 
 #if __SSE4_2__
@@ -1606,6 +1696,96 @@ vfloat64m1_t
 fn14_4xf64 (const vfloat64m1_t x)
 {
   return __riscv_vfmul_vv_f64m1 (x, fn13_4xf64 (x), 4);
+}
+
+vfloat64m1_t
+fn0_8xf64 (const vfloat64m1_t x __attribute__((unused)))
+{
+  return __riscv_vfmv_v_f_f64m1 (1.f, 8);
+}
+
+vfloat64m1_t
+fn1_8xf64 (const vfloat64m1_t x)
+{
+  return x;
+}
+
+vfloat64m1_t
+fn2_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn1_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn3_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn2_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn4_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn3_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn5_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn4_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn6_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn5_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn7_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn6_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn8_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn7_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn9_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn8_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn10_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn9_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn11_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn10_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn12_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn11_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn13_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn12_8xf64 (x), 8);
+}
+
+vfloat64m1_t
+fn14_8xf64 (const vfloat64m1_t x)
+{
+  return __riscv_vfmul_vv_f64m1 (x, fn13_8xf64 (x), 8);
 }
 
 #endif
@@ -3283,6 +3463,240 @@ test_logn_4xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
   unsigned int n;
   for (n = 1; n < MAX_ITERATIONS; n <<= 1)
     if (check_logn_4xf64 (f, g, n * DBL_EPSILON, x0))
+      break;
+  return n;
+}
+
+int
+check_uni_16xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
+                  float (*g) (const float), const float prec,
+                  const float xmin, const float xmax, const unsigned int n)
+{
+  float x[16] JB_ALIGNED, f0[16] JB_ALIGNED, g0[16] JB_ALIGNED;
+  float xm, dx;
+  int i, j, n1;
+  n1 = (int) n - 1;
+  xm = 0.5f * (xmin + xmax);
+  dx = (xmax - xm) / (float) n1;
+  for (i = 0; i < (int) n;)
+    {
+      for (j = 0; j < 16; ++j, ++i)
+        {
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
+            x[j] = xmax;
+          else
+            x[j] = xm + (2 * i - n1) * dx;
+          g0[j] = g (x[j]);
+        }
+      __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 16)), 16);
+      for (j = 0; j < 16; ++j)
+        if (!check_f32 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_16xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
+                   float (*g) (const float), const float prec, const float x0)
+{
+  float x[16] JB_ALIGNED, f0[16] JB_ALIGNED, g0[16] JB_ALIGNED;
+  float xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 16; ++j, xn *= 2.f)
+        {
+          x[j] = xn;
+          g0[j] = g (xn);
+        }
+      __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 16)), 16);
+      for (j = 0; j < 16; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+          if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabsf (xn) > 0.f;)
+    {
+      for (j = 0; j < 16; ++j, xn *= 0.5f)
+        {
+          x[j] = xn;
+          g0[j] = g (xn);
+        }
+      __riscv_vse32_v_f32m1 (f0, f (__riscv_vle32_v_f32m1 (x, 16)), 16);
+      for (j = 0; j < 16; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+          if (!check_f32 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_16xf32_log (vfloat32m1_t (*f) (const vfloat32m1_t),
+                  float (*g) (const float), const float prec)
+{
+  if (!check_logn_16xf32 (f, g, prec, 1.f))
+    return 0;
+  return check_logn_16xf32 (f, g, prec, -1.f);
+}
+
+unsigned int
+test_uni_16xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
+                 float (*g) (const float), const float xmin, const float xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_16xf32 (f, g, n * FLT_EPSILON, xmin, xmax, MAX_CHECKS))
+      break;
+  return n;
+}
+
+unsigned int
+test_16xf32_log (vfloat32m1_t (*f) (const vfloat32m1_t),
+                 float (*g) (const float))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_16xf32_log (f, g, n * FLT_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_16xf32 (vfloat32m1_t (*f) (const vfloat32m1_t),
+                  float (*g) (const float), const float x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_16xf32 (f, g, n * FLT_EPSILON, x0))
+      break;
+  return n;
+}
+
+int
+check_uni_8xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
+                 double (*g) (const double), const double prec,
+                 const double xmin, const double xmax, const unsigned int n)
+{
+  double x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  double xm, dx;
+  int i, j, n1;
+  n1 = (int) n - 1;
+  xm = 0.5 * (xmin + xmax);
+  dx = (xmax - xm) / (double) n1;
+  for (i = 0; i < (int) n;)
+    {
+      for (j = 0; j < 8; ++j, ++i)
+        {
+          if (i == 0)
+            x[j] = xmin;
+          else if (i == n1)
+            x[j] = xmax;
+          else
+            x[j] = xm + (2 * i - n1) * dx;
+          g0[j] = g (x[j]);
+        }
+      __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 8)), 8);
+      for (j = 0; j < 8; ++j)
+        if (!check_f64 (x[j], f0[j], g0[j], prec))
+          return 0;
+    }
+  return 1;
+}
+
+int
+check_logn_8xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
+                  double (*g) (const double),
+                  const double prec, const double x0)
+{
+  double x[8] JB_ALIGNED, f0[8] JB_ALIGNED, g0[8] JB_ALIGNED;
+  double xn;
+  unsigned int j;
+  for (xn = x0; isfinite (xn);)
+    {
+      for (j = 0; j < 8; ++j, xn *= 2.)
+        {
+          x[j] = xn;
+          g0[j] = g (xn);
+        }
+      __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 8)), 8);
+      for (j = 0; j < 8; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            goto break1;
+          if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+break1:
+  for (xn = x0; fabs (xn) > 0.;)
+    {
+      for (j = 0; j < 8; ++j, xn *= 0.5)
+        {
+          x[j] = xn;
+          g0[j] = g (xn);
+        }
+      __riscv_vse64_v_f64m1 (f0, f (__riscv_vle64_v_f64m1 (x, 8)), 8);
+      for (j = 0; j < 8; ++j)
+        {
+          if (!isfinite (f0[j]) && !isfinite (g0[j]))
+            return 1;
+          if (!check_f64 (x[j], f0[j], g0[j], prec))
+            return 0;
+        }
+    }
+  return 1;
+}
+
+int
+check_8xf64_log (vfloat64m1_t (*f) (const vfloat64m1_t),
+                 double (*g) (const double), const double prec)
+{
+  if (!check_logn_8xf64 (f, g, prec, 1.))
+    return 0;
+  return check_logn_8xf64 (f, g, prec, -1.);
+}
+
+unsigned int
+test_uni_8xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
+                double (*g) (const double),
+                const double xmin, const double xmax)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_uni_8xf64 (f, g, n * DBL_EPSILON, xmin, xmax, MAX_CHECKS))
+      break;
+  return n;
+}
+
+unsigned int
+test_8xf64_log (vfloat64m1_t (*f) (const vfloat64m1_t),
+                double (*g) (const double))
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_8xf64_log (f, g, n * DBL_EPSILON))
+      break;
+  return n;
+}
+
+unsigned int
+test_logn_8xf64 (vfloat64m1_t (*f) (const vfloat64m1_t),
+                 double (*g) (const double), const double x0)
+{
+  unsigned int n;
+  for (n = 1; n < MAX_ITERATIONS; n <<= 1)
+    if (check_logn_8xf64 (f, g, n * DBL_EPSILON, x0))
       break;
   return n;
 }
