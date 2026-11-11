@@ -3908,6 +3908,8 @@ main (void)
   printf ("checking float32x4_t functions\n");
 #endif
 #ifdef __riscv_vector
+  if (vlmax32 < 4)
+    goto riscv_no;
   printf ("checking vfloat32m1_t functions (128 bits)\n");
 #endif
 
@@ -4001,6 +4003,8 @@ main (void)
   printf ("checking float64x2_t functions\n");
 #endif
 #ifdef __riscv_vector
+  if (vlmax64 < 2)
+    goto riscv_no;
   printf ("checking vfloat64m1_t functions (128 bits)\n");
 #endif
 
@@ -4095,6 +4099,8 @@ main (void)
   printf ("checking __m256 functions\n");
 #endif
 #ifdef __riscv_vector
+  if (vlmax32 < 8)
+    goto riscv_no;
   printf ("checking vfloat32m1_t functions (256 bits)\n");
 #endif
 
@@ -4185,6 +4191,8 @@ main (void)
   printf ("checking __m256d functions\n");
 #endif
 #ifdef __riscv_vector
+  if (vlmax64 < 4)
+    goto riscv_no;
   printf ("checking vfloat64m1_t functions (256 bits)\n");
 #endif
 
@@ -4273,9 +4281,16 @@ main (void)
 
 #endif
 
-#if JBM_AVX512
+#if JBM_AVX512 || defined (__riscv_vector)
 
-  printf ("checking __m512 functions\n");
+#if JBM_512
+  printf ("checking __m512d functions\n");
+#elif defined(__riscv_vector)
+  if (vlmax32 < 16)
+    goto riscv_no;
+  printf ("checking vfloat32m1_t functions (512 bits)\n");
+#endif
+
   n = test_uni_16xf32 (jbm_16xf32_abs, fabsf, -FLT_MAX, FLT_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4359,7 +4374,14 @@ main (void)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
 
+#if JBM_512
   printf ("checking __m512d functions\n");
+#elif defined(__riscv_vector)
+  if (vlmax64 < 8)
+    goto riscv_no;
+  printf ("checking vfloat64m1_t functions (512 bits)\n");
+#endif
+
   n = test_uni_8xf64 (jbm_8xf64_abs, fabs, -0.5f * DBL_MAX, 0.5f * DBL_MAX);
   if (n == MAX_ITERATIONS)
     return 1;
@@ -4443,6 +4465,10 @@ main (void)
     return 1;
   printf ("check erfc: OK(%u)\n", n);
 
+#endif
+
+#ifdef __riscv_vector
+riscv_no:
 #endif
 
   // tests

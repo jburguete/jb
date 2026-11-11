@@ -860,9 +860,14 @@ enum JBMFluxLimiterType
   JBM_FLUX_LIMITER_TYPE_MEAN = 10
 };
 
+///> macro to define vectorized array functions.
+#define JBM_VECTORIZED 0
+
 #include "math_f32.h"
 #include "math_f64.h"
 #ifdef __SSE4_2__
+#undef JBM_VECTORIZED
+#define JBM_VECTORIZED 1
 #include "math_sse.h"
 #ifdef __AVX2__
 #include "math_avx.h"
@@ -871,10 +876,16 @@ enum JBMFluxLimiterType
 #endif
 #endif
 #elif defined (__ARM_FEATURE_SVE2)
+#undef JBM_VECTORIZED
+#define JBM_VECTORIZED 1
 #include "math_sve.h"
 #elif defined (__ARM_NEON)
+#undef JBM_VECTORIZED
+#define JBM_VECTORIZED 1
 #include "math_neon.h"
 #elif defined (__riscv_vector)
+#undef JBM_VECTORIZED
+#define JBM_VECTORIZED 1
 #include "math_riscv.h"
 #endif
 
@@ -2793,6 +2804,205 @@ jbm_integrall (JBDOUBLE (*f) (JBDOUBLE),
 #endif
   return k * dx;
 }
+
+#if !JBM_VECTORIZED
+
+/**
+ * Function to set a float array with another float array.
+ */
+static inline void
+jbm_array_f32_set (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = xd[i];
+}
+
+/**
+ * Function to calculate the root square of a float array.
+ */
+static inline void
+jbm_array_f32_sqrt (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = sqrtf (xd[i]);
+}
+
+/**
+ * Function to calculate the double of a float array.
+ */
+static inline void
+jbm_array_f32_dbl (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_dbl (xd[i]);
+}
+
+/**
+ * Function to calculate the square of a float array.
+ */
+static inline void
+jbm_array_f32_sqr (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_sqr (xd[i]);
+}
+
+/**
+ * Function to calculate the additive inverse of a float array.
+ */
+static inline void
+jbm_array_f32_opposite (float *restrict xr,     ///< result float array.
+                        const float *restrict xd,       ///< data float array.
+                        const unsigned int n)   ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_opposite (xd[i]);
+}
+
+/**
+ * Function to calculate the multiplicative inverse of a float array.
+ */
+static inline void
+jbm_array_f32_reciprocal (float *restrict xr,   ///< result float array.
+                          const float *restrict xd,     ///< data float array.
+                          const unsigned int n) ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_reciprocal (xd[i]);
+}
+
+/**
+ * Function to calculate the abs function of a float array.
+ */
+static inline void
+jbm_array_f32_abs (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_abs (xd[i]);
+}
+
+/**
+ * Function to calculate the cbrt function of a float array.
+ */
+static inline void
+jbm_array_f32_cbrt (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_cbrt (xd[i]);
+}
+
+/**
+ * Function to calculate the exp2 function of a float array.
+ */
+static inline void
+jbm_array_f32_exp2 (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_exp2 (xd[i]);
+}
+
+/**
+ * Function to calculate the exp function a float array.
+ */
+static inline void
+jbm_array_f32_exp (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_exp (xd[i]);
+}
+
+/**
+ * Function to calculate the exp10 function a float array.
+ */
+static inline void
+jbm_array_f32_exp10 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_exp10 (xd[i]);
+}
+
+/**
+ * Function to calculate the expm1 function a float array.
+ */
+static inline void
+jbm_array_f32_expm1 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_expm1 (xd[i]);
+}
+
+/**
+ * Function to calculate the log2 function a float array.
+ */
+static inline void
+jbm_array_f32_log2 (float *restrict xr, ///< result float array.
+                    const float *restrict xd,   ///< data float array.
+                    const unsigned int n)       ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_log2 (xd[i]);
+}
+
+/**
+ * Function to calculate the log function a float array.
+ */
+static inline void
+jbm_array_f32_log (float *restrict xr,  ///< result float array.
+                   const float *restrict xd,    ///< data float array.
+                   const unsigned int n)        ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_log (xd[i]);
+}
+
+/**
+ * Function to calculate the log10 function a float array.
+ */
+static inline void
+jbm_array_f32_log10 (float *restrict xr,        ///< result float array.
+                     const float *restrict xd,  ///< data float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  unsigned int i;
+  for (i = 0; i < n; ++i)
+    xr[i] = jbm_f32_log10 (xd[i]);
+}
+
+#endif
 
 /**
  * Function to init data of a JBMFarray struct.

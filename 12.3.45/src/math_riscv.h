@@ -973,13 +973,17 @@ jbm_nxf32_interpolate (const vfloat32m1_t x,
  */
 static inline vfloat32m1_t
 jbm_nxf32_v2_length (const vfloat32m1_t x1,
-///< vfloat32m1_t vector of x-coordinates of the 1st points defining the segment.
+///< vfloat32m1_t vector of x-coordinates of the 1st points defining the
+///< segments.
                      const vfloat32m1_t y1,
-///< vfloat32m1_t vector of y-coordinates of the 1st points defining the segment.
+///< vfloat32m1_t vector of y-coordinates of the 1st points defining the
+///< segments.
                      const vfloat32m1_t x2,
-///< vfloat32m1_t vector of x-coordinates of the 2nd points defining the segment.
+///< vfloat32m1_t vector of x-coordinates of the 2nd points defining the
+///< segments.
                      const vfloat32m1_t y2,
-///< vfloat32m1_t vector of y-coordinates of the 2nd points defining the segment.
+///< vfloat32m1_t vector of y-coordinates of the 2nd points defining the
+///< segments.
                      const size_t vl)   ///< vector size.
 {
   return jbm_nxf32_hypot (__riscv_vfsub_vv_f32m1 (x2, x1, vl),
@@ -12294,16 +12298,16 @@ jbm_nxf64_interpolate (const vfloat64m1_t x,
 static inline vfloat64m1_t
 jbm_nxf64_v2_length (const vfloat64m1_t x1,
 ///< vfloat64m1_t vector of x-coordinates of the 1st points defining the
-///< segment.
+///< segments.
                      const vfloat64m1_t y1,
 ///< vfloat64m1_t vector of y-coordinates of the 1st points defining the
-///< segment.
+///< segments.
                      const vfloat64m1_t x2,
 ///< vfloat64m1_t vector of x-coordinates of the 2nd points defining the
-///< segment.
+///< segments.
                      const vfloat64m1_t y2,
 ///< vfloat64m1_t vector of y-coordinates of the 2nd points defining the
-///< segment.
+///< segments.
                      const size_t vl)   ///< vector size.
 {
   return jbm_nxf64_hypot (__riscv_vfsub_vv_f64m1 (x2, x1, vl),
@@ -23509,13 +23513,17 @@ jbm_4xf32_interpolate (const vfloat32m1_t x,
  */
 static inline vfloat32m1_t
 jbm_4xf32_v2_length (const vfloat32m1_t x1,
-///< vfloat32m1_t vector of x-coordinates of the 1st points defining the segment.
+///< vfloat32m1_t vector of x-coordinates of the 1st points defining the
+///< segments.
                      const vfloat32m1_t y1,
-///< vfloat32m1_t vector of y-coordinates of the 1st points defining the segment.
+///< vfloat32m1_t vector of y-coordinates of the 1st points defining the
+///< segments.
                      const vfloat32m1_t x2,
-///< vfloat32m1_t vector of x-coordinates of the 2nd points defining the segment.
+///< vfloat32m1_t vector of x-coordinates of the 2nd points defining the
+///< segments.
                      const vfloat32m1_t y2)
-///< vfloat32m1_t vector of y-coordinates of the 2nd points defining the segment.
+///< vfloat32m1_t vector of y-coordinates of the 2nd points defining the
+///< segments.
 {
   return jbm_nxf32_v2_length (x1, y1, x2, y2, 4);
 }
@@ -30119,13 +30127,17 @@ jbm_2xf64_interpolate (const vfloat64m1_t x,
  */
 static inline vfloat64m1_t
 jbm_2xf64_v2_length (const vfloat64m1_t x1,
-///< vfloat64m1_t vector of x-coordinates of the 1st points defining the segment.
+///< vfloat64m1_t vector of x-coordinates of the 1st points defining the
+///< segments.
                      const vfloat64m1_t y1,
-///< vfloat64m1_t vector of y-coordinates of the 1st points defining the segment.
+///< vfloat64m1_t vector of y-coordinates of the 1st points defining the
+///< segments.
                      const vfloat64m1_t x2,
-///< vfloat64m1_t vector of x-coordinates of the 2nd points defining the segment.
+///< vfloat64m1_t vector of x-coordinates of the 2nd points defining the
+///< segments.
                      const vfloat64m1_t y2)
-///< vfloat64m1_t vector of y-coordinates of the 2nd points defining the segment.
+///< vfloat64m1_t vector of y-coordinates of the 2nd points defining the
+///< segments.
 {
   return jbm_nxf64_v2_length (x1, y1, x2, y2, 2);
 }
@@ -36729,13 +36741,17 @@ jbm_8xf32_interpolate (const vfloat32m1_t x,
  */
 static inline vfloat32m1_t
 jbm_8xf32_v2_length (const vfloat32m1_t x1,
-///< vfloat32m1_t vector of x-coordinates of the 1st points defining the segment.
+///< vfloat32m1_t vector of x-coordinates of the 1st points defining the
+///< segments.
                      const vfloat32m1_t y1,
-///< vfloat32m1_t vector of y-coordinates of the 1st points defining the segment.
+///< vfloat32m1_t vector of y-coordinates of the 1st points defining the
+///< segments.
                      const vfloat32m1_t x2,
-///< vfloat32m1_t vector of x-coordinates of the 2nd points defining the segment.
+///< vfloat32m1_t vector of x-coordinates of the 2nd points defining the
+///< segments.
                      const vfloat32m1_t y2)
-///< vfloat32m1_t vector of y-coordinates of the 2nd points defining the segment.
+///< vfloat32m1_t vector of y-coordinates of the 2nd points defining the
+///< segments.
 {
   return jbm_nxf32_v2_length (x1, y1, x2, y2, 8);
 }
@@ -43339,13 +43355,17 @@ jbm_4xf64_interpolate (const vfloat64m1_t x,
  */
 static inline vfloat64m1_t
 jbm_4xf64_v2_length (const vfloat64m1_t x1,
-///< vfloat64m1_t vector of x-coordinates of the 1st points defining the segment.
+///< vfloat64m1_t vector of x-coordinates of the 1st points defining the
+///< segments.
                      const vfloat64m1_t y1,
-///< vfloat64m1_t vector of y-coordinates of the 1st points defining the segment.
+///< vfloat64m1_t vector of y-coordinates of the 1st points defining the
+///< segments.
                      const vfloat64m1_t x2,
-///< vfloat64m1_t vector of x-coordinates of the 2nd points defining the segment.
+///< vfloat64m1_t vector of x-coordinates of the 2nd points defining the
+///< segments.
                      const vfloat64m1_t y2)
-///< vfloat64m1_t vector of y-coordinates of the 2nd points defining the segment.
+///< vfloat64m1_t vector of y-coordinates of the 2nd points defining the
+///< segments.
 {
   return jbm_nxf64_v2_length (x1, y1, x2, y2, 4);
 }
@@ -49696,6 +49716,13235 @@ jbm_4xf64_integral (vfloat64m1_t (*f) (const vfloat64m1_t, const size_t),
 }
 
 /**
+ * Function to calculate the additive inverse value of a vfloat32m1_t vector.
+ *
+ * \return opposite value vector (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_opposite (const vfloat32m1_t x)      ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_opposite (x, 16);
+}
+
+/**
+ * Function to calculate the multiplicative inverse value of a vfloat32m1_t
+ * vector.
+ *
+ * \return reciprocal value vector (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_reciprocal (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_reciprocal (x, 16);
+}
+
+/**
+ * Function to calculate the absolute value of a vfloat32m1_t vector.
+ *
+ * \return absolute value vector (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_abs (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_abs (x, 16);
+}
+
+/**
+ * Function to copy the sign of a vfloat32m1_t vector to another vfloat32m1_t
+ * vector.
+ *
+ * \return 16x vloat32m1_t vector with magnitude of 1st vector and sign of 2nd
+ * vector.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_copysign (const vfloat32m1_t x,
+                     ///< vfloat32m1_t vector to preserve magnitude.
+                     const vfloat32m1_t y)
+                    ///< vfloat32m1_t vector to preserve sign.
+{
+  return jbm_nxf32_copysign (x, y, 16);
+}
+
+/**
+ * Function to calculate the hypot function (vfloat32m1_t).
+ *
+ * \return function value vector (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_hypot (const vfloat32m1_t x, ///< 1st vfloat32m1_t vector.
+                  const vfloat32m1_t y) ///< 2nd vfloat32m1_t vector.
+{
+  return jbm_nxf32_hypot (x, y, 16);
+}
+
+/**
+ * Function to rounding to nearest (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_16xf32_round (const vfloat32m1_t x) ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_round (x, 16);
+}
+
+/**
+ * Function to rounding towards zero (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_trunc_16xf32 (const vfloat32m1_t x) ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_trunc (x, 16);
+}
+
+/**
+ * Function to rounding down (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_16xf32_floor (const vfloat32m1_t x) ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_floor (x, 16);
+}
+
+/**
+ * Function to rounding top (vfloat32m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_16xf32_ceil (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_floor (x, 16);
+}
+
+/**
+ * Function to calculate the rest of a division (16x vfloat32m1_t).
+ *
+ * \return rest value vector (in [0,|divisor|) interval).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_mod (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
+                const vfloat32m1_t d)   ///< divisor (vfloat32m1_t).
+{
+  return jbm_nxf32_mod (x, d, 16);
+}
+
+/**
+ * Function to implement the standard frexp function (16x vfloat32m1_t).
+ *
+ * \return normalized fraction value in [1/2,1).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_frexp (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                  vint32m1_t *e)
+                  ///< pointer to the extracted exponents vector.
+{
+  return jbm_nxf32_frexp (x, e, 16);
+}
+
+/**
+ * Function to calculate the function \f$2^n\f$ with n an integer vector
+ * (16x vint32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_exp2n (vint32m1_t e) ///< exponent vector (16x vint32m1_t).
+{
+  return jbm_nxf32_exp2n (e, 16);
+}
+
+/**
+ * Function to implement the standard ldexp function (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_ldexp (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                  vint32m1_t e) ///< exponent vector (vint32m1_t).
+{
+  return jbm_nxf32_ldexp (x, e, 16);
+}
+
+/**
+ * Function to check small 16x vfloat32m1_t vectors.
+ *
+ * \return 1 on small number, 0 otherwise.
+ */
+static inline vbool32_t
+jbm_16xf32_small (const vfloat32m1_t x) ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_small (x, 16);
+}
+
+/**
+ * Function to calculate the vfloat32m1_t vector with the components with lower
+ * module in the [a, b] interval.
+ * \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
+ * 0, & a\cdot b\le 0;\\
+ * a, & a,b\ne 0,\;|a|<|b|;\\
+ * b, & a,b\ne 0,\;|a|\ge|b|;
+ * \end{array}\right.\f$.
+ *
+ * \return modmin 16x vfloat32m1_t vector.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_modmin (const vfloat32m1_t a,        ///< 1st vfloat32m1_t vector.
+                   const vfloat32m1_t b)        ///< 2nd vfloat32m1_t vector.
+{
+  return jbm_nxf32_modmin (a, b, 16);
+}
+
+/**
+ * Function to calculate the double of a vfloat32m1_t vector.
+ *
+ * \return 16x vfloat32m1_t double.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_dbl (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_dbl (x, 16);
+}
+
+/**
+ * Function to calculate the square of the components of a vfloat32m1_t vector.
+ *
+ * \return 16x vfloat32m1_t vector square.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_sqr (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_sqr (x, 16);
+}
+
+/**
+ * Function to perform an extrapolation between 2 vfloat32m1_t vectors of 2D
+ * points.
+ *
+ * \return 16x vfloat32m1_t vector of y-coordinates of the extrapolated points.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_extrapolate (const vfloat32m1_t x,
+///< vfloat32m1_t vector of x-coordinates of the extrapolated points.
+                        const vfloat32m1_t x1,
+///< vfloat32m1_t vector of x-coordinates of the 1st points.
+                        const vfloat32m1_t x2,
+///< vfloat32m1_t vector of x-coordinates of the 2nd points.
+                        const vfloat32m1_t y1,
+///< vfloat32m1_t vector of y-coordinates of the 1st points.
+                        const vfloat32m1_t y2)
+///< vfloat32m1_t vector of y-coordinates of the 2nd points.
+{
+  return jbm_nxf32_extrapolate (x, x1, x2, y1, y2, 16);
+}
+
+/**
+ * Function to perform an interpolation between 2 vfloat32m1_t vectors of 2D
+ * points.
+ *
+ * \return 16x vfloat32m1_t vector of y-coordinates of the interpolated points.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_interpolate (const vfloat32m1_t x,
+///< vfloat32m1_t vector of x-coordinates of the interpolated points.
+                        const vfloat32m1_t x1,
+///< vfloat32m1_t vector of x-coordinates of the 1st points.
+                        const vfloat32m1_t x2,
+///< vfloat32m1_t vector of x-coordinates of the 2nd points.
+                        const vfloat32m1_t y1,
+///< vfloat32m1_t vector of y-coordinates of the 1st points.
+                        const vfloat32m1_t y2)
+///< vfloat32m1_t vector of y-coordinates of the 2nd points.
+{
+  return jbm_nxf32_interpolate (x, x1, x2, y1, y2, 16);
+}
+
+/**
+ * Function to calculate the length of a vfloat32m1_t vector of 2D segments.
+ *
+ * \return 16x vfloat32m1_t vector of segment lengths.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_v2_length (const vfloat32m1_t x1,
+///< vfloat32m1_t vector of x-coordinates of the 1st points defining the
+///< segments.
+                      const vfloat32m1_t y1,
+///< vfloat32m1_t vector of y-coordinates of the 1st points defining the
+///< segments.
+                      const vfloat32m1_t x2,
+///< vfloat32m1_t vector of x-coordinates of the 2nd points defining the
+///< segments.
+                      const vfloat32m1_t y2)
+///< vfloat32m1_t vector of y-coordinates of the 2nd points defining the
+///< segments.
+{
+  return jbm_nxf32_v2_length (x1, y1, x2, y2, 16);
+}
+
+/**
+ * Function to calculate the length of a vfloat32m1_t vector of 3D segments.
+ *
+ * \return 16x vfloat32m1_t vector of segment lengths.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_v3_length (const vfloat32m1_t x1,
+///< vfloat32m1_t vector of x-coordinates of the 1st points defining the
+///< segments.
+                      const vfloat32m1_t y1,
+///< vfloat32m1_t vector of y-coordinates of the 1st points defining the
+///< segments.
+                      const vfloat32m1_t z1,
+///< vfloat32m1_t vector of z-coordinates of the 1st points defining the
+///< segments.
+                      const vfloat32m1_t x2,
+///< vfloat32m1_t vector of x-coordinates of the 2nd points defining the
+///< segments.
+                      const vfloat32m1_t y2,
+///< vfloat32m1_t vector of y-coordinates of the 2nd points defining the
+///< segments.
+                      const vfloat32m1_t z2)
+///< vfloat32m1_t vector of z-coordinates of the 2nd points defining the
+///< segments.
+{
+  return jbm_nxf32_v3_length (x1, y1, z1, x2, y2, z2, 16);
+}
+
+/**
+ * Function to calculate a 1st order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_2 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_3 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_4 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_5 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_6 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_7 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_8 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_9 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_10 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_11 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_12 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_13 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_14 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_15 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_16 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_17 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_18 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 19th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_19 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 20th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_20 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_20 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 21th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_21 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_21 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 22th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_22 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_22 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 23th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_23 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_23 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 24th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_24 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_24 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 25th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_25 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_25 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 26th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_26 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_26 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 27th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_27 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_27 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 28th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_28 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_28 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 29th order polynomial (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of polynomial values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_polynomial_29 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_polynomial_29 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+1st order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_1_0 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_1_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_2_0 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_2_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+1st order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_2_1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_2_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_3_0 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_3_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_3_1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_3_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_3_2 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_3_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_4_0 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_4_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_4_1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_4_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_4_2 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_4_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_4_3 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_4_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_5_0 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_5_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_5_1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_5_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_5_2 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_5_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_5_3 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_5_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_5_4 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_5_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_6_0 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_6_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_6_1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_6_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_6_2 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_6_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_6_3 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_6_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_6_4 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_6_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_6_5 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_6_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_7_0 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_7_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_7_1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_7_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_7_2 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_7_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_7_3 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_7_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_7_4 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_7_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_7_5 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_7_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_7_6 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_7_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_8_0 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_8_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_8_1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_8_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_8_2 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_8_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_8_3 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_8_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_8_4 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_8_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_8_5 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_8_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_8_6 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_8_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_8_7 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_8_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_9_0 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_9_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_9_1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_9_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_9_2 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_9_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_9_3 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_9_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_9_4 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_9_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_9_5 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_9_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_9_6 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_9_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_9_7 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_9_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_9_8 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                         const float *p)        ///< array of coefficients.
+{
+  return jbm_nxf32_rational_9_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_10_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_10_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_10_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_10_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_10_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_10_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_10_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_10_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_10_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_10_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_10_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_10_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_10_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_10_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_10_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_10_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_10_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_10_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_10_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_10_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_11_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_11_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_12_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_12_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_13_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_13_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_14_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_14_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_15_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_15_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_16_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_16_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_17_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_17_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_18_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_18_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_19_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_19_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_20_19 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_20_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+21th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 19th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_19 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_21_20 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_21_20 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+22th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+21th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 19th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_19 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 20th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_20 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_20 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+21th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_22_21 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_22_21 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+23th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+22th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+21th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 19th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_19 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 20th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_20 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_20 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 21th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_21 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_21 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+22th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_23_22 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_23_22 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+24th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+23th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+22th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+21th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 19th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_19 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 20th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_20 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_20 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 21th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_21 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_21 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 22th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_22 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_22 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+23th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_24_23 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_24_23 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+25th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+24th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+23th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+22th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+21th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 19th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_19 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 20th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_20 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_20 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 21th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_21 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_21 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 22th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_22 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_22 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 23th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_23 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_23 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+24th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_25_24 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_25_24 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+26th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+25th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+24th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+23th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+22th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+21th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 19th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_19 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 20th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_20 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_20 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 21th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_21 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_21 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 22th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_22 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_22 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 23th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_23 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_23 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 24th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_24 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_24 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+25th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_26_25 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_26_25 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+27th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+26th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+25th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+24th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+23th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+22th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+21th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 19th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_19 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 20th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_20 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_20 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 21th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_21 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_21 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 22th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_22 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_22 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 23th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_23 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_23 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 24th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_24 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_24 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 25th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_25 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_25 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+26th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_27_26 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_27_26 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+28th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+27th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+26th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+25th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+24th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+23th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+22th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+21th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 19th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_19 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 20th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_20 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_20 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 21th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_21 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_21 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 22th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_22 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_22 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 23th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_23 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_23 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 24th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_24 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_24 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 25th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_25 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_25 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 26th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_26 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_26 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+27th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_28_27 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_28_27 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 0th+29th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_0 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+28th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_1 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 2nd+27th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_2 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_2 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 3rd+26th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_3 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_3 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 4th+25th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_4 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_4 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 5th+24th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_5 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_5 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 6th+23th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_6 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_6 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 7th+22th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_7 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_7 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 8th+21th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_8 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_8 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 9th+20th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_9 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
+                          const float *p)       ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_9 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 10th+19th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_10 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_10 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 11th+18th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_11 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_11 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 12th+17th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_12 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_12 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 13th+16th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_13 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_13 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 14th+15th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_14 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_14 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 15th+14th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_15 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_15 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 16th+13th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_16 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_16 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 17th+12th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_17 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_17 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 18th+11th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_18 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_18 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 19th+10th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_19 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_19 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 20th+9th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_20 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_20 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 21th+8th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_21 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_21 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 22th+7th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_22 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_22 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 23th+6th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_23 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_23 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 24th+5th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_24 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_24 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 25th+4th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_25 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_25 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 26th+3rd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_26 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_26 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 27th+2nd order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_27 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_27 (x, p, 16);
+}
+
+/**
+ * Function to calculate a 1st+28th order rational (16x vfloat32m1_t).
+ *
+ * \return 16x vfloat32m1_t vector of rational values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_rational_29_28 (const vfloat32m1_t x,        ///< vfloat32m1_t vector.
+                           const float *p)      ///< array of coefficients.
+{
+  return jbm_nxf32_rational_29_28 (x, p, 16);
+}
+
+/**
+ * Function to calculate the well conditionated function expm1(x) for
+ * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_expm1wc (const vfloat32m1_t x)
+///< vfloat32m1_t vector \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
+{
+  return jbm_nxf32_expm1wc (x, 16);
+}
+
+/**
+ * Function to calculate the well conditionated function exp2(x) for x in
+ * \f$\in\left[\frac12\;,1\right]\f$ (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_exp2wc (const vfloat32m1_t x)
+                  ///< vfloat32m1_t vector \f$\in[\frac12,1]\f$.
+{
+  return jbm_nxf32_exp2wc (x, 16);
+}
+
+/**
+ * Function to calculate the function exp2(x) using the jbm_expwc_16xf32 and
+ * jbm_16xf32_exp2n functions (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_exp2 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_exp2 (x, 16);
+}
+
+/**
+ * Function to calculate the function exp(x) using the jbm_16xf32_exp2 function
+ * (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_exp (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_exp (x, 16);
+}
+
+/**
+ * Function to calculate the function exp10(x) using the jbm_16xf32_exp2
+ * function (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_exp10 (const vfloat32m1_t x) ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_exp10 (x, 16);
+}
+
+/**
+ * Function to calculate the function expm1(x) using the jbm_16xf32_expm1wc and
+ * jbm_16xf32_exp functions (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_expm1 (const vfloat32m1_t x) ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_expm1 (x, 16);
+}
+
+/**
+ * Function to calculate the well conditionated function log2(x) for x in
+ * [0.5,1] (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_log2wc (const vfloat32m1_t x)
+                  ///< vfloat32m1_t vector \f$\in[0.5,1]\f$.
+{
+  return jbm_nxf32_log2wc (x, 16);
+}
+
+/**
+ * Function to calculate the function log_2(x) using jbm_16xf32_log2wc and
+ * jbm_16xf32_frexp (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_log2 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_log2 (x, 16);
+}
+
+/**
+ * Function to calculate the function log(x) using jbm_16xf32_log2
+ * (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_log (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_log (x, 16);
+}
+
+/**
+ * Function to calculate the function log10(x) using jbm_16xf32_log2.
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_log10 (const vfloat32m1_t x) ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_log10 (x, 16);
+}
+
+/**
+ * Function to calculate the function x^e with e an integer number
+ * (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_pown (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                 const int e)   ///< exponent (int).
+{
+  return jbm_nxf32_pown (x, e, 16);
+}
+
+/**
+ * Function to calculate the function pow using the jbm_16xf32_exp2 and
+ * jbm_16xf32_log2 functions (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_pow1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
+                 const float e) ///< exponent (float).
+{
+  return jbm_nxf32_pow1 (x, e, 16);
+}
+
+/**
+ * Function to calculate the function pow using the jbm_16xf32_exp2 and
+ * jbm_16xf32_log2 functions (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_pow (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
+                const vfloat32m1_t e)   ///< exponent (float).
+{
+  return jbm_nxf32_pow (x, e, 16);
+}
+
+/**
+ * Function to calculate the function cbrt(x) (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_cbrt (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_cbrt (x, 16);
+}
+
+/**
+ * Function to calculate the well conditionated function sin(x) for x in
+ * [-pi/4,pi/4] (16x vfloat32m1_t)
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_sinwc (const vfloat32m1_t x)
+                 ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  return jbm_nxf32_sinwc (x, 16);
+}
+
+/**
+ * Function to calculate the well conditionated function cos(x) for x in
+ * [-pi/4,pi/4] (16x vfloat32m1_t):
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_coswc (const vfloat32m1_t x)
+                 ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  return jbm_nxf32_coswc (x, 16);
+}
+
+/**
+ * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * x in [-pi/4,pi/4] from jbm_16xf32_sinwc approximation (16x vfloat32m1_t).
+ */
+static inline void
+jbm_16xf32_sincoswc (const vfloat32m1_t x,
+                     ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                     vfloat32m1_t *s,
+                     ///< pointer to the sin function value (16x vfloat32m1_t).
+                     vfloat32m1_t *c)
+                    ///< pointer to the cos function value (16x vfloat32m1_t).
+{
+  jbm_nxf32_sincoswc (x, s, c, 16);
+}
+
+/**
+ * Function to calculate the function sin(x) from jbm_16xf32_sinwc and
+ * jbm_16xf32_coswc approximations (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_sin (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_sin (x, 16);
+}
+
+/**
+ * Function to calculate the function cos(x) from jbm_16xf32_sinwc and
+ * jbm_16xf32_coswc approximations (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_cos (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_cos (x, 16);
+}
+
+/**
+ * Function to calculate the functions sin(x) and cos(x) from
+ * jbm_16xf32_sinwc and jbm_nxf32_coswc approximations (16x vfloat32m1_t).
+ */
+static inline void
+jbm_16xf32_sincos (const vfloat32m1_t x,
+                   ///< vfloat32m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                   vfloat32m1_t *s,
+                   ///< pointer to the sin function value (16x vfloat32m1_t).
+                   vfloat32m1_t *c)
+                  ///< pointer to the cos function value (16x vfloat32m1_t).
+{
+  jbm_nxf32_sincos (x, s, c, 16);
+}
+
+/**
+ * Function to calculate the function tan(x) from jbm_16xf32_sincos function
+ * (16x vfloat32m1_t).
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_tan (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_tan (x, 16);
+}
+
+/**
+ * Function to calculate the function atan(x) using the jbm_atanwc0_16xf32 and
+ * jbm_16xf32_atanwc1 functions (16x vfloat32m1_t).
+ *
+ * \return function value (in [-pi/2,pi/2]) (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_atan (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_atan (x, 16);
+}
+
+/**
+ * Function to calculate the function atan2(y,x) using the jbm_16xf32_atan
+ * function (16x vfloat32m1_t).
+ *
+ * \return function value (in [-pi,pi]) (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_atan2 (const vfloat32m1_t y, ///< vfloat32m1_t y component.
+                  const vfloat32m1_t x) ///< vfloat32m1_t x component.
+{
+  return jbm_nxf32_atan2 (y, x, 16);
+}
+
+/**
+ * Function to calculate the function asin(x) using the jbm_16xf32_atan function
+ * (16x vfloat32m1_t).
+ *
+ * \return function value (in [-pi/2,pi/2]).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_asin (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_asin (x, 16);
+}
+
+/**
+ * Function to calculate the function acos(x) using the jbm_16xf32_atan function
+ * (16x vfloat32m1_t).
+ *
+ * \return function value (in [0,pi]) (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_acos (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_acos (x, 16);
+}
+
+/**
+ * Function to calculate the function sinh(x)
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_sinh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+{
+  return jbm_nxf32_sinh (x, 16);
+}
+
+/**
+ * Function to calculate the function cosh(x)
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_cosh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+{
+  return jbm_nxf32_cosh (x, 16);
+}
+
+/**
+ * Function to calculate the function tanh(x)
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_tanh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+{
+  return jbm_nxf32_tanh (x, 16);
+}
+
+/**
+ * Function to calculate the function asinh(x)
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_asinh (const vfloat32m1_t x) ///< vfloat32m1_t number.
+{
+  return jbm_nxf32_asinh (x, 16);
+}
+
+/**
+ * Function to calculate the function acosh(x)
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_acosh (const vfloat32m1_t x) ///< vfloat32m1_t number.
+{
+  return jbm_nxf32_asinh (x, 16);
+}
+
+/**
+ * Function to calculate the function atanh(x)
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_atanh (const vfloat32m1_t x) ///< vfloat32m1_t number.
+{
+  return jbm_nxf32_atanh (x, 16);
+}
+
+/**
+ * Function to calculate the well conditionated function erf(x) for x in
+ * [-1,1] (16x vfloat32m1_t)
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_erfwc (const vfloat32m1_t x)
+                 ///< vfloat32m1_t vector \f$\in\left[-1,1\right]\f$.
+{
+  return jbm_nxf32_erfwc (x, 16);
+}
+
+/**
+ * Function to calculate the well conditionated function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (16x vfloat32m1_t)
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_erfcwc (const vfloat32m1_t x)
+                  ///< vfloat32m1_t vector \f$\in\left[1,\infty\right]\f$.
+{
+  return jbm_nxf32_erfcwc (x, 16);
+
+}
+
+/**
+ * Function to calculate the function erf(x) using jbm_16xf32_erfwc and
+ * jbm_16xf32_erfcwc
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_erf (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_erf (x, 16);
+}
+
+/**
+ * Function to calculate the function erfc(x) using jbm_16xf32_erfwc and
+ * jbm_16xf32_erfcwc.
+ *
+ * \return function value (16x vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_16xf32_erfc (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
+{
+  return jbm_nxf32_erfc (x, 16);
+}
+
+/**
+ * Function to calculate the solution of a vfloat32m1_t vector of reduced
+ * quadratic equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$x^2+a\,x+b=0\f$.
+ *
+ * \return vfloat32m1_t vector of solution values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_solve_quadratic_reduced (vfloat32m1_t a,
+///< vfloat32m1_t vector of 1st order coefficient of the equations.
+                                    vfloat32m1_t b,
+///< vfloat32m1_t vector of 0th order coefficient of the equations.
+                                    const vfloat32m1_t x1,
+///< vfloat32m1_t vector of left limits of the solution intervals.
+                                    const vfloat32m1_t x2)
+///< vfloat32m1_t vector of right limits of the solution intervals.
+{
+  return jbm_nxf32_solve_quadratic_reduced (a, b, x1, x2, 16);
+}
+
+/**
+ * Function to calculate the solution of a vfloat32m1_t vector of quadratic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$a\,x^2+b\,x+c=0\f$.
+ *
+ * \return vfloat32m1_t vector of solution values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_solve_quadratic (const vfloat32m1_t a,
+///< vfloat32m1_t vector of 2nd order coefficient of the equations.
+                            const vfloat32m1_t b,
+///< vfloat32m1_t vector of 1st order coefficient of the equations.
+                            const vfloat32m1_t c,
+///< vfloat32m1_t vector of 0th order coefficient of the equations.
+                            const vfloat32m1_t x1,
+///< vfloat32m1_t vector of left limits of the solution intervals.
+                            const vfloat32m1_t x2)
+///< vfloat32m1_t vector of right limits of the solution intervals.
+{
+  return jbm_nxf32_solve_quadratic (a, b, c, x1, x2, 16);
+}
+
+/**
+ * Function to calculate the solution of a vfloat32m1_t vector of reduced cubic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$x^3+a\,x^2+b\,x+c=0\f$.
+ *
+ * \return vfloat32m1_t vector of solution values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_solve_cubic_reduced (const vfloat32m1_t a,
+                                ///< 2nd order coefficient of the equation.
+                                const vfloat32m1_t b,
+                                ///< 1st order coefficient of the equation.
+                                const vfloat32m1_t c,
+                                ///< 0th order coefficient of the equation.
+                                const vfloat32m1_t x1,
+                                ///< left limit of the solution interval.
+                                const vfloat32m1_t x2)
+                               ///< right limit of the solution interval.
+{
+  return jbm_nxf32_solve_cubic_reduced (a, b, c, x1, x2, 16);
+}
+
+/**
+ * Function to calculate the solution of a vfloat32m1_t vector of cubic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$a\,x^3+b\,x^2+c\,x+d=0\f$.
+ *
+ * \return vfloat32m1_t vector of solution values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_solve_cubic (vfloat32m1_t a,
+///< vfloat32m1_t vector of 3rd order coefficient of the equations.
+                        vfloat32m1_t b,
+///< vfloat32m1_t vector of 2nd order coefficient of the equations.
+                        vfloat32m1_t c,
+///< vfloat32m1_t vector of 1st order coefficient of the equations.
+                        vfloat32m1_t d,
+///< vfloat32m1_t vector of 0th order coefficient of the equations.
+                        vfloat32m1_t x1,
+///< vfloat32m1_t vector of left limits of the solution intervals.
+                        vfloat32m1_t x2)
+///< vfloat32m1_t vector of right limits of the solution intervals.
+{
+  return jbm_nxf32_solve_cubic (a, b, c, d, x1, x2, 16);
+}
+
+/**
+ * Function to calculate the total (1st order upwind) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=0\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_total (const vfloat32m1_t d1 __attribute__((unused)),
+                               ///< 1st flux limiter function parameter.
+                               const vfloat32m1_t d2 __attribute__((unused)))
+  ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_total (d1, d2, 16);
+}
+
+/**
+ * Function to calculate the null (2nd order upwind) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=1\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_null (const vfloat32m1_t d1 __attribute__((unused)),
+                              ///< 1st flux limiter function parameter.
+                              const vfloat32m1_t d2 __attribute__((unused)))
+  ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_null (d1, d2, 16);
+}
+
+/**
+ * Function to calculate the centred (2nd order centred) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\frac{d_1}{d_2}\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_centred (const vfloat32m1_t d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const vfloat32m1_t d2)
+                                ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_centred (d1, d2, 16);
+}
+
+/**
+ * Function to calculate the superbee flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{2\,d_1}{d_2}\right),\,
+ * \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_superbee (const vfloat32m1_t d1,
+                                  ///< 1st flux limiter function parameter.
+                                  const vfloat32m1_t d2)
+                                 ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_superbee (d1, d2, 16);
+}
+
+/**
+ * Function to calculate the minmod flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{d_1}{d_2}\right)\right]\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_minmod (const vfloat32m1_t d1,
+                                ///< 1st flux limiter function parameter.
+                                const vfloat32m1_t d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_minmod (d1, d2, 16);
+}
+
+/**
+ * Function to calculate the van Leer flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=
+ * \frac{\frac{d_1}{d_2}+\left|\frac{d_1}{d_2}\right|}
+ * {1+\left|\frac{d_1}{d_2}\right|}\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_VanLeer (const vfloat32m1_t d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const vfloat32m1_t d2)
+                                ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_VanLeer (d1, d2, 16);
+}
+
+/**
+ * Function to calculate the van Albada flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\frac{\frac{d_1}{d_2}+\frac{d_1^2}{d_2^2}}
+ * {1+\frac{d_1^2}{d_2^2}}\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_VanAlbada (const vfloat32m1_t d1,
+                                   ///< 1st flux limiter function parameter.
+                                   const vfloat32m1_t d2)
+                                  ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_VanAlbada (d1, d2, 16);
+}
+
+/**
+ * Function to calculate the minsuper flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_minsuper (const vfloat32m1_t d1,
+                                  ///< 1st flux limiter function parameter.
+                                  const vfloat32m1_t d2)
+                                 ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_minsuper (d1, d2, 16);
+}
+
+/**
+ * Function to calculate the supermin flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{2\,d_1}{d_2}\right)\right]\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_supermin (const vfloat32m1_t d1,
+                                  ///< 1st flux limiter function parameter.
+                                  const vfloat32m1_t d2)
+                                 ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_supermin (d1, d2, 16);
+}
+
+/**
+ * Function to calculate the monotonized central flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(2,\,\frac{1+\frac{d_1}{d_2}}{2},\,\frac{2\,d_1}{d_2}\right)
+ * \right]\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_monotonized_central (const vfloat32m1_t d1,
+///< 1st flux limiter function parameter.
+                                             const vfloat32m1_t d2)
+///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_monotonized_central (d1, d2, 16);
+}
+
+/**
+ * Function to calculate the mean flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=
+ * \max\left(0,\,\frac{1+\frac{d_1}{d_2}}{2}\right)\f$ (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter_mean (const vfloat32m1_t d1,
+                              ///< 1st flux limiter function parameter.
+                              const vfloat32m1_t d2)
+                             ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf32_flux_limiter_mean (d1, d2, 16);
+}
+
+/**
+ * Function to do a flux limiter function (16x vfloat32m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_flux_limiter (const vfloat32m1_t d1,
+                         ///< 1st flux limiter function parameter.
+                         const vfloat32m1_t d2,
+                         ///< 2nd flux limiter function parameter.
+                         unsigned int type)
+                        ///< type of flux limiter function.
+{
+  switch (type)
+    {
+    case JBM_FLUX_LIMITER_TYPE_TOTAL:
+      return jbm_16xf32_flux_limiter_total (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_NULL:
+      return jbm_16xf32_flux_limiter_null (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_CENTRED:
+      return jbm_16xf32_flux_limiter_centred (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
+      return jbm_16xf32_flux_limiter_superbee (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_MINMOD:
+      return jbm_16xf32_flux_limiter_minmod (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
+      return jbm_16xf32_flux_limiter_VanLeer (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
+      return jbm_16xf32_flux_limiter_VanAlbada (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_MINSUPER:
+      return jbm_16xf32_flux_limiter_minsuper (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
+      return jbm_16xf32_flux_limiter_supermin (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
+      return jbm_16xf32_flux_limiter_monotonized_central (d1, d2);
+    }
+  return jbm_16xf32_flux_limiter_mean (d1, d2);
+}
+
+/**
+ * Function to approximate an integral of a function with the Gauss method
+ * defined in an interval (16x vfloat32m1_t).
+ *
+ * \return vfloat32m1_t vector of integral values.
+ */
+static inline vfloat32m1_t
+jbm_16xf32_integral (vfloat32m1_t (*f) (const vfloat32m1_t, const size_t),
+                     ///< pointer to the function to integrate.
+                     const vfloat32m1_t x1,     ///< left limit of the interval.
+                     const vfloat32m1_t x2)
+                    ///< right limit of the interval.
+{
+  return jbm_nxf32_integral (f, x1, x2, 16);
+}
+
+/**
+ * Function to calculate the additive inverse value of a vfloat64m1_t vector.
+ *
+ * \return opposite value vector (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_opposite (const vfloat64m1_t x)       ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_opposite (x, 8);
+}
+
+/**
+ * Function to calculate the multiplicative inverse value of a vfloat64m1_t
+ * vector.
+ *
+ * \return reciprocal value vector (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_reciprocal (const vfloat64m1_t x)     ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_reciprocal (x, 8);
+}
+
+/**
+ * Function to calculate the absolute value of a vfloat64m1_t vector.
+ *
+ * \return absolute value vector (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_abs (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_abs (x, 8);
+}
+
+/**
+ * Function to copy the sign of a vfloat64m1_t vector to another vfloat64m1_t
+ * vector.
+ *
+ * \return 8x vloat32m1_t vector with magnitude of 1st vector and sign of 2nd
+ * vector.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_copysign (const vfloat64m1_t x,
+                    ///< vfloat64m1_t vector to preserve magnitude.
+                    const vfloat64m1_t y)
+                    ///< vfloat64m1_t vector to preserve sign.
+{
+  return jbm_nxf64_copysign (x, y, 8);
+}
+
+/**
+ * Function to calculate the hypot function (vfloat64m1_t).
+ *
+ * \return function value vector (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_hypot (const vfloat64m1_t x,  ///< 1st vfloat64m1_t vector.
+                 const vfloat64m1_t y)  ///< 2nd vfloat64m1_t vector.
+{
+  return jbm_nxf64_hypot (x, y, 8);
+}
+
+/**
+ * Function to rounding to nearest (vfloat64m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_8xf64_round (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_round (x, 8);
+}
+
+/**
+ * Function to rounding towards zero (vfloat64m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_trunc_8xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_trunc (x, 8);
+}
+
+/**
+ * Function to rounding down (vfloat64m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_8xf64_floor (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_floor (x, 8);
+}
+
+/**
+ * Function to rounding top (vfloat64m1_t).
+ *
+ * \return function value vector (vint32m1_t).
+ */
+static inline vint32m1_t
+jbm_8xf64_ceil (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_floor (x, 8);
+}
+
+/**
+ * Function to calculate the rest of a division (8x vfloat64m1_t).
+ *
+ * \return rest value vector (in [0,|divisor|) interval).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_mod (const vfloat64m1_t x,    ///< dividend (vfloat64m1_t).
+               const vfloat64m1_t d)    ///< divisor (vfloat64m1_t).
+{
+  return jbm_nxf64_mod (x, d, 8);
+}
+
+/**
+ * Function to implement the standard frexp function (8x vfloat64m1_t).
+ *
+ * \return normalized fraction value in [1/2,1).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_frexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                 vint32m1_t *e) ///< pointer to the extracted exponents vector.
+{
+  return jbm_nxf64_frexp (x, e, 8);
+}
+
+/**
+ * Function to calculate the function \f$2^n\f$ with n an integer vector
+ * (8x vint32m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_exp2n (vint32m1_t e)  ///< exponent vector (8x vint32m1_t).
+{
+  return jbm_nxf64_exp2n (e, 8);
+}
+
+/**
+ * Function to implement the standard ldexp function (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_ldexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                 vint32m1_t e)  ///< exponent vector (vint32m1_t).
+{
+  return jbm_nxf64_ldexp (x, e, 8);
+}
+
+/**
+ * Function to check small 8x vfloat64m1_t vectors.
+ *
+ * \return 1 on small number, 0 otherwise.
+ */
+static inline vbool32_t
+jbm_8xf64_small (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_small (x, 8);
+}
+
+/**
+ * Function to calculate the vfloat64m1_t vector with the components with lower
+ * module in the [a, b] interval.
+ * \f$\mathrm{modmin}(a, b)=\left\{\begin{array}{lc}
+ * 0, & a\cdot b\le 0;\\
+ * a, & a,b\ne 0,\;|a|<|b|;\\
+ * b, & a,b\ne 0,\;|a|\ge|b|;
+ * \end{array}\right.\f$.
+ *
+ * \return modmin 8x vfloat64m1_t vector.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_modmin (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
+                  const vfloat64m1_t b) ///< 2nd vfloat64m1_t vector.
+{
+  return jbm_nxf64_modmin (a, b, 8);
+}
+
+/**
+ * Function to calculate the double of a vfloat64m1_t vector.
+ *
+ * \return 8x vfloat64m1_t double.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_dbl (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_dbl (x, 8);
+}
+
+/**
+ * Function to calculate the square of the components of a vfloat64m1_t vector.
+ *
+ * \return 8x vfloat64m1_t vector square.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_sqr (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_sqr (x, 8);
+}
+
+/**
+ * Function to perform an extrapolation between 2 vfloat64m1_t vectors of 2D
+ * points.
+ *
+ * \return 8x vfloat64m1_t vector of y-coordinates of the extrapolated points.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_extrapolate (const vfloat64m1_t x,
+///< vfloat64m1_t vector of x-coordinates of the extrapolated points.
+                       const vfloat64m1_t x1,
+///< vfloat64m1_t vector of x-coordinates of the 1st points.
+                       const vfloat64m1_t x2,
+///< vfloat64m1_t vector of x-coordinates of the 2nd points.
+                       const vfloat64m1_t y1,
+///< vfloat64m1_t vector of y-coordinates of the 1st points.
+                       const vfloat64m1_t y2)
+///< vfloat64m1_t vector of y-coordinates of the 2nd points.
+{
+  return jbm_nxf64_extrapolate (x, x1, x2, y1, y2, 8);
+}
+
+/**
+ * Function to perform an interpolation between 2 vfloat64m1_t vectors of 2D
+ * points.
+ *
+ * \return 8x vfloat64m1_t vector of y-coordinates of the interpolated points.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_interpolate (const vfloat64m1_t x,
+///< vfloat64m1_t vector of x-coordinates of the interpolated points.
+                       const vfloat64m1_t x1,
+///< vfloat64m1_t vector of x-coordinates of the 1st points.
+                       const vfloat64m1_t x2,
+///< vfloat64m1_t vector of x-coordinates of the 2nd points.
+                       const vfloat64m1_t y1,
+///< vfloat64m1_t vector of y-coordinates of the 1st points.
+                       const vfloat64m1_t y2)
+///< vfloat64m1_t vector of y-coordinates of the 2nd points.
+{
+  return jbm_nxf64_interpolate (x, x1, x2, y1, y2, 8);
+}
+
+/**
+ * Function to calculate the length of a vfloat64m1_t vector of 2D segments.
+ *
+ * \return 8x vfloat64m1_t vector of segment lengths.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_v2_length (const vfloat64m1_t x1,
+///< vfloat64m1_t vector of x-coordinates of the 1st points defining the
+///< segments.
+                     const vfloat64m1_t y1,
+///< vfloat64m1_t vector of y-coordinates of the 1st points defining the
+///< segments.
+                     const vfloat64m1_t x2,
+///< vfloat64m1_t vector of x-coordinates of the 2nd points defining the
+///< segments.
+                     const vfloat64m1_t y2)
+///< vfloat64m1_t vector of y-coordinates of the 2nd points defining the
+///< segments.
+{
+  return jbm_nxf64_v2_length (x1, y1, x2, y2, 8);
+}
+
+/**
+ * Function to calculate the length of a vfloat64m1_t vector of 3D segments.
+ *
+ * \return 8x vfloat64m1_t vector of segment lengths.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_v3_length (const vfloat64m1_t x1,
+///< vfloat64m1_t vector of x-coordinates of the 1st points defining the
+///< segments.
+                     const vfloat64m1_t y1,
+///< vfloat64m1_t vector of y-coordinates of the 1st points defining the
+///< segments.
+                     const vfloat64m1_t z1,
+///< vfloat64m1_t vector of z-coordinates of the 1st points defining the
+///< segments.
+                     const vfloat64m1_t x2,
+///< vfloat64m1_t vector of x-coordinates of the 2nd points defining the
+///< segments.
+                     const vfloat64m1_t y2,
+///< vfloat64m1_t vector of y-coordinates of the 2nd points defining the
+///< segments.
+                     const vfloat64m1_t z2)
+///< vfloat64m1_t vector of z-coordinates of the 2nd points defining the
+///< segments.
+{
+  return jbm_nxf64_v3_length (x1, y1, z1, x2, y2, z2, 8);
+}
+
+/**
+ * Function to calculate a 1st order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_3 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_4 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_5 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_6 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_7 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_8 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_9 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_10 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_11 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_12 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_13 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_14 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_15 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_16 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_17 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_18 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 19th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_19 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 20th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_20 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_20 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 21th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_21 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_21 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 22th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_22 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_22 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 23th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_23 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_23 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 24th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_24 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_24 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 25th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_25 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_25 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 26th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_26 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_26 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 27th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_27 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_27 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 28th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_28 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_28 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 29th order polynomial (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of polynomial values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_polynomial_29 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_polynomial_29 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+1st order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_1_0 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_1_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_2_0 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_2_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+1st order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_2_1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_2_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_3_0 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_3_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_3_1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_3_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_3_2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_3_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_4_0 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_4_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_4_1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_4_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_4_2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_4_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_4_3 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_4_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_5_0 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_5_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_5_1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_5_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_5_2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_5_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_5_3 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_5_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_5_4 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_5_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_6_0 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_6_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_6_1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_6_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_6_2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_6_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_6_3 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_6_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_6_4 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_6_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_6_5 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_6_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_7_0 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_7_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_7_1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_7_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_7_2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_7_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_7_3 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_7_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_7_4 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_7_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_7_5 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_7_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_7_6 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_7_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_8_0 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_8_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_8_1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_8_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_8_2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_8_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_8_3 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_8_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_8_4 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_8_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_8_5 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_8_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_8_6 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_8_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_8_7 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_8_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_9_0 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_9_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_9_1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_9_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_9_2 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_9_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_9_3 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_9_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_9_4 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_9_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_9_5 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_9_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_9_6 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_9_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_9_7 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_9_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_9_8 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                        const double *p)        ///< array of coefficients.
+{
+  return jbm_nxf64_rational_9_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_10_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_10_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_10_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_10_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_10_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_10_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_10_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_10_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_10_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_10_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_10_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_10_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_10_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_10_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_10_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_10_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_10_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_10_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_10_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_10_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_11_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_11_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_12_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_12_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_13_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_13_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_14_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_14_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_15_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_15_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_16_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_16_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_17_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_17_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_18_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_18_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_19_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_19_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_20_19 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_20_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+21th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 19th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_19 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_21_20 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_21_20 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+22th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+21th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 19th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_19 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 20th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_20 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_20 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+21th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_22_21 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_22_21 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+23th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+22th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+21th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 19th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_19 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 20th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_20 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_20 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 21th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_21 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_21 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+22th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_23_22 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_23_22 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+24th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+23th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+22th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+21th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 19th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_19 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 20th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_20 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_20 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 21th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_21 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_21 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 22th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_22 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_22 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+23th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_24_23 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_24_23 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+25th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+24th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+23th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+22th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+21th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 19th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_19 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 20th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_20 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_20 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 21th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_21 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_21 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 22th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_22 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_22 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 23th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_23 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_23 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+24th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_25_24 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_25_24 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+26th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+25th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+24th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+23th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+22th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+21th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 19th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_19 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 20th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_20 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_20 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 21th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_21 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_21 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 22th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_22 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_22 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 23th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_23 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_23 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 24th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_24 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_24 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+25th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_26_25 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_26_25 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+27th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+26th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+25th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+24th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+23th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+22th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+21th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 19th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_19 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 20th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_20 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_20 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 21th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_21 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_21 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 22th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_22 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_22 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 23th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_23 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_23 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 24th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_24 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_24 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 25th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_25 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_25 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+26th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_27_26 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_27_26 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+28th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+27th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+26th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+25th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+24th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+23th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+22th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+21th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 19th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_19 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 20th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_20 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_20 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 21th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_21 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_21 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 22th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_22 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_22 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 23th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_23 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_23 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 24th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_24 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_24 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 25th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_25 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_25 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 26th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_26 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_26 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+27th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_28_27 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_28_27 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 0th+29th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_0 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_0 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+28th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_1 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 2nd+27th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_2 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_2 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 3rd+26th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_3 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_3 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 4th+25th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_4 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_4 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 5th+24th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_5 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_5 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 6th+23th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_6 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_6 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 7th+22th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_7 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_7 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 8th+21th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_8 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_8 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 9th+20th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_9 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
+                         const double *p)       ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_9 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 10th+19th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_10 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_10 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 11th+18th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_11 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_11 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 12th+17th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_12 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_12 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 13th+16th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_13 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_13 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 14th+15th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_14 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_14 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 15th+14th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_15 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_15 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 16th+13th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_16 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_16 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 17th+12th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_17 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_17 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 18th+11th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_18 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_18 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 19th+10th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_19 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_19 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 20th+9th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_20 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_20 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 21th+8th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_21 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_21 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 22th+7th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_22 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_22 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 23th+6th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_23 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_23 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 24th+5th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_24 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_24 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 25th+4th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_25 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_25 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 26th+3rd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_26 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_26 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 27th+2nd order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_27 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_27 (x, p, 8);
+}
+
+/**
+ * Function to calculate a 1st+28th order rational (8x vfloat64m1_t).
+ *
+ * \return 8x vfloat64m1_t vector of rational values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_rational_29_28 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
+                          const double *p)      ///< array of coefficients.
+{
+  return jbm_nxf64_rational_29_28 (x, p, 8);
+}
+
+/**
+ * Function to calculate the well conditionated function expm1(x) for
+ * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_expm1wc (const vfloat64m1_t x)
+///< vfloat64m1_t vector \f$\in\left[-\log(2)/2,\log(2)/2\right]\f$.
+{
+  return jbm_nxf64_expm1wc (x, 8);
+}
+
+/**
+ * Function to calculate the well conditionated function exp2(x) for x in
+ * \f$\in\left[\frac12\;,1\right]\f$ (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_exp2wc (const vfloat64m1_t x)
+                  ///< vfloat64m1_t vector \f$\in[\frac12,1]\f$.
+{
+  return jbm_nxf64_exp2wc (x, 8);
+}
+
+/**
+ * Function to calculate the function exp2(x) using the jbm_expwc_8xf64 and
+ * jbm_8xf64_exp2n functions (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_exp2 (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_exp2 (x, 8);
+}
+
+/**
+ * Function to calculate the function exp(x) using the jbm_8xf64_exp2 function
+ * (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_exp (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_exp (x, 8);
+}
+
+/**
+ * Function to calculate the function exp10(x) using the jbm_8xf64_exp2
+ * function (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_exp10 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_exp10 (x, 8);
+}
+
+/**
+ * Function to calculate the function expm1(x) using the jbm_8xf64_expm1wc and
+ * jbm_8xf64_exp functions (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_expm1 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_expm1 (x, 8);
+}
+
+/**
+ * Function to calculate the well conditionated function log2(x) for x in
+ * [0.5,1] (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_log2wc (const vfloat64m1_t x)
+                  ///< vfloat64m1_t vector \f$\in[0.5,1]\f$.
+{
+  return jbm_nxf64_log2wc (x, 8);
+}
+
+/**
+ * Function to calculate the function log_2(x) using jbm_8xf64_log2wc and
+ * jbm_8xf64_frexp (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_log2 (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_log2 (x, 8);
+}
+
+/**
+ * Function to calculate the function log(x) using jbm_8xf64_log2
+ * (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_log (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_log (x, 8);
+}
+
+/**
+ * Function to calculate the function log10(x) using jbm_8xf64_log2.
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_log10 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_log10 (x, 8);
+}
+
+/**
+ * Function to calculate the function x^e with e an integer number
+ * (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_pown (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                const int e)    ///< exponent (int).
+{
+  return jbm_nxf64_pown (x, e, 8);
+}
+
+/**
+ * Function to calculate the function pow using the jbm_8xf64_exp2 and
+ * jbm_8xf64_log2 functions (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_pow1 (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
+                const double e) ///< exponent (float).
+{
+  return jbm_nxf64_pow1 (x, e, 8);
+}
+
+/**
+ * Function to calculate the function pow using the jbm_8xf64_exp2 and
+ * jbm_8xf64_log2 functions (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_pow (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
+               const vfloat64m1_t e)    ///< exponent (vfloat64m1_t).
+{
+  return jbm_nxf64_pow (x, e, 8);
+}
+
+/**
+ * Function to calculate the function cbrt(x) (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_cbrt (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_cbrt (x, 8);
+}
+
+/**
+ * Function to calculate the well conditionated function sin(x) for x in
+ * [-pi/4,pi/4] (8x vfloat64m1_t)
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_sinwc (const vfloat64m1_t x)
+                 ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  return jbm_nxf64_sinwc (x, 8);
+}
+
+/**
+ * Function to calculate the well conditionated function cos(x) for x in
+ * [-pi/4,pi/4] (8x vfloat64m1_t):
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_coswc (const vfloat64m1_t x)
+                 ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+{
+  return jbm_nxf64_coswc (x, 8);
+}
+
+/**
+ * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * x in [-pi/4,pi/4] from jbm_8xf64_sinwc approximation (8x vfloat64m1_t).
+ */
+static inline void
+jbm_8xf64_sincoswc (const vfloat64m1_t x,
+                    ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                    vfloat64m1_t *s,
+                    ///< pointer to the sin function value (8x vfloat64m1_t).
+                    vfloat64m1_t *c)
+                    ///< pointer to the cos function value (8x vfloat64m1_t).
+{
+  jbm_nxf64_sincoswc (x, s, c, 8);
+}
+
+/**
+ * Function to calculate the function sin(x) from jbm_8xf64_sinwc and
+ * jbm_8xf64_coswc approximations (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_sin (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_sin (x, 8);
+}
+
+/**
+ * Function to calculate the function cos(x) from jbm_8xf64_sinwc and
+ * jbm_8xf64_coswc approximations (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_cos (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_cos (x, 8);
+}
+
+/**
+ * Function to calculate the functions sin(x) and cos(x) from
+ * jbm_8xf64_sinwc and jbm_nxf64_coswc approximations (8x vfloat64m1_t).
+ */
+static inline void
+jbm_8xf64_sincos (const vfloat64m1_t x,
+                  ///< vfloat64m1_t vector \f$\in\left[-\pi/4,\pi/4\right]\f$.
+                  vfloat64m1_t *s,
+                  ///< pointer to the sin function value (8x vfloat64m1_t).
+                  vfloat64m1_t *c)
+                  ///< pointer to the cos function value (8x vfloat64m1_t).
+{
+  jbm_nxf64_sincos (x, s, c, 8);
+}
+
+/**
+ * Function to calculate the function tan(x) from jbm_8xf64_sincos function
+ * (8x vfloat64m1_t).
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_tan (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_tan (x, 8);
+}
+
+/**
+ * Function to calculate the function atan(x) using the jbm_atanwc0_8xf64 and
+ * jbm_8xf64_atanwc1 functions (8x vfloat64m1_t).
+ *
+ * \return function value (in [-pi/2,pi/2]) (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_atan (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_atan (x, 8);
+}
+
+/**
+ * Function to calculate the function atan2(y,x) using the jbm_8xf64_atan
+ * function (8x vfloat64m1_t).
+ *
+ * \return function value (in [-pi,pi]) (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_atan2 (const vfloat64m1_t y,  ///< vfloat64m1_t y component.
+                 const vfloat64m1_t x)  ///< vfloat64m1_t x component.
+{
+  return jbm_nxf64_atan2 (y, x, 8);
+}
+
+/**
+ * Function to calculate the function asin(x) using the jbm_8xf64_atan function
+ * (8x vfloat64m1_t).
+ *
+ * \return function value (in [-pi/2,pi/2]).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_asin (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_asin (x, 8);
+}
+
+/**
+ * Function to calculate the function acos(x) using the jbm_8xf64_atan function
+ * (8x vfloat64m1_t).
+ *
+ * \return function value (in [0,pi]) (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_acos (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_acos (x, 8);
+}
+
+/**
+ * Function to calculate the function sinh(x)
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_sinh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+{
+  return jbm_nxf64_sinh (x, 8);
+}
+
+/**
+ * Function to calculate the function cosh(x)
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_cosh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+{
+  return jbm_nxf64_cosh (x, 8);
+}
+
+/**
+ * Function to calculate the function tanh(x)
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_tanh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+{
+  return jbm_nxf64_tanh (x, 8);
+}
+
+/**
+ * Function to calculate the function asinh(x)
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_asinh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+{
+  return jbm_nxf64_asinh (x, 8);
+}
+
+/**
+ * Function to calculate the function acosh(x)
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_acosh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+{
+  return jbm_nxf64_asinh (x, 8);
+}
+
+/**
+ * Function to calculate the function atanh(x)
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_atanh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+{
+  return jbm_nxf64_atanh (x, 8);
+}
+
+/**
+ * Function to calculate the well conditionated function erf(x) for x in
+ * [-1,1] (8x vfloat64m1_t)
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_erfwc (const vfloat64m1_t x)
+                 ///< vfloat64m1_t vector \f$\in\left[-1,1\right]\f$.
+{
+  return jbm_nxf64_erfwc (x, 8);
+}
+
+/**
+ * Function to calculate the well conditionated function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (8x vfloat64m1_t)
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_erfcwc (const vfloat64m1_t x)
+                  ///< vfloat64m1_t vector \f$\in\left[1,\infty\right]\f$.
+{
+  return jbm_nxf64_erfcwc (x, 8);
+
+}
+
+/**
+ * Function to calculate the function erf(x) using jbm_8xf64_erfwc and
+ * jbm_8xf64_erfcwc
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_erf (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_erf (x, 8);
+}
+
+/**
+ * Function to calculate the function erfc(x) using jbm_8xf64_erfwc and
+ * jbm_8xf64_erfcwc
+ *
+ * \return function value (8x vfloat64m1_t).
+ */
+static inline vfloat64m1_t
+jbm_8xf64_erfc (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
+{
+  return jbm_nxf64_erfc (x, 8);
+}
+
+/**
+ * Function to calculate the solution of a vfloat64m1_t vector of reduced
+ * quadratic equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$x^2+a\,x+b=0\f$.
+ *
+ * \return vfloat64m1_t vector of solution values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_solve_quadratic_reduced (vfloat64m1_t a,
+///< vfloat64m1_t vector of 1st order coefficient of the equations.
+                                   vfloat64m1_t b,
+///< vfloat64m1_t vector of 0th order coefficient of the equations.
+                                   const vfloat64m1_t x1,
+///< vfloat64m1_t vector of left limits of the solution intervals.
+                                   const vfloat64m1_t x2)
+///< vfloat64m1_t vector of right limits of the solution intervals.
+{
+  return jbm_nxf64_solve_quadratic_reduced (a, b, x1, x2, 8);
+}
+
+/**
+ * Function to calculate the solution of a vfloat64m1_t vector of quadratic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$a\,x^2+b\,x+c=0\f$.
+ *
+ * \return vfloat64m1_t vector of solution values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_solve_quadratic (const vfloat64m1_t a,
+///< vfloat64m1_t vector of 2nd order coefficient of the equations.
+                           const vfloat64m1_t b,
+///< vfloat64m1_t vector of 1st order coefficient of the equations.
+                           const vfloat64m1_t c,
+///< vfloat64m1_t vector of 0th order coefficient of the equations.
+                           const vfloat64m1_t x1,
+///< vfloat64m1_t vector of left limits of the solution intervals.
+                           const vfloat64m1_t x2)
+///< vfloat64m1_t vector of right limits of the solution intervals.
+{
+  return jbm_nxf64_solve_quadratic (a, b, c, x1, x2, 8);
+}
+
+/**
+ * Function to calculate the solution of a vfloat64m1_t vector of reduced cubic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$x^3+a\,x^2+b\,x+c=0\f$.
+ *
+ * \return vfloat64m1_t vector of solution values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_solve_cubic_reduced (const vfloat64m1_t a,
+                               ///< 2nd order coefficient of the equation.
+                               const vfloat64m1_t b,
+                               ///< 1st order coefficient of the equation.
+                               const vfloat64m1_t c,
+                               ///< 0th order coefficient of the equation.
+                               const vfloat64m1_t x1,
+                               ///< left limit of the solution interval.
+                               const vfloat64m1_t x2)
+                               ///< right limit of the solution interval.
+{
+  return jbm_nxf64_solve_cubic_reduced (a, b, c, x1, x2, 8);
+}
+
+/**
+ * Function to calculate the solution of a vfloat64m1_t vector of cubic
+ * equations in an interval \f$\left[x_1,x_2\right]\f$ in the form
+ * \f$a\,x^3+b\,x^2+c\,x+d=0\f$.
+ *
+ * \return vfloat64m1_t vector of solution values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_solve_cubic (vfloat64m1_t a,
+///< vfloat64m1_t vector of 3rd order coefficient of the equations.
+                       vfloat64m1_t b,
+///< vfloat64m1_t vector of 2nd order coefficient of the equations.
+                       vfloat64m1_t c,
+///< vfloat64m1_t vector of 1st order coefficient of the equations.
+                       vfloat64m1_t d,
+///< vfloat64m1_t vector of 0th order coefficient of the equations.
+                       vfloat64m1_t x1,
+///< vfloat64m1_t vector of left limits of the solution intervals.
+                       vfloat64m1_t x2)
+///< vfloat64m1_t vector of right limits of the solution intervals.
+{
+  return jbm_nxf64_solve_cubic (a, b, c, d, x1, x2, 8);
+}
+
+/**
+ * Function to calculate the total (1st order upwind) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=0\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_total (const vfloat64m1_t d1 __attribute__((unused)),
+                              ///< 1st flux limiter function parameter.
+                              const vfloat64m1_t d2 __attribute__((unused)))
+  ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_total (d1, d2, 8);
+}
+
+/**
+ * Function to calculate the null (2nd order upwind) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=1\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_null (const vfloat64m1_t d1 __attribute__((unused)),
+                             ///< 1st flux limiter function parameter.
+                             const vfloat64m1_t d2 __attribute__((unused)))
+  ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_null (d1, d2, 8);
+}
+
+/**
+ * Function to calculate the centred (2nd order centred) flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\frac{d_1}{d_2}\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_centred (const vfloat64m1_t d1,
+                                ///< 1st flux limiter function parameter.
+                                const vfloat64m1_t d2)
+                                ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_centred (d1, d2, 8);
+}
+
+/**
+ * Function to calculate the superbee flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{2\,d_1}{d_2}\right),\,
+ * \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_superbee (const vfloat64m1_t d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const vfloat64m1_t d2)
+                                 ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_superbee (d1, d2, 8);
+}
+
+/**
+ * Function to calculate the minmod flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{d_1}{d_2}\right)\right]\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_minmod (const vfloat64m1_t d1,
+                               ///< 1st flux limiter function parameter.
+                               const vfloat64m1_t d2)
+                               ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_minmod (d1, d2, 8);
+}
+
+/**
+ * Function to calculate the van Leer flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=
+ * \frac{\frac{d_1}{d_2}+\left|\frac{d_1}{d_2}\right|}
+ * {1+\left|\frac{d_1}{d_2}\right|}\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_VanLeer (const vfloat64m1_t d1,
+                                ///< 1st flux limiter function parameter.
+                                const vfloat64m1_t d2)
+                                ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_VanLeer (d1, d2, 8);
+}
+
+/**
+ * Function to calculate the van Albada flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\frac{\frac{d_1}{d_2}+\frac{d_1^2}{d_2^2}}
+ * {1+\frac{d_1^2}{d_2^2}}\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_VanAlbada (const vfloat64m1_t d1,
+                                  ///< 1st flux limiter function parameter.
+                                  const vfloat64m1_t d2)
+                                  ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_VanAlbada (d1, d2, 8);
+}
+
+/**
+ * Function to calculate the minsuper flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(2,\,\frac{d_1}{d_2}\right)\right]\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_minsuper (const vfloat64m1_t d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const vfloat64m1_t d2)
+                                 ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_minsuper (d1, d2, 8);
+}
+
+/**
+ * Function to calculate the supermin flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(1,\,\frac{2\,d_1}{d_2}\right)\right]\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_supermin (const vfloat64m1_t d1,
+                                 ///< 1st flux limiter function parameter.
+                                 const vfloat64m1_t d2)
+                                 ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_supermin (d1, d2, 8);
+}
+
+/**
+ * Function to calculate the monotonized central flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=\max\left[0,\,
+ * \min\left(2,\,\frac{1+\frac{d_1}{d_2}}{2},\,\frac{2\,d_1}{d_2}\right)
+ * \right]\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_monotonized_central (const vfloat64m1_t d1,
+///< 1st flux limiter function parameter.
+                                            const vfloat64m1_t d2)
+///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_monotonized_central (d1, d2, 8);
+}
+
+/**
+ * Function to calculate the mean flux limiter:
+ * \f$\psi\left(d_1,\,d_2\right)=
+ * \max\left(0,\,\frac{1+\frac{d_1}{d_2}}{2}\right)\f$ (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter_mean (const vfloat64m1_t d1,
+                             ///< 1st flux limiter function parameter.
+                             const vfloat64m1_t d2)
+                             ///< 2nd flux limiter function parameter.
+{
+  return jbm_nxf64_flux_limiter_mean (d1, d2, 8);
+}
+
+/**
+ * Function to do a flux limiter function (8x vfloat64m1_t).
+ *
+ * \return flux limiter function value.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_flux_limiter (const vfloat64m1_t d1,
+                        ///< 1st flux limiter function parameter.
+                        const vfloat64m1_t d2,
+                        ///< 2nd flux limiter function parameter.
+                        unsigned int type)
+                        ///< type of flux limiter function.
+{
+  switch (type)
+    {
+    case JBM_FLUX_LIMITER_TYPE_TOTAL:
+      return jbm_8xf64_flux_limiter_total (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_NULL:
+      return jbm_8xf64_flux_limiter_null (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_CENTRED:
+      return jbm_8xf64_flux_limiter_centred (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_SUPERBEE:
+      return jbm_8xf64_flux_limiter_superbee (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_MINMOD:
+      return jbm_8xf64_flux_limiter_minmod (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_VAN_LEER:
+      return jbm_8xf64_flux_limiter_VanLeer (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_VAN_ALBADA:
+      return jbm_8xf64_flux_limiter_VanAlbada (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_MINSUPER:
+      return jbm_8xf64_flux_limiter_minsuper (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_SUPERMIN:
+      return jbm_8xf64_flux_limiter_supermin (d1, d2);
+    case JBM_FLUX_LIMITER_TYPE_MONOTONIZED_CENTRAL:
+      return jbm_8xf64_flux_limiter_monotonized_central (d1, d2);
+    }
+  return jbm_8xf64_flux_limiter_mean (d1, d2);
+}
+
+/**
+ * Function to approximate an integral of a function with the Gauss method
+ * defined in an interval (8x vfloat64m1_t).
+ *
+ * \return vfloat64m1_t vector of integral values.
+ */
+static inline vfloat64m1_t
+jbm_8xf64_integral (vfloat64m1_t (*f) (const vfloat64m1_t, const size_t),
+                    ///< pointer to the function to integrate.
+                    const vfloat64m1_t x1,      ///< left limit of the interval.
+                    const vfloat64m1_t x2)
+                    ///< right limit of the interval.
+{
+  return jbm_nxf32_integral (f, x1, x2, 8);
+}
+
+/**
  * Function to set a float array with another float array.
  */
 static inline void
@@ -49828,7 +63077,7 @@ jbm_array_f32_exp10 (float *restrict xr,        ///< result float array.
 }
 
 /**
- * Function to calculate the exp10 function a float array.
+ * Function to calculate the expm1 function a float array.
  */
 static inline void
 jbm_array_f32_expm1 (float *restrict xr,        ///< result float array.
@@ -50318,7 +63567,7 @@ static inline void
 jbm_array_f32_pow (float *xr,   ///< result float array.
                    const float *x1,     ///< float array.
                    const float *x2,     ///< float array.
-                   const unsigned int n)       ///< number of array elements.
+                   const unsigned int n)        ///< number of array elements.
 {
   JBM_ARRAY_OP2 (xr, x1, x2, n, float, __riscv_vle32_v_f32m1,
                  __riscv_vse32_v_f32m1, jbm_nxf32_pow);
