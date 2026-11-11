@@ -3671,8 +3671,8 @@ jbm_array_f32_regression_linear (const float *x,
  * Function to set a double array with another double array.
  */
 static inline void
-jbm_array_f64_set (double *restrict xr,  ///< result double array.
-                   const double *restrict xd,    ///< data double array.
+jbm_array_f64_set (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -3684,8 +3684,8 @@ jbm_array_f64_set (double *restrict xr,  ///< result double array.
  * Function to calculate the root square of a double array.
  */
 static inline void
-jbm_array_f64_sqrt (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_sqrt (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -3697,8 +3697,8 @@ jbm_array_f64_sqrt (double *restrict xr, ///< result double array.
  * Function to calculate the double of a double array.
  */
 static inline void
-jbm_array_f64_dbl (double *restrict xr,  ///< result double array.
-                   const double *restrict xd,    ///< data double array.
+jbm_array_f64_dbl (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -3710,8 +3710,8 @@ jbm_array_f64_dbl (double *restrict xr,  ///< result double array.
  * Function to calculate the square of a double array.
  */
 static inline void
-jbm_array_f64_sqr (double *restrict xr,  ///< result double array.
-                   const double *restrict xd,    ///< data double array.
+jbm_array_f64_sqr (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -3723,8 +3723,8 @@ jbm_array_f64_sqr (double *restrict xr,  ///< result double array.
  * Function to calculate the additive inverse of a double array.
  */
 static inline void
-jbm_array_f64_opposite (double *restrict xr,     ///< result double array.
-                        const double *restrict xd,       ///< data double array.
+jbm_array_f64_opposite (double *restrict xr,    ///< result double array.
+                        const double *restrict xd,      ///< data double array.
                         const unsigned int n)   ///< number of array elements.
 {
   unsigned int i;
@@ -3736,8 +3736,8 @@ jbm_array_f64_opposite (double *restrict xr,     ///< result double array.
  * Function to calculate the multiplicative inverse of a double array.
  */
 static inline void
-jbm_array_f64_reciprocal (double *restrict xr,   ///< result double array.
-                          const double *restrict xd,     ///< data double array.
+jbm_array_f64_reciprocal (double *restrict xr,  ///< result double array.
+                          const double *restrict xd,    ///< data double array.
                           const unsigned int n) ///< number of array elements.
 {
   unsigned int i;
@@ -3749,8 +3749,8 @@ jbm_array_f64_reciprocal (double *restrict xr,   ///< result double array.
  * Function to calculate the abs function of a double array.
  */
 static inline void
-jbm_array_f64_abs (double *restrict xr,  ///< result double array.
-                   const double *restrict xd,    ///< data double array.
+jbm_array_f64_abs (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -3762,8 +3762,8 @@ jbm_array_f64_abs (double *restrict xr,  ///< result double array.
  * Function to calculate the cbrt function of a double array.
  */
 static inline void
-jbm_array_f64_cbrt (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_cbrt (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -3775,8 +3775,8 @@ jbm_array_f64_cbrt (double *restrict xr, ///< result double array.
  * Function to calculate the exp2 function of a double array.
  */
 static inline void
-jbm_array_f64_exp2 (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_exp2 (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -3788,8 +3788,8 @@ jbm_array_f64_exp2 (double *restrict xr, ///< result double array.
  * Function to calculate the exp function a double array.
  */
 static inline void
-jbm_array_f64_exp (double *restrict xr,  ///< result double array.
-                   const double *restrict xd,    ///< data double array.
+jbm_array_f64_exp (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -3801,8 +3801,8 @@ jbm_array_f64_exp (double *restrict xr,  ///< result double array.
  * Function to calculate the exp10 function a double array.
  */
 static inline void
-jbm_array_f64_exp10 (double *restrict xr,        ///< result double array.
-                     const double *restrict xd,  ///< data double array.
+jbm_array_f64_exp10 (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
   unsigned int i;
@@ -3814,8 +3814,8 @@ jbm_array_f64_exp10 (double *restrict xr,        ///< result double array.
  * Function to calculate the expm1 function a double array.
  */
 static inline void
-jbm_array_f64_expm1 (double *restrict xr,        ///< result double array.
-                     const double *restrict xd,  ///< data double array.
+jbm_array_f64_expm1 (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
   unsigned int i;
@@ -3827,8 +3827,8 @@ jbm_array_f64_expm1 (double *restrict xr,        ///< result double array.
  * Function to calculate the log2 function a double array.
  */
 static inline void
-jbm_array_f64_log2 (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_log2 (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -3840,8 +3840,8 @@ jbm_array_f64_log2 (double *restrict xr, ///< result double array.
  * Function to calculate the log function a double array.
  */
 static inline void
-jbm_array_f64_log (double *restrict xr,  ///< result double array.
-                   const double *restrict xd,    ///< data double array.
+jbm_array_f64_log (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -3853,8 +3853,8 @@ jbm_array_f64_log (double *restrict xr,  ///< result double array.
  * Function to calculate the log10 function a double array.
  */
 static inline void
-jbm_array_f64_log10 (double *restrict xr,        ///< result double array.
-                     const double *restrict xd,  ///< data double array.
+jbm_array_f64_log10 (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
   unsigned int i;
@@ -3866,8 +3866,8 @@ jbm_array_f64_log10 (double *restrict xr,        ///< result double array.
  * Function to calculate the sin function a double array.
  */
 static inline void
-jbm_array_f64_sin (double *restrict xr,  ///< result double array.
-                   const double *restrict xd,    ///< data double array.
+jbm_array_f64_sin (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -3879,8 +3879,8 @@ jbm_array_f64_sin (double *restrict xr,  ///< result double array.
  * Function to calculate the cos function a double array.
  */
 static inline void
-jbm_array_f64_cos (double *restrict xr,  ///< result double array.
-                   const double *restrict xd,    ///< data double array.
+jbm_array_f64_cos (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -3892,8 +3892,8 @@ jbm_array_f64_cos (double *restrict xr,  ///< result double array.
  * Function to calculate the tan function a double array.
  */
 static inline void
-jbm_array_f64_tan (double *restrict xr,  ///< result double array.
-                   const double *restrict xd,    ///< data double array.
+jbm_array_f64_tan (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -3905,8 +3905,8 @@ jbm_array_f64_tan (double *restrict xr,  ///< result double array.
  * Function to calculate the asin function a double array.
  */
 static inline void
-jbm_array_f64_asin (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_asin (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -3918,8 +3918,8 @@ jbm_array_f64_asin (double *restrict xr, ///< result double array.
  * Function to calculate the acos function a double array.
  */
 static inline void
-jbm_array_f64_acos (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_acos (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -3931,8 +3931,8 @@ jbm_array_f64_acos (double *restrict xr, ///< result double array.
  * Function to calculate the atan function a double array.
  */
 static inline void
-jbm_array_f64_atan (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_atan (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -3944,8 +3944,8 @@ jbm_array_f64_atan (double *restrict xr, ///< result double array.
  * Function to calculate the sinh function a double array.
  */
 static inline void
-jbm_array_f64_sinh (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_sinh (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -3957,8 +3957,8 @@ jbm_array_f64_sinh (double *restrict xr, ///< result double array.
  * Function to calculate the cosh function a double array.
  */
 static inline void
-jbm_array_f64_cosh (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_cosh (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -3970,8 +3970,8 @@ jbm_array_f64_cosh (double *restrict xr, ///< result double array.
  * Function to calculate the tanh function a double array.
  */
 static inline void
-jbm_array_f64_tanh (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_tanh (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -3983,8 +3983,8 @@ jbm_array_f64_tanh (double *restrict xr, ///< result double array.
  * Function to calculate the asinh function a double array.
  */
 static inline void
-jbm_array_f64_asinh (double *restrict xr,        ///< result double array.
-                     const double *restrict xd,  ///< data double array.
+jbm_array_f64_asinh (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
   unsigned int i;
@@ -3996,8 +3996,8 @@ jbm_array_f64_asinh (double *restrict xr,        ///< result double array.
  * Function to calculate the acosh function a double array.
  */
 static inline void
-jbm_array_f64_acosh (double *restrict xr,        ///< result double array.
-                     const double *restrict xd,  ///< data double array.
+jbm_array_f64_acosh (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
   unsigned int i;
@@ -4009,8 +4009,8 @@ jbm_array_f64_acosh (double *restrict xr,        ///< result double array.
  * Function to calculate the atanh function a double array.
  */
 static inline void
-jbm_array_f64_atanh (double *restrict xr,        ///< result double array.
-                     const double *restrict xd,  ///< data double array.
+jbm_array_f64_atanh (double *restrict xr,       ///< result double array.
+                     const double *restrict xd, ///< data double array.
                      const unsigned int n)      ///< number of array elements.
 {
   unsigned int i;
@@ -4022,8 +4022,8 @@ jbm_array_f64_atanh (double *restrict xr,        ///< result double array.
  * Function to calculate the erf function a double array.
  */
 static inline void
-jbm_array_f64_erf (double *restrict xr,  ///< result double array.
-                   const double *restrict xd,    ///< data double array.
+jbm_array_f64_erf (double *restrict xr, ///< result double array.
+                   const double *restrict xd,   ///< data double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -4035,8 +4035,8 @@ jbm_array_f64_erf (double *restrict xr,  ///< result double array.
  * Function to calculate the erfc function a double array.
  */
 static inline void
-jbm_array_f64_erfc (double *restrict xr, ///< result double array.
-                    const double *restrict xd,   ///< data double array.
+jbm_array_f64_erfc (double *restrict xr,        ///< result double array.
+                    const double *restrict xd,  ///< data double array.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -4050,7 +4050,7 @@ jbm_array_f64_erfc (double *restrict xr, ///< result double array.
  * \return the summation value.
  */
 static inline double
-jbm_array_f64_sum (const double *x,      ///< double array.
+jbm_array_f64_sum (const double *x,     ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
   double xr;
@@ -4066,7 +4066,7 @@ jbm_array_f64_sum (const double *x,      ///< double array.
  * \return the highest value.
  */
 static inline double
-jbm_array_f64_reduce_max (const double *x,       ///< double array.
+jbm_array_f64_reduce_max (const double *x,      ///< double array.
                           const unsigned int n) ///< number of array elements.
 {
   double xr;
@@ -4082,7 +4082,7 @@ jbm_array_f64_reduce_max (const double *x,       ///< double array.
  * \return the lowest value.
  */
 static inline double
-jbm_array_f64_reduce_min (const double *x,       ///< double array.
+jbm_array_f64_reduce_min (const double *x,      ///< double array.
                           const unsigned int n) ///< number of array elements.
 {
   double xr;
@@ -4096,9 +4096,9 @@ jbm_array_f64_reduce_min (const double *x,       ///< double array.
  * Function to find the highest and the lowest elements of a double array.
  */
 static inline void
-jbm_array_f64_reduce_maxmin (const double *x,    ///< double array.
-                             double *max,        ///< the highest value.
-                             double *min,        ///< the lowest value.
+jbm_array_f64_reduce_maxmin (const double *x,   ///< double array.
+                             double *max,       ///< the highest value.
+                             double *min,       ///< the lowest value.
                              const unsigned int n)
   ///< number of array elements.
 {
@@ -4113,8 +4113,8 @@ jbm_array_f64_reduce_maxmin (const double *x,    ///< double array.
  * Function to set a double array with a number.
  */
 static inline void
-jbm_array_f64_set1 (double *restrict xr, ///< result double array.
-                    const double xd,     ///< data double number.
+jbm_array_f64_set1 (double *restrict xr,        ///< result double array.
+                    const double xd,    ///< data double number.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -4126,9 +4126,9 @@ jbm_array_f64_set1 (double *restrict xr, ///< result double array.
  * Function to add 1 double array + 1 number.
  */
 static inline void
-jbm_array_f64_add1 (double *restrict xr, ///< result double array.
-                    const double *restrict x1,   ///< addend double array.
-                    const double x2,     ///< addend double number.
+jbm_array_f64_add1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< addend double array.
+                    const double x2,    ///< addend double number.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -4140,9 +4140,9 @@ jbm_array_f64_add1 (double *restrict xr, ///< result double array.
  * Function to subtract 1 double array + 1 number.
  */
 static inline void
-jbm_array_f64_sub1 (double *restrict xr, ///< result double array.
-                    const double *restrict x1,   ///< minuend double array.
-                    const double x2,     ///< subtrahend double number.
+jbm_array_f64_sub1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< minuend double array.
+                    const double x2,    ///< subtrahend double number.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -4154,9 +4154,9 @@ jbm_array_f64_sub1 (double *restrict xr, ///< result double array.
  * Function to multiply a double array by a double number.
  */
 static inline void
-jbm_array_f64_mul1 (double *restrict xr, ///< result double array.
-                    const double *restrict x1,   ///< multiplier double array.
-                    const double x2,     ///< multiplicand double number.
+jbm_array_f64_mul1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< multiplier double array.
+                    const double x2,    ///< multiplicand double number.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -4168,9 +4168,9 @@ jbm_array_f64_mul1 (double *restrict xr, ///< result double array.
  * Function to divide a double array by a double number.
  */
 static inline void
-jbm_array_f64_div1 (double *restrict xr, ///< result double array.
-                    const double *restrict x1,   ///< dividend double array.
-                    const double x2,     ///< divisor double number.
+jbm_array_f64_div1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< dividend double array.
+                    const double x2,    ///< divisor double number.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -4182,9 +4182,9 @@ jbm_array_f64_div1 (double *restrict xr, ///< result double array.
  * Function to calculate the maximum between 1 double array + 1 number.
  */
 static inline void
-jbm_array_f64_max1 (double *restrict xr, ///< result double array.
-                    const double *restrict x1,   ///< double array.
-                    const double x2,     ///< double number.
+jbm_array_f64_max1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -4196,9 +4196,9 @@ jbm_array_f64_max1 (double *restrict xr, ///< result double array.
  * Function to calculate the minimum between 1 double array + 1 number.
  */
 static inline void
-jbm_array_f64_min1 (double *restrict xr, ///< result double array.
-                    const double *restrict x1,   ///< double array.
-                    const double x2,     ///< double number.
+jbm_array_f64_min1 (double *restrict xr,        ///< result double array.
+                    const double *restrict x1,  ///< double array.
+                    const double x2,    ///< double number.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -4210,9 +4210,9 @@ jbm_array_f64_min1 (double *restrict xr, ///< result double array.
  * Function to calculate the module between 1 double array + 1 number.
  */
 static inline void
-jbm_array_f64_mod1 (double *xr,  ///< result double array.
-                    const double *x1,    ///< double array.
-                    const double x2,     ///< double number.
+jbm_array_f64_mod1 (double *xr, ///< result double array.
+                    const double *x1,   ///< double array.
+                    const double x2,    ///< double number.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -4224,9 +4224,9 @@ jbm_array_f64_mod1 (double *xr,  ///< result double array.
  * Function to calculate the pow function between 1 double array + 1 number.
  */
 static inline void
-jbm_array_f64_pow1 (double *xr,  ///< result double array.
-                    const double *x1,    ///< double array.
-                    const double x2,     ///< double number.
+jbm_array_f64_pow1 (double *xr, ///< result double array.
+                    const double *x1,   ///< double array.
+                    const double x2,    ///< double number.
                     const unsigned int n)       ///< number of array elements.
 {
   unsigned int i;
@@ -4238,9 +4238,9 @@ jbm_array_f64_pow1 (double *xr,  ///< result double array.
  * Function to add 2 double arrays.
  */
 static inline void
-jbm_array_f64_add (double *xr,   ///< result double array.
-                   const double *x1,     ///< 1st addend double array.
-                   const double *x2,     ///< 2nd addend double array.
+jbm_array_f64_add (double *xr,  ///< result double array.
+                   const double *x1,    ///< 1st addend double array.
+                   const double *x2,    ///< 2nd addend double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -4252,9 +4252,9 @@ jbm_array_f64_add (double *xr,   ///< result double array.
  * Function to subtract 2 double arrays.
  */
 static inline void
-jbm_array_f64_sub (double *xr,   ///< result double array.
-                   const double *x1,     ///< minuend double array.
-                   const double *x2,     ///< subtrahend double array.
+jbm_array_f64_sub (double *xr,  ///< result double array.
+                   const double *x1,    ///< minuend double array.
+                   const double *x2,    ///< subtrahend double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -4266,9 +4266,9 @@ jbm_array_f64_sub (double *xr,   ///< result double array.
  * Function to multiply 2 double arrays.
  */
 static inline void
-jbm_array_f64_mul (double *xr,   ///< result double array.
-                   const double *x1,     ///< multiplier double array.
-                   const double *x2,     ///< multiplicand double array.
+jbm_array_f64_mul (double *xr,  ///< result double array.
+                   const double *x1,    ///< multiplier double array.
+                   const double *x2,    ///< multiplicand double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -4280,9 +4280,9 @@ jbm_array_f64_mul (double *xr,   ///< result double array.
  * Function to divide 2 double arrays.
  */
 static inline void
-jbm_array_f64_div (double *xr,   ///< result double array.
-                   const double *x1,     ///< dividend double array.
-                   const double *x2,     ///< divisor double array.
+jbm_array_f64_div (double *xr,  ///< result double array.
+                   const double *x1,    ///< dividend double array.
+                   const double *x2,    ///< divisor double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -4294,9 +4294,9 @@ jbm_array_f64_div (double *xr,   ///< result double array.
  * Function to calculate the maximum in 2 double arrays.
  */
 static inline void
-jbm_array_f64_max (double *xr,   ///< result double array.
-                   const double *x1,     ///< 1st double array.
-                   const double *x2,     ///< 2nd double array.
+jbm_array_f64_max (double *xr,  ///< result double array.
+                   const double *x1,    ///< 1st double array.
+                   const double *x2,    ///< 2nd double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -4308,9 +4308,9 @@ jbm_array_f64_max (double *xr,   ///< result double array.
  * Function to calculate the minimum in 2 double arrays.
  */
 static inline void
-jbm_array_f64_min (double *xr,   ///< result double array.
-                   const double *x1,     ///< 1st double array.
-                   const double *x2,     ///< 2nd double array.
+jbm_array_f64_min (double *xr,  ///< result double array.
+                   const double *x1,    ///< 1st double array.
+                   const double *x2,    ///< 2nd double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -4322,9 +4322,9 @@ jbm_array_f64_min (double *xr,   ///< result double array.
  * Function to calculate the module in 2 double arrays.
  */
 static inline void
-jbm_array_f64_mod (double *xr,   ///< result double array.
-                   const double *x1,     ///< 1st double array.
-                   const double *x2,     ///< 2nd double array.
+jbm_array_f64_mod (double *xr,  ///< result double array.
+                   const double *x1,    ///< 1st double array.
+                   const double *x2,    ///< 2nd double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -4336,9 +4336,9 @@ jbm_array_f64_mod (double *xr,   ///< result double array.
  * Function to calculate the pow function between 2 double arrays.
  */
 static inline void
-jbm_array_f64_pow (double *xr,   ///< result double array.
-                   const double *x1,     ///< double array.
-                   const double *x2,     ///< double array.
+jbm_array_f64_pow (double *xr,  ///< result double array.
+                   const double *x1,    ///< double array.
+                   const double *x2,    ///< double array.
                    const unsigned int n)        ///< number of array elements.
 {
   unsigned int i;
@@ -4352,8 +4352,8 @@ jbm_array_f64_pow (double *xr,   ///< result double array.
  * \return dot product (double).
  */
 static inline double
-jbm_array_f64_dot (const double *x1,     ///< multiplier double array.
-                   const double *x2,     ///< multiplicand double array.
+jbm_array_f64_dot (const double *x1,    ///< multiplier double array.
+                   const double *x2,    ///< multiplicand double array.
                    const unsigned int n)        ///< number of array elements.
 {
   double xr;
@@ -4368,10 +4368,10 @@ jbm_array_f64_dot (const double *x1,     ///< multiplier double array.
  * one double number: \f$xr_i=\left(x1_i\cdot x2_i\right)+x3\f$.
  */
 static inline void
-jbm_array_f64_fmadd1 (double *xr,        ///< result double array.
-                      const double *x1,  ///< 1st multiplicand double array.
-                      const double x2,   ///< 2nd multiplicand double number.
-                      const double *x3,  ///< addend double array.
+jbm_array_f64_fmadd1 (double *xr,       ///< result double array.
+                      const double *x1, ///< 1st multiplicand double array.
+                      const double x2,  ///< 2nd multiplicand double number.
+                      const double *x3, ///< addend double array.
                       const unsigned int n)     ///< number of array elements.
 {
   unsigned int i;
@@ -4384,10 +4384,10 @@ jbm_array_f64_fmadd1 (double *xr,        ///< result double array.
  * one double number: \f$xr_i=-\left(x1_i\cdot x2_i\right)+x3\f$.
  */
 static inline void
-jbm_array_f64_fnmadd1 (double *xr,       ///< result double array.
-                       const double *x1, ///< 1st multiplicand double array.
-                       const double x2,  ///< 2nd multiplicand double number.
-                       const double *x3, ///< addend double array.
+jbm_array_f64_fnmadd1 (double *xr,      ///< result double array.
+                       const double *x1,        ///< 1st multiplicand double array.
+                       const double x2, ///< 2nd multiplicand double number.
+                       const double *x3,        ///< addend double array.
                        const unsigned int n)    ///< number of array elements.
 {
   const y2 = jbm_f64_opposite (x2);
@@ -4401,10 +4401,10 @@ jbm_array_f64_fnmadd1 (double *xr,       ///< result double array.
  * one double number: \f$xr_i=\left(x1_i\cdot x2_i\right)-x3\f$.
  */
 static inline void
-jbm_array_f64_fmsub1 (double *xr,        ///< result double array.
-                      const double *x1,  ///< 1st multiplicand double array.
-                      const double x2,   ///< 2nd multiplicand double number.
-                      const double *x3,  ///< subtrahend double array.
+jbm_array_f64_fmsub1 (double *xr,       ///< result double array.
+                      const double *x1, ///< 1st multiplicand double array.
+                      const double x2,  ///< 2nd multiplicand double number.
+                      const double *x3, ///< subtrahend double array.
                       const unsigned int n)     ///< number of array elements.
 {
   unsigned int i;
@@ -4417,10 +4417,10 @@ jbm_array_f64_fmsub1 (double *xr,        ///< result double array.
  * one double number: \f$xr_i=-\left(x1_i\cdot x2_i\right)-x3\f$.
  */
 static inline void
-jbm_array_f64_fnmsub1 (double *xr,       ///< result double array.
-                       const double *x1, ///< 1st multiplicand double array.
-                       const double x2,  ///< 2nd multiplicand double number.
-                       const double *x3, ///< subtrahend double array.
+jbm_array_f64_fnmsub1 (double *xr,      ///< result double array.
+                       const double *x1,        ///< 1st multiplicand double array.
+                       const double x2, ///< 2nd multiplicand double number.
+                       const double *x3,        ///< subtrahend double array.
                        const unsigned int n)    ///< number of array elements.
 {
   unsigned int i;
@@ -4433,10 +4433,10 @@ jbm_array_f64_fnmsub1 (double *xr,       ///< result double array.
  * \f$xr_i=\left(x1_i\cdot x2_i\right)+x3_i\f$.
  */
 static inline void
-jbm_array_f64_fmadd (double *xr, ///< result double array.
-                     const double *x1,   ///< 1st multiplicand double array.
-                     const double *x2,   ///< 2nd multiplicand double array.
-                     const double *x3,   ///< addend double array.
+jbm_array_f64_fmadd (double *xr,        ///< result double array.
+                     const double *x1,  ///< 1st multiplicand double array.
+                     const double *x2,  ///< 2nd multiplicand double array.
+                     const double *x3,  ///< addend double array.
                      const unsigned int n)      ///< number of array elements.
 {
   unsigned int i;
@@ -4449,10 +4449,10 @@ jbm_array_f64_fmadd (double *xr, ///< result double array.
  * \f$xr_i=-\left(x1_i\cdot x2_i\right)+x3_i\f$.
  */
 static inline void
-jbm_array_f64_fnmadd (double *xr,        ///< result double array.
-                      const double *x1,  ///< 1st multiplicand double array.
-                      const double *x2,  ///< 2nd multiplicand double array.
-                      const double *x3,  ///< addend double array.
+jbm_array_f64_fnmadd (double *xr,       ///< result double array.
+                      const double *x1, ///< 1st multiplicand double array.
+                      const double *x2, ///< 2nd multiplicand double array.
+                      const double *x3, ///< addend double array.
                       const unsigned int n)     ///< number of array elements.
 {
   unsigned int i;
@@ -4465,10 +4465,10 @@ jbm_array_f64_fnmadd (double *xr,        ///< result double array.
  * \f$xr_i=\left(x1_i\cdot x2_i\right)-x3_i\f$.
  */
 static inline void
-jbm_array_f64_fmsub (double *xr, ///< result double array.
-                     const double *x1,   ///< 1st multiplicand double array.
-                     const double *x2,   ///< 2nd multiplicand double array.
-                     const double *x3,   ///< subtrahend double array.
+jbm_array_f64_fmsub (double *xr,        ///< result double array.
+                     const double *x1,  ///< 1st multiplicand double array.
+                     const double *x2,  ///< 2nd multiplicand double array.
+                     const double *x3,  ///< subtrahend double array.
                      const unsigned int n)      ///< number of array elements.
 {
   unsigned int i;
@@ -4481,10 +4481,10 @@ jbm_array_f64_fmsub (double *xr, ///< result double array.
  * \f$xr_i=-\left(x1_i\cdot x2_i\right)-x3_i\f$.
  */
 static inline void
-jbm_array_f64_fnmsub (double *xr,        ///< result double array.
-                      const double *x1,  ///< 1st multiplicand double array.
-                      const double *x2,  ///< 2nd multiplicand double array.
-                      const double *x3,  ///< subtrahend double array.
+jbm_array_f64_fnmsub (double *xr,       ///< result double array.
+                      const double *x1, ///< 1st multiplicand double array.
+                      const double *x2, ///< 2nd multiplicand double array.
+                      const double *x3, ///< subtrahend double array.
                       const unsigned int n)     ///< number of array elements.
 {
   unsigned int i;

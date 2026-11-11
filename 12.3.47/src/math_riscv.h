@@ -56368,7 +56368,7 @@ jbm_8xf64_abs (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
  * Function to copy the sign of a vfloat64m1_t vector to another vfloat64m1_t
  * vector.
  *
- * \return 8x vloat32m1_t vector with magnitude of 1st vector and sign of 2nd
+ * \return 8x vloat64m1_t vector with magnitude of 1st vector and sign of 2nd
  * vector.
  */
 static inline vfloat64m1_t
@@ -56395,9 +56395,9 @@ jbm_8xf64_hypot (const vfloat64m1_t x,  ///< 1st vfloat64m1_t vector.
 /**
  * Function to rounding to nearest (vfloat64m1_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (vint64m1_t).
  */
-static inline vint32m1_t
+static inline vint64m1_t
 jbm_8xf64_round (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_round (x, 8);
@@ -56406,9 +56406,9 @@ jbm_8xf64_round (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 /**
  * Function to rounding towards zero (vfloat64m1_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (vint64m1_t).
  */
-static inline vint32m1_t
+static inline vint64m1_t
 jbm_trunc_8xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_trunc (x, 8);
@@ -56417,9 +56417,9 @@ jbm_trunc_8xf64 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 /**
  * Function to rounding down (vfloat64m1_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (vint64m1_t).
  */
-static inline vint32m1_t
+static inline vint64m1_t
 jbm_8xf64_floor (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_floor (x, 8);
@@ -56428,9 +56428,9 @@ jbm_8xf64_floor (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 /**
  * Function to rounding top (vfloat64m1_t).
  *
- * \return function value vector (vint32m1_t).
+ * \return function value vector (vint64m1_t).
  */
-static inline vint32m1_t
+static inline vint64m1_t
 jbm_8xf64_ceil (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_floor (x, 8);
@@ -56455,19 +56455,19 @@ jbm_8xf64_mod (const vfloat64m1_t x,    ///< dividend (vfloat64m1_t).
  */
 static inline vfloat64m1_t
 jbm_8xf64_frexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                 vint32m1_t *e) ///< pointer to the extracted exponents vector.
+                 vint64m1_t *e) ///< pointer to the extracted exponents vector.
 {
   return jbm_nxf64_frexp (x, e, 8);
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (8x vint32m1_t).
+ * (8x vint64m1_t).
  *
  * \return function value (8x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_8xf64_exp2n (vint32m1_t e)  ///< exponent vector (8x vint32m1_t).
+jbm_8xf64_exp2n (vint64m1_t e)  ///< exponent vector (8x vint64m1_t).
 {
   return jbm_nxf64_exp2n (e, 8);
 }
@@ -56479,7 +56479,7 @@ jbm_8xf64_exp2n (vint32m1_t e)  ///< exponent vector (8x vint32m1_t).
  */
 static inline vfloat64m1_t
 jbm_8xf64_ldexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
-                 vint32m1_t e)  ///< exponent vector (vint32m1_t).
+                 vint64m1_t e)  ///< exponent vector (vint64m1_t).
 {
   return jbm_nxf64_ldexp (x, e, 8);
 }
@@ -56489,7 +56489,7 @@ jbm_8xf64_ldexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline vbool32_t
+static inline vbool64_t
 jbm_8xf64_small (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_small (x, 8);
@@ -62941,7 +62941,7 @@ jbm_8xf64_integral (vfloat64m1_t (*f) (const vfloat64m1_t, const size_t),
                     const vfloat64m1_t x2)
                     ///< right limit of the interval.
 {
-  return jbm_nxf32_integral (f, x1, x2, 8);
+  return jbm_nxf64_integral (f, x1, x2, 8);
 }
 
 /**
@@ -64527,10 +64527,10 @@ jbm_array_f64_fnmsub1 (double *xr,      ///< result double array.
  * \f$xr_i=\left(x1_i\cdot x2_i\right)+x3_i\f$.
  */
 static inline void
-jbm_array_f64_fmadd (double *xr, ///< result double array.
-                     const double *x1,   ///< 1st multiplicand double array.
-                     const double *x2,   ///< 2nd multiplicand double array.
-                     const double *x3,   ///< addend double array.
+jbm_array_f64_fmadd (double *xr,        ///< result double array.
+                     const double *x1,  ///< 1st multiplicand double array.
+                     const double *x2,  ///< 2nd multiplicand double array.
+                     const double *x3,  ///< addend double array.
                      const unsigned int n)      ///< number of array elements.
 {
   JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, __riscv_vle64_v_f64m1,
@@ -64542,10 +64542,10 @@ jbm_array_f64_fmadd (double *xr, ///< result double array.
  * \f$xr_i=-\left(x1_i\cdot x2_i\right)+x3_i\f$.
  */
 static inline void
-jbm_array_f64_fnmadd (double *xr,        ///< result double array.
-                      const double *x1,  ///< 1st multiplicand double array.
-                      const double *x2,  ///< 2nd multiplicand double array.
-                      const double *x3,  ///< addend double array.
+jbm_array_f64_fnmadd (double *xr,       ///< result double array.
+                      const double *x1, ///< 1st multiplicand double array.
+                      const double *x2, ///< 2nd multiplicand double array.
+                      const double *x3, ///< addend double array.
                       const unsigned int n)     ///< number of array elements.
 {
   JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, __riscv_vle64_v_f64m1,
@@ -64557,10 +64557,10 @@ jbm_array_f64_fnmadd (double *xr,        ///< result double array.
  * \f$xr_i=\left(x1_i\cdot x2_i\right)-x3_i\f$.
  */
 static inline void
-jbm_array_f64_fmsub (double *xr, ///< result double array.
-                     const double *x1,   ///< 1st multiplicand double array.
-                     const double *x2,   ///< 2nd multiplicand double array.
-                     const double *x3,   ///< subtrahend double array.
+jbm_array_f64_fmsub (double *xr,        ///< result double array.
+                     const double *x1,  ///< 1st multiplicand double array.
+                     const double *x2,  ///< 2nd multiplicand double array.
+                     const double *x3,  ///< subtrahend double array.
                      const unsigned int n)      ///< number of array elements.
 {
   JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, __riscv_vle64_v_f64m1,
@@ -64572,10 +64572,10 @@ jbm_array_f64_fmsub (double *xr, ///< result double array.
  * \f$xr_i=-\left(x1_i\cdot x2_i\right)-x3_i\f$.
  */
 static inline void
-jbm_array_f64_fnmsub (double *xr,        ///< result double array.
-                      const double *x1,  ///< 1st multiplicand double array.
-                      const double *x2,  ///< 2nd multiplicand double array.
-                      const double *x3,  ///< subtrahend double array.
+jbm_array_f64_fnmsub (double *xr,       ///< result double array.
+                      const double *x1, ///< 1st multiplicand double array.
+                      const double *x2, ///< 2nd multiplicand double array.
+                      const double *x3, ///< subtrahend double array.
                       const unsigned int n)     ///< number of array elements.
 {
   JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, __riscv_vle64_v_f64m1,
