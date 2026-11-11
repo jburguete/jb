@@ -149,25 +149,25 @@
   size_t i, vl; \
   for (i = 0; (n - i) >= (vlmax << 2);) \
     { \
-      store (xr + i, op (load (x1 + i, vl), x2, vlmax), vlmax); \
+      store (xr + i, op (load (x1 + i, vlmax), x2, vlmax), vlmax); \
       i += vlmax; \
-      store (xr + i, op (load (x1 + i, vl), x2, vlmax), vlmax); \
+      store (xr + i, op (load (x1 + i, vlmax), x2, vlmax), vlmax); \
       i += vlmax; \
-      store (xr + i, op (load (x1 + i, vl), x2, vlmax), vlmax); \
+      store (xr + i, op (load (x1 + i, vlmax), x2, vlmax), vlmax); \
       i += vlmax; \
-      store (xr + i, op (load (x1 + i, vl), x2, vlmax), vlmax); \
+      store (xr + i, op (load (x1 + i, vlmax), x2, vlmax), vlmax); \
       i += vlmax; \
     } \
   if ((n - i) >= (vlmax << 1)) \
     { \
-      store (xr + i, op (load (x1 + i, vl), x2, vlmax), vlmax); \
+      store (xr + i, op (load (x1 + i, vlmax), x2, vlmax), vlmax); \
       i += vlmax; \
-      store (xr + i, op (load (x1 + i, vl), x2, vlmax), vlmax); \
+      store (xr + i, op (load (x1 + i, vlmax), x2, vlmax), vlmax); \
       i += vlmax; \
     } \
   if ((n - i) >= vlmax) \
     { \
-      store (xr + i, op (load (x1 + i, vl), x2, vlmax), vlmax); \
+      store (xr + i, op (load (x1 + i, vlmax), x2, vlmax), vlmax); \
       i += vlmax; \
     } \
   if (i < n) \
@@ -63650,6 +63650,66 @@ jbm_array_f32_fnmsub1 (float *xr,       ///< result float array.
 }
 
 /**
+ * Function to calculate the fmadd function of three float arrays:
+ * \f$xr_i=\left(x1_i\cdot x2_i\right)+x3_i\f$.
+ */
+static inline void
+jbm_array_f32_fmadd (float *xr, ///< result float array.
+                     const float *x1,   ///< 1st multiplicand float array.
+                     const float *x2,   ///< 2nd multiplicand float array.
+                     const float *x3,   ///< addend float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, __riscv_vfmacc_vv_f32m1);
+}
+
+/**
+ * Function to calculate the fnmadd function of three float arrays:
+ * \f$xr_i=-\left(x1_i\cdot x2_i\right)+x3_i\f$.
+ */
+static inline void
+jbm_array_f32_fnmadd (float *xr,        ///< result float array.
+                      const float *x1,  ///< 1st multiplicand float array.
+                      const float *x2,  ///< 2nd multiplicand float array.
+                      const float *x3,  ///< addend float array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, __riscv_vfnmsac_vv_f32m1);
+}
+
+/**
+ * Function to calculate the fmsub function of three float arrays:
+ * \f$xr_i=\left(x1_i\cdot x2_i\right)-x3_i\f$.
+ */
+static inline void
+jbm_array_f32_fmsub (float *xr, ///< result float array.
+                     const float *x1,   ///< 1st multiplicand float array.
+                     const float *x2,   ///< 2nd multiplicand float array.
+                     const float *x3,   ///< subtrahend float array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, __riscv_vfmsac_vv_f32m1);
+}
+
+/**
+ * Function to calculate the fnmsub function of three float arrays:
+ * \f$xr_i=-\left(x1_i\cdot x2_i\right)-x3_i\f$.
+ */
+static inline void
+jbm_array_f32_fnmsub (float *xr,        ///< result float array.
+                      const float *x1,  ///< 1st multiplicand float array.
+                      const float *x2,  ///< 2nd multiplicand float array.
+                      const float *x3,  ///< subtrahend float array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, float, __riscv_vle32_v_f32m1,
+                 __riscv_vse32_v_f32m1, __riscv_vfnmacc_vv_f32m1);
+}
+
+/**
  * Function to calculate the coefficients of a linear regression adjusted by 
  * minimum squares: \f$y=a+b\,x\f$ (float).
  */
@@ -63670,71 +63730,8 @@ jbm_array_f32_regression_linear (const float *x,
   vfloat32m1_t x2, y2, mx2, my2, sx0, sy0, sx1, sy1, sx2, sy2, sx3, sy3;
   float mx, my, sx, sy;
   size_t i, vl;
-  sx0 = sy0 = sx1 = sy1 = sx2 = sy2 = sx3 = sy3 = zero;
-  for (i = 0; (n - i) >= (vlmax << 2);)
-    {
-      x2 = __riscv_vle32_v_f32m1 (x + i, vlmax);
-      y2 = __riscv_vle32_v_f32m1 (y + i, vlmax);
-      sx0 = __riscv_vfadd_vv_f32m1 (sx0, x2, vlmax);
-      sy0 = __riscv_vfadd_vv_f32m1 (sy0, y2, vlmax);
-      i += vlmax;
-      x2 = __riscv_vle32_v_f32m1 (x + i, vlmax);
-      y2 = __riscv_vle32_v_f32m1 (y + i, vlmax);
-      sx1 = __riscv_vfadd_vv_f32m1 (sx1, x2, vlmax);
-      sy1 = __riscv_vfadd_vv_f32m1 (sy1, y2, vlmax);
-      i += vlmax;
-      x2 = __riscv_vle32_v_f32m1 (x + i, vlmax);
-      y2 = __riscv_vle32_v_f32m1 (y + i, vlmax);
-      sx2 = __riscv_vfadd_vv_f32m1 (sx2, x2, vlmax);
-      sy2 = __riscv_vfadd_vv_f32m1 (sy2, y2, vlmax);
-      i += vlmax;
-      x2 = __riscv_vle32_v_f32m1 (x + i, vlmax);
-      y2 = __riscv_vle32_v_f32m1 (y + i, vlmax);
-      sx3 = __riscv_vfadd_vv_f32m1 (sx3, x2, vlmax);
-      sy3 = __riscv_vfadd_vv_f32m1 (sy3, y2, vlmax);
-      i += vlmax;
-    }
-  if ((n - i) >= (vlmax << 1))
-    {
-      x2 = __riscv_vle32_v_f32m1 (x + i, vlmax);
-      y2 = __riscv_vle32_v_f32m1 (y + i, vlmax);
-      sx0 = __riscv_vfadd_vv_f32m1 (sx0, x2, vlmax);
-      sy0 = __riscv_vfadd_vv_f32m1 (sy0, y2, vlmax);
-      i += vlmax;
-      x2 = __riscv_vle32_v_f32m1 (x + i, vlmax);
-      y2 = __riscv_vle32_v_f32m1 (y + i, vlmax);
-      sx1 = __riscv_vfadd_vv_f32m1 (sx1, x2, vlmax);
-      sy1 = __riscv_vfadd_vv_f32m1 (sy1, y2, vlmax);
-      i += vlmax;
-    }
-  if ((n - i) >= vlmax)
-    {
-      x2 = __riscv_vle32_v_f32m1 (x + i, vlmax);
-      y2 = __riscv_vle32_v_f32m1 (y + i, vlmax);
-      sx2 = __riscv_vfadd_vv_f32m1 (sx2, x2, vlmax);
-      sy2 = __riscv_vfadd_vv_f32m1 (sy2, y2, vlmax);
-      i += vlmax;
-    }
-  if (i < n)
-    {
-      vl = JBM_VL (float, n - i);
-      x2 = __riscv_vle32_v_f32m1 (x + i, vl);
-      y2 = __riscv_vle32_v_f32m1 (y + i, vl);
-      sx3 = __riscv_vfadd_vv_f32m1 (sx3, x2, vl);
-      sy3 = __riscv_vfadd_vv_f32m1 (sy3, y2, vl);
-    }
-  sx0 = __riscv_vfadd_vv_f32m1 (sx0, sx1, vlmax);
-  sx2 = __riscv_vfadd_vv_f32m1 (sx2, sx3, vlmax);
-  sx0 = __riscv_vfadd_vv_f32m1 (sx0, sx2, vlmax);
-  sy0 = __riscv_vfadd_vv_f32m1 (sy0, sy1, vlmax);
-  sy2 = __riscv_vfadd_vv_f32m1 (sy2, sy3, vlmax);
-  sy0 = __riscv_vfadd_vv_f32m1 (sy0, sy2, vlmax);
-  mx = __riscv_vfmv_f_s_f32m1_f32
-    (__riscv_vfredusum_vs_f32m1_f32m1 (sx0, zero, vlmax));
-  my = __riscv_vfmv_f_s_f32m1_f32
-    (__riscv_vfredusum_vs_f32m1_f32m1 (sy0, zero, vlmax));
-  mx /= (float) n;
-  my /= (float) n;
+  mx = jbm_array_f32_sum (x, n) / (float) n;
+  my = jbm_array_f32_sum (y, n) / (float) n;
   mx2 = __riscv_vfmv_v_f_f32m1 (mx, vlmax);
   my2 = __riscv_vfmv_v_f_f32m1 (my, vlmax);
   sx0 = sy0 = sx1 = sy1 = sx2 = sy2 = sx3 = sy3 = zero;
@@ -64526,6 +64523,66 @@ jbm_array_f64_fnmsub1 (double *xr,      ///< result double array.
 }
 
 /**
+ * Function to calculate the fmadd function of three double arrays:
+ * \f$xr_i=\left(x1_i\cdot x2_i\right)+x3_i\f$.
+ */
+static inline void
+jbm_array_f64_fmadd (double *xr, ///< result double array.
+                     const double *x1,   ///< 1st multiplicand double array.
+                     const double *x2,   ///< 2nd multiplicand double array.
+                     const double *x3,   ///< addend double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, __riscv_vle64_v_f64m1,
+                 __riscv_vse64_v_f64m1, __riscv_vfmacc_vv_f64m1);
+}
+
+/**
+ * Function to calculate the fnmadd function of three double arrays:
+ * \f$xr_i=-\left(x1_i\cdot x2_i\right)+x3_i\f$.
+ */
+static inline void
+jbm_array_f64_fnmadd (double *xr,        ///< result double array.
+                      const double *x1,  ///< 1st multiplicand double array.
+                      const double *x2,  ///< 2nd multiplicand double array.
+                      const double *x3,  ///< addend double array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, __riscv_vle64_v_f64m1,
+                 __riscv_vse64_v_f64m1, __riscv_vfnmsac_vv_f64m1);
+}
+
+/**
+ * Function to calculate the fmsub function of three double arrays:
+ * \f$xr_i=\left(x1_i\cdot x2_i\right)-x3_i\f$.
+ */
+static inline void
+jbm_array_f64_fmsub (double *xr, ///< result double array.
+                     const double *x1,   ///< 1st multiplicand double array.
+                     const double *x2,   ///< 2nd multiplicand double array.
+                     const double *x3,   ///< subtrahend double array.
+                     const unsigned int n)      ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, __riscv_vle64_v_f64m1,
+                 __riscv_vse64_v_f64m1, __riscv_vfmsac_vv_f64m1);
+}
+
+/**
+ * Function to calculate the fnmsub function of three double arrays:
+ * \f$xr_i=-\left(x1_i\cdot x2_i\right)-x3_i\f$.
+ */
+static inline void
+jbm_array_f64_fnmsub (double *xr,        ///< result double array.
+                      const double *x1,  ///< 1st multiplicand double array.
+                      const double *x2,  ///< 2nd multiplicand double array.
+                      const double *x3,  ///< subtrahend double array.
+                      const unsigned int n)     ///< number of array elements.
+{
+  JBM_ARRAY_OP4 (xr, x1, x2, x3, n, double, __riscv_vle64_v_f64m1,
+                 __riscv_vse64_v_f64m1, __riscv_vfnmacc_vv_f64m1);
+}
+
+/**
  * Function to calculate the coefficients of a linear regression adjusted by 
  * minimum squares: \f$y=a+b\,x\f$ (double).
  */
@@ -64544,74 +64601,10 @@ jbm_array_f64_regression_linear (const double *x,
   const size_t vlmax = JBM_VLMAX (double);
   const vfloat64m1_t zero = __riscv_vfmv_v_f_f64m1 (0., vlmax);
   vfloat64m1_t x2, y2, mx2, my2, sx0, sy0, sx1, sy1, sx2, sy2, sx3, sy3;
-  double mx, my, sx, sy, dx, dy;
+  double mx, my, sx, sy;
   size_t i, vl;
-  sx0 = sy0 = sx1 = sy1 = sx2 = sy2 = sx3 = sy3 = zero;
-  for (i = 0; (n - i) >= (vlmax << 2);)
-    {
-      x2 = __riscv_vle64_v_f64m1 (x + i, vlmax);
-      y2 = __riscv_vle64_v_f64m1 (y + i, vlmax);
-      sx0 = __riscv_vfadd_vv_f64m1 (sx0, x2, vlmax);
-      sy0 = __riscv_vfadd_vv_f64m1 (sy0, y2, vlmax);
-      i += vlmax;
-      x2 = __riscv_vle64_v_f64m1 (x + i, vlmax);
-      y2 = __riscv_vle64_v_f64m1 (y + i, vlmax);
-      sx1 = __riscv_vfadd_vv_f64m1 (sx1, x2, vlmax);
-      sy1 = __riscv_vfadd_vv_f64m1 (sy1, y2, vlmax);
-      i += vlmax;
-      x2 = __riscv_vle64_v_f64m1 (x + i, vlmax);
-      y2 = __riscv_vle64_v_f64m1 (y + i, vlmax);
-      sx2 = __riscv_vfadd_vv_f64m1 (sx2, x2, vlmax);
-      sy2 = __riscv_vfadd_vv_f64m1 (sy2, y2, vlmax);
-      i += vlmax;
-      x2 = __riscv_vle64_v_f64m1 (x + i, vlmax);
-      y2 = __riscv_vle64_v_f64m1 (y + i, vlmax);
-      sx3 = __riscv_vfadd_vv_f64m1 (sx3, x2, vlmax);
-      sy3 = __riscv_vfadd_vv_f64m1 (sy3, y2, vlmax);
-      i += vlmax;
-    }
-  if ((n - i) >= (vlmax << 1))
-    {
-      x2 = __riscv_vle64_v_f64m1 (x + i, vlmax);
-      y2 = __riscv_vle64_v_f64m1 (y + i, vlmax);
-      sx0 = __riscv_vfadd_vv_f64m1 (sx0, x2, vlmax);
-      sy0 = __riscv_vfadd_vv_f64m1 (sy0, y2, vlmax);
-      i += vlmax;
-      x2 = __riscv_vle64_v_f64m1 (x + i, vlmax);
-      y2 = __riscv_vle64_v_f64m1 (y + i, vlmax);
-      sx1 = __riscv_vfadd_vv_f64m1 (sx1, x2, vlmax);
-      sy1 = __riscv_vfadd_vv_f64m1 (sy1, y2, vlmax);
-      i += vlmax;
-    }
-  if ((n - i) >= vlmax)
-    {
-      x2 = __riscv_vle64_v_f64m1 (x + i, vlmax);
-      y2 = __riscv_vle64_v_f64m1 (y + i, vlmax);
-      sx2 = __riscv_vfadd_vv_f64m1 (sx2, x2, vlmax);
-      sy2 = __riscv_vfadd_vv_f64m1 (sy2, y2, vlmax);
-      i += vlmax;
-    }
-  if (i < n)
-    {
-      vl = JBM_VL (double, n - i);
-      x2 = __riscv_vle64_v_f64m1 (x + i, vl);
-      y2 = __riscv_vle64_v_f64m1 (y + i, vl);
-      sx3 = __riscv_vfadd_vv_f64m1 (sx3, x2, vl);
-      sy3 = __riscv_vfadd_vv_f64m1 (sy3, y2, vl);
-      i += vl;
-    }
-  sx0 = __riscv_vfadd_vv_f64m1 (sx0, sx1, vlmax);
-  sx2 = __riscv_vfadd_vv_f64m1 (sx2, sx3, vlmax);
-  sx0 = __riscv_vfadd_vv_f64m1 (sx0, sx2, vlmax);
-  sy0 = __riscv_vfadd_vv_f64m1 (sy0, sy1, vlmax);
-  sy2 = __riscv_vfadd_vv_f64m1 (sy2, sy3, vlmax);
-  sy0 = __riscv_vfadd_vv_f64m1 (sy0, sy2, vlmax);
-  mx = __riscv_vfmv_f_s_f64m1_f64
-    (__riscv_vfredusum_vs_f64m1_f64m1 (sx0, zero, vlmax));
-  my = __riscv_vfmv_f_s_f64m1_f64
-    (__riscv_vfredusum_vs_f64m1_f64m1 (sy0, zero, vlmax));
-  mx /= (double) n;
-  my /= (double) n;
+  mx = jbm_array_f64_sum (x, n) / (double) n;
+  my = jbm_array_f64_sum (y, n) / (double) n;
   mx2 = __riscv_vfmv_v_f_f64m1 (mx, vlmax);
   my2 = __riscv_vfmv_v_f_f64m1 (my, vlmax);
   sx0 = sy0 = sx1 = sy1 = sx2 = sy2 = sx3 = sy3 = zero;

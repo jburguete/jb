@@ -17450,87 +17450,8 @@ jbm_array_f32_regression_linear (const float *x,
   __m128 x2, y2, mx2, my2, sx2, sy2;
   float mx, my, sx, sy, dx, dy;
   unsigned int i, nn;
-  sx8 = sy8 = sx8b = sy8b = sx8c = sy8c = sx8d = sy8d = _mm256_setzero_ps ();
-  i = 0;
-  nn = n >> 5;
-  if (nn)
-    {
-      for (; nn > 0; --nn, i += 8)
-        {
-          x8 = _mm256_loadu_ps (x + i);
-          y8 = _mm256_loadu_ps (y + i);
-          sx8 = _mm256_add_ps (sx8, x8);
-          sy8 = _mm256_add_ps (sy8, y8);
-          i += 8;
-          x8 = _mm256_loadu_ps (x + i);
-          y8 = _mm256_loadu_ps (y + i);
-          sx8b = _mm256_add_ps (sx8b, x8);
-          sy8b = _mm256_add_ps (sy8b, y8);
-          i += 8;
-          x8 = _mm256_loadu_ps (x + i);
-          y8 = _mm256_loadu_ps (y + i);
-          sx8c = _mm256_add_ps (sx8c, x8);
-          sy8c = _mm256_add_ps (sy8c, y8);
-          i += 8;
-          x8 = _mm256_loadu_ps (x + i);
-          y8 = _mm256_loadu_ps (y + i);
-          sx8d = _mm256_add_ps (sx8d, x8);
-          sy8d = _mm256_add_ps (sy8d, y8);
-        }
-      sx8 = _mm256_add_ps (sx8, sx8b);
-      sy8 = _mm256_add_ps (sy8, sy8b);
-      sx8c = _mm256_add_ps (sx8c, sx8d);
-      sy8c = _mm256_add_ps (sy8c, sy8d);
-      sx8 = _mm256_add_ps (sx8, sx8c);
-      sy8 = _mm256_add_ps (sy8, sy8c);
-    }
-  nn = (n - i) >> 4;
-  if (nn)
-    {
-      x8 = _mm256_loadu_ps (x + i);
-      y8 = _mm256_loadu_ps (y + i);
-      sx8 = _mm256_add_ps (sx8, x8);
-      sy8 = _mm256_add_ps (sy8, y8);
-      i += 8;
-      x8 = _mm256_loadu_ps (x + i);
-      y8 = _mm256_loadu_ps (y + i);
-      sx8 = _mm256_add_ps (sx8, x8);
-      sy8 = _mm256_add_ps (sy8, y8);
-      i += 8;
-    }
-  nn = (n - i) >> 3;
-  if (nn)
-    {
-      x8 = _mm256_loadu_ps (x + i);
-      y8 = _mm256_loadu_ps (y + i);
-      sx8 = _mm256_add_ps (sx8, x8);
-      sy8 = _mm256_add_ps (sy8, y8);
-      i += 8;
-    }
-  sx2 = _mm_add_ps (_mm256_castps256_ps128 (sx8),
-                    _mm256_extractf128_ps (sx8, 1));
-  sy2 = _mm_add_ps (_mm256_castps256_ps128 (sy8),
-                    _mm256_extractf128_ps (sy8, 1));
-  nn = (n - i) >> 2;
-  if (nn)
-    {
-      x2 = _mm_loadu_ps (x + i);
-      y2 = _mm_loadu_ps (y + i);
-      sx2 = _mm_add_ps (sx2, x2);
-      sy2 = _mm_add_ps (sy2, y2);
-      i += 4;
-    }
-  sx2 = _mm_hadd_ps (sx2, sx2);
-  sy2 = _mm_hadd_ps (sy2, sy2);
-  mx = _mm_cvtss_f32 (_mm_hadd_ps (sx2, sx2));
-  my = _mm_cvtss_f32 (_mm_hadd_ps (sy2, sy2));
-  for (; i < n; ++i)
-    {
-      mx += x[i];
-      my += y[i];
-    }
-  mx /= (float) n;
-  my /= (float) n;
+  mx = jbm_array_f32_sum (x, n) / (float) n;
+  my = jbm_array_f32_sum (y, n) / (float) n;
   mx8 = _mm256_set1_ps (mx);
   my8 = _mm256_set1_ps (my);
   mx2 = _mm_set1_ps (mx);
@@ -18468,85 +18389,8 @@ jbm_array_f64_regression_linear (const double *x,
   __m128d x2, y2, mx2, my2, sx2, sy2;
   double mx, my, sx, sy, dx, dy;
   unsigned int i, nn;
-  sx8 = sy8 = sx8b = sy8b = sx8c = sy8c = sx8d = sy8d = _mm256_setzero_pd ();
-  i = 0;
-  nn = n >> 4;
-  if (nn)
-    {
-      for (; nn > 0; --nn, i += 4)
-        {
-          x8 = _mm256_loadu_pd (x + i);
-          y8 = _mm256_loadu_pd (y + i);
-          sx8 = _mm256_add_pd (sx8, x8);
-          sy8 = _mm256_add_pd (sy8, y8);
-          i += 4;
-          x8 = _mm256_loadu_pd (x + i);
-          y8 = _mm256_loadu_pd (y + i);
-          sx8b = _mm256_add_pd (sx8b, x8);
-          sy8b = _mm256_add_pd (sy8b, y8);
-          i += 4;
-          x8 = _mm256_loadu_pd (x + i);
-          y8 = _mm256_loadu_pd (y + i);
-          sx8c = _mm256_add_pd (sx8c, x8);
-          sy8c = _mm256_add_pd (sy8c, y8);
-          i += 4;
-          x8 = _mm256_loadu_pd (x + i);
-          y8 = _mm256_loadu_pd (y + i);
-          sx8d = _mm256_add_pd (sx8d, x8);
-          sy8d = _mm256_add_pd (sy8d, y8);
-        }
-      sx8 = _mm256_add_pd (sx8, sx8b);
-      sy8 = _mm256_add_pd (sy8, sy8b);
-      sx8c = _mm256_add_pd (sx8c, sx8d);
-      sy8c = _mm256_add_pd (sy8c, sy8d);
-      sx8 = _mm256_add_pd (sx8, sx8c);
-      sy8 = _mm256_add_pd (sy8, sy8c);
-    }
-  nn = (n - i) >> 3;
-  if (nn)
-    {
-      x8 = _mm256_loadu_pd (x + i);
-      y8 = _mm256_loadu_pd (y + i);
-      sx8 = _mm256_add_pd (sx8, x8);
-      sy8 = _mm256_add_pd (sy8, y8);
-      i += 4;
-      x8 = _mm256_loadu_pd (x + i);
-      y8 = _mm256_loadu_pd (y + i);
-      sx8 = _mm256_add_pd (sx8, x8);
-      sy8 = _mm256_add_pd (sy8, y8);
-      i += 4;
-    }
-  nn = (n - i) >> 2;
-  if (nn)
-    {
-      x8 = _mm256_loadu_pd (x + i);
-      y8 = _mm256_loadu_pd (y + i);
-      sx8 = _mm256_add_pd (sx8, x8);
-      sy8 = _mm256_add_pd (sy8, y8);
-      i += 4;
-    }
-  sx2 = _mm_add_pd (_mm256_castpd256_pd128 (sx8),
-                    _mm256_extractf128_pd (sx8, 1));
-  sy2 = _mm_add_pd (_mm256_castpd256_pd128 (sy8),
-                    _mm256_extractf128_pd (sy8, 1));
-  nn = (n - i) >> 1;
-  if (nn)
-    {
-      x2 = _mm_loadu_pd (x + i);
-      y2 = _mm_loadu_pd (y + i);
-      sx2 = _mm_add_pd (sx2, x2);
-      sy2 = _mm_add_pd (sy2, y2);
-      i += 2;
-    }
-  mx = _mm_cvtsd_f64 (_mm_add_pd (sx2, _mm_unpackhi_pd (sx2, sx2)));
-  my = _mm_cvtsd_f64 (_mm_add_pd (sy2, _mm_unpackhi_pd (sy2, sy2)));
-  if (i < n)
-    {
-      mx += x[i];
-      my += y[i];
-    }
-  mx /= (double) n;
-  my /= (double) n;
+  mx = jbm_array_f64_sum (x, n) / (double) n;
+  my = jbm_array_f64_sum (y, n) / (double) n;
   mx8 = _mm256_set1_pd (mx);
   my8 = _mm256_set1_pd (my);
   mx2 = _mm_set1_pd (mx);

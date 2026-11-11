@@ -16969,72 +16969,8 @@ jbm_array_f32_regression_linear (const float *x,
   float32x4_t x2, y2, mx2, my2, sx2, sy2, sx2b, sy2b, sx2c, sy2c, sx2d, sy2d;
   float mx, my, sx, sy, dx, dy;
   unsigned int i, nn;
-  sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = vdupq_n_f32 (0.f);
-  i = 0;
-  nn = n >> 4;
-  if (nn)
-    {
-      for (; nn > 0; --nn, i += 4)
-        {
-          x2 = vld1q_f32 (x + i);
-          y2 = vld1q_f32 (y + i);
-          sx2 = vaddq_f32 (sx2, x2);
-          sy2 = vaddq_f32 (sy2, y2);
-          i += 4;
-          x2 = vld1q_f32 (x + i);
-          y2 = vld1q_f32 (y + i);
-          sx2b = vaddq_f32 (sx2b, x2);
-          sy2b = vaddq_f32 (sy2b, y2);
-          i += 4;
-          x2 = vld1q_f32 (x + i);
-          y2 = vld1q_f32 (y + i);
-          sx2c = vaddq_f32 (sx2c, x2);
-          sy2c = vaddq_f32 (sy2c, y2);
-          i += 4;
-          x2 = vld1q_f32 (x + i);
-          y2 = vld1q_f32 (y + i);
-          sx2d = vaddq_f32 (sx2d, x2);
-          sy2d = vaddq_f32 (sy2d, y2);
-        }
-      sx2 = vaddq_f32 (sx2, sx2b);
-      sy2 = vaddq_f32 (sy2, sy2b);
-      sx2c = vaddq_f32 (sx2c, sx2d);
-      sy2c = vaddq_f32 (sy2c, sy2d);
-      sx2 = vaddq_f32 (sx2, sx2c);
-      sy2 = vaddq_f32 (sy2, sy2c);
-    }
-  nn = (n - i) >> 3;
-  if (nn)
-    {
-      x2 = vld1q_f32 (x + i);
-      y2 = vld1q_f32 (y + i);
-      sx2 = vaddq_f32 (sx2, x2);
-      sy2 = vaddq_f32 (sy2, y2);
-      i += 4;
-      x2 = vld1q_f32 (x + i);
-      y2 = vld1q_f32 (y + i);
-      sx2 = vaddq_f32 (sx2, x2);
-      sy2 = vaddq_f32 (sy2, y2);
-      i += 4;
-    }
-  nn = (n - i) >> 2;
-  if (nn)
-    {
-      x2 = vld1q_f32 (x + i);
-      y2 = vld1q_f32 (y + i);
-      sx2 = vaddq_f32 (sx2, x2);
-      sy2 = vaddq_f32 (sy2, y2);
-      i += 4;
-    }
-  mx = vaddvq_f32 (sx2);
-  my = vaddvq_f32 (sy2);
-  for (; i < n; ++i)
-    {
-      mx += x[i];
-      my += y[i];
-    }
-  mx /= (float) n;
-  my /= (float) n;
+  mx = jbm_array_f32_sum (x, n) / (float) n;
+  my = jbm_array_f32_sum (y, n) / (float) n;
   mx2 = vdupq_n_f32 (mx);
   my2 = vdupq_n_f32 (my);
   sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = vdupq_n_f32 (0.f);
@@ -17880,72 +17816,8 @@ jbm_array_f64_regression_linear (const double *x,
   float64x2_t x2, y2, mx2, my2, sx2, sy2, sx2b, sy2b, sx2c, sy2c, sx2d, sy2d;
   double mx, my, sx, sy, dx, dy;
   unsigned int i, nn;
-  sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = vdupq_n_f64 (0.);
-  i = 0;
-  nn = n >> 3;
-  if (nn)
-    {
-      for (; nn > 0; --nn, i += 2)
-        {
-          x2 = vld1q_f64 (x + i);
-          y2 = vld1q_f64 (y + i);
-          sx2 = vaddq_f64 (sx2, x2);
-          sy2 = vaddq_f64 (sy2, y2);
-          i += 2;
-          x2 = vld1q_f64 (x + i);
-          y2 = vld1q_f64 (y + i);
-          sx2b = vaddq_f64 (sx2b, x2);
-          sy2b = vaddq_f64 (sy2b, y2);
-          i += 2;
-          x2 = vld1q_f64 (x + i);
-          y2 = vld1q_f64 (y + i);
-          sx2c = vaddq_f64 (sx2c, x2);
-          sy2c = vaddq_f64 (sy2c, y2);
-          i += 2;
-          x2 = vld1q_f64 (x + i);
-          y2 = vld1q_f64 (y + i);
-          sx2d = vaddq_f64 (sx2d, x2);
-          sy2d = vaddq_f64 (sy2d, y2);
-        }
-      sx2 = vaddq_f64 (sx2, sx2b);
-      sy2 = vaddq_f64 (sy2, sy2b);
-      sx2c = vaddq_f64 (sx2c, sx2d);
-      sy2c = vaddq_f64 (sy2c, sy2d);
-      sx2 = vaddq_f64 (sx2, sx2c);
-      sy2 = vaddq_f64 (sy2, sy2c);
-    }
-  nn = (n - i) >> 2;
-  if (nn)
-    {
-      x2 = vld1q_f64 (x + i);
-      y2 = vld1q_f64 (y + i);
-      sx2 = vaddq_f64 (sx2, x2);
-      sy2 = vaddq_f64 (sy2, y2);
-      i += 2;
-      x2 = vld1q_f64 (x + i);
-      y2 = vld1q_f64 (y + i);
-      sx2 = vaddq_f64 (sx2, x2);
-      sy2 = vaddq_f64 (sy2, y2);
-      i += 2;
-    }
-  nn = (n - i) >> 1;
-  if (nn)
-    {
-      x2 = vld1q_f64 (x + i);
-      y2 = vld1q_f64 (y + i);
-      sx2 = vaddq_f64 (sx2, x2);
-      sy2 = vaddq_f64 (sy2, y2);
-      i += 2;
-    }
-  mx = vaddvq_f64 (sx2);
-  my = vaddvq_f64 (sy2);
-  if (i < n)
-    {
-      mx += x[i];
-      my += y[i];
-    }
-  mx /= (double) n;
-  my /= (double) n;
+  mx = jbm_array_f64_sum (x, n) / (double) n;
+  my = jbm_array_f64_sum (y, n) / (double) n;
   mx2 = vdupq_n_f64 (mx);
   my2 = vdupq_n_f64 (my);
   sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = vdupq_n_f64 (0.);

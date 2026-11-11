@@ -17197,74 +17197,8 @@ jbm_array_f32_regression_linear (const float *x,
   __m128 x2, y2, mx2, my2, sx2, sy2, sx2b, sy2b, sx2c, sy2c, sx2d, sy2d;
   float mx, my, sx, sy, dx, dy;
   unsigned int i, nn;
-  sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = _mm_setzero_ps ();
-  i = 0;
-  nn = n >> 4;
-  if (nn)
-    {
-      for (; nn > 0; --nn, i += 4)
-        {
-          x2 = _mm_loadu_ps (x + i);
-          y2 = _mm_loadu_ps (y + i);
-          sx2 = _mm_add_ps (sx2, x2);
-          sy2 = _mm_add_ps (sy2, y2);
-          i += 4;
-          x2 = _mm_loadu_ps (x + i);
-          y2 = _mm_loadu_ps (y + i);
-          sx2b = _mm_add_ps (sx2b, x2);
-          sy2b = _mm_add_ps (sy2b, y2);
-          i += 4;
-          x2 = _mm_loadu_ps (x + i);
-          y2 = _mm_loadu_ps (y + i);
-          sx2c = _mm_add_ps (sx2c, x2);
-          sy2c = _mm_add_ps (sy2c, y2);
-          i += 4;
-          x2 = _mm_loadu_ps (x + i);
-          y2 = _mm_loadu_ps (y + i);
-          sx2d = _mm_add_ps (sx2d, x2);
-          sy2d = _mm_add_ps (sy2d, y2);
-        }
-      sx2 = _mm_add_ps (sx2, sx2b);
-      sy2 = _mm_add_ps (sy2, sy2b);
-      sx2c = _mm_add_ps (sx2c, sx2d);
-      sy2c = _mm_add_ps (sy2c, sy2d);
-      sx2 = _mm_add_ps (sx2, sx2c);
-      sy2 = _mm_add_ps (sy2, sy2c);
-    }
-  nn = (n - i) >> 3;
-  if (nn)
-    {
-      x2 = _mm_loadu_ps (x + i);
-      y2 = _mm_loadu_ps (y + i);
-      sx2 = _mm_add_ps (sx2, x2);
-      sy2 = _mm_add_ps (sy2, y2);
-      i += 4;
-      x2 = _mm_loadu_ps (x + i);
-      y2 = _mm_loadu_ps (y + i);
-      sx2 = _mm_add_ps (sx2, x2);
-      sy2 = _mm_add_ps (sy2, y2);
-      i += 4;
-    }
-  nn = (n - i) >> 2;
-  if (nn)
-    {
-      x2 = _mm_loadu_ps (x + i);
-      y2 = _mm_loadu_ps (y + i);
-      sx2 = _mm_add_ps (sx2, x2);
-      sy2 = _mm_add_ps (sy2, y2);
-      i += 4;
-    }
-  sx2 = _mm_hadd_ps (sx2, sx2);
-  sy2 = _mm_hadd_ps (sy2, sy2);
-  mx = _mm_cvtss_f32 (_mm_hadd_ps (sx2, sx2));
-  my = _mm_cvtss_f32 (_mm_hadd_ps (sy2, sy2));
-  for (; i < n; ++i)
-    {
-      mx += x[i];
-      my += y[i];
-    }
-  mx /= (float) n;
-  my /= (float) n;
+  mx = jbm_array_f32_sum (x, n) / (float) n;
+  my = jbm_array_f32_sum (y, n) / (float) n;
   mx2 = _mm_set1_ps (mx);
   my2 = _mm_set1_ps (my);
   sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = _mm_setzero_ps ();
@@ -18115,72 +18049,8 @@ jbm_array_f64_regression_linear (const double *x,
   __m128d x2, y2, mx2, my2, sx2, sy2, sx2b, sy2b, sx2c, sy2c, sx2d, sy2d;
   double mx, my, sx, sy, dx, dy;
   unsigned int i, nn;
-  sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = _mm_setzero_pd ();
-  i = 0;
-  nn = n >> 3;
-  if (nn)
-    {
-      for (; nn > 0; --nn, i += 2)
-        {
-          x2 = _mm_loadu_pd (x + i);
-          y2 = _mm_loadu_pd (y + i);
-          sx2 = _mm_add_pd (sx2, x2);
-          sy2 = _mm_add_pd (sy2, y2);
-          i += 2;
-          x2 = _mm_loadu_pd (x + i);
-          y2 = _mm_loadu_pd (y + i);
-          sx2b = _mm_add_pd (sx2b, x2);
-          sy2b = _mm_add_pd (sy2b, y2);
-          i += 2;
-          x2 = _mm_loadu_pd (x + i);
-          y2 = _mm_loadu_pd (y + i);
-          sx2c = _mm_add_pd (sx2c, x2);
-          sy2c = _mm_add_pd (sy2c, y2);
-          i += 2;
-          x2 = _mm_loadu_pd (x + i);
-          y2 = _mm_loadu_pd (y + i);
-          sx2d = _mm_add_pd (sx2d, x2);
-          sy2d = _mm_add_pd (sy2d, y2);
-        }
-      sx2 = _mm_add_pd (sx2, sx2b);
-      sy2 = _mm_add_pd (sy2, sy2b);
-      sx2c = _mm_add_pd (sx2c, sx2d);
-      sy2c = _mm_add_pd (sy2c, sy2d);
-      sx2 = _mm_add_pd (sx2, sx2c);
-      sy2 = _mm_add_pd (sy2, sy2c);
-    }
-  nn = (n - i) >> 2;
-  if (nn)
-    {
-      x2 = _mm_loadu_pd (x + i);
-      y2 = _mm_loadu_pd (y + i);
-      sx2 = _mm_add_pd (sx2, x2);
-      sy2 = _mm_add_pd (sy2, y2);
-      i += 2;
-      x2 = _mm_loadu_pd (x + i);
-      y2 = _mm_loadu_pd (y + i);
-      sx2 = _mm_add_pd (sx2, x2);
-      sy2 = _mm_add_pd (sy2, y2);
-      i += 2;
-    }
-  nn = (n - i) >> 1;
-  if (nn)
-    {
-      x2 = _mm_loadu_pd (x + i);
-      y2 = _mm_loadu_pd (y + i);
-      sx2 = _mm_add_pd (sx2, x2);
-      sy2 = _mm_add_pd (sy2, y2);
-      i += 2;
-    }
-  mx = _mm_cvtsd_f64 (_mm_add_pd (sx2, _mm_unpackhi_pd (sx2, sx2)));
-  my = _mm_cvtsd_f64 (_mm_add_pd (sy2, _mm_unpackhi_pd (sy2, sy2)));
-  if (i < n)
-    {
-      mx += x[i];
-      my += y[i];
-    }
-  mx /= (double) n;
-  my /= (double) n;
+  mx = jbm_array_f64_sum (x, n) / (double) n;
+  my = jbm_array_f64_sum (y, n) / (double) n;
   mx2 = _mm_set1_pd (mx);
   my2 = _mm_set1_pd (my);
   sx2 = sy2 = sx2b = sy2b = sx2c = sy2c = sx2d = sy2d = _mm_setzero_pd ();
