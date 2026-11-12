@@ -3530,7 +3530,7 @@ jbm_array_f32_fnmadd1 (float *xr,       ///< result float array.
                        const float *x3, ///< addend float array.
                        const unsigned int n)    ///< number of array elements.
 {
-  const y2 = jbm_f32_opposite (x2);
+  const float y2 = jbm_f32_opposite (x2);
   unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = fmaf (x1[i], y2, x3[i]);
@@ -4482,12 +4482,13 @@ jbm_array_f64_fmadd1 (double *xr,       ///< result double array.
  */
 static inline void
 jbm_array_f64_fnmadd1 (double *xr,      ///< result double array.
-                       const double *x1,        ///< 1st multiplicand double array.
+                       const double *x1,
+                       ///< 1st multiplicand double array.
                        const double x2, ///< 2nd multiplicand double number.
                        const double *x3,        ///< addend double array.
                        const unsigned int n)    ///< number of array elements.
 {
-  const y2 = jbm_f64_opposite (x2);
+  const double y2 = jbm_f64_opposite (x2);
   unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = fma (x1[i], y2, x3[i]);
