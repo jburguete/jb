@@ -3633,6 +3633,103 @@ jbm_array_f32_fnmsub (float *xr,        ///< result float array.
 }
 
 /**
+ * Function to search the interval where a number is in a increasingly sorted
+ * float.
+ *
+ * \return interval number.
+ */
+static inline unsigned int
+jbm_array_f32_search (const float *xx,  ///< float array.
+                      const float x,    ///< number to search.
+                      const unsigned int n)     ///< number of array elements.
+{
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  for (i = 0; n1 - i > 1;)
+    {
+      j = (i + n1) >> 1;
+      if (x < xx[j])
+        n1 = j;
+      else
+        i = j;
+    }
+  return i;
+}
+
+/**
+ * Function to search the interval where a number is in a increasingly sorted
+ * array of float numbers.
+ * \return interval number, -1 if x<fa[0] or n-1 if x>fa[n-1].
+ */
+static inline int
+jbm_array_f32_search_extended (const float *xx, ///< float array.
+                               const float x,   ///< number to search.
+                               const unsigned int n)
+                               ///< number of array elements.
+{
+  unsigned int n1;
+  if (x < xx[0])
+    return -1;
+  n1 = n - 1;
+  if (x >= xx[n1])
+    return (int) n1;
+  return (int) jbm_array_f32_search (xx, x, n);
+}
+
+/**
+ * Function to interchange 2 float arrays.
+ */
+static inline void
+jbm_array_f32_change (float **restrict fa,      ///< 1st float array.
+                      float **restrict fb)      ///< 2nd float array.
+{
+  float *fc;
+  fc = *fa;
+  *fa = *fb;
+  *fb = fc;
+}
+
+/**
+ * Function to merge 2 increasingly sorted float arrays.
+ *
+ * \return resulting float array.
+ */
+static inline float *
+jbm_array_f32_merge (const float *xa,
+                     ///< pointer to the 1st increasingly sorted float array.
+                     const unsigned int na,
+                     ///< number of elements of the 1st array.
+                     const float *xb,
+                     ///< pointer to the 2nd increasingly sorted float array.
+                     const unsigned int nb,
+                     ///< number of elements of the 2nd array.
+                     unsigned int *nc)
+                     ///< pointer to the number of elements of the new array.
+{
+  float *xc;
+  unsigned int i, j, k;
+  xc = (float *) malloc ((na + nb) * sizeof (float));
+  if (!xc)
+    return NULL;
+  for (i = j = k = 0; i < na || j < nb; ++k)
+    {
+      if (i >= na)
+        xc[k] = xb[j++];
+      else if (j >= nb)
+        xc[k] = xa[i++];
+      else if (xa[i] > xb[j])
+        xc[k] = xb[j++];
+      else if (xa[i] < xb[j])
+        xc[k] = xa[i++];
+      else
+        xc[k] = xa[i++], j++;
+    }
+  xc = (float *) realloc (xc, k * sizeof (float));
+  *nc = k;
+  return xc;
+}
+
+/**
  * Function to calculate the coefficients of a linear regression adjusted by 
  * minimum squares: \f$y=a+b\,x\f$ (float).
  */
@@ -4490,6 +4587,103 @@ jbm_array_f64_fnmsub (double *xr,       ///< result double array.
   unsigned int i;
   for (i = 0; i < n; ++i)
     xr[i] = jbm_f64_opposite (fma (x1[i], x2[i], (x3[i])));
+}
+
+/**
+ * Function to search the interval where a number is in a increasingly sorted
+ * double.
+ *
+ * \return interval number.
+ */
+static inline unsigned int
+jbm_array_f64_search (const double *xx, ///< double array.
+                      const double x,   ///< number to search.
+                      const unsigned int n)     ///< number of array elements.
+{
+  unsigned int i, j, n1;
+  n1 = n - 1;
+  for (i = 0; n1 - i > 1;)
+    {
+      j = (i + n1) >> 1;
+      if (x < xx[j])
+        n1 = j;
+      else
+        i = j;
+    }
+  return i;
+}
+
+/**
+ * Function to search the interval where a number is in a increasingly sorted
+ * array of double numbers.
+ * \return interval number, -1 if x<fa[0] or n-1 if x>fa[n-1].
+ */
+static inline int
+jbm_array_f64_search_extended (const double *xx,        ///< double array.
+                               const double x,  ///< number to search.
+                               const unsigned int n)
+                               ///< number of array elements.
+{
+  unsigned int n1;
+  if (x < xx[0])
+    return -1;
+  n1 = n - 1;
+  if (x >= xx[n1])
+    return (int) n1;
+  return (int) jbm_array_f64_search (xx, x, n);
+}
+
+/**
+ * Function to interchange 2 double arrays.
+ */
+static inline void
+jbm_array_f64_change (double **restrict fa,     ///< 1st double array.
+                      double **restrict fb)     ///< 2nd double array.
+{
+  double *fc;
+  fc = *fa;
+  *fa = *fb;
+  *fb = fc;
+}
+
+/**
+ * Function to merge 2 increasingly sorted double arrays.
+ *
+ * \return resulting double array.
+ */
+static inline double *
+jbm_array_f64_merge (const double *xa,
+                     ///< pointer to the 1st increasingly sorted double array.
+                     const unsigned int na,
+                     ///< number of elements of the 1st array.
+                     const double *xb,
+                     ///< pointer to the 2nd increasingly sorted double array.
+                     const unsigned int nb,
+                     ///< number of elements of the 2nd array.
+                     unsigned int *nc)
+                     ///< pointer to the number of elements of the new array.
+{
+  double *xc;
+  unsigned int i, j, k;
+  xc = (double *) malloc ((na + nb) * sizeof (double));
+  if (!xc)
+    return NULL;
+  for (i = j = k = 0; i < na || j < nb; ++k)
+    {
+      if (i >= na)
+        xc[k] = xb[j++];
+      else if (j >= nb)
+        xc[k] = xa[i++];
+      else if (xa[i] > xb[j])
+        xc[k] = xb[j++];
+      else if (xa[i] < xb[j])
+        xc[k] = xa[i++];
+      else
+        xc[k] = xa[i++], j++;
+    }
+  xc = (double *) realloc (xc, k * sizeof (double));
+  *nc = k;
+  return xc;
 }
 
 /**
