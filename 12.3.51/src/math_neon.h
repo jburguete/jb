@@ -1313,7 +1313,7 @@ jbm_4xf32_rational_3_0 (const float32x4_t x,    ///< float32x4_t vector.
 }
 
 /**
- * Function to calculate a 1st+2nd order rational (float32x4_t).
+ * Function to calculate a 2nd+1st order rational (float32x4_t).
  *
  * \return float32x4_t vector of rational values.
  */

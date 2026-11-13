@@ -365,9 +365,9 @@ jbm_f32_frexp (const float x,   ///< float number.
   JBMF32 y;
   uint32_t exp;
   y.x = x;
-  exp = y.i & 0x7fffffffu;
+  exp = y.i & JBM_F32_BITS_ABS;
   // check NaN or 0
-  if (exp >= 0x7f800000u || !exp)
+  if (exp >= JBM_F32_BITS_EXPONENT || !exp)
     {
       *e = 0;
       return x;

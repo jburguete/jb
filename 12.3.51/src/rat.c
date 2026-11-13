@@ -7,7 +7,8 @@ enum Type
   TYPE_AVX512 = 2,
   TYPE_ARM_NEON = 3,
   TYPE_RISCV = 4,
-  TYPE_NONE = 5
+  TYPE_SVE = 5,
+  TYPE_NONE = 6
 };
 
 void
@@ -15,7 +16,7 @@ print_comment_pol (FILE *f, const unsigned int i, const unsigned int type)
 {
   const char *ch[5] = { "th", "st", "nd", "rd", "th" };
   const char *t[TYPE_NONE] = { "__m128", "__m256", "__m512", "float32x4_t",
-    "vfloat32m1_t"
+    "vfloat32m1_t", "svfloat32_t"
   };
   const char *th;
   if (i > 3)
@@ -39,7 +40,7 @@ print_pol_1 (FILE *f, const unsigned int type)
     case TYPE_SSE:
       fprintf (f, "static inline __m128\n");
       fprintf (f,
-               "jbm_polynomial_1_4xdbl (const __m128 x, ///< __m128 vector.\n");
+               "jbm_4xf32_polynomial_1 (const __m128 x, ///< __m128 vector.\n");
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -49,7 +50,7 @@ print_pol_1 (FILE *f, const unsigned int type)
     case TYPE_AVX:
       fprintf (f, "static inline __m256\n");
       fprintf (f,
-               "jbm_polynomial_1_8xdbl (const __m256 x, ///< __m256 vector.\n");
+               "jbm_8xf32_polynomial_1 (const __m256 x, ///< __m256 vector.\n");
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -59,7 +60,7 @@ print_pol_1 (FILE *f, const unsigned int type)
     case TYPE_AVX512:
       fprintf (f, "static inline __m512\n");
       fprintf (f,
-               "jbm_polynomial_1_16xdbl (const __m512 x, ///< __m512 vector.\n");
+               "jbm_16xf32_polynomial_1 (const __m512 x, ///< __m512 vector.\n");
       fprintf (f,
                "                         const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -69,24 +70,37 @@ print_pol_1 (FILE *f, const unsigned int type)
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float32x4_t\n");
       fprintf (f,
-               "jbm_polynomial_1_4xdbl (const float32x4_t x, ///< float32x4_t vector.\n");
+               "jbm_4xf32_polynomial_1 (const float32x4_t x, ///< float32x4_t vector.\n");
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return vmlaq_dbl (vdupq_n_dbl (p[0]), x, vdupq_n_dbl (p[1]));\n");
+               "  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, vdupq_n_f32 (p[1]));\n");
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat32m1_t\n");
       fprintf (f,
-               "jbm_polynomial_1_nxdbl (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n");
+               "jbm_nxf32_polynomial_1 (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n");
       fprintf (f,
                "                        const float *p, ///< array of coefficients.\n");
       fprintf (f,
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
+      fprintf (f, "  return\n");
       fprintf (f,
-               "  return vfmacc_vf_dblm1 (vfmv_v_f_dbl (p[0], vl), p[1], x, vl);\n");
+               "    __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), p[1], x, vl);\n");
+      break;
+    case TYPE_SVE:
+      fprintf (f, "static inline svfloat32_t\n");
+      fprintf (f,
+               "jbm_nxf32_polynomial_1 (svbool_t pg, ///< predicate.\n");
+      fprintf (f,
+               "                        const svfloat32_t x, ///< svfloat32_t vector.\n");
+      fprintf (f,
+               "                        const float *p) ///< array of coefficients.\n");
+      fprintf (f, "{\n");
+      fprintf (f,
+               "  return svmla_n_f32_x (pg, svdup_n_f32 (p[0]), x, p[1]);\n");
       break;
     }
   fprintf (f, "}\n\n");
@@ -100,32 +114,23 @@ print_pol_i (FILE *f, const unsigned int i, const unsigned int type)
     {
     case TYPE_SSE:
       fprintf (f, "static inline __m128\n");
-      if (i < 10)
-        {
-          fprintf (f,
-                   "jbm_polynomial_%u_4xdbl (const __m128 x, ///< __m128 vector.\n",
-                   i);
-          fprintf (f,
-                   "                        const float *p) ///< array of coefficients.\n");
-        }
-      else
-        {
-          fprintf (f,
-                   "jbm_polynomial_%u_4xdbl (const __m128 x,        ///< __m128 vector.\n",
-                   i);
-          fprintf (f,
-                   "                         const float *p)        ///< array of coefficients.\n");
-        }
+      fprintf (f,
+               "jbm_4xf32_polynomial_%u (const __m128 x, ///< __m128 vector.\n",
+               i);
+      if (i > 9)
+        fprintf (f, " ");
+      fprintf (f,
+               "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return _mm_fmadd_ps (x, jbm_polynomial_%u_4xdbl (x, p + 1),\n",
+               "  return _mm_fmadd_ps (x, jbm_4xf32_polynomial_%u (x, p + 1),\n",
                i - 1);
-      fprintf (f, "                       _mm_set1_ps (p[0]));\n");
+      fprintf (f, "                    _mm_set1_ps (p[0]));\n");
       break;
     case TYPE_AVX:
       fprintf (f, "static inline __m256\n");
       fprintf (f,
-               "jbm_polynomial_%u_8xdbl (const __m256 x, ///< __m256 vector.\n",
+               "jbm_8xf32_polynomial_%u (const __m256 x, ///< __m256 vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -133,29 +138,29 @@ print_pol_i (FILE *f, const unsigned int i, const unsigned int type)
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return _mm256_fmadd_ps (x, jbm_polynomial_%u_8xdbl (x, p + 1),\n",
+               "  return _mm256_fmadd_ps (x, jbm_8xf32_polynomial_%u (x, p + 1),\n",
                i - 1);
-      fprintf (f, "                          _mm256_set1_ps (p[0]));\n");
+      fprintf (f, "                       _mm256_set1_ps (p[0]));\n");
       break;
     case TYPE_AVX512:
       fprintf (f, "static inline __m512\n");
       fprintf (f,
-               "jbm_polynomial_%u_16xdbl (const __m512 x, ///< __m512 vector.\n",
+               "jbm_16xf32_polynomial_%u (const __m512 x, ///< __m512 vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
-      fprintf (f,
+      fprintf (f, 
                "                         const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return _mm512_fmadd_ps (x, jbm_polynomial_%u_16xdbl (x, p + 1),\n",
+               "  return _mm512_fmadd_ps (x, jbm_16xf32_polynomial_%u (x, p + 1),\n",
                i - 1);
-      fprintf (f, "                          _mm512_set1_ps (p[0]));\n");
+      fprintf (f, "                       _mm512_set1_ps (p[0]));\n");
       break;
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float32x4_t\n");
       fprintf (f,
-               "jbm_polynomial_%u_4xdbl (const float32x4_t x, ///< float32x4_t vector.\n",
+               "jbm_4xf32_polynomial_%u (const float32x4_t x, ///< float32x4_t vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -163,13 +168,13 @@ print_pol_i (FILE *f, const unsigned int i, const unsigned int type)
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return vmlaq_dbl (vdupq_n_dbl (p[0]), x, jbm_polynomial_%u_4xdbl (x, p + 1));\n",
+               "  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, jbm_4xf32_polynomial_%u (x, p + 1));\n",
                i - 1);
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat32m1_t\n");
       fprintf (f,
-               "jbm_polynomial_%u_nxdbl (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n",
+               "jbm_nxf32_polynomial_%u (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -180,9 +185,28 @@ print_pol_i (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f,
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vfmacc_vv_dblm1 (vfmv_v_f_dblm1 (p[0], vl), x,\n");
+      fprintf (f, "  return\n");
       fprintf (f,
-               "                          jbm_polynomial_%u_nxdbl (x, p + 1, vl), vl);\n",
+               "    __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl), x,\n");
+      fprintf (f,
+               "                             jbm_nxf32_polynomial_%u (x, p + 1, vl), vl);\n",
+               i - 1);
+      break;
+    case TYPE_SVE:
+      fprintf (f, "static inline svfloat32_t\n");
+      fprintf (f, "jbm_nxf32_polynomial_%u (svbool_t pg, ///< predicate.\n", i);
+      if (i > 9)
+        fprintf (f, " ");
+      fprintf (f,
+               "                        const svfloat32_t x, ///< svfloat32_t vector.\n");
+      if (i > 9)
+        fprintf (f, " ");
+      fprintf (f,
+               "                        const float *p) ///< array of coefficients.\n");
+      fprintf (f, "{\n");
+      fprintf (f, "  return svmla_f32_x (pg, svdup_n_f32 (p[0]), x,\n");
+      fprintf (f,
+               "                      jbm_nxf32_polynomial_%u (pg, x, p + 1));\n",
                i - 1);
       break;
     }
@@ -195,7 +219,7 @@ print_comment_rat (FILE *f, const unsigned int i, const unsigned int j,
 {
   const char *ch[5] = { "th", "st", "nd", "rd", "th" };
   const char *t[TYPE_NONE] = { "__m128", "__m256", "__m512", "float32x4_t",
-    "vfloat32m1_t"
+    "vfloat32m1_t", "svfloat32_t"
   };
   const char *th1, *th2;
   if (i > 3)
@@ -223,7 +247,7 @@ print_rat_1_0 (FILE *f, const unsigned int type)
     case TYPE_SSE:
       fprintf (f, "static inline __m128\n");
       fprintf (f,
-               "jbm_rational_1_0_4xdbl (const __m128 x, ///< __m128 vector.\n");
+               "jbm_4xf32_rational_1_0 (const __m128 x, ///< __m128 vector.\n");
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -234,7 +258,7 @@ print_rat_1_0 (FILE *f, const unsigned int type)
     case TYPE_AVX:
       fprintf (f, "static inline __m256\n");
       fprintf (f,
-               "jbm_rational_1_0_8xdbl (const __m256 x, ///< __m256 vector.\n");
+               "jbm_8xf32_rational_1_0 (const __m256 x, ///< __m256 vector.\n");
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -245,7 +269,7 @@ print_rat_1_0 (FILE *f, const unsigned int type)
     case TYPE_AVX512:
       fprintf (f, "static inline __m512\n");
       fprintf (f,
-               "jbm_rational_1_0_16xdbl (const __m512 x, ///< __m512 vector.\n");
+               "jbm_16xf32_rational_1_0 (const __m512 x, ///< __m512 vector.\n");
       fprintf (f,
                "                         const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -256,27 +280,44 @@ print_rat_1_0 (FILE *f, const unsigned int type)
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float32x4_t\n");
       fprintf (f,
-               "jbm_rational_1_0_4xdbl (const float32x4_t x, ///< float32x4_t vector.\n");
+               "jbm_4xf32_rational_1_0 (const float32x4_t x, ///< float32x4_t vector.\n");
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vdivq_dbl (vdupq_n_dbl (p[0]),\n");
+      fprintf (f, "  return vdivq_f32 (vdupq_n_f32 (p[0]),\n");
       fprintf (f,
-               "                    vmlaq_dbl (vdupq_n_dbl (1.f), x, vdupq_n_dbl (p[1])));\n");
+               "                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[1])));\n");
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat32m1_t\n");
       fprintf (f,
-               "jbm_rational_1_0_nxdbl (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n");
+               "jbm_nxf32_rational_1_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n");
       fprintf (f,
                "                        const float *p, ///< array of coefficients.\n");
       fprintf (f,
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vfdiv_vv_dblm1 (vfmv_v_f_dblm1 (p[0], vl),\n");
+      fprintf (f, "  return\n");
       fprintf (f,
-               "                         vfmacc_vf_dbl (vfmv_v_f_dblm1 (1.f, vl),\n");
-      fprintf (f, "                                        p[1], x, vl));\n");
+               "    __riscv_vfdiv_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (p[0], vl),\n");
+      fprintf (f,
+               "                            __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl),\n");
+      fprintf (f,
+               "                                                     p[1], x, vl));\n");
+      break;
+    case TYPE_SVE:
+      fprintf (f, "static inline svfloat32_t\n");
+      fprintf (f,
+               "jbm_nxf32_rational_1_0 (svbool_t pg, ///< predicate.\n");
+      fprintf (f,
+               "                        const svfloat32_t x, ///< svfloat32_t vector.\n");
+      fprintf (f,
+               "                        const float *p) ///< array of coefficients.\n");
+      fprintf (f, "{\n");
+      fprintf (f, "  return\n");
+      fprintf (f, "    svdiv_f32_x (pg, svdup_n_f32 (p[0]),\n");
+      fprintf (f,
+               "                 svmla_n_f32_x (pg, svdup_n_f32 (1.f), x, p[1]));\n");
       break;
     }
   fprintf (f, "}\n\n");
@@ -291,32 +332,33 @@ print_rat_0 (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_SSE:
       fprintf (f, "static inline __m128\n");
       fprintf (f,
-               "jbm_rational_%u_0_4xdbl (const __m128 x, ///< __m128 vector.\n",
+               "jbm_4xf32_rational_%u_0 (const __m128 x, ///< __m128 vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm_div_ps (_mm_set1_ps (p[0]),\n");
+      fprintf (f, "  return\n");
+      fprintf (f, "    _mm_div_ps (_mm_set1_ps (p[0]),\n");
       fprintf (f,
-               "                     _mm_fmadd_ps (x, jbm_polynomial_%u_4xdbl (x, p + 1),\n",
+               "                _mm_fmadd_ps (x, jbm_4xf32_polynomial_%u (x, p + 1),\n",
                i - 1);
-      fprintf (f, "                                   _mm_set1_ps (1.f)));\n");
+      fprintf (f, "                              _mm_set1_ps (1.f)));\n");
       break;
     case TYPE_AVX:
       fprintf (f, "static inline __m256\n");
       fprintf (f,
-               "jbm_rational_%u_0_8xdbl (const __m256 x, ///< __m256 vector.\n",
+               "jbm_8xf32_rational_%u_0 (const __m256 x, ///< __m256 vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
       fprintf (f,
-               "                         const float *p) ///< array of coefficients.\n");
+               "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f, "  return _mm256_div_ps (_mm256_set1_ps (p[0]),\n");
       fprintf (f,
-               "                        _mm256_fmadd_ps (x, jbm_polynomial_%u_8xdbl (x, p + 1),\n",
+               "                        _mm256_fmadd_ps (x, jbm_8xf32_polynomial_%u (x, p + 1),\n",
                i - 1);
       fprintf (f,
                "                                         _mm256_set1_ps (1.f)));\n");
@@ -324,40 +366,41 @@ print_rat_0 (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_AVX512:
       fprintf (f, "static inline __m512\n");
       fprintf (f,
-               "jbm_rational_%u_0_16xdbl (const __m512 x, ///< __m512 vector.\n",
+               "jbm_16xf32_rational_%u_0 (const __m512 x, ///< __m512 vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
       fprintf (f,
                "                         const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm512_div_ps (_mm512_set1_ps (p[0]),\n");
+      fprintf (f, "  return\n");
+      fprintf (f, "    _mm512_div_ps (_mm512_set1_ps (p[0]),\n");
       fprintf (f,
-               "                        _mm512_fmadd_ps (x, jbm_polynomial_%u_16xdbl (x, p + 1),\n",
+               "                   _mm512_fmadd_ps (x, jbm_16xf32_polynomial_%u (x, p + 1),\n",
                i - 1);
       fprintf (f,
-               "                                         _mm512_set1_ps (1.f)));\n");
+               "                                    _mm512_set1_ps (1.f)));\n");
       break;
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float32x4_t\n");
       fprintf (f,
-               "jbm_rational_%u_0_4xdbl (const float32x4_t x, ///< float32x4_t vector.\n",
+               "jbm_4xf32_rational_%u_0 (const float32x4_t x, ///< float32x4_t vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vdivq_dbl (vdupq_n_dbl (p[0]),\n");
-      fprintf (f, "                    vmlaq_dbl (vdupq_n_dbl (1.f), x,\n");
+      fprintf (f, "  return vdivq_f32 (vdupq_n_f32 (p[0]),\n");
+      fprintf (f, "                    vmlaq_f32 (vdupq_n_f32 (1.f), x,\n");
       fprintf (f,
-               "                               jbm_polynomial_%u_4xdbl (x, p + 1)));\n",
+               "                               jbm_4xf32_polynomial_%u (x, p + 1)));\n",
                i - 1);
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat32m1_t\n");
       fprintf (f,
-               "jbm_rational_%u_0_nxdbl (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n",
+               "jbm_nxf32_rational_%u_0 (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -369,13 +412,34 @@ print_rat_0 (FILE *f, const unsigned int i, const unsigned int type)
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
       fprintf (f, "  return\n");
-      fprintf (f, "    vfdiv_vv_dblm1 (vfmv_v_f_dblm1 (p[0], vl),\n");
+      fprintf (f, "    __riscv_vfdiv_vv_f32m1\n");
+      fprintf (f, "    (__riscv_vfmv_v_f_f32m1 (p[0], vl),\n");
       fprintf (f,
-               "                    vfmacc_vv_dblm1 (vfmv_v_f_dblm1 (1.f, vl), x,\n");
+               "     __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,\n");
       fprintf (f,
-               "                                     jbm_polynomial_%u_nxdbl (x, p + 1, vl),\n",
+               "                              jbm_nxf32_polynomial_%u (x, p + 1, vl), vl), vl);\n",
                i - 1);
-      fprintf (f, "                                     vl), vl);\n");
+      break;
+    case TYPE_SVE:
+      fprintf (f, "static inline svfloat32_t\n");
+      fprintf (f,
+               "jbm_nxf32_rational_%u_0 (svbool_t pg, ///< predicate.\n", i);
+      if (i > 9)
+        fprintf (f, " ");
+      fprintf (f,
+               "                        const svfloat32_t x, ///< svfloat32_t vector.\n");
+      if (i > 9)
+        fprintf (f, " ");
+      fprintf (f,
+               "                        const float *p) ///< array of coefficients.\n");
+      fprintf (f, "{\n");
+      fprintf (f, "  return\n");
+      fprintf (f, "    svdiv_f32_x (pg, svdup_n_f32 (p[0]),\n");
+      fprintf (f,
+               "                 svmla_f32_x (pg, svdup_n_f32 (1.f), x,\n");
+      fprintf (f,
+               "                              jbm_nxf32_polynomial_%u (pg, x, p + 1)));\n",
+               i - 1);
       break;
     }
   fprintf (f, "}\n\n");
@@ -391,7 +455,7 @@ print_rat_i (FILE *f, const unsigned int i, const unsigned int j,
     case TYPE_SSE:
       fprintf (f, "static inline __m128\n");
       fprintf (f,
-               "jbm_rational_%u_%u_4xdbl (const __m128 x, ///< __m128 vector.\n",
+               "jbm_4xf32_rational_%u_%u (const __m128 x, ///< __m128 vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -400,16 +464,16 @@ print_rat_i (FILE *f, const unsigned int i, const unsigned int j,
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm_div_ps (jbm_polynomial_%u_4xdbl (x, p),\n", j);
+      fprintf (f, "  return _mm_div_ps (jbm_4xf32_polynomial_%u (x, p),\n", j);
       fprintf (f,
-               "                     _mm_fmadd_ps (x, jbm_polynomial_%u_4xdbl (x, p + %u),\n",
+               "                     _mm_fmadd_ps (x, jbm_4xf32_polynomial_%u (x, p + %u),\n",
                i - j - 1, j + 1);
       fprintf (f, "                                   _mm_set1_ps (1.f)));\n");
       break;
     case TYPE_AVX:
       fprintf (f, "static inline __m256\n");
       fprintf (f,
-               "jbm_rational_%u_%u_8xdbl (const __m256 x, ///< __m256 vector.\n",
+               "jbm_8xf32_rational_%u_%u (const __m256 x, ///< __m256 vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -418,10 +482,10 @@ print_rat_i (FILE *f, const unsigned int i, const unsigned int j,
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm256_div_ps (jbm_polynomial_%u_8xdbl (x, p),\n",
+      fprintf (f, "  return _mm256_div_ps (jbm_8xf32_polynomial_%u (x, p),\n",
                j);
       fprintf (f,
-               "                        _mm256_fmadd_ps (x, jbm_polynomial_%u_8xdbl (x, p + %u),\n",
+               "                        _mm256_fmadd_ps (x, jbm_8xf32_polynomial_%u (x, p + %u),\n",
                i - j - 1, j + 1);
       fprintf (f,
                "                                         _mm256_set1_ps (1.f)));\n");
@@ -429,7 +493,7 @@ print_rat_i (FILE *f, const unsigned int i, const unsigned int j,
     case TYPE_AVX512:
       fprintf (f, "static inline __m512\n");
       fprintf (f,
-               "jbm_rational_%u_%u_16xdbl (const __m512 x, ///< __m512 vector.\n",
+               "jbm_16xf32_rational_%u_%u (const __m512 x, ///< __m512 vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -438,10 +502,10 @@ print_rat_i (FILE *f, const unsigned int i, const unsigned int j,
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm512_div_ps (jbm_polynomial_%u_16xdbl (x, p),\n",
+      fprintf (f, "  return _mm512_div_ps (jbm_16xf32_polynomial_%u (x, p),\n",
                j);
       fprintf (f,
-               "                        _mm512_fmadd_ps (x, jbm_polynomial_%u_16xdbl (x, p + %u),\n",
+               "                        _mm512_fmadd_ps (x, jbm_16xf32_polynomial_%u (x, p + %u),\n",
                i - j - 1, j + 1);
       fprintf (f,
                "                                         _mm512_set1_ps (1.f)));\n");
@@ -449,7 +513,7 @@ print_rat_i (FILE *f, const unsigned int i, const unsigned int j,
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float32x4_t\n");
       fprintf (f,
-               "jbm_rational_%u_%u_4xdbl (const float32x4_t x, ///< float32x4_t vector.\n",
+               "jbm_4xf32_rational_%u_%u (const float32x4_t x, ///< float32x4_t vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -458,16 +522,16 @@ print_rat_i (FILE *f, const unsigned int i, const unsigned int j,
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vdivq_dbl (jbm_polynomial_%u_4xdbl (x, p),\n", j);
-      fprintf (f, "                    vmlaq_dbl (vdupq_n_dbl (1.f), x,\n");
+      fprintf (f, "  return vdivq_f32 (jbm_4xf32_polynomial_%u (x, p),\n", j);
+      fprintf (f, "                    vmlaq_f32 (vdupq_n_f32 (1.f), x,\n");
       fprintf (f,
-               "                               jbm_polynomial_%u_4xdbl (x, p + %u)));\n",
+               "                               jbm_4xf32_polynomial_%u (x, p + %u)));\n",
                i - j - 1, j + 1);
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat32m1_t\n");
       fprintf (f,
-               "jbm_rational_%u_%u_nxdbl (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n",
+               "jbm_nxf32_rational_%u_%u (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -483,19 +547,41 @@ print_rat_i (FILE *f, const unsigned int i, const unsigned int j,
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
       fprintf (f, "  return\n");
-      fprintf (f, "    vfdiv_vv_dblm1 (jbm_polynomial_%u_nxdbl (x, p, vl),\n",
+      fprintf (f, "    __riscv_vfdiv_vv_f32m1\n");
+      fprintf (f, "    (jbm_nxf32_polynomial_%u (x, p, vl),\n", j);
+      fprintf (f,
+               "     __riscv_vfmacc_vv_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), x,\n");
+      fprintf (f,
+               "                              jbm_nxf32_polynomial_%u (x, p + %u, vl), vl), vl);\n",
+               i - j - 1, j + 1);
+      break;
+    case TYPE_SVE:
+      fprintf (f, "static inline svfloat32_t\n");
+      fprintf (f,
+               "jbm_nxf32_rational_%u_%u (svbool_t pg, ///< predicate.\n",
+               i, j);
+      if (i > 9)
+        fprintf (f, " ");
+      if (j > 9)
+        fprintf (f, " ");
+      fprintf (f,
+               "                        const svfloat32_t x, ///< svfloat32_t vector.\n");
+      
+      if (i > 9)
+        fprintf (f, " ");
+      if (j > 9)
+        fprintf (f, " ");
+      fprintf (f,
+               "                        const float *p) ///< array of coefficients.\n");
+      fprintf (f, "{\n");
+      fprintf (f, "  return\n");
+      fprintf (f, "    svdiv_f32_x (pg, jbm_nxf32_polynomial_%u (pg, x, p),\n",
                j);
       fprintf (f,
-               "                    vfmacc_vv_dblm1 (vfmv_v_f_dblm1 (1.f, vl), x,\n");
+               "                    svmla_f32_x (pg, svdup_n_f32 (1.f), x,\n");
       fprintf (f,
-               "                                     jbm_polynomial_%u_nxdbl (x, p + %u, vl),\n",
+               "                                 jbm_nxf32_polynomial_%u (pg, x, p + %u)));\n",
                i - j - 1, j + 1);
-      if (i - j > 10)
-        fprintf (f, " ");
-      if (j > 8)
-        fprintf (f, " ");
-      fprintf (f,
-               "                                                             vl), vl);\n");
       break;
     }
   fprintf (f, "}\n\n");
@@ -510,7 +596,7 @@ print_rat_n (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_SSE:
       fprintf (f, "static inline __m128\n");
       fprintf (f,
-               "jbm_rational_%u_%u_4xdbl (const __m128 x, ///< __m128 vector.\n",
+               "jbm_4xf32_rational_%u_%u (const __m128 x, ///< __m128 vector.\n",
                i, i - 1);
       if (i > 9)
         {
@@ -521,7 +607,7 @@ print_rat_n (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm_div_ps (jbm_polynomial_%u_4xdbl (x, p),\n",
+      fprintf (f, "  return _mm_div_ps (jbm_4xf32_polynomial_%u (x, p),\n",
                i - 1);
       fprintf (f,
                "                     _mm_fmadd_ps (x, _mm_set1_ps (p[%u]), _mm_set1_ps (1.f)));\n",
@@ -530,7 +616,7 @@ print_rat_n (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_AVX:
       fprintf (f, "static inline __m256\n");
       fprintf (f,
-               "jbm_rational_%u_%u_8xdbl (const __m256 x, ///< __m256 vector.\n",
+               "jbm_8xf32_rational_%u_%u (const __m256 x, ///< __m256 vector.\n",
                i, i - 1);
       if (i > 9)
         {
@@ -541,7 +627,7 @@ print_rat_n (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm256_div_ps (jbm_polynomial_%u_8xdbl (x, p),\n",
+      fprintf (f, "  return _mm256_div_ps (jbm_8xf32_polynomial_%u (x, p),\n",
                i - 1);
       fprintf (f,
                "                        _mm256_fmadd_ps (x, _mm256_set1_ps (p[%u]),\n",
@@ -552,7 +638,7 @@ print_rat_n (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_AVX512:
       fprintf (f, "static inline __m512\n");
       fprintf (f,
-               "jbm_rational_%u_%u_16xdbl (const __m512 x, ///< __m512 vector.\n",
+               "jbm_16xf32_rational_%u_%u (const __m512 x, ///< __m512 vector.\n",
                i, i - 1);
       if (i > 9)
         {
@@ -563,7 +649,7 @@ print_rat_n (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm512_div_ps (jbm_polynomial_%u_16xdbl (x, p),\n",
+      fprintf (f, "  return _mm512_div_ps (jbm_16xf32_polynomial_%u (x, p),\n",
                i - 1);
       fprintf (f,
                "                        _mm512_fmadd_ps (x, _mm512_set1_ps (p[%u]),\n",
@@ -574,7 +660,7 @@ print_rat_n (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float32x4_t\n");
       fprintf (f,
-               "jbm_rational_%u_%u_4xdbl (const float32x4_t x, ///< float32x4_t vector.\n",
+               "jbm_4xf32_rational_%u_%u (const float32x4_t x, ///< float32x4_t vector.\n",
                i, i - 1);
       if (i > 9)
         {
@@ -585,16 +671,16 @@ print_rat_n (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vdivq_dbl (jbm_polynomial_%u_4xdbl (x, p),\n",
+      fprintf (f, "  return vdivq_f32 (jbm_4xf32_polynomial_%u (x, p),\n",
                i - 1);
       fprintf (f,
-               "                    vmlaq_dbl (vdupq_n_dbl (1.f), x, vdupq_n_dbl (p[%u])));\n",
+               "                    vmlaq_f32 (vdupq_n_f32 (1.f), x, vdupq_n_f32 (p[%u])));\n",
                i);
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat32m1_t\n");
       fprintf (f,
-               "jbm_rational_%u_%u_nxdbl (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n",
+               "jbm_nxf32_rational_%u_%u (const vfloat32m1_t x, ///< vfloat32m1_t vector.\n",
                i, i - 1);
       if (i > 9)
         {
@@ -614,12 +700,35 @@ print_rat_n (FILE *f, const unsigned int i, const unsigned int type)
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
       fprintf (f, "  return\n");
-      fprintf (f, "    vfdiv_vv_dblm1 (jbm_polynomial_%u_nxdbl (x, p, vl),\n",
+      fprintf (f, "    __riscv_vfdiv_vv_f32m1\n");
+      fprintf (f, "    (jbm_nxf32_polynomial_%u (x, p, vl),\n", i - 1);
+      fprintf (f,
+               "     __riscv_vfmacc_vf_f32m1 (__riscv_vfmv_v_f_f32m1 (1.f, vl), p[%u], x, vl),\n",
+               i);
+      fprintf (f, "     vl);\n");
+      break;
+    case TYPE_SVE:
+      fprintf (f, "static inline svfloat32_t\n");
+      fprintf (f,
+               "jbm_nxf32_rational_%u_%u (svbool_t pg, ///< predicate.\n",
+               i, i - 1);
+      fprintf (f,
+               "                        const svfloat32_t x, ///< svfloat32_t vector.\n");
+      if (i > 9)
+        {
+          fprintf (f, " ");
+          if (i > 10)
+            fprintf (f, " ");
+        }
+      fprintf (f,
+               "                        const float *p) ///< array of coefficients.\n");
+      fprintf (f, "{\n");
+      fprintf (f, "  return\n");
+      fprintf (f, "    svdiv_f32_x (pg, jbm_nxf32_polynomial_%u (pg, x, p),\n",
                i - 1);
       fprintf (f,
-               "                    vfmacc_vf_dblm1 (vfmv_v_f_dblm1 (1.f, vl), p[%u], x, vl),\n",
+               "                 svmla_n_f32_x (pg, svdup_n_f32 (1.f), x, p[%u]));\n",
                i);
-      fprintf (f, "                    vl);\n");
       break;
     }
   fprintf (f, "}\n\n");
@@ -630,7 +739,7 @@ print_comment_pol_d (FILE *f, const unsigned int i, const unsigned int type)
 {
   const char *ch[5] = { "th", "st", "nd", "rd", "th" };
   const char *t[TYPE_NONE] = { "__m128d", "__m256d", "__m512d", "float64x2_t",
-    "vfloat64m1_t"
+    "vfloat64m1_t", "svfloat64_t"
   };
   const char *th;
   if (i > 3)
@@ -654,7 +763,7 @@ print_pol_1_d (FILE *f, const unsigned int type)
     case TYPE_SSE:
       fprintf (f, "static inline __m128d\n");
       fprintf (f,
-               "jbm_polynomial_1_2xdbl (const __m128d x, ///< __m128d vector.\n");
+               "jbm_2xf64_polynomial_1 (const __m128d x, ///< __m128d vector.\n");
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -664,7 +773,7 @@ print_pol_1_d (FILE *f, const unsigned int type)
     case TYPE_AVX:
       fprintf (f, "static inline __m256d\n");
       fprintf (f,
-               "jbm_polynomial_1_4xdbl (const __m256d x, ///< __m256d vector.\n");
+               "jbm_4xf64_polynomial_1 (const __m256d x, ///< __m256d vector.\n");
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -674,7 +783,7 @@ print_pol_1_d (FILE *f, const unsigned int type)
     case TYPE_AVX512:
       fprintf (f, "static inline __m512d\n");
       fprintf (f,
-               "jbm_polynomial_1_8xdbl (const __m512d x, ///< __m512d vector.\n");
+               "jbm_8xf64_polynomial_1 (const __m512d x, ///< __m512d vector.\n");
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -684,24 +793,37 @@ print_pol_1_d (FILE *f, const unsigned int type)
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float64x2_t\n");
       fprintf (f,
-               "jbm_polynomial_1_2xdbl (const float64x2_t x, ///< float64x2_t vector.\n");
+               "jbm_2xf64_polynomial_1 (const float64x2_t x, ///< float64x2_t vector.\n");
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return vmlaq_dbl (vdupq_n_dbl (p[0]), x, vdupq_n_dbl (p[1]));\n");
+               "  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, vdupq_n_f64 (p[1]));\n");
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat64m1_t\n");
       fprintf (f,
-               "jbm_polynomial_1_nxdbl (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n");
+               "jbm_nxf64_polynomial_1 (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n");
       fprintf (f,
                "                        const double *p, ///< array of coefficients.\n");
       fprintf (f,
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
+      fprintf (f, "  return\n");
       fprintf (f,
-               "  return vfmacc_vx_dblm1 (vfmv_v_f_dbl (p[0], vl), p[1], x, vl);\n");
+               "    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), p[1], x, vl);\n");
+      break;
+    case TYPE_SVE:
+      fprintf (f, "static inline svfloat64_t\n");
+      fprintf (f,
+               "jbm_nxf64_polynomial_1 (svbool_t pg, ///< predicate.\n");
+      fprintf (f,
+               "                        const svfloat64_t x, ///< svfloat64_t vector.\n");
+      fprintf (f,
+               "                        const double *p) ///< array of coefficients.\n");
+      fprintf (f, "{\n");
+      fprintf (f,
+               "  return svmla_n_f64_x (pg, svdup_n_f64 (p[0]), x, p[1]);\n");
       break;
     }
   fprintf (f, "}\n\n");
@@ -716,7 +838,7 @@ print_pol_i_d (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_SSE:
       fprintf (f, "static inline __m128d\n");
       fprintf (f,
-               "jbm_polynomial_%u_2xdbl (const __m128d x, ///< __m128d vector.\n",
+               "jbm_2xf64_polynomial_%u (const __m128d x, ///< __m128d vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -724,14 +846,14 @@ print_pol_i_d (FILE *f, const unsigned int i, const unsigned int type)
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return _mm_fmadd_pd (x, jbm_polynomial_%u_2xdbl (x, p + 1),\n",
+               "  return _mm_fmadd_pd (x, jbm_2xf64_polynomial_%u (x, p + 1),\n",
                i - 1);
-      fprintf (f, "                       _mm_set1_pd (p[0]));\n");
+      fprintf (f, "                    _mm_set1_pd (p[0]));\n");
       break;
     case TYPE_AVX:
       fprintf (f, "static inline __m256d\n");
       fprintf (f,
-               "jbm_polynomial_%u_4xdbl (const __m256d x, ///< __m256d vector.\n",
+               "jbm_4xf64_polynomial_%u (const __m256d x, ///< __m256d vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -739,29 +861,29 @@ print_pol_i_d (FILE *f, const unsigned int i, const unsigned int type)
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return _mm256_fmadd_pd (x, jbm_polynomial_%u_4xdbl (x, p + 1),\n",
+               "  return _mm256_fmadd_pd (x, jbm_4xf64_polynomial_%u (x, p + 1),\n",
                i - 1);
-      fprintf (f, "                          _mm256_set1_pd (p[0]));\n");
+      fprintf (f, "                       _mm256_set1_pd (p[0]));\n");
       break;
     case TYPE_AVX512:
       fprintf (f, "static inline __m512d\n");
       fprintf (f,
-               "jbm_polynomial_%u_8xdbl (const __m512d x, ///< __m512d vector.\n",
+               "jbm_8xf64_polynomial_%u (const __m512d x, ///< __m512d vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
-      fprintf (f,
+      fprintf (f, 
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return _mm512_fmadd_pd (x, jbm_polynomial_%u_8xdbl (x, p + 1),\n",
+               "  return _mm512_fmadd_pd (x, jbm_8xf64_polynomial_%u (x, p + 1),\n",
                i - 1);
-      fprintf (f, "                          _mm512_set1_pd (p[0]));\n");
+      fprintf (f, "                       _mm512_set1_pd (p[0]));\n");
       break;
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float64x2_t\n");
       fprintf (f,
-               "jbm_polynomial_%u_2xdbl (const float64x2_t x, ///< float64x2_t vector.\n",
+               "jbm_2xf64_polynomial_%u (const float64x2_t x, ///< float64x2_t vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -769,13 +891,13 @@ print_pol_i_d (FILE *f, const unsigned int i, const unsigned int type)
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return vmlaq_dbl (vdupq_n_dbl (p[0]), x, jbm_polynomial_%u_2xdbl (x, p + 1));\n",
+               "  return vmlaq_f64 (vdupq_n_f64 (p[0]), x, jbm_2xf64_polynomial_%u (x, p + 1));\n",
                i - 1);
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat64m1_t\n");
       fprintf (f,
-               "jbm_polynomial_%u_nxdbl (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n",
+               "jbm_nxf64_polynomial_%u (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -786,9 +908,28 @@ print_pol_i_d (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f,
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vfmacc_vv_dblm1 (vfmv_v_f_dblm1 (p[0], vl), x,\n");
+      fprintf (f, "  return\n");
       fprintf (f,
-               "                          jbm_polynomial_%u_nxdbl (x, p + 1, vl), vl);\n",
+               "    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl), x,\n");
+      fprintf (f,
+               "                             jbm_nxf64_polynomial_%u (x, p + 1, vl), vl);\n",
+               i - 1);
+      break;
+    case TYPE_SVE:
+      fprintf (f, "static inline svfloat64_t\n");
+      fprintf (f, "jbm_nxf64_polynomial_%u (svbool_t pg, ///< predicate.\n", i);
+      if (i > 9)
+        fprintf (f, " ");
+      fprintf (f,
+               "                        const svfloat64_t x, ///< svfloat64_t vector.\n");
+      if (i > 9)
+        fprintf (f, " ");
+      fprintf (f,
+               "                        const double *p) ///< array of coefficients.\n");
+      fprintf (f, "{\n");
+      fprintf (f, "  return svmla_f64_x (pg, svdup_n_f64 (p[0]), x,\n");
+      fprintf (f,
+               "                      jbm_nxf64_polynomial_%u (pg, x, p + 1));\n",
                i - 1);
       break;
     }
@@ -801,7 +942,7 @@ print_comment_rat_d (FILE *f, const unsigned int i, const unsigned int j,
 {
   const char *ch[5] = { "th", "st", "nd", "rd", "th" };
   const char *t[TYPE_NONE] = { "__m128d", "__m256d", "__m512d", "float64x2_t",
-    "vfloat64m1_t"
+    "vfloat64m1_t", "svfloat64_t"
   };
   const char *th1, *th2;
   if (i > 3)
@@ -829,7 +970,7 @@ print_rat_1_0_d (FILE *f, const unsigned int type)
     case TYPE_SSE:
       fprintf (f, "static inline __m128d\n");
       fprintf (f,
-               "jbm_rational_1_0_2xdbl (const __m128d x, ///< __m128d vector.\n");
+               "jbm_rational_1_0_2xf64 (const __m128d x, ///< __m128d vector.\n");
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -840,7 +981,7 @@ print_rat_1_0_d (FILE *f, const unsigned int type)
     case TYPE_AVX:
       fprintf (f, "static inline __m256d\n");
       fprintf (f,
-               "jbm_rational_1_0_4xdbl (const __m256d x, ///< __m256d vector.\n");
+               "jbm_rational_1_0_4xf64 (const __m256d x, ///< __m256d vector.\n");
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -851,7 +992,7 @@ print_rat_1_0_d (FILE *f, const unsigned int type)
     case TYPE_AVX512:
       fprintf (f, "static inline __m512d\n");
       fprintf (f,
-               "jbm_rational_1_0_8xdbl (const __m512d x, ///< __m512d vector.\n");
+               "jbm_rational_1_0_8xf64 (const __m512d x, ///< __m512d vector.\n");
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
@@ -862,26 +1003,26 @@ print_rat_1_0_d (FILE *f, const unsigned int type)
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float64x2_t\n");
       fprintf (f,
-               "jbm_rational_1_0_2xdbl (const float64x2_t x, ///< float64x2_t vector.\n");
+               "jbm_rational_1_0_2xf64 (const float64x2_t x, ///< float64x2_t vector.\n");
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vdivq_dbl (vdupq_n_dbl (p[0]),\n");
+      fprintf (f, "  return vdivq_f64 (vdupq_n_f64 (p[0]),\n");
       fprintf (f,
-               "                    vmlaq_dbl (vdupq_n_dbl (1.), x, vdupq_n_dbl (p[1])));\n");
+               "                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[1])));\n");
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat64m1_t\n");
       fprintf (f,
-               "jbm_rational_1_0_nxdbl (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n");
+               "jbm_rational_1_0_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n");
       fprintf (f,
                "                        const double *p, ///< array of coefficients.\n");
       fprintf (f,
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vfdiv_vv_dblm1 (vfmv_v_f_dblm1 (p[0], vl),\n");
+      fprintf (f, "  return __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),\n");
       fprintf (f,
-               "                         vfmacc_vf_dbl (vfmv_v_f_dblm1 (1., vl),\n");
+               "                         __riscv_vfmacc_vf_f64 (__riscv_vfmv_v_f_f64m1 (1., vl),\n");
       fprintf (f, "                                        p[1], x, vl));\n");
       break;
     }
@@ -897,7 +1038,7 @@ print_rat_0_d (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_SSE:
       fprintf (f, "static inline __m128d\n");
       fprintf (f,
-               "jbm_rational_%u_0_2xdbl (const __m128d x, ///< __m128d vector.\n",
+               "jbm_rational_%u_0_2xf64 (const __m128d x, ///< __m128d vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -906,14 +1047,14 @@ print_rat_0_d (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f, "{\n");
       fprintf (f, "  return _mm_div_pd (_mm_set1_pd (p[0]),\n");
       fprintf (f,
-               "                     _mm_fmadd_pd (x, jbm_polynomial_%u_2xdbl (x, p + 1),\n",
+               "                     _mm_fmadd_pd (x, jbm_polynomial_%u_2xf64 (x, p + 1),\n",
                i - 1);
       fprintf (f, "                                   _mm_set1_pd (1.)));\n");
       break;
     case TYPE_AVX:
       fprintf (f, "static inline __m256d\n");
       fprintf (f,
-               "jbm_rational_%u_0_4xdbl (const __m256d x, ///< __m256d vector.\n",
+               "jbm_rational_%u_0_4xf64 (const __m256d x, ///< __m256d vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -922,7 +1063,7 @@ print_rat_0_d (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f, "{\n");
       fprintf (f, "  return _mm256_div_pd (_mm256_set1_pd (p[0]),\n");
       fprintf (f,
-               "                        _mm256_fmadd_pd (x, jbm_polynomial_%u_4xdbl (x, p + 1),\n",
+               "                        _mm256_fmadd_pd (x, jbm_polynomial_%u_4xf64 (x, p + 1),\n",
                i - 1);
       fprintf (f,
                "                                         _mm256_set1_pd (1.)));\n");
@@ -930,7 +1071,7 @@ print_rat_0_d (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_AVX512:
       fprintf (f, "static inline __m512d\n");
       fprintf (f,
-               "jbm_rational_%u_0_8xdbl (const __m512d x, ///< __m512d vector.\n",
+               "jbm_rational_%u_0_8xf64 (const __m512d x, ///< __m512d vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -939,7 +1080,7 @@ print_rat_0_d (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f, "{\n");
       fprintf (f, "  return _mm512_div_pd (_mm512_set1_pd (p[0]),\n");
       fprintf (f,
-               "                        _mm512_fmadd_pd (x, jbm_polynomial_%u_8xdbl (x, p + 1),\n",
+               "                        _mm512_fmadd_pd (x, jbm_polynomial_%u_8xf64 (x, p + 1),\n",
                i - 1);
       fprintf (f,
                "                                         _mm512_set1_pd (1.)));\n");
@@ -947,23 +1088,23 @@ print_rat_0_d (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float64x2_t\n");
       fprintf (f,
-               "jbm_rational_%u_0_2xdbl (const float64x2_t x, ///< float64x2_t vector.\n",
+               "jbm_rational_%u_0_2xf64 (const float64x2_t x, ///< float64x2_t vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vdivq_dbl (vdupq_n_dbl (p[0]),\n");
-      fprintf (f, "                    vmlaq_dbl (vdupq_n_dbl (1.), x,\n");
+      fprintf (f, "  return vdivq_f64 (vdupq_n_f64 (p[0]),\n");
+      fprintf (f, "                    vmlaq_f64 (vdupq_n_f64 (1.), x,\n");
       fprintf (f,
-               "                               jbm_polynomial_%u_2xdbl (x, p + 1)));\n",
+               "                               jbm_polynomial_%u_2xf64 (x, p + 1)));\n",
                i - 1);
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat64m1_t\n");
       fprintf (f,
-               "jbm_rational_%u_0_nxdbl (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n",
+               "jbm_rational_%u_0_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n",
                i);
       if (i > 9)
         fprintf (f, " ");
@@ -975,11 +1116,11 @@ print_rat_0_d (FILE *f, const unsigned int i, const unsigned int type)
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
       fprintf (f, "  return\n");
-      fprintf (f, "    vfdiv_vv_dblm1 (vfmv_v_f_dblm1 (p[0], vl),\n");
+      fprintf (f, "    __riscv_vfdiv_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (p[0], vl),\n");
       fprintf (f,
-               "                    vfmacc_vv_dblm1 (vfmv_v_f_dblm1 (1., vl), x,\n");
+               "                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,\n");
       fprintf (f,
-               "                                     jbm_polynomial_%u_nxdbl (x, p + 1, vl),\n",
+               "                                     jbm_polynomial_%u_nxf64 (x, p + 1, vl),\n",
                i - 1);
       fprintf (f, "                                     vl), vl);\n");
       break;
@@ -997,7 +1138,7 @@ print_rat_i_d (FILE *f, const unsigned int i, const unsigned int j,
     case TYPE_SSE:
       fprintf (f, "static inline __m128d\n");
       fprintf (f,
-               "jbm_rational_%u_%u_2xdbl (const __m128d x, ///< __m128d vector.\n",
+               "jbm_rational_%u_%u_2xf64 (const __m128d x, ///< __m128d vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -1006,16 +1147,16 @@ print_rat_i_d (FILE *f, const unsigned int i, const unsigned int j,
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm_div_pd (jbm_polynomial_%u_2xdbl (x, p),\n", j);
+      fprintf (f, "  return _mm_div_pd (jbm_polynomial_%u_2xf64 (x, p),\n", j);
       fprintf (f,
-               "                     _mm_fmadd_pd (x, jbm_polynomial_%u_2xdbl (x, p + %u),\n",
+               "                     _mm_fmadd_pd (x, jbm_polynomial_%u_2xf64 (x, p + %u),\n",
                i - j - 1, j + 1);
       fprintf (f, "                                   _mm_set1_pd (1.)));\n");
       break;
     case TYPE_AVX:
       fprintf (f, "static inline __m256d\n");
       fprintf (f,
-               "jbm_rational_%u_%u_4xdbl (const __m256d x, ///< __m256d vector.\n",
+               "jbm_rational_%u_%u_4xf64 (const __m256d x, ///< __m256d vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -1024,10 +1165,10 @@ print_rat_i_d (FILE *f, const unsigned int i, const unsigned int j,
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm256_div_pd (jbm_polynomial_%u_4xdbl (x, p),\n",
+      fprintf (f, "  return _mm256_div_pd (jbm_polynomial_%u_4xf64 (x, p),\n",
                j);
       fprintf (f,
-               "                        _mm256_fmadd_pd (x, jbm_polynomial_%u_4xdbl (x, p + %u),\n",
+               "                        _mm256_fmadd_pd (x, jbm_polynomial_%u_4xf64 (x, p + %u),\n",
                i - j - 1, j + 1);
       fprintf (f,
                "                                         _mm256_set1_pd (1.)));\n");
@@ -1035,7 +1176,7 @@ print_rat_i_d (FILE *f, const unsigned int i, const unsigned int j,
     case TYPE_AVX512:
       fprintf (f, "static inline __m512d\n");
       fprintf (f,
-               "jbm_rational_%u_%u_8xdbl (const __m512d x, ///< __m512d vector.\n",
+               "jbm_rational_%u_%u_8xf64 (const __m512d x, ///< __m512d vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -1044,10 +1185,10 @@ print_rat_i_d (FILE *f, const unsigned int i, const unsigned int j,
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm512_div_pd (jbm_polynomial_%u_8xdbl (x, p),\n",
+      fprintf (f, "  return _mm512_div_pd (jbm_polynomial_%u_8xf64 (x, p),\n",
                j);
       fprintf (f,
-               "                        _mm512_fmadd_pd (x, jbm_polynomial_%u_8xdbl (x, p + %u),\n",
+               "                        _mm512_fmadd_pd (x, jbm_polynomial_%u_8xf64 (x, p + %u),\n",
                i - j - 1, j + 1);
       fprintf (f,
                "                                         _mm512_set1_pd (1.)));\n");
@@ -1055,7 +1196,7 @@ print_rat_i_d (FILE *f, const unsigned int i, const unsigned int j,
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float64x2_t\n");
       fprintf (f,
-               "jbm_rational_%u_%u_2xdbl (const float64x2_t x, ///< float64x2_t vector.\n",
+               "jbm_rational_%u_%u_2xf64 (const float64x2_t x, ///< float64x2_t vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -1064,16 +1205,16 @@ print_rat_i_d (FILE *f, const unsigned int i, const unsigned int j,
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vdivq_dbl (jbm_polynomial_%u_2xdbl (x, p),\n", j);
-      fprintf (f, "                    vmlaq_dbl (vdupq_n_dbl (1.), x,\n");
+      fprintf (f, "  return vdivq_f64 (jbm_polynomial_%u_2xf64 (x, p),\n", j);
+      fprintf (f, "                    vmlaq_f64 (vdupq_n_f64 (1.), x,\n");
       fprintf (f,
-               "                               jbm_polynomial_%u_2xdbl (x, p + %u)));\n",
+               "                               jbm_polynomial_%u_2xf64 (x, p + %u)));\n",
                i - j - 1, j + 1);
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat64m1_t\n");
       fprintf (f,
-               "jbm_rational_%u_%u_nxdbl (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n",
+               "jbm_rational_%u_%u_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n",
                i, j);
       if (i > 9)
         fprintf (f, " ");
@@ -1089,12 +1230,12 @@ print_rat_i_d (FILE *f, const unsigned int i, const unsigned int j,
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
       fprintf (f, "  return\n");
-      fprintf (f, "    vfdiv_vv_dblm1 (jbm_polynomial_%u_nxdbl (x, p, vl),\n",
+      fprintf (f, "    __riscv_vfdiv_vv_f64m1 (jbm_polynomial_%u_nxf64 (x, p, vl),\n",
                j);
       fprintf (f,
-               "                    vfmacc_vv_dblm1 (vfmv_v_f_dblm1 (1., vl), x,\n");
+               "                    __riscv_vfmacc_vv_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), x,\n");
       fprintf (f,
-               "                                     jbm_polynomial_%u_nxdbl (x, p + %u, vl),\n",
+               "                                     jbm_polynomial_%u_nxf64 (x, p + %u, vl),\n",
                i - j - 1, j + 1);
       if (i - j > 10)
         fprintf (f, " ");
@@ -1116,7 +1257,7 @@ print_rat_n_d (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_SSE:
       fprintf (f, "static inline __m128d\n");
       fprintf (f,
-               "jbm_rational_%u_%u_2xdbl (const __m128d x, ///< __m128d vector.\n",
+               "jbm_rational_%u_%u_2xf64 (const __m128d x, ///< __m128d vector.\n",
                i, i - 1);
       if (i > 9)
         {
@@ -1127,7 +1268,7 @@ print_rat_n_d (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm_div_pd (jbm_polynomial_%u_2xdbl (x, p),\n",
+      fprintf (f, "  return _mm_div_pd (jbm_polynomial_%u_2xf64 (x, p),\n",
                i - 1);
       fprintf (f,
                "                     _mm_fmadd_pd (x, _mm_set1_pd (p[%u]), _mm_set1_pd (1.)));\n",
@@ -1136,7 +1277,7 @@ print_rat_n_d (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_AVX:
       fprintf (f, "static inline __m256d\n");
       fprintf (f,
-               "jbm_rational_%u_%u_4xdbl (const __m256d x, ///< __m256d vector.\n",
+               "jbm_rational_%u_%u_4xf64 (const __m256d x, ///< __m256d vector.\n",
                i, i - 1);
       if (i > 9)
         {
@@ -1147,7 +1288,7 @@ print_rat_n_d (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm256_div_pd (jbm_polynomial_%u_4xdbl (x, p),\n",
+      fprintf (f, "  return _mm256_div_pd (jbm_polynomial_%u_4xf64 (x, p),\n",
                i - 1);
       fprintf (f,
                "                        _mm256_fmadd_pd (x, _mm256_set1_pd (p[%u]),\n",
@@ -1158,7 +1299,7 @@ print_rat_n_d (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_AVX512:
       fprintf (f, "static inline __m512d\n");
       fprintf (f,
-               "jbm_rational_%u_%u_8xdbl (const __m512d x, ///< __m512d vector.\n",
+               "jbm_rational_%u_%u_8xf64 (const __m512d x, ///< __m512d vector.\n",
                i, i - 1);
       if (i > 9)
         {
@@ -1169,7 +1310,7 @@ print_rat_n_d (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return _mm512_div_pd (jbm_polynomial_%u_8xdbl (x, p),\n",
+      fprintf (f, "  return _mm512_div_pd (jbm_polynomial_%u_8xf64 (x, p),\n",
                i - 1);
       fprintf (f,
                "                        _mm512_fmadd_pd (x, _mm512_set1_pd (p[%u]),\n",
@@ -1180,7 +1321,7 @@ print_rat_n_d (FILE *f, const unsigned int i, const unsigned int type)
     case TYPE_ARM_NEON:
       fprintf (f, "static inline float64x2_t\n");
       fprintf (f,
-               "jbm_rational_%u_%u_2xdbl (const float64x2_t x, ///< float64x2_t vector.\n",
+               "jbm_rational_%u_%u_2xf64 (const float64x2_t x, ///< float64x2_t vector.\n",
                i, i - 1);
       if (i > 9)
         {
@@ -1191,16 +1332,16 @@ print_rat_n_d (FILE *f, const unsigned int i, const unsigned int type)
       fprintf (f,
                "                        const double *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return vdivq_dbl (jbm_polynomial_%u_2xdbl (x, p),\n",
+      fprintf (f, "  return vdivq_f64 (jbm_polynomial_%u_2xf64 (x, p),\n",
                i - 1);
       fprintf (f,
-               "                    vmlaq_dbl (vdupq_n_dbl (1.), x, vdupq_n_dbl (p[%u])));\n",
+               "                    vmlaq_f64 (vdupq_n_f64 (1.), x, vdupq_n_f64 (p[%u])));\n",
                i);
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat64m1_t\n");
       fprintf (f,
-               "jbm_rational_%u_%u_nxdbl (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n",
+               "jbm_rational_%u_%u_nxf64 (const vfloat64m1_t x, ///< vfloat64m1_t vector.\n",
                i, i - 1);
       if (i > 9)
         {
@@ -1220,10 +1361,10 @@ print_rat_n_d (FILE *f, const unsigned int i, const unsigned int type)
                "                        const size_t vl) ///< array size.\n");
       fprintf (f, "{\n");
       fprintf (f, "  return\n");
-      fprintf (f, "    vfdiv_vv_dblm1 (jbm_polynomial_%u_nxdbl (x, p, vl),\n",
+      fprintf (f, "    __riscv_vfdiv_vv_f64m1 (jbm_polynomial_%u_nxf64 (x, p, vl),\n",
                i - 1);
       fprintf (f,
-               "                    vfmacc_vf_dblm1 (vfmv_v_f_dblm1 (1., vl), p[%u], x, vl),\n",
+               "                    __riscv_vfmacc_vf_f64m1 (__riscv_vfmv_v_f_f64m1 (1., vl), p[%u], x, vl),\n",
                i);
       fprintf (f, "                    vl);\n");
       break;

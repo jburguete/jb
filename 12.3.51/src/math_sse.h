@@ -462,10 +462,17 @@ jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
     = _mm_blendv_ps (y.x, _mm_mul_ps (y.x, _mm_set1_ps (0x1p23f)),
                      _mm_castsi128_ps (is_sub));
   exp
-    = _mm_blendv_epi8 (exp, _mm_sub_epi32 (_mm_srli_epi32 (y.i, 23),
-                                           _mm_set1_epi32 (23)), is_sub);
+    = _mm_castps_si128
+    (_mm_blendv_ps (_mm_castsi128_ps (exp),
+                    _mm_castsi128_ps
+                    (_mm_sub_epi32 (_mm_srli_epi32 (y.i, 23),
+                                    _mm_set1_epi32 (23))),
+                    _mm_castsi128_ps (is_sub)));
   // exponent
-  *e = _mm_blendv_epi8 (zi, _mm_sub_epi32 (exp, JBM_4xF32_BIAS), is_finite);
+  *e = _mm_castps_si128
+    (_mm_blendv_ps (_mm_castsi128_ps (zi),
+                    _mm_castsi128_ps (_mm_sub_epi32 (exp, JBM_4xF32_BIAS)),
+                    _mm_castsi128_ps (is_finite)));
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm_or_si128 (_mm_and_si128 (z.i, JBM_4xF32_BITS_SIGN),
@@ -1111,7 +1118,7 @@ jbm_4xf32_rational_3_0 (const __m128 x, ///< __m128 vector.
 }
 
 /**
- * Function to calculate a 1st+2nd order rational (__m128).
+ * Function to calculate a 2nd+1st order rational (__m128).
  *
  * \return __m128 vector of rational values.
  */

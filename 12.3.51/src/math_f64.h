@@ -410,8 +410,8 @@ jbm_f64_frexp (const double x,  ///< double number.
   JBMF64 y;
   uint64_t exp;
   y.x = x;
-  // check NaN or 0
   exp = y.i & JBM_F64_BITS_ABS;
+  // check NaN or 0
   if (exp >= JBM_F64_BITS_EXPONENT || !exp)
     {
       *e = 0;

@@ -385,12 +385,18 @@ jbm_8xf32_frexp (const __m256 x,        ///< __m256 vector.
                         _mm256_mul_ps (y.x, _mm256_set1_ps (0x1p23f)),
                         _mm256_castsi256_ps (is_sub));
   exp
-    = _mm256_blendv_epi8 (exp, _mm256_sub_epi32 (_mm256_srli_epi32 (y.i, 23),
-                                                 _mm256_set1_epi32 (23)),
-                          is_sub);
+    = _mm256_castps_si256
+    (_mm256_blendv_ps (_mm256_castsi256_ps (exp),
+                       _mm256_castsi256_ps
+                       (_mm256_sub_epi32 (_mm256_srli_epi32 (y.i, 23),
+                                          _mm256_set1_epi32 (23))),
+                       _mm256_castsi256_ps (is_sub)));
   // exponent
-  *e = _mm256_blendv_epi8 (zi, _mm256_sub_epi32 (exp, JBM_8xF32_BIAS),
-                           is_finite);
+  *e = _mm256_castps_si256
+    (_mm256_blendv_ps (_mm256_castsi256_ps (zi),
+                       _mm256_castsi256_ps
+                       (_mm256_sub_epi32 (exp, JBM_8xF32_BIAS)),
+                       _mm256_castsi256_ps (is_finite)));
   // build mantissa in [0.5,1)
   z.x = x;
   y.i = _mm256_or_si256 (_mm256_and_si256 (z.i, JBM_8xF32_BITS_SIGN),
@@ -1042,7 +1048,7 @@ jbm_8xf32_rational_3_0 (const __m256 x, ///< __m256 vector.
 }
 
 /**
- * Function to calculate a 1st+2nd order rational (__m256).
+ * Function to calculate a 2nd+1st order rational (__m256).
  *
  * \return __m256 vector of rational values.
  */

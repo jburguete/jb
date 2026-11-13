@@ -1491,7 +1491,7 @@ jbm_16xf32_rational_3_0 (const __m512 x,        ///< __m512 vector.
 }
 
 /**
- * Function to calculate a 1st+2nd order rational (__m512).
+ * Function to calculate a 2nd+1st order rational (__m512).
  *
  * \return __m512 vector of rational values.
  */
