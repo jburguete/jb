@@ -750,7 +750,7 @@ jbm_4xf32_ldexp (const float32x4_t x,   ///< float32x4_t vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline uint32x4_t
-jbm_4xf32_small (const float32x4_t x)   ///< float64x2_t vector.
+jbm_4xf32_small (const float32x4_t x)   ///< float32x4_t vector.
 {
   return vcltq_f32 (jbm_4xf32_abs (x), vdupq_n_f32 (FLT_EPSILON));
 }
@@ -7320,7 +7320,7 @@ jbm_4xf32_rational_29_28 (const float32x4_t x,  ///< float32x4_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function cbrt(x) for x
+ * Function to calculate the well-conditioned function cbrt(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (float32x4_t).
  *
  * \return function value (float32x4_t).
@@ -7362,7 +7362,7 @@ jbm_4xf32_cbrt (const float32x4_t x)    ///< float32x4_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (float32x4_t).
  *
  * \return function value.
@@ -7413,7 +7413,7 @@ jbm_4xf32_exp10 (const float32x4_t x)   ///< float32x4_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for
+ * Function to calculate the well-conditioned function expm1(x) for
  * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (float32x4_t).
  *
  * \return function value (float32x4_t).
@@ -7450,7 +7450,7 @@ jbm_4xf32_expm1 (const float32x4_t x)   ///< float32x4_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (float32x4_t).
  *
  * \return function value (float32x4_t).
@@ -7545,7 +7545,7 @@ jbm_4xf32_pow (const float32x4_t x,     ///< float32x4_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (float32x4_t)
  *
  * \return function value (float32x4_t).
@@ -7558,7 +7558,7 @@ jbm_4xf32_sinwc (const float32x4_t x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (float32x4_t):
  *
  * \return function value (float32x4_t).
@@ -7571,7 +7571,7 @@ jbm_4xf32_coswc (const float32x4_t x)
 }
 
 /**
- * Function to calculate the well conditionated function tan(x) for x in
+ * Function to calculate the well-conditioned function tan(x) for x in
  * [-pi/4,pi/4].
  *
  * \return function value (float32x4_t).
@@ -7584,7 +7584,7 @@ jbm_4xf32_tanwc (const float32x4_t x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_4xf32_sinwc approximation (float32x4_t).
  */
 static inline void
@@ -7701,7 +7701,7 @@ jbm_4xf32_tan (const float32x4_t x)     ///< float32x4_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * Function to calculate the well-conditioned function atan(x) for x in [-1,1]
  * (float32x4_t).
  *
  * \return function value (float32x4_t).
@@ -7753,7 +7753,7 @@ jbm_4xf32_atan2 (const float32x4_t y,   ///< float32x4_t y component.
  * Function to calculate the function asin(x) using the jbm_4xf32_atan function
  * (float32x4_t).
  *
- * \return function value (in [-pi/2,pi/2]).
+ * \return function value (float32x4_t in [-pi/2,pi/2]).
  */
 static inline float32x4_t
 jbm_4xf32_asin (const float32x4_t x)    ///< float32x4_t vector.
@@ -7780,7 +7780,7 @@ jbm_4xf32_acos (const float32x4_t x)    ///< float32x4_t vector.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (float32x4_t).
  */
@@ -7797,7 +7797,7 @@ jbm_4xf32_sinh (const float32x4_t x)    ///< float32x4_t number.
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (float32x4_t).
  */
@@ -7811,7 +7811,7 @@ jbm_4xf32_cosh (const float32x4_t x)    ///< float32x4_t number.
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (float32x4_t).
  */
@@ -7828,7 +7828,7 @@ jbm_4xf32_tanh (const float32x4_t x)    ///< float32x4_t number.
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (float32x4_t).
  */
@@ -7841,7 +7841,7 @@ jbm_4xf32_asinh (const float32x4_t x)   ///< float32x4_t number.
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (float32x4_t).
  */
@@ -7855,7 +7855,7 @@ jbm_4xf32_acosh (const float32x4_t x)   ///< float32x4_t number.
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (float32x4_t).
  */
@@ -7870,8 +7870,8 @@ jbm_4xf32_atanh (const float32x4_t x)   ///< float32x4_t number.
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (float32x4_t)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (float32x4_t).
  *
  * \return function value (float32x4_t).
  */
@@ -7883,8 +7883,8 @@ jbm_4xf32_erfwc (const float32x4_t x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (float32x4_t)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (float32x4_t).
  *
  * \return function value (float32x4_t).
  */
@@ -7904,7 +7904,7 @@ jbm_4xf32_erfcwc (const float32x4_t x)
 
 /**
  * Function to calculate the function erf(x) using jbm_4xf32_erfwc and
- * jbm_4xf32_erfcwc
+ * jbm_4xf32_erfcwc (float32x4_t).
  *
  * \return function value (float32x4_t).
  */
@@ -7921,7 +7921,7 @@ jbm_4xf32_erf (const float32x4_t x)     ///< float32x4_t vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_4xf32_erfwc and
- * jbm_4xf32_erfcwc
+ * jbm_4xf32_erfcwc (float32x4_t).
  *
  * \return function value (float32x4_t).
  */
@@ -7997,41 +7997,40 @@ jbm_4xf32_solve_quadratic (const float32x4_t a,
  * \return float32x4_t vector of solution values.
  */
 static inline float32x4_t
-jbm_solve_cubic_reduced_4xf32 (const float32x4_t a,
-                               ///< 2nd order coefficient of the equation.
+jbm_4xf32_solve_cubic_reduced (const float32x4_t a,
+///< float32x4_t vector of 2nd order coefficient of the equations.
                                const float32x4_t b,
-                               ///< 1st order coefficient of the equation.
+///< float32x4_t vector of 1st order coefficient of the equations.
                                const float32x4_t c,
-                               ///< 0th order coefficient of the equation.
+///< float32x4_t vector of 0th order coefficient of the equations.
                                const float32x4_t x1,
-                               ///< left limit of the solution interval.
+///< float32x4_t vector of left limits of the solution intervals.
                                const float32x4_t x2)
-                               ///< right limit of the solution interval.
+///< float32x4_t vector of right limits of the solution intervals.
 {
-  float32x4_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2, c_3;
+  float32x4_t a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
   c2p_3 = vdupq_n_f32 (2.f * M_PIf / 3.f);
-  c_2 = vdupq_n_f32 (0.5f);
   c_3 = vdupq_n_f32 (1.f / 3.f);
   a3 = vmulq_f32 (a, c_3);
   k0 = vmulq_f32 (a3, a3);
-  k1 = vmlsq_f32 (k0, b, c_3);
-  k0 = vmlsq_f32 (vmulq_f32 (a3, k0), vmlsq_f32 (b, a3, c), c_2);
-  k3 = vmulq_f32 (k1, vmulq_f32 (k1, k1));
-  k2 = vmlaq_f32 (k3, k0, k0);
+  k1 = vsubq_f32 (vmulq_f32 (b, c_3), k0);
+  k0 = vsubq_f32 (vmulq_f32 (vsubq_f32 (vmulq_f32 (b, a3), c),
+                             vdupq_n_f32 (0.5f)), vmulq_f32 (a3, k0));
+  k2 = vfmaq_f32 (vmulq_f32 (k1, vmulq_f32 (k1, k1)), k0, k0);
   l1 = vsqrtq_f32 (jbm_4xf32_opposite (k1));
-  l0 = vmulq_f32 (jbm_4xf32_acos (vdivq_f32 (k0, k3)), c_3);
+  l0 = vmulq_f32
+       (jbm_4xf32_acos (vdivq_f32 (k0,vmulq_f32 (l1, vmulq_f32 (l1, l1)))),
+        c_3);
   l1 = vaddq_f32 (l1, l1);
-  l2 = vmlsq_f32 (a3, l1, jbm_4xf32_cos (k0));
-  l3 = vmlsq_f32 (a3, l1, jbm_4xf32_cos (vaddq_f32 (l0, c2p_3)));
+  l2 = vsubq_f32 (vmulq_f32 (l1, jbm_4xf32_cos (l0)), a3);
+  l3 = vsubq_f32 (vmulq_f32 (l1, jbm_4xf32_cos (vaddq_f32 (l0, c2p_3))), a3);
   l3 = vbslq_f32 (vorrq_u32 (vcltq_f32 (l2, x1), vcgtq_f32 (l2, x2)), l2, l3);
-  l4 = vmlsq_f32 (a, l1, jbm_4xf32_cos (vsubq_f32 (l0, c2p_3)));
+  l4 = vsubq_f32 (vmulq_f32 (l1, jbm_4xf32_cos (vsubq_f32 (l0, c2p_3))), a3);
   l4 = vbslq_f32 (vorrq_u32 (vcltq_f32 (l3, x1), vcgtq_f32 (l3, x2)), l3, l4);
   k1 = vsqrtq_f32 (k2);
-  l5 = vaddq_f32 (k0, k1);
-  l5 = jbm_4xf32_cbrt (k2);
-  k0 = vsubq_f32 (k0, k1);
-  l5 = vaddq_f32 (l5, vsubq_f32 (jbm_4xf32_cbrt (k0), a3));
-  return vbslq_f32 (vcltzq_f32 (k2), l5, l4);
+  l5 = jbm_4xf32_cbrt (vaddq_f32 (k0, k1));
+  l5 = vaddq_f32 (l5, vsubq_f32 (jbm_4xf32_cbrt (vsubq_f32 (k0, k1)), a3));
+  return vbslq_f32 (vcltzq_f32 (k2), l4, l5);
 }
 
 /**
@@ -8058,7 +8057,7 @@ jbm_4xf32_solve_cubic (float32x4_t a,
   return
     vbslq_f32 (jbm_4xf32_small (a),
                jbm_4xf32_solve_quadratic (b, c, d, x1, x2),
-               jbm_solve_cubic_reduced_4xf32 (vdivq_f32 (b, a),
+               jbm_4xf32_solve_cubic_reduced (vdivq_f32 (b, a),
                                               vdivq_f32 (c, a),
                                               vdivq_f32 (d, a), x1, x2));
 
@@ -8329,34 +8328,6 @@ jbm_4xf32_integral (float32x4_t (*f) (float32x4_t),
                     const float32x4_t x1,       ///< left limit of the interval.
                     const float32x4_t x2)       ///< right limit of the interval.
 {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] JB_ALIGNED = { 2.f };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] JB_ALIGNED = { 8.f / 9.f, 5.f / 9.f },
-    b[2] JB_ALIGNED = { 0.f, 7.745966692414834e-1f };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] JB_ALIGNED = {
-    128.f / 225.f,
-    4.786286704993665e-1f,
-    2.369268850561891e-1f
-  }, b[3] JB_ALIGNED = {
-    0.f,
-    5.384693101056831e-1f,
-    9.061798459386640e-1f
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] JB_ALIGNED = {
-    4.179591836734694e-1f,
-    3.818300505051189e-1f,
-    2.797053914892767e-1f,
-    1.294849661688697e-1f
-  }, b[4] JB_ALIGNED = {
-    0.f,
-    4.058451513773972e-1f,
-    7.415311855993944e-1f,
-    9.491079123427585e-1f
-  };
-#endif
   float32x4_t k, x, dx, h;
 #if JBM_INTEGRAL_GAUSS_N > 1
   float32x4_t k2, f1, f2;
@@ -8365,17 +8336,16 @@ jbm_4xf32_integral (float32x4_t (*f) (float32x4_t),
   h = vdupq_n_f32 (0.5f);
   dx = vmulq_f32 (h, vsubq_f32 (x2, x1));
   x = vmulq_f32 (h, vaddq_f32 (x2, x1));
-  k = vdupq_n_f32 (a[0]);
+  k = vdupq_n_f32 (JBM_INTEGRAL_GAUSS_A_F32[0]);
   k = vmulq_f32 (k, f (x));
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = vdupq_n_f32 (b[i]);
-      k2 = vmulq_f32 (k2, dx);
+      k2 = vmulq_f32 (vdupq_n_f32 (JBM_INTEGRAL_GAUSS_B_F32[i]), dx);
       f1 = f (vsubq_f32 (x, k2));
       f2 = f (vaddq_f32 (x, k2));
-      h = vdupq_n_f32 (a[i]);
-      k = vmlaq_f32 (k, h, vaddq_f32 (f1, f2));
+      k = vmlaq_f32 (k, vdupq_n_f32 (JBM_INTEGRAL_GAUSS_A_F32[i]),
+                     vaddq_f32 (f1, f2));
     }
 #endif
   k = vmulq_f32 (k, dx);
@@ -15150,7 +15120,7 @@ jbm_2xf64_rational_29_28 (const float64x2_t x,  ///< float64x2_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function cbrt(x) for x
+ * Function to calculate the well-conditioned function cbrt(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (float64x2_t).
  *
  * \return function value (float64x2_t).
@@ -15192,7 +15162,7 @@ jbm_2xf64_cbrt (const float64x2_t x)    ///< float64x2_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for x in
+ * Function to calculate the well-conditioned function expm1(x) for x in
  * [-log(2)/2,log(2)/2] (float64x2_t).
  *
  * \return function value (float64x2_t).
@@ -15205,7 +15175,7 @@ jbm_2xf64_expm1wc (const float64x2_t x)
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (float64x2_t).
  *
  * \return function value.
@@ -15270,7 +15240,7 @@ jbm_2xf64_expm1 (const float64x2_t x)   ///< float64x2_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(1+x) for x in
+ * Function to calculate the well-conditioned function log2(1+x) for x in
  * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (float64x2_t).
  *
  * \return function value (float64x2_t).
@@ -15365,7 +15335,7 @@ jbm_2xf64_pow (const float64x2_t x,     ///< float64x2_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (float64x2_t)
  *
  * \return function value (float64x2_t).
@@ -15378,7 +15348,7 @@ jbm_2xf64_sinwc (const float64x2_t x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (float64x2_t).
  *
  * \return function value (float64x2_t).
@@ -15391,7 +15361,7 @@ jbm_2xf64_coswc (const float64x2_t x)
 }
 
 /**
- * Function to calculate the well conditionated function tan(x) for x in
+ * Function to calculate the well-conditioned function tan(x) for x in
  * [-pi/4,pi/4] (float64x2_t)
  *
  * \return function value (float64x2_t).
@@ -15404,7 +15374,7 @@ jbm_2xf64_tanwc (const float64x2_t x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_2xf64_sinwc approximation (float64x2_t).
  */
 static inline void
@@ -15520,7 +15490,7 @@ jbm_2xf64_tan (const float64x2_t x)     ///< float64x2_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * Function to calculate the well-conditioned function atan(x) for x in [-1,1]
  * (float64x2_t).
  *
  * \return function value (float64x2_t).
@@ -15600,7 +15570,7 @@ jbm_2xf64_acos (const float64x2_t x)    ///< float64x2_t number.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (float64x2_t).
  */
@@ -15616,7 +15586,7 @@ jbm_2xf64_sinh (const float64x2_t x)    ///< float64x2_t number.
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (float64x2_t).
  */
@@ -15629,7 +15599,7 @@ jbm_2xf64_cosh (const float64x2_t x)    ///< float64x2_t number.
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (float64x2_t).
  */
@@ -15647,7 +15617,7 @@ jbm_2xf64_tanh (const float64x2_t x)    ///< float64x2_t number.
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (float64x2_t).
  */
@@ -15660,7 +15630,7 @@ jbm_2xf64_asinh (const float64x2_t x)   ///< float64x2_t number.
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (float64x2_t).
  */
@@ -15674,7 +15644,7 @@ jbm_2xf64_acosh (const float64x2_t x)   ///< float64x2_t number.
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (float64x2_t).
  */
@@ -15689,8 +15659,8 @@ jbm_2xf64_atanh (const float64x2_t x)   ///< float64x2_t number.
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (float64x2_t)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (float64x2_t).
  *
  * \return function value (float64x2_t).
  */
@@ -15702,8 +15672,8 @@ jbm_2xf64_erfwc (const float64x2_t x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (float64x2_t)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (float64x2_t).
  *
  * \return function value (float64x2_t).
  */
@@ -15723,7 +15693,7 @@ jbm_2xf64_erfcwc (const float64x2_t x)
 
 /**
  * Function to calculate the function erf(x) using jbm_2xf64_erfwc and
- * jbm_2xf64_erfcwc
+ * jbm_2xf64_erfcwc (float64x2_t).
  *
  * \return function value (float64x2_t).
  */
@@ -15739,7 +15709,7 @@ jbm_2xf64_erf (const float64x2_t x)     ///< float64x2_t vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_2xf64_erfwc and
- * jbm_2xf64_erfcwc
+ * jbm_2xf64_erfcwc (float64x2_t).
  *
  * \return function value (float64x2_t).
  */
@@ -15815,41 +15785,41 @@ jbm_2xf64_solve_quadratic (const float64x2_t a,
  * \return float64x2_t vector of solution values.
  */
 static inline float64x2_t
-jbm_solve_cubic_reduced_2xf64 (const float64x2_t a,
-                               ///< 2nd order coefficient of the equation.
+jbm_2xf64_solve_cubic_reduced (const float64x2_t a,
+///< float64x2_t vector of 2nd order coefficient of the equations.
                                const float64x2_t b,
-                               ///< 1st order coefficient of the equation.
+///< float64x2_t vector of 1st order coefficient of the equations.
                                const float64x2_t c,
-                               ///< 0th order coefficient of the equation.
+///< float64x2_t vector of 0th order coefficient of the equations.
                                const float64x2_t x1,
-                               ///< left limit of the solution interval.
+///< float64x2_t vector of left limits of the solution intervals.
                                const float64x2_t x2)
-  ///< right limit of the solution interval.
+///< float64x2_t vector of right limits of the solution intervals.
 {
-  float64x2_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2, c_3;
+  float64x2_t a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
   c2p_3 = vdupq_n_f64 (2. * M_PI / 3.);
-  c_2 = vdupq_n_f64 (0.5);
   c_3 = vdupq_n_f64 (1. / 3.);
   a3 = vmulq_f64 (a, c_3);
   k0 = vmulq_f64 (a3, a3);
-  k1 = vmlsq_f64 (k0, b, c_3);
-  k0 = vmlsq_f64 (vmulq_f64 (a3, k0), vmlsq_f64 (c, b, a3), c_2);
-  k3 = vmulq_f64 (k1, vmulq_f64 (k1, k1));
-  k2 = vmlaq_f64 (k0, k0, k3);
+  k1 = vsubq_f64 (vmulq_f64 (b, c_3), k0);
+  k0 = vsubq_f64 (vmulq_f64 (vsubq_f64 (vmulq_f64 (b, a3), c),
+                             vdupq_n_f64 (0.5)), vmulq_f64 (a3, k0));
+  k2 = vfmaq_f64 (vmulq_f64 (k1, vmulq_f64 (k1, k1)), k0, k0);
   l1 = vsqrtq_f64 (jbm_2xf64_opposite (k1));
-  l0 = vmulq_f64 (jbm_2xf64_acos (vdivq_f64 (k0, k3)), c_3);
+  l0 = vmulq_f64 (jbm_2xf64_acos (vdivq_f64 (k0,
+                                             vmulq_f64 (l1,
+                                                        vmulq_f64 (l1, l1)))),
+                  c_3);
   l1 = vaddq_f64 (l1, l1);
-  l2 = vmlsq_f64 (a3, l1, jbm_2xf64_cos (k0));
-  l3 = vmlsq_f64 (a3, l1, jbm_2xf64_cos (vaddq_f64 (l0, c2p_3)));
+  l2 = vsubq_f64 (vmulq_f64 (l1, jbm_2xf64_cos (l0)), a3);
+  l3 = vsubq_f64 (vmulq_f64 (l1, jbm_2xf64_cos (vaddq_f64 (l0, c2p_3))), a3);
   l3 = vbslq_f64 (vorrq_u64 (vcltq_f64 (l2, x1), vcgtq_f64 (l2, x2)), l2, l3);
-  l4 = vmlsq_f64 (a, l1, jbm_2xf64_cos (vsubq_f64 (l0, c2p_3)));
+  l4 = vsubq_f64 (vmulq_f64 (l1, jbm_2xf64_cos (vsubq_f64 (l0, c2p_3))), a3);
   l4 = vbslq_f64 (vorrq_u64 (vcltq_f64 (l3, x1), vcgtq_f64 (l3, x2)), l3, l4);
   k1 = vsqrtq_f64 (k2);
-  l5 = vaddq_f64 (k0, k1);
-  l5 = jbm_2xf64_cbrt (k2);
-  k0 = vsubq_f64 (k0, k1);
-  l5 = vaddq_f64 (l5, vsubq_f64 (jbm_2xf64_cbrt (k0), a3));
-  return vbslq_f64 (vcltzq_f64 (k2), l5, l4);
+  l5 = jbm_2xf64_cbrt (vaddq_f64 (k0, k1));
+  l5 = vaddq_f64 (l5, vsubq_f64 (jbm_2xf64_cbrt (vsubq_f64 (k0, k1)), a3));
+  return vbslq_f64 (vcltzq_f64 (k2), l4, l5);
 }
 
 /**
@@ -15876,7 +15846,7 @@ jbm_2xf64_solve_cubic (float64x2_t a,
   return
     vbslq_f64 (jbm_2xf64_small (a),
                jbm_2xf64_solve_quadratic (b, c, d, x1, x2),
-               jbm_solve_cubic_reduced_2xf64 (vdivq_f64 (b, a),
+               jbm_2xf64_solve_cubic_reduced (vdivq_f64 (b, a),
                                               vdivq_f64 (c, a),
                                               vdivq_f64 (d, a), x1, x2));
 
@@ -16145,34 +16115,6 @@ jbm_2xf64_integral (float64x2_t (*f) (float64x2_t),
                     const float64x2_t x1,       ///< left limit of the interval.
                     const float64x2_t x2)       ///< right limit of the interval.
 {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] JB_ALIGNED = { 2. };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] JB_ALIGNED = { 8. / 9., 5. / 9. },
-    b[2] JB_ALIGNED = { 0., 7.745966692414834e-1 };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] JB_ALIGNED = {
-    128. / 225.,
-    4.786286704993665e-1,
-    2.369268850561891e-1
-  }, b[3] JB_ALIGNED = {
-    0.,
-    5.384693101056831e-1,
-    9.061798459386640e-1
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] JB_ALIGNED = {
-    4.179591836734694e-1,
-    3.818300505051189e-1,
-    2.797053914892767e-1,
-    1.294849661688697e-1
-  }, b[4] JB_ALIGNED = {
-    0.,
-    4.058451513773972e-1,
-    7.415311855993944e-1,
-    9.491079123427585e-1
-  };
-#endif
   float64x2_t k, x, dx, h;
 #if JBM_INTEGRAL_GAUSS_N > 1
   float64x2_t k2, f1, f2;
@@ -16181,17 +16123,16 @@ jbm_2xf64_integral (float64x2_t (*f) (float64x2_t),
   h = vdupq_n_f64 (0.5);
   dx = vmulq_f64 (h, vsubq_f64 (x2, x1));
   x = vmulq_f64 (h, vaddq_f64 (x2, x1));
-  k = vdupq_n_f64 (a[0]);
+  k = vdupq_n_f64 (JBM_INTEGRAL_GAUSS_A[0]);
   k = vmulq_f64 (k, f (x));
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = vdupq_n_f64 (b[i]);
-      k2 = vmulq_f64 (k2, dx);
+      k2 = vmulq_f64 (vdupq_n_f64 (JBM_INTEGRAL_GAUSS_B[i]), dx);
       f1 = f (vsubq_f64 (x, k2));
       f2 = f (vaddq_f64 (x, k2));
-      h = vdupq_n_f64 (a[i]);
-      k = vmlaq_f64 (k, h, vaddq_f64 (f1, f2));
+      k = vmlaq_f64 (k, vdupq_n_f64 (JBM_INTEGRAL_GAUSS_A[i]),
+                     vaddq_f64 (f1, f2));
     }
 #endif
   k = vmulq_f64 (k, dx);

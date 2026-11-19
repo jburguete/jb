@@ -206,42 +206,12 @@ static const double K_ERFCWC_F64[17] JB_ALIGNED = {
 };
 
 ///> 1st constant to calculate integrals by the Gauss method (double).
-static const double JBM_INTEGRAL_GAUSS_A_F64[JBM_INTEGRAL_GAUSS_N] = {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  2.
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  8. / 9.,
-  5. / 9.
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  128. / 225.,
-  4.7862867049936646804129151483563819e-1,
-  2.3692688505618908751426404071991736e-1
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  4.1795918367346938775510204081632653e-1,
-  3.8183005050511894495036977548897513e-1,
-  2.7970539148927666790146777142377958e-1,
-  1.2948496616886969327061143267908202e-1
-#endif
-};
+static const double JBM_INTEGRAL_GAUSS_A_F64[JBM_INTEGRAL_GAUSS_N]
+  = { JBM_INTEGRAL_GAUSS_A (double) };
 
 ///> 2nd constant to calculate integrals by the Gauss method (double).
-static const double JBM_INTEGRAL_GAUSS_B_F64[JBM_INTEGRAL_GAUSS_N] = {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  0.
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  0.,
-  7.7459666924148340427791481488384306e-1
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  0.,
-  5.3846931010568309103631442070020880e-1,
-  9.0617984593866399279762687829939297e-1
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  0.,
-  4.0584515137739716690660641207696146e-1,
-  7.4153118559939443986386477328078841e-1,
-  9.4910791234275852452618968404785126e-1
-#endif
-};
+static const double JBM_INTEGRAL_GAUSS_B_F64[JBM_INTEGRAL_GAUSS_N]
+  = { JBM_INTEGRAL_GAUSS_B (double) };
 
 /**
  * Function to calculate the double of a double number.
@@ -3775,7 +3745,7 @@ jbm_f64_rational_21_20 (const double x, ///< double value.
 }
 
 /**
- * Function to calculate the well conditionated function cbrt(x) for x
+ * Function to calculate the well-conditioned function cbrt(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (double).
  *
  * \return function value (double).
@@ -3813,7 +3783,7 @@ jbm_f64_cbrt (const double x)   ///< double number.
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x
+ * Function to calculate the well-conditioned function exp2(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (double).
  *
  * \return function value (double).
@@ -3868,7 +3838,7 @@ jbm_f64_exp10 (const double x)  ///< double number.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for x in
+ * Function to calculate the well-conditioned function expm1(x) for x in
  * [-log(2)/2,log(2)/2].
  *
  * \return function value (double).
@@ -3895,7 +3865,7 @@ jbm_f64_expm1 (const double x)  ///< double number.
 }
 
 /**
- * Function to calculate the well conditionated function log2(1+x) for x in
+ * Function to calculate the well-conditioned function log2(1+x) for x in
  * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (double).
  *
  * \return function value (double).
@@ -3993,7 +3963,7 @@ jbm_f64_pow (const double x,    ///< double number.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4].
  *
  * \return function value (double).
@@ -4006,7 +3976,7 @@ jbm_f64_sinwc (const double x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4].
  *
  * \return function value (double).
@@ -4019,7 +3989,7 @@ jbm_f64_coswc (const double x)
 }
 
 /**
- * Function to calculate the well conditionated function tan(x) for x in
+ * Function to calculate the well-conditioned function tan(x) for x in
  * [-pi/4,pi/4].
  *
  * \return function value (double).
@@ -4032,7 +4002,7 @@ jbm_f64_tanwc (const double x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_f64_sinwc approximation (double).
  */
 static inline void
@@ -4142,7 +4112,7 @@ jbm_f64_tan (const double x)    ///< double number.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
+ * Function to calculate the well-conditioned function atan(x) for x in
  * [-1,1].
  *
  * \return function value (double).
@@ -4212,7 +4182,7 @@ jbm_f64_acos (const double x)   ///< double number.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (double).
  */
@@ -4224,7 +4194,7 @@ jbm_f64_sinh (const double x)   ///< double number.
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (double).
  */
@@ -4237,7 +4207,7 @@ jbm_f64_cosh (const double x)   ///< double number.
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (double).
  */
@@ -4254,7 +4224,7 @@ jbm_f64_tanh (const double x)   ///< double number.
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (double).
  */
@@ -4265,7 +4235,7 @@ jbm_f64_asinh (const double x)  ///< double number.
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (double).
  */
@@ -4276,7 +4246,7 @@ jbm_f64_acosh (const double x)  ///< double number.
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (double).
  */
@@ -4287,7 +4257,7 @@ jbm_f64_atanh (const double x)  ///< double number.
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
+ * Function to calculate the well-conditioned function erf(x) for x in
  * [-1,1].
  *
  * \return function value (double).
@@ -4300,7 +4270,7 @@ jbm_f64_erfwc (const double x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
+ * Function to calculate the well-conditioned function erfc(x) for
  * \f$x\in[1,\infty]\f$.
  *
  * \return function value (double).

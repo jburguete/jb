@@ -53,6 +53,24 @@
 #ifdef __riscv_vector
 #include <riscv_vector.h>
 #endif
+#ifdef __loongarch_sx
+#include <lsxintrin.h>
+#endif
+#ifdef __loongarch_asx
+#include <lasxintrin.h>
+#endif
+
+/**
+ * \def JBM_F128
+ * \brief macro to do maximum precision suffixes.
+ */
+#ifdef __GNUC__
+#define JBM_F128(x) x##Q
+#elifdef __clang__
+#define JBM_F128(x) x##f128
+#else
+#error "Compiler not supported"
+#endif
 
 /**
  * \def aligned_free
@@ -809,40 +827,75 @@ exp10l (long double x)
 ///> macro to do a division.
 #define JBM_DIV(x, y) ((x) / (y))
 
-#define JBM_FACT0 1.            ///< 0!.
-#define JBM_FACT1 1.            ///< 1!.
-#define JBM_FACT2 2.            ///< 2!.
-#define JBM_FACT3 6.            ///< 3!.
-#define JBM_FACT4 24.           ///< 4!.
-#define JBM_FACT5 120.          ///< 5!.
-#define JBM_FACT6 720.          ///< 6!.
-#define JBM_FACT7 5040.         ///< 7!.
-#define JBM_FACT8 40320.        ///< 8!.
-#define JBM_FACT9 362880.       ///< 9!.
-#define JBM_FACT10 3628800.     ///< 10!.
-#define JBM_FACT11 39916800.    ///< 11!.
-#define JBM_FACT12 479001600.   ///< 12!.
-#define JBM_FACT13 6227020800.  ///< 13!.
-#define JBM_FACT14 87178291200. ///< 14!.
-#define JBM_FACT15 1307674368000.       ///< 15!.
-#define JBM_FACT16 20922789888000.      ///< 16!.
-#define JBM_1_FACT0 (1. / JBM_FACT0)    ///< 1/0!.
-#define JBM_1_FACT1 (1. / JBM_FACT1)    ///< 1/1!.
-#define JBM_1_FACT2 (1. / JBM_FACT2)    ///< 1/2!.
-#define JBM_1_FACT3 (1. / JBM_FACT3)    ///< 1/3!.
-#define JBM_1_FACT4 (1. / JBM_FACT4)    ///< 1/4!.
-#define JBM_1_FACT5 (1. / JBM_FACT5)    ///< 1/5!.
-#define JBM_1_FACT6 (1. / JBM_FACT6)    ///< 1/6!.
-#define JBM_1_FACT7 (1. / JBM_FACT7)    ///< 1/7!.
-#define JBM_1_FACT8 (1. / JBM_FACT8)    ///< 1/8!.
-#define JBM_1_FACT9 (1. / JBM_FACT9)    ///< 1/9!.
-#define JBM_1_FACT10 (1. / JBM_FACT10)  ///< 1/10!.
-#define JBM_1_FACT11 (1. / JBM_FACT11)  ///< 1/11!.
-#define JBM_1_FACT12 (1. / JBM_FACT12)  ///< 1/12!.
-#define JBM_1_FACT13 (1. / JBM_FACT13)  ///< 1/13!.
-#define JBM_1_FACT14 (1. / JBM_FACT14)  ///< 1/14!.
-#define JBM_1_FACT15 (1. / JBM_FACT15)  ///< 1/15!.
-#define JBM_1_FACT16 (1. / JBM_FACT16)  ///< 1/16!.
+#define JBM_FACT0 JBM_F128(1.)  ///< 0!.
+#define JBM_FACT1 JBM_F128(1.)  ///< 1!.
+#define JBM_FACT2 JBM_F128(2.)  ///< 2!.
+#define JBM_FACT3 JBM_F128(6.)  ///< 3!.
+#define JBM_FACT4 JBM_F128(24.) ///< 4!.
+#define JBM_FACT5 JBM_F128(120.)        ///< 5!.
+#define JBM_FACT6 JBM_F128(720.)        ///< 6!.
+#define JBM_FACT7 JBM_F128(5040.)       ///< 7!.
+#define JBM_FACT8 JBM_F128(40320.)      ///< 8!.
+#define JBM_FACT9 JBM_F128(362880.)     ///< 9!.
+#define JBM_FACT10 JBM_F128(3628800.)   ///< 10!.
+#define JBM_FACT11 JBM_F128(39916800.)  ///< 11!.
+#define JBM_FACT12 JBM_F128(479001600.) ///< 12!.
+#define JBM_FACT13 JBM_F128(6227020800.)        ///< 13!.
+#define JBM_FACT14 JBM_F128(87178291200.)       ///< 14!.
+#define JBM_FACT15 JBM_F128(1307674368000.)     ///< 15!.
+#define JBM_FACT16 JBM_F128(20922789888000.)    ///< 16!.
+#define JBM_1_FACT0 (JBM_FLOAT(1.) / JBM_FACT0) ///< 1/0!.
+#define JBM_1_FACT1 (JBM_FLOAT(1.) / JBM_FACT1) ///< 1/1!.
+#define JBM_1_FACT2 (JBM_FLOAT(1.) / JBM_FACT2) ///< 1/2!.
+#define JBM_1_FACT3 (JBM_FLOAT(1.) / JBM_FACT3) ///< 1/3!.
+#define JBM_1_FACT4 (JBM_FLOAT(1.) / JBM_FACT4) ///< 1/4!.
+#define JBM_1_FACT5 (JBM_FLOAT(1.) / JBM_FACT5) ///< 1/5!.
+#define JBM_1_FACT6 (JBM_FLOAT(1.) / JBM_FACT6) ///< 1/6!.
+#define JBM_1_FACT7 (JBM_FLOAT(1.) / JBM_FACT7) ///< 1/7!.
+#define JBM_1_FACT8 (JBM_FLOAT(1.) / JBM_FACT8) ///< 1/8!.
+#define JBM_1_FACT9 (JBM_FLOAT(1.) / JBM_FACT9) ///< 1/9!.
+#define JBM_1_FACT10 (JBM_FLOAT(1.) / JBM_FACT10)       ///< 1/10!.
+#define JBM_1_FACT11 (JBM_FLOAT(1.) / JBM_FACT11)       ///< 1/11!.
+#define JBM_1_FACT12 (JBM_FLOAT(1.) / JBM_FACT12)       ///< 1/12!.
+#define JBM_1_FACT13 (JBM_FLOAT(1.) / JBM_FACT13)       ///< 1/13!.
+#define JBM_1_FACT14 (JBM_FLOAT(1.) / JBM_FACT14)       ///< 1/14!.
+#define JBM_1_FACT15 (JBM_FLOAT(1.) / JBM_FACT15)       ///< 1/15!.
+#define JBM_1_FACT16 (JBM_FLOAT(1.) / JBM_FACT16)       ///< 1/16!.
+
+/**
+ * \def JBM_INTEGRAL_GAUSS_A
+ * \brief 1st constants of the Gauss integral method.
+ * \def JBM_INTEGRAL_GAUSS_B
+ * \brief 2nd constants of the Gauss integral method.
+ */
+#if JBM_INTEGRAL_GAUSS_N == 1
+#define JBM_INTEGRAL_GAUSS_A(type) (type) JBM_F128(2.)
+#define JBM_INTEGRAL_GAUSS_B(type) (type) JBM_F128(0.)
+#elif JBM_INTEGRAL_GAUSS_N == 2
+#define JBM_INTEGRAL_GAUSS_A(type) (type) JBM_F128 (8.) / JBM_F128(9.), \
+  (type) JBM_F128(5.) / JBM_F128(9.)
+#define JBM_INTEGRAL_GAUSS_B(type) (type) JBM_F128 (0.) \
+    (type) JBM_F128(7.7459666924148340427791481488384306e-1)
+#elif JBM_INTEGRAL_GAUSS_N == 3
+#define JBM_INTEGRAL_GAUSS_A(type) (type) JBM_F128 (128.) / JBM_F128(225.), \
+    (type) JBM_F128(4.7862867049936646804129151483563819e-1), \
+    (type) JBM_F128(2.3692688505618908751426404071991736e-1)
+#define JBM_INTEGRAL_GAUSS_B(type) (type) JBM_F128 (0.) \
+    (type) JBM_F128(5.3846931010568309103631442070020880e-1), \
+    (type) JBM_F128(9.0617984593866399279762687829939297e-1)
+#elif JBM_INTEGRAL_GAUSS_N == 4
+#define JBM_INTEGRAL_GAUSS_A(type) \
+    (type) JBM_F128(4.1795918367346938775510204081632653e-1), \
+    (type) JBM_F128(3.8183005050511894495036977548897513e-1), \
+    (type) JBM_F128(2.7970539148927666790146777142377958e-1), \
+    (type) JBM_F128(1.2948496616886969327061143267908202e-1)
+#define JBM_INTEGRAL_GAUSS_B(type) (type) JBM_F128 (0.) \
+    (type) JBM_F128(4.0584515137739716690660641207696146e-1), \
+    (type) JBM_F128(7.4153118559939443986386477328078841e-1), \
+    (type) JBM_F128(9.4910791234275852452618968404785126e-1)
+#else
+#error "Gaussian integral method not implemented"
+#endif
 
 ///> enum to select the flux limiter type.
 enum JBMFluxLimiterType
@@ -879,15 +932,23 @@ enum JBMFluxLimiterType
 #undef JBM_VECTORIZED
 #define JBM_VECTORIZED 1
 #include "math_sve.h"
-#elif defined (__ARM_NEON)
+#elifdef __ARM_NEON
 #undef JBM_VECTORIZED
 #define JBM_VECTORIZED 1
 #include "math_neon.h"
-#elif defined (__riscv_vector)
+#elifdef __riscv_vector
 #undef JBM_VECTORIZED
 #define JBM_VECTORIZED 1
 #include "math_riscv.h"
+#elifdef __loongarch_sx
+#undef JBM_VECTORIZED
+#define JBM_VECTORIZED 1
+#include "math_lsx.h"
+#ifdef __loongarch_asx
+#include "math_lasx.h"
 #endif
+#endif
+
 
 /**
  * struct to define arrays of JBFLOAT numbers.
@@ -2024,34 +2085,8 @@ jbm_integral (JBFLOAT (*f) (JBFLOAT),
               const JBFLOAT x1, ///< left limit of the interval.
               const JBFLOAT x2) ///< right limit of the interval.
 {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] = { (JBFLOAT) 2. };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] = { (JBFLOAT) 8. / 9., (JBFLOAT) 5. / 9. },
-    b[2] = { (JBFLOAT) 0., (JBFLOAT) 7.7459666924148340427791481488384306e-1 };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] = {
-    (JBFLOAT) 128. / 225.,
-    (JBFLOAT) 4.7862867049936646804129151483563819e-1,
-    (JBFLOAT) 2.3692688505618908751426404071991736e-1
-  }, b[3] = {
-    (JBFLOAT) 0.,
-    (JBFLOAT) 5.3846931010568309103631442070020880e-1,
-    (JBFLOAT) 9.0617984593866399279762687829939297e-1
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] = {
-    (JBFLOAT) 4.1795918367346938775510204081632653e-1,
-    (JBFLOAT) 3.8183005050511894495036977548897513e-1,
-    (JBFLOAT) 2.7970539148927666790146777142377958e-1,
-    (JBFLOAT) 1.2948496616886969327061143267908202e-1
-  }, b[4] = {
-    (JBFLOAT) 0.,
-    (JBFLOAT) 4.0584515137739716690660641207696146e-1,
-    (JBFLOAT) 7.4153118559939443986386477328078841e-1,
-    (JBFLOAT) 9.4910791234275852452618968404785126e-1
-  };
-#endif
+  const JBFLOAT a[JBM_INTEGRAL_GAUSS_N] = { JBM_INTEGRAL_GAUSS_A (JBFLOAT) };
+  const JBFLOAT b[JBM_INTEGRAL_GAUSS_N] = { JBM_INTEGRAL_GAUSS_B (JBFLOAT) };
   JBFLOAT k, x, dx;
 #if JBM_INTEGRAL_GAUSS_N > 1
   JBFLOAT k2;
@@ -2757,36 +2792,8 @@ jbm_integrall (JBDOUBLE (*f) (JBDOUBLE),
                const JBDOUBLE x1,       ///< left limit of the interval.
                const JBDOUBLE x2)       ///< right limit of the interval.
 {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBDOUBLE a[1] = { (JBDOUBLE) 2. };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBDOUBLE a[2] = { (JBDOUBLE) 8. / 9., (JBDOUBLE) 5. / 9. }, b[2] = {
-    (JBDOUBLE) 0.,
-    (JBDOUBLE) 7.7459666924148340427791481488384306e-1
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBDOUBLE a[3] = {
-    (JBDOUBLE) 128. / 225.,
-    (JBDOUBLE) 4.7862867049936646804129151483563819e-1,
-    (JBDOUBLE) 2.3692688505618908751426404071991736e-1
-  }, b[3] = {
-    (JBDOUBLE) 0.,
-    (JBDOUBLE) 5.3846931010568309103631442070020880e-1,
-    (JBDOUBLE) 9.0617984593866399279762687829939297e-1
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBDOUBLE a[4] = {
-    (JBDOUBLE) 4.1795918367346938775510204081632653e-1,
-    (JBDOUBLE) 3.8183005050511894495036977548897513e-1,
-    (JBDOUBLE) 2.7970539148927666790146777142377958e-1,
-    (JBDOUBLE) 1.2948496616886969327061143267908202e-1
-  }, b[4] = {
-    (JBDOUBLE) 0.,
-    (JBDOUBLE) 4.0584515137739716690660641207696146e-1,
-    (JBDOUBLE) 7.4153118559939443986386477328078841e-1,
-    (JBDOUBLE) 9.4910791234275852452618968404785126e-1
-  };
-#endif
+  const JBDOUBLE a[JBM_INTEGRAL_GAUSS_N] = { JBM_INTEGRAL_GAUSS_A (JBDOUBLE) };
+  const JBDOUBLE b[JBM_INTEGRAL_GAUSS_N] = { JBM_INTEGRAL_GAUSS_B (JBDOUBLE) };
   JBDOUBLE k, x, dx;
 #if JBM_INTEGRAL_GAUSS_N > 1
   JBDOUBLE k2;

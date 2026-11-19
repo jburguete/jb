@@ -50,6 +50,8 @@
 #define K_ERFC_MAX_F32 9.1945494491346722541126284791161797e+00f
 ///< maximum value for the erfc function for floats.
 
+#endif
+
 /**
  * union to work with bits in float numbers.
  */
@@ -162,42 +164,12 @@ static const float K_ERFCWC_F32[8] JB_ALIGNED = {
 };
 
 ///> 1st constant to calculate integrals by the Gauss method (float).
-static const float JBM_INTEGRAL_GAUSS_A_F32[JBM_INTEGRAL_GAUSS_N] = {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  2.f
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  8.f / 9.f,
-  5.f / 9.f
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  128.f / 225.f,
-  4.7862867049936646804129151483563819e-1f,
-  2.3692688505618908751426404071991736e-1f
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  4.1795918367346938775510204081632653e-1f,
-  3.8183005050511894495036977548897513e-1f,
-  2.7970539148927666790146777142377958e-1f,
-  1.2948496616886969327061143267908202e-1f
-#endif
-};
+static const float JBM_INTEGRAL_GAUSS_A_F32[JBM_INTEGRAL_GAUSS_N]
+  = { JBM_INTEGRAL_GAUSS_A (float) };
 
 ///> 2nd constant to calculate integrals by the Gauss method (float).
-static const float JBM_INTEGRAL_GAUSS_B_F32[JBM_INTEGRAL_GAUSS_N] = {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  0.f
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  0.f,
-  7.7459666924148340427791481488384306e-1f
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  0.f,
-  5.3846931010568309103631442070020880e-1f,
-  9.0617984593866399279762687829939297e-1f
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  0.f,
-  4.0584515137739716690660641207696146e-1f,
-  7.4153118559939443986386477328078841e-1f,
-  9.4910791234275852452618968404785126e-1f
-#endif
-};
+static const float JBM_INTEGRAL_GAUSS_B_F32[JBM_INTEGRAL_GAUSS_N]
+  = { JBM_INTEGRAL_GAUSS_B (float) };
 
 /**
  * Function to calculate the double of a float number.
@@ -3731,7 +3703,7 @@ jbm_f32_rational_21_20 (const float x,  ///< float value.
 }
 
 /**
- * Function to calculate the well conditionated function cbrt(x) for x
+ * Function to calculate the well-conditioned function cbrt(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (float).
  *
  * \return function value (float).
@@ -3769,7 +3741,7 @@ jbm_f32_cbrt (const float x)    ///< float number.
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x
+ * Function to calculate the well-conditioned function exp2(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (float).
  *
  * \return function value (float).
@@ -3824,7 +3796,7 @@ jbm_f32_exp10 (const float x)   ///< float number.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for x in
+ * Function to calculate the well-conditioned function expm1(x) for x in
  * [-log(2)/2,log(2)/2].
  *
  * \return function value (float).
@@ -3855,7 +3827,7 @@ jbm_f32_expm1 (const float x)   ///< float number.
 }
 
 /**
- * Function to calculate the well conditionated function log2(1+x) for x in
+ * Function to calculate the well-conditioned function log2(1+x) for x in
  * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (float).
  *
  * \return function value (float).
@@ -3951,7 +3923,7 @@ jbm_f32_pow (const float x,     ///< float number.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4].
  *
  * \return function value (float).
@@ -3964,7 +3936,7 @@ jbm_f32_sinwc (const float x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4].
  *
  * \return function value (float).
@@ -3977,7 +3949,7 @@ jbm_f32_coswc (const float x)
 }
 
 /**
- * Function to calculate the well conditionated function tan(x) for x in
+ * Function to calculate the well-conditioned function tan(x) for x in
  * [-pi/4,pi/4].
  *
  * \return function value (float).
@@ -3990,7 +3962,7 @@ jbm_f32_tanwc (const float x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_f32_sinwc approximation (float).
  */
 static inline void
@@ -4101,7 +4073,7 @@ jbm_f32_tan (const float x)     ///< float number.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
+ * Function to calculate the well-conditioned function atan(x) for x in
  * [-1,1].
  *
  * \return function value (float).
@@ -4173,7 +4145,7 @@ jbm_f32_acos (const float x)    ///< float number.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (float).
  */
@@ -4185,7 +4157,7 @@ jbm_f32_sinh (const float x)    ///< float number.
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (float).
  */
@@ -4198,7 +4170,7 @@ jbm_f32_cosh (const float x)    ///< float number.
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (float).
  */
@@ -4215,7 +4187,7 @@ jbm_f32_tanh (const float x)    ///< float number.
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (float).
  */
@@ -4226,7 +4198,7 @@ jbm_f32_asinh (const float x)   ///< float number.
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (float).
  */
@@ -4237,7 +4209,7 @@ jbm_f32_acosh (const float x)   ///< float number.
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (float).
  */
@@ -4248,7 +4220,7 @@ jbm_f32_atanh (const float x)   ///< float number.
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
+ * Function to calculate the well-conditioned function erf(x) for x in
  * [-1,1].
  *
  * \return function value (float).
@@ -4261,7 +4233,7 @@ jbm_f32_erfwc (const float x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
+ * Function to calculate the well-conditioned function erfc(x) for
  * \f$x\in[1,\infty]\f$.
  *
  * \return function value (float).

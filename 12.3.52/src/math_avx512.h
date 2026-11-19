@@ -844,32 +844,32 @@ static inline __m512
 jbm_16xf32_frexp (const __m512 x,       ///< __m512 vector.
                   __m512i *e)   ///< pointer to the extracted exponents vector.
 {
-  const __m512i zi = _mm512_setzero_epi32 ();
+  const __m512i zero = _mm512_setzero_epi32 ();
   const __m512i mant_mask = JBM_16xF32_BITS_MANTISSA;
-  JBM16xF32 y, z;
-  __m512i lz, exp;
+  JBM16xF32 y, z, s;
+  __m512i exp, exp_sub;
   __mmask16 is_sub, is_finite;
-  // y=abs(x)
   y.x = jbm_16xf32_abs (x);
-  // mask
   is_finite
     = _mm512_cmplt_epu32_mask (_mm512_sub_epi32 (y.i, _mm512_set1_epi32 (1)),
                                JBM_16xF32_BITS_EXPONENT - 1);
-  // extract exponent
   exp = _mm512_maskz_srli_epi32 (is_finite, y.i, 23);
-  // subnormals
-  is_sub = _mm512_cmpeq_epu32_mask (exp, zi) & is_finite;
-  lz = _mm512_lzcnt_epi32 (y.i);
-  y.i = _mm512_mask_sllv_epi32 (y.i, is_sub, y.i,
-                                _mm512_sub_epi32 (lz, _mm512_set1_epi32 (8)));
-  exp = _mm512_mask_sub_epi32 (exp, is_sub, _mm512_set1_epi32 (9), lz);
-  *e = _mm512_mask_sub_epi32 (zi, is_finite, exp, JBM_16xF32_BIAS);
-  // build mantissa in [0.5,1)
+  is_sub = _mm512_cmpeq_epu32_mask (exp, zero) & is_finite;
+  // Scale subnormals
+  s.x = _mm512_mul_ps (x, _mm512_set1_ps (0x1p23f));
+  // Exponent
+  exp = _mm512_mask_mov_epi32 (exp, is_sub,
+                               _mm512_sub_epi32 (_mm512_srli_epi32 (s.i, 23),
+                                                 _mm512_set1_epi32 (23)));
+  *e = _mm512_mask_sub_epi32 (zero, is_finite, exp,
+                              _mm512_set1_epi32 (JBM_16xF32_BIAS));
+  // Mantissa
   z.x = x;
+  s.i = _mm512_mask_mov_epi32 (y.i, is_sub, s.i);
   y.i = _mm512_or_epi32 (_mm512_and_epi32 (z.i, JBM_16xF32_BITS_SIGN),
-                         _mm512_or_epi32 (_mm512_set1_epi32 (JBM_F32_BIAS
-                                                             << 23),
-                                          _mm512_and_epi32 (y.i, mant_mask)));
+                         _mm512_or_epi32
+                         (_mm512_set1_epi32 (JBM_F32_BIAS << 23),
+                          _mm512_and_epi32 (s.i, mant_mask)));
   return _mm512_mask_mov_ps (x, is_finite, y.x);
 }
 
@@ -903,7 +903,7 @@ jbm_16xf32_ldexp (const __m512 x,       ///< __m512 vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline __mmask16
-jbm_16xf32_small (const __m512 x)       ///< __m512d vector.
+jbm_16xf32_small (const __m512 x)       ///< __m512 vector.
 {
   return _mm512_cmp_ps_mask (jbm_16xf32_abs (x), _mm512_set1_ps (FLT_EPSILON),
                              _CMP_LT_OS);
@@ -7580,7 +7580,7 @@ jbm_16xf32_rational_29_28 (const __m512 x,      ///< __m512 vector.
 }
 
 /**
- * Function to calculate the well conditionated function cbrt(x) for x
+ * Function to calculate the well-conditioned function cbrt(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (__m512).
  *
  * \return function value (__m512).
@@ -7622,7 +7622,7 @@ jbm_16xf32_cbrt (const __m512 x)        ///< __m512 vector.
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (__m512).
  *
  * \return function value.
@@ -7672,7 +7672,7 @@ jbm_16xf32_exp10 (const __m512 x)       ///< __m512 vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for
+ * Function to calculate the well-conditioned function expm1(x) for
  * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (__m512).
  *
  * \return function value (__m512).
@@ -7712,7 +7712,7 @@ jbm_16xf32_expm1 (const __m512 x)       ///< __m512 vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (__m512).
  *
  * \return function value (__m512).
@@ -7811,7 +7811,7 @@ jbm_16xf32_pow (const __m512 x, ///< __m512 vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (__m512)
  *
  * \return function value (__m512).
@@ -7826,7 +7826,7 @@ jbm_16xf32_sinwc (const __m512 x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (__m512):
  *
  * \return function value (__m512).
@@ -7839,7 +7839,7 @@ jbm_16xf32_coswc (const __m512 x)
 }
 
 /**
- * Function to calculate the well conditionated function tan(x) for x in
+ * Function to calculate the well-conditioned function tan(x) for x in
  * [-pi/4,pi/4].
  *
  * \return function value (__m512).
@@ -7853,7 +7853,7 @@ jbm_16xf32_tanwc (const __m512 x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_16xf32_sinwc approximation (__m512).
  */
 static inline void
@@ -7970,7 +7970,7 @@ jbm_16xf32_tan (const __m512 x) ///< __m512 vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * Function to calculate the well-conditioned function atan(x) for x in [-1,1]
  * (__m512).
  *
  * \return function value (__m512).
@@ -8024,7 +8024,7 @@ jbm_16xf32_atan2 (const __m512 y,       ///< __m512 y component.
  * Function to calculate the function asin(x) using the jbm_16xf32_atan function
  * (__m512).
  *
- * \return function value (in [-pi/2,pi/2]).
+ * \return function value (__m512 in [-pi/2,pi/2]).
  */
 static inline __m512
 jbm_16xf32_asin (const __m512 x)        ///< __m512 vector.
@@ -8053,12 +8053,12 @@ jbm_16xf32_acos (const __m512 x)        ///< __m512 vector.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (__m512).
  */
 static inline __m512
-jbm_16xf32_sinh (const __m512 x)        ///< __m512 number.
+jbm_16xf32_sinh (const __m512 x)        ///< __m512 vector.
 {
   const __m512 f = jbm_16xf32_expm1 (jbm_16xf32_abs (x));
   return
@@ -8072,12 +8072,12 @@ jbm_16xf32_sinh (const __m512 x)        ///< __m512 number.
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (__m512).
  */
 static inline __m512
-jbm_16xf32_cosh (const __m512 x)        ///< __m512 number.
+jbm_16xf32_cosh (const __m512 x)        ///< __m512 vector.
 {
   __m512 f;
   f = jbm_16xf32_exp (x);
@@ -8086,12 +8086,12 @@ jbm_16xf32_cosh (const __m512 x)        ///< __m512 number.
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (__m512).
  */
 static inline __m512
-jbm_16xf32_tanh (const __m512 x)        ///< __m512 number.
+jbm_16xf32_tanh (const __m512 x)        ///< __m512 vector.
 {
   const __m512 x2 = jbm_16xf32_dbl (x);
   __m512 f = jbm_16xf32_expm1 (x2);
@@ -8106,12 +8106,12 @@ jbm_16xf32_tanh (const __m512 x)        ///< __m512 number.
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (__m512).
  */
 static inline __m512
-jbm_16xf32_asinh (const __m512 x)       ///< __m512 number.
+jbm_16xf32_asinh (const __m512 x)       ///< __m512 vector.
 {
   return
     jbm_16xf32_log (_mm512_add_ps
@@ -8121,12 +8121,12 @@ jbm_16xf32_asinh (const __m512 x)       ///< __m512 number.
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (__m512).
  */
 static inline __m512
-jbm_16xf32_acosh (const __m512 x)       ///< __m512 number.
+jbm_16xf32_acosh (const __m512 x)       ///< __m512 vector.
 {
   return
     jbm_16xf32_log (_mm512_add_ps
@@ -8136,12 +8136,12 @@ jbm_16xf32_acosh (const __m512 x)       ///< __m512 number.
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (__m512).
  */
 static inline __m512
-jbm_16xf32_atanh (const __m512 x)       ///< __m512 number.
+jbm_16xf32_atanh (const __m512 x)       ///< __m512 vector.
 {
   const __m512 u = _mm512_set1_ps (1.f);
   return _mm512_mul_ps (_mm512_set1_ps (0.5f),
@@ -8150,8 +8150,8 @@ jbm_16xf32_atanh (const __m512 x)       ///< __m512 number.
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (__m512)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (__m512).
  *
  * \return function value (__m512).
  */
@@ -8165,8 +8165,8 @@ jbm_16xf32_erfwc (const __m512 x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (__m512)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (__m512).
  *
  * \return function value (__m512).
  */
@@ -8188,7 +8188,7 @@ jbm_16xf32_erfcwc (const __m512 x)
 
 /**
  * Function to calculate the function erf(x) using jbm_16xf32_erfwc and
- * jbm_16xf32_erfcwc
+ * jbm_16xf32_erfcwc (__m512).
  *
  * \return function value (__m512).
  */
@@ -8207,7 +8207,7 @@ jbm_16xf32_erf (const __m512 x) ///< __m512 vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_16xf32_erfwc and
- * jbm_16xf32_erfcwc
+ * jbm_16xf32_erfcwc (__m512).
  *
  * \return function value (__m512).
  */
@@ -8288,45 +8288,44 @@ jbm_16xf32_solve_quadratic (const __m512 a,
  * \return __m512 vector of solution values.
  */
 static inline __m512
-jbm_solve_cubic_reduced_16xf32 (const __m512 a,
-                                ///< 2nd order coefficient of the equation.
+jbm_16xf32_solve_cubic_reduced (const __m512 a,
+///< __m512 vector of 2nd order coefficient of the equations.
                                 const __m512 b,
-                                ///< 1st order coefficient of the equation.
+///< __m512 vector of 1st order coefficient of the equations.
                                 const __m512 c,
-                                ///< 0th order coefficient of the equation.
+///< __m512 vector of 0th order coefficient of the equations.
                                 const __m512 x1,
-                                ///< left limit of the solution interval.
+///< __m512 vector of left limits of the solution intervals.
                                 const __m512 x2)
-                               ///< right limit of the solution interval.
+///< __m512 vector of right limits of the solution intervals.
 {
-  __m512 a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2, c_3;
+  __m512 a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
   c2p_3 = _mm512_set1_ps (2.f * M_PIf / 3.f);
-  c_2 = _mm512_set1_ps (0.5f);
   c_3 = _mm512_set1_ps (1.f / 3.f);
   a3 = _mm512_mul_ps (a, c_3);
   k0 = _mm512_mul_ps (a3, a3);
   k1 = _mm512_fmsub_ps (b, c_3, k0);
-  k0 =
-    _mm512_fmsub_ps (_mm512_fmsub_ps (b, a3, c), c_2, _mm512_mul_ps (a3, k0));
-  k3 = _mm512_mul_ps (k1, _mm512_mul_ps (k1, k1));
-  k2 = _mm512_fmadd_ps (k0, k0, k3);
+  k0 = _mm512_fmsub_ps (_mm512_fmsub_ps (b, a3, c), _mm512_set1_ps (0.5f),
+                        _mm512_mul_ps (a3, k0));
+  k2 = _mm512_fmadd_ps (k0, k0, _mm512_mul_ps (k1, _mm512_mul_ps (k1, k1)));
   l1 = _mm512_sqrt_ps (jbm_16xf32_opposite (k1));
-  l0 = _mm512_mul_ps (jbm_16xf32_acos (_mm512_div_ps (k0, k3)), c_3);
+  l0 = _mm512_mul_ps
+       (jbm_16xf32_acos
+	(_mm512_div_ps (k0, _mm512_mul_ps (l1, _mm512_mul_ps (l1, l1)))), c_3);
   l1 = _mm512_add_ps (l1, l1);
-  l2 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (k0), a3);
+  l2 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (l0), a3);
   l3 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (_mm512_add_ps (l0, c2p_3)), a3);
   l3 = _mm512_mask_mov_ps (l3, _mm512_cmp_ps_mask (l2, x1, _CMP_LT_OS)
                            | _mm512_cmp_ps_mask (l2, x2, _CMP_GT_OS), l2);
-  l4 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (_mm512_sub_ps (l0, c2p_3)), a);
+  l4 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (_mm512_sub_ps (l0, c2p_3)), a3);
   l4 = _mm512_mask_mov_ps (l4, _mm512_cmp_ps_mask (l3, x1, _CMP_LT_OS)
-                           | _mm512_cmp_ps_mask (l3, x2, _CMP_GT_OS), l3);
   k1 = _mm512_sqrt_ps (k2);
-  l5 = _mm512_add_ps (k0, k1);
-  l5 = jbm_16xf32_cbrt (k2);
-  k0 = _mm512_sub_ps (k0, k1);
-  l5 = _mm512_add_ps (l5, _mm512_sub_ps (jbm_16xf32_cbrt (k0), a3));
-  return _mm512_mask_mov_ps (l4, _mm512_cmp_ps_mask (k2, _mm512_setzero_ps (),
-                                                     _CMP_LT_OS), l5);
+  l5 = jbm_16xf32_cbrt (_mm512_add_ps (k0, k1));
+  l5 = _mm512_add_ps (l5,
+                      _mm512_sub_ps (jbm_16xf32_cbrt (_mm512_sub_ps (k0, k1)),
+                                     a3));
+  return _mm512_mask_mov_ps (l5, _mm512_cmp_ps_mask (k2, _mm512_setzero_ps (),
+                                                     _CMP_LT_OS), l4);
 }
 
 /**
@@ -8352,7 +8351,7 @@ jbm_16xf32_solve_cubic (const __m512 a,
 {
   return
     _mm512_mask_blend_ps (jbm_16xf32_small (a),
-                          jbm_solve_cubic_reduced_16xf32 (_mm512_div_ps (b, a),
+                          jbm_16xf32_solve_cubic_reduced (_mm512_div_ps (b, a),
                                                           _mm512_div_ps (c, a),
                                                           _mm512_div_ps (d, a),
                                                           x1, x2),
@@ -8666,12 +8665,11 @@ jbm_16xf32_integral (__m512 (*f) (__m512),
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = _mm512_set1_ps (JBM_INTEGRAL_GAUSS_B_F32[i]);
-      k2 = _mm512_mul_ps (k2, dx);
+      k2 = _mm512_mul_ps (_mm512_set1_ps (JBM_INTEGRAL_GAUSS_B_F32[i]), dx);
       f1 = f (_mm512_sub_ps (x, k2));
       f2 = f (_mm512_add_ps (x, k2));
-      h = _mm512_set1_ps (JBM_INTEGRAL_GAUSS_A_F32[i]);
-      k = _mm512_fmadd_ps (h, _mm512_add_ps (f1, f2), k);
+      k = _mm512_fmadd_ps (_mm512_set1_ps (JBM_INTEGRAL_GAUSS_A_F32[i]),
+                           _mm512_add_ps (f1, f2), k);
     }
 #endif
   return _mm512_mul_ps (k, dx);
@@ -8841,34 +8839,32 @@ static inline __m512d
 jbm_8xf64_frexp (const __m512d x,       ///< __m512d vector.
                  __m512i *e)    ///< pointer to the extracted exponents vector.
 {
-  const __m512i zi = _mm512_setzero_si512 ();
+  const __m512i zero = _mm512_setzero_epi64 ();
   const __m512i mant_mask = JBM_8xF64_BITS_MANTISSA;
-  JBM8xF64 y, z;
-  __m512i lz, exp;
+  JBM8xF64 y, z, s;
+  __m512i exp, exp_sub;
   __mmask8 is_sub, is_finite;
-  // y=abs(x)
   y.x = jbm_8xf64_abs (x);
-  // mask
   is_finite
     = _mm512_cmp_epu64_mask (_mm512_sub_epi64 (y.i, _mm512_set1_epi64 (1ll)),
                              JBM_8xF64_BITS_EXPONENT - 1ll, _MM_CMPINT_LT);
-  // extract exponent
   exp = _mm512_maskz_srli_epi64 (is_finite, y.i, 52);
-  // subnormals
-  is_sub = _mm512_cmpeq_epu64_mask (exp, zi) & is_finite;
-  lz = _mm512_lzcnt_epi64 (y.i);
-  y.i = _mm512_mask_sllv_epi64 (y.i, is_sub, y.i,
-                                _mm512_sub_epi64 (lz,
-                                                  _mm512_set1_epi64 (11ll)));
-  exp = _mm512_mask_sub_epi64 (exp, is_sub, _mm512_set1_epi64 (12ll), lz);
-  // exponent
-  *e = _mm512_mask_sub_epi64 (zi, is_finite, exp, JBM_8xF64_BIAS);
-  // build mantissa in [0.5,1)
+  is_sub = _mm512_cmpeq_epu64_mask (exp, zero) & is_finite;
+  // Scale subnormals
+  s.x = _mm512_mul_pd (x, _mm512_set1_pd (0x1p52));
+  // Exponent
+  exp_sub
+    = _mm512_sub_epi64 (_mm512_srli_epi64 (s.i, 52), _mm512_set1_epi64 (52));
+  exp = _mm512_mask_mov_epi64 (exp, is_sub, exp_sub);
+  *e = _mm512_mask_sub_epi64 (zero, is_finite, exp,
+                              _mm512_set1_epi64 (JBM_8xF64_BIAS));
+  // Mantissa
   z.x = x;
+  s.i = _mm512_mask_mov_epi64 (y.i, is_sub, s.i);
   y.i = _mm512_or_epi64 (_mm512_and_epi64 (z.i, JBM_8xF64_BITS_SIGN),
-                         _mm512_or_epi64 (_mm512_set1_epi64 (JBM_F64_BIAS
-                                                             << 52),
-                                          _mm512_and_epi64 (y.i, mant_mask)));
+                         _mm512_or_epi64
+                         (_mm512_set1_epi64 (JBM_F64_BIAS << 52),
+                          _mm512_and_epi64 (s.i, mant_mask)));
   return _mm512_mask_mov_pd (x, is_finite, y.x);
 }
 
@@ -8933,7 +8929,7 @@ jbm_8xf64_modmin (const __m512d a,      ///< 1st __m512d vector.
 }
 
 /**
- * Function to interchange 2 __m512d numbers.
+ * Function to interchange 2 __m512d vectors.
  */
 static inline void
 jbm_change_8xf64 (__m512d *restrict a,  ///< 1st __m512d vector pointer.
@@ -15525,7 +15521,7 @@ jbm_8xf64_rational_29_28 (const __m512d x,      ///< __m512d vector.
 }
 
 /**
- * Function to calculate the well conditionated function cbrt(x) for x
+ * Function to calculate the well-conditioned function cbrt(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (__m512d).
  *
  * \return function value (__m512d).
@@ -15567,7 +15563,7 @@ jbm_8xf64_cbrt (const __m512d x)        ///< __m512d vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for x in
+ * Function to calculate the well-conditioned function expm1(x) for x in
  * [-log(2)/2,log(2)/2] (__m512d).
  *
  * \return function value (__m512d).
@@ -15580,7 +15576,7 @@ jbm_8xf64_expm1wc (const __m512d x)
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (__m512d).
  *
  * \return function value.
@@ -15647,7 +15643,7 @@ jbm_8xf64_expm1 (const __m512d x)       ///< __m512d vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (__m512d).
  *
  * \return function value (__m512d).
@@ -15745,7 +15741,7 @@ jbm_8xf64_pow (const __m512d x, ///< __m512d vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (__m512d)
  *
  * \return function value (__m512d).
@@ -15759,7 +15755,7 @@ jbm_8xf64_sinwc (const __m512d x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (__m512d).
  *
  * \return function value (__m512d).
@@ -15772,7 +15768,7 @@ jbm_8xf64_coswc (const __m512d x)
 }
 
 /**
- * Function to calculate the well conditionated function tann(x) for x in
+ * Function to calculate the well-conditioned function tann(x) for x in
  * [-pi/4,pi/4] (__m512d)
  *
  * \return function value (__m512d).
@@ -15786,7 +15782,7 @@ jbm_8xf64_tanwc (const __m512d x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_8xf64_sinwc approximation (__m512d).
  */
 static inline void
@@ -15907,7 +15903,7 @@ jbm_8xf64_tan (const __m512d x) ///< __m512d vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in
+ * Function to calculate the well-conditioned function atan(x) for x in
  * [-1,1] (__m512d).
  *
  * \return function value (__m512d).
@@ -15965,7 +15961,7 @@ jbm_8xf64_atan2 (const __m512d y,       ///< __m512d y component.
  * \return function value (__m512d in [-pi/2,pi/2]).
  */
 static inline __m512d
-jbm_8xf64_asin (const __m512d x)        ///< __m512d number.
+jbm_8xf64_asin (const __m512d x)        ///< __m512d vector.
 {
   return
     jbm_8xf64_atan (_mm512_div_pd
@@ -15981,7 +15977,7 @@ jbm_8xf64_asin (const __m512d x)        ///< __m512d number.
  * \return function value (__m512d in [0,pi]).
  */
 static inline __m512d
-jbm_8xf64_acos (const __m512d x)        ///< __m512d number.
+jbm_8xf64_acos (const __m512d x)        ///< __m512d vector.
 {
   const __m512d k1 = _mm512_set1_pd (1.);
   return
@@ -15991,12 +15987,12 @@ jbm_8xf64_acos (const __m512d x)        ///< __m512d number.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (__m512d).
  */
 static inline __m512d
-jbm_8xf64_sinh (const __m512d x)        ///< __m512d number.
+jbm_8xf64_sinh (const __m512d x)        ///< __m512d vector.
 {
   const __m512d f = jbm_8xf64_expm1 (jbm_8xf64_abs (x));
   return
@@ -16010,12 +16006,12 @@ jbm_8xf64_sinh (const __m512d x)        ///< __m512d number.
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (__m512d).
  */
 static inline __m512d
-jbm_8xf64_cosh (const __m512d x)        ///< __m512d number.
+jbm_8xf64_cosh (const __m512d x)        ///< __m512d vector.
 {
   __m512d f;
   f = jbm_8xf64_exp (x);
@@ -16024,12 +16020,12 @@ jbm_8xf64_cosh (const __m512d x)        ///< __m512d number.
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (__m512d).
  */
 static inline __m512d
-jbm_8xf64_tanh (const __m512d x)        ///< __m512d number.
+jbm_8xf64_tanh (const __m512d x)        ///< __m512d vector.
 {
   const __m512d x2 = jbm_8xf64_dbl (x);
   __m512d f = jbm_8xf64_expm1 (x2);
@@ -16044,12 +16040,12 @@ jbm_8xf64_tanh (const __m512d x)        ///< __m512d number.
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (__m512d).
  */
 static inline __m512d
-jbm_8xf64_asinh (const __m512d x)       ///< __m512d number.
+jbm_8xf64_asinh (const __m512d x)       ///< __m512d vector.
 {
   return
     jbm_8xf64_log (_mm512_add_pd
@@ -16059,12 +16055,12 @@ jbm_8xf64_asinh (const __m512d x)       ///< __m512d number.
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (__m512d).
  */
 static inline __m512d
-jbm_8xf64_acosh (const __m512d x)       ///< __m512d number.
+jbm_8xf64_acosh (const __m512d x)       ///< __m512d vector.
 {
   return
     jbm_8xf64_log (_mm512_add_pd
@@ -16074,12 +16070,12 @@ jbm_8xf64_acosh (const __m512d x)       ///< __m512d number.
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (__m512d).
  */
 static inline __m512d
-jbm_8xf64_atanh (const __m512d x)       ///< __m512d number.
+jbm_8xf64_atanh (const __m512d x)       ///< __m512d vector.
 {
   __m512d u;
   u = _mm512_set1_pd (1.);
@@ -16089,8 +16085,8 @@ jbm_8xf64_atanh (const __m512d x)       ///< __m512d number.
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (__m512d)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (__m512d).
  *
  * \return function value (__m512d).
  */
@@ -16103,8 +16099,8 @@ jbm_8xf64_erfwc (const __m512d x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (__m512d)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (__m512d).
  *
  * \return function value (__m512d).
  */
@@ -16126,7 +16122,7 @@ jbm_8xf64_erfcwc (const __m512d x)
 
 /**
  * Function to calculate the function erf(x) using jbm_8xf64_erfwc and
- * jbm_8xf64_erfcwc
+ * jbm_8xf64_erfcwc (__m512d).
  *
  * \return function value (__m512d).
  */
@@ -16146,7 +16142,7 @@ jbm_8xf64_erf (const __m512d x) ///< __m512d vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_8xf64_erfwc and
- * jbm_8xf64_erfcwc
+ * jbm_8xf64_erfcwc (__m512d).
  *
  * \return function value (__m512d).
  */
@@ -16226,46 +16222,47 @@ jbm_8xf64_solve_quadratic (const __m512d a,
  * \return __m512d vector of solution values.
  */
 static inline __m512d
-jbm_solve_cubic_reduced_8xf64 (const __m512d a,
-                               ///< 2nd order coefficient of the equation.
+jbm_8xf64_solve_cubic_reduced (const __m512d a,
+///< __m512d vector of 2nd order coefficient of the equations.
                                const __m512d b,
-                               ///< 1st order coefficient of the equation.
+///< __m512d vector of 1st order coefficient of the equations.
                                const __m512d c,
-                               ///< 0th order coefficient of the equation.
+///< __m512d vector of 0th order coefficient of the equations.
                                const __m512d x1,
-                               ///< left limit of the solution interval.
+///< __m512d vector of left limits of the solution intervals.
                                const __m512d x2)
-    ///< right limit of the solution interval.
+///< __m512d vector of right limits of the solution intervals.
 {
-  __m512d a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2, c_3;
+  __m512d a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
   c2p_3 = _mm512_set1_pd (2. * M_PI / 3.);
-  c_2 = _mm512_set1_pd (0.5);
   c_3 = _mm512_set1_pd (1. / 3.);
   a3 = _mm512_mul_pd (a, c_3);
   k0 = _mm512_mul_pd (a3, a3);
   k1 = _mm512_fmsub_pd (b, c_3, k0);
-  k0 =
-    _mm512_fmsub_pd (_mm512_fmsub_pd (b, a3, c), c_2, _mm512_mul_pd (a3, k0));
-  k3 = _mm512_mul_pd (k1, _mm512_mul_pd (k1, k1));
-  k2 = _mm512_fmadd_pd (k0, k0, k3);
+  k0 = _mm512_fmsub_pd (_mm512_fmsub_pd (b, a3, c), _mm512_set1_pd (0.5),
+                        _mm512_mul_pd (a3, k0));
+  k2 = _mm512_fmadd_pd (k0, k0, _mm512_mul_pd (k1, _mm512_mul_pd (k1, k1)));
   l1 = _mm512_sqrt_pd (jbm_8xf64_opposite (k1));
-  l0 = _mm512_mul_pd (jbm_8xf64_acos (_mm512_div_pd (k0, k3)), c_3);
+  l0 = _mm512_mul_pd
+       (jbm_8xf64_acos (_mm512_div_pd (k0,
+                                       _mm512_mul_pd (l1,
+                                                      _mm512_mul_pd (l1, l1)))),
+        c_3);
   l1 = _mm512_add_pd (l1, l1);
-  l2 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (k0), a3);
+  l2 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (l0), a3);
   l3 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (_mm512_add_pd (l0, c2p_3)), a3);
   l3 = _mm512_mask_mov_pd (l3, _mm512_cmp_pd_mask (l2, x1, _CMP_LT_OS)
                            | _mm512_cmp_pd_mask (l2, x2, _CMP_GT_OS), l2);
-  l4 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (_mm512_sub_pd (l0, c2p_3)), a);
+  l4 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (_mm512_sub_pd (l0, c2p_3)), a3);
   l4 = _mm512_mask_mov_pd (l4, _mm512_cmp_pd_mask (l3, x1, _CMP_LT_OS)
                            | _mm512_cmp_pd_mask (l3, x2, _CMP_GT_OS), l3);
   k1 = _mm512_sqrt_pd (k2);
-  l5 = _mm512_add_pd (k0, k1);
-  l5 = jbm_8xf64_cbrt (k2);
-  k0 = _mm512_sub_pd (k0, k1);
-  l5 = _mm512_add_pd (l5, _mm512_sub_pd (jbm_8xf64_cbrt (k0), a3));
-  return _mm512_mask_mov_pd (l4, _mm512_cmp_pd_mask (k2, _mm512_setzero_pd (),
-                                                     _CMP_LT_OS), l5);
-
+  l5 = jbm_8xf64_cbrt (_mm512_add_pd (k0, k1));
+  l5 = _mm512_add_pd (l5,
+                      _mm512_sub_pd (jbm_8xf64_cbrt (_mm512_sub_pd (k0, k1)),
+                                     a3));
+  return _mm512_mask_mov_pd (l5, _mm512_cmp_pd_mask (k2, _mm512_setzero_pd (),
+                                                     _CMP_LT_OS), l4);
 }
 
 /**
@@ -16291,7 +16288,7 @@ jbm_8xf64_solve_cubic (const __m512d a,
 {
   return
     _mm512_mask_blend_pd (jbm_8xf64_small (a),
-                          jbm_solve_cubic_reduced_8xf64 (_mm512_div_pd (b, a),
+                          jbm_8xf64_solve_cubic_reduced (_mm512_div_pd (b, a),
                                                          _mm512_div_pd (c, a),
                                                          _mm512_div_pd (d, a),
                                                          x1, x2),
@@ -16600,12 +16597,11 @@ jbm_8xf64_integral (__m512d (*f) (__m512d),
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = _mm512_set1_pd (JBM_INTEGRAL_GAUSS_B_F64[i]);
-      k2 = _mm512_mul_pd (k2, dx);
+      k2 = _mm512_mul_pd (_mm512_set1_pd (JBM_INTEGRAL_GAUSS_B_F64[i]), dx);
       f1 = f (_mm512_sub_pd (x, k2));
       f2 = f (_mm512_add_pd (x, k2));
-      h = _mm512_set1_pd (JBM_INTEGRAL_GAUSS_A_F64[i]);
-      k = _mm512_fmadd_pd (h, _mm512_add_pd (f1, f2), k);
+      k = _mm512_fmadd_pd (_mm512_set1_pd (JBM_INTEGRAL_GAUSS_A_F64[i]),
+                           _mm512_add_pd (f1, f2), k);
     }
 #endif
   k = _mm512_mul_pd (k, dx);

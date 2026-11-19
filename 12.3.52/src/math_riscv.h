@@ -870,11 +870,10 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
     = __riscv_vmor_mm_b32
     (__riscv_vmsgeu_vx_u32m1_b32 (ai_abs, JBM_F32_BITS_EXPONENT, vl),
      __riscv_vmseq_vx_u32m1_b32 (ai_abs, 0, vl), vl);
-  const vbool32_t m_sub
-    = __riscv_vmseq_vx_u32m1_b32
-    (__riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_EXPONENT, vl), 0, vl);
+  const vuint32m1_t yi = __riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_EXPONENT, vl);
+  const vbool32_t m_sub = __riscv_vmseq_vx_u32m1_b32 (yi, 0, vl);
   // Scale subnormals
-  const vuint32m1_t yi
+  const vuint32m1_t zi
     = __riscv_vreinterpret_v_f32m1_u32m1 (__riscv_vfmul_vf_f32m1 (x, 0x1p23f,
                                                                   vl));
   // Exponent
@@ -882,7 +881,12 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
     = __riscv_vsub_vx_i32m1
     (__riscv_vreinterpret_v_u32m1_i32m1 (__riscv_vsrl_vx_u32m1 (yi, 23, vl)),
      JBM_F32_BIAS, vl);
-  const vint32m1_t en_sub = __riscv_vsub_vx_i32m1 (en, 23, vl);
+  const vint32m1_t en_sub
+    = __riscv_vsub_vx_i32m1
+    (__riscv_vreinterpret_v_u32m1_i32m1
+     (__riscv_vsrl_vx_u32m1
+      (__riscv_vand_vx_u32m1 (zi, JBM_F32_BITS_EXPONENT, vl), 23, vl)),
+     JBM_F32_BIAS + 23, vl);
   *e = __riscv_vmerge_vvm_i32m1
     (__riscv_vmerge_vvm_i32m1 (en, en_sub, m_sub, vl),
      __riscv_vmv_v_x_i32m1 (0, vl), m_special, vl);
@@ -890,8 +894,9 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
   const vuint32m1_t mant
     = __riscv_vor_vv_u32m1
     (__riscv_vor_vx_u32m1
-     (__riscv_vand_vx_u32m1 (yi, JBM_F32_BITS_SIGN, vl), 0x3f000000, vl),
-     __riscv_vand_vx_u32m1 (yi, JBM_F32_BITS_MANTISSA, vl), vl);
+     (__riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_SIGN, vl), 0x3f000000, vl),
+     __riscv_vand_vx_u32m1 (__riscv_vmerge_vvm_u32m1 (ai, zi, m_sub, vl),
+      JBM_F32_BITS_MANTISSA, vl), vl);
   return __riscv_vmerge_vvm_f32m1
     (__riscv_vreinterpret_v_u32m1_f32m1 (mant), x, m_special, vl);
 }
@@ -9330,14 +9335,15 @@ jbm_nxf32_rational_29_28 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function cbrt(x) for x
+ * Function to calculate the well-conditioned function cbrt(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (vfloat32m1_t).
  *
  * \return function value (vfloat32m1_t).
  */
-static inline vfloat32m1_t jbm_nxf32_cbrtwc (const vfloat32m1_t x,
-                                             ///< vfloat32m1_t vector \f$\in\left[\frac12,\;1\right]\f$.
-                                             const size_t vl)   ///< vector size.
+static inline vfloat32m1_t
+jbm_nxf32_cbrtwc (const vfloat32m1_t x,
+                  ///< vfloat32m1_t vector \f$\in\left[\frac12,\;1\right]\f$.
+                  const size_t vl)      ///< vector size.
 {
   return jbm_nxf32_rational_5_3 (x, K_CBRTWC_F32, vl);
 }
@@ -9378,7 +9384,7 @@ jbm_nxf32_cbrt (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (vfloat32m1_t).
  *
  * \return function value.
@@ -9434,7 +9440,7 @@ jbm_nxf32_exp10 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for
+ * Function to calculate the well-conditioned function expm1(x) for
  * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (vfloat32m1_t).
  *
  * \return function value (vfloat32m1_t).
@@ -9477,7 +9483,7 @@ jbm_nxf32_expm1 (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * [0.5,1] (vfloat32m1_t).
  *
  * \return function value (vfloat32m1_t).
@@ -9605,7 +9611,7 @@ jbm_nxf32_pow (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (vfloat32m1_t)
  *
  * \return function value (vfloat32m1_t).
@@ -9622,7 +9628,7 @@ jbm_nxf32_sinwc (const vfloat32m1_t x,
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (vfloat32m1_t):
  *
  * \return function value (vfloat32m1_t).
@@ -9636,7 +9642,7 @@ jbm_nxf32_coswc (const vfloat32m1_t x,
 }
 
 /**
- * Function to calculate the well conditionated function tan(x) for x in
+ * Function to calculate the well-conditioned function tan(x) for x in
  * [-pi/4,pi/4] (vfloat32m1_t):
  *
  * \return function value (vfloat32m1_t).
@@ -9653,7 +9659,7 @@ jbm_nxf32_tanwc (const vfloat32m1_t x,
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_nxf32_sinwc approximation (vfloat32m1_t).
  */
 static inline void
@@ -9780,7 +9786,7 @@ jbm_nxf32_tan (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * Function to calculate the well-conditioned function atan(x) for x in [-1,1]
  * (vfloat32m1_t).
  *
  * \return function value (vfloat32m1_t).
@@ -9845,7 +9851,7 @@ jbm_nxf32_atan2 (const vfloat32m1_t y,  ///< vfloat32m1_t y component.
  * Function to calculate the function asin(x) using the jbm_nxf32_atan function
  * (vfloat32m1_t).
  *
- * \return function value (in [-pi/2,pi/2]).
+ * \return function value (vfloat32m1_t in [-pi/2,pi/2]).
  */
 static inline vfloat32m1_t
 jbm_nxf32_asin (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
@@ -9880,12 +9886,12 @@ jbm_nxf32_acos (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_nxf32_sinh (const vfloat32m1_t x,   ///< vfloat32m1_t number.
+jbm_nxf32_sinh (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                 const size_t vl)        ///< array size.
 {
   const vfloat32m1_t f = jbm_nxf32_expm1 (jbm_nxf32_abs (x, vl), vl);
@@ -9898,12 +9904,12 @@ jbm_nxf32_sinh (const vfloat32m1_t x,   ///< vfloat32m1_t number.
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_nxf32_cosh (const vfloat32m1_t x,   ///< vfloat32m1_t number.
+jbm_nxf32_cosh (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                 const size_t vl)        ///< array size.
 {
   vfloat32m1_t f;
@@ -9914,12 +9920,12 @@ jbm_nxf32_cosh (const vfloat32m1_t x,   ///< vfloat32m1_t number.
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_nxf32_tanh (const vfloat32m1_t x,   ///< vfloat32m1_t number.
+jbm_nxf32_tanh (const vfloat32m1_t x,   ///< vfloat32m1_t vector.
                 const size_t vl)        ///< array size.
 {
   const vfloat32m1_t x2 = jbm_nxf32_dbl (x, vl);
@@ -9935,12 +9941,12 @@ jbm_nxf32_tanh (const vfloat32m1_t x,   ///< vfloat32m1_t number.
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_nxf32_asinh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
+jbm_nxf32_asinh (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< array size.
 {
   return
@@ -9953,12 +9959,12 @@ jbm_nxf32_asinh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_nxf32_acosh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
+jbm_nxf32_acosh (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< array size.
 {
   return
@@ -9970,12 +9976,12 @@ jbm_nxf32_acosh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_nxf32_atanh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
+jbm_nxf32_atanh (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
                  const size_t vl)       ///< array size.
 {
   vfloat32m1_t u;
@@ -9989,8 +9995,8 @@ jbm_nxf32_atanh (const vfloat32m1_t x,  ///< vfloat32m1_t number.
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (vfloat32m1_t)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (vfloat32m1_t).
  *
  * \return function value (vfloat32m1_t).
  */
@@ -10006,8 +10012,8 @@ jbm_nxf32_erfwc (const vfloat32m1_t x,
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (vfloat32m1_t)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (vfloat32m1_t).
  *
  * \return function value (vfloat32m1_t).
  */
@@ -10032,7 +10038,7 @@ jbm_nxf32_erfcwc (const vfloat32m1_t x,
 
 /**
  * Function to calculate the function erf(x) using jbm_nxf32_erfwc and
- * jbm_nxf32_erfcwc
+ * jbm_nxf32_erfcwc (vfloat32m1_t).
  *
  * \return function value (vfloat32m1_t).
  */
@@ -10053,7 +10059,7 @@ jbm_nxf32_erf (const vfloat32m1_t x,    ///< vfloat32m1_t vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_nxf32_erfwc and
- * jbm_nxf32_erfcwc
+ * jbm_nxf32_erfcwc (vloat32m1_t).
  *
  * \return function value (vfloat32m1_t).
  */
@@ -10143,46 +10149,50 @@ jbm_nxf32_solve_quadratic (const vfloat32m1_t a,
  */
 static inline vfloat32m1_t
 jbm_nxf32_solve_cubic_reduced (const vfloat32m1_t a,
-                               ///< 2nd order coefficient of the equation.
+///< vfloat32m1_t vector of 2nd order coefficient of the equations.
                                const vfloat32m1_t b,
-                               ///< 1st order coefficient of the equation.
+///< vfloat32m1_t vector of 1st order coefficient of the equations.
                                const vfloat32m1_t c,
-                               ///< 0th order coefficient of the equation.
+///< vfloat32m1_t vector of 0th order coefficient of the equations.
                                const vfloat32m1_t x1,
-                               ///< left limit of the solution interval.
+///< vfloat32m1_t vector of left limits of the solution intervals.
                                const vfloat32m1_t x2,
-                               ///< right limit of the solution interval.
+///< vfloat32m1_t vector of right limits of the solution intervals.
                                const size_t vl) ///< array size.
 {
-  vfloat32m1_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5;
+  vfloat32m1_t a3, k0, k1, k2, l0, l1, l2, l3, l4, l5;
   a3 = __riscv_vfmul_vf_f32m1 (a, 1.f / 3.f, vl);
   k0 = jbm_nxf32_sqr (a3, vl);
   k1 =
-    __riscv_vfsub_vv_f32m1 (k0, __riscv_vfmul_vf_f32m1 (b, 1.f / 3.f, vl), vl);
+    __riscv_vfsub_vv_f32m1 (__riscv_vfmul_vf_f32m1 (b, 1.f / 3.f, vl), k0, vl);
   k0 =
-    __riscv_vfsub_vv_f32m1 (__riscv_vfmul_vv_f32m1 (a3, k0, vl),
-                            __riscv_vfmul_vf_f32m1 (__riscv_vfnmsac_vv_f32m1
+    __riscv_vfsub_vv_f32m1 (__riscv_vfmul_vf_f32m1 (__riscv_vfmsub_vv_f32m1
                                                     (b, a3, c, vl),
-                                                    0.5f, vl), vl);
-  k3 = __riscv_vfmul_vv_f32m1 (k1, jbm_nxf32_sqr (k1, vl), vl);
-  k2 = __riscv_vfmacc_vv_f32m1 (k3, k0, k0, vl);
+                                                    0.5f, vl),
+                            __riscv_vfmul_vv_f32m1 (a3, k0, vl), vl);
+  k2 = __riscv_vfmacc_vv_f32m1 (__riscv_vfmul_vv_f32m1 (k1,
+                                                        jbm_nxf32_sqr (k1, vl),
+                                                        vl),
+                                k0, k0, vl);
+
   l1 = __riscv_vfsqrt_v_f32m1 (jbm_nxf32_opposite (k1, vl), vl);
   l0 =
     __riscv_vfmul_vf_f32m1 (jbm_nxf32_acos
-                            (__riscv_vfdiv_vv_f32m1 (k0, k3, vl), vl),
+                            (__riscv_vfdiv_vv_f32m1 (k0,
+                                                     __riscv_vfmul_vv_f32m1
+                                                     (l1, jbm_nxf32_sqr (l1, vl),
+                                                      vl), vl), vl),
                             1.f / 3.f, vl);
   l1 = jbm_nxf32_dbl (l1, vl);
   l2 =
-    __riscv_vfsub_vv_f32m1 (a3,
-                            __riscv_vfmul_vv_f32m1 (l1, jbm_nxf32_cos (k0, vl),
-                                                    vl), vl);
+    __riscv_vfsub_vv_f32m1 (__riscv_vfmul_vv_f32m1 (l1, jbm_nxf32_cos (l0, vl),
+                                                    vl), a3, vl);
   l3 =
-    __riscv_vfsub_vv_f32m1 (a3,
-                            __riscv_vfmul_vv_f32m1 (l1,
+    __riscv_vfsub_vv_f32m1 (__riscv_vfmul_vv_f32m1 (l1,
                                                     jbm_nxf32_cos
                                                     (__riscv_vfadd_vf_f32m1
                                                      (l0, 2.f * M_PIf / 3.f,
-                                                      vl), vl), vl), vl);
+                                                      vl), vl), vl), a3, vl);
   l3 =
     __riscv_vmerge_vvm_f32m1 (l2, l3,
                               __riscv_vmor_mm_b32 (__riscv_vmflt_vv_f32m1_b32
@@ -10190,26 +10200,26 @@ jbm_nxf32_solve_cubic_reduced (const vfloat32m1_t a,
                                                    __riscv_vmfgt_vv_f32m1_b32
                                                    (l2, x2, vl), vl), vl);
   l4 =
-    __riscv_vfsub_vv_f32m1 (a,
-                            __riscv_vfmul_vv_f32m1 (l1,
+    __riscv_vfsub_vv_f32m1 (__riscv_vfmul_vv_f32m1 (l1,
                                                     jbm_nxf32_cos
                                                     (__riscv_vfsub_vf_f32m1
                                                      (l0, 2.f * M_PIf / 3.f,
-                                                      vl), vl), vl), vl);
+                                                      vl), vl), vl), a3, vl);
   l4 =
     __riscv_vmerge_vvm_f32m1 (l3, l4,
                               __riscv_vmor_mm_b32 (__riscv_vmflt_vv_f32m1_b32
                                                    (l3, x1, vl),
                                                    __riscv_vmfgt_vv_f32m1_b32
                                                    (l3, x2, vl), vl), vl);
+
   k1 = __riscv_vfsqrt_v_f32m1 (k2, vl);
-  l5 = __riscv_vfadd_vv_f32m1 (k0, k1, vl);
-  l5 = jbm_nxf32_cbrt (k2, vl);
-  k0 = __riscv_vfsub_vv_f32m1 (k0, k1, vl);
+  l5 = jbm_nxf32_cbrt (__riscv_vfadd_vv_f32m1 (k0, k1, vl), vl);
   l5 =
     __riscv_vfadd_vv_f32m1 (l5,
-                            __riscv_vfsub_vv_f32m1 (jbm_nxf32_cbrt (k0, vl), a3,
-                                                    vl), vl);
+                            __riscv_vfsub_vv_f32m1 (jbm_nxf32_cbrt
+                                                    (__riscv_vfsub_vv_f32m1
+                                                     (k0, k1, vl), vl),
+                                                    a3, vl), vl);
   return __riscv_vmerge_vvm_f32m1 (l5, l4,
                                    __riscv_vmflt_vf_f32m1_b32 (k2, 0.f, vl),
                                    vl);
@@ -10556,34 +10566,6 @@ jbm_nxf32_integral (vfloat32m1_t (*f) (const vfloat32m1_t, const size_t),
                     ///< right limit of the interval.
                     const size_t vl)    ///< array size.
 {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] JB_ALIGNED = { 2.f };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] JB_ALIGNED = { 8.f / 9.f, 5.f / 9.f },
-    b[2] JB_ALIGNED = { 0.f, 7.745966692414834e-1f };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] JB_ALIGNED = {
-    128.f / 225.f,
-    4.786286704993665e-1f,
-    2.369268850561891e-1f
-  }, b[3] JB_ALIGNED = {
-    0.f,
-    5.384693101056831e-1f,
-    9.061798459386640e-1f
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] JB_ALIGNED = {
-    4.179591836734694e-1f,
-    3.818300505051189e-1f,
-    2.797053914892767e-1f,
-    1.294849661688697e-1f
-  }, b[4] JB_ALIGNED = {
-    0.f,
-    4.058451513773972e-1f,
-    7.415311855993944e-1f,
-    9.491079123427585e-1f
-  };
-#endif
   vfloat32m1_t k, x, dx;
 #if JBM_INTEGRAL_GAUSS_N > 1
   vfloat32m1_t k2, f1, f2;
@@ -10591,16 +10573,16 @@ jbm_nxf32_integral (vfloat32m1_t (*f) (const vfloat32m1_t, const size_t),
   unsigned int i;
   dx = __riscv_vfmul_vf_f32m1 (__riscv_vfsub_vv_f32m1 (x2, x1, vl), 0.5f, vl);
   x = __riscv_vfmul_vf_f32m1 (__riscv_vfadd_vv_f32m1 (x2, x1, vl), 0.5f, vl);
-  k = __riscv_vfmul_vf_f32m1 (f (x, vl), a[0], vl);
+  k = __riscv_vfmul_vf_f32m1 (f (x, vl), JBM_INTEGRAL_GAUSS_A_F32[0], vl);
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = __riscv_vfmul_vf_f32m1 (dx, b[i], vl);
+      k2 = __riscv_vfmul_vf_f32m1 (dx, JBM_INTEGRAL_GAUSS_B_F32[i], vl);
       f1 = f (__riscv_vfsub_vv_f32m1 (x, k2, vl), vl);
       f2 = f (__riscv_vfadd_vv_f32m1 (x, k2, vl), vl);
       k =
-        __riscv_vfmacc_vf_f32m1 (k, a[i], __riscv_vfadd_vv_f32m1 (f1, f2, vl),
-                                 vl);
+        __riscv_vfmacc_vf_f32m1 (k, JBM_INTEGRAL_GAUSS_A_F32[i],
+                                 __riscv_vfadd_vv_f32m1 (f1, f2, vl), vl);
     }
 #endif
   k = __riscv_vfmul_vv_f32m1 (k, dx, vl);
@@ -10780,6 +10762,7 @@ jbm_nxf64_frexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                            (__riscv_vand_vx_u64m1
                             (ai, JBM_F64_BITS_MANTISSA, vl), 0ull, vl), vl),
      vl);
+  // Scale subnormals
   const vuint64m1_t zi
     = __riscv_vreinterpret_v_f64m1_u64m1 (__riscv_vfmul_vf_f64m1 (x, 0x1p1023,
                                                                   vl));
@@ -10802,7 +10785,7 @@ jbm_nxf64_frexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
     (__riscv_vreinterpret_v_u64m1_f64m1
      (__riscv_vor_vv_u64m1
       (__riscv_vor_vx_u64m1 (__riscv_vand_vx_u64m1 (ai, JBM_F64_BITS_SIGN, vl),
-                             0x3FE0000000000000ull, vl),
+                             0x3fe0000000000000ull, vl),
        __riscv_vand_vx_u64m1 (__riscv_vmerge_vvm_u64m1 (ai, zi, m_sub, vl),
                               JBM_F64_BITS_MANTISSA, vl), vl)), x, m_special,
      vl);
@@ -10888,7 +10871,7 @@ jbm_nxf64_modmin (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
 }
 
 /**
- * Function to interchange 2 vfloat64m1_t numbers.
+ * Function to interchange 2 vfloat64m1_t vectors.
  */
 static inline void
 jbm_nxf64_change (vfloat64m1_t *restrict a,
@@ -20654,7 +20637,7 @@ jbm_nxf64_rational_29_28 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function cbrt(x) for x
+ * Function to calculate the well-conditioned function cbrt(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
@@ -20702,7 +20685,7 @@ jbm_nxf64_cbrt (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for x in
+ * Function to calculate the well-conditioned function expm1(x) for x in
  * [-log(2)/2,log(2)/2] (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
@@ -20718,7 +20701,7 @@ jbm_nxf64_expm1wc (const vfloat64m1_t x,
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (vfloat64m1_t).
  *
  * \return function value.
@@ -20790,7 +20773,7 @@ jbm_nxf64_expm1 (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * [0.5,1] (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
@@ -20920,7 +20903,7 @@ jbm_nxf64_pow (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (vfloat64m1_t)
  *
  * \return function value (vfloat64m1_t).
@@ -20937,7 +20920,7 @@ jbm_nxf64_sinwc (const vfloat64m1_t x,
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
@@ -20951,7 +20934,7 @@ jbm_nxf64_coswc (const vfloat64m1_t x,
 }
 
 /**
- * Function to calculate the well conditionated function tan(x) for x in
+ * Function to calculate the well-conditioned function tan(x) for x in
  * [-pi/4,pi/4] (vfloat64m1_t):
  *
  * \return function value (vfloat64m1_t).
@@ -20968,7 +20951,7 @@ jbm_nxf64_tanwc (const vfloat64m1_t x,
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_nxf64_sinwc approximation (vfloat64m1_t).
  */
 static inline void
@@ -21095,7 +21078,7 @@ jbm_nxf64_tan (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * Function to calculate the well-conditioned function atan(x) for x in [-1,1]
  * (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
@@ -21131,8 +21114,7 @@ jbm_nxf64_atan (const vfloat64m1_t x,   ///< double number.
     __riscv_vmerge_vvm_f64m1 (f, __riscv_vfsub_vv_f64m1
                               (__riscv_vfmv_v_f_f64m1 (M_PI_2, vl), f, vl),
                               m, vl);
-  return __riscv_vmerge_vvm_f64m1 (f, jbm_nxf64_opposite (f, vl),
-                                   __riscv_vmflt_vf_f64m1_b64 (x, 0., vl), vl);
+  return jbm_nxf64_copysign (f, x, vl);
 }
 
 /**
@@ -21164,7 +21146,7 @@ jbm_nxf64_atan2 (const vfloat64m1_t y,  ///< vfloat64m1_t y component.
  * \return function value (vfloat64m1_t in [-pi/2,pi/2]).
  */
 static inline vfloat64m1_t
-jbm_nxf64_asin (const vfloat64m1_t x,   ///< vfloat64m1_t number.
+jbm_nxf64_asin (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                 const size_t vl)        ///< array size.
 {
   return
@@ -21182,7 +21164,7 @@ jbm_nxf64_asin (const vfloat64m1_t x,   ///< vfloat64m1_t number.
  * \return function value (vfloat64m1_t in [0,pi]).
  */
 static inline vfloat64m1_t
-jbm_nxf64_acos (const vfloat64m1_t x,   ///< vfloat64m1_t number.
+jbm_nxf64_acos (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                 const size_t vl)        ///< array size.
 {
   const vfloat64m1_t k1 = __riscv_vfmv_v_f_f64m1 (1., vl);
@@ -21196,12 +21178,12 @@ jbm_nxf64_acos (const vfloat64m1_t x,   ///< vfloat64m1_t number.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_nxf64_sinh (const vfloat64m1_t x,   ///< vfloat64m1_t number.
+jbm_nxf64_sinh (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                 const size_t vl)        ///< array size.
 {
   const vfloat64m1_t f = jbm_nxf64_expm1 (jbm_nxf64_abs (x, vl), vl);
@@ -21214,12 +21196,12 @@ jbm_nxf64_sinh (const vfloat64m1_t x,   ///< vfloat64m1_t number.
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_nxf64_cosh (const vfloat64m1_t x,   ///< vfloat64m1_t number.
+jbm_nxf64_cosh (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                 const size_t vl)        ///< array size.
 {
   vfloat64m1_t f;
@@ -21230,12 +21212,12 @@ jbm_nxf64_cosh (const vfloat64m1_t x,   ///< vfloat64m1_t number.
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_nxf64_tanh (const vfloat64m1_t x,   ///< vfloat64m1_t number.
+jbm_nxf64_tanh (const vfloat64m1_t x,   ///< vfloat64m1_t vector.
                 const size_t vl)        ///< array size.
 {
   const vfloat64m1_t x2 = jbm_nxf64_dbl (x, vl);
@@ -21251,12 +21233,12 @@ jbm_nxf64_tanh (const vfloat64m1_t x,   ///< vfloat64m1_t number.
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_nxf64_asinh (const vfloat64m1_t x,  ///< vfloat64m1_t number.
+jbm_nxf64_asinh (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< array size.
 {
   return
@@ -21269,12 +21251,12 @@ jbm_nxf64_asinh (const vfloat64m1_t x,  ///< vfloat64m1_t number.
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_nxf64_acosh (const vfloat64m1_t x,  ///< vfloat64m1_t number.
+jbm_nxf64_acosh (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< array size.
 {
   return
@@ -21286,12 +21268,12 @@ jbm_nxf64_acosh (const vfloat64m1_t x,  ///< vfloat64m1_t number.
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_nxf64_atanh (const vfloat64m1_t x,  ///< vfloat64m1_t number.
+jbm_nxf64_atanh (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< array size.
 {
   vfloat64m1_t u;
@@ -21305,8 +21287,8 @@ jbm_nxf64_atanh (const vfloat64m1_t x,  ///< vfloat64m1_t number.
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (vfloat64m1_t)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
  */
@@ -21322,8 +21304,8 @@ jbm_nxf64_erfwc (const vfloat64m1_t x,
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (vfloat64m1_t)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
  */
@@ -21347,7 +21329,7 @@ jbm_nxf64_erfcwc (const vfloat64m1_t x,
 
 /**
  * Function to calculate the function erf(x) using jbm_nxf64_erfwc and
- * jbm_nxf64_erfcwc
+ * jbm_nxf64_erfcwc (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
  */
@@ -21368,7 +21350,7 @@ jbm_nxf64_erf (const vfloat64m1_t x,    ///< vfloat64m1_t vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_nxf64_erfwc and
- * jbm_nxf64_erfcwc
+ * jbm_nxf64_erfcwc (vfloat64m1_t).
  *
  * \return function value (vfloat64m1_t).
  */
@@ -21457,72 +21439,70 @@ jbm_nxf64_solve_quadratic (const vfloat64m1_t a,
  */
 static inline vfloat64m1_t
 jbm_nxf64_solve_cubic_reduced (const vfloat64m1_t a,
-                               ///< 2nd order coefficient of the equation.
+///< vfloat64m1_t vector of 2nd order coefficient of the equations.
                                const vfloat64m1_t b,
-                               ///< 1st order coefficient of the equation.
+///< vfloat64m1_t vector of 1st order coefficient of the equations.
                                const vfloat64m1_t c,
-                               ///< 0th order coefficient of the equation.
+///< vfloat64m1_t vector of 0th order coefficient of the equations.
                                const vfloat64m1_t x1,
-                               ///< left limit of the solution interval.
+///< vfloat64m1_t vector of left limits of the solution intervals.
                                const vfloat64m1_t x2,
-                               ///< right limit of the solution interval.
+///< vfloat64m1_t vector of right limits of the solution intervals.
                                const size_t vl) ///< array size.
 {
-  vfloat64m1_t a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5;
+  vfloat64m1_t a3, k0, k1, k2, l0, l1, l2, l3, l4, l5;
   a3 = __riscv_vfmul_vf_f64m1 (a, 1. / 3., vl);
   k0 = jbm_nxf64_sqr (a3, vl);
-  k1 = __riscv_vfsub_vv_f64m1 (k0, __riscv_vfmul_vf_f64m1 (b, 1. / 3., vl), vl);
+  k1 = __riscv_vfsub_vv_f64m1 (__riscv_vfmul_vf_f64m1 (b, 1. / 3., vl), k0, vl);
   k0 =
-    __riscv_vfsub_vv_f64m1 (__riscv_vfmul_vv_f64m1 (a3, k0, vl),
-                            __riscv_vfmul_vf_f64m1 (__riscv_vfnmsac_vv_f64m1
-                                                    (b, a3, c, vl),
-                                                    0.5, vl), vl);
-  k3 = __riscv_vfmul_vv_f64m1 (k1, jbm_nxf64_sqr (k1, vl), vl);
-  k2 = __riscv_vfmacc_vv_f64m1 (k3, k0, k0, vl);
+    __riscv_vfsub_vv_f64m1
+    (__riscv_vfmul_vf_f64m1 (__riscv_vfmsub_vv_f64m1 (b, a3, c, vl), 0.5, vl),
+     __riscv_vfmul_vv_f64m1 (a3, k0, vl), vl);
+  k2 = __riscv_vfmacc_vv_f64m1 (__riscv_vfmul_vv_f64m1 (k1,
+                                                        jbm_nxf64_sqr (k1, vl),
+                                                        vl),
+                                k0, k0, vl);
   l1 = __riscv_vfsqrt_v_f64m1 (jbm_nxf64_opposite (k1, vl), vl);
   l0 =
-    __riscv_vfmul_vf_f64m1 (jbm_nxf64_acos
-                            (__riscv_vfdiv_vv_f64m1 (k0, k3, vl), vl), 1. / 3.,
-                            vl);
+    __riscv_vfmul_vf_f64m1
+    (jbm_nxf64_acos
+     (__riscv_vfdiv_vv_f64m1 (k0, __riscv_vfmul_vv_f64m1 (l1,
+                                                          jbm_nxf64_sqr (l1,
+                                                                         vl),
+                                                          vl), vl), vl),
+      1. / 3., vl);
   l1 = jbm_nxf64_dbl (l1, vl);
   l2 =
-    __riscv_vfsub_vv_f64m1 (a3,
-                            __riscv_vfmul_vv_f64m1 (l1, jbm_nxf64_cos (k0, vl),
-                                                    vl), vl);
+    __riscv_vfsub_vv_f64m1 (__riscv_vfmul_vv_f64m1 (l1, jbm_nxf64_cos (l0, vl),
+                                                    vl), a3, vl);
   l3 =
-    __riscv_vfsub_vv_f64m1 (a3,
-                            __riscv_vfmul_vv_f64m1 (l1,
-                                                    jbm_nxf64_cos
-                                                    (__riscv_vfadd_vf_f64m1
-                                                     (l0, 2. * M_PI / 3., vl),
-                                                     vl), vl), vl);
+    __riscv_vfsub_vv_f64m1
+    (__riscv_vfmul_vv_f64m1
+     (l1, jbm_nxf64_cos (__riscv_vfadd_vf_f64m1 (l0, 2. * M_PI / 3., vl), vl),
+      vl), a3, vl);
   l3 =
-    __riscv_vmerge_vvm_f64m1 (l2, l3,
-                              __riscv_vmor_mm_b64 (__riscv_vmflt_vv_f64m1_b64
-                                                   (l2, x1, vl),
-                                                   __riscv_vmfgt_vv_f64m1_b64
-                                                   (l2, x2, vl), vl), vl);
+    __riscv_vmerge_vvm_f64m1
+    (l2, l3, __riscv_vmor_mm_b64 (__riscv_vmflt_vv_f64m1_b64 (l2, x1, vl),
+                                  __riscv_vmfgt_vv_f64m1_b64 (l2, x2, vl), vl),
+     vl);
   l4 =
-    __riscv_vfsub_vv_f64m1 (a,
-                            __riscv_vfmul_vv_f64m1 (l1,
-                                                    jbm_nxf64_cos
-                                                    (__riscv_vfsub_vf_f64m1
-                                                     (l0, 2. * M_PI / 3., vl),
-                                                     vl), vl), vl);
+    __riscv_vfsub_vv_f64m1
+    (__riscv_vfmul_vv_f64m1
+     (l1, jbm_nxf64_cos (__riscv_vfsub_vf_f64m1 (l0, 2. * M_PI / 3., vl), vl),
+      vl), a3, vl);
   l4 =
-    __riscv_vmerge_vvm_f64m1 (l3, l4,
-                              __riscv_vmor_mm_b64 (__riscv_vmflt_vv_f64m1_b64
-                                                   (l3, x1, vl),
-                                                   __riscv_vmfgt_vv_f64m1_b64
-                                                   (l3, x2, vl), vl), vl);
+    __riscv_vmerge_vvm_f64m1
+    (l3, l4, __riscv_vmor_mm_b64 (__riscv_vmflt_vv_f64m1_b64 (l3, x1, vl),
+                                  __riscv_vmfgt_vv_f64m1_b64 (l3, x2, vl), vl),
+     vl);
   k1 = __riscv_vfsqrt_v_f64m1 (k2, vl);
-  l5 = __riscv_vfadd_vv_f64m1 (k0, k1, vl);
-  l5 = jbm_nxf64_cbrt (k2, vl);
-  k0 = __riscv_vfsub_vv_f64m1 (k0, k1, vl);
+  l5 = jbm_nxf64_cbrt (__riscv_vfadd_vv_f64m1 (k0, k1, vl), vl);
   l5 =
-    __riscv_vfadd_vv_f64m1 (l5,
-                            __riscv_vfsub_vv_f64m1 (jbm_nxf64_cbrt (k0, vl), a3,
-                                                    vl), vl);
+    __riscv_vfadd_vv_f64m1
+    (l5,
+     __riscv_vfsub_vv_f64m1 (jbm_nxf64_cbrt (__riscv_vfsub_vv_f64m1 (k0, k1,
+                                                                     vl), vl),
+                             a3, vl), vl);
   return __riscv_vmerge_vvm_f64m1 (l5, l4,
                                    __riscv_vmflt_vf_f64m1_b64 (k2, 0., vl), vl);
 }
@@ -21863,34 +21843,6 @@ jbm_nxf64_integral (vfloat64m1_t (*f) (vfloat64m1_t, size_t),
                     const vfloat64m1_t x2,      ///< right limit of the interval.
                     const size_t vl)    ///< array size.
 {
-#if JBM_INTEGRAL_GAUSS_N == 1
-  const JBFLOAT a[1] JB_ALIGNED = { 2. };
-#elif JBM_INTEGRAL_GAUSS_N == 2
-  const JBFLOAT a[2] JB_ALIGNED = { 8. / 9., 5. / 9. },
-    b[2] JB_ALIGNED = { 0., 7.745966692414834e-1 };
-#elif JBM_INTEGRAL_GAUSS_N == 3
-  const JBFLOAT a[3] JB_ALIGNED = {
-    128. / 225.,
-    4.786286704993665e-1,
-    2.369268850561891e-1
-  }, b[3] JB_ALIGNED = {
-    0.,
-    5.384693101056831e-1,
-    9.061798459386640e-1
-  };
-#elif JBM_INTEGRAL_GAUSS_N == 4
-  const JBFLOAT a[4] JB_ALIGNED = {
-    4.179591836734694e-1,
-    3.818300505051189e-1,
-    2.797053914892767e-1,
-    1.294849661688697e-1
-  }, b[4] JB_ALIGNED = {
-    0.,
-    4.058451513773972e-1,
-    7.415311855993944e-1,
-    9.491079123427585e-1
-  };
-#endif
   vfloat64m1_t k, x, dx;
 #if JBM_INTEGRAL_GAUSS_N > 1
   vfloat64m1_t k2, f1, f2;
@@ -21898,16 +21850,16 @@ jbm_nxf64_integral (vfloat64m1_t (*f) (vfloat64m1_t, size_t),
   unsigned int i;
   dx = __riscv_vfmul_vf_f64m1 (__riscv_vfsub_vv_f64m1 (x2, x1, vl), 0.5, vl);
   x = __riscv_vfmul_vf_f64m1 (__riscv_vfadd_vv_f64m1 (x2, x1, vl), 0.5, vl);
-  k = __riscv_vfmul_vf_f64m1 (f (x, vl), a[0], vl);
+  k = __riscv_vfmul_vf_f64m1 (f (x, vl), JBM_INTEGRAL_GAUSS_A_F64[0], vl);
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = __riscv_vfmul_vf_f64m1 (dx, b[i], vl);
+      k2 = __riscv_vfmul_vf_f64m1 (dx, JBM_INTEGRAL_GAUSS_B_F64[i], vl);
       f1 = f (__riscv_vfsub_vv_f64m1 (x, k2, vl), vl);
       f2 = f (__riscv_vfadd_vv_f64m1 (x, k2, vl), vl);
       k =
-        __riscv_vfmacc_vf_f64m1 (k, a[i], __riscv_vfadd_vv_f64m1 (f1, f2, vl),
-                                 vl);
+        __riscv_vfmacc_vf_f64m1 (k, JBM_INTEGRAL_GAUSS_A_F64[i],
+                                 __riscv_vfadd_vv_f64m1 (f1, f2, vl), vl);
     }
 #endif
   k = __riscv_vfmul_vv_f64m1 (k, dx, vl);
@@ -27816,7 +27768,7 @@ jbm_4xf32_rational_29_28 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for
+ * Function to calculate the well-conditioned function expm1(x) for
  * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (4x vfloat32m1_t).
  *
  * \return function value (4x vfloat32m1_t).
@@ -27829,7 +27781,7 @@ jbm_4xf32_expm1wc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (4x vfloat32m1_t).
  *
  * \return function value (4x vfloat32m1_t).
@@ -27890,7 +27842,7 @@ jbm_4xf32_expm1 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * [0.5,1] (4x vfloat32m1_t).
  *
  * \return function value (4x vfloat32m1_t).
@@ -27988,7 +27940,7 @@ jbm_4xf32_cbrt (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (4x vfloat32m1_t)
  *
  * \return function value (4x vfloat32m1_t).
@@ -28001,7 +27953,7 @@ jbm_4xf32_sinwc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (4x vfloat32m1_t):
  *
  * \return function value (4x vfloat32m1_t).
@@ -28014,7 +27966,7 @@ jbm_4xf32_coswc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_4xf32_sinwc approximation (4x vfloat32m1_t).
  */
 static inline void
@@ -28080,8 +28032,7 @@ jbm_4xf32_tan (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc0_4xf32 and
- * jbm_4xf32_atanwc1 functions (4x vfloat32m1_t).
+ * Function to calculate the function atan(x) (4x vfloat32m1_t).
  *
  * \return function value (in [-pi/2,pi/2]) (4x vfloat32m1_t).
  */
@@ -28092,8 +28043,7 @@ jbm_4xf32_atan (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the function atan2(y,x) using the jbm_4xf32_atan
- * function (4x vfloat32m1_t).
+ * Function to calculate the function atan2(y,x) (4x vfloat32m1_t).
  *
  * \return function value (in [-pi,pi]) (4x vfloat32m1_t).
  */
@@ -28129,74 +28079,74 @@ jbm_4xf32_acos (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (4x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_4xf32_sinh (const vfloat32m1_t x)   ///< vfloat32m1_t number.
+jbm_4xf32_sinh (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_sinh (x, 4);
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (4x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_4xf32_cosh (const vfloat32m1_t x)   ///< vfloat32m1_t number.
+jbm_4xf32_cosh (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_cosh (x, 4);
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (4x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_4xf32_tanh (const vfloat32m1_t x)   ///< vfloat32m1_t number.
+jbm_4xf32_tanh (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_tanh (x, 4);
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (4x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_4xf32_asinh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+jbm_4xf32_asinh (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_asinh (x, 4);
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (4x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_4xf32_acosh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+jbm_4xf32_acosh (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_asinh (x, 4);
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (4x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_4xf32_atanh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+jbm_4xf32_atanh (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_atanh (x, 4);
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (4x vfloat32m1_t)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (4x vfloat32m1_t).
  *
  * \return function value (4x vfloat32m1_t).
  */
@@ -28208,8 +28158,8 @@ jbm_4xf32_erfwc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (4x vfloat32m1_t)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (4x vfloat32m1_t).
  *
  * \return function value (4x vfloat32m1_t).
  */
@@ -28223,7 +28173,7 @@ jbm_4xf32_erfcwc (const vfloat32m1_t x)
 
 /**
  * Function to calculate the function erf(x) using jbm_4xf32_erfwc and
- * jbm_4xf32_erfcwc
+ * jbm_4xf32_erfcwc (4x vfloat32m1_t).
  *
  * \return function value (4x vfloat32m1_t).
  */
@@ -28235,7 +28185,7 @@ jbm_4xf32_erf (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_4xf32_erfwc and
- * jbm_4xf32_erfcwc
+ * jbm_4xf32_erfcwc (4x vfloat32m1_t).
  *
  * \return function value (4x vfloat32m1_t).
  */
@@ -28296,15 +28246,16 @@ jbm_4xf32_solve_quadratic (const vfloat32m1_t a,
  */
 static inline vfloat32m1_t
 jbm_4xf32_solve_cubic_reduced (const vfloat32m1_t a,
-                               ///< 2nd order coefficient of the equation.
+///< vfloat32m1_t vector of 2nd order coefficient of the equations.
                                const vfloat32m1_t b,
-                               ///< 1st order coefficient of the equation.
+///< vfloat32m1_t vector of 1st order coefficient of the equations.
                                const vfloat32m1_t c,
-                               ///< 0th order coefficient of the equation.
+///< vfloat32m1_t vector of 0th order coefficient of the equations.
                                const vfloat32m1_t x1,
-                               ///< left limit of the solution interval.
-                               const vfloat32m1_t x2)
-                               ///< right limit of the solution interval.
+///< vfloat32m1_t vector of left limits of the solution intervals.
+                               const vfloat32m1_t x2,
+///< vfloat32m1_t vector of right limits of the solution intervals.
+                               const size_t vl) ///< array size.
 {
   return jbm_nxf32_solve_cubic_reduced (a, b, c, x1, x2, 4);
 }
@@ -34430,7 +34381,7 @@ jbm_2xf64_rational_29_28 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for
+ * Function to calculate the well-conditioned function expm1(x) for
  * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (2x vfloat64m1_t).
  *
  * \return function value (2x vfloat64m1_t).
@@ -34443,7 +34394,7 @@ jbm_2xf64_expm1wc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (2x vfloat64m1_t).
  *
  * \return function value (2x vfloat64m1_t).
@@ -34504,7 +34455,7 @@ jbm_2xf64_expm1 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * [0.5,1] (2x vfloat64m1_t).
  *
  * \return function value (2x vfloat64m1_t).
@@ -34602,7 +34553,7 @@ jbm_2xf64_cbrt (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (2x vfloat64m1_t)
  *
  * \return function value (2x vfloat64m1_t).
@@ -34615,7 +34566,7 @@ jbm_2xf64_sinwc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (2x vfloat64m1_t):
  *
  * \return function value (2x vfloat64m1_t).
@@ -34628,7 +34579,7 @@ jbm_2xf64_coswc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_2xf64_sinwc approximation (2x vfloat64m1_t).
  */
 static inline void
@@ -34694,8 +34645,7 @@ jbm_2xf64_tan (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc0_2xf64 and
- * jbm_atanwc1_2xf64 functions (2x vfloat64m1_t).
+ * Function to calculate the function atan(x) (2x vfloat64m1_t).
  *
  * \return function value (in [-pi/2,pi/2]) (2x vfloat64m1_t).
  */
@@ -34706,8 +34656,7 @@ jbm_2xf64_atan (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the function atan2(y,x) using the jbm_2xf64_atan
- * function (2x vfloat64m1_t).
+ * Function to calculate the function atan2(y,x) (2x vfloat64m1_t).
  *
  * \return function value (in [-pi,pi]) (2x vfloat64m1_t).
  */
@@ -34743,74 +34692,74 @@ jbm_2xf64_acos (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (2x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_2xf64_sinh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+jbm_2xf64_sinh (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_sinh (x, 2);
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (2x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_2xf64_cosh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+jbm_2xf64_cosh (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_cosh (x, 2);
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (2x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_2xf64_tanh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+jbm_2xf64_tanh (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_tanh (x, 2);
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (2x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_2xf64_asinh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+jbm_2xf64_asinh (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_asinh (x, 2);
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (2x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_2xf64_acosh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+jbm_2xf64_acosh (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_asinh (x, 2);
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (2x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_2xf64_atanh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+jbm_2xf64_atanh (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_atanh (x, 2);
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (2x vfloat64m1_t)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (2x vfloat64m1_t).
  *
  * \return function value (2x vfloat64m1_t).
  */
@@ -34822,8 +34771,8 @@ jbm_2xf64_erfwc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (2x vfloat64m1_t)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (2x vfloat64m1_t).
  *
  * \return function value (2x vfloat64m1_t).
  */
@@ -34837,7 +34786,7 @@ jbm_2xf64_erfcwc (const vfloat64m1_t x)
 
 /**
  * Function to calculate the function erf(x) using jbm_2xf64_erfwc and
- * jbm_2xf64_erfcwc
+ * jbm_2xf64_erfcwc (2x vfloat64m1_t).
  *
  * \return function value (2x vfloat64m1_t).
  */
@@ -34849,7 +34798,7 @@ jbm_2xf64_erf (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_2xf64_erfwc and
- * jbm_2xf64_erfcwc
+ * jbm_2xf64_erfcwc (2x vfloat64m1_t).
  *
  * \return function value (2x vfloat64m1_t).
  */
@@ -34910,15 +34859,16 @@ jbm_2xf64_solve_quadratic (const vfloat64m1_t a,
  */
 static inline vfloat64m1_t
 jbm_2xf64_solve_cubic_reduced (const vfloat64m1_t a,
-                               ///< 2nd order coefficient of the equation.
+///< vfloat64m1_t vector of 2nd order coefficient of the equations.
                                const vfloat64m1_t b,
-                               ///< 1st order coefficient of the equation.
+///< vfloat64m1_t vector of 1st order coefficient of the equations.
                                const vfloat64m1_t c,
-                               ///< 0th order coefficient of the equation.
+///< vfloat64m1_t vector of 0th order coefficient of the equations.
                                const vfloat64m1_t x1,
-                               ///< left limit of the solution interval.
-                               const vfloat64m1_t x2)
-                               ///< right limit of the solution interval.
+///< vfloat64m1_t vector of left limits of the solution intervals.
+                               const vfloat64m1_t x2,
+///< vfloat64m1_t vector of right limits of the solution intervals.
+                               const size_t vl) ///< array size.
 {
   return jbm_nxf64_solve_cubic_reduced (a, b, c, x1, x2, 2);
 }
@@ -41044,7 +40994,7 @@ jbm_8xf32_rational_29_28 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for
+ * Function to calculate the well-conditioned function expm1(x) for
  * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (8x vfloat32m1_t).
  *
  * \return function value (8x vfloat32m1_t).
@@ -41057,7 +41007,7 @@ jbm_8xf32_expm1wc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (8x vfloat32m1_t).
  *
  * \return function value (8x vfloat32m1_t).
@@ -41118,7 +41068,7 @@ jbm_8xf32_expm1 (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * [0.5,1] (8x vfloat32m1_t).
  *
  * \return function value (8x vfloat32m1_t).
@@ -41216,7 +41166,7 @@ jbm_8xf32_cbrt (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (8x vfloat32m1_t)
  *
  * \return function value (8x vfloat32m1_t).
@@ -41229,7 +41179,7 @@ jbm_8xf32_sinwc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (8x vfloat32m1_t):
  *
  * \return function value (8x vfloat32m1_t).
@@ -41242,7 +41192,7 @@ jbm_8xf32_coswc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_8xf32_sinwc approximation (8x vfloat32m1_t).
  */
 static inline void
@@ -41308,8 +41258,7 @@ jbm_8xf32_tan (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc0_8xf32 and
- * jbm_8xf32_atanwc1 functions (8x vfloat32m1_t).
+ * Function to calculate the function atan(x) (8x vfloat32m1_t).
  *
  * \return function value (in [-pi/2,pi/2]) (8x vfloat32m1_t).
  */
@@ -41357,74 +41306,74 @@ jbm_8xf32_acos (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (8x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_8xf32_sinh (const vfloat32m1_t x)   ///< vfloat32m1_t number.
+jbm_8xf32_sinh (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_sinh (x, 8);
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (8x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_8xf32_cosh (const vfloat32m1_t x)   ///< vfloat32m1_t number.
+jbm_8xf32_cosh (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_cosh (x, 8);
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (8x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_8xf32_tanh (const vfloat32m1_t x)   ///< vfloat32m1_t number.
+jbm_8xf32_tanh (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_tanh (x, 8);
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (8x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_8xf32_asinh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+jbm_8xf32_asinh (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_asinh (x, 8);
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (8x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_8xf32_acosh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+jbm_8xf32_acosh (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_asinh (x, 8);
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (8x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_8xf32_atanh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+jbm_8xf32_atanh (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_atanh (x, 8);
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (8x vfloat32m1_t)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (8x vfloat32m1_t).
  *
  * \return function value (8x vfloat32m1_t).
  */
@@ -41436,8 +41385,8 @@ jbm_8xf32_erfwc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (8x vfloat32m1_t)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (8x vfloat32m1_t).
  *
  * \return function value (8x vfloat32m1_t).
  */
@@ -41451,7 +41400,7 @@ jbm_8xf32_erfcwc (const vfloat32m1_t x)
 
 /**
  * Function to calculate the function erf(x) using jbm_8xf32_erfwc and
- * jbm_8xf32_erfcwc
+ * jbm_8xf32_erfcwc (8x vfloat32m1_t).
  *
  * \return function value (8x vfloat32m1_t).
  */
@@ -41463,7 +41412,7 @@ jbm_8xf32_erf (const vfloat32m1_t x)    ///< vfloat32m1_t vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_8xf32_erfwc and
- * jbm_8xf32_erfcwc.
+ * jbm_8xf32_erfcwc (8x vfloat32m1_t).
  *
  * \return function value (8x vfloat32m1_t).
  */
@@ -41524,15 +41473,16 @@ jbm_8xf32_solve_quadratic (const vfloat32m1_t a,
  */
 static inline vfloat32m1_t
 jbm_8xf32_solve_cubic_reduced (const vfloat32m1_t a,
-                               ///< 2nd order coefficient of the equation.
+///< vfloat32m1_t vector of 2nd order coefficient of the equations.
                                const vfloat32m1_t b,
-                               ///< 1st order coefficient of the equation.
+///< vfloat32m1_t vector of 1st order coefficient of the equations.
                                const vfloat32m1_t c,
-                               ///< 0th order coefficient of the equation.
+///< vfloat32m1_t vector of 0th order coefficient of the equations.
                                const vfloat32m1_t x1,
-                               ///< left limit of the solution interval.
-                               const vfloat32m1_t x2)
-                               ///< right limit of the solution interval.
+///< vfloat32m1_t vector of left limits of the solution intervals.
+                               const vfloat32m1_t x2,
+///< vfloat32m1_t vector of right limits of the solution intervals.
+                               const size_t vl) ///< array size.
 {
   return jbm_nxf32_solve_cubic_reduced (a, b, c, x1, x2, 8);
 }
@@ -47658,7 +47608,7 @@ jbm_4xf64_rational_29_28 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for
+ * Function to calculate the well-conditioned function expm1(x) for
  * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (4x vfloat64m1_t).
  *
  * \return function value (4x vfloat64m1_t).
@@ -47671,7 +47621,7 @@ jbm_4xf64_expm1wc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (4x vfloat64m1_t).
  *
  * \return function value (4x vfloat64m1_t).
@@ -47732,7 +47682,7 @@ jbm_4xf64_expm1 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * [0.5,1] (4x vfloat64m1_t).
  *
  * \return function value (4x vfloat64m1_t).
@@ -47830,7 +47780,7 @@ jbm_4xf64_cbrt (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (4x vfloat64m1_t)
  *
  * \return function value (4x vfloat64m1_t).
@@ -47843,7 +47793,7 @@ jbm_4xf64_sinwc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (4x vfloat64m1_t):
  *
  * \return function value (4x vfloat64m1_t).
@@ -47856,7 +47806,7 @@ jbm_4xf64_coswc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_4xf64_sinwc approximation (4x vfloat64m1_t).
  */
 static inline void
@@ -47922,8 +47872,7 @@ jbm_4xf64_tan (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc0_4xf64 and
- * jbm_4xf64_atanwc1 functions (4x vfloat64m1_t).
+ * Function to calculate the function atan(x) (4x vfloat64m1_t).
  *
  * \return function value (in [-pi/2,pi/2]) (4x vfloat64m1_t).
  */
@@ -47971,74 +47920,74 @@ jbm_4xf64_acos (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (4x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_4xf64_sinh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+jbm_4xf64_sinh (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_sinh (x, 4);
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (4x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_4xf64_cosh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+jbm_4xf64_cosh (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_cosh (x, 4);
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (4x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_4xf64_tanh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+jbm_4xf64_tanh (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_tanh (x, 4);
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (4x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_4xf64_asinh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+jbm_4xf64_asinh (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_asinh (x, 4);
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (4x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_4xf64_acosh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+jbm_4xf64_acosh (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_asinh (x, 4);
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (4x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_4xf64_atanh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+jbm_4xf64_atanh (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_atanh (x, 4);
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (4x vfloat64m1_t)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (4x vfloat64m1_t).
  *
  * \return function value (4x vfloat64m1_t).
  */
@@ -48050,8 +47999,8 @@ jbm_4xf64_erfwc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (4x vfloat64m1_t)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (4x vfloat64m1_t).
  *
  * \return function value (4x vfloat64m1_t).
  */
@@ -48065,7 +48014,7 @@ jbm_4xf64_erfcwc (const vfloat64m1_t x)
 
 /**
  * Function to calculate the function erf(x) using jbm_4xf64_erfwc and
- * jbm_4xf64_erfcwc
+ * jbm_4xf64_erfcwc (4xvfloat64m1_t).
  *
  * \return function value (4x vfloat64m1_t).
  */
@@ -48077,7 +48026,7 @@ jbm_4xf64_erf (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_4xf64_erfwc and
- * jbm_4xf64_erfcwc
+ * jbm_4xf64_erfcwc (4x vfloat64m1_t).
  *
  * \return function value (4x vfloat64m1_t).
  */
@@ -48138,15 +48087,16 @@ jbm_4xf64_solve_quadratic (const vfloat64m1_t a,
  */
 static inline vfloat64m1_t
 jbm_4xf64_solve_cubic_reduced (const vfloat64m1_t a,
-                               ///< 2nd order coefficient of the equation.
+///< vfloat64m1_t vector of 2nd order coefficient of the equations.
                                const vfloat64m1_t b,
-                               ///< 1st order coefficient of the equation.
+///< vfloat64m1_t vector of 1st order coefficient of the equations.
                                const vfloat64m1_t c,
-                               ///< 0th order coefficient of the equation.
+///< vfloat64m1_t vector of 0th order coefficient of the equations.
                                const vfloat64m1_t x1,
-                               ///< left limit of the solution interval.
-                               const vfloat64m1_t x2)
-                               ///< right limit of the solution interval.
+///< vfloat64m1_t vector of left limits of the solution intervals.
+                               const vfloat64m1_t x2,
+///< vfloat64m1_t vector of right limits of the solution intervals.
+                               const size_t vl) ///< array size.
 {
   return jbm_nxf64_solve_cubic_reduced (a, b, c, x1, x2, 4);
 }
@@ -54273,7 +54223,7 @@ jbm_16xf32_rational_29_28 (const vfloat32m1_t x,        ///< vfloat32m1_t vector
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for
+ * Function to calculate the well-conditioned function expm1(x) for
  * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (16x vfloat32m1_t).
  *
  * \return function value (16x vfloat32m1_t).
@@ -54286,7 +54236,7 @@ jbm_16xf32_expm1wc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (16x vfloat32m1_t).
  *
  * \return function value (16x vfloat32m1_t).
@@ -54347,7 +54297,7 @@ jbm_16xf32_expm1 (const vfloat32m1_t x) ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * [0.5,1] (16x vfloat32m1_t).
  *
  * \return function value (16x vfloat32m1_t).
@@ -54445,7 +54395,7 @@ jbm_16xf32_cbrt (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (16x vfloat32m1_t)
  *
  * \return function value (16x vfloat32m1_t).
@@ -54458,7 +54408,7 @@ jbm_16xf32_sinwc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (16x vfloat32m1_t):
  *
  * \return function value (16x vfloat32m1_t).
@@ -54471,7 +54421,7 @@ jbm_16xf32_coswc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_16xf32_sinwc approximation (16x vfloat32m1_t).
  */
 static inline void
@@ -54537,8 +54487,7 @@ jbm_16xf32_tan (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc0_16xf32 and
- * jbm_16xf32_atanwc1 functions (16x vfloat32m1_t).
+ * Function to calculate the function atan(x) (16x vfloat32m1_t).
  *
  * \return function value (in [-pi/2,pi/2]) (16x vfloat32m1_t).
  */
@@ -54586,74 +54535,74 @@ jbm_16xf32_acos (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (16x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_16xf32_sinh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+jbm_16xf32_sinh (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_sinh (x, 16);
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (16x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_16xf32_cosh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+jbm_16xf32_cosh (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_cosh (x, 16);
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (16x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_16xf32_tanh (const vfloat32m1_t x)  ///< vfloat32m1_t number.
+jbm_16xf32_tanh (const vfloat32m1_t x)  ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_tanh (x, 16);
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (16x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_16xf32_asinh (const vfloat32m1_t x) ///< vfloat32m1_t number.
+jbm_16xf32_asinh (const vfloat32m1_t x) ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_asinh (x, 16);
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (16x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_16xf32_acosh (const vfloat32m1_t x) ///< vfloat32m1_t number.
+jbm_16xf32_acosh (const vfloat32m1_t x) ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_asinh (x, 16);
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (16x vfloat32m1_t).
  */
 static inline vfloat32m1_t
-jbm_16xf32_atanh (const vfloat32m1_t x) ///< vfloat32m1_t number.
+jbm_16xf32_atanh (const vfloat32m1_t x) ///< vfloat32m1_t vector.
 {
   return jbm_nxf32_atanh (x, 16);
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (16x vfloat32m1_t)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (16x vfloat32m1_t).
  *
  * \return function value (16x vfloat32m1_t).
  */
@@ -54665,8 +54614,8 @@ jbm_16xf32_erfwc (const vfloat32m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (16x vfloat32m1_t)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (16x vfloat32m1_t).
  *
  * \return function value (16x vfloat32m1_t).
  */
@@ -54680,7 +54629,7 @@ jbm_16xf32_erfcwc (const vfloat32m1_t x)
 
 /**
  * Function to calculate the function erf(x) using jbm_16xf32_erfwc and
- * jbm_16xf32_erfcwc
+ * jbm_16xf32_erfcwc (16x vfloat32m1_t).
  *
  * \return function value (16x vfloat32m1_t).
  */
@@ -54692,7 +54641,7 @@ jbm_16xf32_erf (const vfloat32m1_t x)   ///< vfloat32m1_t vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_16xf32_erfwc and
- * jbm_16xf32_erfcwc.
+ * jbm_16xf32_erfcwc (16x vfloat32m1_t).
  *
  * \return function value (16x vfloat32m1_t).
  */
@@ -54753,15 +54702,16 @@ jbm_16xf32_solve_quadratic (const vfloat32m1_t a,
  */
 static inline vfloat32m1_t
 jbm_16xf32_solve_cubic_reduced (const vfloat32m1_t a,
-                                ///< 2nd order coefficient of the equation.
-                                const vfloat32m1_t b,
-                                ///< 1st order coefficient of the equation.
-                                const vfloat32m1_t c,
-                                ///< 0th order coefficient of the equation.
-                                const vfloat32m1_t x1,
-                                ///< left limit of the solution interval.
-                                const vfloat32m1_t x2)
-                               ///< right limit of the solution interval.
+///< vfloat32m1_t vector of 2nd order coefficient of the equations.
+                               const vfloat32m1_t b,
+///< vfloat32m1_t vector of 1st order coefficient of the equations.
+                               const vfloat32m1_t c,
+///< vfloat32m1_t vector of 0th order coefficient of the equations.
+                               const vfloat32m1_t x1,
+///< vfloat32m1_t vector of left limits of the solution intervals.
+                               const vfloat32m1_t x2,
+///< vfloat32m1_t vector of right limits of the solution intervals.
+                               const size_t vl) ///< array size.
 {
   return jbm_nxf32_solve_cubic_reduced (a, b, c, x1, x2, 16);
 }
@@ -60887,7 +60837,7 @@ jbm_8xf64_rational_29_28 (const vfloat64m1_t x, ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for
+ * Function to calculate the well-conditioned function expm1(x) for
  * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (8x vfloat64m1_t).
  *
  * \return function value (8x vfloat64m1_t).
@@ -60900,7 +60850,7 @@ jbm_8xf64_expm1wc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (8x vfloat64m1_t).
  *
  * \return function value (8x vfloat64m1_t).
@@ -60961,7 +60911,7 @@ jbm_8xf64_expm1 (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * [0.5,1] (8x vfloat64m1_t).
  *
  * \return function value (8x vfloat64m1_t).
@@ -61059,7 +61009,7 @@ jbm_8xf64_cbrt (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (8x vfloat64m1_t)
  *
  * \return function value (8x vfloat64m1_t).
@@ -61072,7 +61022,7 @@ jbm_8xf64_sinwc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (8x vfloat64m1_t):
  *
  * \return function value (8x vfloat64m1_t).
@@ -61085,7 +61035,7 @@ jbm_8xf64_coswc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_8xf64_sinwc approximation (8x vfloat64m1_t).
  */
 static inline void
@@ -61151,8 +61101,7 @@ jbm_8xf64_tan (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc0_8xf64 and
- * jbm_8xf64_atanwc1 functions (8x vfloat64m1_t).
+ * Function to calculate the function atan(x) (8x vfloat64m1_t).
  *
  * \return function value (in [-pi/2,pi/2]) (8x vfloat64m1_t).
  */
@@ -61200,74 +61149,74 @@ jbm_8xf64_acos (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (8x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_8xf64_sinh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+jbm_8xf64_sinh (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_sinh (x, 8);
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (8x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_8xf64_cosh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+jbm_8xf64_cosh (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_cosh (x, 8);
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (8x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_8xf64_tanh (const vfloat64m1_t x)   ///< vfloat64m1_t number.
+jbm_8xf64_tanh (const vfloat64m1_t x)   ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_tanh (x, 8);
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (8x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_8xf64_asinh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+jbm_8xf64_asinh (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_asinh (x, 8);
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (8x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_8xf64_acosh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+jbm_8xf64_acosh (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_asinh (x, 8);
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (8x vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_8xf64_atanh (const vfloat64m1_t x)  ///< vfloat64m1_t number.
+jbm_8xf64_atanh (const vfloat64m1_t x)  ///< vfloat64m1_t vector.
 {
   return jbm_nxf64_atanh (x, 8);
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (8x vfloat64m1_t)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (8x vfloat64m1_t).
  *
  * \return function value (8x vfloat64m1_t).
  */
@@ -61279,8 +61228,8 @@ jbm_8xf64_erfwc (const vfloat64m1_t x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (8x vfloat64m1_t)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (8x vfloat64m1_t).
  *
  * \return function value (8x vfloat64m1_t).
  */
@@ -61294,7 +61243,7 @@ jbm_8xf64_erfcwc (const vfloat64m1_t x)
 
 /**
  * Function to calculate the function erf(x) using jbm_8xf64_erfwc and
- * jbm_8xf64_erfcwc
+ * jbm_8xf64_erfcwc (8x vfloat64m1_t).
  *
  * \return function value (8x vfloat64m1_t).
  */
@@ -61306,7 +61255,7 @@ jbm_8xf64_erf (const vfloat64m1_t x)    ///< vfloat64m1_t vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_8xf64_erfwc and
- * jbm_8xf64_erfcwc
+ * jbm_8xf64_erfcwc (8x vfloat64m1_t).
  *
  * \return function value (8x vfloat64m1_t).
  */
@@ -61367,15 +61316,16 @@ jbm_8xf64_solve_quadratic (const vfloat64m1_t a,
  */
 static inline vfloat64m1_t
 jbm_8xf64_solve_cubic_reduced (const vfloat64m1_t a,
-                               ///< 2nd order coefficient of the equation.
+///< vfloat64m1_t vector of 2nd order coefficient of the equations.
                                const vfloat64m1_t b,
-                               ///< 1st order coefficient of the equation.
+///< vfloat64m1_t vector of 1st order coefficient of the equations.
                                const vfloat64m1_t c,
-                               ///< 0th order coefficient of the equation.
+///< vfloat64m1_t vector of 0th order coefficient of the equations.
                                const vfloat64m1_t x1,
-                               ///< left limit of the solution interval.
-                               const vfloat64m1_t x2)
-                               ///< right limit of the solution interval.
+///< vfloat64m1_t vector of left limits of the solution intervals.
+                               const vfloat64m1_t x2,
+///< vfloat64m1_t vector of right limits of the solution intervals.
+                               const size_t vl) ///< array size.
 {
   return jbm_nxf64_solve_cubic_reduced (a, b, c, x1, x2, 8);
 }

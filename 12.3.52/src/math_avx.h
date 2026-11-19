@@ -460,7 +460,7 @@ jbm_8xf32_ldexp (const __m256 x,        ///< __m256 vector.
  * \return 1 on small number, 0 otherwise.
  */
 static inline __m256
-jbm_8xf32_small (const __m256 x)        ///< __m256d vector.
+jbm_8xf32_small (const __m256 x)        ///< __m256 vector.
 {
   return _mm256_cmp_ps (jbm_8xf32_abs (x), _mm256_set1_ps (FLT_EPSILON),
                         _CMP_LT_OS);
@@ -7082,7 +7082,7 @@ jbm_8xf32_rational_29_28 (const __m256 x,       ///< __m256 vector.
 }
 
 /**
- * Function to calculate the well conditionated function cbrt(x) for x
+ * Function to calculate the well-conditioned function cbrt(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (__m256).
  *
  * \return function value (__m256).
@@ -7141,7 +7141,7 @@ jbm_8xf32_cbrt (const __m256 x) ///< __m256 vector.
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (__m256).
  *
  * \return function value.
@@ -7197,7 +7197,7 @@ jbm_8xf32_exp10 (const __m256 x)        ///< __m256 vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for
+ * Function to calculate the well-conditioned function expm1(x) for
  * \f$x\in\left[-\log(2)/2,\log(2)/2\right]\f$ (__m256).
  *
  * \return function value (__m256).
@@ -7236,7 +7236,7 @@ jbm_8xf32_expm1 (const __m256 x)        ///< __m128 vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(x) for x in
+ * Function to calculate the well-conditioned function log2(x) for x in
  * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (__m256).
  *
  * \return function value (__m256).
@@ -7335,7 +7335,7 @@ jbm_8xf32_pow (const __m256 x,  ///< __m256 vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (__m256)
  *
  * \return function value (__m256).
@@ -7349,7 +7349,7 @@ jbm_8xf32_sinwc (const __m256 x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (__m256):
  *
  * \return function value (__m256).
@@ -7362,7 +7362,7 @@ jbm_8xf32_coswc (const __m256 x)
 }
 
 /**
- * Function to calculate the well conditionated function tan(x) for x in
+ * Function to calculate the well-conditioned function tan(x) for x in
  * [-pi/4,pi/4].
  *
  * \return function value (__m256).
@@ -7376,7 +7376,7 @@ jbm_8xf32_tanwc (const __m256 x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_8xf32_sinwc approximation (__m256).
  */
 static inline void
@@ -7502,7 +7502,7 @@ jbm_8xf32_tan (const __m256 x)  ///< __m256 vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * Function to calculate the well-conditioned function atan(x) for x in [-1,1]
  * (__m256).
  *
  * \return function value (__m256).
@@ -7516,7 +7516,7 @@ jbm_8xf32_atanwc (const __m256 x)
 }
 
 /**
- * Function to calculate the function atan(x) using the jbm_atanwc0_8xf32
+ * Function to calculate the function atan(x) using the jbm_8xf32_atanwc
  * function (__m256).
  *
  * \return function value (in [-pi/2,pi/2]) (__m256).
@@ -7557,7 +7557,7 @@ jbm_8xf32_atan2 (const __m256 y,        ///< __m256 y component.
  * Function to calculate the function asin(x) using the jbm_8xf32_atan function
  * (__m256).
  *
- * \return function value (in [-pi/2,pi/2]).
+ * \return function value (__m256 in [-pi/2,pi/2]).
  */
 static inline __m256
 jbm_8xf32_asin (const __m256 x) ///< __m256 vector.
@@ -7586,12 +7586,12 @@ jbm_8xf32_acos (const __m256 x) ///< __m256 vector.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (__m256).
  */
 static inline __m256
-jbm_8xf32_sinh (const __m256 x) ///< __m256 number.
+jbm_8xf32_sinh (const __m256 x) ///< __m256 vector.
 {
   const __m256 f = jbm_8xf32_expm1 (jbm_8xf32_abs (x));
   return
@@ -7605,12 +7605,12 @@ jbm_8xf32_sinh (const __m256 x) ///< __m256 number.
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (__m256).
  */
 static inline __m256
-jbm_8xf32_cosh (const __m256 x) ///< __m256 number.
+jbm_8xf32_cosh (const __m256 x) ///< __m256 vector.
 {
   __m256 f;
   f = jbm_8xf32_exp (x);
@@ -7619,12 +7619,12 @@ jbm_8xf32_cosh (const __m256 x) ///< __m256 number.
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (__m256).
  */
 static inline __m256
-jbm_8xf32_tanh (const __m256 x) ///< __m256 number.
+jbm_8xf32_tanh (const __m256 x) ///< __m256 vector.
 {
   const __m256 x2 = jbm_8xf32_dbl (x);
   __m256 f = jbm_8xf32_expm1 (x2);
@@ -7641,12 +7641,12 @@ jbm_8xf32_tanh (const __m256 x) ///< __m256 number.
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (__m256).
  */
 static inline __m256
-jbm_8xf32_asinh (const __m256 x)        ///< __m256 number.
+jbm_8xf32_asinh (const __m256 x)        ///< __m256 vector.
 {
   return
     jbm_8xf32_log (_mm256_add_ps
@@ -7656,12 +7656,12 @@ jbm_8xf32_asinh (const __m256 x)        ///< __m256 number.
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (__m256).
  */
 static inline __m256
-jbm_8xf32_acosh (const __m256 x)        ///< __m256 number.
+jbm_8xf32_acosh (const __m256 x)        ///< __m256 vector.
 {
   return
     jbm_8xf32_log (_mm256_add_ps
@@ -7671,12 +7671,12 @@ jbm_8xf32_acosh (const __m256 x)        ///< __m256 number.
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (__m256).
  */
 static inline __m256
-jbm_8xf32_atanh (const __m256 x)        ///< __m256 number.
+jbm_8xf32_atanh (const __m256 x)        ///< __m256 vector.
 {
   const __m256 u = _mm256_set1_ps (1.f);
   return _mm256_mul_ps (_mm256_set1_ps (0.5f),
@@ -7685,8 +7685,8 @@ jbm_8xf32_atanh (const __m256 x)        ///< __m256 number.
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (__m256)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (__m256).
  *
  * \return function value (__m256).
  */
@@ -7699,8 +7699,8 @@ jbm_8xf32_erfwc (const __m256 x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (__m256)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (__m256).
  *
  * \return function value (__m256).
  */
@@ -7721,7 +7721,7 @@ jbm_8xf32_erfcwc (const __m256 x)
 
 /**
  * Function to calculate the function erf(x) using jbm_8xf32_erfwc and
- * jbm_8xf32_erfcwc.
+ * jbm_8xf32_erfcwc (__m256).
  *
  * \return function value (__m256).
  */
@@ -7739,7 +7739,7 @@ jbm_8xf32_erf (const __m256 x)  ///< __m256 vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_8xf32_erfwc and
- * jbm_8xf32_erfcwc.
+ * jbm_8xf32_erfcwc (__m256).
  *
  * \return function value (__m256).
  */
@@ -7820,7 +7820,7 @@ jbm_8xf32_solve_quadratic (const __m256 a,
  * \return __m256 vector of solution values.
  */
 static inline __m256
-jbm_solve_cubic_reduced_8xf32 (const __m256 a,
+jbm_8xf32_solve_cubic_reduced (const __m256 a,
                                ///< 2nd order coefficient of the equation.
                                const __m256 b,
                                ///< 1st order coefficient of the equation.
@@ -7831,35 +7831,37 @@ jbm_solve_cubic_reduced_8xf32 (const __m256 a,
                                const __m256 x2)
                                ///< right limit of the solution interval.
 {
-  __m256 a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2, c_3;
+  __m256 a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
   c2p_3 = _mm256_set1_ps (2.f * M_PIf / 3.f);
-  c_2 = _mm256_set1_ps (0.5f);
   c_3 = _mm256_set1_ps (1.f / 3.f);
   a3 = _mm256_mul_ps (a, c_3);
   k0 = _mm256_mul_ps (a3, a3);
   k1 = _mm256_fmsub_ps (b, c_3, k0);
-  k0 =
-    _mm256_fmsub_ps (_mm256_fmsub_ps (b, a3, c), c_2, _mm256_mul_ps (a3, k0));
-  k3 = _mm256_mul_ps (k1, _mm256_mul_ps (k1, k1));
-  k2 = _mm256_fmadd_ps (k0, k0, k3);
+  k0 = _mm256_fmsub_ps (_mm256_fmsub_ps (b, a3, c), _mm256_set1_ps (0.5f),
+                        _mm256_mul_ps (a3, k0));
+  k2 = _mm256_fmadd_ps (k0, k0, _mm256_mul_ps (k1, _mm256_mul_ps (k1, k1)));
   l1 = _mm256_sqrt_ps (jbm_8xf32_opposite (k1));
-  l0 = _mm256_mul_ps (jbm_8xf32_acos (_mm256_div_ps (k0, k3)), c_3);
+  l0 = _mm256_mul_ps
+       (jbm_8xf32_acos (_mm256_div_ps (k0,
+                                       _mm256_mul_ps (l1,
+                                                      _mm256_mul_ps (l1, l1)))),
+        c_3);
   l1 = _mm256_add_ps (l1, l1);
-  l2 = _mm256_fmsub_ps (l1, jbm_8xf32_cos (k0), a3);
+  l2 = _mm256_fmsub_ps (l1, jbm_8xf32_cos (l0), a3);
   l3 = _mm256_fmsub_ps (l1, jbm_8xf32_cos (_mm256_add_ps (l0, c2p_3)), a3);
   l3 = _mm256_blendv_ps (l3, l2,
                          _mm256_or_ps (_mm256_cmp_ps (l2, x1, _CMP_LT_OS),
                                        _mm256_cmp_ps (l2, x2, _CMP_GT_OS)));
-  l4 = _mm256_fmsub_ps (l1, jbm_8xf32_cos (_mm256_sub_ps (l0, c2p_3)), a);
+  l4 = _mm256_fmsub_ps (l1, jbm_8xf32_cos (_mm256_sub_ps (l0, c2p_3)), a3);
   l4 = _mm256_blendv_ps (l4, l3,
                          _mm256_or_ps (_mm256_cmp_ps (l3, x1, _CMP_LT_OS),
                                        _mm256_cmp_ps (l3, x2, _CMP_GT_OS)));
   k1 = _mm256_sqrt_ps (k2);
-  l5 = _mm256_add_ps (k0, k1);
-  l5 = jbm_8xf32_cbrt (k2);
-  k0 = _mm256_sub_ps (k0, k1);
-  l5 = _mm256_add_ps (l5, _mm256_sub_ps (jbm_8xf32_cbrt (k0), a3));
-  return _mm256_blendv_ps (l4, l5,
+  l5 = jbm_8xf32_cbrt (_mm256_add_ps (k0, k1));
+  l5 = _mm256_add_ps (l5,
+                      _mm256_sub_ps (jbm_8xf32_cbrt (_mm256_sub_ps (k0, k1)),
+                                     a3));
+  return _mm256_blendv_ps (l5, l4,
                            _mm256_cmp_ps (k2, _mm256_setzero_ps (),
                                           _CMP_LT_OS));
 }
@@ -7886,7 +7888,7 @@ jbm_8xf32_solve_cubic (const __m256 a,
 ///< __m256 vector of right limits of the solution intervals.
 {
   return
-    _mm256_blendv_ps (jbm_solve_cubic_reduced_8xf32 (_mm256_div_ps (b, a),
+    _mm256_blendv_ps (jbm_8xf32_solve_cubic_reduced (_mm256_div_ps (b, a),
                                                      _mm256_div_ps (c, a),
                                                      _mm256_div_ps (d, a), x1,
                                                      x2),
@@ -8198,12 +8200,11 @@ jbm_8xf32_integral (__m256 (*f) (__m256),
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = _mm256_set1_ps (JBM_INTEGRAL_GAUSS_B_F32[i]);
-      k2 = _mm256_mul_ps (k2, dx);
+      k2 = _mm256_mul_ps (_mm256_set1_ps (JBM_INTEGRAL_GAUSS_B_F32[i]), dx);
       f1 = f (_mm256_sub_ps (x, k2));
       f2 = f (_mm256_add_ps (x, k2));
-      h = _mm256_set1_ps (JBM_INTEGRAL_GAUSS_A_F32[i]);
-      k = _mm256_fmadd_ps (h, _mm256_add_ps (f1, f2), k);
+      k = _mm256_fmadd_ps (_mm256_set1_ps (JBM_INTEGRAL_GAUSS_A_F32[i]),
+                           _mm256_add_ps (f1, f2), k);
     }
 #endif
   return _mm256_mul_ps (k, dx);
@@ -8529,7 +8530,7 @@ jbm_4xf64_modmin (const __m256d a,      ///< 1st __m256d vector.
 }
 
 /**
- * Function to interchange 2 __m256d numbers.
+ * Function to interchange 2 __m256d vectors.
  */
 static inline void
 jbm_change_4xf64 (__m256d *restrict a,  ///< 1st __m256d vector pointer.
@@ -15121,7 +15122,7 @@ jbm_4xf64_rational_29_28 (const __m256d x,      ///< __m256d vector.
 }
 
 /**
- * Function to calculate the well conditionated function cbrt(x) for x
+ * Function to calculate the well-conditioned function cbrt(x) for x
  * \f$\in\left[\frac12\;,1\right]\f$ (__m256d).
  *
  * \return function value (__m256d).
@@ -15181,7 +15182,7 @@ jbm_4xf64_cbrt (const __m256d x)        ///< __m256d vector.
 }
 
 /**
- * Function to calculate the well conditionated function expm1(x) for x in
+ * Function to calculate the well-conditioned function expm1(x) for x in
  * [-log(2)/2,log(2)/2] (__m256d).
  *
  * \return function value (__m256d).
@@ -15194,7 +15195,7 @@ jbm_4xf64_expm1wc (const __m256d x)
 }
 
 /**
- * Function to calculate the well conditionated function exp2(x) for x in
+ * Function to calculate the well-conditioned function exp2(x) for x in
  * \f$\in\left[\frac12\;,1\right]\f$ (__m256d).
  *
  * \return function value.
@@ -15265,7 +15266,7 @@ jbm_4xf64_expm1 (const __m256d x)       ///< __m256d vector.
 }
 
 /**
- * Function to calculate the well conditionated function log2(1+x) for x in
+ * Function to calculate the well-conditioned function log2(1+x) for x in
  * \f$[\sqrt{0.5}-1,\sqrt{2}-1]\f$ (__m256d).
  *
  * \return function value (__m256d).
@@ -15363,7 +15364,7 @@ jbm_4xf64_pow (const __m256d x, ///< __m256d vector.
 }
 
 /**
- * Function to calculate the well conditionated function sin(x) for x in
+ * Function to calculate the well-conditioned function sin(x) for x in
  * [-pi/4,pi/4] (__m256d)
  *
  * \return function value (__m256d).
@@ -15377,7 +15378,7 @@ jbm_4xf64_sinwc (const __m256d x)
 }
 
 /**
- * Function to calculate the well conditionated function cos(x) for x in
+ * Function to calculate the well-conditioned function cos(x) for x in
  * [-pi/4,pi/4] (__m256d).
  *
  * \return function value (__m256d).
@@ -15390,7 +15391,7 @@ jbm_4xf64_coswc (const __m256d x)
 }
 
 /**
- * Function to calculate the well conditionated function tann(x) for x in
+ * Function to calculate the well-conditioned function tann(x) for x in
  * [-pi/4,pi/4] (__m256d)
  *
  * \return function value (__m256d).
@@ -15404,7 +15405,7 @@ jbm_4xf64_tanwc (const __m256d x)
 }
 
 /**
- * Function to calculate the well conditionated functions sin(x) and cos(x) for
+ * Function to calculate the well-conditioned functions sin(x) and cos(x) for
  * x in [-pi/4,pi/4] from jbm_4xf64_sinwc approximation (__m256d).
  */
 static inline void
@@ -15532,7 +15533,7 @@ jbm_4xf64_tan (const __m256d x) ///< __m256d vector.
 }
 
 /**
- * Function to calculate the well conditionated function atan(x) for x in [-1,1]
+ * Function to calculate the well-conditioned function atan(x) for x in [-1,1]
  * (__m256d).
  *
  * \return function value (__m256d).
@@ -15592,7 +15593,7 @@ jbm_4xf64_atan2 (const __m256d y,       ///< __m256d y component.
  * \return function value (__m256d in [-pi/2,pi/2]).
  */
 static inline __m256d
-jbm_4xf64_asin (const __m256d x)        ///< __m256d number.
+jbm_4xf64_asin (const __m256d x)        ///< __m256d vector.
 {
   return
     jbm_4xf64_atan (_mm256_div_pd
@@ -15608,7 +15609,7 @@ jbm_4xf64_asin (const __m256d x)        ///< __m256d number.
  * \return function value (__m256d in [0,pi]).
  */
 static inline __m256d
-jbm_4xf64_acos (const __m256d x)        ///< __m256d number.
+jbm_4xf64_acos (const __m256d x)        ///< __m256d vector.
 {
   const __m256d k1 = _mm256_set1_pd (1.);
   return
@@ -15618,12 +15619,12 @@ jbm_4xf64_acos (const __m256d x)        ///< __m256d number.
 }
 
 /**
- * Function to calculate the function sinh(x)
+ * Function to calculate the function sinh(x).
  *
  * \return function value (__m256d).
  */
 static inline __m256d
-jbm_4xf64_sinh (const __m256d x)        ///< __m256d number.
+jbm_4xf64_sinh (const __m256d x)        ///< __m256d vector.
 {
   const __m256d f = jbm_4xf64_expm1 (jbm_4xf64_abs (x));
   return
@@ -15637,12 +15638,12 @@ jbm_4xf64_sinh (const __m256d x)        ///< __m256d number.
 }
 
 /**
- * Function to calculate the function cosh(x)
+ * Function to calculate the function cosh(x).
  *
  * \return function value (__m256d).
  */
 static inline __m256d
-jbm_4xf64_cosh (const __m256d x)        ///< __m256d number.
+jbm_4xf64_cosh (const __m256d x)        ///< __m256d vector.
 {
   __m256d f;
   f = jbm_4xf64_exp (x);
@@ -15651,12 +15652,12 @@ jbm_4xf64_cosh (const __m256d x)        ///< __m256d number.
 }
 
 /**
- * Function to calculate the function tanh(x)
+ * Function to calculate the function tanh(x).
  *
  * \return function value (__m256d).
  */
 static inline __m256d
-jbm_4xf64_tanh (const __m256d x)        ///< __m256d number.
+jbm_4xf64_tanh (const __m256d x)        ///< __m256d vector.
 {
   const __m256d x2 = jbm_4xf64_dbl (x);
   __m256d f = jbm_4xf64_expm1 (x2);
@@ -15673,12 +15674,12 @@ jbm_4xf64_tanh (const __m256d x)        ///< __m256d number.
 }
 
 /**
- * Function to calculate the function asinh(x)
+ * Function to calculate the function asinh(x).
  *
  * \return function value (__m256d).
  */
 static inline __m256d
-jbm_4xf64_asinh (const __m256d x)       ///< __m256d number.
+jbm_4xf64_asinh (const __m256d x)       ///< __m256d vector.
 {
   return
     jbm_4xf64_log (_mm256_add_pd
@@ -15688,12 +15689,12 @@ jbm_4xf64_asinh (const __m256d x)       ///< __m256d number.
 }
 
 /**
- * Function to calculate the function acosh(x)
+ * Function to calculate the function acosh(x).
  *
  * \return function value (__m256d).
  */
 static inline __m256d
-jbm_4xf64_acosh (const __m256d x)       ///< __m256d number.
+jbm_4xf64_acosh (const __m256d x)       ///< __m256d vector.
 {
   return
     jbm_4xf64_log (_mm256_add_pd
@@ -15703,12 +15704,12 @@ jbm_4xf64_acosh (const __m256d x)       ///< __m256d number.
 }
 
 /**
- * Function to calculate the function atanh(x)
+ * Function to calculate the function atanh(x).
  *
  * \return function value (__m256d).
  */
 static inline __m256d
-jbm_4xf64_atanh (const __m256d x)       ///< __m256d number.
+jbm_4xf64_atanh (const __m256d x)       ///< __m256d vector.
 {
   __m256d u;
   u = _mm256_set1_pd (1.);
@@ -15718,8 +15719,8 @@ jbm_4xf64_atanh (const __m256d x)       ///< __m256d number.
 }
 
 /**
- * Function to calculate the well conditionated function erf(x) for x in
- * [-1,1] (__m256d)
+ * Function to calculate the well-conditioned function erf(x) for x in
+ * [-1,1] (__m256d).
  *
  * \return function value (__m256d).
  */
@@ -15732,8 +15733,8 @@ jbm_4xf64_erfwc (const __m256d x)
 }
 
 /**
- * Function to calculate the well conditionated function erfc(x) for
- * \f$x\in[1,\infty]\f$ (__m256d)
+ * Function to calculate the well-conditioned function erfc(x) for
+ * \f$x\in[1,\infty]\f$ (__m256d).
  *
  * \return function value (__m256d).
  */
@@ -15754,7 +15755,7 @@ jbm_4xf64_erfcwc (const __m256d x)
 
 /**
  * Function to calculate the function erf(x) using jbm_4xf64_erfwc and
- * jbm_4xf64_erfcwc.
+ * jbm_4xf64_erfcwc (__m256d).
  *
  * \return function value (__m256d).
  */
@@ -15772,7 +15773,7 @@ jbm_4xf64_erf (const __m256d x) ///< __m256d vector.
 
 /**
  * Function to calculate the function erfc(x) using jbm_4xf64_erfwc and
- * jbm_4xf64_erfcwc.
+ * jbm_4xf64_erfcwc (__m256).
  *
  * \return function value (__m256d).
  */
@@ -15852,48 +15853,48 @@ jbm_4xf64_solve_quadratic (const __m256d a,
  * \return __m256d vector of solution values.
  */
 static inline __m256d
-jbm_solve_cubic_reduced_4xf64 (const __m256d a,
-                               ///< 2nd order coefficient of the equation.
+jbm_4xf64_solve_cubic_reduced (const __m256d a,
+///< __m256d vector of 2nd order coefficient of the equations.
                                const __m256d b,
-                               ///< 1st order coefficient of the equation.
+///< __m256d vector of 1st order coefficient of the equations.
                                const __m256d c,
-                               ///< 0th order coefficient of the equation.
+///< __m256d vector of 0th order coefficient of the equations.
                                const __m256d x1,
-                               ///< left limit of the solution interval.
+///< __m256d vector of left limits of the solution intervals.
                                const __m256d x2)
-    ///< right limit of the solution interval.
+///< __m256d vector of right limits of the solution intervals.
 {
-  __m256d a3, k0, k1, k2, k3, l0, l1, l2, l3, l4, l5, c2p_3, c_2, c_3;
-  c2p_3 = _mm256_set1_pd (2. * M_PI / 3.);
-  c_2 = _mm256_set1_pd (0.5);
-  c_3 = _mm256_set1_pd (1. / 3.);
-  a3 = _mm256_mul_pd (a, c_3);
-  k0 = _mm256_mul_pd (a3, a3);
-  k1 = _mm256_fmsub_pd (b, c_3, k0);
-  k0 =
-    _mm256_fmsub_pd (_mm256_fmsub_pd (b, a3, c), c_2, _mm256_mul_pd (a3, k0));
-  k3 = _mm256_mul_pd (k1, _mm256_mul_pd (k1, k1));
-  k2 = _mm256_fmadd_pd (k0, k0, k3);
-  l1 = _mm256_sqrt_pd (jbm_4xf64_opposite (k1));
-  l0 = _mm256_mul_pd (jbm_4xf64_acos (_mm256_div_pd (k0, k3)), c_3);
-  l1 = _mm256_add_pd (l1, l1);
-  l2 = _mm256_fmsub_pd (l1, jbm_4xf64_cos (k0), a3);
-  l3 = _mm256_fmsub_pd (l1, jbm_4xf64_cos (_mm256_add_pd (l0, c2p_3)), a3);
-  l3 = _mm256_blendv_pd (l3, l2,
-                         _mm256_or_pd (_mm256_cmp_pd (l2, x1, _CMP_LT_OS),
-                                       _mm256_cmp_pd (l2, x2, _CMP_GT_OS)));
-  l4 = _mm256_fmsub_pd (l1, jbm_4xf64_cos (_mm256_sub_pd (l0, c2p_3)), a);
-  l4 = _mm256_blendv_pd (l4, l3,
-                         _mm256_or_pd (_mm256_cmp_pd (l3, x1, _CMP_LT_OS),
-                                       _mm256_cmp_pd (l3, x2, _CMP_GT_OS)));
-  k1 = _mm256_sqrt_pd (k2);
-  l5 = _mm256_add_pd (k0, k1);
-  l5 = jbm_4xf64_cbrt (k2);
-  k0 = _mm256_sub_pd (k0, k1);
-  l5 = _mm256_add_pd (l5, _mm256_sub_pd (jbm_4xf64_cbrt (k0), a3));
-  return _mm256_blendv_pd (l4, l5,
-                           _mm256_cmp_pd (k2, _mm256_setzero_pd (),
-                                          _CMP_LT_OS));
+  c2p_3 = _mm512_set1_pd (2. * M_PI / 3.);
+  c_3 = _mm512_set1_pd (1. / 3.);
+  a3 = _mm512_mul_pd (a, c_3);
+  k0 = _mm512_mul_pd (a3, a3);
+  k1 = _mm512_fmsub_pd (b, c_3, k0);
+  k0 = _mm512_fmsub_pd (_mm512_fmsub_pd (b, a3, c), _mm512_set1_pd (0.5),
+                        _mm512_mul_pd (a3, k0));
+  k2 = _mm512_fmadd_pd (k0, k0, _mm512_mul_pd (k1, _mm512_mul_pd (k1, k1)));
+
+  l1 = _mm512_sqrt_pd (jbm_8xf64_opposite (k1));
+  l0 = _mm512_mul_pd
+       (jbm_8xf64_acos (_mm512_div_pd (k0,
+                                       _mm512_mul_pd (l1,
+                                                      _mm512_mul_pd (l1, l1)))),
+        c_3);
+  l1 = _mm512_add_pd (l1, l1);
+  l2 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (l0), a3);
+  l3 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (_mm512_add_pd (l0, c2p_3)), a3);
+  l3 = _mm512_mask_mov_pd (l3, _mm512_cmp_pd_mask (l2, x1, _CMP_LT_OS)
+                           | _mm512_cmp_pd_mask (l2, x2, _CMP_GT_OS), l2);
+  l4 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (_mm512_sub_pd (l0, c2p_3)), a3);
+  l4 = _mm512_mask_mov_pd (l4, _mm512_cmp_pd_mask (l3, x1, _CMP_LT_OS)
+                           | _mm512_cmp_pd_mask (l3, x2, _CMP_GT_OS), l3);
+
+  k1 = _mm512_sqrt_pd (k2);
+  l5 = jbm_8xf64_cbrt (_mm512_add_pd (k0, k1));
+  l5 = _mm512_add_pd (l5,
+                      _mm512_sub_pd (jbm_8xf64_cbrt (_mm512_sub_pd (k0, k1)),
+                                     a3));
+  return _mm512_mask_mov_pd (l5, _mm512_cmp_pd_mask (k2, _mm512_setzero_pd (),
+                                                     _CMP_LT_OS), l4);
 }
 
 /**
@@ -15918,7 +15919,7 @@ jbm_4xf64_solve_cubic (const __m256d a,
 ///< __m256d vector of right limits of the solution intervals.
 {
   return
-    _mm256_blendv_pd (jbm_solve_cubic_reduced_4xf64 (_mm256_div_pd (b, a),
+    _mm256_blendv_pd (jbm_4xf64_solve_cubic_reduced (_mm256_div_pd (b, a),
                                                      _mm256_div_pd (c, a),
                                                      _mm256_div_pd (d, a), x1,
                                                      x2),
@@ -16227,12 +16228,11 @@ jbm_4xf64_integral (__m256d (*f) (__m256d),
 #if JBM_INTEGRAL_GAUSS_N > 1
   for (i = JBM_INTEGRAL_GAUSS_N; --i > 0;)
     {
-      k2 = _mm256_set1_pd (JBM_INTEGRAL_GAUSS_B_F64[i]);
-      k2 = _mm256_mul_pd (k2, dx);
+      k2 = _mm256_mul_pd (_mm256_set1_pd (JBM_INTEGRAL_GAUSS_B_F64[i]), dx);
       f1 = f (_mm256_sub_pd (x, k2));
       f2 = f (_mm256_add_pd (x, k2));
-      h = _mm256_set1_pd (JBM_INTEGRAL_GAUSS_A_F64[i]);
-      k = _mm256_fmadd_pd (h, _mm256_add_pd (f1, f2), k);
+      k = _mm256_fmadd_pd (_mm256_set1_pd (JBM_INTEGRAL_GAUSS_A_F64[i]),
+                           _mm256_add_pd (f1, f2), k);
     }
 #endif
   return _mm256_mul_pd (k, dx);
