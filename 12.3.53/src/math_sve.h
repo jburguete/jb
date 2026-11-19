@@ -843,29 +843,31 @@ jbm_nxf32_frexp (svbool_t pg,   ///< predicate.
   const svuint32_t yi = svand_n_u32_x (pg, ai, JBM_F32_BITS_EXPONENT);
   const svbool_t m_sub = svcmpeq_n_u32 (pg, yi, 0);
   // Scale subnormals
-  const svuint32_t zi
-    = svreinterpret_u32_f32 (svmul_n_f32_x (pg, x, 0x1p23f));
+  const svuint32_t zi = svreinterpret_u32_f32 (svmul_n_f32_x (pg, x, 0x1p23f));
   // Exponent
-  const svint32_t en
-    = svsub_n_s32_x (pg,
-                     svreinterpret_s32_u32 (svlsr_n_u32_x (pg, yi, 23)),
-                     JBM_F32_BIAS);
-  const svint32_t en_sub
-    = svsub_n_s32_x (pg,
-                     svreinterpret_s32_u32
-                     (svlsr_n_u32_x
-                      (pg, svand_n_u32_x (pg, zi, JBM_F32_BITS_EXPONENT), 23)),
-                     JBM_F32_BIAS + 23);
-  *e = svsel_s32 (m_special, svdup_n_s32 (0),
-                  svsel_s32 (m_sub, en_sub, en));
+  const svint32_t en = svsub_n_s32_x (pg,
+                                      svreinterpret_s32_u32 (svlsr_n_u32_x
+                                                             (pg, yi, 23)),
+                                      JBM_F32_BIAS);
+  const svint32_t en_sub = svsub_n_s32_x (pg,
+                                          svreinterpret_s32_u32
+                                          (svlsr_n_u32_x
+                                           (pg,
+                                            svand_n_u32_x (pg, zi,
+                                                           JBM_F32_BITS_EXPONENT),
+                                            23)),
+                                          JBM_F32_BIAS + 23);
+  *e = svsel_s32 (m_special, svdup_n_s32 (0), svsel_s32 (m_sub, en_sub, en));
   // Mantissa
-  const svuint32_t mant
-    = svorr_n_u32_x (pg,
-                     svorr_n_u32_x (pg,
-                                    svand_n_u32_x (pg, ai, JBM_F32_BITS_SIGN),
-                                    0x3f000000),
-                     svand_n_u32_x (pg, svsel_u32 (m_sub, zi, ai),
-                                    JBM_F32_BITS_MANTISSA));
+  const svuint32_t mant = svorr_n_u32_x (pg,
+                                         svorr_n_u32_x (pg,
+                                                        svand_n_u32_x (pg, ai,
+                                                                       JBM_F32_BITS_SIGN),
+                                                        0x3f000000),
+                                         svand_n_u32_x (pg,
+                                                        svsel_u32 (m_sub, zi,
+                                                                   ai),
+                                                        JBM_F32_BITS_MANTISSA));
   return svsel_f32 (m_special, x, svreinterpret_f32_u32 (mant));
 }
 
@@ -8519,8 +8521,8 @@ jbm_nxf32_expm1wc (svbool_t pg, ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_expm1 (svbool_t pg,                 ///< predicate.
-                 const svfloat32_t x)         ///< svfloat32_t vector.
+jbm_nxf32_expm1 (svbool_t pg,   ///< predicate.
+                 const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return
     svsel_f32 (svcmplt_n_f32 (pg, jbm_nxf32_abs (pg, x), M_LN2f / 2.f),
@@ -8854,10 +8856,10 @@ jbm_nxf32_atan2 (svbool_t pg,   ///< predicate.
   return
     svsel_f32 (svcmpne_n_u32 (pg,
                               svand_n_u32_x (pg, svreinterpret_u32_f32 (x),
-                              JBM_F32_BITS_SIGN), 0),
-                svadd_f32_x (pg, f,
-                             jbm_nxf32_copysign (pg, svdup_n_f32 (M_PIf), y)),
-                jbm_nxf32_atan (pg, svdiv_f32_x (pg, y, x)));
+                                             JBM_F32_BITS_SIGN), 0),
+               svadd_f32_x (pg, f,
+                            jbm_nxf32_copysign (pg, svdup_n_f32 (M_PIf), y)),
+               jbm_nxf32_atan (pg, svdiv_f32_x (pg, y, x)));
 }
 
 /**
@@ -8915,7 +8917,7 @@ jbm_nxf32_sinh (svbool_t pg,    ///< predicate.
                     svadd_f32_x (pg, f,
                                  svdiv_f32_x (pg, f,
                                               svadd_n_f32_x (pg, f, 1.f))),
-		    0.5f), x);
+                    0.5f), x);
 }
 
 /**
@@ -8983,8 +8985,8 @@ jbm_nxf32_acosh (svbool_t pg,   ///< predicate.
                                 svsqrt_f32_x (pg,
                                               svsub_n_f32_x (pg,
                                                              jbm_nxf32_sqr (pg,
-								            x),
-							     1.f))));
+                                                                            x),
+                                                             1.f))));
 }
 
 /**
@@ -9077,11 +9079,9 @@ jbm_nxf32_erfc (svbool_t pg,    ///< predicate.
   return
     svsel_f32 (svcmplt_f32 (pg, ax, u),
                svsub_f32_x (pg, u, jbm_nxf32_erfwc (pg, x)),);
-               svsub_f32_x (pg, u,
-                            svmul_f32_x (pg, svdiv_f32_x (pg, x, ax),
-                                         svsub_f32_x (pg, u,
-                                                      jbm_nxf32_erfcwc (pg,
-                                                                        ax))));
+  svsub_f32_x (pg, u,
+               svmul_f32_x (pg, svdiv_f32_x (pg, x, ax),
+                            svsub_f32_x (pg, u, jbm_nxf32_erfcwc (pg, ax))));
 }
 
 /**
@@ -9119,7 +9119,7 @@ jbm_nxf32_solve_quadratic_reduced (svbool_t pg, ///< predicate.
  * \return svfloat32_t vector of solution values.
  */
 static inline svfloat32_t
-jbm_nxf32_solve_quadratic (svbool_t pg,         ///< predicate.
+jbm_nxf32_solve_quadratic (svbool_t pg, ///< predicate.
                            svfloat32_t a,
 ///< svfloat32_t vector of 2nd order coefficient of the equations.
                            svfloat32_t b,
@@ -9166,17 +9166,16 @@ jbm_nxf32_solve_cubic_reduced (svbool_t pg,     ///< predicate.
   k0 = svsub_f32_x (pg,
                     svmul_n_f32_x (pg,
                                    svsub_f32_x (pg, svmul_f32_x (pg, b, a3), c),
-                                   0.5f),
-                    svmul_f32_x (pg, a3, k0));
+                                   0.5f), svmul_f32_x (pg, a3, k0));
   k2 = svmla_f32_x (pg, svmul_f32_x (pg, k1, jbm_nxf32_sqr (pg, k1)), k0, k0);
   l1 = svsqrt_f32_x (pg, jbm_nxf32_opposite (pg, k1));
   l0 = svmul_n_f32_x
-       (pg,
-        jbm_nxf32_acos (pg,
-                        svdiv_f32_x (pg, k0,
-                                     svmul_f32_x (pg, l1,
-                                                  jbm_nxf32_sqr (pg, l1)))),
-        1.f / 3.f);
+    (pg,
+     jbm_nxf32_acos (pg,
+                     svdiv_f32_x (pg, k0,
+                                  svmul_f32_x (pg, l1,
+                                               jbm_nxf32_sqr (pg, l1)))),
+     1.f / 3.f);
   l1 = jbm_nxf32_dbl (pg, l1);
   l2 = svsub_f32_x (pg, svmul_f32_x (pg, l1, jbm_nxf32_cos (pg, l0)), a3);
   l3 =
@@ -9184,8 +9183,7 @@ jbm_nxf32_solve_cubic_reduced (svbool_t pg,     ///< predicate.
     (pg,
      svmul_f32_x (pg, l1,
                   jbm_nxf32_cos (pg, svadd_n_f32_x (pg, l0,
-                                                    2.f * M_PIf / 3.f))),
-     a3);
+                                                    2.f * M_PIf / 3.f))), a3);
   l3 = svsel_f32 (svorr_b_z (pg, svcmplt_f32 (pg, l2, x1),
                              svcmpgt_f32 (pg, l2, x2)), l2, l3);
   l4 =
@@ -9193,8 +9191,7 @@ jbm_nxf32_solve_cubic_reduced (svbool_t pg,     ///< predicate.
     (pg,
      svmul_f32_x (pg, l1,
                   jbm_nxf32_cos (pg, svsub_n_f32_x (pg, l0,
-                                                    2.f * M_PIf / 3.f))),
-     a3);
+                                                    2.f * M_PIf / 3.f))), a3);
   l4 = svsel_f32 (svorr_b_z (pg, svcmplt_f32 (pg, l3, x1),
                              svcmpgt_f32 (pg, l3, x2)), l3, l4);
   k1 = svsqrt_f32_x (pg, k2);
@@ -9248,7 +9245,7 @@ jbm_nxf32_flux_limiter_total (svbool_t pg,      ///< predicate.
                               const svfloat32_t d1 __attribute__((unused)),
                               ///< 1st flux limiter function parameter.
                               const svfloat32_t d2 __attribute__((unused)))
-                              ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return svdup_n_f32 (0.f);
 }
@@ -9264,7 +9261,7 @@ jbm_nxf32_flux_limiter_null (svbool_t pg,       ///< predicate.
                              const svfloat32_t d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
                              const svfloat32_t d2 __attribute__((unused)))
-                             ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return svdup_n_f32 (1.f);
 }
@@ -9678,29 +9675,32 @@ jbm_nxf64_frexp (svbool_t pg,   ///< predicate.
   const svuint64_t yi = svand_n_u64_x (pg, ai, JBM_F64_BITS_EXPONENT);
   const svbool_t m_sub = svcmpeq_n_u64 (pg, yi, 0);
   // Scale subnormals
-  const svuint64_t zi
-    = svreinterpret_u64_f64 (svmul_n_f64_x (pg, x, 0x1p52));
+  const svuint64_t zi = svreinterpret_u64_f64 (svmul_n_f64_x (pg, x, 0x1p52));
   // Exponent
-  const svint64_t en
-    = svsub_n_s64_x (pg,
-                     svreinterpret_s64_u64 (svlsr_n_u64_x (pg, yi, 52)),
-                     JBM_F64_BIAS);
-  const svint64_t en_sub
-    = svsub_n_s64_x (pg,
-                     svreinterpret_s64_u64
-                     (svlsr_n_u64_x
-                      (pg, svand_n_u64_x (pg, zi, JBM_F64_BITS_EXPONENT), 52)),
-                     JBM_F64_BIAS + 52);
-  *e = svsel_s64 (m_special, svdup_n_s64 (0),
-                  svsel_s64 (m_sub, en_sub, en));
+  const svint64_t en = svsub_n_s64_x (pg,
+                                      svreinterpret_s64_u64 (svlsr_n_u64_x
+                                                             (pg, yi, 52)),
+                                      JBM_F64_BIAS);
+  const svint64_t en_sub = svsub_n_s64_x (pg,
+                                          svreinterpret_s64_u64
+                                          (svlsr_n_u64_x
+                                           (pg,
+                                            svand_n_u64_x (pg, zi,
+                                                           JBM_F64_BITS_EXPONENT),
+                                            52)),
+                                          JBM_F64_BIAS + 52);
+  *e = svsel_s64 (m_special, svdup_n_s64 (0), svsel_s64 (m_sub, en_sub, en));
   // Mantissa
-  const svuint64_t mant
-    = svorr_n_u64_x (pg,
-                     svorr_n_u64_x
-                     (pg, svand_n_u64_x (pg, ai, JBM_F64_BITS_SIGN),
-                      0x3fe0000000000000ull),
-                     svand_n_u64_x (pg, svsel_u64 (m_sub, zi, ai),
-                                    JBM_F64_BITS_MANTISSA));
+  const svuint64_t mant = svorr_n_u64_x (pg,
+                                         svorr_n_u64_x
+                                         (pg,
+                                          svand_n_u64_x (pg, ai,
+                                                         JBM_F64_BITS_SIGN),
+                                          0x3fe0000000000000ull),
+                                         svand_n_u64_x (pg,
+                                                        svsel_u64 (m_sub, zi,
+                                                                   ai),
+                                                        JBM_F64_BITS_MANTISSA));
   return svsel_f64 (m_special, x, svreinterpret_f64_u64 (mant));
 }
 
@@ -9770,10 +9770,10 @@ jbm_nxf64_modmin (svbool_t pg,  ///< predicate.
                   const svfloat64_t b)  ///< 2nd svfloat64_t vector.
 {
   const svbool_t z = svcmple_n_f64 (pg, svmul_f64_x (pg, a, b), 0.);
-  const svbool_t m
-    = svbic_b_z (pg,
-                 svcmplt_f64 (pg, svabs_f64_x (pg, a), svabs_f64_x (pg, b)),
-                 z);
+  const svbool_t m = svbic_b_z (pg,
+                                svcmplt_f64 (pg, svabs_f64_x (pg, a),
+                                             svabs_f64_x (pg, b)),
+                                z);
   return svsel_f64 (z, svdup_n_f64 (0.), svsel_f64 (m, a, b));
 }
 
@@ -9881,13 +9881,11 @@ jbm_nxf64_v3_length (svbool_t pg,       ///< predicate.
                      const svfloat64_t y2,      ///< y-coord. of 2nd points.
                      const svfloat64_t z2)      ///< z-coord. of 2nd points.
 {
-  const svfloat64_t dx2
-    = jbm_nxf64_sqr (pg, svsub_f64_x (pg, x2, x1));
+  const svfloat64_t dx2 = jbm_nxf64_sqr (pg, svsub_f64_x (pg, x2, x1));
   const svfloat64_t dy = svsub_f64_x (pg, y2, y1);
   const svfloat64_t dz = svsub_f64_x (pg, z2, z1);
   return svsqrt_f64_x (pg,
-                       svmla_f64_x (pg, svmla_f64_x (pg, dx2, dy, dy),
-                                    dz, dz));
+                       svmla_f64_x (pg, svmla_f64_x (pg, dx2, dy, dy), dz, dz));
 }
 
 /**
@@ -17350,8 +17348,7 @@ jbm_nxf64_expm1 (svbool_t pg,   ///< predicate.
 {
   const svbool_t m_small
     = svcmplt_n_f64 (pg, jbm_nxf64_abs (pg, x), M_LN2 / 2.);
-  const svfloat64_t f_large
-    = svsub_n_f64_x (pg, jbm_nxf64_exp (pg, x), 1.);
+  const svfloat64_t f_large = svsub_n_f64_x (pg, jbm_nxf64_exp (pg, x), 1.);
   return svsel_f64 (m_small, jbm_nxf64_expm1wc (pg, x), f_large);
 }
 
@@ -17687,14 +17684,14 @@ jbm_nxf64_atan2 (svbool_t pg,   ///< predicate.
                  const svfloat64_t x)   ///< svfloat64_t x component.
 {
   const svfloat64_t f = jbm_nxf64_atan (pg, svdiv_f64_x (pg, y, x));
-  const svfloat64_t g
-    = svadd_f64_x (pg, f,
-                   jbm_nxf64_copysign (pg, svdup_n_f64 (M_PI), y));
-  const svbool_t m
-    = svcmpne_n_u64 (pg,
-                     svand_n_u64_x (pg, svreinterpret_u64_f64 (x),
-                                    JBM_F64_BITS_SIGN),
-                     0);
+  const svfloat64_t g = svadd_f64_x (pg, f,
+                                     jbm_nxf64_copysign (pg, svdup_n_f64 (M_PI),
+                                                         y));
+  const svbool_t m = svcmpne_n_u64 (pg,
+                                    svand_n_u64_x (pg,
+                                                   svreinterpret_u64_f64 (x),
+                                                   JBM_F64_BITS_SIGN),
+                                    0);
   return svsel_f64 (m, g, f);
 }
 
@@ -17708,9 +17705,9 @@ static inline svfloat64_t
 jbm_nxf64_asin (svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
-  const svfloat64_t t
-    = svsqrt_f64_x (pg, svsub_n_f64_x (pg, svdup_n_f64 (1.),
-                                       jbm_nxf64_sqr (pg, x)));
+  const svfloat64_t t = svsqrt_f64_x (pg, svsub_n_f64_x (pg, svdup_n_f64 (1.),
+                                                         jbm_nxf64_sqr (pg,
+                                                                        x)));
   return jbm_nxf64_atan (pg, svdiv_f64_x (pg, x, t));
 }
 
@@ -17725,10 +17722,9 @@ jbm_nxf64_acos (svbool_t pg,    ///< predicate.
                 const svfloat64_t x)    ///< svfloat64_t vector.
 {
   const svfloat64_t k1 = svdup_n_f64 (1.);
-  const svfloat64_t t
-    = svsqrt_f64_x (pg,
-                    svdiv_f64_x (pg, svsub_f64_x (pg, k1, x),
-                                 svadd_f64_x (pg, k1, x)));
+  const svfloat64_t t = svsqrt_f64_x (pg,
+                                      svdiv_f64_x (pg, svsub_f64_x (pg, k1, x),
+                                                   svadd_f64_x (pg, k1, x)));
   return jbm_nxf64_dbl (pg, jbm_nxf64_atan (pg, t));
 }
 
@@ -17827,7 +17823,7 @@ jbm_nxf64_atanh (svbool_t pg,   ///< predicate.
     (pg,
      jbm_nxf64_log (pg,
                     svdiv_f64_x (pg, svadd_f64_x (pg, u, x),
-                                     svsub_f64_x (pg, u, x))), 0.5);
+                                 svsub_f64_x (pg, u, x))), 0.5);
 }
 
 /**
@@ -17858,13 +17854,14 @@ jbm_nxf64_erfcwc (svbool_t pg,  ///< predicate.
                   ///< svfloat64_t vector \f$\in[1,\infty)\f$.
 {
   const svfloat64_t x2 = jbm_nxf64_sqr (pg, x);
-  const svfloat64_t f
-    = svmul_f64_x (pg,
-                   jbm_nxf64_rational_16_8 (pg, jbm_nxf64_reciprocal (pg, x),
-                                            K_ERFCWC_F64),
-                   svdiv_f64_x (pg, x, jbm_nxf64_exp (pg, x2)));
-  return svsel_f64 (svcmpgt_n_f64 (pg, x, K_ERFC_MAX_F64),
-                    svdup_n_f64 (0.), f);
+  const svfloat64_t f = svmul_f64_x (pg,
+                                     jbm_nxf64_rational_16_8 (pg,
+                                                              jbm_nxf64_reciprocal
+                                                              (pg, x),
+                                                              K_ERFCWC_F64),
+                                     svdiv_f64_x (pg, x,
+                                                  jbm_nxf64_exp (pg, x2)));
+  return svsel_f64 (svcmpgt_n_f64 (pg, x, K_ERFC_MAX_F64), svdup_n_f64 (0.), f);
 }
 
 /**
@@ -17879,10 +17876,10 @@ jbm_nxf64_erf (svbool_t pg,     ///< predicate.
 {
   const svfloat64_t ax = jbm_nxf64_abs (pg, x);
   const svfloat64_t u = svdup_n_f64 (1.);
-  const svfloat64_t f
-    = svmul_f64_x (pg,
-                   svdiv_f64_x (pg, x, ax),
-                   svsub_f64_x (pg, u, jbm_nxf64_erfcwc (pg, ax)));
+  const svfloat64_t f = svmul_f64_x (pg,
+                                     svdiv_f64_x (pg, x, ax),
+                                     svsub_f64_x (pg, u,
+                                                  jbm_nxf64_erfcwc (pg, ax)));
   return svsel_f64 (svcmplt_f64 (pg, ax, u), jbm_nxf64_erfwc (pg, x), f);
 }
 
@@ -17898,12 +17895,12 @@ jbm_nxf64_erfc (svbool_t pg,    ///< predicate.
 {
   const svfloat64_t ax = jbm_nxf64_abs (pg, x);
   const svfloat64_t u = svdup_n_f64 (1.);
-  const svfloat64_t f
-    = svsub_f64_x (pg, u,
-                   svmul_f64_x (pg,
-                                svdiv_f64_x (pg, x, ax),
-                                svsub_f64_x (pg, u,
-                                             jbm_nxf64_erfcwc (pg, ax))));
+  const svfloat64_t f = svsub_f64_x (pg, u,
+                                     svmul_f64_x (pg,
+                                                  svdiv_f64_x (pg, x, ax),
+                                                  svsub_f64_x (pg, u,
+                                                               jbm_nxf64_erfcwc
+                                                               (pg, ax))));
   return svsel_f64 (svcmplt_f64 (pg, ax, u),
                     svsub_f64_x (pg, u, jbm_nxf64_erfwc (pg, x)), f);
 }
@@ -17943,7 +17940,7 @@ jbm_nxf64_solve_quadratic_reduced (svbool_t pg, ///< predicate.
  * \return svfloat64_t vector of solution values.
  */
 static inline svfloat64_t
-jbm_nxf64_solve_quadratic (svbool_t pg,         ///< predicate.
+jbm_nxf64_solve_quadratic (svbool_t pg, ///< predicate.
                            svfloat64_t a,
 ///< svfloat64_t vector of 2nd order coefficient of the equations.
                            svfloat64_t b,
@@ -17995,12 +17992,12 @@ jbm_nxf64_solve_cubic_reduced (svbool_t pg,     ///< predicate.
 
   l1 = svsqrt_f64_x (pg, jbm_nxf64_opposite (pg, k1));
   l0 = svmul_n_f64_x
-       (pg,
-        jbm_nxf64_acos (pg,
-                        svdiv_f64_x (pg, k0,
-                                     svmul_f64_x (pg, l1,
-                                                  jbm_nxf64_sqr (pg, l1)))),
-        1. / 3.);
+    (pg,
+     jbm_nxf64_acos (pg,
+                     svdiv_f64_x (pg, k0,
+                                  svmul_f64_x (pg, l1,
+                                               jbm_nxf64_sqr (pg, l1)))),
+     1. / 3.);
   l1 = jbm_nxf64_dbl (pg, l1);
   l2 = svsub_f64_x (pg, svmul_f64_x (pg, l1, jbm_nxf64_cos (pg, l0)), a3);
   l3 =
@@ -18071,7 +18068,7 @@ jbm_nxf64_flux_limiter_total (svbool_t pg,      ///< predicate.
                               const svfloat64_t d1 __attribute__((unused)),
                               ///< 1st flux limiter function parameter.
                               const svfloat64_t d2 __attribute__((unused)))
-                              ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return svdup_n_f64 (0.);
 }
@@ -18087,7 +18084,7 @@ jbm_nxf64_flux_limiter_null (svbool_t pg,       ///< predicate.
                              const svfloat64_t d1 __attribute__((unused)),
                              ///< 1st flux limiter function parameter.
                              const svfloat64_t d2 __attribute__((unused)))
-                             ///< 2nd flux limiter function parameter.
+  ///< 2nd flux limiter function parameter.
 {
   return svdup_n_f64 (1.);
 }
@@ -18277,8 +18274,7 @@ jbm_nxf64_flux_limiter_mean (svbool_t pg,       ///< predicate.
                              ///< 2nd flux limiter function parameter.
 {
   svfloat64_t r;
-  r = svmul_n_f64_x (pg,
-                     svadd_n_f64_x (pg, svdiv_f64_x (pg, d1, d2), 1.), 0.5);
+  r = svmul_n_f64_x (pg, svadd_n_f64_x (pg, svdiv_f64_x (pg, d1, d2), 1.), 0.5);
   return svsel_f64 (svcmpgt_n_f64 (pg, svmul_f64_x (pg, d1, d2), DBL_EPSILON),
                     svdup_n_f64 (0.), r);
 }

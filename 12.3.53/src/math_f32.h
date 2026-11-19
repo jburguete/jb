@@ -50,8 +50,6 @@
 #define K_ERFC_MAX_F32 9.1945494491346722541126284791161797e+00f
 ///< maximum value for the erfc function for floats.
 
-#endif
-
 /**
  * union to work with bits in float numbers.
  */

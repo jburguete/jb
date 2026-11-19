@@ -847,7 +847,7 @@ jbm_16xf32_frexp (const __m512 x,       ///< __m512 vector.
   const __m512i zero = _mm512_setzero_epi32 ();
   const __m512i mant_mask = JBM_16xF32_BITS_MANTISSA;
   JBM16xF32 y, z, s;
-  __m512i exp, exp_sub;
+  __m512i exp;
   __mmask16 is_sub, is_finite;
   y.x = jbm_16xf32_abs (x);
   is_finite
@@ -861,8 +861,7 @@ jbm_16xf32_frexp (const __m512 x,       ///< __m512 vector.
   exp = _mm512_mask_mov_epi32 (exp, is_sub,
                                _mm512_sub_epi32 (_mm512_srli_epi32 (s.i, 23),
                                                  _mm512_set1_epi32 (23)));
-  *e = _mm512_mask_sub_epi32 (zero, is_finite, exp,
-                              _mm512_set1_epi32 (JBM_16xF32_BIAS));
+  *e = _mm512_mask_sub_epi32 (zero, is_finite, exp, JBM_16xF32_BIAS);
   // Mantissa
   z.x = x;
   s.i = _mm512_mask_mov_epi32 (y.i, is_sub, s.i);
@@ -8299,9 +8298,9 @@ jbm_16xf32_solve_cubic_reduced (const __m512 a,
                                 const __m512 x2)
 ///< __m512 vector of right limits of the solution intervals.
 {
-  __m512 a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
-  c2p_3 = _mm512_set1_ps (2.f * M_PIf / 3.f);
-  c_3 = _mm512_set1_ps (1.f / 3.f);
+  const __m512 c2p_3 = _mm512_set1_ps (2.f * M_PIf / 3.f);
+  const __m512 c_3 = _mm512_set1_ps (1.f / 3.f);
+  __m512 a3, k0, k1, k2, l0, l1, l2, l3, l4, l5;
   a3 = _mm512_mul_ps (a, c_3);
   k0 = _mm512_mul_ps (a3, a3);
   k1 = _mm512_fmsub_ps (b, c_3, k0);
@@ -8310,8 +8309,8 @@ jbm_16xf32_solve_cubic_reduced (const __m512 a,
   k2 = _mm512_fmadd_ps (k0, k0, _mm512_mul_ps (k1, _mm512_mul_ps (k1, k1)));
   l1 = _mm512_sqrt_ps (jbm_16xf32_opposite (k1));
   l0 = _mm512_mul_ps
-       (jbm_16xf32_acos
-	(_mm512_div_ps (k0, _mm512_mul_ps (l1, _mm512_mul_ps (l1, l1)))), c_3);
+    (jbm_16xf32_acos
+     (_mm512_div_ps (k0, _mm512_mul_ps (l1, _mm512_mul_ps (l1, l1)))), c_3);
   l1 = _mm512_add_ps (l1, l1);
   l2 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (l0), a3);
   l3 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (_mm512_add_ps (l0, c2p_3)), a3);
@@ -8319,6 +8318,7 @@ jbm_16xf32_solve_cubic_reduced (const __m512 a,
                            | _mm512_cmp_ps_mask (l2, x2, _CMP_GT_OS), l2);
   l4 = _mm512_fmsub_ps (l1, jbm_16xf32_cos (_mm512_sub_ps (l0, c2p_3)), a3);
   l4 = _mm512_mask_mov_ps (l4, _mm512_cmp_ps_mask (l3, x1, _CMP_LT_OS)
+                           | _mm512_cmp_ps_mask (l3, x2, _CMP_GT_OS), l3);
   k1 = _mm512_sqrt_ps (k2);
   l5 = jbm_16xf32_cbrt (_mm512_add_ps (k0, k1));
   l5 = _mm512_add_ps (l5,
@@ -8400,9 +8400,7 @@ jbm_16xf32_flux_limiter_centred (const __m512 d1,
                                  const __m512 d2)
                               ///< 2nd flux limiter function parameter.
 {
-  return _mm512_mask_blend_ps (jbm_16xf32_small (d2),
-                               _mm512_div_ps (d1, d2), _mm512_setzero_ps ());
-
+  return _mm512_maskz_div_ps (~jbm_16xf32_small (d2), d1, d2);
 }
 
 /**
@@ -8419,14 +8417,14 @@ jbm_16xf32_flux_limiter_superbee (const __m512 d1,
                                   const __m512 d2)
                                ///< 2nd flux limiter function parameter.
 {
-  __m512 r;
-  r = _mm512_div_ps (d1, d2);
-  r = _mm512_max_ps (_mm512_min_ps (jbm_16xf32_dbl (r), _mm512_set1_ps (1.f)),
-                     _mm512_min_ps (r, _mm512_set1_ps (2.f)));
-  return _mm512_mask_mov_ps (_mm512_setzero_ps (),
-                             _mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
-                                                 _mm512_set1_ps (FLT_EPSILON),
-                                                 _CMP_GT_OS), r);
+  const __m512 r = _mm512_div_ps (d1, d2);
+  return
+    _mm512_maskz_max_ps (_mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
+                                             _mm512_set1_ps (FLT_EPSILON),
+                                             _CMP_GT_OS),
+                         _mm512_min_ps (jbm_16xf32_dbl (r),
+                                        _mm512_set1_ps (1.f)),
+                         _mm512_min_ps (r, _mm512_set1_ps (2.f)));
 }
 
 /**
@@ -8442,12 +8440,11 @@ jbm_16xf32_flux_limiter_minmod (const __m512 d1,
                                 const __m512 d2)
                                 ///< 2nd flux limiter function parameter.
 {
-  __m512 r;
-  r = _mm512_min_ps (_mm512_div_ps (d1, d2), _mm512_set1_ps (1.f));
-  return _mm512_mask_mov_ps (_mm512_setzero_ps (),
-                             _mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
-                                                 _mm512_set1_ps (FLT_EPSILON),
-                                                 _CMP_GT_OS), r);
+  return
+    _mm512_maskz_min_ps (_mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
+                                             _mm512_set1_ps (FLT_EPSILON),
+                                             _CMP_GT_OS),
+                         _mm512_div_ps (d1, d2), _mm512_set1_ps (1.f));
 }
 
 /**
@@ -8464,16 +8461,13 @@ jbm_16xf32_flux_limiter_VanLeer (const __m512 d1,
                                  const __m512 d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512 r, k;
-  r = _mm512_div_ps (d1, d2);
-  k = jbm_16xf32_abs (r);
-  r =
-    _mm512_div_ps (_mm512_add_ps (r, k),
-                   _mm512_add_ps (_mm512_set1_ps (1.f), k));
-  return _mm512_mask_mov_ps (_mm512_setzero_ps (),
-                             _mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
-                                                 _mm512_set1_ps (FLT_EPSILON),
-                                                 _CMP_GT_OS), r);
+  const __m512 r = _mm512_div_ps (d1, d2);
+  const __m512 k = jbm_16xf32_abs (r);
+  return _mm512_maskz_div_ps (_mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
+                                                  _mm512_set1_ps (FLT_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_add_ps (r, k),
+                              _mm512_add_ps (_mm512_set1_ps (1.f), k));
 }
 
 /**
@@ -8489,16 +8483,13 @@ jbm_16xf32_flux_limiter_VanAlbada (const __m512 d1,
                                    const __m512 d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512 r, k;
-  r = _mm512_div_ps (d1, d2);
-  k = jbm_16xf32_sqr (r);
-  r =
-    _mm512_div_ps (_mm512_add_ps (r, k),
-                   _mm512_add_ps (_mm512_set1_ps (1.f), k));
-  return _mm512_mask_mov_ps (_mm512_setzero_ps (),
-                             _mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
-                                                 _mm512_set1_ps (FLT_EPSILON),
-                                                 _CMP_GT_OS), r);
+  const __m512 r = _mm512_div_ps (d1, d2);
+  const __m512 k = jbm_16xf32_sqr (r);
+  return _mm512_maskz_div_ps (_mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
+                                                  _mm512_set1_ps (FLT_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_add_ps (r, k),
+                              _mm512_add_ps (_mm512_set1_ps (1.f), k));
 }
 
 /**
@@ -8514,12 +8505,10 @@ jbm_16xf32_flux_limiter_minsuper (const __m512 d1,
                                   const __m512 d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512 r;
-  r = _mm512_min_ps (_mm512_div_ps (d1, d2), _mm512_set1_ps (2.f));
-  return _mm512_mask_mov_ps (_mm512_setzero_ps (),
-                             _mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
-                                                 _mm512_set1_ps (FLT_EPSILON),
-                                                 _CMP_GT_OS), r);
+  return _mm512_maskz_min_ps (_mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
+                                                  _mm512_set1_ps (FLT_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_div_ps (d1, d2), _mm512_set1_ps (2.f));
 }
 
 /**
@@ -8535,13 +8524,11 @@ jbm_16xf32_flux_limiter_supermin (const __m512 d1,
                                   const __m512 d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512 r;
-  r = _mm512_div_ps (d1, d2);
-  r = _mm512_min_ps (jbm_16xf32_dbl (r), _mm512_set1_ps (1.f));
-  return _mm512_mask_mov_ps (_mm512_setzero_ps (),
-                             _mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
-                                                 _mm512_set1_ps (FLT_EPSILON),
-                                                 _CMP_GT_OS), r);
+  return _mm512_maskz_min_ps (_mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
+                                                  _mm512_set1_ps (FLT_EPSILON),
+                                                  _CMP_GT_OS),
+                              jbm_16xf32_dbl (_mm512_div_ps (d1, d2)),
+                              _mm512_set1_ps (1.f));
 }
 
 /**
@@ -8558,24 +8545,14 @@ jbm_16xf32_flux_limiter_monotonized_central (const __m512 d1,
                                              const __m512 d2)
 ///< 2nd flux limiter function parameter.
 {
-  __m512 r, rm;
-  r = _mm512_div_ps (d1, d2);
-  rm =
-    _mm512_mul_ps (_mm512_set1_ps (0.5f),
-                   _mm512_add_ps (r, _mm512_set1_ps (1.f)));
-  rm =
-    _mm512_mask_mov_ps (_mm512_set1_ps (2.f),
-                        _mm512_cmp_ps_mask (r, _mm512_set1_ps (3.f),
-                                            _CMP_LT_OS), rm);
-
-  rm =
-    _mm512_mask_mov_ps (rm, _mm512_cmp_ps_mask (r, _mm512_set1_ps (1.f / 3.f),
-                                                _CMP_GT_OS),
-                        jbm_16xf32_dbl (r));
-  return _mm512_mask_mov_ps (_mm512_setzero_ps (),
-                             _mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
-                                                 _mm512_set1_ps (FLT_EPSILON),
-                                                 _CMP_GT_OS), r);
+  const __m512 r = _mm512_div_ps (d1, d2);
+  const __m512 rm = _mm512_mul_ps (_mm512_set1_ps (0.5f),
+                                   _mm512_add_ps (r, _mm512_set1_ps (1.f)));
+  return _mm512_maskz_min_ps (_mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
+                                                  _mm512_set1_ps (FLT_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_min_ps (_mm512_set1_ps (2.f), rm),
+                              jbm_16xf32_dbl (r));
 }
 
 /**
@@ -8591,14 +8568,12 @@ jbm_16xf32_flux_limiter_mean (const __m512 d1,
                               const __m512 d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512 r;
-  r = _mm512_mul_ps (_mm512_set1_ps (0.5f),
-                     _mm512_add_ps (_mm512_set1_ps (1.f),
-                                    _mm512_div_ps (d1, d2)));
-  return _mm512_mask_mov_ps (_mm512_setzero_ps (),
-                             _mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
-                                                 _mm512_set1_ps (FLT_EPSILON),
-                                                 _CMP_GT_OS), r);
+  return _mm512_maskz_mul_ps (_mm512_cmp_ps_mask (_mm512_mul_ps (d1, d2),
+                                                  _mm512_set1_ps (FLT_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_set1_ps (0.5f),
+                              _mm512_add_ps (_mm512_set1_ps (1.f),
+                                             _mm512_div_ps (d1, d2)));
 }
 
 /**
@@ -8839,7 +8814,7 @@ static inline __m512d
 jbm_8xf64_frexp (const __m512d x,       ///< __m512d vector.
                  __m512i *e)    ///< pointer to the extracted exponents vector.
 {
-  const __m512i zero = _mm512_setzero_epi64 ();
+  const __m512i zero = _mm512_setzero_si512 ();
   const __m512i mant_mask = JBM_8xF64_BITS_MANTISSA;
   JBM8xF64 y, z, s;
   __m512i exp, exp_sub;
@@ -8856,8 +8831,7 @@ jbm_8xf64_frexp (const __m512d x,       ///< __m512d vector.
   exp_sub
     = _mm512_sub_epi64 (_mm512_srli_epi64 (s.i, 52), _mm512_set1_epi64 (52));
   exp = _mm512_mask_mov_epi64 (exp, is_sub, exp_sub);
-  *e = _mm512_mask_sub_epi64 (zero, is_finite, exp,
-                              _mm512_set1_epi64 (JBM_8xF64_BIAS));
+  *e = _mm512_mask_sub_epi64 (zero, is_finite, exp, JBM_8xF64_BIAS);
   // Mantissa
   z.x = x;
   s.i = _mm512_mask_mov_epi64 (y.i, is_sub, s.i);
@@ -16233,9 +16207,9 @@ jbm_8xf64_solve_cubic_reduced (const __m512d a,
                                const __m512d x2)
 ///< __m512d vector of right limits of the solution intervals.
 {
-  __m512d a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
-  c2p_3 = _mm512_set1_pd (2. * M_PI / 3.);
-  c_3 = _mm512_set1_pd (1. / 3.);
+  const __m512d c2p_3 = _mm512_set1_pd (2. * M_PI / 3.);
+  const __m512d c_3 = _mm512_set1_pd (1. / 3.);
+  __m512d a3, k0, k1, k2, l0, l1, l2, l3, l4, l5;
   a3 = _mm512_mul_pd (a, c_3);
   k0 = _mm512_mul_pd (a3, a3);
   k1 = _mm512_fmsub_pd (b, c_3, k0);
@@ -16244,10 +16218,10 @@ jbm_8xf64_solve_cubic_reduced (const __m512d a,
   k2 = _mm512_fmadd_pd (k0, k0, _mm512_mul_pd (k1, _mm512_mul_pd (k1, k1)));
   l1 = _mm512_sqrt_pd (jbm_8xf64_opposite (k1));
   l0 = _mm512_mul_pd
-       (jbm_8xf64_acos (_mm512_div_pd (k0,
-                                       _mm512_mul_pd (l1,
-                                                      _mm512_mul_pd (l1, l1)))),
-        c_3);
+    (jbm_8xf64_acos (_mm512_div_pd (k0,
+                                    _mm512_mul_pd (l1,
+                                                   _mm512_mul_pd (l1, l1)))),
+     c_3);
   l1 = _mm512_add_pd (l1, l1);
   l2 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (l0), a3);
   l3 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (_mm512_add_pd (l0, c2p_3)), a3);
@@ -16338,8 +16312,7 @@ jbm_8xf64_flux_limiter_centred (const __m512d d1,
                                 const __m512d d2)
     ///< 2nd flux limiter function parameter.
 {
-  return _mm512_mask_blend_pd (jbm_8xf64_small (d2),
-                               _mm512_div_pd (d1, d2), _mm512_setzero_pd ());
+  return _mm512_maskz_div_pd (~jbm_8xf64_small (d2), d1, d2);
 
 }
 
@@ -16357,14 +16330,13 @@ jbm_8xf64_flux_limiter_superbee (const __m512d d1,
                                  const __m512d d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512d r;
-  r = _mm512_div_pd (d1, d2);
-  r = _mm512_max_pd (_mm512_min_pd (jbm_8xf64_dbl (r), _mm512_set1_pd (1.)),
-                     _mm512_min_pd (r, _mm512_set1_pd (2.)));
-  return _mm512_mask_mov_pd (_mm512_setzero_pd (),
-                             _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
-                                                 _mm512_set1_pd (DBL_EPSILON),
-                                                 _CMP_GT_OS), r);
+  const __m512d r = _mm512_div_pd (d1, d2);
+  return
+    _mm512_maskz_max_pd (_mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
+                                             _mm512_set1_pd (DBL_EPSILON),
+                                             _CMP_GT_OS),
+                         _mm512_min_pd (jbm_8xf64_dbl (r), _mm512_set1_pd (1.)),
+                         _mm512_min_pd (r, _mm512_set1_pd (2.)));
 }
 
 /**
@@ -16380,12 +16352,10 @@ jbm_8xf64_flux_limiter_minmod (const __m512d d1,
                                const __m512d d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512d r;
-  r = _mm512_min_pd (_mm512_div_pd (d1, d2), _mm512_set1_pd (1.));
-  return _mm512_mask_mov_pd (_mm512_setzero_pd (),
-                             _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
-                                                 _mm512_set1_pd (DBL_EPSILON),
-                                                 _CMP_GT_OS), r);
+  return _mm512_maskz_min_pd (_mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
+                                                  _mm512_set1_pd (DBL_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_div_pd (d1, d2), _mm512_set1_pd (1.));
 }
 
 /**
@@ -16402,15 +16372,13 @@ jbm_8xf64_flux_limiter_VanLeer (const __m512d d1,
                                 const __m512d d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512d r, k;
-  r = _mm512_div_pd (d1, d2);
-  k = jbm_8xf64_abs (r);
-  r = _mm512_div_pd (_mm512_add_pd (r, k),
-                     _mm512_add_pd (_mm512_set1_pd (1.), k));
-  return _mm512_mask_mov_pd (_mm512_setzero_pd (),
-                             _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
-                                                 _mm512_set1_pd (DBL_EPSILON),
-                                                 _CMP_GT_OS), r);
+  const __m512d r = _mm512_div_pd (d1, d2);
+  const __m512d k = jbm_8xf64_abs (r);
+  return _mm512_maskz_div_pd (_mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
+                                                  _mm512_set1_pd (DBL_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_add_pd (r, k),
+                              _mm512_add_pd (_mm512_set1_pd (1.), k));
 }
 
 /**
@@ -16426,15 +16394,13 @@ jbm_8xf64_flux_limiter_VanAlbada (const __m512d d1,
                                   const __m512d d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512d r, k;
-  r = _mm512_div_pd (d1, d2);
-  k = jbm_8xf64_sqr (r);
-  r = _mm512_div_pd (_mm512_add_pd (r, k),
-                     _mm512_add_pd (_mm512_set1_pd (1.), k));
-  return _mm512_mask_mov_pd (_mm512_setzero_pd (),
-                             _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
-                                                 _mm512_set1_pd (DBL_EPSILON),
-                                                 _CMP_GT_OS), r);
+  const __m512d r = _mm512_div_pd (d1, d2);
+  const __m512d k = jbm_8xf64_sqr (r);
+  return _mm512_maskz_div_pd (_mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
+                                                  _mm512_set1_pd (DBL_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_add_pd (r, k),
+                              _mm512_add_pd (_mm512_set1_pd (1.), k));
 }
 
 /**
@@ -16450,12 +16416,10 @@ jbm_8xf64_flux_limiter_minsuper (const __m512d d1,
                                  const __m512d d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512d r;
-  r = _mm512_min_pd (_mm512_div_pd (d1, d2), _mm512_set1_pd (2.));
-  return _mm512_mask_mov_pd (_mm512_setzero_pd (),
-                             _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
-                                                 _mm512_set1_pd (DBL_EPSILON),
-                                                 _CMP_GT_OS), r);
+  return _mm512_maskz_min_pd (_mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
+                                                  _mm512_set1_pd (DBL_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_div_pd (d1, d2), _mm512_set1_pd (2.));
 }
 
 /**
@@ -16471,13 +16435,11 @@ jbm_8xf64_flux_limiter_supermin (const __m512d d1,
                                  const __m512d d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512d r;
-  r = _mm512_div_pd (d1, d2);
-  r = _mm512_min_pd (jbm_8xf64_dbl (r), _mm512_set1_pd (1.));
-  return _mm512_mask_mov_pd (_mm512_setzero_pd (),
-                             _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
-                                                 _mm512_set1_pd (DBL_EPSILON),
-                                                 _CMP_GT_OS), r);
+  return _mm512_maskz_min_pd (_mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
+                                                  _mm512_set1_pd (DBL_EPSILON),
+                                                  _CMP_GT_OS),
+                              jbm_8xf64_dbl (_mm512_div_pd (d1, d2)),
+                              _mm512_set1_pd (1.));
 }
 
 /**
@@ -16494,20 +16456,14 @@ jbm_8xf64_flux_limiter_monotonized_central (const __m512d d1,
                                             const __m512d d2)
 ///< 2nd flux limiter function parameter.
 {
-  __m512d r, rm;
-  r = _mm512_div_pd (d1, d2);
-  rm = _mm512_mul_pd (_mm512_set1_pd (0.5),
-                      _mm512_add_pd (r, _mm512_set1_pd (1.)));
-  rm = _mm512_mask_mov_pd (_mm512_set1_pd (2.),
-                           _mm512_cmp_pd_mask (r, _mm512_set1_pd (3.),
-                                               _CMP_LT_OS), rm);
-  rm = _mm512_mask_mov_pd (rm, _mm512_cmp_pd_mask (r, _mm512_set1_pd (1. / 3.),
-                                                   _CMP_GT_OS),
-                           jbm_8xf64_dbl (r));
-  return _mm512_mask_mov_pd (_mm512_setzero_pd (),
-                             _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
-                                                 _mm512_set1_pd (DBL_EPSILON),
-                                                 _CMP_GT_OS), r);
+  const __m512d r = _mm512_div_pd (d1, d2);
+  const __m512d rm = _mm512_mul_pd (_mm512_set1_pd (0.5),
+                                    _mm512_add_pd (r, _mm512_set1_pd (1.)));
+  return _mm512_maskz_min_pd (_mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
+                                                  _mm512_set1_pd (DBL_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_min_pd (_mm512_set1_pd (2.), rm),
+                              jbm_8xf64_dbl (r));
 }
 
 /**
@@ -16523,14 +16479,12 @@ jbm_8xf64_flux_limiter_mean (const __m512d d1,
                              const __m512d d2)
     ///< 2nd flux limiter function parameter.
 {
-  __m512d r;
-  r = _mm512_mul_pd (_mm512_set1_pd (0.5),
-                     _mm512_add_pd (_mm512_set1_pd (1.),
-                                    _mm512_div_pd (d1, d2)));
-  return _mm512_mask_mov_pd (_mm512_setzero_pd (),
-                             _mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
-                                                 _mm512_set1_pd (DBL_EPSILON),
-                                                 _CMP_GT_OS), r);
+  return _mm512_maskz_mul_pd (_mm512_cmp_pd_mask (_mm512_mul_pd (d1, d2),
+                                                  _mm512_set1_pd (DBL_EPSILON),
+                                                  _CMP_GT_OS),
+                              _mm512_set1_pd (0.5),
+                              _mm512_add_pd (_mm512_set1_pd (1.),
+                                             _mm512_div_pd (d1, d2)));
 }
 
 /**

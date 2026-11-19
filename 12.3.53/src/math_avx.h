@@ -7831,9 +7831,9 @@ jbm_8xf32_solve_cubic_reduced (const __m256 a,
                                const __m256 x2)
                                ///< right limit of the solution interval.
 {
-  __m256 a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
-  c2p_3 = _mm256_set1_ps (2.f * M_PIf / 3.f);
-  c_3 = _mm256_set1_ps (1.f / 3.f);
+  const __m256 c2p_3 = _mm256_set1_ps (2.f * M_PIf / 3.f);
+  const __m256 c_3 = _mm256_set1_ps (1.f / 3.f);
+  __m256 a3, k0, k1, k2, l0, l1, l2, l3, l4, l5;
   a3 = _mm256_mul_ps (a, c_3);
   k0 = _mm256_mul_ps (a3, a3);
   k1 = _mm256_fmsub_ps (b, c_3, k0);
@@ -7842,10 +7842,10 @@ jbm_8xf32_solve_cubic_reduced (const __m256 a,
   k2 = _mm256_fmadd_ps (k0, k0, _mm256_mul_ps (k1, _mm256_mul_ps (k1, k1)));
   l1 = _mm256_sqrt_ps (jbm_8xf32_opposite (k1));
   l0 = _mm256_mul_ps
-       (jbm_8xf32_acos (_mm256_div_ps (k0,
-                                       _mm256_mul_ps (l1,
-                                                      _mm256_mul_ps (l1, l1)))),
-        c_3);
+    (jbm_8xf32_acos (_mm256_div_ps (k0,
+                                    _mm256_mul_ps (l1,
+                                                   _mm256_mul_ps (l1, l1)))),
+     c_3);
   l1 = _mm256_add_ps (l1, l1);
   l2 = _mm256_fmsub_ps (l1, jbm_8xf32_cos (l0), a3);
   l3 = _mm256_fmsub_ps (l1, jbm_8xf32_cos (_mm256_add_ps (l0, c2p_3)), a3);
@@ -8097,16 +8097,10 @@ jbm_8xf32_flux_limiter_monotonized_central (const __m256 d1,
 {
   __m256 r, rm;
   r = _mm256_div_ps (d1, d2);
-  rm =
-    _mm256_mul_ps (_mm256_set1_ps (0.5f),
-                   _mm256_add_ps (r, _mm256_set1_ps (1.f)));
-  rm =
-    _mm256_blendv_ps (_mm256_set1_ps (2.f), rm,
-                      _mm256_cmp_ps (r, _mm256_set1_ps (3.f), _CMP_LT_OS));
-  rm =
-    _mm256_blendv_ps (rm, jbm_8xf32_dbl (r),
-                      _mm256_cmp_ps (r, _mm256_set1_ps (1.f / 3.f),
-                                     _CMP_GT_OS));
+  rm = _mm256_mul_ps (_mm256_set1_ps (0.5f),
+                      _mm256_add_ps (r, _mm256_set1_ps (1.f)));
+  rm = _mm256_min_ps (_mm256_min_ps (_mm256_set1_ps (2.f), rm),
+                      jbm_8xf32_dbl (r));
   return _mm256_blendv_ps (_mm256_setzero_ps (), r,
                            _mm256_cmp_ps (_mm256_mul_ps (d1, d2),
                                           _mm256_set1_ps (FLT_EPSILON),
@@ -15864,37 +15858,39 @@ jbm_4xf64_solve_cubic_reduced (const __m256d a,
                                const __m256d x2)
 ///< __m256d vector of right limits of the solution intervals.
 {
-  c2p_3 = _mm512_set1_pd (2. * M_PI / 3.);
-  c_3 = _mm512_set1_pd (1. / 3.);
-  a3 = _mm512_mul_pd (a, c_3);
-  k0 = _mm512_mul_pd (a3, a3);
-  k1 = _mm512_fmsub_pd (b, c_3, k0);
-  k0 = _mm512_fmsub_pd (_mm512_fmsub_pd (b, a3, c), _mm512_set1_pd (0.5),
-                        _mm512_mul_pd (a3, k0));
-  k2 = _mm512_fmadd_pd (k0, k0, _mm512_mul_pd (k1, _mm512_mul_pd (k1, k1)));
-
-  l1 = _mm512_sqrt_pd (jbm_8xf64_opposite (k1));
-  l0 = _mm512_mul_pd
-       (jbm_8xf64_acos (_mm512_div_pd (k0,
-                                       _mm512_mul_pd (l1,
-                                                      _mm512_mul_pd (l1, l1)))),
-        c_3);
-  l1 = _mm512_add_pd (l1, l1);
-  l2 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (l0), a3);
-  l3 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (_mm512_add_pd (l0, c2p_3)), a3);
-  l3 = _mm512_mask_mov_pd (l3, _mm512_cmp_pd_mask (l2, x1, _CMP_LT_OS)
-                           | _mm512_cmp_pd_mask (l2, x2, _CMP_GT_OS), l2);
-  l4 = _mm512_fmsub_pd (l1, jbm_8xf64_cos (_mm512_sub_pd (l0, c2p_3)), a3);
-  l4 = _mm512_mask_mov_pd (l4, _mm512_cmp_pd_mask (l3, x1, _CMP_LT_OS)
-                           | _mm512_cmp_pd_mask (l3, x2, _CMP_GT_OS), l3);
-
-  k1 = _mm512_sqrt_pd (k2);
-  l5 = jbm_8xf64_cbrt (_mm512_add_pd (k0, k1));
-  l5 = _mm512_add_pd (l5,
-                      _mm512_sub_pd (jbm_8xf64_cbrt (_mm512_sub_pd (k0, k1)),
+  const __m256d c2p_3 = _mm256_set1_pd (2. * M_PI / 3.);
+  const __m256d c_3 = _mm256_set1_pd (1. / 3.);
+  __m256d a3, k0, k1, k2, l0, l1, l2, l3, l4, l5;
+  a3 = _mm256_mul_pd (a, c_3);
+  k0 = _mm256_mul_pd (a3, a3);
+  k1 = _mm256_fmsub_pd (b, c_3, k0);
+  k0 = _mm256_fmsub_pd (_mm256_fmsub_pd (b, a3, c), _mm256_set1_pd (0.5),
+                        _mm256_mul_pd (a3, k0));
+  k2 = _mm256_fmadd_pd (k0, k0, _mm256_mul_pd (k1, _mm256_mul_pd (k1, k1)));
+  l1 = _mm256_sqrt_pd (jbm_4xf64_opposite (k1));
+  l0 = _mm256_mul_pd
+    (jbm_4xf64_acos (_mm256_div_pd (k0,
+                                    _mm256_mul_pd (l1,
+                                                   _mm256_mul_pd (l1, l1)))),
+     c_3);
+  l1 = _mm256_add_pd (l1, l1);
+  l2 = _mm256_fmsub_pd (l1, jbm_4xf64_cos (l0), a3);
+  l3 = _mm256_fmsub_pd (l1, jbm_4xf64_cos (_mm256_add_pd (l0, c2p_3)), a3);
+  l3 = _mm256_blendv_pd (l3, l2,
+                         _mm256_or_pd (_mm256_cmp_pd (l2, x1, _CMP_LT_OS),
+                                       _mm256_cmp_pd (l2, x2, _CMP_GT_OS)));
+  l4 = _mm256_fmsub_pd (l1, jbm_4xf64_cos (_mm256_sub_pd (l0, c2p_3)), a3);
+  l4 = _mm256_blendv_pd (l4, l3,
+                         _mm256_or_pd (_mm256_cmp_pd (l3, x1, _CMP_LT_OS),
+                                       _mm256_cmp_pd (l3, x2, _CMP_GT_OS)));
+  k1 = _mm256_sqrt_pd (k2);
+  l5 = jbm_4xf64_cbrt (_mm256_add_pd (k0, k1));
+  l5 = _mm256_add_pd (l5,
+                      _mm256_sub_pd (jbm_4xf64_cbrt (_mm256_sub_pd (k0, k1)),
                                      a3));
-  return _mm512_mask_mov_pd (l5, _mm512_cmp_pd_mask (k2, _mm512_setzero_pd (),
-                                                     _CMP_LT_OS), l4);
+  return _mm256_blendv_pd (l5, l4,
+                           _mm256_cmp_pd (k2, _mm256_setzero_pd (),
+                                          _CMP_LT_OS));
 }
 
 /**
@@ -16126,15 +16122,10 @@ jbm_4xf64_flux_limiter_monotonized_central (const __m256d d1,
 {
   __m256d r, rm;
   r = _mm256_div_pd (d1, d2);
-  rm =
-    _mm256_mul_pd (_mm256_set1_pd (0.5),
-                   _mm256_add_pd (r, _mm256_set1_pd (1.)));
-  rm =
-    _mm256_blendv_pd (_mm256_set1_pd (2.), rm,
-                      _mm256_cmp_pd (r, _mm256_set1_pd (3.), _CMP_LT_OS));
-  rm =
-    _mm256_blendv_pd (rm, jbm_4xf64_dbl (r),
-                      _mm256_cmp_pd (r, _mm256_set1_pd (1. / 3.), _CMP_GT_OS));
+  rm = _mm256_mul_pd (_mm256_set1_pd (0.5),
+                      _mm256_add_pd (r, _mm256_set1_pd (1.)));
+  rm = _mm256_min_pd (_mm256_min_pd (_mm256_set1_pd (2.), rm),
+                      jbm_4xf64_dbl (r));
   return _mm256_blendv_pd (_mm256_setzero_pd (), rm,
                            _mm256_cmp_pd (_mm256_mul_pd (d1, d2),
                                           _mm256_set1_pd (DBL_EPSILON),

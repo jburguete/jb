@@ -896,7 +896,7 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
     (__riscv_vor_vx_u32m1
      (__riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_SIGN, vl), 0x3f000000, vl),
      __riscv_vand_vx_u32m1 (__riscv_vmerge_vvm_u32m1 (ai, zi, m_sub, vl),
-      JBM_F32_BITS_MANTISSA, vl), vl);
+                            JBM_F32_BITS_MANTISSA, vl), vl);
   return __riscv_vmerge_vvm_f32m1
     (__riscv_vreinterpret_v_u32m1_f32m1 (mant), x, m_special, vl);
 }
@@ -9340,10 +9340,9 @@ jbm_nxf32_rational_29_28 (const vfloat32m1_t x, ///< vfloat32m1_t vector.
  *
  * \return function value (vfloat32m1_t).
  */
-static inline vfloat32m1_t
-jbm_nxf32_cbrtwc (const vfloat32m1_t x,
-                  ///< vfloat32m1_t vector \f$\in\left[\frac12,\;1\right]\f$.
-                  const size_t vl)      ///< vector size.
+static inline vfloat32m1_t jbm_nxf32_cbrtwc (const vfloat32m1_t x,
+                                             ///< vfloat32m1_t vector \f$\in\left[\frac12,\;1\right]\f$.
+                                             const size_t vl)   ///< vector size.
 {
   return jbm_nxf32_rational_5_3 (x, K_CBRTWC_F32, vl);
 }
@@ -10172,17 +10171,17 @@ jbm_nxf32_solve_cubic_reduced (const vfloat32m1_t a,
                             __riscv_vfmul_vv_f32m1 (a3, k0, vl), vl);
   k2 = __riscv_vfmacc_vv_f32m1 (__riscv_vfmul_vv_f32m1 (k1,
                                                         jbm_nxf32_sqr (k1, vl),
-                                                        vl),
-                                k0, k0, vl);
+                                                        vl), k0, k0, vl);
 
   l1 = __riscv_vfsqrt_v_f32m1 (jbm_nxf32_opposite (k1, vl), vl);
   l0 =
     __riscv_vfmul_vf_f32m1 (jbm_nxf32_acos
                             (__riscv_vfdiv_vv_f32m1 (k0,
                                                      __riscv_vfmul_vv_f32m1
-                                                     (l1, jbm_nxf32_sqr (l1, vl),
-                                                      vl), vl), vl),
-                            1.f / 3.f, vl);
+                                                     (l1,
+                                                      jbm_nxf32_sqr (l1, vl),
+                                                      vl), vl), vl), 1.f / 3.f,
+                            vl);
   l1 = jbm_nxf32_dbl (l1, vl);
   l2 =
     __riscv_vfsub_vv_f32m1 (__riscv_vfmul_vv_f32m1 (l1, jbm_nxf32_cos (l0, vl),
@@ -21460,8 +21459,7 @@ jbm_nxf64_solve_cubic_reduced (const vfloat64m1_t a,
      __riscv_vfmul_vv_f64m1 (a3, k0, vl), vl);
   k2 = __riscv_vfmacc_vv_f64m1 (__riscv_vfmul_vv_f64m1 (k1,
                                                         jbm_nxf64_sqr (k1, vl),
-                                                        vl),
-                                k0, k0, vl);
+                                                        vl), k0, k0, vl);
   l1 = __riscv_vfsqrt_v_f64m1 (jbm_nxf64_opposite (k1, vl), vl);
   l0 =
     __riscv_vfmul_vf_f64m1
@@ -21470,7 +21468,7 @@ jbm_nxf64_solve_cubic_reduced (const vfloat64m1_t a,
                                                           jbm_nxf64_sqr (l1,
                                                                          vl),
                                                           vl), vl), vl),
-      1. / 3., vl);
+     1. / 3., vl);
   l1 = jbm_nxf64_dbl (l1, vl);
   l2 =
     __riscv_vfsub_vv_f64m1 (__riscv_vfmul_vv_f64m1 (l1, jbm_nxf64_cos (l0, vl),
@@ -54703,15 +54701,15 @@ jbm_16xf32_solve_quadratic (const vfloat32m1_t a,
 static inline vfloat32m1_t
 jbm_16xf32_solve_cubic_reduced (const vfloat32m1_t a,
 ///< vfloat32m1_t vector of 2nd order coefficient of the equations.
-                               const vfloat32m1_t b,
+                                const vfloat32m1_t b,
 ///< vfloat32m1_t vector of 1st order coefficient of the equations.
-                               const vfloat32m1_t c,
+                                const vfloat32m1_t c,
 ///< vfloat32m1_t vector of 0th order coefficient of the equations.
-                               const vfloat32m1_t x1,
+                                const vfloat32m1_t x1,
 ///< vfloat32m1_t vector of left limits of the solution intervals.
-                               const vfloat32m1_t x2,
+                                const vfloat32m1_t x2,
 ///< vfloat32m1_t vector of right limits of the solution intervals.
-                               const size_t vl) ///< array size.
+                                const size_t vl)        ///< array size.
 {
   return jbm_nxf32_solve_cubic_reduced (a, b, c, x1, x2, 16);
 }

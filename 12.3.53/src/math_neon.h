@@ -8008,9 +8008,9 @@ jbm_4xf32_solve_cubic_reduced (const float32x4_t a,
                                const float32x4_t x2)
 ///< float32x4_t vector of right limits of the solution intervals.
 {
-  float32x4_t a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
-  c2p_3 = vdupq_n_f32 (2.f * M_PIf / 3.f);
-  c_3 = vdupq_n_f32 (1.f / 3.f);
+  const float32x4_t c2p_3 = vdupq_n_f32 (2.f * M_PIf / 3.f);
+  const float32x4_t c_3 = vdupq_n_f32 (1.f / 3.f);
+  float32x4_t a3, k0, k1, k2, l0, l1, l2, l3, l4, l5;
   a3 = vmulq_f32 (a, c_3);
   k0 = vmulq_f32 (a3, a3);
   k1 = vsubq_f32 (vmulq_f32 (b, c_3), k0);
@@ -8019,8 +8019,7 @@ jbm_4xf32_solve_cubic_reduced (const float32x4_t a,
   k2 = vfmaq_f32 (vmulq_f32 (k1, vmulq_f32 (k1, k1)), k0, k0);
   l1 = vsqrtq_f32 (jbm_4xf32_opposite (k1));
   l0 = vmulq_f32
-       (jbm_4xf32_acos (vdivq_f32 (k0,vmulq_f32 (l1, vmulq_f32 (l1, l1)))),
-        c_3);
+    (jbm_4xf32_acos (vdivq_f32 (k0, vmulq_f32 (l1, vmulq_f32 (l1, l1)))), c_3);
   l1 = vaddq_f32 (l1, l1);
   l2 = vsubq_f32 (vmulq_f32 (l1, jbm_4xf32_cos (l0)), a3);
   l3 = vsubq_f32 (vmulq_f32 (l1, jbm_4xf32_cos (vaddq_f32 (l0, c2p_3))), a3);
@@ -15796,9 +15795,9 @@ jbm_2xf64_solve_cubic_reduced (const float64x2_t a,
                                const float64x2_t x2)
 ///< float64x2_t vector of right limits of the solution intervals.
 {
-  float64x2_t a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
-  c2p_3 = vdupq_n_f64 (2. * M_PI / 3.);
-  c_3 = vdupq_n_f64 (1. / 3.);
+  const float64x2_t c2p_3 = vdupq_n_f64 (2. * M_PI / 3.);
+  const float64x2_t c_3 = vdupq_n_f64 (1. / 3.);
+  float64x2_t a3, k0, k1, k2, l0, l1, l2, l3, l4, l5;
   a3 = vmulq_f64 (a, c_3);
   k0 = vmulq_f64 (a3, a3);
   k1 = vsubq_f64 (vmulq_f64 (b, c_3), k0);

@@ -64,10 +64,10 @@
  * \def JBM_F128
  * \brief macro to do maximum precision suffixes.
  */
-#ifdef __GNUC__
-#define JBM_F128(x) x##Q
-#elifdef __clang__
-#define JBM_F128(x) x##f128
+#ifdef __clang__
+#define JBM_F128(x) __extension__ x##f128
+#elifdef __GNUC__
+#define JBM_F128(x) __extension__ x##Q
 #else
 #error "Compiler not supported"
 #endif
@@ -874,13 +874,13 @@ exp10l (long double x)
 #elif JBM_INTEGRAL_GAUSS_N == 2
 #define JBM_INTEGRAL_GAUSS_A(type) (type) JBM_F128 (8.) / JBM_F128(9.), \
   (type) JBM_F128(5.) / JBM_F128(9.)
-#define JBM_INTEGRAL_GAUSS_B(type) (type) JBM_F128 (0.) \
+#define JBM_INTEGRAL_GAUSS_B(type) (type) JBM_F128 (0.), \
     (type) JBM_F128(7.7459666924148340427791481488384306e-1)
 #elif JBM_INTEGRAL_GAUSS_N == 3
 #define JBM_INTEGRAL_GAUSS_A(type) (type) JBM_F128 (128.) / JBM_F128(225.), \
     (type) JBM_F128(4.7862867049936646804129151483563819e-1), \
     (type) JBM_F128(2.3692688505618908751426404071991736e-1)
-#define JBM_INTEGRAL_GAUSS_B(type) (type) JBM_F128 (0.) \
+#define JBM_INTEGRAL_GAUSS_B(type) (type) JBM_F128 (0.), \
     (type) JBM_F128(5.3846931010568309103631442070020880e-1), \
     (type) JBM_F128(9.0617984593866399279762687829939297e-1)
 #elif JBM_INTEGRAL_GAUSS_N == 4
@@ -889,7 +889,7 @@ exp10l (long double x)
     (type) JBM_F128(3.8183005050511894495036977548897513e-1), \
     (type) JBM_F128(2.7970539148927666790146777142377958e-1), \
     (type) JBM_F128(1.2948496616886969327061143267908202e-1)
-#define JBM_INTEGRAL_GAUSS_B(type) (type) JBM_F128 (0.) \
+#define JBM_INTEGRAL_GAUSS_B(type) (type) JBM_F128 (0.), \
     (type) JBM_F128(4.0584515137739716690660641207696146e-1), \
     (type) JBM_F128(7.4153118559939443986386477328078841e-1), \
     (type) JBM_F128(9.4910791234275852452618968404785126e-1)

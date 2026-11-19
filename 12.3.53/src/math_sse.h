@@ -7842,9 +7842,9 @@ jbm_4xf32_solve_cubic_reduced (const __m128 a,
                                const __m128 x2)
 ///< __m128 vector of right limits of the solution intervals.
 {
-  __m128 a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
-  c2p_3 = _mm_set1_ps (2.f * M_PIf / 3.f);
-  c_3 = _mm_set1_ps (1.f / 3.f);
+  const __m128 c2p_3 = _mm_set1_ps (2.f * M_PIf / 3.f);
+  const __m128 c_3 = _mm_set1_ps (1.f / 3.f);
+  __m128 a3, k0, k1, k2, l0, l1, l2, l3, l4, l5;
   a3 = _mm_mul_ps (a, c_3);
   k0 = _mm_mul_ps (a3, a3);
   k1 = _mm_fmsub_ps (b, c_3, k0);
@@ -7853,8 +7853,8 @@ jbm_4xf32_solve_cubic_reduced (const __m128 a,
   k2 = _mm_fmadd_ps (k0, k0, _mm_mul_ps (k1, _mm_mul_ps (k1, k1)));
   l1 = _mm_sqrt_ps (jbm_4xf32_opposite (k1));
   l0 = _mm_mul_ps
-       (jbm_4xf32_acos (_mm_div_ps (k0,
-                        _mm_mul_ps (l1, _mm_mul_ps (l1, l1)))), c_3);
+    (jbm_4xf32_acos (_mm_div_ps (k0,
+                                 _mm_mul_ps (l1, _mm_mul_ps (l1, l1)))), c_3);
   l1 = _mm_add_ps (l1, l1);
   l2 = _mm_fmsub_ps (l1, jbm_4xf32_cos (l0), a3);
   l3 = _mm_fmsub_ps (l1, jbm_4xf32_cos (_mm_add_ps (l0, c2p_3)), a3);
@@ -8090,10 +8090,7 @@ jbm_4xf32_flux_limiter_monotonized_central (const __m128 d1,
   __m128 r, rm;
   r = _mm_div_ps (d1, d2);
   rm = _mm_mul_ps (_mm_set1_ps (0.5f), _mm_add_ps (r, _mm_set1_ps (1.f)));
-  rm = _mm_blendv_ps (_mm_set1_ps (2.f), rm,
-                      _mm_cmplt_ps (r, _mm_set1_ps (3.f)));
-  rm = _mm_blendv_ps (rm, jbm_4xf32_dbl (r),
-                      _mm_cmpgt_ps (r, _mm_set1_ps (1.f / 3.f)));
+  rm = _mm_min_ps (_mm_min_ps (_mm_set1_ps (2.f), rm), jbm_4xf32_dbl (r));
   return _mm_blendv_ps (_mm_setzero_ps (), rm,
                         _mm_cmpgt_ps (_mm_mul_ps (d1, d2),
                                       _mm_set1_ps (FLT_EPSILON)));
@@ -15775,41 +15772,34 @@ jbm_2xf64_solve_cubic_reduced (const __m128d a,
                                const __m128d x2)
 ///< __m128d vector of right limits of the solution intervals.
 {
-  __m256d a3, k0, k1, k2, l0, l1, l2, l3, l4, l5, c2p_3, c_3;
-  c2p_3 = _mm256_set1_pd (2. * M_PI / 3.);
-  c_3 = _mm256_set1_pd (1. / 3.);
-  a3 = _mm256_mul_pd (a, c_3);
-  k0 = _mm256_mul_pd (a3, a3);
-  k1 = _mm256_fmsub_pd (b, c_3, k0);
-  k0 = _mm256_fmsub_pd (_mm256_fmsub_pd (b, a3, c), _mm256_set1_pd (0.5),
-                        _mm256_mul_pd (a3, k0));
-  k2 = _mm256_fmadd_pd (k0, k0, _mm256_mul_pd (k1, _mm256_mul_pd (k1, k1)));
+  const __m128d c2p_3 = _mm_set1_pd (2. * M_PI / 3.);
+  const __m128d c_3 = _mm_set1_pd (1. / 3.);
+  __m128d a3, k0, k1, k2, l0, l1, l2, l3, l4, l5;
+  a3 = _mm_mul_pd (a, c_3);
+  k0 = _mm_mul_pd (a3, a3);
+  k1 = _mm_fmsub_pd (b, c_3, k0);
+  k0 = _mm_fmsub_pd (_mm_fmsub_pd (b, a3, c), _mm_set1_pd (0.5),
+                     _mm_mul_pd (a3, k0));
+  k2 = _mm_fmadd_pd (k0, k0, _mm_mul_pd (k1, _mm_mul_pd (k1, k1)));
+  l1 = _mm_sqrt_pd (jbm_2xf64_opposite (k1));
+  l0 = _mm_mul_pd
+    (jbm_2xf64_acos (_mm_div_pd (k0,
+                                 _mm_mul_pd (l1, _mm_mul_pd (l1, l1)))), c_3);
+  l1 = _mm_add_pd (l1, l1);
+  l2 = _mm_fmsub_pd (l1, jbm_2xf64_cos (l0), a3);
+  l3 = _mm_fmsub_pd (l1, jbm_2xf64_cos (_mm_add_pd (l0, c2p_3)), a3);
+  l3 = _mm_blendv_pd (l3, l2,
+                      _mm_or_pd (_mm_cmp_pd (l2, x1, _CMP_LT_OS),
+                                 _mm_cmp_pd (l2, x2, _CMP_GT_OS)));
+  l4 = _mm_fmsub_pd (l1, jbm_2xf64_cos (_mm_sub_pd (l0, c2p_3)), a3);
+  l4 = _mm_blendv_pd (l4, l3,
+                      _mm_or_pd (_mm_cmp_pd (l3, x1, _CMP_LT_OS),
+                                 _mm_cmp_pd (l3, x2, _CMP_GT_OS)));
 
-  l1 = _mm256_sqrt_pd (jbm_4xf64_opposite (k1));
-  l0 = _mm256_mul_pd
-       (jbm_4xf64_acos (_mm256_div_pd (k0,
-                                       _mm256_mul_pd (l1,
-                                                      _mm256_mul_pd (l1, l1)))),
-        c_3);
-  l1 = _mm256_add_pd (l1, l1);
-  l2 = _mm256_fmsub_pd (l1, jbm_4xf64_cos (l0), a3);
-  l3 = _mm256_fmsub_pd (l1, jbm_4xf64_cos (_mm256_add_pd (l0, c2p_3)), a3);
-  l3 = _mm256_blendv_pd (l3, l2,
-                         _mm256_or_pd (_mm256_cmp_pd (l2, x1, _CMP_LT_OS),
-                                       _mm256_cmp_pd (l2, x2, _CMP_GT_OS)));
-  l4 = _mm256_fmsub_pd (l1, jbm_4xf64_cos (_mm256_sub_pd (l0, c2p_3)), a3);
-  l4 = _mm256_blendv_pd (l4, l3,
-                         _mm256_or_pd (_mm256_cmp_pd (l3, x1, _CMP_LT_OS),
-                                       _mm256_cmp_pd (l3, x2, _CMP_GT_OS)));
-
-  k1 = _mm256_sqrt_pd (k2);
-  l5 = jbm_4xf64_cbrt (_mm256_add_pd (k0, k1));
-  l5 = _mm256_add_pd (l5,
-                      _mm256_sub_pd (jbm_4xf64_cbrt (_mm256_sub_pd (k0, k1)),
-                                     a3));
-  return _mm256_blendv_pd (l5, l4,
-                           _mm256_cmp_pd (k2, _mm256_setzero_pd (),
-                                          _CMP_LT_OS));
+  k1 = _mm_sqrt_pd (k2);
+  l5 = jbm_2xf64_cbrt (_mm_add_pd (k0, k1));
+  l5 = _mm_add_pd (l5, _mm_sub_pd (jbm_2xf64_cbrt (_mm_sub_pd (k0, k1)), a3));
+  return _mm_blendv_pd (l5, l4, _mm_cmp_pd (k2, _mm_setzero_pd (), _CMP_LT_OS));
 }
 
 /**
@@ -16033,9 +16023,7 @@ jbm_2xf64_flux_limiter_monotonized_central (const __m128d d1,
   __m128d r, rm;
   r = _mm_div_pd (d1, d2);
   rm = _mm_mul_pd (_mm_set1_pd (0.5), _mm_add_pd (r, _mm_set1_pd (1.)));
-  rm = _mm_blendv_pd (_mm_set1_pd (2.), rm, _mm_cmplt_pd (r, _mm_set1_pd (3.)));
-  rm = _mm_blendv_pd (rm, jbm_2xf64_dbl (r),
-                      _mm_cmpgt_pd (r, _mm_set1_pd (1. / 3.)));
+  rm = _mm_min_pd (_mm_min_pd (_mm_set1_pd (2.), rm), jbm_2xf64_dbl (r));
   return _mm_blendv_pd (_mm_setzero_pd (), rm,
                         _mm_cmpgt_pd (_mm_mul_pd (d1, d2),
                                       _mm_set1_pd (DBL_EPSILON)));
