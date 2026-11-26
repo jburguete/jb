@@ -965,7 +965,7 @@ jbm_nxf32_modmin (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
                   const size_t vl)      ///< vector size.
 {
   return
-    __riscv_vmerge_vfm_f32m1
+    __riscv_vfmerge_vfm_f32m1
     (__riscv_vmerge_vvm_f32m1
      (b, a, __riscv_vmflt_vv_f32m1_b32 (__riscv_vfabs_v_f32m1 (a, vl),
                                         __riscv_vfabs_v_f32m1 (b, vl), vl), vl),
@@ -10760,7 +10760,8 @@ jbm_nxf64_frexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
   // Exponent
   *e = __riscv_vmerge_vxm_i64m1
     (__riscv_vsub_vx_i64m1_mu
-     (__riscv_vsub_vx_i64m1 (__riscv_vreinterpret_v_u64m1_i64m1 (yi),
+     (m_sub,
+      __riscv_vsub_vx_i64m1 (__riscv_vreinterpret_v_u64m1_i64m1 (yi),
                              (int64_t) JBM_F64_BIAS, vl),
       __riscv_vreinterpret_v_u64m1_i64m1 (__riscv_vsrl_vx_u64m1 (zi_abs, 52,
                                                                  vl)),
@@ -10849,7 +10850,7 @@ jbm_nxf64_modmin (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
                   const size_t vl)      ///< vector size.
 {
   return
-    __riscv_vmerge_vfm_f64m1
+    __riscv_vfmerge_vfm_f64m1
     (__riscv_vmerge_vvm_f64m1
      (b, a, __riscv_vmflt_vv_f64m1_b64 (__riscv_vfabs_v_f64m1 (a, vl),
                                         __riscv_vfabs_v_f64m1 (b, vl), vl), vl),
@@ -28240,9 +28241,8 @@ jbm_4xf32_solve_cubic_reduced (const vfloat32m1_t a,
 ///< vfloat32m1_t vector of 0th order coefficient of the equations.
                                const vfloat32m1_t x1,
 ///< vfloat32m1_t vector of left limits of the solution intervals.
-                               const vfloat32m1_t x2,
+                               const vfloat32m1_t x2)
 ///< vfloat32m1_t vector of right limits of the solution intervals.
-                               const size_t vl) ///< array size.
 {
   return jbm_nxf32_solve_cubic_reduced (a, b, c, x1, x2, 4);
 }
@@ -34853,9 +34853,8 @@ jbm_2xf64_solve_cubic_reduced (const vfloat64m1_t a,
 ///< vfloat64m1_t vector of 0th order coefficient of the equations.
                                const vfloat64m1_t x1,
 ///< vfloat64m1_t vector of left limits of the solution intervals.
-                               const vfloat64m1_t x2,
+                               const vfloat64m1_t x2)
 ///< vfloat64m1_t vector of right limits of the solution intervals.
-                               const size_t vl) ///< array size.
 {
   return jbm_nxf64_solve_cubic_reduced (a, b, c, x1, x2, 2);
 }
@@ -41467,9 +41466,8 @@ jbm_8xf32_solve_cubic_reduced (const vfloat32m1_t a,
 ///< vfloat32m1_t vector of 0th order coefficient of the equations.
                                const vfloat32m1_t x1,
 ///< vfloat32m1_t vector of left limits of the solution intervals.
-                               const vfloat32m1_t x2,
+                               const vfloat32m1_t x2)
 ///< vfloat32m1_t vector of right limits of the solution intervals.
-                               const size_t vl) ///< array size.
 {
   return jbm_nxf32_solve_cubic_reduced (a, b, c, x1, x2, 8);
 }
@@ -48081,9 +48079,8 @@ jbm_4xf64_solve_cubic_reduced (const vfloat64m1_t a,
 ///< vfloat64m1_t vector of 0th order coefficient of the equations.
                                const vfloat64m1_t x1,
 ///< vfloat64m1_t vector of left limits of the solution intervals.
-                               const vfloat64m1_t x2,
+                               const vfloat64m1_t x2)
 ///< vfloat64m1_t vector of right limits of the solution intervals.
-                               const size_t vl) ///< array size.
 {
   return jbm_nxf64_solve_cubic_reduced (a, b, c, x1, x2, 4);
 }
@@ -54696,9 +54693,8 @@ jbm_16xf32_solve_cubic_reduced (const vfloat32m1_t a,
 ///< vfloat32m1_t vector of 0th order coefficient of the equations.
                                 const vfloat32m1_t x1,
 ///< vfloat32m1_t vector of left limits of the solution intervals.
-                                const vfloat32m1_t x2,
+                                const vfloat32m1_t x2)
 ///< vfloat32m1_t vector of right limits of the solution intervals.
-                                const size_t vl)        ///< array size.
 {
   return jbm_nxf32_solve_cubic_reduced (a, b, c, x1, x2, 16);
 }
@@ -61310,9 +61306,8 @@ jbm_8xf64_solve_cubic_reduced (const vfloat64m1_t a,
 ///< vfloat64m1_t vector of 0th order coefficient of the equations.
                                const vfloat64m1_t x1,
 ///< vfloat64m1_t vector of left limits of the solution intervals.
-                               const vfloat64m1_t x2,
+                               const vfloat64m1_t x2)
 ///< vfloat64m1_t vector of right limits of the solution intervals.
-                               const size_t vl) ///< array size.
 {
   return jbm_nxf64_solve_cubic_reduced (a, b, c, x1, x2, 8);
 }
