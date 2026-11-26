@@ -836,9 +836,8 @@ jbm_nxf32_frexp (svbool_t pg,   ///< predicate.
 {
   const svuint32_t ai = svreinterpret_u32_f32 (x);
   const svuint32_t ai_abs = svand_n_u32_x (pg, ai, JBM_F32_BITS_ABS);
-  const svbool_t m_special
-    = svcmpge_n_u32 (pg, svsub_n_u32_x (pg, ai_abs, 1u),
-                     JBM_F32_BITS_EXPONENT - 1u);
+  const svbool_t m_special = svcmpge_n_u32 (pg, svsub_n_u32_x (pg, ai_abs, 1u),
+                                            JBM_F32_BITS_EXPONENT - 1u);
   const svuint32_t yi = svlsr_n_u32_x (pg, ai_abs, 23);
   const svbool_t m_sub = svcmpeq_n_u32 (pg, yi, 0u);
   // Scale subnormals
@@ -846,16 +845,15 @@ jbm_nxf32_frexp (svbool_t pg,   ///< predicate.
     = svreinterpret_u32_f32 (svmul_n_f32_x (pg, svreinterpret_f32_u32 (ai_abs),
                                             0x1p23f));
   // Exponent
-  *e
-    = svdup_n_s32_m
-      (svsel_s32 (m_sub,
-                  svsub_n_s32_x (m_sub,
-                                 svreinterpret_s32_u32 (svlsr_n_u32_x (m_sub,
-                                                                       zi_abs,
-                                                                       23u)),
-                                 JBM_F32_BIAS + 23u),
-                  svsub_n_s32_x (pg, svreinterpret_s32_u32 (yi), JBM_F32_BIAS)),
-       m_special, 0);
+  *e = svdup_n_s32_m
+    (svsel_s32 (m_sub,
+                svsub_n_s32_x (m_sub,
+                               svreinterpret_s32_u32 (svlsr_n_u32_x (m_sub,
+                                                                     zi_abs,
+                                                                     23u)),
+                               JBM_F32_BIAS + 23u),
+                svsub_n_s32_x (pg, svreinterpret_s32_u32 (yi), JBM_F32_BIAS)),
+     m_special, 0);
   // Mantissa
   return
     svsel_f32
@@ -864,7 +862,7 @@ jbm_nxf32_frexp (svbool_t pg,   ///< predicate.
      (svbsl_u32 (ai, svbsl_u32 (svsel_u32 (m_sub, zi_abs, ai_abs),
                                 svdup_n_u32 ((uint32_t) JBM_F32_BIAS << 23u),
                                 svdup_n_u32 (JBM_F32_BITS_MANTISSA)),
-		 svdup_n_u64 (JBM_F64_BITS_SIGN))));
+                 svdup_n_u64 (JBM_F64_BITS_SIGN))));
 }
 
 /**
@@ -874,7 +872,7 @@ jbm_nxf32_frexp (svbool_t pg,   ///< predicate.
  * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_exp2n (svbool_t pg,           ///< predicate.
+jbm_nxf32_exp2n (svbool_t pg,   ///< predicate.
                  const svint32_t e)     ///< exponent vector (svint32_t).
 {
   return svscale_f32_x (pg, svdup_n_f32 (1.f), e);
@@ -9662,16 +9660,15 @@ jbm_nxf64_frexp (svbool_t pg,   ///< predicate.
     = svreinterpret_u64_f64 (svmul_n_f64_x (pg, svreinterpret_f64_u64 (ai_abs),
                                             0x1p52));
   // Exponent
-  *e
-    = svdup_n_s64_m
-      (svsel_s64 (m_sub,
-                  svsub_n_s64_x (m_sub,
-                                 svreinterpret_s64_u64 (svlsr_n_u64_x (m_sub,
-                                                                       zi_abs,
-                                                                       52ull)),
-                                 JBM_F64_BIAS + 52ull),
-                  svsub_n_s32_x (pg, svreinterpret_s32_u32 (yi), JBM_F32_BIAS)),
-       m_special, 0);
+  *e = svdup_n_s64_m
+    (svsel_s64 (m_sub,
+                svsub_n_s64_x (m_sub,
+                               svreinterpret_s64_u64 (svlsr_n_u64_x (m_sub,
+                                                                     zi_abs,
+                                                                     52ull)),
+                               JBM_F64_BIAS + 52ull),
+                svsub_n_s32_x (pg, svreinterpret_s32_u32 (yi), JBM_F32_BIAS)),
+     m_special, 0);
   *e = svdup_n_s64_m (en, m_special, 0ll);
   // Mantissa
   return
@@ -9681,7 +9678,7 @@ jbm_nxf64_frexp (svbool_t pg,   ///< predicate.
      (svbsl_u64 (ai, svbsl_u64 (svsel_u64 (m_sub, zi_abs, ai_abs),
                                 svdup_n_u64 ((uint64_t) JBM_F64_BIAS << 52ull),
                                 svdup_n_u64 (JBM_F64_BITS_MANTISSA)),
-		 svdup_n_u64 (JBM_F64_BITS_SIGN))));
+                 svdup_n_u64 (JBM_F64_BITS_SIGN))));
 }
 
 /**
@@ -9715,7 +9712,7 @@ jbm_nxf64_exp2n (svbool_t pg,   ///< predicate.
  * \return function value (svfloat64_t).
  */
 static inline svfloat64_t
-jbm_nxf64_exp2n (svbool_t pg,           ///< predicate.
+jbm_nxf64_exp2n (svbool_t pg,   ///< predicate.
                  const svint64_t e)     ///< exponent vector (svint64_t).
 {
   return svscale_f64_x (pg, svdup_n_f64 (1.), e);

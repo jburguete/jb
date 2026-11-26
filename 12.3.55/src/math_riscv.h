@@ -876,14 +876,13 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
   const vuint32m1_t zi = __riscv_vreinterpret_v_f32m1_u32m1 (z);
   const vuint32m1_t zi_abs = __riscv_vand_vx_u32m1 (zi, JBM_F32_BITS_ABS, vl);
   // Exponent
-  *e
-    = __riscv_vmerge_vxm_i32m1
+  *e = __riscv_vmerge_vxm_i32m1
     (__riscv_vsub_vx_i32m1_mu
      (m_sub,
       __riscv_vsub_vx_i32m1 (__riscv_vreinterpret_v_u32m1_i32m1 (yi),
                              (int32_t) JBM_F32_BIAS, vl),
       __riscv_vreinterpret_v_u32m1_i32m1 (__riscv_vsrl_vx_u32m1 (zi_abs, 23,
-                                          vl)),
+                                                                 vl)),
       (int32_t) (JBM_F32_BIAS + 23u), vl), 0, m_special, vl);
   // Mantissa
   return
@@ -894,33 +893,9 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
        (__riscv_vand_vx_u32m1 (__riscv_vmerge_vvm_u32m1 (ai_abs, zi_abs, m_sub,
                                                          vl),
                                JBM_F32_BITS_MANTISSA, vl),
-       JBM_F32_BIAS << 23u, vl)), x, vl), x, m_special, vl);
+        JBM_F32_BIAS << 23u, vl)), x, vl), x, m_special, vl);
 }
 
-/**
- * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (vint32m1_t).
- *
- * \return function value (vfloat32m1_t).
- */
-static inline vfloat32m1_t
-jbm_nxf32_exp2n (vint32m1_t e,  ///< exponent vector (vint32m1_t).
-                 const size_t vl)       ///< vector size.
-{
-  return
-    __riscv_vreinterpret_v_u32m1_f32m1
-    (__riscv_vmerge_vxm_u32m1
-     (__riscv_vmerge_vxm_u32m1
-      (__riscv_vmerge_vvm_u32m1
-       (__riscv_vsll_vx_u32m1 (__riscv_vreinterpret_v_i32m1_u32m1
-                               (__riscv_vadd_vx_i32m1 (e, 127, vl)), 23, vl),
-        __riscv_vsll_vv_u32m1 (__riscv_vmv_v_x_u32m1 (1, vl),
-                               __riscv_vreinterpret_v_i32m1_u32m1
-                               (__riscv_vadd_vx_i32m1 (e, 149, vl)), vl),
-        __riscv_vmslt_vx_i32m1_b32 (e, -126, vl), vl), 0,
-       __riscv_vmslt_vx_i32m1_b32 (e, -149, vl), vl), JBM_F32_BITS_EXPONENT,
-      __riscv_vmsgt_vx_i32m1_b32 (e, 127, vl), vl));
-}
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
  * (vint32m1_t).
@@ -989,15 +964,14 @@ jbm_nxf32_modmin (const vfloat32m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat32m1_t b, ///< 2nd vfloat64m1_t vector.
                   const size_t vl)      ///< vector size.
 {
-  const vbool32_t z
-    = __riscv_vmfle_vf_f32m1_b32 (__riscv_vfmul_vv_f32m1 (a, b, vl), 0.f, vl);
-  const vbool32_t m
-    = __riscv_vmandnot_mm_b32
-    (z, __riscv_vmflt_vv_f32m1_b32 (jbm_nxf32_abs (a, vl),
-                                    jbm_nxf32_abs (b, vl), vl), vl);
   return
-    __riscv_vfmerge_vfm_f32m1 (__riscv_vmerge_vvm_f32m1 (b, a, m, vl), 0.f, z,
-                               vl);
+    __riscv_vmerge_vfm_f32m1
+    (__riscv_vmerge_vvm_f32m1
+     (b, a, __riscv_vmflt_vv_f32m1_b32 (__riscv_vfabs_v_f32m1 (a, vl),
+                                        __riscv_vfabs_v_f32m1 (b, vl), vl), vl),
+     0.f,
+     __riscv_vmflt_vf_f32m1_b32 (__riscv_vfsgnjx_vv_f32m1 (a, b, vl), 0.f, vl),
+     vl);
 }
 
 /**
@@ -10784,14 +10758,13 @@ jbm_nxf64_frexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
   const vuint64m1_t zi = __riscv_vreinterpret_v_f64m1_u64m1 (z);
   const vuint64m1_t zi_abs = __riscv_vand_vx_u64m1 (zi, JBM_F64_BITS_ABS, vl);
   // Exponent
-  *e
-    = __riscv_vmerge_vxm_i64m1
-      (__riscv_vsub_vx_i64m1_mu
-       (__riscv_vsub_vx_i64m1 (__riscv_vreinterpret_v_u64m1_i64m1 (yi),
-                               (int64_t) JBM_F64_BIAS, vl),
-        __riscv_vreinterpret_v_u64m1_i64m1 (__riscv_vsrl_vx_u64m1 (zi_abs, 52,
-                                                                   vl)),
-        (int64_t) (JBM_F64_BIAS + 52ull), vl), 0ll, m_special, vl);
+  *e = __riscv_vmerge_vxm_i64m1
+    (__riscv_vsub_vx_i64m1_mu
+     (__riscv_vsub_vx_i64m1 (__riscv_vreinterpret_v_u64m1_i64m1 (yi),
+                             (int64_t) JBM_F64_BIAS, vl),
+      __riscv_vreinterpret_v_u64m1_i64m1 (__riscv_vsrl_vx_u64m1 (zi_abs, 52,
+                                                                 vl)),
+      (int64_t) (JBM_F64_BIAS + 52ull), vl), 0ll, m_special, vl);
   // Mantissa
   return
     __riscv_vmerge_vvm_f64m1
@@ -10875,15 +10848,14 @@ jbm_nxf64_modmin (const vfloat64m1_t a, ///< 1st vfloat64m1_t vector.
                   const vfloat64m1_t b, ///< 2nd vfloat64m1_t vector.
                   const size_t vl)      ///< vector size.
 {
-  vfloat64m1_t aa, ab, y;
-  ab = __riscv_vfmul_vv_f64m1 (a, b, vl);
-  y =
-    __riscv_vfmerge_vfm_f64m1 (a, 0., __riscv_vmfgt_vf_f64m1_b64 (ab, 0., vl),
-                               vl);
-  aa = jbm_nxf64_abs (y, vl);
-  ab = jbm_nxf64_abs (b, vl);
-  return __riscv_vmerge_vvm_f64m1 (b, y,
-                                   __riscv_vmfgt_vv_f64m1_b64 (aa, ab, vl), vl);
+  return
+    __riscv_vmerge_vfm_f64m1
+    (__riscv_vmerge_vvm_f64m1
+     (b, a, __riscv_vmflt_vv_f64m1_b64 (__riscv_vfabs_v_f64m1 (a, vl),
+                                        __riscv_vfabs_v_f64m1 (b, vl), vl), vl),
+     0.,
+     __riscv_vmflt_vf_f64m1_b64 (__riscv_vfsgnjx_vv_f64m1 (a, b, vl), 0., vl),
+     vl);
 }
 
 /**

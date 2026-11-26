@@ -353,10 +353,10 @@ jbm_8xf32_frexp (const __m256 x,        ///< __m256 vector.
   // mask
   is_finite
     = _mm256_cmpgt_epi32
-      (_mm256_set1_epi32 ((int32_t)
-                          ((JBM_F32_BITS_EXPONENT - 1u) ^ JBM_F32_BITS_SIGN)),
-       _mm256_xor_si256 (_mm256_sub_epi32 (y.i, _mm256_set1_epi32 (1)),
-                         JBM_8xF32_BITS_SIGN));
+    (_mm256_set1_epi32 ((int32_t)
+                        ((JBM_F32_BITS_EXPONENT - 1u) ^ JBM_F32_BITS_SIGN)),
+     _mm256_xor_si256 (_mm256_sub_epi32 (y.i, _mm256_set1_epi32 (1)),
+                       JBM_8xF32_BITS_SIGN));
   // extract exponent
   exp = _mm256_srli_epi32 (y.i, 23);
   // subnormals
@@ -366,8 +366,7 @@ jbm_8xf32_frexp (const __m256 x,        ///< __m256 vector.
                           _mm256_castsi256_ps (is_sub));
   exp = _mm256_blendv_epi8 (exp,
                             _mm256_sub_epi32 (_mm256_srli_epi32 (y.i, 23),
-                                              _mm256_set1_epi32 (23)),
-                            is_sub);
+                                              _mm256_set1_epi32 (23)), is_sub);
   // exponent
   *e = _mm256_and_si256 (is_finite, _mm256_sub_epi32 (exp, JBM_8xF32_BIAS));
   // build mantissa in [0.5,1)
@@ -393,11 +392,11 @@ jbm_8xf32_exp2n (const __m256i e)       ///< exponent vector (__m256i).
   const __m256i v127 = _mm256_set1_epi32 (127);
   JBM8xF32 x;
   // normal and subnormal
-  x.i = _mm256_blendv_epi8 (
-    _mm256_sllv_epi32 (_mm256_set1_epi32 (1),
-                       _mm256_add_epi32 (_mm256_set1_epi32 (149), e)),
-    _mm256_slli_epi32 (_mm256_add_epi32 (e, v127), 23),
-    _mm256_cmpgt_epi32 (e, _mm256_set1_epi32 (-127)));
+  x.i = _mm256_blendv_epi8 (_mm256_sllv_epi32 (_mm256_set1_epi32 (1),
+                                               _mm256_add_epi32
+                                               (_mm256_set1_epi32 (149), e)),
+                            _mm256_slli_epi32 (_mm256_add_epi32 (e, v127), 23),
+                            _mm256_cmpgt_epi32 (e, _mm256_set1_epi32 (-127)));
   // zero
   x.i = _mm256_andnot_si256 (_mm256_cmpgt_epi32 (_mm256_set1_epi32 (-149), e),
                              x.i);
@@ -8334,7 +8333,7 @@ jbm_4xf64_frexp (const __m256d x,       ///< __m256d vector.
 #if JBM_AVX512
   const __mmask8 is_special = _mm256_fpclass_pd_mask (x, 0x9f);
   const __m256d m
-     = _mm256_getmant_pd (x, _MM_MANT_NORM_p5_1, _MM_MANT_SIGN_src);
+    = _mm256_getmant_pd (x, _MM_MANT_NORM_p5_1, _MM_MANT_SIGN_src);
   const __m256d exp = _mm256_add_pd (_mm256_getexp_pd (x), _mm256_set1_pd (1.));
   *e = _mm256_maskz_cvtpd_epi64 (~is_special, exp);
   return _mm256_mask_mov_pd (m, is_special, x);
@@ -8348,10 +8347,10 @@ jbm_4xf64_frexp (const __m256d x,       ///< __m256d vector.
   // mask
   is_finite
     = _mm256_cmpgt_epi64
-      (_mm256_set1_epi64x ((int64_t)
-                           ((JBM_F64_BITS_EXPONENT - 1ull) ^ JBM_F64_BITS_SIGN)),
-       _mm256_xor_si256 (_mm256_sub_epi64 (y.i, _mm256_set1_epi64x (1ll)),
-                         JBM_4xF64_BITS_SIGN));
+    (_mm256_set1_epi64x ((int64_t)
+                         ((JBM_F64_BITS_EXPONENT - 1ull) ^ JBM_F64_BITS_SIGN)),
+     _mm256_xor_si256 (_mm256_sub_epi64 (y.i, _mm256_set1_epi64x (1ll)),
+                       JBM_4xF64_BITS_SIGN));
   // extract exponent
   exp = _mm256_srli_epi64 (y.i, 52);
   // subnormals
@@ -8388,11 +8387,13 @@ jbm_4xf64_exp2n (const __m256i e)       ///< exponent vector (__m256i).
   const __m256i v1023 = _mm256_set1_epi64x (1023ll);
   JBM4xF64 x;
   // normal and subnormal
-  x.i = _mm256_blendv_epi8 (
-    _mm256_slli_epi64 (_mm256_add_epi64 (e, v1023), 52),
-    _mm256_sllv_epi64 (_mm256_set1_epi64x (1ll),
-                       _mm256_add_epi64 (e, _mm256_set1_epi64x (1074ll))),
-    _mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1022ll), e));
+  x.i = _mm256_blendv_epi8 (_mm256_slli_epi64 (_mm256_add_epi64 (e, v1023), 52),
+                            _mm256_sllv_epi64 (_mm256_set1_epi64x (1ll),
+                                               _mm256_add_epi64 (e,
+                                                                 _mm256_set1_epi64x
+                                                                 (1074ll))),
+                            _mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1022ll),
+                                                e));
   // zero
   x.i
     = _mm256_andnot_si256 (_mm256_cmpgt_epi64 (_mm256_set1_epi64x (-1074ll), e),

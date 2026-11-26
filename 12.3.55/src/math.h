@@ -64,13 +64,7 @@
  * \def JBM_F128
  * \brief macro to do maximum precision suffixes.
  */
-#ifdef __clang__
 #define JBM_F128(x) __extension__ x##f128
-#elifdef __GNUC__
-#define JBM_F128(x) __extension__ x##Q
-#else
-#error "Compiler not supported"
-#endif
 
 /**
  * \def aligned_free
@@ -928,7 +922,7 @@ enum JBMFluxLimiterType
 #include "math_avx512.h"
 #endif
 #endif
-#elif defined (__ARM_FEATURE_SVE2)
+#elifdef __ARM_FEATURE_SVE2
 #undef JBM_VECTORIZED
 #define JBM_VECTORIZED 1
 #include "math_sve.h"
@@ -940,13 +934,10 @@ enum JBMFluxLimiterType
 #undef JBM_VECTORIZED
 #define JBM_VECTORIZED 1
 #include "math_riscv.h"
-#elifdef __loongarch_sx
+#elifdef __loongarch_asx
 #undef JBM_VECTORIZED
 #define JBM_VECTORIZED 1
-#include "math_lsx.h"
-#ifdef __loongarch_asx
-#include "math_lasx.h"
-#endif
+#include "math_loong.h"
 #endif
 
 

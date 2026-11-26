@@ -396,8 +396,8 @@ jbm_4xf32_mod (const __m128 x,  ///< dividend (__m128).
   __m128 r;
   r = _mm_floor_ps (_mm_div_ps (x, d));
   return
-     _mm_blendv_ps (_mm_fnmadd_ps (r, d, x), _mm_mul_ps (d, _mm_set1_ps (0.5f)),
-                    _mm_cmpgt_ps (jbm_4xf32_abs (r), _mm_set1_ps (0x1p23)));
+    _mm_blendv_ps (_mm_fnmadd_ps (r, d, x), _mm_mul_ps (d, _mm_set1_ps (0.5f)),
+                   _mm_cmpgt_ps (jbm_4xf32_abs (r), _mm_set1_ps (0x1p23)));
 }
 
 /**
@@ -426,10 +426,10 @@ jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
   // mask
   is_finite
     = _mm_cmpgt_epi32
-      (_mm_set1_epi32 ((int32_t)
-                       ((JBM_F32_BITS_EXPONENT - 1u) ^ JBM_F32_BITS_SIGN)),
-       _mm_xor_si128 (_mm_sub_epi32 (y.i, _mm_set1_epi32 (1)),
-                      JBM_4xF32_BITS_SIGN));
+    (_mm_set1_epi32 ((int32_t)
+                     ((JBM_F32_BITS_EXPONENT - 1u) ^ JBM_F32_BITS_SIGN)),
+     _mm_xor_si128 (_mm_sub_epi32 (y.i, _mm_set1_epi32 (1)),
+                    JBM_4xF32_BITS_SIGN));
   // extract exponent
   exp = _mm_srli_epi32 (y.i, 23);
   // subnormals
@@ -439,8 +439,7 @@ jbm_4xf32_frexp (const __m128 x,        ///< __m128 vector.
                        _mm_castsi128_ps (is_sub));
   exp = _mm_blendv_epi8 (exp,
                          _mm_sub_epi32 (_mm_srli_epi32 (y.i, 23),
-                                        _mm_set1_epi32 (23)),
-                         is_sub);
+                                        _mm_set1_epi32 (23)), is_sub);
   // exponent
   *e = _mm_and_si128 (is_finite, _mm_sub_epi32 (exp, JBM_4xF32_BIAS));
   // build mantissa in [0.5,1)
@@ -8754,10 +8753,10 @@ jbm_2xf64_frexp (const __m128d x,       ///< __m128d vector.
   // mask
   is_finite
     = _mm_cmpgt_epi64
-      (_mm_set1_epi64x ((int64_t)
-                        ((JBM_F64_BITS_EXPONENT - 1ull) ^ JBM_F64_BITS_SIGN)),
-       _mm_xor_si128 (_mm_sub_epi64 (y.i, _mm_set1_epi64x (1ll)),
-                      JBM_2xF64_BITS_SIGN));
+    (_mm_set1_epi64x ((int64_t)
+                      ((JBM_F64_BITS_EXPONENT - 1ull) ^ JBM_F64_BITS_SIGN)),
+     _mm_xor_si128 (_mm_sub_epi64 (y.i, _mm_set1_epi64x (1ll)),
+                    JBM_2xF64_BITS_SIGN));
   // extract exponent
   exp = _mm_srli_epi64 (y.i, 52);
   // subnormals
@@ -8767,8 +8766,7 @@ jbm_2xf64_frexp (const __m128d x,       ///< __m128d vector.
                        _mm_castsi128_pd (is_sub));
   exp = _mm_blendv_epi8 (exp,
                          _mm_sub_epi64 (_mm_srli_epi64 (y.i, 52),
-                                        _mm_set1_epi64x (52ll)),
-                         is_sub);
+                                        _mm_set1_epi64x (52ll)), is_sub);
   // exponent
   *e = _mm_and_si128 (is_finite, _mm_sub_epi64 (exp, JBM_2xF64_BIAS));
   // build mantissa in [0.5,1)
