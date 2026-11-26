@@ -827,7 +827,7 @@ jbm_nxf32_mod1 (svbool_t pg,    ///< predicate.
 /**
  * Function to implement the standard frexp function (svfloat32_t).
  *
- * \return normalized fraction value in [1/2,1).
+ * \return normalized fraction value in [1/2,1) (svfloat32_t).
  */
 static inline svfloat32_t
 jbm_nxf32_frexp (svbool_t pg,   ///< predicate.
@@ -836,64 +836,48 @@ jbm_nxf32_frexp (svbool_t pg,   ///< predicate.
 {
   const svuint32_t ai = svreinterpret_u32_f32 (x);
   const svuint32_t ai_abs = svand_n_u32_x (pg, ai, JBM_F32_BITS_ABS);
-  const svbool_t m_special = svorr_b_z (pg,
-                                        svcmpge_n_u32 (pg, ai_abs,
-                                                       JBM_F32_BITS_EXPONENT),
-                                        svcmpeq_n_u32 (pg, ai_abs, 0));
-  const svuint32_t yi = svand_n_u32_x (pg, ai, JBM_F32_BITS_EXPONENT);
-  const svbool_t m_sub = svcmpeq_n_u32 (pg, yi, 0);
+  const svbool_t m_special
+    = svcmpge_n_u32 (pg, svsub_n_u32_x (pg, ai_abs, 1u),
+                     JBM_F32_BITS_EXPONENT - 1u);
+  const svuint32_t yi = svlsr_n_u32_x (pg, ai_abs, 23);
+  const svbool_t m_sub = svcmpeq_n_u32 (pg, yi, 0u);
   // Scale subnormals
-  const svuint32_t zi = svreinterpret_u32_f32 (svmul_n_f32_x (pg, x, 0x1p23f));
+  const svuint32_t zi_abs
+    = svreinterpret_u32_f32 (svmul_n_f32_x (pg, svreinterpret_f32_u32 (ai_abs),
+                                            0x1p23f));
   // Exponent
-  const svint32_t en = svsub_n_s32_x (pg,
-                                      svreinterpret_s32_u32 (svlsr_n_u32_x
-                                                             (pg, yi, 23)),
-                                      JBM_F32_BIAS);
-  const svint32_t en_sub = svsub_n_s32_x (pg,
-                                          svreinterpret_s32_u32
-                                          (svlsr_n_u32_x
-                                           (pg,
-                                            svand_n_u32_x (pg, zi,
-                                                           JBM_F32_BITS_EXPONENT),
-                                            23)),
-                                          JBM_F32_BIAS + 23);
-  *e = svsel_s32 (m_special, svdup_n_s32 (0), svsel_s32 (m_sub, en_sub, en));
+  *e
+    = svdup_n_s32_m
+      (svsel_s32 (m_sub,
+                  svsub_n_s32_x (m_sub,
+                                 svreinterpret_s32_u32 (svlsr_n_u32_x (m_sub,
+                                                                       zi_abs,
+                                                                       23u)),
+                                 JBM_F32_BIAS + 23u),
+                  svsub_n_s32_x (pg, svreinterpret_s32_u32 (yi), JBM_F32_BIAS)),
+       m_special, 0);
   // Mantissa
-  const svuint32_t mant = svorr_n_u32_x (pg,
-                                         svorr_n_u32_x (pg,
-                                                        svand_n_u32_x (pg, ai,
-                                                                       JBM_F32_BITS_SIGN),
-                                                        0x3f000000),
-                                         svand_n_u32_x (pg,
-                                                        svsel_u32 (m_sub, zi,
-                                                                   ai),
-                                                        JBM_F32_BITS_MANTISSA));
-  return svsel_f32 (m_special, x, svreinterpret_f32_u32 (mant));
+  return
+    svsel_f32
+    (m_special, x,
+     svreinterpret_f32_u32
+     (svbsl_u32 (ai, svbsl_u32 (svsel_u32 (m_sub, zi_abs, ai_abs),
+                                svdup_n_u32 ((uint32_t) JBM_F32_BIAS << 23u),
+                                svdup_n_u32 (JBM_F32_BITS_MANTISSA)),
+		 svdup_n_u64 (JBM_F64_BITS_SIGN))));
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
  * (svint32_t).
  *
- * \return function value vector (svfloat32_t).
+ * \return function value (svfloat32_t).
  */
 static inline svfloat32_t
-jbm_nxf32_exp2n (svbool_t pg,   ///< predicate.
-                 svint32_t e)   ///< exponent vector (svint32_t).
+jbm_nxf32_exp2n (svbool_t pg,           ///< predicate.
+                 const svint32_t e)     ///< exponent vector (svint32_t).
 {
-  svuint32_t r;
-  r = svsel_u32 (svcmplt_n_s32 (pg, e, -126),
-                 svlsl_u32_x (pg, svdup_n_u32 (1),
-                              svreinterpret_u32_s32 (svadd_n_s32_x (pg, e,
-                                                                    149))),
-                 svlsl_n_u32_x (pg,
-                                svreinterpret_u32_s32 (svadd_n_s32_x (pg, e,
-                                                                      127)),
-                                23));
-  r =
-    svsel_u32 (svcmpgt_n_s32 (pg, e, 127), svdup_n_u32 (JBM_F32_BITS_EXPONENT),
-               r);
-  return svreinterpret_f32_u32 (r);
+  return svscale_f32_x (pg, svdup_n_f32 (1.f), e);
 }
 
 /**
@@ -906,7 +890,7 @@ jbm_nxf32_ldexp (svbool_t pg,   ///< predicate.
                  const svfloat32_t x,   ///< svfloat32_t vector.
                  svint32_t e)   ///< exponent vector (svint32_t).
 {
-  return svmul_f32_x (pg, x, jbm_nxf32_exp2n (pg, e));
+  return svscale_f32_x (pg, x, e);
 }
 
 /**
@@ -9659,7 +9643,7 @@ jbm_nxf64_mod1 (svbool_t pg,    ///< predicate.
 /**
  * Function to implement the standard frexp function (svfloat64_t).
  *
- * \return normalized fraction value in [1/2,1).
+ * \return normalized fraction value in [1/2,1) (svfloat64_t).
  */
 static inline svfloat64_t
 jbm_nxf64_frexp (svbool_t pg,   ///< predicate.
@@ -9668,40 +9652,36 @@ jbm_nxf64_frexp (svbool_t pg,   ///< predicate.
 {
   const svuint64_t ai = svreinterpret_u64_f64 (x);
   const svuint64_t ai_abs = svand_n_u64_x (pg, ai, JBM_F64_BITS_ABS);
-  const svbool_t m_special = svorr_b_z (pg,
-                                        svcmpge_n_u64 (pg, ai_abs,
-                                                       JBM_F64_BITS_EXPONENT),
-                                        svcmpeq_n_u64 (pg, ai_abs, 0));
-  const svuint64_t yi = svand_n_u64_x (pg, ai, JBM_F64_BITS_EXPONENT);
-  const svbool_t m_sub = svcmpeq_n_u64 (pg, yi, 0);
+  const svbool_t m_special
+    = svcmpge_n_u64 (pg, svsub_n_u64_x (pg, ai_abs, 1ull),
+                     JBM_F64_BITS_EXPONENT - 1ull);
+  const svuint64_t yi = svlsr_n_u64_x (pg, ai_abs, 52ull);
+  const svbool_t m_sub = svcmpeq_n_u64 (pg, yi, 0ull);
   // Scale subnormals
-  const svuint64_t zi = svreinterpret_u64_f64 (svmul_n_f64_x (pg, x, 0x1p52));
+  const svuint64_t zi_abs
+    = svreinterpret_u64_f64 (svmul_n_f64_x (pg, svreinterpret_f64_u64 (ai_abs),
+                                            0x1p52));
   // Exponent
-  const svint64_t en = svsub_n_s64_x (pg,
-                                      svreinterpret_s64_u64 (svlsr_n_u64_x
-                                                             (pg, yi, 52)),
-                                      JBM_F64_BIAS);
-  const svint64_t en_sub = svsub_n_s64_x (pg,
-                                          svreinterpret_s64_u64
-                                          (svlsr_n_u64_x
-                                           (pg,
-                                            svand_n_u64_x (pg, zi,
-                                                           JBM_F64_BITS_EXPONENT),
-                                            52)),
-                                          JBM_F64_BIAS + 52);
-  *e = svsel_s64 (m_special, svdup_n_s64 (0), svsel_s64 (m_sub, en_sub, en));
+  *e
+    = svdup_n_s64_m
+      (svsel_s64 (m_sub,
+                  svsub_n_s64_x (m_sub,
+                                 svreinterpret_s64_u64 (svlsr_n_u64_x (m_sub,
+                                                                       zi_abs,
+                                                                       52ull)),
+                                 JBM_F64_BIAS + 52ull),
+                  svsub_n_s32_x (pg, svreinterpret_s32_u32 (yi), JBM_F32_BIAS)),
+       m_special, 0);
+  *e = svdup_n_s64_m (en, m_special, 0ll);
   // Mantissa
-  const svuint64_t mant = svorr_n_u64_x (pg,
-                                         svorr_n_u64_x
-                                         (pg,
-                                          svand_n_u64_x (pg, ai,
-                                                         JBM_F64_BITS_SIGN),
-                                          0x3fe0000000000000ull),
-                                         svand_n_u64_x (pg,
-                                                        svsel_u64 (m_sub, zi,
-                                                                   ai),
-                                                        JBM_F64_BITS_MANTISSA));
-  return svsel_f64 (m_special, x, svreinterpret_f64_u64 (mant));
+  return
+    svsel_f64
+    (m_special, x,
+     svreinterpret_f64_u64
+     (svbsl_u64 (ai, svbsl_u64 (svsel_u64 (m_sub, zi_abs, ai_abs),
+                                svdup_n_u64 ((uint64_t) JBM_F64_BIAS << 52ull),
+                                svdup_n_u64 (JBM_F64_BITS_MANTISSA)),
+		 svdup_n_u64 (JBM_F64_BITS_SIGN))));
 }
 
 /**
@@ -9715,17 +9695,30 @@ jbm_nxf64_exp2n (svbool_t pg,   ///< predicate.
                  svint64_t e)   ///< exponent vector (svint64_t).
 {
   svuint64_t r;
-  r = svsel_u64 (svcmplt_n_s64 (pg, e, -1022),
-                 svlsl_u64_x (pg, svdup_n_u64 (1),
+  r = svsel_u64 (svcmplt_n_s64 (pg, e, -1022ll),
+                 svlsl_u64_x (pg, svdup_n_u64 (1ull),
                               svreinterpret_u64_s64 (svadd_n_s64_x (pg, e,
-                                                                    1074))),
+                                                                    1074ll))),
                  svlsl_n_u64_x (pg,
                                 svreinterpret_u64_s64 (svadd_n_s64_x (pg, e,
-                                                                      1023)),
-                                52));
-  r = svsel_u64 (svcmpgt_n_s64 (pg, e, 1023),
+                                                                      1023ll)),
+                                52ull));
+  r = svsel_u64 (svcmpgt_n_s64 (pg, e, 1023ll),
                  svdup_n_u64 (JBM_F64_BITS_EXPONENT), r);
   return svreinterpret_f64_u64 (r);
+}
+
+/**
+ * Function to calculate the function \f$2^n\f$ with n an integer vector
+ * (svint64_t).
+ *
+ * \return function value (svfloat64_t).
+ */
+static inline svfloat64_t
+jbm_nxf64_exp2n (svbool_t pg,           ///< predicate.
+                 const svint64_t e)     ///< exponent vector (svint64_t).
+{
+  return svscale_f64_x (pg, svdup_n_f64 (1.), e);
 }
 
 /**
@@ -9738,7 +9731,7 @@ jbm_nxf64_ldexp (svbool_t pg,   ///< predicate.
                  const svfloat64_t x,   ///< svfloat64_t vector.
                  svint64_t e)   ///< exponent vector (svint64_t).
 {
-  return svmul_f64_x (pg, x, jbm_nxf64_exp2n (pg, e));
+  return svscale_f64_x (pg, x, e);
 }
 
 /**

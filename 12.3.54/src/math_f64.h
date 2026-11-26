@@ -365,7 +365,7 @@ jbm_f64_mod (const double x,    ///< dividend (double).
 {
   double r;
   r = floor (x / d);
-  return (jbm_f64_abs (r) > 1. / DBL_EPSILON) ? 0.5 * d : x - d * r;
+  return (jbm_f64_abs (r) > 0x1p52) ? 0.5 * d : x - d * r;
 }
 
 /**

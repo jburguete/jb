@@ -33,7 +33,7 @@
 #ifndef JB_MATH_F32__H
 #define JB_MATH_F32__H 1
 
-#define JBM_F32_BIAS 126u       ///< bias for doubles.
+#define JBM_F32_BIAS 126u       ///< bias for floats.
 #define JBM_F32_BITS_1 0x3f800000u      ///< 1 bits for floats.
 #define JBM_F32_BITS_ABS 0x7fffffffu    ///< absolute value bits for floats.
 #define JBM_F32_BITS_EXPONENT 0x7f800000u       ///< exponent bits for floats.
@@ -320,7 +320,7 @@ jbm_f32_mod (const float x,     ///< dividend (float).
 {
   float r;
   r = floorf (x / d);
-  return (jbm_f32_abs (r) > 1.f / FLT_EPSILON) ? 0.5f * d : x - d * r;
+  return (jbm_f32_abs (r) > 0x1p23f) ? 0.5f * d : x - d * r;
 }
 
 /**

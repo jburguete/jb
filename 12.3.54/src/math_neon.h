@@ -672,43 +672,42 @@ jbm_4xf32_mod (const float32x4_t x,     ///< dividend (float32x4_t).
   float32x4_t r;
   r = vrndmq_f32 (vdivq_f32 (x, d));
   return
-    vbslq_f32 (vcgtq_f32 (jbm_4xf32_abs (r), vdupq_n_f32 (1.f / FLT_EPSILON)),
+    vbslq_f32 (vcgtq_f32 (jbm_4xf32_abs (r), vdupq_n_f32 (0x1p23)),
                vmulq_n_f32 (d, 0.5f), vfmsq_f32 (x, r, d));
 }
 
 /**
  * Function to implement the standard frexp function (float32x4_t).
  *
- * \return normalized fraction value in [1/2,1).
+ * \return normalized fraction value in [1/2,1) (float32x4_t).
  */
 static inline float32x4_t
 jbm_4xf32_frexp (const float32x4_t x,   ///< float32x4_t vector.
                  int32x4_t *e)  ///< pointer to the extracted exponents vector.
 {
-  const uint32x4_t zi = vdupq_n_u32 (0);
-  const uint32x4_t mant_mask = JBM_4xF32_BITS_MANTISSA;
+  const uint32x4_t zi = vdupq_n_u32 (0u);
+  const uint32x4_t vbias = vdupq_n_u32 (JBM_F32_BIAS << 23u);
   JBM4xF32 y, z;
   uint32x4_t exp, is_sub, is_finite;
   // y=abs(x)
   y.x = jbm_4xf32_abs (x);
   // mask
-  is_finite = vcltq_u32 (vsubq_u32 (y.i, vdupq_n_u32 (1)),
-                         vdupq_n_u32 (JBM_F32_BITS_EXPONENT - 1));
+  is_finite = vcltq_u32 (vsubq_u32 (y.i, vdupq_n_u32 (1u)),
+                         vdupq_n_u32 (JBM_F32_BITS_EXPONENT - 1u));
   // extract exponent
   exp = vshrq_n_u32 (y.i, 23);
   // subnormals
   is_sub = vandq_u32 (is_finite, vceqq_u32 (exp, zi));
   y.x = vbslq_f32 (is_sub, vmulq_n_f32 (y.x, 0x1p23f), y.x);
-  exp = vbslq_u32 (is_sub, vsubq_u32 (vshrq_n_u32 (y.i, 23), vdupq_n_u32 (23)),
+  exp = vbslq_u32 (is_sub, vsubq_u32 (vshrq_n_u32 (y.i, 23), vdupq_n_u32 (23u)),
                    exp);
   // exponent
-  *e = vreinterpretq_s32_u32 (vbslq_u32 (is_finite,
-                                         vsubq_u32 (exp, JBM_4xF32_BIAS), zi));
+  *e = vreinterpretq_s32_u32 (vandq_u32 (is_finite,
+                                         vsubq_u32 (exp, JBM_4xF32_BIAS)));
   // build mantissa in [0.5,1)
   z.x = x;
-  y.i = vorrq_u32 (vandq_u32 (z.i, JBM_4xF32_BITS_SIGN),
-                   vorrq_u32 (vdupq_n_u32 (JBM_F32_BIAS << 23),
-                              vandq_u32 (y.i, mant_mask)));
+  y.i = vbslq_u32 (JBM_4xF32_BITS_MANTISSA, y.i, vbias);
+  y.i = vbslq_u32 (JBM_4xF32_BITS_SIGN, z.i, y.i);
   return vbslq_f32 (is_finite, y.x, x);
 }
 
@@ -723,13 +722,14 @@ jbm_4xf32_exp2n (int32x4_t e)   ///< exponent vector (int32x4_t).
 {
   const int32x4_t v127 = vdupq_n_s32 (127);
   const int32x4_t v149 = vdupq_n_s32 (149);
-  float32x4_t x;
-  x = vbslq_f32 (vcgtq_s32 (e, vdupq_n_s32 (-127)),
-                 vreinterpretq_f32_s32 (vshlq_n_s32 (vaddq_s32 (e, v127), 23)),
-                 vreinterpretq_f32_s32 (vshlq_s32 (vdupq_n_s32 (1),
+  uint32x4_t x;
+  x = vbslq_u32 (vcgtq_s32 (e, vdupq_n_s32 (-127)),
+                 vreinterpretq_u32_s32 (vshlq_n_s32 (vaddq_s32 (e, v127), 23)),
+                 vreinterpretq_u32_s32 (vshlq_s32 (vdupq_n_s32 (1),
                                                    vaddq_s32 (v149, e))));
-  x = vbslq_f32 (vcltq_s32 (e, vdupq_n_s32 (-150)), vdupq_n_f32 (0.f), x);
-  return vbslq_f32 (vcgtq_s32 (e, v127), vdupq_n_f32 (INFINITY), x);
+  x = vbicq_u32 (x, vcltq_s32 (e, vdupq_n_s32 (-149)));
+  return vreinterpretq_f32_u32 (vbslq_u32 (vcgtq_s32 (e, v127),
+                                           JBM_4xF32_BITS_EXPONENT, x));
 }
 
 /**
@@ -8477,14 +8477,14 @@ jbm_2xf64_mod (const float64x2_t x,     ///< dividend (float64x2_t).
 /**
  * Function to implement the standard frexp function (float64x2_t).
  *
- * \return normalized fraction value in [1/2,1).
+ * \return normalized fraction value in [1/2,1) (float64x2_t).
  */
 static inline float64x2_t
 jbm_2xf64_frexp (const float64x2_t x,   ///< float64x2_t vector.
                  int64x2_t *e)  ///< pointer to the extracted exponents vector.
 {
   const uint64x2_t zi = vdupq_n_u64 (0ull);
-  const uint64x2_t mant_mask = JBM_2xF64_BITS_MANTISSA;
+  const uint64x2_t vbias = vdupq_n_u64 ((uint64_t) JBM_F64_BIAS << 52ull);
   JBM2xF64 y, z;
   uint64x2_t exp, is_sub, is_finite;
   // y=abs(x)
@@ -8500,19 +8500,18 @@ jbm_2xf64_frexp (const float64x2_t x,   ///< float64x2_t vector.
   exp = vbslq_u64 (is_sub, vsubq_u64 (vshrq_n_u64 (y.i, 52),
                                       vdupq_n_u64 (52ull)), exp);
   // exponent
-  *e = vreinterpretq_s64_u64 (vbslq_u64 (is_finite,
-                                         vsubq_u64 (exp, JBM_2xF64_BIAS), zi));
+  *e = vreinterpretq_s64_u64 (vandq_u64 (is_finite,
+                                         vsubq_u64 (exp, JBM_2xF64_BIAS)));
   // build mantissa in [0.5,1)
   z.x = x;
-  y.i = vorrq_u64 (vandq_u64 (z.i, JBM_2xF64_BITS_SIGN),
-                   vorrq_u64 (vdupq_n_u64 (JBM_F64_BIAS << 52),
-                              vandq_u64 (y.i, mant_mask)));
+  y.i = vbslq_u64 (JBM_2xF64_BITS_MANTISSA, y.i, vbias);
+  y.i = vbslq_u64 (JBM_2xF64_BITS_SIGN, z.i, y.i);
   return vbslq_f64 (is_finite, y.x, x);
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (int64x2_t)
+ * (int64x2_t).
  *
  * \return function value (float64x2_t).
  */
@@ -8521,14 +8520,15 @@ jbm_2xf64_exp2n (int64x2_t e)   ///< exponent vector (int64x2_t).
 {
   const int64x2_t v1023 = vdupq_n_s64 (1023ll);
   const int64x2_t v1074 = vdupq_n_s64 (1074ll);
-  float64x2_t x;
-  x = vbslq_f64 (vcgtq_s64 (e, vdupq_n_s64 (-1022ll)),
-                 vreinterpretq_f64_s64 (vshlq_n_s64 (vaddq_s64 (e, v1023),
+  uint64x2_t x;
+  x = vbslq_u64 (vcgtq_s64 (e, vdupq_n_s64 (-1022ll)),
+                 vreinterpretq_u64_s64 (vshlq_n_s64 (vaddq_s64 (e, v1023),
                                                      52ll)),
-                 vreinterpretq_f64_s64 (vshlq_s64 (vdupq_n_s64 (1ll),
+                 vreinterpretq_u64_s64 (vshlq_s64 (vdupq_n_s64 (1ll),
                                                    vaddq_s64 (v1074, e))));
-  x = vbslq_f64 (vcltq_s64 (e, vdupq_n_s64 (-1075ll)), vdupq_n_f64 (0.), x);
-  return vbslq_f64 (vcgtq_s64 (e, v1023), vdupq_n_f64 (INFINITY), x);
+  x = vbicq_u64 (x, vcltq_s64 (e, vdupq_n_s64 (-1074ll)));
+  return vreinterpretq_f64_u64 (vbslq_u64 (vcgtq_s64 (e, v1023),
+                                           JBM_2xF64_BITS_EXPONENT, x));
 }
 
 /**

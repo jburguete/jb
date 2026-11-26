@@ -857,7 +857,7 @@ jbm_nxf32_mod1 (const vfloat32m1_t x,   ///< dividend (vfloat32m1_t).
 /**
  * Function to implement the standard frexp function (vfloat32m1_t).
  *
- * \return normalized fraction value in [1/2,1).
+ * \return normalized fraction value in [1/2,1) (vfloat32m1_t).
  */
 static inline vfloat32m1_t
 jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
@@ -867,38 +867,34 @@ jbm_nxf32_frexp (const vfloat32m1_t x,  ///< vfloat32m1_t vector.
   const vuint32m1_t ai = __riscv_vreinterpret_v_f32m1_u32m1 (x);
   const vuint32m1_t ai_abs = __riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_ABS, vl);
   const vbool32_t m_special
-    = __riscv_vmor_mm_b32
-    (__riscv_vmsgeu_vx_u32m1_b32 (ai_abs, JBM_F32_BITS_EXPONENT, vl),
-     __riscv_vmseq_vx_u32m1_b32 (ai_abs, 0, vl), vl);
-  const vuint32m1_t yi = __riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_EXPONENT, vl);
-  const vbool32_t m_sub = __riscv_vmseq_vx_u32m1_b32 (yi, 0, vl);
+    = __riscv_vmsgeu_vx_u32m1_b32 (__riscv_vsub_vx_u32m1 (ai_abs, 1u, vl),
+                                   JBM_F32_BITS_EXPONENT - 1u, vl);
+  const vuint32m1_t yi = __riscv_vsrl_vx_u32m1 (ai_abs, 23, vl);
+  const vbool32_t m_sub = __riscv_vmseq_vx_u32m1_b32 (yi, 0u, vl);
   // Scale subnormals
-  const vuint32m1_t zi
-    = __riscv_vreinterpret_v_f32m1_u32m1 (__riscv_vfmul_vf_f32m1 (x, 0x1p23f,
-                                                                  vl));
+  const vfloat32m1_t z = __riscv_vfmul_vf_f32m1 (x, 0x1p23f, vl);
+  const vuint32m1_t zi = __riscv_vreinterpret_v_f32m1_u32m1 (z);
+  const vuint32m1_t zi_abs = __riscv_vand_vx_u32m1 (zi, JBM_F32_BITS_ABS, vl);
   // Exponent
-  const vint32m1_t en
-    = __riscv_vsub_vx_i32m1
-    (__riscv_vreinterpret_v_u32m1_i32m1 (__riscv_vsrl_vx_u32m1 (yi, 23, vl)),
-     JBM_F32_BIAS, vl);
-  const vint32m1_t en_sub
-    = __riscv_vsub_vx_i32m1
-    (__riscv_vreinterpret_v_u32m1_i32m1
-     (__riscv_vsrl_vx_u32m1
-      (__riscv_vand_vx_u32m1 (zi, JBM_F32_BITS_EXPONENT, vl), 23, vl)),
-     JBM_F32_BIAS + 23, vl);
-  *e = __riscv_vmerge_vvm_i32m1
-    (__riscv_vmerge_vvm_i32m1 (en, en_sub, m_sub, vl),
-     __riscv_vmv_v_x_i32m1 (0, vl), m_special, vl);
+  *e
+    = __riscv_vmerge_vxm_i32m1
+    (__riscv_vsub_vx_i32m1_mu
+     (m_sub,
+      __riscv_vsub_vx_i32m1 (__riscv_vreinterpret_v_u32m1_i32m1 (yi),
+                             (int32_t) JBM_F32_BIAS, vl),
+      __riscv_vreinterpret_v_u32m1_i32m1 (__riscv_vsrl_vx_u32m1 (zi_abs, 23,
+                                          vl)),
+      (int32_t) (JBM_F32_BIAS + 23u), vl), 0, m_special, vl);
   // Mantissa
-  const vuint32m1_t mant
-    = __riscv_vor_vv_u32m1
-    (__riscv_vor_vx_u32m1
-     (__riscv_vand_vx_u32m1 (ai, JBM_F32_BITS_SIGN, vl), 0x3f000000, vl),
-     __riscv_vand_vx_u32m1 (__riscv_vmerge_vvm_u32m1 (ai, zi, m_sub, vl),
-                            JBM_F32_BITS_MANTISSA, vl), vl);
-  return __riscv_vmerge_vvm_f32m1
-    (__riscv_vreinterpret_v_u32m1_f32m1 (mant), x, m_special, vl);
+  return
+    __riscv_vmerge_vvm_f32m1
+    (__riscv_vfsgnj_vv_f32m1
+     (__riscv_vreinterpret_v_u32m1_f32m1
+      (__riscv_vor_vx_u32m1
+       (__riscv_vand_vx_u32m1 (__riscv_vmerge_vvm_u32m1 (ai_abs, zi_abs, m_sub,
+                                                         vl),
+                               JBM_F32_BITS_MANTISSA, vl),
+       JBM_F32_BIAS << 23u, vl)), x, vl), x, m_special, vl);
 }
 
 /**
@@ -924,6 +920,32 @@ jbm_nxf32_exp2n (vint32m1_t e,  ///< exponent vector (vint32m1_t).
         __riscv_vmslt_vx_i32m1_b32 (e, -126, vl), vl), 0,
        __riscv_vmslt_vx_i32m1_b32 (e, -149, vl), vl), JBM_F32_BITS_EXPONENT,
       __riscv_vmsgt_vx_i32m1_b32 (e, 127, vl), vl));
+}
+/**
+ * Function to calculate the function \f$2^n\f$ with n an integer vector
+ * (vint32m1_t).
+ *
+ * \return function value (vfloat32m1_t).
+ */
+static inline vfloat32m1_t
+jbm_nxf32_exp2n (const vint32m1_t e,    ///< exponent vector (vint32m1_t).
+                 const size_t vl)       ///< vector size.
+{
+  const vuint32m1_t eu = __riscv_vreinterpret_v_i32m1_u32m1 (e);
+  // normal
+  vuint32m1_t xi
+    = __riscv_vsll_vx_u32m1 (__riscv_vadd_vx_u32m1 (eu, 127u, vl), 23, vl);
+  // subnormal
+  xi = __riscv_vsll_vv_u32m1_mu (__riscv_vmslt_vx_i32m1_b32 (e, -126, vl), xi,
+                                 __riscv_vmv_v_x_u32m1 (1u, vl),
+                                 __riscv_vadd_vx_u32m1 (eu, 149u, vl), vl);
+  // zero
+  xi = __riscv_vmerge_vxm_u32m1 (xi, 0u,
+                                 __riscv_vmslt_vx_i32m1_b32 (e, -149, vl), vl);
+  // infinity
+  xi = __riscv_vmerge_vxm_u32m1 (xi, JBM_F32_BITS_EXPONENT,
+                                 __riscv_vmsgt_vx_i32m1_b32 (e, 127, vl), vl);
+  return __riscv_vreinterpret_v_u32m1_f32m1 (xi);
 }
 
 /**
@@ -10751,70 +10773,65 @@ jbm_nxf64_frexp (const vfloat64m1_t x,  ///< vfloat64m1_t vector.
                  const size_t vl)       ///< vector size.
 {
   const vuint64m1_t ai = __riscv_vreinterpret_v_f64m1_u64m1 (x);
-  const vuint64m1_t yi = __riscv_vand_vx_u64m1 (ai, JBM_F64_BITS_EXPONENT, vl);
-  const vbool64_t m_sub = __riscv_vmseq_vx_u64m1_b64 (yi, 0ull, vl);
+  const vuint64m1_t ai_abs = __riscv_vand_vx_u64m1 (ai, JBM_F64_BITS_ABS, vl);
   const vbool64_t m_special
-    = __riscv_vmor_mm_b64
-    (__riscv_vmseq_vx_u64m1_b64 (yi, JBM_F64_BITS_EXPONENT, vl),
-     __riscv_vmand_mm_b64 (m_sub,
-                           __riscv_vmseq_vx_u64m1_b64
-                           (__riscv_vand_vx_u64m1
-                            (ai, JBM_F64_BITS_MANTISSA, vl), 0ull, vl), vl),
-     vl);
+    = __riscv_vmsgeu_vx_u64m1_b64 (__riscv_vsub_vx_u64m1 (ai_abs, 1ull, vl),
+                                   JBM_F64_BITS_EXPONENT - 1ull, vl);
+  const vuint64m1_t yi = __riscv_vsrl_vx_u64m1 (ai_abs, 52, vl);
+  const vbool64_t m_sub = __riscv_vmseq_vx_u64m1_b64 (yi, 0ull, vl);
   // Scale subnormals
-  const vuint64m1_t zi
-    = __riscv_vreinterpret_v_f64m1_u64m1 (__riscv_vfmul_vf_f64m1 (x, 0x1p1023,
-                                                                  vl));
+  const vfloat64m1_t z = __riscv_vfmul_vf_f64m1 (x, 0x1p52, vl);
+  const vuint64m1_t zi = __riscv_vreinterpret_v_f64m1_u64m1 (z);
+  const vuint64m1_t zi_abs = __riscv_vand_vx_u64m1 (zi, JBM_F64_BITS_ABS, vl);
   // Exponent
-  vint64m1_t en
-    = __riscv_vmerge_vvm_i64m1
-    (__riscv_vsub_vx_i64m1
-     (__riscv_vsra_vx_i64m1
-      (__riscv_vreinterpret_v_u64m1_i64m1 (yi), 52ll, vl), JBM_F64_BIAS, vl),
-     __riscv_vsub_vx_i64m1
-     (__riscv_vsra_vx_i64m1
-      (__riscv_vreinterpret_v_u64m1_i64m1
-       (__riscv_vand_vx_u64m1 (zi, JBM_F64_BITS_EXPONENT, vl)), 52ll, vl),
-      (int64_t) (JBM_F64_BIAS + 1023ull), vl), m_sub, vl);
-  *e = __riscv_vmerge_vvm_i64m1 (en, __riscv_vmv_v_x_i64m1 (0ll, vl), m_special,
-                                 vl);
+  *e
+    = __riscv_vmerge_vxm_i64m1
+      (__riscv_vsub_vx_i64m1_mu
+       (__riscv_vsub_vx_i64m1 (__riscv_vreinterpret_v_u64m1_i64m1 (yi),
+                               (int64_t) JBM_F64_BIAS, vl),
+        __riscv_vreinterpret_v_u64m1_i64m1 (__riscv_vsrl_vx_u64m1 (zi_abs, 52,
+                                                                   vl)),
+        (int64_t) (JBM_F64_BIAS + 52ull), vl), 0ll, m_special, vl);
   // Mantissa
   return
     __riscv_vmerge_vvm_f64m1
-    (__riscv_vreinterpret_v_u64m1_f64m1
-     (__riscv_vor_vv_u64m1
-      (__riscv_vor_vx_u64m1 (__riscv_vand_vx_u64m1 (ai, JBM_F64_BITS_SIGN, vl),
-                             0x3fe0000000000000ull, vl),
-       __riscv_vand_vx_u64m1 (__riscv_vmerge_vvm_u64m1 (ai, zi, m_sub, vl),
-                              JBM_F64_BITS_MANTISSA, vl), vl)), x, m_special,
-     vl);
+    (__riscv_vfsgnj_vv_f64m1
+     (__riscv_vreinterpret_v_u64m1_f64m1
+      (__riscv_vor_vx_u64m1
+       (__riscv_vand_vx_u64m1 (__riscv_vmerge_vvm_u64m1 (ai_abs, zi_abs, m_sub,
+                                                         vl),
+                               JBM_F64_BITS_MANTISSA, vl),
+        (uint64_t) JBM_F64_BIAS << 52ull, vl)), x, vl), x, m_special, vl);
 }
 
 /**
  * Function to calculate the function \f$2^n\f$ with n an integer vector
- * (vint64m1_t)
+ * (vint64m1_t).
  *
  * \return function value (vfloat64m1_t).
  */
 static inline vfloat64m1_t
-jbm_nxf64_exp2n (vint64m1_t e,  ///< exponent vector (vint64m1_t).
+jbm_nxf64_exp2n (const vint64m1_t e,    ///< exponent vector (vint64m1_t).
                  const size_t vl)       ///< vector size.
 {
-  return
-    __riscv_vreinterpret_v_u64m1_f64m1
-    (__riscv_vmerge_vxm_u64m1
-     (__riscv_vmerge_vxm_u64m1
-      (__riscv_vmerge_vvm_u64m1
-       (__riscv_vsll_vx_u64m1 (__riscv_vreinterpret_v_i64m1_u64m1
-                               (__riscv_vadd_vx_i64m1 (e, 1023ll, vl)), 52ll,
-                               vl),
-        __riscv_vsll_vv_u64m1 (__riscv_vmv_v_x_u64m1 (1ll, vl),
-                               __riscv_vreinterpret_v_i64m1_u64m1
-                               (__riscv_vadd_vx_i64m1 (e, 1074ll, vl)), vl),
-        __riscv_vmslt_vx_i64m1_b64 (e, -1022ll, vl), vl), 0,
-       __riscv_vmslt_vx_i64m1_b64 (e, -1074ll, vl), vl),
-      (int64_t) JBM_F64_BITS_EXPONENT,
-      __riscv_vmsgt_vx_i64m1_b64 (e, 1023ll, vl), vl));
+  const vuint64m1_t eu = __riscv_vreinterpret_v_i64m1_u64m1 (e);
+  // normal
+  vuint64m1_t xi
+    = __riscv_vsll_vx_u64m1 (__riscv_vadd_vx_u64m1 (eu, 1023ull, vl), 52, vl);
+  // subnormal
+  xi = __riscv_vsll_vv_u64m1_mu (__riscv_vmslt_vx_i64m1_b64 (e, -1022ll, vl),
+                                 xi,
+                                 __riscv_vmv_v_x_u64m1 (1ull, vl),
+                                 __riscv_vadd_vx_u64m1 (eu, 1074ull, vl), vl);
+  // zero
+  xi = __riscv_vmerge_vxm_u64m1 (xi, 0ull,
+                                 __riscv_vmslt_vx_i64m1_b64 (e, -1074ll, vl),
+                                 vl);
+  // infinity
+  xi = __riscv_vmerge_vxm_u64m1 (xi, JBM_F64_BITS_EXPONENT,
+                                 __riscv_vmsgt_vx_i64m1_b64 (e, 1023ll, vl),
+                                 vl);
+  return __riscv_vreinterpret_v_u64m1_f64m1 (xi);
 }
 
 /**

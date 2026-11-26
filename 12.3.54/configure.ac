@@ -346,21 +346,22 @@ AS_CASE([$host_cpu],
 	[x86_64*|amd64*],
 	[
 		DOXYGEN_PREDEFINED="__SSE4_2__=1 __AVX2__=1 JBM_AVX512=1"
-		DOXYGEN_EXCLUDE="src/math_neon.h src/math_riscv.h"
+		DOXYGEN_EXCLUDE="src/math_neon.h src/math_sve.h src/math_riscv.h src/math_loong.h"
 	],
 	[aarch64*|arm64*],
 	[
 		DOXYGEN_PREDEFINED="__ARM_NEON=1"
-		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_riscv.h"
+		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_sve.h src/math_riscv.h src/math_loong.h"
 	],
 	[riscv64*],
 	[
 		DOXYGEN_PREDEFINED="__riscv_vector=1"
-		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h"
+		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h src/math_sve.h src/math_loong.h"
 	],
 	[loongarch64*],
 	[
-		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h src/math_riscv.h"
+		DOXYGEN_PREDEFINED="__loongarch_sx=1 __longarch_asx=1"
+		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h src/math_sve.h src/math_riscv.h"
 	],
 	[AC_MSG_ERROR([Unsupported architecture: $host_cpu])]
 )

@@ -746,8 +746,7 @@ jbm_16xf32_reduce_maxmin (const __m512 x,       ///< __m512 vector.
 static inline __m512
 jbm_16xf32_opposite (const __m512 x)    ///< __m512 vector.
 {
-  JBM16xF32 y;
-  y.i = JBM_16xF32_BITS_SIGN;
+  const JBM16xF32 y = {.i = JBM_16xF32_BITS_SIGN };
   return _mm512_xor_ps (x, y.x);
 }
 
@@ -770,11 +769,8 @@ jbm_16xf32_reciprocal (const __m512 x)  ///< __m512 vector.
 static inline __m512
 jbm_16xf32_sign (const __m512 x)        ///< __m512 vector.
 {
-  JBM16xF32 y;
-  y.x = x;
-  y.i = _mm512_and_epi32 (y.i, JBM_16xF32_BITS_SIGN);
-  y.i = _mm512_or_epi32 (y.i, JBM_16xF32_BITS_1);
-  return y.x;
+  return (__m512) _mm512_ternarylogic_epi32 ((__m512i) x, JBM_16xF32_BITS_1,
+                                             JBM_16xF32_BITS_SIGN, 0xd8);
 }
 
 /**
@@ -785,9 +781,7 @@ jbm_16xf32_sign (const __m512 x)        ///< __m512 vector.
 static inline __m512
 jbm_16xf32_abs (const __m512 x) ///< __m512 vector.
 {
-  JBM16xF32 y;
-  y.i = JBM_16xF32_BITS_SIGN;
-  return _mm512_andnot_ps (y.x, x);
+  return _mm512_abs_ps (x);
 }
 
 /**
@@ -800,9 +794,8 @@ jbm_16xf32_copysign (const __m512 x,
 ///< __m512 vector to preserve magnitude.
                      const __m512 y)    ///< __m512 vector to preserve sign.
 {
-  JBM16xF32 m;
-  m.i = JBM_16xF32_BITS_SIGN;
-  return _mm512_or_ps (jbm_16xf32_abs (x), _mm512_and_ps (y, m.x));
+  return (__m512) _mm512_ternarylogic_epi32 ((__m512i) x, (__m512i) y,
+                                             JBM_16xF32_BITS_SIGN, 0xd8);
 }
 
 /**
@@ -830,7 +823,7 @@ jbm_16xf32_mod (const __m512 x, ///< dividend (__m512).
   r = _mm512_floor_ps (_mm512_div_ps (x, d));
   return
     _mm512_mask_blend_ps
-    (_mm512_cmp_ps_mask (jbm_16xf32_abs (r), _mm512_set1_ps (1.f / FLT_EPSILON),
+    (_mm512_cmp_ps_mask (jbm_16xf32_abs (r), _mm512_set1_ps (0x1p23),
                          _CMP_GT_OQ),
      _mm512_fnmadd_ps (r, d, x), _mm512_mul_ps (d, _mm512_set1_ps (0.5f)));
 }
@@ -838,38 +831,17 @@ jbm_16xf32_mod (const __m512 x, ///< dividend (__m512).
 /**
  * Function to implement the standard frexp function (__m512).
  *
- * \return normalized fraction value in [1/2,1).
+ * \return normalized fraction value in [1/2,1) (__m512).
  */
 static inline __m512
 jbm_16xf32_frexp (const __m512 x,       ///< __m512 vector.
                   __m512i *e)   ///< pointer to the extracted exponents vector.
 {
-  const __m512i zero = _mm512_setzero_epi32 ();
-  const __m512i mant_mask = JBM_16xF32_BITS_MANTISSA;
-  JBM16xF32 y, z, s;
-  __m512i exp;
-  __mmask16 is_sub, is_finite;
-  y.x = jbm_16xf32_abs (x);
-  is_finite
-    = _mm512_cmplt_epu32_mask (_mm512_sub_epi32 (y.i, _mm512_set1_epi32 (1)),
-                               JBM_16xF32_BITS_EXPONENT - 1);
-  exp = _mm512_maskz_srli_epi32 (is_finite, y.i, 23);
-  is_sub = _mm512_cmpeq_epu32_mask (exp, zero) & is_finite;
-  // Scale subnormals
-  s.x = _mm512_mul_ps (x, _mm512_set1_ps (0x1p23f));
-  // Exponent
-  exp = _mm512_mask_mov_epi32 (exp, is_sub,
-                               _mm512_sub_epi32 (_mm512_srli_epi32 (s.i, 23),
-                                                 _mm512_set1_epi32 (23)));
-  *e = _mm512_mask_sub_epi32 (zero, is_finite, exp, JBM_16xF32_BIAS);
-  // Mantissa
-  z.x = x;
-  s.i = _mm512_mask_mov_epi32 (y.i, is_sub, s.i);
-  y.i = _mm512_or_epi32 (_mm512_and_epi32 (z.i, JBM_16xF32_BITS_SIGN),
-                         _mm512_or_epi32
-                         (_mm512_set1_epi32 (JBM_F32_BIAS << 23),
-                          _mm512_and_epi32 (s.i, mant_mask)));
-  return _mm512_mask_mov_ps (x, is_finite, y.x);
+  const __mmask16 is_special = _mm512_fpclass_ps_mask (x, 0x9f);
+  const __m512 m = _mm512_getmant_ps (x, _MM_MANT_NORM_p5_1, _MM_MANT_SIGN_src);
+  const __m512 exp = _mm512_add_ps (_mm512_getexp_ps (x), _mm512_set1_ps (1.f));
+  *e = _mm512_maskz_cvtps_epi32 (~is_special, exp);
+  return _mm512_mask_mov_ps (m, is_special, x);
 }
 
 /**
@@ -8716,8 +8688,7 @@ jbm_8xf64_reduce_maxmin (const __m512d x,       ///< __m512d vector.
 static inline __m512d
 jbm_8xf64_opposite (const __m512d x)    ///< __m512d vector.
 {
-  JBM8xF64 y;
-  y.i = JBM_8xF64_BITS_SIGN;
+  const JBM8xF64 y = {.i = JBM_8xF64_BITS_SIGN };
   return _mm512_xor_pd (x, y.x);
 }
 
@@ -8740,11 +8711,8 @@ jbm_8xf64_reciprocal (const __m512d x)  ///< __m512d vector.
 static inline __m512d
 jbm_8xf64_sign (const __m512d x)        ///< __m512d vector.
 {
-  JBM8xF64 y;
-  y.x = x;
-  y.i = _mm512_and_epi64 (y.i, JBM_8xF64_BITS_SIGN);
-  y.i = _mm512_or_epi64 (y.i, JBM_8xF64_BITS_1);
-  return y.x;
+  return (__m512d) _mm512_ternarylogic_epi64 ((__m512i) x, JBM_8xF64_BITS_1,
+                                              JBM_8xF64_BITS_SIGN, 0xd8);
 }
 
 /**
@@ -8755,9 +8723,7 @@ jbm_8xf64_sign (const __m512d x)        ///< __m512d vector.
 static inline __m512d
 jbm_8xf64_abs (const __m512d x)
 {
-  JBM8xF64 y;
-  y.i = JBM_8xF64_BITS_SIGN;
-  return _mm512_andnot_pd (y.x, x);
+  return _mm512_abs_pd (x);
 }
 
 /**
@@ -8770,9 +8736,8 @@ jbm_8xf64_copysign (const __m512d x,
 ///< __m512d vector to preserve magnitude.
                     const __m512d y)    ///< __m512d vector to preserve sign.
 {
-  JBM8xF64 m;
-  m.i = JBM_8xF64_BITS_SIGN;
-  return _mm512_or_pd (jbm_8xf64_abs (x), _mm512_and_pd (y, m.x));
+  return (__m512d) _mm512_ternarylogic_epi64 ((__m512i) x, (__m512i) y,
+                                              JBM_8xF64_BITS_SIGN, 0xd8);
 }
 
 /**
@@ -8800,7 +8765,7 @@ jbm_8xf64_mod (const __m512d x, ///< dividend (__m512d).
   r = _mm512_floor_pd (_mm512_div_pd (x, d));
   return
     _mm512_mask_blend_pd
-    (_mm512_cmp_pd_mask (jbm_8xf64_abs (r), _mm512_set1_pd (1. / DBL_EPSILON),
+    (_mm512_cmp_pd_mask (jbm_8xf64_abs (r), _mm512_set1_pd (0x1p52),
                          _CMP_GT_OQ),
      _mm512_fnmadd_pd (r, d, x), _mm512_mul_pd (d, _mm512_set1_pd (0.5)));
 }
@@ -8808,38 +8773,18 @@ jbm_8xf64_mod (const __m512d x, ///< dividend (__m512d).
 /**
  * Function to implement the standard frexp function (__m512d).
  *
- * \return normalized fraction value in [1/2,1).
+ * \return normalized fraction value in [1/2,1) (__m512d).
  */
 static inline __m512d
 jbm_8xf64_frexp (const __m512d x,       ///< __m512d vector.
                  __m512i *e)    ///< pointer to the extracted exponents vector.
 {
-  const __m512i zero = _mm512_setzero_si512 ();
-  const __m512i mant_mask = JBM_8xF64_BITS_MANTISSA;
-  JBM8xF64 y, z, s;
-  __m512i exp, exp_sub;
-  __mmask8 is_sub, is_finite;
-  y.x = jbm_8xf64_abs (x);
-  is_finite
-    = _mm512_cmp_epu64_mask (_mm512_sub_epi64 (y.i, _mm512_set1_epi64 (1ll)),
-                             JBM_8xF64_BITS_EXPONENT - 1ll, _MM_CMPINT_LT);
-  exp = _mm512_maskz_srli_epi64 (is_finite, y.i, 52);
-  is_sub = _mm512_cmpeq_epu64_mask (exp, zero) & is_finite;
-  // Scale subnormals
-  s.x = _mm512_mul_pd (x, _mm512_set1_pd (0x1p52));
-  // Exponent
-  exp_sub
-    = _mm512_sub_epi64 (_mm512_srli_epi64 (s.i, 52), _mm512_set1_epi64 (52));
-  exp = _mm512_mask_mov_epi64 (exp, is_sub, exp_sub);
-  *e = _mm512_mask_sub_epi64 (zero, is_finite, exp, JBM_8xF64_BIAS);
-  // Mantissa
-  z.x = x;
-  s.i = _mm512_mask_mov_epi64 (y.i, is_sub, s.i);
-  y.i = _mm512_or_epi64 (_mm512_and_epi64 (z.i, JBM_8xF64_BITS_SIGN),
-                         _mm512_or_epi64
-                         (_mm512_set1_epi64 (JBM_F64_BIAS << 52),
-                          _mm512_and_epi64 (s.i, mant_mask)));
-  return _mm512_mask_mov_pd (x, is_finite, y.x);
+  const __mmask8 is_special = _mm512_fpclass_pd_mask (x, 0x9f);
+  const __m512d m
+    = _mm512_getmant_pd (x, _MM_MANT_NORM_p5_1, _MM_MANT_SIGN_src);
+  const __m512d exp = _mm512_add_pd (_mm512_getexp_pd (x), _mm512_set1_pd (1.));
+  *e = _mm512_maskz_cvtpd_epi64 (~is_special, exp);
+  return _mm512_mask_mov_pd (m, is_special, x);
 }
 
 /**

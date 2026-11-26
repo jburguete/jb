@@ -13,21 +13,73 @@ enum Type
   TYPE_NONE = 8
 };
 
+#include <stdio.h>
+
+enum Type
+{
+  TYPE_SSE = 0,
+  TYPE_AVX = 1,
+  TYPE_AVX512 = 2,
+  TYPE_ARM_NEON = 3,
+  TYPE_RISCV = 4,
+  TYPE_SVE = 5,
+  TYPE_LSX = 6,
+  TYPE_LASX = 7,
+  TYPE_NONE = 8
+};
+
+static const char *
+ordinal_suffix (const unsigned int n)
+{
+  if (n % 100 >= 11 && n % 100 <= 13)
+    return "th";
+  switch (n % 10)
+    {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+    }
+}
+
+static void
+print_lsx_f32 (FILE *f, const char *val)
+{
+  fprintf (f, "((JBM4xF32){ .x = { %s, %s, %s, %s } }).x", val, val, val, val);
+}
+
+static void
+print_lasx_f32 (FILE *f, const char *val)
+{
+  fprintf (f, "((JBM8xF32){ .x = { %s, %s, %s, %s, %s, %s, %s, %s } }).x",
+           val, val, val, val, val, val, val, val);
+}
+
+static void
+print_lsx_f64 (FILE *f, const char *val)
+{
+  fprintf (f, "((JBM2xF64){ .x = { %s, %s } }).x", val, val);
+}
+
+static void
+print_lasx_f64 (FILE *f, const char *val)
+{
+  fprintf (f, "((JBM4xF64){ .x = { %s, %s, %s, %s } }).x", val, val, val, val);
+}
+
 void
 print_comment_pol (FILE *f, const unsigned int i, const unsigned int type)
 {
-  const char *ch[5] = { "th", "st", "nd", "rd", "th" };
   const char *t[TYPE_NONE] = { "__m128", "__m256", "__m512", "float32x4_t",
     "vfloat32m1_t", "svfloat32_t", "__m128", "__m256"
   };
-  const char *th;
-  if (i > 3)
-    th = ch[4];
-  else
-    th = ch[i];
   fprintf (f, "/**\n");
   fprintf (f, " * Function to calculate a %u%s order polynomial (%s).\n",
-           i, th, t[type]);
+           i, ordinal_suffix (i), t[type]);
   fprintf (f, " *\n");
   fprintf (f, " * \\return %s vector of polynomial values.\n", t[type]);
   fprintf (f, " */\n");
@@ -77,7 +129,7 @@ print_pol_1 (FILE *f, const unsigned int type)
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
       fprintf (f,
-               "  return vmlaq_f32 (vdupq_n_f32 (p[0]), x, vdupq_n_f32 (p[1]));\n");
+               "  return vmlaq_n_f32 (vdupq_n_f32 (p[0]), x, p[1]);\n");
       break;
     case TYPE_RISCV:
       fprintf (f, "static inline vfloat32m1_t\n");
@@ -110,9 +162,11 @@ print_pol_1 (FILE *f, const unsigned int type)
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return\n");
-      fprintf (f,
-               "    __lsx_vfmadd_s (x, __lsx_vreplfr2vr_s (p[1]), __lsx_vreplfr2vr_s (p[0]));\n");
+      fprintf (f, "  return __lsx_vfmadd_s (x, ");
+      print_lsx_f32 (f, "p[1]");
+      fprintf (f, ",\n                         ");
+      print_lsx_f32 (f, "p[0]");
+      fprintf (f, ");\n");
       break;
     case TYPE_LASX:
       fprintf (f, "static inline __m256\n");
@@ -121,9 +175,11 @@ print_pol_1 (FILE *f, const unsigned int type)
       fprintf (f,
                "                        const float *p) ///< array of coefficients.\n");
       fprintf (f, "{\n");
-      fprintf (f, "  return\n");
-      fprintf (f, "    __lasx_xvfmadd_s (x, __lasx_xvreplfr2vr_s (p[1]),\n");
-      fprintf (f, "                      __lasx_xvreplfr2vr_s (p[0]));\n");
+      fprintf (f, "  return __lasx_xvfmadd_s (x, ");
+      print_lasx_f32 (f, "p[1]");
+      fprintf (f, ",\n                           ");
+      print_lasx_f32 (f, "p[0]");
+      fprintf (f, ");\n");
       break;
     }
   fprintf (f, "}\n\n");
