@@ -737,11 +737,14 @@ jbm_nxf32_abs (svbool_t pg,     ///< predicate.
  * vector.
  */
 static inline svfloat32_t
-jbm_nxf32_copysign (svbool_t pg,        ///< predicate.
-                    const svfloat32_t x,        ///< vector to preserve magnitude.
+jbm_nxf32_copysign (const svfloat32_t x,
+		    ///< vector to preserve magnitude.
                     const svfloat32_t y)        ///< vector to preserve sign.
 {
-  return svcopysign_f32_x (pg, x, y);
+  return
+    svreinterpret_f32_u32 (svbsl_u32 (svreinterpret_u32_f32 (y),
+                                      svreinterpret_u32_f32 (x),
+                                      svdup_n_u32 (JBM_F32_BITS_SIGN)));
 }
 
 /**
@@ -862,7 +865,7 @@ jbm_nxf32_frexp (svbool_t pg,   ///< predicate.
      (svbsl_u32 (ai, svbsl_u32 (svsel_u32 (m_sub, zi_abs, ai_abs),
                                 svdup_n_u32 ((uint32_t) JBM_F32_BIAS << 23u),
                                 svdup_n_u32 (JBM_F32_BITS_MANTISSA)),
-                 svdup_n_u64 (JBM_F64_BITS_SIGN))));
+                 svdup_n_u32 (JBM_F32_BITS_SIGN))));
 }
 
 /**
@@ -8410,7 +8413,7 @@ jbm_nxf32_cbrt (svbool_t pg,    ///< predicate.
   s = svsel_f32 (svcmpeq_n_s32 (pg, r, 2), svdup_n_f32 (JBM_F32_CBRT4), s);
   f = svmul_f32_x (pg, jbm_nxf32_cbrtwc (pg, f), s);
   f = jbm_nxf32_ldexp (pg, f, q);
-  f = jbm_nxf32_copysign (pg, f, x);
+  f = jbm_nxf32_copysign (f, x);
   m_special
     = svorr_b_z (pg, svcmpeq_n_f32 (pg, xa, 0.f),
                  svorr_b_z (pg, svcmpeq_n_f32 (pg, xa, INFINITY),
@@ -8821,7 +8824,7 @@ jbm_nxf32_atan (svbool_t pg,    ///< predicate.
   ax = svsel_f32 (m, jbm_nxf32_reciprocal (pg, ax), ax);
   f = jbm_nxf32_atanwc (pg, ax);
   f = svsel_f32 (m, svsub_f32_x (pg, svdup_n_f32 (M_PI_2f), f), f);
-  return jbm_nxf32_copysign (pg, f, x);
+  return jbm_nxf32_copysign (f, x);
 }
 
 /**
@@ -8840,7 +8843,7 @@ jbm_nxf32_atan2 (svbool_t pg,   ///< predicate.
                               svand_n_u32_x (pg, svreinterpret_u32_f32 (x),
                                              JBM_F32_BITS_SIGN), 0),
                svadd_f32_x (pg, f,
-                            jbm_nxf32_copysign (pg, svdup_n_f32 (M_PIf), y)),
+                            jbm_nxf32_copysign (svdup_n_f32 (M_PIf), y)),
                jbm_nxf32_atan (pg, svdiv_f32_x (pg, y, x)));
 }
 
@@ -8894,8 +8897,7 @@ jbm_nxf32_sinh (svbool_t pg,    ///< predicate.
   const svfloat32_t f = jbm_nxf32_expm1 (pg, jbm_nxf32_abs (pg, x));
   return
     jbm_nxf32_copysign
-    (pg,
-     svmul_n_f32_x (pg,
+    (svmul_n_f32_x (pg,
                     svadd_f32_x (pg, f,
                                  svdiv_f32_x (pg, f,
                                               svadd_n_f32_x (pg, f, 1.f))),
@@ -9551,11 +9553,14 @@ jbm_nxf64_abs (svbool_t pg,     ///< predicate.
  * vector.
  */
 static inline svfloat64_t
-jbm_nxf64_copysign (svbool_t pg,        ///< predicate.
-                    const svfloat64_t x,        ///< vector to preserve magnitude.
+jbm_nxf64_copysign (const svfloat64_t x,
+                    ///< vector to preserve magnitude.
                     const svfloat64_t y)        ///< vector to preserve sign.
 {
-  return svcopysign_f64_x (pg, x, y);
+  return
+    svreinterpret_f64_u64 (svbsl_u64 (svreinterpret_u64_f64 (y),
+                                      svreinterpret_u64_f64 (x),
+                                      svdup_n_u64 (JBM_F64_BITS_SIGN)));
 }
 
 /**
@@ -17251,7 +17256,7 @@ jbm_nxf64_cbrt (svbool_t pg,    ///< predicate.
   s = svsel_f64 (svcmpeq_n_s64 (pg, r, 2), svdup_n_f64 (JBM_F64_CBRT4), s);
   f = svmul_f64_x (pg, jbm_nxf64_cbrtwc (pg, f), s);
   f = jbm_nxf64_ldexp (pg, f, q);
-  f = jbm_nxf64_copysign (pg, f, x);
+  f = jbm_nxf64_copysign (f, x);
   m1 = svcmpeq_n_f64 (pg, xa, 0.);
   m2 = svcmpeq_n_f64 (pg, xa, INFINITY);
   m3 = svcmpne_f64 (pg, xa, xa);
@@ -17659,7 +17664,7 @@ jbm_nxf64_atan (svbool_t pg,    ///< predicate.
   ax = svsel_f64 (m, ax, jbm_nxf64_reciprocal (pg, ax));
   f = jbm_nxf64_atanwc (pg, ax);
   f = svsel_f64 (m, f, svsub_f64_x (pg, svdup_n_f64 (M_PI_2), f));
-  return jbm_nxf64_copysign (pg, f, x);
+  return jbm_nxf64_copysign (f, x);
 }
 
 /**
@@ -17675,7 +17680,7 @@ jbm_nxf64_atan2 (svbool_t pg,   ///< predicate.
 {
   const svfloat64_t f = jbm_nxf64_atan (pg, svdiv_f64_x (pg, y, x));
   const svfloat64_t g = svadd_f64_x (pg, f,
-                                     jbm_nxf64_copysign (pg, svdup_n_f64 (M_PI),
+                                     jbm_nxf64_copysign (svdup_n_f64 (M_PI),
                                                          y));
   const svbool_t m = svcmpne_n_u64 (pg,
                                     svand_n_u64_x (pg,
@@ -17730,8 +17735,7 @@ jbm_nxf64_sinh (svbool_t pg,    ///< predicate.
   const svfloat64_t f = jbm_nxf64_expm1 (pg, jbm_nxf64_abs (pg, x));
   return
     jbm_nxf64_copysign
-    (pg,
-     svmul_n_f64_x (pg,
+    (svmul_n_f64_x (pg,
                     svadd_f64_x (pg, f,
                                  svdiv_f64_x (pg, f,
                                               svadd_n_f64_x (pg, f, 1.))), 0.5),
