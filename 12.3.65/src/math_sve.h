@@ -614,6 +614,89 @@
   pg = JBM_PRED (type, 0, n); \
   return rop (pg, mul (pg, load (pg, x1), load (pg, x2)));
 
+///> macro to automatize dot products on arrays.
+#define JBM_ARRAY_DOT(x1, x2, n, type, vtype, load, mul, fma, add, red) \
+  const size_t vlmax = JBM_VLMAX (type); \
+  const svbool_t pg_true = JBM_PTRUE (type); \
+  svbool_t pg; \
+  vtype a, b, c, d; \
+  size_t i = 0; \
+  if (n >= (vlmax << 2)) \
+    { \
+      a = mul (pg_true, load (pg_true, x1), load (pg_true, x2)); \
+      i += vlmax; \
+      b = mul (pg_true, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+      i += vlmax; \
+      c = mul (pg_true, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+      i += vlmax; \
+      d = mul (pg_true, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+      i += vlmax; \
+      while ((n - i) >= (vlmax << 2)) \
+        { \
+          a = fma (pg_true, a, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+          i += vlmax; \
+          b = fma (pg_true, b, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+          i += vlmax; \
+          c = fma (pg_true, c, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+          i += vlmax; \
+          d = fma (pg_true, d, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+          i += vlmax; \
+        } \
+      if ((n - i) >= (vlmax << 1)) \
+        { \
+          a = fma (pg_true, a, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+          i += vlmax; \
+          b = fma (pg_true, b, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+          i += vlmax; \
+        } \
+      if ((n - i) >= vlmax) \
+        { \
+          a = fma (pg_true, a, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+          i += vlmax; \
+        } \
+      a = add (pg_true, a, b); \
+      c = add (pg_true, c, d); \
+      a = add (pg_true, a, c); \
+      if (i < n) \
+        { \
+          pg = JBM_PRED (type, i, n); \
+          a = fma (pg, a, load (pg, x1 + i), load (pg, x2 + i)); \
+        } \
+      return red (pg_true, a); \
+    } \
+  if (n >= (vlmax << 1)) \
+    { \
+      a = mul (pg_true, load (pg_true, x1), load (pg_true, x2)); \
+      i += vlmax; \
+      b = mul (pg_true, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+      i += vlmax; \
+      if ((n - i) >= vlmax) \
+        { \
+          a = fma (pg_true, a, load (pg_true, x1 + i), load (pg_true, x2 + i)); \
+          i += vlmax; \
+        } \
+      a = add (pg_true, a, b); \
+      if (i < n) \
+        { \
+          pg = JBM_PRED (type, i, n); \
+          a = fma (pg, a, load (pg, x1 + i), load (pg, x2 + i)); \
+        } \
+      return red (pg_true, a); \
+    } \
+  if (n >= vlmax) \
+    { \
+      a = mul (pg_true, load (pg_true, x1), load (pg_true, x2)); \
+      i += vlmax; \
+      if (i < n) \
+        { \
+          pg = JBM_PRED (type, i, n); \
+          a = fma (pg, a, load (pg, x1 + i), load (pg, x2 + i)); \
+        } \
+      return red (pg_true, a); \
+    } \
+  pg = JBM_PRED (type, 0, n); \
+  return red (pg, mul (pg, load (pg, x1), load (pg, x2)));
+
 static inline void
 print_vbit32_t (FILE *file, const char *label, svuint32_t x, const size_t vl)
 {
@@ -9495,7 +9578,7 @@ jbm_nxf32_flux_limiter (const svbool_t pg,    ///< predicate.
  */
 static inline svfloat32_t
 jbm_nxf32_integral (const svbool_t pg,        ///< predicate.
-                    svfloat32_t (*f) (svbool_t, const svfloat32_t),
+                    svfloat32_t (*f) (const svbool_t, const svfloat32_t),
                     ///< pointer to the function to integrate.
                     const svfloat32_t x1,       ///< left limit of the interval.
                     const svfloat32_t x2)
@@ -18303,7 +18386,7 @@ jbm_nxf64_flux_limiter (const svbool_t pg,    ///< predicate.
  */
 static inline svfloat64_t
 jbm_nxf64_integral (const svbool_t pg,        ///< predicate.
-                    svfloat64_t (*f) (svbool_t, const svfloat64_t),
+                    svfloat64_t (*f) (const svbool_t, const svfloat64_t),
                     ///< pointer to the function to integrate.
                     const svfloat64_t x1,       ///< left limit of the interval.
                     const svfloat64_t x2)
@@ -24936,7 +25019,7 @@ jbm_4xf32_flux_limiter (const svfloat32_t d1,
  * \return svfloat32_t vector of integral values.
  */
 static inline svfloat32_t
-jbm_4xf32_integral (svfloat32_t (*f) (svbool_t, const svfloat32_t),
+jbm_4xf32_integral (svfloat32_t (*f) (const svbool_t, const svfloat32_t),
                     ///< pointer to the function to integrate.
                     const svfloat32_t x1,       ///< left limit of the interval.
                     const svfloat32_t x2)
@@ -38168,13 +38251,13 @@ jbm_8xf32_flux_limiter (const svfloat32_t d1,
  * \return svfloat32_t vector of integral values.
  */
 static inline svfloat32_t
-jbm_8xf32_integral (svfloat32_t (*f) (svbool_t, const svfloat32_t),
+jbm_8xf32_integral (svfloat32_t (*f) (const svbool_t, const svfloat32_t),
                     ///< pointer to the function to integrate.
                     const svfloat32_t x1,       ///< left limit of the interval.
                     const svfloat32_t x2)
                     ///< right limit of the interval.
 {
-  return jbm_xf32_integral (svptrue_pat_b32 (SV_VL8), f, x1, x2);
+  return jbm_nxf32_integral (svptrue_pat_b32 (SV_VL8), f, x1, x2);
 }
 
 /**
@@ -38316,7 +38399,7 @@ jbm_4xf64_frexp (const svfloat64_t x,   ///< svfloat64_t vector.
 static inline svfloat64_t
 jbm_4xf64_exp2n (svint64_t e)  ///< exponent vector (4x svint64_t).
 {
-  return jbm_nxf64_exp2n (e, 4);
+  return jbm_nxf64_exp2n (svptrue_pat_b64 (SV_VL4), e);
 }
 
 /**
@@ -51402,7 +51485,7 @@ jbm_16xf32_flux_limiter (const svfloat32_t d1,
  * \return svfloat32_t vector of integral values.
  */
 static inline svfloat32_t
-jbm_16xf32_integral (svfloat32_t (*f) (svbool_t, const svfloat32_t),
+jbm_16xf32_integral (svfloat32_t (*f) (const svbool_t, const svfloat32_t),
                      ///< pointer to the function to integrate.
                      const svfloat32_t x1,      ///< left limit of the interval.
                      const svfloat32_t x2)
@@ -58018,7 +58101,7 @@ jbm_8xf64_flux_limiter (const svfloat64_t d1,
  * \return svfloat64_t vector of integral values.
  */
 static inline svfloat64_t
-jbm_8xf64_integral (svfloat32_t (*f) (svbool_t, const svfloat64_t),
+jbm_8xf64_integral (svfloat32_t (*f) (const svbool_t, const svfloat64_t),
                     ///< pointer to the function to integrate.
                     const svfloat64_t x1,       ///< left limit of the interval.
                     const svfloat64_t x2)
@@ -58612,10 +58695,8 @@ jbm_array_f32_dot (const float *x1,     ///< multiplier float array.
                    const float *x2,     ///< multiplicand float array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_DOT (x1, x2, n, float, svfloat32_t, svld1_f32,
-                 __riscv_vfmul_vv_f32m1, svmla_f32_x,
-                 svadd_f32_m, svaddv_f32,
-                 __riscv_vfmv_f_s_f32m1_f32, svdup_n_f32);
+  JBM_ARRAY_DOT (x1, x2, n, float, svfloat32_t, svld1_f32, svmul_f32_x,
+                 svmla_f32_m, svadd_f32_x, svaddv_f32);
 }
 
 /**
@@ -59319,10 +59400,8 @@ jbm_array_f64_dot (const double *x1,    ///< multiplier double array.
                    const double *x2,    ///< multiplicand double array.
                    const unsigned int n)        ///< number of array elements.
 {
-  JBM_ARRAY_DOT (x1, x2, n, double, svfloat64_t, svld1_f64,
-                 svmul_f64_x, svmla_f64_x,
-                 svadd_f64_m, svaddv_f64,
-                 __riscv_vfmv_f_s_f64m1_f64, svdup_n_f64);
+  JBM_ARRAY_DOT (x1, x2, n, double, svfloat64_t, svld1_f64, svmul_f64_x,
+                 svmla_f64_m, svadd_f64_x, svaddv_f64);
 }
 
 /**
