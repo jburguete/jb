@@ -9020,7 +9020,7 @@ jbm_2xf64_reduce_add (const __m128d x)  ///< __m128d vector.
 {
   JBM2xF64 y;
   y.x = __lsx_vfadd_d (x, (__m128d) __lsx_vshuf4i_w ((__m128i) x, 0x4e));
-  return y.x;
+  return y.x[0];
 }
 
 /**
@@ -9033,7 +9033,7 @@ jbm_2xf64_reduce_max (const __m128d x)  ///< __m128d vector.
 {
   JBM2xF64 y;
   y.x = __lsx_vfmax_d (x, (__m128d) __lsx_vshuf4i_w ((__m128i) x, 0x4e));
-  return y.x;
+  return y.x[0];
 }
 
 /**
@@ -9046,7 +9046,7 @@ jbm_2xf64_reduce_min (const __m128d x)  ///< __m128d vector.
 {
   JBM2xF64 y;
   y.x = __lsx_vfmin_d (x, (__m128d) __lsx_vshuf4i_w ((__m128i) x, 0x4e));
-  return y.x;
+  return y.x[0];
 }
 
 /**
@@ -9063,9 +9063,9 @@ jbm_2xf64_reduce_maxmin (const __m128d x,       ///< __m128d vector.
   JBM2xF64 y, z;
   z.x = (__m128d) __lsx_vshuf4i_w ((__m128i) x, 0x4e);
   y.x = __lsx_vfmax_d (x, z.x);
-  *max = y.x;
+  *max = y.x[0];
   y.x = __lsx_vfmin_d (x, z.x);
-  *min = y.x;
+  *min = y.x[0];
 }
 
 /**
@@ -17656,8 +17656,12 @@ jbm_2xf64_rational_29_28 (const __m128d x,      ///< __m128d vector.
 static inline float
 jbm_8xf32_reduce_add (const __m256 x)   ///< __m256 vector.
 {
-  __m256 h = (__m256) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
-  return jbm_4xf32_reduce_add ((__m128) __lasx_xvfadd_s (x, h));
+  JBM8xF32 y;
+  y.x = (__m256) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
+  y.x = __lasx_xvfadd_s (x, y.x);
+  y.x = __lasx_xvfadd_s (y.x, (__m256) __lasx_xvshuf4i_w (y.i, 0x4e));
+  y.x = __lasx_xvfadd_s (y.x, (__m256) __lasx_xvshuf4i_w (y.i, 0xb1));
+  return y.x[0];
 }
 
 /**
@@ -17668,8 +17672,12 @@ jbm_8xf32_reduce_add (const __m256 x)   ///< __m256 vector.
 static inline float
 jbm_8xf32_reduce_max (const __m256 x)   ///< __m256 vector.
 {
-  __m256 h = (__m256) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
-  return jbm_4xf32_reduce_max ((__m128) __lasx_xvfmax_s (x, h));
+  JBM8xF32 y;
+  y.x = (__m256) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
+  y.x = __lasx_xvfmax_s (x, y.x);
+  y.x = __lasx_xvfmax_s (y.x, (__m256) __lasx_xvshuf4i_w (y.i, 0x4e));
+  y.x = __lasx_xvfmax_s (y.x, (__m256) __lasx_xvshuf4i_w (y.i, 0xb1));
+  return y.x[0];
 }
 
 /**
@@ -17680,8 +17688,12 @@ jbm_8xf32_reduce_max (const __m256 x)   ///< __m256 vector.
 static inline float
 jbm_8xf32_reduce_min (const __m256 x)   ///< __m256 vector.
 {
-  __m256 h = (__m256) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
-  return jbm_4xf32_reduce_min ((__m128) __lasx_xvfmin_s (x, h));
+  JBM8xF32 y;
+  y.x = (__m256) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
+  y.x = __lasx_xvfmin_s (x, y.x);
+  y.x = __lasx_xvfmin_s (y.x, (__m256) __lasx_xvshuf4i_w (y.i, 0x4e));
+  y.x = __lasx_xvfmin_s (y.x, (__m256) __lasx_xvshuf4i_w (y.i, 0xb1));
+  return y.x[0];
 }
 
 /**
@@ -17693,9 +17705,16 @@ jbm_8xf32_reduce_maxmin (const __m256 x,        ///< __m256 vector.
                          float *max,    ///< pointer to the maximum value
                          float *min)    ///< pointer to the minimum value
 {
-  __m256 h = (__m256) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
-  *max = jbm_4xf32_reduce_max ((__m128) __lasx_xvfmax_s (x, h));
-  *min = jbm_4xf32_reduce_min ((__m128) __lasx_xvfmin_s (x, h));
+  JBM8xF32 h, y;
+  h.x = (__m256) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
+  y.x = __lasx_xvfmax_s (x, h.x);
+  y.x = __lasx_xvfmax_s (y.x, (__m256) __lasx_xvshuf4i_w (y.i, 0x4e));
+  y.x = __lasx_xvfmax_s (y.x, (__m256) __lasx_xvshuf4i_w (y.i, 0xb1));
+  *max = y.x[0];
+  y.x = __lasx_xvfmin_s (x, h.x);
+  y.x = __lasx_xvfmin_s (y.x, (__m256) __lasx_xvshuf4i_w (y.i, 0x4e));
+  y.x = __lasx_xvfmin_s (y.x, (__m256) __lasx_xvshuf4i_w (y.i, 0xb1));
+  *min = y.x[0];
 }
 
 /**
@@ -28146,8 +28165,11 @@ jbm_8xf32_rational_29_28 (const __m256 x,       ///< __m256 vector.
 static inline double
 jbm_4xf64_reduce_add (const __m256d x)  ///< __m256d vector.
 {
-  __m256d h = (__m256d) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
-  return jbm_2xf64_reduce_add ((__m128d) __lasx_xvfadd_d (x, h));
+  JBM4xF64 y;
+  y.x = (__m256d) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
+  y.x = __lasx_xvfadd_d (x, y.x);
+  y.x = __lasx_xvfadd_d (y.x, (__m256d) __lasx_xvshuf4i_w (y.i, 0x4e));
+  return y.x[0];
 }
 
 /**
@@ -28158,8 +28180,11 @@ jbm_4xf64_reduce_add (const __m256d x)  ///< __m256d vector.
 static inline double
 jbm_4xf64_reduce_max (const __m256d x)  ///< __m256d vector.
 {
-  __m256d h = (__m256d) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
-  return jbm_2xf64_reduce_max ((__m128d) __lasx_xvfmax_d (x, h));
+  JBM4xF64 y;
+  y.x = (__m256d) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
+  y.x = __lasx_xvfmax_d (x, y.x);
+  y.x = __lasx_xvfmax_d (y.x, (__m256d) __lasx_xvshuf4i_w (y.i, 0x4e));
+  return y.x[0];
 }
 
 /**
@@ -28170,8 +28195,11 @@ jbm_4xf64_reduce_max (const __m256d x)  ///< __m256d vector.
 static inline double
 jbm_4xf64_reduce_min (const __m256d x)  ///< __m256d vector.
 {
-  __m256d h = (__m256d) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
-  return jbm_2xf64_reduce_min ((__m128d) __lasx_xvfmin_d (x, h));
+  JBM4xF64 y;
+  y.x = (__m256d) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
+  y.x = __lasx_xvfmin_d (x, y.x);
+  y.x = __lasx_xvfmin_d (y.x, (__m256d) __lasx_xvshuf4i_w (y.i, 0x4e));
+  return y.x[0];
 }
 
 /**
@@ -28183,9 +28211,14 @@ jbm_4xf64_reduce_maxmin (const __m256d x,       ///< __m256d vector.
                          double *max,   ///< pointer to the maximum value
                          double *min)   ///< pointer to the minimum value
 {
-  __m256d h = (__m256d) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
-  *max = jbm_2xf64_reduce_max ((__m128d) __lasx_xvfmax_d (x, h));
-  *min = jbm_2xf64_reduce_min ((__m128d) __lasx_xvfmin_d (x, h));
+  JBM4xF64 h, y;
+  h.x = (__m256d) __lasx_xvpermi_q ((__m256i) x, (__m256i) x, 0x01);
+  y.x = __lasx_xvfmax_d (x, h.x);
+  y.x = __lasx_xvfmax_d (y.x, (__m256d) __lasx_xvshuf4i_w (y.i, 0x4e));
+  *max = y.x[0];
+  y.x = __lasx_xvfmin_d (x, h.x);
+  y.x = __lasx_xvfmin_d (y.x, (__m256d) __lasx_xvshuf4i_w (y.i, 0x4e));
+  *min = y.x[0];
 }
 
 /**
