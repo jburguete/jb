@@ -9494,9 +9494,9 @@ jbm_nxf32_flux_limiter (svbool_t pg,    ///< predicate.
  * \return svfloat32_t vector of integral values.
  */
 static inline svfloat32_t
-jbm_nxf32_integral (svfloat32_t (*f) (svbool_t, const svfloat32_t),
+jbm_nxf32_integral (svbool_t pg,        ///< predicate.
+                    svfloat32_t (*f) (svbool_t, const svfloat32_t),
                     ///< pointer to the function to integrate.
-                    svbool_t pg,        ///< predicate.
                     const svfloat32_t x1,       ///< left limit of the interval.
                     const svfloat32_t x2)
                     ///< right limit of the interval.
@@ -18302,9 +18302,9 @@ jbm_nxf64_flux_limiter (svbool_t pg,    ///< predicate.
  * \return svfloat64_t vector of integral values.
  */
 static inline svfloat64_t
-jbm_nxf64_integral (svfloat64_t (*f) (svbool_t, const svfloat64_t),
+jbm_nxf64_integral (svbool_t pg,        ///< predicate.
+                    svfloat64_t (*f) (svbool_t, const svfloat64_t),
                     ///< pointer to the function to integrate.
-                    svbool_t pg,        ///< predicate.
                     const svfloat64_t x1,       ///< left limit of the interval.
                     const svfloat64_t x2)
                     ///< right limit of the interval.
@@ -18489,7 +18489,7 @@ jbm_4xf32_ldexp (const svfloat32_t x,   ///< svfloat32_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline vbool32_t
+static inline svbool32_t
 jbm_4xf32_small (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_small (svptrue_pat_b32 (SV_VL4), x);
@@ -25104,7 +25104,7 @@ jbm_2xf64_ldexp (const svfloat64_t x,   ///< svfloat64_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline vbool64_t
+static inline svbool64_t
 jbm_2xf64_small (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_small (svptrue_pat_b64 (SV_VL2), x);
@@ -25211,7 +25211,7 @@ jbm_2xf64_v2_length (const svfloat64_t x1,
 ///< svfloat64_t vector of y-coordinates of the 2nd points defining the
 ///< segments.
 {
-  return jbm_nxf64_v2_length (svptrue_pat_b64 (SV_VL2), x, x1, y1, x2, y2);
+  return jbm_nxf64_v2_length (svptrue_pat_b64 (SV_VL2), x1, y1, x2, y2);
 }
 
 /**
@@ -25240,7 +25240,7 @@ jbm_2xf64_v3_length (const svfloat64_t x1,
 ///< segments.
 {
   return
-    jbm_nxf64_v3_length (svptrue_pat_b64 (SV_VL2), x, x1, y1, z1, x2, y2, z2);
+    jbm_nxf64_v3_length (svptrue_pat_b64 (SV_VL2), x1, y1, z1, x2, y2, z2);
 }
 
 /**
@@ -31720,7 +31720,7 @@ jbm_8xf32_ldexp (const svfloat32_t x,   ///< svfloat32_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline vbool32_t
+static inline svbool32_t
 jbm_8xf32_small (const svfloat32_t x)   ///< svfloat32_t vector.
 {
   return jbm_nxf32_small (svptrue_pat_b32 (SV_VL8), x);
@@ -38336,7 +38336,7 @@ jbm_4xf64_ldexp (const svfloat64_t x,   ///< svfloat64_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline vbool64_t
+static inline svbool64_t
 jbm_4xf64_small (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_small (svptrue_pat_b64 (SV_VL4), x);
@@ -44953,7 +44953,7 @@ jbm_16xf32_ldexp (const svfloat32_t x,  ///< svfloat32_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline vbool32_t
+static inline svbool32_t
 jbm_16xf32_small (const svfloat32_t x)  ///< svfloat32_t vector.
 {
   return jbm_nxf32_small (svptrue_pat_b32 (SV_VL16), x);
@@ -51570,7 +51570,7 @@ jbm_8xf64_ldexp (const svfloat64_t x,   ///< svfloat64_t vector.
  *
  * \return 1 on small number, 0 otherwise.
  */
-static inline vbool64_t
+static inline svbool64_t
 jbm_8xf64_small (const svfloat64_t x)   ///< svfloat64_t vector.
 {
   return jbm_nxf64_small (svptrue_pat_b64 (SV_VL8), x);
