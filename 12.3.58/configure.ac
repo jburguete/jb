@@ -3,7 +3,7 @@ AC_PREREQ([2.69])
 AC_INIT([jb],[12.3.28],[https://github.com/jburguete/jb])
 
 # Checks for operative systems
-AC_CANONICAL_TARGET
+AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE
 AC_MSG_NOTICE([Build: $build])
 AC_MSG_NOTICE([Host: $host])
@@ -72,7 +72,7 @@ else
 fi
 
 # Checks for programs
-AC_PROG_CC([gcc-15 gcc15 gcc-14 gcc14 gcc-13 gcc13 gcc-12 gcc11 egcc gcc clang])
+AC_PROG_CC([gcc-16 gcc16 gcc-15 gcc15 gcc-14 gcc14 gcc-13 gcc13 egcc gcc clang])
 AC_MSG_NOTICE([Compiler: $CC])
 $CC -v
 AC_PROG_LN_S
@@ -271,15 +271,41 @@ AC_CHECK_FUNC([get_nprocs], AC_DEFINE([HAVE_GET_NPROCS], [1]))
 AC_CHECK_FUNC([aligned_alloc], AC_DEFINE([HAVE_ALIGNED_ALLOC], [1]))
 
 # Check for intrinsics
-AS_IF([test "$host_cpu" = "aarch64"], [
-	AC_MSG_CHECKING([for vmvnq_u64 intrinsic])
-	AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
-		[[#include <arm_neon.h>]],
-		[[uint64x2_t a = vdupq_n_u64(0); uint64x2_t b = vmvnq_u64(a);
-		 (void)b;]])],
-		[AC_MSG_RESULT([yes])
-		AC_DEFINE([HAVE_VMVNQ_U64], [1])],[AC_MSG_RESULT([no])])
-])
+AS_CASE([$host_cpu],
+	[aarch64*|arm64*],
+	[
+		AC_MSG_CHECKING([for vmvnq_u64 intrinsic])
+		AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+			[[#include <arm_neon.h>]],
+			[[uint64x2_t a = vdupq_n_u64 (0);
+			  uint64x2_t b = vmvnq_u64 (a);
+			  (void) b;]])],
+			[AC_MSG_RESULT([yes])
+			AC_DEFINE([HAVE_VMVNQ_U64], [1])],
+			[AC_MSG_RESULT([no])])
+	],
+	[loongarch64*],
+	[
+		AC_MSG_CHECKING([for __lsx_vfscaleb_s intrinsic])
+		AC_LINK_IFELSE([AC_LANG_PROGRAM(
+			[[#include <lsxintrin.h>]],
+			[[__m128 x = {0}; __m128i e = {0};
+			  __m128 r = __lsx_vfscaleb_s (x, e);
+			  return (int) r[0];]])],
+			[AC_MSG_RESULT([yes])
+			AC_DEFINE([HAVE_LSX_VFSCALEB], [1])],
+			[AC_MSG_RESULT([no])])
+		AC_MSG_CHECKING([for __lasx_xvfscaleb_s intrinsic])
+		AC_LINK_IFELSE([AC_LANG_PROGRAM(
+			[[#include <lasxintrin.h>]],
+			[[__m256 x = {0}; __m256i e = {0};
+			  __m256 r = __lasx_xvfscaleb_s (x, e);
+			  return (int) r[0];]])],
+			[AC_MSG_RESULT([yes])
+			AC_DEFINE([HAVE_LASX_XVFSCALEB], [1])],
+			[AC_MSG_RESULT([no])])
+	]
+)
 
 # Check for font
 if test $gtk = 1; then
@@ -360,7 +386,7 @@ AS_CASE([$host_cpu],
 	],
 	[loongarch64*],
 	[
-		DOXYGEN_PREDEFINED="__loongarch_sx=1 __longarch_asx=1"
+		DOXYGEN_PREDEFINED="__loongarch_sx=1 __loongarch_asx=1"
 		DOXYGEN_EXCLUDE="src/math_sse.h src/math_avx.h src/math_avx512.h src/math_neon.h src/math_sve.h src/math_riscv.h"
 	],
 	[AC_MSG_ERROR([Unsupported architecture: $host_cpu])]
